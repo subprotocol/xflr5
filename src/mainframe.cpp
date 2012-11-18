@@ -53,6 +53,8 @@
 #include "xdirect/FoilGeomDlg.h"
 #include "xdirect/TEGapDlg.h"
 #include "xdirect/LEDlg.h"
+#include "xdirect/XFoilAnalysisDlg.h"
+#include "xdirect/FoilPolarDlg.h"
 #include "xinverse/XInverse.h"
 
 #include <QDesktopWidget>
@@ -69,6 +71,7 @@ QPointer<MainFrame> MainFrame::_self = 0L;
 MainFrame::MainFrame(QWidget *parent, Qt::WFlags flags)
 	: QMainWindow(parent, flags)
 {
+
 	m_VersionName = QString::fromLatin1("XFLR5 v6.09.01 beta");
 	QString jpegPluginPath;
 
@@ -184,45 +187,36 @@ MainFrame::MainFrame(QWidget *parent, Qt::WFlags flags)
 	CreateToolbars();
 	CreateStatusBar();
 
-// second line
-	m_crColors[0] = QColor(255,0,0),
-	m_crColors[1] = QColor(0,255,0),
-	m_crColors[2] = QColor(0,0,255),
-	m_crColors[3] = QColor(255,255,0),
-	m_crColors[4] = QColor(255,0,255),
-	m_crColors[5] = QColor(0,255,255),
-
-// third line
-	m_crColors[6]  = QColor(200,60,60),
-	m_crColors[7]  = QColor(0,160,0),
-	m_crColors[8]  = QColor(100,100,240),
-	m_crColors[9]  = QColor(170,170,0),
-	m_crColors[10] = QColor(130,0,130),
-	m_crColors[11] = QColor(0,130,130),
-
-// fourth line
-	m_crColors[12] = QColor(255,128,128),
-	m_crColors[13] = QColor(0,255,128),
-	m_crColors[14] = QColor(64,200,255),
-	m_crColors[15] = QColor(170,170,100),
-	m_crColors[16] = QColor(190,100,190),
-	m_crColors[17] = QColor(100,170,170),
-
-// fifth line
-	m_crColors[18] = QColor(228,150,70),
-	m_crColors[19] = QColor(170,255,170),
-	m_crColors[20] = QColor(120,120,255),
-	m_crColors[21] = QColor(228,228,128),
-	m_crColors[22] = QColor(255,170,255),
-	m_crColors[23] = QColor(170,255,255),
-
-// first line
-	m_crColors[24] = QColor(50,50,50),
-	m_crColors[25] = QColor(90,90,90),
-	m_crColors[26] = QColor(130,130,130),
-	m_crColors[27] = QColor(170,170,170),
-	m_crColors[28] = QColor(210,210,210),
-	m_crColors[29] = QColor(255,255,255),
+	m_ColorList.append(QColor(255,0,0));
+	m_ColorList.append(QColor(0,255,0));
+	m_ColorList.append(QColor(0,0,255));
+	m_ColorList.append(QColor(255,255,0));
+	m_ColorList.append(QColor(255,0,255));
+	m_ColorList.append(QColor(0,255,255));
+	m_ColorList.append(QColor(200,60,60));
+	m_ColorList.append(QColor(0,160,0));
+	m_ColorList.append(QColor(100,100,240));
+	m_ColorList.append(QColor(170,170,0));
+	m_ColorList.append(QColor(130,0,130));
+	m_ColorList.append(QColor(0,130,130));
+	m_ColorList.append(QColor(255,128,128));
+	m_ColorList.append(QColor(0,255,128));
+	m_ColorList.append(QColor(64,200,255));
+	m_ColorList.append(QColor(170,170,100));
+	m_ColorList.append(QColor(190,100,190));
+	m_ColorList.append(QColor(100,170,170));
+	m_ColorList.append(QColor(228,150,70));
+	m_ColorList.append(QColor(170,255,170));
+	m_ColorList.append(QColor(120,120,255));
+	m_ColorList.append(QColor(228,228,128));
+	m_ColorList.append(QColor(255,170,255));
+	m_ColorList.append(QColor(170,255,255));
+	m_ColorList.append(QColor(50,50,50));
+	m_ColorList.append(QColor(90,90,90));
+	m_ColorList.append(QColor(130,130,130));
+	m_ColorList.append(QColor(170,170,170));
+	m_ColorList.append(QColor(210,210,210));
+	m_ColorList.append(QColor(255,255,255));
 
 	g_pCurFoil = NULL;
 
@@ -2873,124 +2867,130 @@ QColor MainFrame::GetColor(int type)
 		case 0:
 		{
 			CFoil *pFoil;
-			for (j=0; j<24; j++)
+			for (j=0; j<m_ColorList.size(); j++)
 			{
 				for (i=0; i<m_oaFoil.size(); i++)
 				{
 					pFoil = (CFoil*)m_oaFoil.at(i);
 					bFound = false;
-					if(pFoil->m_FoilColor == m_crColors[j])
+					if(pFoil->m_FoilColor == m_ColorList.at(j))
 					{
 						bFound = true;
 						break;
 					}
 				}
-				if(!bFound) return m_crColors[j];
+				if(!bFound) return m_ColorList.at(j);
 			}
-			return m_crColors[m_oaFoil.size()%24];
-			break;
+			return QColor((int)((double)qrand()/(double)RAND_MAX*255.0),
+						  (int)((double)qrand()/(double)RAND_MAX*255.0),
+						  (int)((double)qrand()/(double)RAND_MAX*255.0));
 		}
 		case 1:
 		{
 			CPolar *pPolar;
-			for (j=0; j<24; j++)
+			for (j=0; j<m_ColorList.size(); j++)
 			{
 				for (i=0; i<m_oaPolar.size(); i++)
 				{
 					pPolar = (CPolar*)m_oaPolar.at(i);
 					bFound = false;
-					if(pPolar->m_Color == m_crColors[j])
+					if(pPolar->m_Color == m_ColorList.at(j))
 					{
 						bFound = true;
 						break;
 					}
 				}
-				if(!bFound) return m_crColors[j];
+				if(!bFound) return m_ColorList.at(j);
 			}
-			return m_crColors[m_oaPolar.size()%24];
-			break;
+			return QColor((int)((double)qrand()/(double)RAND_MAX*255.0),
+						  (int)((double)qrand()/(double)RAND_MAX*255.0),
+						  (int)((double)qrand()/(double)RAND_MAX*255.0));
 		}
 		case 2:
 		{
 			OpPoint *pOpPoint;
-			for (j=0; j<24; j++){
+			for (j=0; j<m_ColorList.size(); j++){
 				for (i=0; i<m_oaOpp.size(); i++)
 				{
 					pOpPoint = (OpPoint*)m_oaOpp.at(i);
 					bFound = false;
-					if(pOpPoint->m_Color == m_crColors[j])
+					if(pOpPoint->m_Color == m_ColorList.at(j))
 					{
 						bFound = true;
 						break;
 					}
 				}
-				if(!bFound) return m_crColors[j];
+				if(!bFound) return m_ColorList.at(j);
 			}
-			return m_crColors[m_oaOpp.size()%24];
-			break;
+			return QColor((int)((double)qrand()/(double)RAND_MAX*255.0),
+						  (int)((double)qrand()/(double)RAND_MAX*255.0),
+						  (int)((double)qrand()/(double)RAND_MAX*255.0));
 		}
 		case 4:
 		{
 			CWPolar *pWPolar;
-			for (j=0; j<24; j++)
+			for (j=0; j<m_ColorList.size(); j++)
 			{
 				for (i=0; i<m_oaWPolar.size(); i++)
 				{
 					pWPolar = (CWPolar*)m_oaWPolar.at(i);
 					bFound = false;
-					if(pWPolar->m_Color == m_crColors[j])
+					if(pWPolar->m_Color == m_ColorList.at(j))
 					{
 						bFound = true;
 						break;
 					}
 				}
 				if(!bFound)
-					return m_crColors[j];
+					return m_ColorList.at(j);
 
 			}
-			return m_crColors[m_oaWPolar.size()%24];
-			break;
+			return QColor((int)((double)qrand()/(double)RAND_MAX*255.0),
+						  (int)((double)qrand()/(double)RAND_MAX*255.0),
+						  (int)((double)qrand()/(double)RAND_MAX*255.0));
 		}
 		case 5:
 		{
 			CWOpp *pWOpp;
-			for (j=0; j<24; j++)
+			for (j=0; j<m_ColorList.size(); j++)
 			{
 				for (i=0; i<m_oaWOpp.size(); i++)
 				{
 					pWOpp = (CWOpp*)m_oaWOpp.at(i);
 					bFound = false;
-					if(pWOpp->m_Color == m_crColors[j])
+					if(pWOpp->m_Color == m_ColorList.at(j))
 					{
 						bFound = true;
 						break;
 					}
 				}
-				if(!bFound) return m_crColors[j];
+				if(!bFound) return m_ColorList.at(j);
 			}
-			return m_crColors[m_oaWOpp.size()%24];
-			break;
+			return QColor((int)((double)qrand()/(double)RAND_MAX*255.0),
+						  (int)((double)qrand()/(double)RAND_MAX*255.0),
+						  (int)((double)qrand()/(double)RAND_MAX*255.0));
 		}
 		case 6:
 		{
 			CPOpp *pPOpp;
-			for (j=0; j<24; j++)
+			for (j=0; j<m_ColorList.size(); j++)
 			{
 				for (i=0; i<m_oaPOpp.size(); i++)
 				{
 					pPOpp = (CPOpp*)m_oaPOpp.at(i);
 					bFound = false;
-					if(pPOpp->m_Color == m_crColors[j])
+					if(pPOpp->m_Color == m_ColorList.at(j))
 					{
 						bFound = true;
 						break;
 					}
 				}
 				if(!bFound)
-					return m_crColors[j];
+					return m_ColorList.at(j);
 			}
-			return m_crColors[m_oaPOpp.size()%24];
-			break;
+			return QColor((int)((double)qrand()/(double)RAND_MAX*255.0),
+						  (int)((double)qrand()/(double)RAND_MAX*255.0),
+						  (int)((double)qrand()/(double)RAND_MAX*255.0));
 		}
 
 		default:
@@ -3254,7 +3254,7 @@ bool MainFrame::LoadPolarFileV3(QDataStream &ar, bool bIsStoring, int ArchiveFor
 			return false;
 		}
 
-		pOpp->m_Color = m_crColors[m_oaOpp.size()%24];
+		pOpp->m_Color = m_ColorList[m_oaOpp.size()%24];
 		if(ArchiveFormat>=100002)
 		{
 			if (!pOpp->Serialize(ar, bIsStoring, 100002))

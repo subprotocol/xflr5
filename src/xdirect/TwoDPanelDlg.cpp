@@ -20,7 +20,7 @@
 *****************************************************************************/
 
 #include <QMessageBox>
-
+#include <QGridLayout>
 
 #include "TwoDPanelDlg.h"
 #include "../params.h"

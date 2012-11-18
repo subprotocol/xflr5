@@ -23,7 +23,7 @@
 #include "NacaFoilDlg.h"
 #include "XDirect.h"
 #include "../design/AFoil.h"
-
+#include <QGridLayout>
 
 
 void *NacaFoilDlg::s_pXFoil;

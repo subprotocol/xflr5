@@ -37,19 +37,6 @@
 #include "../objects/OpPoint.h"
 #include "../graph/QGraph.h"
 #include "XFoil.h"
-#include "XFoilAnalysisDlg.h"
-#include "../graph/GraphDlg.h"
-#include "BatchDlg.h"
-#include "BatchThreadDlg.h"
-#include "FoilPolarDlg.h"
-#include "XFoilAdvancedDlg.h"
-#include "../misc/RenameDlg.h"
-#include "../misc/PolarFilterDlg.h"
-
-
-#include "CAddDlg.h"
-#include "XDirectStyleDlg.h"
-#include "ManageFoilsDlg.h"
 
 
 class QXDirect : public QWidget
@@ -242,15 +229,6 @@ protected:
 	OpPoint* AddOpPoint(CPolar *pPolar = NULL, bool bStoreOpp=false);
 
 private:
-    XFoilAdvancedDlg *m_pXFoilAdvancedDlg;
-    BatchDlg *m_pBatchDlg;
-    BatchThreadDlg *m_pBatchThreadDlg;
-    FoilPolarDlg *m_pFoilPolarDlg;
-    RenameDlg *m_RenameDlg;
-
-    XDirectStyleDlg     *m_pXDirectStyleDlg;
-    ManageFoilsDlg      *m_pManageFoilsDlg;
-    PolarFilterDlg      *m_PolarFilterDlg;
 
 	QStackedWidget *m_pctrlMiddleControls;
 
@@ -374,9 +352,6 @@ private:
 	QPoint m_PointDown;		// the client point for the last mouse left-click
 	QPoint m_FoilOffset;		// the screen offset position for the foil display
 	QPoint m_PolarLegendOffset;
-//	CFoilAnalysisDlg m_Adlg;	// the polar definition dialog box
-//	CUFOListDlg m_UFOdlg;		// the foil management dialog box
-    XFoilAnalysisDlg *m_pXFdlg;	// the dialog class which manages the xfoil calculation and display output
 
 	XFoil *m_pXFoil;		// a pointer to the XFoil object
 };

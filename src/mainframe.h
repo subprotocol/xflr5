@@ -397,7 +397,7 @@ private:
 	QString m_ProjectName, m_FileName, m_LanguageFilePath;
 	QString m_LastDirName, m_ExportLastDirName, m_ImageDirName;
 	QString m_UFOType;
-	QColor m_crColors[30];
+	QList <QColor> m_ColorList;
 
 	QGraph m_RefGraph;//Reference setttings
 	QColor m_BorderClr;

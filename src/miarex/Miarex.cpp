@@ -47,21 +47,23 @@ void *QMiarex::s_p3dWidget;
 QMiarex::QMiarex(QWidget *parent)
 	: QWidget(parent)
 {
-	//construct evrything
-    m_pWingDlg = new GL3dWingDlg(this);
-    m_pPlaneDlg = new PlaneDlg(this);
-    m_pGraphDlg = new GraphDlg(this);
-    m_pRenameDlg = new RenameDlg(this);
-    m_pGL3dBody = new GL3dBodyDlg(this);
-    m_pInertiaDlg = new InertiaDlg(this);
-    m_pManageBodiesDlg = new ManageBodiesDlg(this);
-    m_pManageUFOsDlg = new ManageUFOsDlg(this);
-    m_pWAdvancedDlg = new WAdvancedDlg(this);
-    m_pWingScaleDlg = new WingScaleDlg(this);
-    m_pGLLightDlg = new GLLightDlg(this);
-    m_pModDlg = new ModDlg(this);
-    m_pPolarFilterDlg = new PolarFilterDlg(this);
-    m_pW3dPrefsDlg = new W3dPrefsDlg(this);
+	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
+	//construct and initialize everything
+	m_pWingDlg = new GL3dWingDlg(pMainFrame);
+	m_pPlaneDlg = new PlaneDlg(pMainFrame);
+	m_pGraphDlg = new GraphDlg(pMainFrame);
+	m_pRenameDlg = new RenameDlg(pMainFrame);
+	m_pGL3dBody = new GL3dBodyDlg(pMainFrame);
+	m_pInertiaDlg = new InertiaDlg(pMainFrame);
+	m_pManageBodiesDlg = new ManageBodiesDlg(pMainFrame);
+	m_pManageUFOsDlg = new ManageUFOsDlg(pMainFrame);
+	m_pWAdvancedDlg = new WAdvancedDlg(pMainFrame);
+	m_pWingScaleDlg = new WingScaleDlg(pMainFrame);
+	m_pGLLightDlg = new GLLightDlg(pMainFrame);
+	m_pPolarFilterDlg = new PolarFilterDlg(pMainFrame);
+	m_pW3dPrefsDlg = new W3dPrefsDlg(pMainFrame);
+	m_pModDlg = new ModDlg(pMainFrame);
+
 
 	m_pXFile      = NULL;
 	m_pPanelDlg   = NULL;
@@ -751,16 +753,16 @@ void QMiarex::AddPOpp(bool bPointOut, double *Cp, double *Gamma, double *Sigma, 
 			for (j=0; j<m_poaWOpp->size();j++)
 			{
 				pWOpp = (CWOpp*)m_poaWOpp->at(j);
-				if(pWOpp->m_Color == pMainFrame->m_crColors[i]) bFound = true;
+				if(pWOpp->m_Color == pMainFrame->m_ColorList[i]) bFound = true;
 			}
 			for (j=0; j<m_poaPOpp->size();j++)
 			{
 				pOldPOpp = (CPOpp*)m_poaPOpp->at(j);
-				if(pOldPOpp->m_Color == pMainFrame->m_crColors[i]) bFound = true;
+				if(pOldPOpp->m_Color == pMainFrame->m_ColorList[i]) bFound = true;
 			}
 			if(!bFound)
 			{
-				pPOpp->m_Color = pMainFrame->m_crColors[i];
+				pPOpp->m_Color = pMainFrame->m_ColorList[i];
 				break;
 			}
 		}
@@ -1187,16 +1189,16 @@ void QMiarex::AddWOpp(double QInf, double Alpha, bool bPointOut, double *Gamma, 
 			for (j=0; j<m_poaWOpp->size();j++)
 			{
 				pWOpp = (CWOpp*)m_poaWOpp->at(j);
-				if(pWOpp->m_Color == pMainFrame->m_crColors[i]) bFound = true;
+				if(pWOpp->m_Color == pMainFrame->m_ColorList[i]) bFound = true;
 			}
 			for (j=0; j<m_poaPOpp->size();j++)
 			{
 				pPOpp = (CPOpp*)m_poaPOpp->at(j);
-				if(pPOpp->m_Color == pMainFrame->m_crColors[i]) bFound = true;
+				if(pPOpp->m_Color == pMainFrame->m_ColorList[i]) bFound = true;
 			}
 			if(!bFound)
 			{
-				pNewPoint->m_Color = pMainFrame->m_crColors[i];
+				pNewPoint->m_Color = pMainFrame->m_ColorList[i];
 				break;
 			}
 		}
@@ -2773,11 +2775,11 @@ void QMiarex::CreateWOpp(CWOpp *pWOpp, CWing *pWing)
 		for (j=0; j<m_poaWOpp->size();j++)
 		{
 			pOldWOpp = (CWOpp*)m_poaWOpp->at(j);
-			if(pOldWOpp->m_Color == pMainFrame->m_crColors[i]) bFound = true;
+			if(pOldWOpp->m_Color == pMainFrame->m_ColorList[i]) bFound = true;
 		}
 		if(!bFound)
 		{
-			pWOpp->m_Color = pMainFrame->m_crColors[i];
+			pWOpp->m_Color = pMainFrame->m_ColorList[i];
 			break;
 		}
 	}
@@ -9877,7 +9879,7 @@ void QMiarex::OnKeepCpSection()
 	pNewCurve = m_CpGraph.AddCurve();
 	pNewCurve->Copy(pCurve);
 
-	m_CpColor = pMainFrame->m_crColors[(m_CpGraph.GetCurveCount())%24];
+	m_CpColor = pMainFrame->m_ColorList[(m_CpGraph.GetCurveCount())%24];
 	pCurve->SetColor(m_CpColor);
 
 	m_CpStyle = 0;

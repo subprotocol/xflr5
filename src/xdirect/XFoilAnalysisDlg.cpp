@@ -95,31 +95,32 @@ void XFoilAnalysisDlg::SetupLayout()
 
 	m_pGraphWidget = new GraphWidget;
 	m_pGraphWidget->setMinimumHeight(350);
-	m_pGraphWidget->setMinimumWidth(100);
+	m_pGraphWidget->setMinimumWidth(600);
+	m_pGraphWidget->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
 	m_pGraphWidget->m_pGraph = &m_RmsGraph;
-
-	QHBoxLayout *GraphLayout = new QHBoxLayout;
-	GraphLayout->addWidget(m_pGraphWidget);
-
-	m_pctrlSkip   = new QPushButton(tr("Skip"));
-	m_pctrlCancel = new QPushButton(tr("Cancel"));
-
-	connect(m_pctrlSkip,   SIGNAL(clicked()), this, SLOT(OnSkipPoint()));
-	connect(m_pctrlCancel, SIGNAL(clicked()), this, SLOT(OnCancelAnalysis()));
 
 
 	QHBoxLayout *buttonsLayout = new QHBoxLayout;
-	buttonsLayout->addStretch(1);
-	buttonsLayout->addWidget(m_pctrlSkip);
-	buttonsLayout->addStretch(1);
-	buttonsLayout->addWidget(m_pctrlCancel);
-	buttonsLayout->addStretch(1);
+	{
+		m_pctrlSkip   = new QPushButton(tr("Skip"));
+		m_pctrlCancel = new QPushButton(tr("Cancel"));
+
+		connect(m_pctrlSkip,   SIGNAL(clicked()), this, SLOT(OnSkipPoint()));
+		connect(m_pctrlCancel, SIGNAL(clicked()), this, SLOT(OnCancelAnalysis()));
+		buttonsLayout->addStretch(1);
+		buttonsLayout->addWidget(m_pctrlSkip);
+		buttonsLayout->addStretch(1);
+		buttonsLayout->addWidget(m_pctrlCancel);
+		buttonsLayout->addStretch(1);
+	}
 
 	QVBoxLayout *mainLayout = new QVBoxLayout;
-	mainLayout->addWidget(m_pctrlTextOutput);
-	mainLayout->addLayout(GraphLayout);
-	mainLayout->addLayout(buttonsLayout);
-	setLayout(mainLayout);
+	{
+		mainLayout->addWidget(m_pctrlTextOutput);
+		mainLayout->addWidget(m_pGraphWidget);
+		mainLayout->addLayout(buttonsLayout);
+		setLayout(mainLayout);
+	}
 }
 
 

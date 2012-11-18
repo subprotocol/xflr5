@@ -19,12 +19,12 @@
 
 *****************************************************************************/
 
-#include <QMessageBox>
-
 #include "LEDlg.h"
 #include "XFoil.h"
 #include "XDirect.h"
 #include "../design/AFoil.h"
+#include <QMessageBox>
+#include <QHBoxLayout>
 
 
 void *LEDlg::s_pXFoil;

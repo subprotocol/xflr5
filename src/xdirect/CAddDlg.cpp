@@ -22,6 +22,7 @@
 #include <QMessageBox>
 
 #include "CAddDlg.h"
+#include <QGridLayout>
 #include "XDirect.h"
 #include "../design/AFoil.h"
 #include "XFoil.h"

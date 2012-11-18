@@ -19,13 +19,13 @@
 
 *****************************************************************************/
 
-#include <QMessageBox>
-
-
 #include "TEGapDlg.h"
 #include "XFoil.h"
 #include "XDirect.h"
 #include "../design/AFoil.h"
+
+#include <QMessageBox>
+#include <QHBoxLayout>
 
 void *TEGapDlg::s_pXFoil;
 
