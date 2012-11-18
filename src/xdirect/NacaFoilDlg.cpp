@@ -46,48 +46,54 @@ NacaFoilDlg::NacaFoilDlg(QWidget *pParent) : QDialog(pParent)
 
 void NacaFoilDlg::SetupLayout()
 {
-	QGridLayout *MainGrid = new QGridLayout;
-	QLabel *NacaNumber   = new QLabel(tr("4 or 5 digits"));
-	QLabel *PanelNumber  = new QLabel(tr("Number of Panels"));
+	QGridLayout *MainGridLayout = new QGridLayout;
+	{
+		QLabel *NacaNumber   = new QLabel(tr("4 or 5 digits"));
+		QLabel *PanelNumber  = new QLabel(tr("Number of Panels"));
 
-	m_pctrlNumber = new FloatEdit(0,0);
-	m_pctrlPanels = new FloatEdit(100,0);
-	m_pctrlMessage = new QLabel();
-	m_pctrlMessage->setMinimumWidth(120);
+		m_pctrlNumber = new FloatEdit(0,0);
+		m_pctrlPanels = new FloatEdit(100,0);
+		m_pctrlMessage = new QLabel();
+		m_pctrlMessage->setMinimumWidth(120);
 
-//	QValidator *PanelValid = new QIntValidator(0, IQX, this);
-//	m_pctrlPanels->setValidator(PanelValid);
+	//	QValidator *PanelValid = new QIntValidator(0, IQX, this);
+	//	m_pctrlPanels->setValidator(PanelValid);
 
-//	QValidator *NacaValid = new QIntValidator(0, 100000000, this);
-//	m_pctrlNumber->setValidator(NacaValid);
+	//	QValidator *NacaValid = new QIntValidator(0, 100000000, this);
+	//	m_pctrlNumber->setValidator(NacaValid);
 
-	m_pctrlNumber->setAlignment(Qt::AlignRight);
-	m_pctrlPanels->setAlignment(Qt::AlignRight);
-	MainGrid->addWidget(NacaNumber,     1,1, 1,1, Qt::AlignRight);
-	MainGrid->addWidget(m_pctrlNumber,  1,2, 1,1, Qt::AlignRight);
-	MainGrid->addWidget(m_pctrlMessage, 2,1, 1,2, Qt::AlignRight);
-	MainGrid->addWidget(PanelNumber,    3,1, 1,1, Qt::AlignRight);
-	MainGrid->addWidget(m_pctrlPanels,  3,2, 1,1, Qt::AlignRight);
+		m_pctrlNumber->setAlignment(Qt::AlignRight);
+		m_pctrlPanels->setAlignment(Qt::AlignRight);
+		MainGridLayout->addWidget(NacaNumber,     1,1, 1,1, Qt::AlignRight);
+		MainGridLayout->addWidget(m_pctrlNumber,  1,2, 1,1, Qt::AlignRight);
+		MainGridLayout->addWidget(m_pctrlMessage, 2,1, 1,2, Qt::AlignRight);
+		MainGridLayout->addWidget(PanelNumber,    3,1, 1,1, Qt::AlignRight);
+		MainGridLayout->addWidget(m_pctrlPanels,  3,2, 1,1, Qt::AlignRight);
+	}
 
 
-	QHBoxLayout *CommandButtons = new QHBoxLayout;
-	OKButton = new QPushButton(tr("OK"));
-	OKButton->setAutoDefault(false);
-	CancelButton = new QPushButton(tr("Cancel"));
-	CancelButton->setAutoDefault(false);
-	CommandButtons->addStretch(1);
-	CommandButtons->addWidget(OKButton);
-	CommandButtons->addStretch(1);
-	CommandButtons->addWidget(CancelButton);
-	CommandButtons->addStretch(1);
-	connect(OKButton, SIGNAL(clicked()),this, SLOT(OnOK()));
-	connect(CancelButton, SIGNAL(clicked()), this, SLOT(reject()));
+	QHBoxLayout *CommandButtonsLayout = new QHBoxLayout;
+	{
+		OKButton = new QPushButton(tr("OK"));
+		OKButton->setAutoDefault(false);
+		CancelButton = new QPushButton(tr("Cancel"));
+		CancelButton->setAutoDefault(false);
+		CommandButtonsLayout->addStretch(1);
+		CommandButtonsLayout->addWidget(OKButton);
+		CommandButtonsLayout->addStretch(1);
+		CommandButtonsLayout->addWidget(CancelButton);
+		CommandButtonsLayout->addStretch(1);
+		connect(OKButton, SIGNAL(clicked()),this, SLOT(OnOK()));
+		connect(CancelButton, SIGNAL(clicked()), this, SLOT(reject()));
+	}
 
 	QVBoxLayout *mainLayout = new QVBoxLayout;
-	mainLayout->addLayout(MainGrid);
-	mainLayout->addStretch(1);
-	mainLayout->addSpacing(30);
-	mainLayout->addLayout(CommandButtons);
+	{
+		mainLayout->addLayout(MainGridLayout);
+		mainLayout->addStretch(1);
+		mainLayout->addSpacing(30);
+		mainLayout->addLayout(CommandButtonsLayout);
+	}
 
 	setLayout(mainLayout);
 

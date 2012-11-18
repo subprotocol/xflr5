@@ -36,7 +36,7 @@ class FoilGeomDlg : public QDialog
 	friend class MainFrame;
 
 public:
-    FoilGeomDlg(QWidget *pParent);
+	FoilGeomDlg(QWidget *pParent=NULL);
 	void InitDialog();
 
 private slots:

@@ -38,7 +38,7 @@ class FoilPolarDlg : public QDialog
     Q_OBJECT
 
 public:
-    FoilPolarDlg(QWidget *pParent);
+	FoilPolarDlg(QWidget *pParent=NULL);
 
 	void ReadParams();
 	void keyPressEvent(QKeyEvent *event);

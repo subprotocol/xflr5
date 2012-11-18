@@ -41,7 +41,7 @@ private slots:
 	void OnOK();
 
 public:
-    NacaFoilDlg(QWidget *pParent);
+	NacaFoilDlg(QWidget *pParent=NULL);
 	void SetupLayout();
 	void GenerateFoil();
 	void keyPressEvent(QKeyEvent *event);

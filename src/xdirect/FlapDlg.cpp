@@ -69,54 +69,58 @@ FlapDlg::FlapDlg(QWidget *pParent) : QDialog(pParent)
 
 void FlapDlg::SetupLayout()
 {
-	QGridLayout *FlapData = new QGridLayout;
-	m_pctrlLEFlapCheck = new QCheckBox(tr("L.E. Flap"));
-	m_pctrlTEFlapCheck = new QCheckBox(tr("T.E. Flap"));
-	m_pctrlLEXHinge    = new FloatEdit;
-	m_pctrlLEYHinge    = new FloatEdit;
-	m_pctrlTEXHinge    = new FloatEdit;
-	m_pctrlTEYHinge    = new FloatEdit;
-	m_pctrlTEFlapAngle = new FloatEdit;
-	m_pctrlLEFlapAngle = new FloatEdit;
+	QGridLayout *pFlapDataLayout = new QGridLayout;
+	{
+		m_pctrlLEFlapCheck = new QCheckBox(tr("L.E. Flap"));
+		m_pctrlTEFlapCheck = new QCheckBox(tr("T.E. Flap"));
+		m_pctrlLEXHinge    = new FloatEdit;
+		m_pctrlLEYHinge    = new FloatEdit;
+		m_pctrlTEXHinge    = new FloatEdit;
+		m_pctrlTEYHinge    = new FloatEdit;
+		m_pctrlTEFlapAngle = new FloatEdit;
+		m_pctrlLEFlapAngle = new FloatEdit;
 
-	QLabel *lab1 = new QLabel(tr("Flap Angle"));
-	QLabel *lab2 = new QLabel(QString::fromUtf8("° (")+tr("+ is down") +")");
-	QLabel *lab3 = new QLabel(tr("Hinge X Position"));
-	QLabel *lab4 = new QLabel(tr("% Chord"));
-	QLabel *lab5 = new QLabel(tr("Hinge Y Position"));
-	QLabel *lab6 = new QLabel(tr("% Thickness"));
+		QLabel *lab1 = new QLabel(tr("Flap Angle"));
+		QLabel *lab2 = new QLabel(QString::fromUtf8("° (")+tr("+ is down") +")");
+		QLabel *lab3 = new QLabel(tr("Hinge X Position"));
+		QLabel *lab4 = new QLabel(tr("% Chord"));
+		QLabel *lab5 = new QLabel(tr("Hinge Y Position"));
+		QLabel *lab6 = new QLabel(tr("% Thickness"));
 
-	FlapData->addWidget(m_pctrlLEFlapCheck, 1, 2);
-	FlapData->addWidget(m_pctrlTEFlapCheck, 1, 3);
-	FlapData->addWidget(lab1, 2, 1);
-	FlapData->addWidget(m_pctrlLEFlapAngle, 2, 2);
-	FlapData->addWidget(m_pctrlTEFlapAngle, 2, 3);
-	FlapData->addWidget(lab2, 2, 4);
-	FlapData->addWidget(lab3, 3, 1);
-	FlapData->addWidget(m_pctrlLEXHinge, 3, 2);
-	FlapData->addWidget(m_pctrlTEXHinge, 3, 3);
-	FlapData->addWidget(lab4, 3, 4);
-	FlapData->addWidget(lab5, 4, 1);
-	FlapData->addWidget(m_pctrlLEYHinge, 4, 2);
-	FlapData->addWidget(m_pctrlTEYHinge, 4, 3);
-	FlapData->addWidget(lab6, 4, 4);
+		pFlapDataLayout->addWidget(m_pctrlLEFlapCheck, 1, 2);
+		pFlapDataLayout->addWidget(m_pctrlTEFlapCheck, 1, 3);
+		pFlapDataLayout->addWidget(lab1, 2, 1);
+		pFlapDataLayout->addWidget(m_pctrlLEFlapAngle, 2, 2);
+		pFlapDataLayout->addWidget(m_pctrlTEFlapAngle, 2, 3);
+		pFlapDataLayout->addWidget(lab2, 2, 4);
+		pFlapDataLayout->addWidget(lab3, 3, 1);
+		pFlapDataLayout->addWidget(m_pctrlLEXHinge, 3, 2);
+		pFlapDataLayout->addWidget(m_pctrlTEXHinge, 3, 3);
+		pFlapDataLayout->addWidget(lab4, 3, 4);
+		pFlapDataLayout->addWidget(lab5, 4, 1);
+		pFlapDataLayout->addWidget(m_pctrlLEYHinge, 4, 2);
+		pFlapDataLayout->addWidget(m_pctrlTEYHinge, 4, 3);
+		pFlapDataLayout->addWidget(lab6, 4, 4);
+	}
 
-	QHBoxLayout *CommandButtons = new QHBoxLayout;
-	OKButton      = new QPushButton(tr("OK"));
-	CancelButton  = new QPushButton(tr("Cancel"));
-	ApplyButton  = new QPushButton(tr("Apply"));
+	QHBoxLayout *pCommandButtons = new QHBoxLayout;
+	{
+		OKButton      = new QPushButton(tr("OK"));
+		CancelButton  = new QPushButton(tr("Cancel"));
+		ApplyButton  = new QPushButton(tr("Apply"));
+	}
 
-	CommandButtons->addStretch(1);
-	CommandButtons->addWidget(ApplyButton);
-	CommandButtons->addStretch(1);
-	CommandButtons->addWidget(OKButton);
-	CommandButtons->addStretch(1);
-	CommandButtons->addWidget(CancelButton);
-	CommandButtons->addStretch(1);
+	pCommandButtons->addStretch(1);
+	pCommandButtons->addWidget(ApplyButton);
+	pCommandButtons->addStretch(1);
+	pCommandButtons->addWidget(OKButton);
+	pCommandButtons->addStretch(1);
+	pCommandButtons->addWidget(CancelButton);
+	pCommandButtons->addStretch(1);
 
 	QVBoxLayout *MainLayout = new QVBoxLayout;
-	MainLayout->addLayout(FlapData);
-	MainLayout->addLayout(CommandButtons);
+	MainLayout->addLayout(pFlapDataLayout);
+	MainLayout->addLayout(pCommandButtons);
 	setLayout(MainLayout);
 }
 

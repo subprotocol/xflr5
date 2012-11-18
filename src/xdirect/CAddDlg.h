@@ -39,7 +39,7 @@ class CAddDlg : public QDialog
 	friend class QAFoil;
 
 public:
-    CAddDlg(QWidget *pParent);
+	CAddDlg(QWidget *pParent = NULL);
 	void InitDialog();
 	void SetupLayout();
 

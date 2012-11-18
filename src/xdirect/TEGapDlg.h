@@ -35,7 +35,7 @@ class TEGapDlg : public QDialog
 	friend class QAFoil;
 
 public:
-    TEGapDlg(QWidget *pParent);
+	TEGapDlg(QWidget *pParent=NULL);
 	void SetupLayout();
 	void InitDialog();
 

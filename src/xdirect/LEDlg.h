@@ -34,7 +34,7 @@ class LEDlg : public QDialog
 	friend class QAFoil;
 
 public:
-    LEDlg(QWidget *pParent);
+	LEDlg(QWidget *pParent=NULL);
 	void SetupLayout();
 	void InitDialog();
 

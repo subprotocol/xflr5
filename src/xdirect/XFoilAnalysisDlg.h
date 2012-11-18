@@ -42,7 +42,7 @@ class XFoilAnalysisDlg : public QDialog
 	friend class QXDirect;
 
 public:
-    XFoilAnalysisDlg(QWidget *pParent);
+	XFoilAnalysisDlg(QWidget *pParent=NULL);
 
 	void InitDialog();
 

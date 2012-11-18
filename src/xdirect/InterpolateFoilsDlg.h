@@ -46,7 +46,7 @@ private slots:
 	void keyPressEvent(QKeyEvent *event);
 
 public:
-    InterpolateFoilsDlg(QWidget *pParent);
+	InterpolateFoilsDlg(QWidget *pParent=NULL);
 	void InitDialog();
 	void SetupLayout();
 	void Update();

@@ -4066,19 +4066,19 @@ void QXDirect::OnPanels()
 	m_bBL       = false;
 	OnOpPoints();
 
-    TwoDPanelDlg TwoDPanelDlg(this);
-	TwoDPanelDlg.move(pMainFrame->m_DlgPos);
-	TwoDPanelDlg.m_pXDirect = this;
-	TwoDPanelDlg.m_pAFoil   = NULL;
-	TwoDPanelDlg.m_pBufferFoil = &m_BufferFoil;
-	TwoDPanelDlg.m_pMemFoil    = g_pCurFoil;
+	TwoDPanelDlg dlg(this);
+	dlg.move(pMainFrame->m_DlgPos);
+	dlg.m_pXDirect = this;
+	dlg.m_pAFoil   = NULL;
+	dlg.m_pBufferFoil = &m_BufferFoil;
+	dlg.m_pMemFoil    = g_pCurFoil;
 
 	m_bShowPanels = true;
 	UpdateView();
 
-	TwoDPanelDlg.InitDialog();
+	dlg.InitDialog();
 
-	if(QDialog::Accepted == TwoDPanelDlg.exec())
+	if(QDialog::Accepted == dlg.exec())
 	{
 		CFoil *pNewFoil = new CFoil();
 		pNewFoil->CopyFoil(&m_BufferFoil);
@@ -4097,7 +4097,7 @@ void QXDirect::OnPanels()
 		SetBufferFoil();
 		m_pXFoil->InitXFoilGeometry(g_pCurFoil);
 	}
-	pMainFrame->m_DlgPos = TwoDPanelDlg.pos();
+	pMainFrame->m_DlgPos = dlg.pos();
 
 	m_bShowPanels = bState;//restore as it was
 	m_bPressure   = bPressure;

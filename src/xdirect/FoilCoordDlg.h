@@ -39,7 +39,7 @@ class FoilCoordDlg : public QDialog
 	friend class QAFoil;
 
 public:
-    FoilCoordDlg(QWidget *pParent);
+	FoilCoordDlg(QWidget *pParent=NULL);
 	void InitDialog();
 
 private slots:

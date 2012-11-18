@@ -34,7 +34,7 @@ class FlapDlg : public QDialog
 	Q_OBJECT
 
 public:
-    FlapDlg(QWidget *pParent);
+	FlapDlg(QWidget *pParent=NULL);
 
 	friend class QAFoil;
 	friend class QXDirect;

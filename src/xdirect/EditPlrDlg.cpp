@@ -240,18 +240,20 @@ void EditPlrDlg::OnDeleteAllPoints()
 
 void EditPlrDlg::SetupLayout()
 {
-	QVBoxLayout *CommandButtons = new QVBoxLayout;
-	m_pctrlDeleteAllPoints = new QPushButton(tr("Delete All Points"));
-	m_pctrlDeletePoint	   = new QPushButton(tr("Delete Point"));
-	OKButton               = new QPushButton(tr("OK"));
-	CancelButton           = new QPushButton(tr("Cancel"));
-	CommandButtons->addStretch(1);
-	CommandButtons->addWidget(m_pctrlDeleteAllPoints);
-	CommandButtons->addWidget(m_pctrlDeletePoint);
-	CommandButtons->addStretch(2);
-	CommandButtons->addWidget(OKButton);
-	CommandButtons->addWidget(CancelButton);
-	CommandButtons->addStretch(1);
+	QVBoxLayout *CommandButtonsLayout = new QVBoxLayout;
+	{
+		m_pctrlDeleteAllPoints = new QPushButton(tr("Delete All Points"));
+		m_pctrlDeletePoint	   = new QPushButton(tr("Delete Point"));
+		OKButton               = new QPushButton(tr("OK"));
+		CancelButton           = new QPushButton(tr("Cancel"));
+		CommandButtonsLayout->addStretch(1);
+		CommandButtonsLayout->addWidget(m_pctrlDeleteAllPoints);
+		CommandButtonsLayout->addWidget(m_pctrlDeletePoint);
+		CommandButtonsLayout->addStretch(2);
+		CommandButtonsLayout->addWidget(OKButton);
+		CommandButtonsLayout->addWidget(CancelButton);
+		CommandButtonsLayout->addStretch(1);
+	}
 
 	m_pctrlPointTable = new QTableView(this);
 
@@ -261,9 +263,10 @@ void EditPlrDlg::SetupLayout()
 	m_pctrlPointTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
 
 	QHBoxLayout * MainLayout = new QHBoxLayout(this);
-	MainLayout->addWidget(m_pctrlPointTable);
-	MainLayout->addLayout(CommandButtons);
-
+	{
+		MainLayout->addWidget(m_pctrlPointTable);
+		MainLayout->addLayout(CommandButtonsLayout);
+	}
 
 	setLayout(MainLayout);
 

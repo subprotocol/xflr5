@@ -39,7 +39,7 @@ private slots:
 	void OnChanged();
 
 public:
-    TwoDPanelDlg(QWidget *pParent);
+	TwoDPanelDlg(QWidget *pParent=NULL);
 
 	static void *s_pXFoil;
 

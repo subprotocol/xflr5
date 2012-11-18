@@ -25,6 +25,8 @@
 #include <QGridLayout>
 #include <QLabel>
 
+
+
 XDirectStyleDlg::XDirectStyleDlg(QWidget *pParent) : QDialog(pParent)
 {
 	setWindowTitle(tr("XDirect Styles"));
@@ -35,49 +37,56 @@ XDirectStyleDlg::XDirectStyleDlg(QWidget *pParent) : QDialog(pParent)
 	OnRestoreDefaults();
 }
 
+
 void XDirectStyleDlg::SetupLayout()
 {
-	QGridLayout *GridLayout = new QGridLayout;
-	m_pctrlNeutral  = new LineButton;
-	m_pctrlBL       = new LineButton;
-	m_pctrlPressure = new LineButton;
-	QLabel *lab1 = new QLabel(tr("Neutral Line"));
-	QLabel *lab2 = new QLabel(tr("Boundary Layer"));
-	QLabel *lab3 = new QLabel(tr("Pressure"));
-	GridLayout->addWidget(lab1,1,1);
-	GridLayout->addWidget(lab2,2,1);
-	GridLayout->addWidget(lab3,3,1);
-	GridLayout->addWidget(m_pctrlNeutral,1,2);
-	GridLayout->addWidget(m_pctrlBL,2,2);
-	GridLayout->addWidget(m_pctrlPressure,3,2);
+	QGridLayout *StyleLayout = new QGridLayout;
+	{
+		m_pctrlNeutral  = new LineButton;
+		m_pctrlBL       = new LineButton;
+		m_pctrlPressure = new LineButton;
+		QLabel *lab1 = new QLabel(tr("Neutral Line"));
+		QLabel *lab2 = new QLabel(tr("Boundary Layer"));
+		QLabel *lab3 = new QLabel(tr("Pressure"));
+		StyleLayout->addWidget(lab1,1,1);
+		StyleLayout->addWidget(lab2,2,1);
+		StyleLayout->addWidget(lab3,3,1);
+		StyleLayout->addWidget(m_pctrlNeutral,1,2);
+		StyleLayout->addWidget(m_pctrlBL,2,2);
+		StyleLayout->addWidget(m_pctrlPressure,3,2);
+		connect(m_pctrlNeutral, SIGNAL(clicked()),this, SLOT(OnNeutralStyle()));
+		connect(m_pctrlBL, SIGNAL(clicked()),this, SLOT(OnBLStyle()));
+		connect(m_pctrlPressure, SIGNAL(clicked()),this, SLOT(OnPressureStyle()));
+	}
 
 	QHBoxLayout *CommandButtons = new QHBoxLayout;
-	OKButton = new QPushButton(tr("OK"));
-	QPushButton *DefaultsButton = new QPushButton(tr("Defaults"));
-	QPushButton *CancelButton   = new QPushButton(tr("Cancel"));
-	CommandButtons->addStretch(1);
-	CommandButtons->addWidget(OKButton);
-	CommandButtons->addStretch(1);
-	CommandButtons->addWidget(DefaultsButton);
-	CommandButtons->addStretch(1);
-	CommandButtons->addWidget(CancelButton);
-	CommandButtons->addStretch(1);
+	{
+		OKButton = new QPushButton(tr("OK"));
+		QPushButton *DefaultsButton = new QPushButton(tr("Defaults"));
+		QPushButton *CancelButton   = new QPushButton(tr("Cancel"));
+		CommandButtons->addStretch(1);
+		CommandButtons->addWidget(OKButton);
+		CommandButtons->addStretch(1);
+		CommandButtons->addWidget(DefaultsButton);
+		CommandButtons->addStretch(1);
+		CommandButtons->addWidget(CancelButton);
+		CommandButtons->addStretch(1);
+		connect(OKButton, SIGNAL(clicked()),this, SLOT(accept()));
+		connect(DefaultsButton, SIGNAL(clicked()),this, SLOT(OnRestoreDefaults()));
+		connect(CancelButton, SIGNAL(clicked()), this, SLOT(reject()));
+	}
 
 	QVBoxLayout *MainLayout = new QVBoxLayout;
-	MainLayout->addLayout(GridLayout);
-	MainLayout->addStretch(1);
-	MainLayout->addLayout(CommandButtons);
-	MainLayout->addStretch(1);
+	{
+		MainLayout->addLayout(StyleLayout);
+		MainLayout->addStretch(1);
+		MainLayout->addLayout(CommandButtons);
+		MainLayout->addStretch(1);
+	}
 
 	setLayout(MainLayout);
 
-	connect(m_pctrlNeutral, SIGNAL(clicked()),this, SLOT(OnNeutralStyle()));
-	connect(m_pctrlBL, SIGNAL(clicked()),this, SLOT(OnBLStyle()));
-	connect(m_pctrlPressure, SIGNAL(clicked()),this, SLOT(OnPressureStyle()));
 
-	connect(OKButton, SIGNAL(clicked()),this, SLOT(accept()));
-	connect(DefaultsButton, SIGNAL(clicked()),this, SLOT(OnRestoreDefaults()));
-	connect(CancelButton, SIGNAL(clicked()), this, SLOT(reject()));
 
 }
 

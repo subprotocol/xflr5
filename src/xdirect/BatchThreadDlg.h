@@ -52,7 +52,7 @@ class BatchThreadDlg : public QDialog
 	friend class XFoilTask;
 
 public:
-    BatchThreadDlg(QWidget *pParent);
+	BatchThreadDlg(QWidget *pParent=NULL);
 
 	void SetupLayout();
 	void InitDialog();

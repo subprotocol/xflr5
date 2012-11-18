@@ -39,7 +39,7 @@ class ManageFoilsDlg : public QDialog
 	friend class MainFrame;
 
 public:
-    ManageFoilsDlg(QWidget *pParent);
+	ManageFoilsDlg(QWidget *pParent=NULL);
 	void InitDialog(QString FoilName);
 
 private slots:

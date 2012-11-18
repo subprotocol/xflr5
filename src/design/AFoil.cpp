@@ -1162,7 +1162,7 @@ void QAFoil::OnAFoilPanels()
 
 	UpdateView();
 
-    TwoDPanelDlg TwoDPanelDlg(this);
+	TwoDPanelDlg TwoDPanelDlg;
 	TwoDPanelDlg.m_pBufferFoil = m_pBufferFoil;
 	TwoDPanelDlg.m_pMemFoil    = g_pCurFoil;
 	TwoDPanelDlg.m_pXDirect    = NULL;

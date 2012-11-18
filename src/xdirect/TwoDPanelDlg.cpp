@@ -30,7 +30,8 @@
 
 void *TwoDPanelDlg::s_pXFoil;
 
-TwoDPanelDlg::TwoDPanelDlg(QWidget *pParent) : QDialog(this)
+
+TwoDPanelDlg::TwoDPanelDlg(QWidget *pParent) : QDialog(pParent)
 {
 	SetupLayout();
 	m_pXDirect    = NULL;
@@ -38,74 +39,82 @@ TwoDPanelDlg::TwoDPanelDlg(QWidget *pParent) : QDialog(this)
 	m_bApplied    = false;
 }
 
+
+
 void TwoDPanelDlg::SetupLayout()
 {
 	setWindowTitle(tr("Global Panel Refinement"));
-	QGridLayout *InputData = new QGridLayout;
-	QLabel *l1 = new QLabel(tr("Number of Panels"));
-	QLabel *l2 = new QLabel(tr("Panel Bunching Parameter"));
-	QLabel *l3 = new QLabel(tr("TE/LE Panel Density Ratio"));
-	QLabel *l4 = new QLabel(tr("Refined area/LE Panel Density Ratio"));
-	QLabel *l5 = new QLabel(tr("Top Side Refined Area x/c limits"));
-	QLabel *l6 = new QLabel(tr("Bottom Side Refined Area x/c limits"));
+	QGridLayout *InputDataLayout = new QGridLayout;
+	{
+		QLabel *l1 = new QLabel(tr("Number of Panels"));
+		QLabel *l2 = new QLabel(tr("Panel Bunching Parameter"));
+		QLabel *l3 = new QLabel(tr("TE/LE Panel Density Ratio"));
+		QLabel *l4 = new QLabel(tr("Refined area/LE Panel Density Ratio"));
+		QLabel *l5 = new QLabel(tr("Top Side Refined Area x/c limits"));
+		QLabel *l6 = new QLabel(tr("Bottom Side Refined Area x/c limits"));
 
-	InputData->addWidget(l1,1,1);
-	InputData->addWidget(l2,2,1);
-	InputData->addWidget(l3,3,1);
-	InputData->addWidget(l4,4,1);
-	InputData->addWidget(l5,5,1);
-	InputData->addWidget(l6,6,1);
+		InputDataLayout->addWidget(l1,1,1);
+		InputDataLayout->addWidget(l2,2,1);
+		InputDataLayout->addWidget(l3,3,1);
+		InputDataLayout->addWidget(l4,4,1);
+		InputDataLayout->addWidget(l5,5,1);
+		InputDataLayout->addWidget(l6,6,1);
 
 
-	m_pctrlNPanels = new QLineEdit("100");
-	m_pctrlNPanels->setAlignment(Qt::AlignRight);
-	QValidator *PanelValid = new QIntValidator(0, 1000000, this);
-	m_pctrlNPanels->setValidator(PanelValid);
-	m_pctrlCVpar  = new FloatEdit;
-	m_pctrlCTErat = new FloatEdit;
-	m_pctrlCTRrat = new FloatEdit;
-	m_pctrlXsRef1 = new FloatEdit;
-	m_pctrlXsRef2 = new FloatEdit;
-	m_pctrlXpRef1 = new FloatEdit;
-	m_pctrlXpRef2 = new FloatEdit;
+		m_pctrlNPanels = new QLineEdit("100");
+		m_pctrlNPanels->setAlignment(Qt::AlignRight);
+		QValidator *PanelValid = new QIntValidator(0, 1000000, this);
+		m_pctrlNPanels->setValidator(PanelValid);
+		m_pctrlCVpar  = new FloatEdit;
+		m_pctrlCTErat = new FloatEdit;
+		m_pctrlCTRrat = new FloatEdit;
+		m_pctrlXsRef1 = new FloatEdit;
+		m_pctrlXsRef2 = new FloatEdit;
+		m_pctrlXpRef1 = new FloatEdit;
+		m_pctrlXpRef2 = new FloatEdit;
 
-	InputData->addWidget(m_pctrlNPanels, 1, 2);
-	InputData->addWidget(m_pctrlCVpar,         2, 2);
-	InputData->addWidget(m_pctrlCTErat,        3, 2);
-	InputData->addWidget(m_pctrlCTRrat,        4, 2);
-	InputData->addWidget(m_pctrlXsRef1,        5, 2);
-	InputData->addWidget(m_pctrlXsRef2,        5, 3);
-	InputData->addWidget(m_pctrlXpRef1,        6, 2);
-	InputData->addWidget(m_pctrlXpRef2,        6, 3);
+		InputDataLayout->addWidget(m_pctrlNPanels, 1, 2);
+		InputDataLayout->addWidget(m_pctrlCVpar,   2, 2);
+		InputDataLayout->addWidget(m_pctrlCTErat,  3, 2);
+		InputDataLayout->addWidget(m_pctrlCTRrat,  4, 2);
+		InputDataLayout->addWidget(m_pctrlXsRef1,  5, 2);
+		InputDataLayout->addWidget(m_pctrlXsRef2,  5, 3);
+		InputDataLayout->addWidget(m_pctrlXpRef1,  6, 2);
+		InputDataLayout->addWidget(m_pctrlXpRef2,  6, 3);
 
-	connect(m_pctrlNPanels, SIGNAL(editingFinished()), this, SLOT(OnChanged()));
-	connect(m_pctrlCVpar, SIGNAL(editingFinished()), this, SLOT(OnChanged()));
-	connect(m_pctrlCTErat, SIGNAL(editingFinished()), this, SLOT(OnChanged()));
-	connect(m_pctrlCTRrat, SIGNAL(editingFinished()), this, SLOT(OnChanged()));
-	connect(m_pctrlXsRef1, SIGNAL(editingFinished()), this, SLOT(OnChanged()));
-	connect(m_pctrlXsRef2, SIGNAL(editingFinished()), this, SLOT(OnChanged()));
-	connect(m_pctrlXpRef1, SIGNAL(editingFinished()), this, SLOT(OnChanged()));
-	connect(m_pctrlXpRef2, SIGNAL(editingFinished()), this, SLOT(OnChanged()));
+		connect(m_pctrlNPanels, SIGNAL(editingFinished()), this, SLOT(OnChanged()));
+		connect(m_pctrlCVpar,   SIGNAL(editingFinished()), this, SLOT(OnChanged()));
+		connect(m_pctrlCTErat,  SIGNAL(editingFinished()), this, SLOT(OnChanged()));
+		connect(m_pctrlCTRrat,  SIGNAL(editingFinished()), this, SLOT(OnChanged()));
+		connect(m_pctrlXsRef1,  SIGNAL(editingFinished()), this, SLOT(OnChanged()));
+		connect(m_pctrlXsRef2,  SIGNAL(editingFinished()), this, SLOT(OnChanged()));
+		connect(m_pctrlXpRef1,  SIGNAL(editingFinished()), this, SLOT(OnChanged()));
+		connect(m_pctrlXpRef2,  SIGNAL(editingFinished()), this, SLOT(OnChanged()));
+	}
 
-	QHBoxLayout *CommandButtons = new QHBoxLayout;
-	OKButton      = new QPushButton(tr("OK"));
-	CancelButton  = new QPushButton(tr("Cancel"));
-	ApplyButton   = new QPushButton(tr("Apply"));
-	CommandButtons->addStretch(1);
-	CommandButtons->addWidget(ApplyButton);
-	CommandButtons->addStretch(1);
-	CommandButtons->addWidget(OKButton);
-	CommandButtons->addStretch(1);
-	CommandButtons->addWidget(CancelButton);
-	CommandButtons->addStretch(1);
+	QHBoxLayout *CommandButtonsLayout = new QHBoxLayout;
+	{
+		OKButton      = new QPushButton(tr("OK"));
+		CancelButton  = new QPushButton(tr("Cancel"));
+		ApplyButton   = new QPushButton(tr("Apply"));
+		CommandButtonsLayout->addStretch(1);
+		CommandButtonsLayout->addWidget(ApplyButton);
+		CommandButtonsLayout->addStretch(1);
+		CommandButtonsLayout->addWidget(OKButton);
+		CommandButtonsLayout->addStretch(1);
+		CommandButtonsLayout->addWidget(CancelButton);
+		CommandButtonsLayout->addStretch(1);
+	}
 
 	QVBoxLayout *mainLayout = new QVBoxLayout;
-	mainLayout->addStretch(1);
-	mainLayout->addLayout(InputData);
-	mainLayout->addStretch(1);
-	mainLayout->addLayout(CommandButtons);
-	mainLayout->addStretch(1);
-	setLayout(mainLayout);
+	{
+		mainLayout->addStretch(1);
+		mainLayout->addLayout(InputDataLayout);
+		mainLayout->addStretch(1);
+		mainLayout->addLayout(CommandButtonsLayout);
+		mainLayout->addStretch(1);
+		setLayout(mainLayout);
+	}
 
 	connect(ApplyButton, SIGNAL(clicked()),this, SLOT(OnApply()));
 	connect(OKButton, SIGNAL(clicked()),this, SLOT(OnOK()));
@@ -173,11 +182,14 @@ void TwoDPanelDlg::keyPressEvent(QKeyEvent *event)
 	}
 }
 
+
+
 void TwoDPanelDlg::OnChanged()
 {
 	m_bApplied  = false;
 	OnApply();
 }
+
 
 
 void TwoDPanelDlg::OnApply()

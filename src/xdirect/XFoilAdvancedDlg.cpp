@@ -37,47 +37,55 @@ XFoilAdvancedDlg::XFoilAdvancedDlg(QWidget *pParent) : QDialog(pParent)
 	connect(CancelButton, SIGNAL(clicked()), this, SLOT(reject()));
 }
 
+
 void XFoilAdvancedDlg::SetupLayout()
 {
-	QHBoxLayout *VAccelBox = new QHBoxLayout;
-	QLabel *lab1 = new QLabel(tr("VAccel"));
-	lab1->setAlignment(Qt::AlignRight);
-	m_pctrlVAccel = new FloatEdit;
-	m_pctrlVAccel->setAlignment(Qt::AlignRight);
-	VAccelBox->addStretch(1);
-	VAccelBox->addWidget(lab1);
-	VAccelBox->addWidget(m_pctrlVAccel);
+	QHBoxLayout *VAccelBoxLayout = new QHBoxLayout;
+	{
+		QLabel *lab1 = new QLabel(tr("VAccel"));
+		lab1->setAlignment(Qt::AlignRight);
+		m_pctrlVAccel = new FloatEdit;
+		m_pctrlVAccel->setAlignment(Qt::AlignRight);
+		VAccelBoxLayout->addStretch(1);
+		VAccelBoxLayout->addWidget(lab1);
+		VAccelBoxLayout->addWidget(m_pctrlVAccel);
+	}
 
-	QHBoxLayout *IterBox = new QHBoxLayout;
-	QLabel *lab2 = new QLabel(tr("Iteration Limit"));
-	lab2->setAlignment(Qt::AlignRight);
-	m_pctrlIterLimit = new QLineEdit;
-	m_pctrlIterLimit->setAlignment(Qt::AlignRight);
-	QValidator *IterValid = new QIntValidator(0, 100000000, this);
-	m_pctrlIterLimit->setValidator(IterValid);
-	IterBox->addStretch(1);
-	IterBox->addWidget(lab2);
-	IterBox->addWidget(m_pctrlIterLimit);
+	QHBoxLayout *IterBoxLayout = new QHBoxLayout;
+	{
+		QLabel *lab2 = new QLabel(tr("Iteration Limit"));
+		lab2->setAlignment(Qt::AlignRight);
+		m_pctrlIterLimit = new QLineEdit;
+		m_pctrlIterLimit->setAlignment(Qt::AlignRight);
+		QValidator *IterValid = new QIntValidator(0, 100000000, this);
+		m_pctrlIterLimit->setValidator(IterValid);
+		IterBoxLayout->addStretch(1);
+		IterBoxLayout->addWidget(lab2);
+		IterBoxLayout->addWidget(m_pctrlIterLimit);
+	}
 
 	m_pctrlInitBL = new QCheckBox(tr("Re-initialize BLs after an unconverged iteration"));
 	m_pctrlFullReport = new QCheckBox(tr("Show full log report for an XFoil analysis"));
 
-	QHBoxLayout *CommandButtons = new QHBoxLayout;
-	OKButton      = new QPushButton(tr("OK"));
-	CancelButton  = new QPushButton(tr("Cancel"));
-	CommandButtons->addStretch(1);
-	CommandButtons->addWidget(OKButton);
-	CommandButtons->addStretch(1);
-	CommandButtons->addWidget(CancelButton);
-	CommandButtons->addStretch(1);
-
+	QHBoxLayout *CommandButtonsLayout = new QHBoxLayout;
+	{
+		OKButton      = new QPushButton(tr("OK"));
+		CancelButton  = new QPushButton(tr("Cancel"));
+		CommandButtonsLayout->addStretch(1);
+		CommandButtonsLayout->addWidget(OKButton);
+		CommandButtonsLayout->addStretch(1);
+		CommandButtonsLayout->addWidget(CancelButton);
+		CommandButtonsLayout->addStretch(1);
+	}
 
 	QVBoxLayout *MainLayout = new QVBoxLayout;
-	MainLayout->addLayout(VAccelBox);
-	MainLayout->addLayout(IterBox);
-	MainLayout->addWidget(m_pctrlInitBL);
-	MainLayout->addWidget(m_pctrlFullReport);
-	MainLayout->addLayout(CommandButtons);
+	{
+		MainLayout->addLayout(VAccelBoxLayout);
+		MainLayout->addLayout(IterBoxLayout);
+		MainLayout->addWidget(m_pctrlInitBL);
+		MainLayout->addWidget(m_pctrlFullReport);
+		MainLayout->addLayout(CommandButtonsLayout);
+	}
 
 	setLayout(MainLayout);
 }

@@ -40,7 +40,7 @@ class EditPlrDlg : public QDialog
 	friend class QMiarex;
 
 public:
-    EditPlrDlg(QWidget *pParent);
+	EditPlrDlg(QWidget *pParent=NULL);
 	void InitDialog();
 
 private slots:

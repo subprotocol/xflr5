@@ -31,7 +31,7 @@ class XDirectStyleDlg : public QDialog
 	friend class QXDirect;
 
 public:
-    XDirectStyleDlg(QWidget *pParent);
+	XDirectStyleDlg(QWidget *pParent=NULL);
 	void InitDialog();
 
 private slots:

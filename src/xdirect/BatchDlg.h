@@ -42,7 +42,7 @@ class BatchDlg : public QDialog
 	friend class MainFrame;
 	friend class QReListDlg;
 public:
-    BatchDlg(QWidget *pParent);
+	BatchDlg(QWidget *pParent=NULL);
 
 	void SetupLayout();
 	void InitDialog();

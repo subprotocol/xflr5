@@ -38,7 +38,7 @@ class ReListDlg : public QDialog
 	friend class BatchThreadDlg;
 
 public:
-    ReListDlg(QWidget *pParent);
+	ReListDlg(QWidget *pParent=NULL);
 	void InitDialog();
 
 private slots:

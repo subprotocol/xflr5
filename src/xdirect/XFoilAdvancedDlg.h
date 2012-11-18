@@ -40,7 +40,7 @@ class XFoilAdvancedDlg : public QDialog
 	friend class QXDirect;
 
 public:
-    XFoilAdvancedDlg(QWidget *pParent);
+	XFoilAdvancedDlg(QWidget *pParent=NULL);
 	void InitDialog();
 
 
