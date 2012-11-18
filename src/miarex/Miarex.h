@@ -509,9 +509,6 @@ protected:
 	bool m_bTransGraph;			// true if a graph is being dragged
 
 	bool m_bShowWingCurve[MAXWINGS];
-//	bool m_bShowWing2;			// true if the biplane's second wing OpPoint results should be displayed
-//	bool m_bShowStab;			// true if the stabilisator (elevator) OpPoint results should be displayed
-//	bool m_bShowFin;			// true if the fin OpPoint results should be displayed
 	bool m_bLogFile;			// true if the log file warning is turned on
 	bool m_bResetWake;
 
