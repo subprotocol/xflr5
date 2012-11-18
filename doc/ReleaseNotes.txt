@@ -16,10 +16,12 @@
 
 
 
-xflr5 v6.09.01 Beta, November 24th, 2012
-	- corrected the bugs in body edition
-	- fixed a few crash bugs
-	- code cleaning
+xflr5 v6.09.01 Beta, November 18th, 2012
+	- Modified the wing twist definition which is now applied around the panel's quarter chord rather than around the y-axis. Impact on results.
+	- Corrected the bugs in body edition
+	- Fixed a few crash bugs
+	- Minor enhancements
+	- Made a lot of code cleaning
 
 
 

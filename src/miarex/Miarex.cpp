@@ -8302,8 +8302,8 @@ void QMiarex::OnDeleteCurUFO()
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	QString strong;
 	if(m_pCurPlane) strong = tr("Are you sure you want to delete the plane :\n") +  m_pCurPlane->PlaneName() +"?\n";
-	else 	      strong = tr("Are you sure you want to delete the wing :\n") +   m_pCurWing->WingName() +"?\n";
-	if (QMessageBox::Yes != QMessageBox::question(window(), tr("Question"), strong, QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel)) return;
+	else 	        strong = tr("Are you sure you want to delete the wing :\n") +   m_pCurWing->WingName() +"?\n";
+	if (QMessageBox::Yes != QMessageBox::question(pMainFrame, tr("Question"), strong, QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel)) return;
 
 	if(m_pCurPlane) pMainFrame->DeletePlane(m_pCurPlane);
 	else            pMainFrame->DeleteWing(m_pCurWing);
@@ -8465,7 +8465,7 @@ void QMiarex::OnDeleteUFOWPolars()
 	else            UFOName = m_pCurWing->WingName();
 
 	strong = tr("Are you sure you want to delete the polars associated to :\n") +  UFOName +"?\n";
-	if (QMessageBox::Yes != QMessageBox::question(window(), tr("Question"), strong, QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel)) return;
+	if (QMessageBox::Yes != QMessageBox::question(pMainFrame, tr("Question"), strong, QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel)) return;
 
 	for(int j=m_poaWPolar->size()-1; j>=0; j--)
 	{
@@ -8527,7 +8527,7 @@ void QMiarex::OnDeleteCurWPolar()
 	else return;
 
 	strong = tr("Are you sure you want to delete the polar :\n") +  m_pCurWPolar->m_PlrName +"?\n";
-	if (QMessageBox::Yes != QMessageBox::question(window(), tr("Question"), strong,
+	if (QMessageBox::Yes != QMessageBox::question(pMainFrame, tr("Question"), strong,
 												  QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel)) return;
 
 	//first remove all WOpps associated to the Wing Polar
@@ -10371,7 +10371,7 @@ void QMiarex::OnResetCurWPolar()
 	if (!m_pCurWPolar) return;
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	QString strong = tr("Are you sure you want to reset the content of the polar :\n")+  m_pCurWPolar->m_PlrName +"?\n";
-	if (QMessageBox::Yes != QMessageBox::question(window(), tr("Question"), strong,
+	if (QMessageBox::Yes != QMessageBox::question(pMainFrame, tr("Question"), strong,
 												  QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel,
 												  QMessageBox::Cancel)) return;
 
@@ -13511,7 +13511,7 @@ bool QMiarex::SetModWing(CWing *pModWing)
 			else if(pOldPlane)
 
 			{
-//				if(pOldPlane->m_bActive) QMessageBox::warning(window(), tr("Warning"),tr("Cannot overwrite current plane"));
+//				if(pOldPlane->m_bActive) QMessageBox::warning(pMainFrame, tr("Warning"),tr("Cannot overwrite current plane"));
 //				else
 				{
 					for (k=0; k<m_poaPlane->size(); k++)
