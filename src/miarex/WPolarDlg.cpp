@@ -174,14 +174,14 @@ void WPolarDlg::InitDialog(CPlane *pPlane, CWing *pWing, CWPolar *pWPolar)
 
 	if(pWPolar)
 	{
-		m_bAutoName = false;
+//		m_bAutoName = false;
 		m_pctrlAutoName->setChecked(false);
 		m_pctrlWPolarName->setText(pWPolar->m_PlrName);
 		s_WPolar.DuplicateSpec(pWPolar);
 	}
 	else
 	{
-		m_bAutoName = true;
+//		m_bAutoName = true;
 		m_pctrlAutoName->setChecked(true);
 	}
 
