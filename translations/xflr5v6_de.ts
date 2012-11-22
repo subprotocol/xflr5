@@ -810,114 +810,114 @@ CPCALC: local speed too large
 <context>
     <name>CAddDlg</name>
     <message>
-        <location filename="../src/xdirect/CAddDlg.cpp" line="35"/>
+        <location filename="../src/xdirect/CAddDlg.cpp" line="36"/>
         <source>Local Panel Refinement</source>
         <translation>Lokale Panel Verfeinerung</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/CAddDlg.cpp" line="51"/>
+        <location filename="../src/xdirect/CAddDlg.cpp" line="52"/>
         <source>Angle Criterion </source>
         <translation>Winkelkriterium</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/CAddDlg.cpp" line="52"/>
+        <location filename="../src/xdirect/CAddDlg.cpp" line="53"/>
         <source>Type of Spline</source>
         <translation>Art der Spline</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/CAddDlg.cpp" line="53"/>
+        <location filename="../src/xdirect/CAddDlg.cpp" line="54"/>
         <source>Refinement X Limits</source>
         <translation>Verfeinerung X Grenzen</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/CAddDlg.cpp" line="54"/>
+        <location filename="../src/xdirect/CAddDlg.cpp" line="55"/>
         <source>From</source>
         <translation>Von</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/CAddDlg.cpp" line="55"/>
+        <location filename="../src/xdirect/CAddDlg.cpp" line="56"/>
         <source>To</source>
         <translation>nach</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/CAddDlg.cpp" line="62"/>
+        <location filename="../src/xdirect/CAddDlg.cpp" line="63"/>
         <source>Uniform</source>
         <translation>gleichmäßig</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/CAddDlg.cpp" line="63"/>
+        <location filename="../src/xdirect/CAddDlg.cpp" line="64"/>
         <source>Arc Length</source>
         <translation>Bogenlänge</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/CAddDlg.cpp" line="76"/>
+        <location filename="../src/xdirect/CAddDlg.cpp" line="77"/>
         <source>Total</source>
         <translation>Gesamt</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/CAddDlg.cpp" line="77"/>
+        <location filename="../src/xdirect/CAddDlg.cpp" line="78"/>
         <source>Added</source>
         <translation>hinzugefügt</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/CAddDlg.cpp" line="78"/>
+        <location filename="../src/xdirect/CAddDlg.cpp" line="79"/>
         <source>MaxAngle</source>
         <translation>Maximal Winkel</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/CAddDlg.cpp" line="79"/>
+        <location filename="../src/xdirect/CAddDlg.cpp" line="80"/>
         <source>At Panel</source>
         <translation>bei Panel</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/CAddDlg.cpp" line="82"/>
+        <location filename="../src/xdirect/CAddDlg.cpp" line="83"/>
         <source>Accept</source>
         <translation>Bestätigen</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/CAddDlg.cpp" line="83"/>
+        <location filename="../src/xdirect/CAddDlg.cpp" line="84"/>
         <source>Cancel</source>
         <translation>Abbrechen</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/CAddDlg.cpp" line="84"/>
+        <location filename="../src/xdirect/CAddDlg.cpp" line="85"/>
         <source>Apply</source>
         <translation>Anwenden</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/CAddDlg.cpp" line="136"/>
+        <location filename="../src/xdirect/CAddDlg.cpp" line="137"/>
         <source>Warning</source>
         <translation>Warnung</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/CAddDlg.cpp" line="136"/>
+        <location filename="../src/xdirect/CAddDlg.cpp" line="137"/>
         <source>Unrecognized foil format</source>
         <translation>Unbekannts Profil Format</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/CAddDlg.cpp" line="150"/>
-        <location filename="../src/xdirect/CAddDlg.cpp" line="215"/>
+        <location filename="../src/xdirect/CAddDlg.cpp" line="151"/>
+        <location filename="../src/xdirect/CAddDlg.cpp" line="216"/>
         <source>Total number of points is %1</source>
         <translation>Gesamtzahl der Punkte ist %1</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/CAddDlg.cpp" line="152"/>
+        <location filename="../src/xdirect/CAddDlg.cpp" line="153"/>
         <source>(added %1 points to original foil)</source>
         <translation>(%1 Punkte hinzugefügt)</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/CAddDlg.cpp" line="166"/>
+        <location filename="../src/xdirect/CAddDlg.cpp" line="167"/>
         <source>Maximum panel angle is %1</source>
         <translation>Maximaler Panel Winkel ist %1</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/CAddDlg.cpp" line="168"/>
-        <location filename="../src/xdirect/CAddDlg.cpp" line="212"/>
+        <location filename="../src/xdirect/CAddDlg.cpp" line="169"/>
+        <location filename="../src/xdirect/CAddDlg.cpp" line="213"/>
         <source>at panel position %1</source>
         <translation>bei Panel Position %1</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/CAddDlg.cpp" line="210"/>
+        <location filename="../src/xdirect/CAddDlg.cpp" line="211"/>
         <source>Maximum panel angle is %1 deg</source>
         <translation>Maximaler Panel Winkel ist %1</translation>
     </message>
@@ -1165,22 +1165,22 @@ CPCALC: local speed too large
         <translation>Polar Punkte Verwalten</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/EditPlrDlg.cpp" line="244"/>
+        <location filename="../src/xdirect/EditPlrDlg.cpp" line="245"/>
         <source>Delete All Points</source>
         <translation>Alle Punkte löschen</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/EditPlrDlg.cpp" line="245"/>
+        <location filename="../src/xdirect/EditPlrDlg.cpp" line="246"/>
         <source>Delete Point</source>
         <translation>Punkt löschen</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/EditPlrDlg.cpp" line="246"/>
+        <location filename="../src/xdirect/EditPlrDlg.cpp" line="247"/>
         <source>OK</source>
         <translation>Ok</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/EditPlrDlg.cpp" line="247"/>
+        <location filename="../src/xdirect/EditPlrDlg.cpp" line="248"/>
         <source>Cancel</source>
         <translation>Abbrechen</translation>
     </message>
@@ -1193,67 +1193,67 @@ CPCALC: local speed too large
         <translation>Klappen Dialog</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/FlapDlg.cpp" line="73"/>
+        <location filename="../src/xdirect/FlapDlg.cpp" line="74"/>
         <source>L.E. Flap</source>
         <translation>L.E (Vorderkanten) Klappe</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/FlapDlg.cpp" line="74"/>
+        <location filename="../src/xdirect/FlapDlg.cpp" line="75"/>
         <source>T.E. Flap</source>
         <translation>T.E.(Hinterkanten) Klappe</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/FlapDlg.cpp" line="82"/>
+        <location filename="../src/xdirect/FlapDlg.cpp" line="83"/>
         <source>Flap Angle</source>
         <translation>Klappen Winkel</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/FlapDlg.cpp" line="83"/>
+        <location filename="../src/xdirect/FlapDlg.cpp" line="84"/>
         <source>+ is down</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/xdirect/FlapDlg.cpp" line="84"/>
+        <location filename="../src/xdirect/FlapDlg.cpp" line="85"/>
         <source>Hinge X Position</source>
         <translation>Aufhängungs X-Position</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/FlapDlg.cpp" line="85"/>
+        <location filename="../src/xdirect/FlapDlg.cpp" line="86"/>
         <source>% Chord</source>
         <translation>% Chord (Flügeltiefe)</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/FlapDlg.cpp" line="86"/>
+        <location filename="../src/xdirect/FlapDlg.cpp" line="87"/>
         <source>Hinge Y Position</source>
         <translation>Aufhängungs Y-Position</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/FlapDlg.cpp" line="87"/>
+        <location filename="../src/xdirect/FlapDlg.cpp" line="88"/>
         <source>% Thickness</source>
         <translation>% Dicke</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/FlapDlg.cpp" line="105"/>
+        <location filename="../src/xdirect/FlapDlg.cpp" line="108"/>
         <source>OK</source>
         <translation>Ok</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/FlapDlg.cpp" line="106"/>
+        <location filename="../src/xdirect/FlapDlg.cpp" line="109"/>
         <source>Cancel</source>
         <translation>Abbrechen</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/FlapDlg.cpp" line="107"/>
+        <location filename="../src/xdirect/FlapDlg.cpp" line="110"/>
         <source>Apply</source>
         <translation>Anwenden</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/FlapDlg.cpp" line="155"/>
+        <location filename="../src/xdirect/FlapDlg.cpp" line="159"/>
         <source>Warning</source>
         <translation>Warnung</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/FlapDlg.cpp" line="155"/>
+        <location filename="../src/xdirect/FlapDlg.cpp" line="159"/>
         <source>The trailing edge hinge must be downstream of the leading edge hinge</source>
         <translation>Die Hinterkante muss nach der Vorderkante angeströmt werden</translation>
     </message>
@@ -1710,7 +1710,7 @@ CPCALC: local speed too large
     </message>
     <message>
         <location filename="../src/miarex/GL3dBodyDlg.cpp" line="167"/>
-        <location filename="../src/miarex/GL3dBodyDlg.cpp" line="3476"/>
+        <location filename="../src/miarex/GL3dBodyDlg.cpp" line="3488"/>
         <source>Reset Scales</source>
         <translation>Skalierungen zurücksetzen</translation>
     </message>
@@ -1725,7 +1725,7 @@ CPCALC: local speed too large
     </message>
     <message>
         <location filename="../src/miarex/GL3dBodyDlg.cpp" line="171"/>
-        <location filename="../src/miarex/GL3dBodyDlg.cpp" line="3500"/>
+        <location filename="../src/miarex/GL3dBodyDlg.cpp" line="3512"/>
         <source>Undo</source>
         <translation>Rückgängig</translation>
     </message>
@@ -1736,7 +1736,7 @@ CPCALC: local speed too large
     </message>
     <message>
         <location filename="../src/miarex/GL3dBodyDlg.cpp" line="175"/>
-        <location filename="../src/miarex/GL3dBodyDlg.cpp" line="3501"/>
+        <location filename="../src/miarex/GL3dBodyDlg.cpp" line="3513"/>
         <source>Redo</source>
         <translation>Wiederherstellen</translation>
     </message>
@@ -1785,13 +1785,13 @@ CPCALC: local speed too large
         <translation>Skalierung = %1</translation>
     </message>
     <message>
-        <location filename="../src/miarex/GL3dBodyDlg.cpp" line="3708"/>
-        <location filename="../src/miarex/GL3dBodyDlg.cpp" line="3730"/>
+        <location filename="../src/miarex/GL3dBodyDlg.cpp" line="3720"/>
+        <location filename="../src/miarex/GL3dBodyDlg.cpp" line="3742"/>
         <source>NPanels</source>
         <translation>NPanels</translation>
     </message>
     <message>
-        <location filename="../src/miarex/GL3dBodyDlg.cpp" line="3003"/>
+        <location filename="../src/miarex/GL3dBodyDlg.cpp" line="3015"/>
         <source>Body Dlg Exit</source>
         <translation>Rumpfverwaltung Exit</translation>
     </message>
@@ -1806,38 +1806,38 @@ CPCALC: local speed too large
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/miarex/GL3dBodyDlg.cpp" line="3003"/>
+        <location filename="../src/miarex/GL3dBodyDlg.cpp" line="3015"/>
         <source>Save the Body ?</source>
         <translation>Rumpf speichern?</translation>
     </message>
     <message>
-        <location filename="../src/miarex/GL3dBodyDlg.cpp" line="3418"/>
+        <location filename="../src/miarex/GL3dBodyDlg.cpp" line="3430"/>
         <source>Axes</source>
         <translation>Axen</translation>
     </message>
     <message>
-        <location filename="../src/miarex/GL3dBodyDlg.cpp" line="3419"/>
+        <location filename="../src/miarex/GL3dBodyDlg.cpp" line="3431"/>
         <source>Light</source>
         <translation>Licht</translation>
     </message>
     <message>
-        <location filename="../src/miarex/GL3dBodyDlg.cpp" line="3420"/>
+        <location filename="../src/miarex/GL3dBodyDlg.cpp" line="3432"/>
         <source>Surfaces</source>
         <translation>Oberflächen</translation>
     </message>
     <message>
-        <location filename="../src/miarex/GL3dBodyDlg.cpp" line="3421"/>
+        <location filename="../src/miarex/GL3dBodyDlg.cpp" line="3433"/>
         <source>Outline</source>
         <translation>Kontur</translation>
     </message>
     <message>
-        <location filename="../src/miarex/GL3dBodyDlg.cpp" line="3422"/>
-        <location filename="../src/miarex/GL3dBodyDlg.cpp" line="3576"/>
+        <location filename="../src/miarex/GL3dBodyDlg.cpp" line="3434"/>
+        <location filename="../src/miarex/GL3dBodyDlg.cpp" line="3588"/>
         <source>Panels</source>
         <translation>Panele</translation>
     </message>
     <message>
-        <location filename="../src/miarex/GL3dBodyDlg.cpp" line="3423"/>
+        <location filename="../src/miarex/GL3dBodyDlg.cpp" line="3435"/>
         <source>Masses</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1858,122 +1858,122 @@ CPCALC: local speed too large
         <translation type="obsolete">Iso</translation>
     </message>
     <message>
-        <location filename="../src/miarex/GL3dBodyDlg.cpp" line="3473"/>
+        <location filename="../src/miarex/GL3dBodyDlg.cpp" line="3485"/>
         <source>Pick Center</source>
         <translation>Zentrum auswählen</translation>
     </message>
     <message>
-        <location filename="../src/miarex/GL3dBodyDlg.cpp" line="3485"/>
+        <location filename="../src/miarex/GL3dBodyDlg.cpp" line="3497"/>
         <source>Clip Plane</source>
         <translation>Schnittebene</translation>
     </message>
     <message>
-        <location filename="../src/miarex/GL3dBodyDlg.cpp" line="3502"/>
+        <location filename="../src/miarex/GL3dBodyDlg.cpp" line="3514"/>
         <source>Other</source>
         <translation>Andere</translation>
     </message>
     <message>
-        <location filename="../src/miarex/GL3dBodyDlg.cpp" line="3504"/>
+        <location filename="../src/miarex/GL3dBodyDlg.cpp" line="3516"/>
         <source>Actions...</source>
         <translation>Aktionen...</translation>
     </message>
     <message>
-        <location filename="../src/miarex/GL3dBodyDlg.cpp" line="3524"/>
+        <location filename="../src/miarex/GL3dBodyDlg.cpp" line="3536"/>
         <source>Save and Close</source>
         <translation>speichern und schliessen</translation>
     </message>
     <message>
-        <location filename="../src/miarex/GL3dBodyDlg.cpp" line="3526"/>
+        <location filename="../src/miarex/GL3dBodyDlg.cpp" line="3538"/>
         <source>Cancel</source>
         <translation>Abbrechen</translation>
     </message>
     <message>
-        <location filename="../src/miarex/GL3dBodyDlg.cpp" line="3563"/>
+        <location filename="../src/miarex/GL3dBodyDlg.cpp" line="3575"/>
         <source>Flat Panels</source>
         <translation>Flache Panels</translation>
     </message>
     <message>
-        <location filename="../src/miarex/GL3dBodyDlg.cpp" line="3564"/>
+        <location filename="../src/miarex/GL3dBodyDlg.cpp" line="3576"/>
         <source>BSplines</source>
         <translation>BSplines</translation>
     </message>
     <message>
-        <location filename="../src/miarex/GL3dBodyDlg.cpp" line="3573"/>
+        <location filename="../src/miarex/GL3dBodyDlg.cpp" line="3585"/>
         <source>x</source>
         <translation>x</translation>
     </message>
     <message>
-        <location filename="../src/miarex/GL3dBodyDlg.cpp" line="3574"/>
+        <location filename="../src/miarex/GL3dBodyDlg.cpp" line="3586"/>
         <source>Hoop</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/miarex/GL3dBodyDlg.cpp" line="3575"/>
+        <location filename="../src/miarex/GL3dBodyDlg.cpp" line="3587"/>
         <source>Degree</source>
         <translation>Grad</translation>
     </message>
     <message>
-        <location filename="../src/miarex/GL3dBodyDlg.cpp" line="3548"/>
+        <location filename="../src/miarex/GL3dBodyDlg.cpp" line="3560"/>
         <source>BodyName</source>
         <translation>Rupf-Name</translation>
     </message>
     <message>
-        <location filename="../src/miarex/GL3dBodyDlg.cpp" line="3559"/>
+        <location filename="../src/miarex/GL3dBodyDlg.cpp" line="3571"/>
         <source>Enter here a short description for the body</source>
         <translation>Geben Sie eine Beschreibung für den Rumpf an</translation>
     </message>
     <message>
-        <location filename="../src/miarex/GL3dBodyDlg.cpp" line="3555"/>
+        <location filename="../src/miarex/GL3dBodyDlg.cpp" line="3567"/>
         <source>Description:</source>
         <translation>Beschreibung:</translation>
     </message>
     <message>
-        <location filename="../src/miarex/GL3dBodyDlg.cpp" line="3451"/>
+        <location filename="../src/miarex/GL3dBodyDlg.cpp" line="3463"/>
         <source>X View</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/miarex/GL3dBodyDlg.cpp" line="3452"/>
+        <location filename="../src/miarex/GL3dBodyDlg.cpp" line="3464"/>
         <source>Y View</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/miarex/GL3dBodyDlg.cpp" line="3453"/>
+        <location filename="../src/miarex/GL3dBodyDlg.cpp" line="3465"/>
         <source>Z View</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/miarex/GL3dBodyDlg.cpp" line="3454"/>
+        <location filename="../src/miarex/GL3dBodyDlg.cpp" line="3466"/>
         <source>Iso View</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/miarex/GL3dBodyDlg.cpp" line="3577"/>
+        <location filename="../src/miarex/GL3dBodyDlg.cpp" line="3589"/>
         <source>Panel bunch</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/miarex/GL3dBodyDlg.cpp" line="3637"/>
+        <location filename="../src/miarex/GL3dBodyDlg.cpp" line="3649"/>
         <source>Frames</source>
         <translation>Rahmen</translation>
     </message>
     <message>
-        <location filename="../src/miarex/GL3dBodyDlg.cpp" line="3638"/>
+        <location filename="../src/miarex/GL3dBodyDlg.cpp" line="3650"/>
         <source>Frame Positions</source>
         <translation>Rahmen Position</translation>
     </message>
     <message>
-        <location filename="../src/miarex/GL3dBodyDlg.cpp" line="3657"/>
+        <location filename="../src/miarex/GL3dBodyDlg.cpp" line="3669"/>
         <source>Points</source>
         <translation>Punkte</translation>
     </message>
     <message>
-        <location filename="../src/miarex/GL3dBodyDlg.cpp" line="3658"/>
+        <location filename="../src/miarex/GL3dBodyDlg.cpp" line="3670"/>
         <source>Current Frame Definition</source>
         <translation>Aktuelle Rahmen Definition</translation>
     </message>
     <message>
-        <location filename="../src/miarex/GL3dBodyDlg.cpp" line="3771"/>
+        <location filename="../src/miarex/GL3dBodyDlg.cpp" line="3783"/>
         <source>Context Menu</source>
         <translation>Befehlsübersicht</translation>
     </message>
@@ -1986,10 +1986,10 @@ CPCALC: local speed too large
         <location filename="../src/miarex/GL3dWingDlg.cpp" line="164"/>
         <location filename="../src/miarex/GL3dWingDlg.cpp" line="170"/>
         <location filename="../src/miarex/GL3dWingDlg.cpp" line="1479"/>
-        <location filename="../src/miarex/GL3dWingDlg.cpp" line="1590"/>
-        <location filename="../src/miarex/GL3dWingDlg.cpp" line="1595"/>
-        <location filename="../src/miarex/GL3dWingDlg.cpp" line="1649"/>
-        <location filename="../src/miarex/GL3dWingDlg.cpp" line="2689"/>
+        <location filename="../src/miarex/GL3dWingDlg.cpp" line="1589"/>
+        <location filename="../src/miarex/GL3dWingDlg.cpp" line="1594"/>
+        <location filename="../src/miarex/GL3dWingDlg.cpp" line="1648"/>
+        <location filename="../src/miarex/GL3dWingDlg.cpp" line="2688"/>
         <source>Warning</source>
         <translation>Warnung</translation>
     </message>
@@ -2004,27 +2004,27 @@ CPCALC: local speed too large
         <translation>Der erste Abschnitt kann nicht gelöscht werden</translation>
     </message>
     <message>
-        <location filename="../src/miarex/GL3dWingDlg.cpp" line="2139"/>
+        <location filename="../src/miarex/GL3dWingDlg.cpp" line="2138"/>
         <source>Insert after section</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/miarex/GL3dWingDlg.cpp" line="2143"/>
+        <location filename="../src/miarex/GL3dWingDlg.cpp" line="2142"/>
         <source>Insert before section</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/miarex/GL3dWingDlg.cpp" line="2257"/>
+        <location filename="../src/miarex/GL3dWingDlg.cpp" line="2256"/>
         <source>Symetric</source>
         <translation>symetrisch</translation>
     </message>
     <message>
-        <location filename="../src/miarex/GL3dWingDlg.cpp" line="2258"/>
+        <location filename="../src/miarex/GL3dWingDlg.cpp" line="2257"/>
         <source>Right Side</source>
         <translation>rechte Seite</translation>
     </message>
     <message>
-        <location filename="../src/miarex/GL3dWingDlg.cpp" line="2259"/>
+        <location filename="../src/miarex/GL3dWingDlg.cpp" line="2258"/>
         <source>Left Side</source>
         <translation>linke Seite</translation>
     </message>
@@ -2050,7 +2050,7 @@ CPCALC: local speed too large
     </message>
     <message>
         <location filename="../src/miarex/GL3dWingDlg.cpp" line="122"/>
-        <location filename="../src/miarex/GL3dWingDlg.cpp" line="2147"/>
+        <location filename="../src/miarex/GL3dWingDlg.cpp" line="2146"/>
         <source>Delete section</source>
         <translation>Abschnitt löschen</translation>
     </message>
@@ -2072,7 +2072,7 @@ The maximum number is</source>
     </message>
     <message>
         <location filename="../src/miarex/GL3dWingDlg.cpp" line="170"/>
-        <location filename="../src/miarex/GL3dWingDlg.cpp" line="2689"/>
+        <location filename="../src/miarex/GL3dWingDlg.cpp" line="2688"/>
         <source>Too many panels
 Reduce the mesh size</source>
         <translation>Zu viele Panele\nBitte reduzieren sie die Gittergröße</translation>
@@ -2084,37 +2084,37 @@ Reduce the mesh size</source>
     </message>
     <message>
         <location filename="../src/miarex/GL3dWingDlg.cpp" line="177"/>
-        <location filename="../src/miarex/GL3dWingDlg.cpp" line="1989"/>
+        <location filename="../src/miarex/GL3dWingDlg.cpp" line="1988"/>
         <source>Question</source>
         <translation>Frage</translation>
     </message>
     <message>
         <location filename="../src/miarex/GL3dWingDlg.cpp" line="351"/>
         <location filename="../src/miarex/GL3dWingDlg.cpp" line="359"/>
-        <location filename="../src/miarex/GL3dWingDlg.cpp" line="1961"/>
-        <location filename="../src/miarex/GL3dWingDlg.cpp" line="1976"/>
+        <location filename="../src/miarex/GL3dWingDlg.cpp" line="1960"/>
+        <location filename="../src/miarex/GL3dWingDlg.cpp" line="1975"/>
         <source>Uniform</source>
         <translation>Gleichmäßig</translation>
     </message>
     <message>
         <location filename="../src/miarex/GL3dWingDlg.cpp" line="352"/>
         <location filename="../src/miarex/GL3dWingDlg.cpp" line="360"/>
-        <location filename="../src/miarex/GL3dWingDlg.cpp" line="1962"/>
-        <location filename="../src/miarex/GL3dWingDlg.cpp" line="1977"/>
+        <location filename="../src/miarex/GL3dWingDlg.cpp" line="1961"/>
+        <location filename="../src/miarex/GL3dWingDlg.cpp" line="1976"/>
         <source>Cosine</source>
         <translation>COSinus</translation>
     </message>
     <message>
         <location filename="../src/miarex/GL3dWingDlg.cpp" line="361"/>
-        <location filename="../src/miarex/GL3dWingDlg.cpp" line="1963"/>
-        <location filename="../src/miarex/GL3dWingDlg.cpp" line="1978"/>
+        <location filename="../src/miarex/GL3dWingDlg.cpp" line="1962"/>
+        <location filename="../src/miarex/GL3dWingDlg.cpp" line="1977"/>
         <source>Sine</source>
         <translation>SINus</translation>
     </message>
     <message>
         <location filename="../src/miarex/GL3dWingDlg.cpp" line="362"/>
-        <location filename="../src/miarex/GL3dWingDlg.cpp" line="1964"/>
-        <location filename="../src/miarex/GL3dWingDlg.cpp" line="1979"/>
+        <location filename="../src/miarex/GL3dWingDlg.cpp" line="1963"/>
+        <location filename="../src/miarex/GL3dWingDlg.cpp" line="1978"/>
         <source>-Sine</source>
         <translation>-SINus</translation>
     </message>
@@ -2134,43 +2134,43 @@ Reduce the mesh size</source>
         <translation>Abstand (</translation>
     </message>
     <message>
-        <location filename="../src/miarex/GL3dWingDlg.cpp" line="1590"/>
-        <location filename="../src/miarex/GL3dWingDlg.cpp" line="1649"/>
+        <location filename="../src/miarex/GL3dWingDlg.cpp" line="1589"/>
+        <location filename="../src/miarex/GL3dWingDlg.cpp" line="1648"/>
         <source>The maximum number of panels has been reached</source>
         <translation>Die Maximalanzahl von Panels wurde erreicht</translation>
     </message>
     <message>
-        <location filename="../src/miarex/GL3dWingDlg.cpp" line="1595"/>
+        <location filename="../src/miarex/GL3dWingDlg.cpp" line="1594"/>
         <source>No insertion possible before the first section</source>
         <translation>Kein einfügen vor dieser Position ist möglich</translation>
     </message>
     <message>
-        <location filename="../src/miarex/GL3dWingDlg.cpp" line="1883"/>
+        <location filename="../src/miarex/GL3dWingDlg.cpp" line="1882"/>
         <source>Wing Description</source>
         <translation>Tragflächenbeschreibung</translation>
     </message>
     <message>
-        <location filename="../src/miarex/GL3dWingDlg.cpp" line="1988"/>
+        <location filename="../src/miarex/GL3dWingDlg.cpp" line="1987"/>
         <source>Save the changes ?</source>
         <translation>Änderungen speichern?</translation>
     </message>
     <message>
-        <location filename="../src/miarex/GL3dWingDlg.cpp" line="2477"/>
+        <location filename="../src/miarex/GL3dWingDlg.cpp" line="2476"/>
         <source>X View</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/miarex/GL3dWingDlg.cpp" line="2478"/>
+        <location filename="../src/miarex/GL3dWingDlg.cpp" line="2477"/>
         <source>Y View</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/miarex/GL3dWingDlg.cpp" line="2479"/>
+        <location filename="../src/miarex/GL3dWingDlg.cpp" line="2478"/>
         <source>Z View</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/miarex/GL3dWingDlg.cpp" line="2480"/>
+        <location filename="../src/miarex/GL3dWingDlg.cpp" line="2479"/>
         <source>Iso View</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2187,7 +2187,7 @@ Reduce the mesh size</source>
         <translation type="obsolete">Löschen von Abschnitt %1</translation>
     </message>
     <message>
-        <location filename="../src/miarex/GL3dWingDlg.cpp" line="2210"/>
+        <location filename="../src/miarex/GL3dWingDlg.cpp" line="2209"/>
         <source>Undefined</source>
         <translation>Undefiniert</translation>
     </message>
@@ -2200,33 +2200,33 @@ Reduce the mesh size</source>
         <translation type="obsolete">Abschnitt löschen</translation>
     </message>
     <message>
-        <location filename="../src/miarex/GL3dWingDlg.cpp" line="2275"/>
+        <location filename="../src/miarex/GL3dWingDlg.cpp" line="2274"/>
         <source>WingName</source>
         <translation>Tragflächen Name</translation>
     </message>
     <message>
-        <location filename="../src/miarex/GL3dWingDlg.cpp" line="2324"/>
+        <location filename="../src/miarex/GL3dWingDlg.cpp" line="2323"/>
         <source>Wing Span</source>
         <translation>Trangflächen-Spannweite</translation>
     </message>
     <message>
-        <location filename="../src/miarex/GL3dWingDlg.cpp" line="2325"/>
+        <location filename="../src/miarex/GL3dWingDlg.cpp" line="2324"/>
         <source>Area</source>
         <translation>Fläche</translation>
     </message>
     <message>
-        <location filename="../src/miarex/GL3dWingDlg.cpp" line="2326"/>
+        <location filename="../src/miarex/GL3dWingDlg.cpp" line="2325"/>
         <source>Projected Span</source>
         <translation>Projizierte Spannweite</translation>
     </message>
     <message>
-        <location filename="../src/miarex/GL3dWingDlg.cpp" line="2327"/>
+        <location filename="../src/miarex/GL3dWingDlg.cpp" line="2326"/>
         <source>Projected Area</source>
         <translation>Projizierte Fläche</translation>
     </message>
     <message>
-        <location filename="../src/miarex/GL3dWingDlg.cpp" line="2366"/>
-        <location filename="../src/miarex/GL3dWingDlg.cpp" line="2370"/>
+        <location filename="../src/miarex/GL3dWingDlg.cpp" line="2365"/>
+        <location filename="../src/miarex/GL3dWingDlg.cpp" line="2369"/>
         <source>Max is </source>
         <translation>Maximum ist</translation>
     </message>
@@ -2235,12 +2235,12 @@ Reduce the mesh size</source>
         <translation type="obsolete">Volumen</translation>
     </message>
     <message>
-        <location filename="../src/miarex/GL3dWingDlg.cpp" line="2328"/>
+        <location filename="../src/miarex/GL3dWingDlg.cpp" line="2327"/>
         <source>Total VLM Panels</source>
         <translation>Anzahl der gesamten LVM Panels</translation>
     </message>
     <message>
-        <location filename="../src/miarex/GL3dWingDlg.cpp" line="2329"/>
+        <location filename="../src/miarex/GL3dWingDlg.cpp" line="2328"/>
         <source>Number of 3D Panels</source>
         <translation>Gesamtzahl der 3D Panels</translation>
     </message>
@@ -2253,82 +2253,82 @@ Reduce the mesh size</source>
         <translation type="obsolete">Max ist 2000</translation>
     </message>
     <message>
-        <location filename="../src/miarex/GL3dWingDlg.cpp" line="2375"/>
+        <location filename="../src/miarex/GL3dWingDlg.cpp" line="2374"/>
         <source>Mean Geom. Chord</source>
         <translation>Mittlere Geometrische Flügeltiefe </translation>
     </message>
     <message>
-        <location filename="../src/miarex/GL3dWingDlg.cpp" line="2376"/>
+        <location filename="../src/miarex/GL3dWingDlg.cpp" line="2375"/>
         <source>Mean Aero Chord</source>
         <translation>Mittlere Aerodynamische Flügeltiefe</translation>
     </message>
     <message>
-        <location filename="../src/miarex/GL3dWingDlg.cpp" line="2377"/>
+        <location filename="../src/miarex/GL3dWingDlg.cpp" line="2376"/>
         <source>MAC Span Pos</source>
         <translation>M.A.C. Spantenposition</translation>
     </message>
     <message>
-        <location filename="../src/miarex/GL3dWingDlg.cpp" line="2378"/>
+        <location filename="../src/miarex/GL3dWingDlg.cpp" line="2377"/>
         <source>Aspect ratio</source>
         <translation>Streckungs Verhältnis</translation>
     </message>
     <message>
-        <location filename="../src/miarex/GL3dWingDlg.cpp" line="2379"/>
+        <location filename="../src/miarex/GL3dWingDlg.cpp" line="2378"/>
         <source>Taper Ratio</source>
         <translation>Aufweitungsverhältnis</translation>
     </message>
     <message>
-        <location filename="../src/miarex/GL3dWingDlg.cpp" line="2380"/>
+        <location filename="../src/miarex/GL3dWingDlg.cpp" line="2379"/>
         <source>Root to Tip Sweep</source>
         <translation>Wurzel-Spitzen Rückfall (Root to Tip sweep)</translation>
     </message>
     <message>
-        <location filename="../src/miarex/GL3dWingDlg.cpp" line="2381"/>
+        <location filename="../src/miarex/GL3dWingDlg.cpp" line="2380"/>
         <source>Number of Flaps</source>
         <translation>Anzahl der Klappen</translation>
     </message>
     <message>
-        <location filename="../src/miarex/GL3dWingDlg.cpp" line="2430"/>
+        <location filename="../src/miarex/GL3dWingDlg.cpp" line="2429"/>
         <source>Enter here a short description for the wing</source>
         <translation>Kurzbeschreibung der Tragfläche</translation>
     </message>
     <message>
-        <location filename="../src/miarex/GL3dWingDlg.cpp" line="2433"/>
+        <location filename="../src/miarex/GL3dWingDlg.cpp" line="2432"/>
         <source>Description:</source>
         <translation>Beschreibung:</translation>
     </message>
     <message>
-        <location filename="../src/miarex/GL3dWingDlg.cpp" line="2441"/>
+        <location filename="../src/miarex/GL3dWingDlg.cpp" line="2440"/>
         <source>Axes</source>
         <translation>Axen</translation>
     </message>
     <message>
-        <location filename="../src/miarex/GL3dWingDlg.cpp" line="2442"/>
+        <location filename="../src/miarex/GL3dWingDlg.cpp" line="2441"/>
         <source>Light</source>
         <translation>Licht</translation>
     </message>
     <message>
-        <location filename="../src/miarex/GL3dWingDlg.cpp" line="2443"/>
+        <location filename="../src/miarex/GL3dWingDlg.cpp" line="2442"/>
         <source>Surfaces</source>
         <translation>Oberflächen</translation>
     </message>
     <message>
-        <location filename="../src/miarex/GL3dWingDlg.cpp" line="2444"/>
+        <location filename="../src/miarex/GL3dWingDlg.cpp" line="2443"/>
         <source>Outline</source>
         <translation>Kontur</translation>
     </message>
     <message>
-        <location filename="../src/miarex/GL3dWingDlg.cpp" line="2445"/>
+        <location filename="../src/miarex/GL3dWingDlg.cpp" line="2444"/>
         <source>Panels</source>
         <translation>Panels</translation>
     </message>
     <message>
-        <location filename="../src/miarex/GL3dWingDlg.cpp" line="2446"/>
+        <location filename="../src/miarex/GL3dWingDlg.cpp" line="2445"/>
         <source>Foil Names</source>
         <translation>Profil Namen</translation>
     </message>
     <message>
-        <location filename="../src/miarex/GL3dWingDlg.cpp" line="2447"/>
+        <location filename="../src/miarex/GL3dWingDlg.cpp" line="2446"/>
         <source>Masses</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2345,47 +2345,47 @@ Reduce the mesh size</source>
         <translation type="obsolete">Isometrisch</translation>
     </message>
     <message>
-        <location filename="../src/miarex/GL3dWingDlg.cpp" line="2499"/>
+        <location filename="../src/miarex/GL3dWingDlg.cpp" line="2498"/>
         <source>Pick Center</source>
         <translation>Zentrum auswählen</translation>
     </message>
     <message>
-        <location filename="../src/miarex/GL3dWingDlg.cpp" line="2500"/>
+        <location filename="../src/miarex/GL3dWingDlg.cpp" line="2499"/>
         <source>Activate the button, then click on the object to center it in the viewport; alternatively, double click on the object</source>
         <translation type="unfinished">Doppelklick auf das Objekt um es zu zentrieren</translation>
     </message>
     <message>
-        <location filename="../src/miarex/GL3dWingDlg.cpp" line="2501"/>
+        <location filename="../src/miarex/GL3dWingDlg.cpp" line="2500"/>
         <source>Reset</source>
         <translation type="unfinished">Zurücksetzen</translation>
     </message>
     <message>
-        <location filename="../src/miarex/GL3dWingDlg.cpp" line="2515"/>
+        <location filename="../src/miarex/GL3dWingDlg.cpp" line="2514"/>
         <source>Clip Plane</source>
         <translation>Ebenenschnitt</translation>
     </message>
     <message>
-        <location filename="../src/miarex/GL3dWingDlg.cpp" line="2530"/>
+        <location filename="../src/miarex/GL3dWingDlg.cpp" line="2529"/>
         <source>Reset Mesh</source>
         <translation>Gitter zurücksetzen</translation>
     </message>
     <message>
-        <location filename="../src/miarex/GL3dWingDlg.cpp" line="2531"/>
+        <location filename="../src/miarex/GL3dWingDlg.cpp" line="2530"/>
         <source>Scale Wing</source>
         <translation>Tragfläche skalieren</translation>
     </message>
     <message>
-        <location filename="../src/miarex/GL3dWingDlg.cpp" line="2532"/>
+        <location filename="../src/miarex/GL3dWingDlg.cpp" line="2531"/>
         <source>Inertia...</source>
         <translation>Trägheit...</translation>
     </message>
     <message>
-        <location filename="../src/miarex/GL3dWingDlg.cpp" line="2543"/>
+        <location filename="../src/miarex/GL3dWingDlg.cpp" line="2542"/>
         <source>Save and Close</source>
         <translation>speichern und schliessen</translation>
     </message>
     <message>
-        <location filename="../src/miarex/GL3dWingDlg.cpp" line="2545"/>
+        <location filename="../src/miarex/GL3dWingDlg.cpp" line="2544"/>
         <source>Cancel</source>
         <translation>Abbrechen</translation>
     </message>
@@ -3843,12 +3843,12 @@ Reduce the mesh size</source>
 <context>
     <name>MainFrame</name>
     <message>
-        <location filename="../src/mainframe.cpp" line="429"/>
+        <location filename="../src/mainframe.cpp" line="424"/>
         <source>Save the project before exit ?</source>
         <translation>Projekt vor verlassen speichern?</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="463"/>
+        <location filename="../src/mainframe.cpp" line="458"/>
         <source>New Project</source>
         <translation>Neues Projekt</translation>
     </message>
@@ -3857,12 +3857,12 @@ Reduce the mesh size</source>
         <translation type="obsolete">Ctrl+N</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="465"/>
+        <location filename="../src/mainframe.cpp" line="460"/>
         <source>Save and close the current project, create a new project</source>
         <translation>Aktuelles Projekt peichern und schliessen, erzeugt neues Projekt</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="468"/>
+        <location filename="../src/mainframe.cpp" line="463"/>
         <source>Close the Project</source>
         <translation>Aktuelles Projekt schliessen</translation>
     </message>
@@ -3871,12 +3871,12 @@ Reduce the mesh size</source>
         <translation type="obsolete">Ctrl+W</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="470"/>
+        <location filename="../src/mainframe.cpp" line="465"/>
         <source>Save and close the current project</source>
         <translation>Aktuelles Projekt speichern und schliessen</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="473"/>
+        <location filename="../src/mainframe.cpp" line="468"/>
         <source>&amp;Open...</source>
         <translation>&amp;Öffnen...</translation>
     </message>
@@ -3885,22 +3885,22 @@ Reduce the mesh size</source>
         <translation type="obsolete">Ctrl+O</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="475"/>
+        <location filename="../src/mainframe.cpp" line="470"/>
         <source>Open an existing file</source>
         <translation>Bestehenden File öffnen</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="478"/>
+        <location filename="../src/mainframe.cpp" line="473"/>
         <source>&amp;Insert Project...</source>
         <translation>Projekt e&amp;infügen...</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="479"/>
+        <location filename="../src/mainframe.cpp" line="474"/>
         <source>Insert an existing project in the current project</source>
         <translation>Bestehendes Projekt in aktives Projekt einfügen</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="482"/>
+        <location filename="../src/mainframe.cpp" line="477"/>
         <source>&amp;Direct Foil Design</source>
         <translation>&amp;Direct Foil Design</translation>
     </message>
@@ -3909,12 +3909,12 @@ Reduce the mesh size</source>
         <translation type="obsolete">Ctrl+1</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="484"/>
+        <location filename="../src/mainframe.cpp" line="479"/>
         <source>Open Foil Design application</source>
         <translation>Öffne Profil Design Applikation</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="487"/>
+        <location filename="../src/mainframe.cpp" line="482"/>
         <source>&amp;XFoil Inverse Design</source>
         <translation>&amp;XFoil Inverse Design</translation>
     </message>
@@ -3923,12 +3923,12 @@ Reduce the mesh size</source>
         <translation type="obsolete">Ctrl+3</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="489"/>
+        <location filename="../src/mainframe.cpp" line="484"/>
         <source>Open XFoil inverse analysis application</source>
         <translation>Öffnen XFoil invserse Analyse Applikation</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="492"/>
+        <location filename="../src/mainframe.cpp" line="487"/>
         <source>&amp;XFoil Mixed Inverse Design</source>
         <translation>&amp;Xfoil Mixed Inverse Design</translation>
     </message>
@@ -3937,12 +3937,12 @@ Reduce the mesh size</source>
         <translation type="obsolete">Ctrl+4</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="494"/>
+        <location filename="../src/mainframe.cpp" line="489"/>
         <source>Open XFoil Mixed Inverse analysis application</source>
         <translation>Öffne XFoil mixed Inverse Analyse Applikation</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="497"/>
+        <location filename="../src/mainframe.cpp" line="492"/>
         <source>&amp;XFoil Direct Analysis</source>
         <translation>&amp;XFoil Direct Aanalyse</translation>
     </message>
@@ -3951,12 +3951,12 @@ Reduce the mesh size</source>
         <translation type="obsolete">Ctrl+5</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="499"/>
+        <location filename="../src/mainframe.cpp" line="494"/>
         <source>Open XFoil direct analysis application</source>
         <translation>Öffne XFoil direkt Analyse Applikation</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="502"/>
+        <location filename="../src/mainframe.cpp" line="497"/>
         <source>&amp;Wing and Plane Design</source>
         <translation>&amp;Tragfläche und Modell Design</translation>
     </message>
@@ -3965,13 +3965,13 @@ Reduce the mesh size</source>
         <translation type="obsolete">Ctrl+6</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="504"/>
+        <location filename="../src/mainframe.cpp" line="499"/>
         <source>Open Wing/plane design and analysis application</source>
         <translation>Öffne Tragfläche/Modell Design und Analyse Applikation</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="507"/>
-        <location filename="../src/mainframe.cpp" line="3510"/>
+        <location filename="../src/mainframe.cpp" line="502"/>
+        <location filename="../src/mainframe.cpp" line="3518"/>
         <source>Save</source>
         <translation>speichern</translation>
     </message>
@@ -3980,22 +3980,22 @@ Reduce the mesh size</source>
         <translation type="obsolete">Ctrl+5</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="509"/>
+        <location filename="../src/mainframe.cpp" line="504"/>
         <source>Save the project to disk</source>
         <translation>Projekt speichern</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="512"/>
+        <location filename="../src/mainframe.cpp" line="507"/>
         <source>Save Project As...</source>
         <translation>Speichern als...</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="513"/>
+        <location filename="../src/mainframe.cpp" line="508"/>
         <source>Save the current project under a new name</source>
         <translation>Aktuelles Projekt unter neuem Namen speichern</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="516"/>
+        <location filename="../src/mainframe.cpp" line="511"/>
         <source>Save Options</source>
         <translation>Speicher Optionen</translation>
     </message>
@@ -4004,32 +4004,32 @@ Reduce the mesh size</source>
         <translation type="obsolete">Einheiten definieren...</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="521"/>
+        <location filename="../src/mainframe.cpp" line="516"/>
         <source>Define the units for this project</source>
         <translation>Einheiten für dieses Projekt definieren</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="524"/>
+        <location filename="../src/mainframe.cpp" line="519"/>
         <source>Language...</source>
         <translation>Sprache...</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="525"/>
+        <location filename="../src/mainframe.cpp" line="520"/>
         <source>Define the default language for the application</source>
         <translation>Standardsprache</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="528"/>
+        <location filename="../src/mainframe.cpp" line="523"/>
         <source>Restore toolbars</source>
         <translation>Toolbars wiederherstellen</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="529"/>
+        <location filename="../src/mainframe.cpp" line="524"/>
         <source>Restores the toolbars to their original state</source>
         <translation>Toolbars Positionen wiederherstellen</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="532"/>
+        <location filename="../src/mainframe.cpp" line="527"/>
         <source>Save View to Image File</source>
         <translation>Speichere Ansicht in Bilddatei</translation>
     </message>
@@ -4038,33 +4038,33 @@ Reduce the mesh size</source>
         <translation type="obsolete">Ctrl+I</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="534"/>
+        <location filename="../src/mainframe.cpp" line="529"/>
         <source>Saves the current view to a file on disk</source>
         <translation>Aktuelle Ansicht in Datei speichern</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="538"/>
+        <location filename="../src/mainframe.cpp" line="533"/>
         <source>Reset Default Settings</source>
         <translation>Auf Standardeinstellungen zurücksetzen</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="539"/>
+        <location filename="../src/mainframe.cpp" line="534"/>
         <source>will revert to default settings at the next session</source>
         <translation>Die Standardeinstellungen werden beim Neustart verwendet.</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="550"/>
+        <location filename="../src/mainframe.cpp" line="545"/>
         <source>General Display Settings</source>
         <translation>Allgemeine Display Einstellungen</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="555"/>
-        <location filename="../src/mainframe.cpp" line="3645"/>
+        <location filename="../src/mainframe.cpp" line="550"/>
+        <location filename="../src/mainframe.cpp" line="3653"/>
         <source>Export Graph</source>
         <translation>Graphen exportieren</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="556"/>
+        <location filename="../src/mainframe.cpp" line="551"/>
         <source>Export the current graph data to a text file</source>
         <translation>Graph Daten in Text-File exportieren</translation>
     </message>
@@ -4073,12 +4073,12 @@ Reduce the mesh size</source>
         <translation type="obsolete">Graph Skalierung zurücksetzen (R)</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="560"/>
+        <location filename="../src/mainframe.cpp" line="555"/>
         <source>Restores the graph&apos;s x and y scales</source>
         <translation>X und Y Skalierung zurücksetzen</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="563"/>
+        <location filename="../src/mainframe.cpp" line="558"/>
         <source>E&amp;xit</source>
         <translation>B&amp;eenden</translation>
     </message>
@@ -4087,22 +4087,22 @@ Reduce the mesh size</source>
         <translation type="obsolete">Ctrl+Q</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="565"/>
+        <location filename="../src/mainframe.cpp" line="560"/>
         <source>Exit the application</source>
         <translation>Applikation beenden</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="568"/>
+        <location filename="../src/mainframe.cpp" line="563"/>
         <source>&amp;Guidelines</source>
         <translation>&amp;Richtlinien</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="569"/>
+        <location filename="../src/mainframe.cpp" line="564"/>
         <source>Show the guidelines for some help</source>
         <translation>Zeige die Richtlinen an</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="572"/>
+        <location filename="../src/mainframe.cpp" line="567"/>
         <source>&amp;About</source>
         <translation>&amp;Info</translation>
     </message>
@@ -4111,22 +4111,22 @@ Reduce the mesh size</source>
         <translation type="obsolete">QFLR5</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="601"/>
+        <location filename="../src/mainframe.cpp" line="596"/>
         <source>Grid Options</source>
         <translation>Gitter Optionen</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="602"/>
+        <location filename="../src/mainframe.cpp" line="597"/>
         <source>Define the grid settings for the view</source>
         <translation>Gitter Einstellungen für die Ansicht</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="605"/>
+        <location filename="../src/mainframe.cpp" line="600"/>
         <source>Use Splines</source>
         <translation>Splines verwenden</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="606"/>
+        <location filename="../src/mainframe.cpp" line="601"/>
         <source>Define a foil using one B-Spline for each foil side</source>
         <translation>Profile mit B-Splines für jede Seite erstellen</translation>
     </message>
@@ -4139,128 +4139,128 @@ Reduce the mesh size</source>
         <translation type="obsolete">Profile mit B-Splines 3. Ordnung mit 2 Kontrollpunkten erstellen</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="609"/>
+        <location filename="../src/mainframe.cpp" line="604"/>
         <source>Store Splines as Foil</source>
         <translation>Profil als Splines speichern</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="610"/>
+        <location filename="../src/mainframe.cpp" line="605"/>
         <source>Store the current splines in the foil database</source>
         <translation>Aktuelles Profil als Splines in der Profildatenbank speichern</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="613"/>
+        <location filename="../src/mainframe.cpp" line="608"/>
         <source>Splines Params</source>
         <translation>Splines Parameter</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="614"/>
-        <location filename="../src/mainframe.cpp" line="618"/>
+        <location filename="../src/mainframe.cpp" line="609"/>
+        <location filename="../src/mainframe.cpp" line="613"/>
         <source>Define parameters for the splines : degree, number of out points</source>
         <translation>Definition der Splines Parameter: Winkel, Anzahl der Punkte</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="617"/>
+        <location filename="../src/mainframe.cpp" line="612"/>
         <source>Export Splines To File</source>
         <translation>Splines in File exportieren</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="621"/>
+        <location filename="../src/mainframe.cpp" line="616"/>
         <source>New Splines</source>
         <translation>Neue Splines</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="622"/>
+        <location filename="../src/mainframe.cpp" line="617"/>
         <source>Reset the splines</source>
         <translation>Splines zurücksetzen</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="675"/>
-        <location filename="../src/mainframe.cpp" line="2436"/>
+        <location filename="../src/mainframe.cpp" line="670"/>
+        <location filename="../src/mainframe.cpp" line="2431"/>
         <source>Zoom in</source>
         <translation>Hineinzoomen</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="676"/>
-        <location filename="../src/mainframe.cpp" line="2437"/>
+        <location filename="../src/mainframe.cpp" line="671"/>
+        <location filename="../src/mainframe.cpp" line="2432"/>
         <source>Zoom the view by drawing a rectangle in the client area</source>
         <translation>Zoomen durch auswahl eines Rechteckes in der Ansicht</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="631"/>
+        <location filename="../src/mainframe.cpp" line="626"/>
         <source>Reset X Scale</source>
         <translation>X-Skalierung zurücksetzen</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="632"/>
+        <location filename="../src/mainframe.cpp" line="627"/>
         <source>Resets the scale to fit the current screen width</source>
         <translation>Skalierung auf Ansichtsbreite zurücksetzen</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="640"/>
+        <location filename="../src/mainframe.cpp" line="635"/>
         <source>Undo</source>
         <translation>Rückgängig</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="642"/>
+        <location filename="../src/mainframe.cpp" line="637"/>
         <source>Cancels the last modifiction made to the splines</source>
         <translation>Letzte Änderung an den Splines zurücksetzten</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="645"/>
+        <location filename="../src/mainframe.cpp" line="640"/>
         <source>Redo</source>
         <translation>Wiederherstellen</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="647"/>
+        <location filename="../src/mainframe.cpp" line="642"/>
         <source>Restores the last cancelled modifiction made to the splines</source>
         <translation>Stellt die letzte Änderung an den Splines wieder her</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="650"/>
+        <location filename="../src/mainframe.cpp" line="645"/>
         <source>Show All Foils</source>
         <translation>Zeige alle Profile</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="652"/>
+        <location filename="../src/mainframe.cpp" line="647"/>
         <source>Hide All Foils</source>
         <translation>Ausblenden aller Profile</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="656"/>
-        <location filename="../src/mainframe.cpp" line="1438"/>
-        <location filename="../src/mainframe.cpp" line="1466"/>
-        <location filename="../src/mainframe.cpp" line="1955"/>
+        <location filename="../src/mainframe.cpp" line="651"/>
+        <location filename="../src/mainframe.cpp" line="1433"/>
+        <location filename="../src/mainframe.cpp" line="1461"/>
+        <location filename="../src/mainframe.cpp" line="1950"/>
         <source>Delete...</source>
         <translation>Löschen...</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="659"/>
-        <location filename="../src/mainframe.cpp" line="1203"/>
-        <location filename="../src/mainframe.cpp" line="1450"/>
-        <location filename="../src/mainframe.cpp" line="1958"/>
+        <location filename="../src/mainframe.cpp" line="654"/>
+        <location filename="../src/mainframe.cpp" line="1198"/>
+        <location filename="../src/mainframe.cpp" line="1445"/>
+        <location filename="../src/mainframe.cpp" line="1953"/>
         <source>Rename...</source>
         <translation>Umbenennen...</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="663"/>
-        <location filename="../src/mainframe.cpp" line="1238"/>
-        <location filename="../src/mainframe.cpp" line="1961"/>
+        <location filename="../src/mainframe.cpp" line="658"/>
+        <location filename="../src/mainframe.cpp" line="1233"/>
+        <location filename="../src/mainframe.cpp" line="1956"/>
         <source>Export...</source>
         <translation>Exportieren...</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="666"/>
+        <location filename="../src/mainframe.cpp" line="661"/>
         <source>Show Current Foil</source>
         <translation>Zeige aktuelles Profil</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="669"/>
+        <location filename="../src/mainframe.cpp" line="664"/>
         <source>Hide Current Foil</source>
         <translation>Ausblenden des aktuellen Profils</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="672"/>
+        <location filename="../src/mainframe.cpp" line="667"/>
         <source>Reset Y Scale</source>
         <translation>Y-Skalierung zurücksetzen</translation>
     </message>
@@ -4269,42 +4269,42 @@ Reduce the mesh size</source>
         <translation type="obsolete">Skalierung zurücksetzen (R)</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="764"/>
+        <location filename="../src/mainframe.cpp" line="759"/>
         <source>F&amp;oil</source>
         <translation>Pr&amp;ofil</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1348"/>
+        <location filename="../src/mainframe.cpp" line="1343"/>
         <source>Two Graphs</source>
         <translation>Zwei Graphen</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1353"/>
+        <location filename="../src/mainframe.cpp" line="1348"/>
         <source>All Graphs</source>
         <translation>Alle Graphen</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1358"/>
+        <location filename="../src/mainframe.cpp" line="1353"/>
         <source>Graph 1</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1363"/>
+        <location filename="../src/mainframe.cpp" line="1358"/>
         <source>Graph 2</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1368"/>
+        <location filename="../src/mainframe.cpp" line="1363"/>
         <source>Graph 3</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1373"/>
+        <location filename="../src/mainframe.cpp" line="1368"/>
         <source>Graph 4</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1526"/>
+        <location filename="../src/mainframe.cpp" line="1521"/>
         <source>&amp;Body</source>
         <translation>Rumpf(&amp;B)</translation>
     </message>
@@ -4321,7 +4321,7 @@ Reduce the mesh size</source>
         <translation type="obsolete">Profil Skalierung zurücksetzen	(R)</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="636"/>
+        <location filename="../src/mainframe.cpp" line="631"/>
         <source>Resets the x and y scales to screen size</source>
         <translation>X- und Y- Skalierung auf Ansichts zurücksetzen</translation>
     </message>
@@ -4330,103 +4330,103 @@ Reduce the mesh size</source>
         <translation type="obsolete">&amp;Info</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="679"/>
-        <location filename="../src/mainframe.cpp" line="680"/>
+        <location filename="../src/mainframe.cpp" line="674"/>
+        <location filename="../src/mainframe.cpp" line="675"/>
         <source>Zoom Less</source>
         <translation>Herauszoomen</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="683"/>
-        <location filename="../src/mainframe.cpp" line="2445"/>
+        <location filename="../src/mainframe.cpp" line="678"/>
+        <location filename="../src/mainframe.cpp" line="2440"/>
         <source>Zoom Y Scale Only</source>
         <translation>Nur Y-Skalierung zoomen</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="684"/>
+        <location filename="../src/mainframe.cpp" line="679"/>
         <source>Zoom Y scale Only</source>
         <translation>Nur Y-Skalierung zoomen</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="687"/>
-        <location filename="../src/mainframe.cpp" line="2095"/>
+        <location filename="../src/mainframe.cpp" line="682"/>
+        <location filename="../src/mainframe.cpp" line="2090"/>
         <source>De-rotate the Foil</source>
         <translation>Entdrehen des Profils </translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="690"/>
-        <location filename="../src/mainframe.cpp" line="2098"/>
+        <location filename="../src/mainframe.cpp" line="685"/>
+        <location filename="../src/mainframe.cpp" line="2093"/>
         <source>Normalize the Foil</source>
         <translation>Normalisieren des Profils</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="696"/>
-        <location filename="../src/mainframe.cpp" line="2101"/>
+        <location filename="../src/mainframe.cpp" line="691"/>
+        <location filename="../src/mainframe.cpp" line="2096"/>
         <source>Refine Locally</source>
         <translation>Lokales redefinieren</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="693"/>
-        <location filename="../src/mainframe.cpp" line="2104"/>
+        <location filename="../src/mainframe.cpp" line="688"/>
+        <location filename="../src/mainframe.cpp" line="2099"/>
         <source>Refine Globally</source>
         <translation>GLobales redefinieren</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="699"/>
-        <location filename="../src/mainframe.cpp" line="2107"/>
+        <location filename="../src/mainframe.cpp" line="694"/>
+        <location filename="../src/mainframe.cpp" line="2102"/>
         <source>Edit Foil Coordinates</source>
         <translation>Profil Koordinaten editieren</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="702"/>
-        <location filename="../src/mainframe.cpp" line="2110"/>
+        <location filename="../src/mainframe.cpp" line="697"/>
+        <location filename="../src/mainframe.cpp" line="2105"/>
         <source>Scale camber and thickness</source>
         <translation>Wölbung und Dicke skalieren</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="705"/>
-        <location filename="../src/mainframe.cpp" line="2113"/>
+        <location filename="../src/mainframe.cpp" line="700"/>
+        <location filename="../src/mainframe.cpp" line="2108"/>
         <source>Set T.E. Gap</source>
         <translation>Setzen der Hinterkanten Spalte (T.E.)</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="708"/>
-        <location filename="../src/mainframe.cpp" line="2116"/>
+        <location filename="../src/mainframe.cpp" line="703"/>
+        <location filename="../src/mainframe.cpp" line="2111"/>
         <source>Set L.E. Radius</source>
         <translation>Setzen des Vorderkaten Radius (L.E)</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="711"/>
+        <location filename="../src/mainframe.cpp" line="706"/>
         <source>Show LE Circle</source>
         <translation>Zeigen Vorderkanten Kreis (L.E)</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="714"/>
+        <location filename="../src/mainframe.cpp" line="709"/>
         <source>Show Legend</source>
         <translation>Legende anzeigen</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="718"/>
-        <location filename="../src/mainframe.cpp" line="2119"/>
+        <location filename="../src/mainframe.cpp" line="713"/>
+        <location filename="../src/mainframe.cpp" line="2114"/>
         <source>Set Flap</source>
         <translation>Setze Klappen</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="721"/>
-        <location filename="../src/mainframe.cpp" line="2122"/>
+        <location filename="../src/mainframe.cpp" line="716"/>
+        <location filename="../src/mainframe.cpp" line="2117"/>
         <source>Interpolate Foils</source>
         <translation>Profile interpolieren</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="724"/>
-        <location filename="../src/mainframe.cpp" line="2125"/>
+        <location filename="../src/mainframe.cpp" line="719"/>
+        <location filename="../src/mainframe.cpp" line="2120"/>
         <source>Naca Foils</source>
         <translation>NACA Profile</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="743"/>
-        <location filename="../src/mainframe.cpp" line="1479"/>
-        <location filename="../src/mainframe.cpp" line="2196"/>
-        <location filename="../src/mainframe.cpp" line="2453"/>
+        <location filename="../src/mainframe.cpp" line="738"/>
+        <location filename="../src/mainframe.cpp" line="1474"/>
+        <location filename="../src/mainframe.cpp" line="2191"/>
+        <location filename="../src/mainframe.cpp" line="2448"/>
         <source>&amp;View</source>
         <translation>&amp;Ansicht</translation>
     </message>
@@ -4435,58 +4435,58 @@ Reduce the mesh size</source>
         <translation type="obsolete">&amp;Profil Design</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="788"/>
+        <location filename="../src/mainframe.cpp" line="783"/>
         <source>&amp;Splines</source>
         <translation>&amp;Splines</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="801"/>
-        <location filename="../src/mainframe.cpp" line="1632"/>
-        <location filename="../src/mainframe.cpp" line="1670"/>
-        <location filename="../src/mainframe.cpp" line="1692"/>
-        <location filename="../src/mainframe.cpp" line="1715"/>
-        <location filename="../src/mainframe.cpp" line="1739"/>
-        <location filename="../src/mainframe.cpp" line="1759"/>
-        <location filename="../src/mainframe.cpp" line="2323"/>
-        <location filename="../src/mainframe.cpp" line="2361"/>
-        <location filename="../src/mainframe.cpp" line="2476"/>
+        <location filename="../src/mainframe.cpp" line="796"/>
+        <location filename="../src/mainframe.cpp" line="1627"/>
+        <location filename="../src/mainframe.cpp" line="1665"/>
+        <location filename="../src/mainframe.cpp" line="1687"/>
+        <location filename="../src/mainframe.cpp" line="1710"/>
+        <location filename="../src/mainframe.cpp" line="1734"/>
+        <location filename="../src/mainframe.cpp" line="1754"/>
+        <location filename="../src/mainframe.cpp" line="2318"/>
+        <location filename="../src/mainframe.cpp" line="2356"/>
+        <location filename="../src/mainframe.cpp" line="2471"/>
         <source>Context Menu</source>
         <translation>Befehlsübersicht</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="2205"/>
+        <location filename="../src/mainframe.cpp" line="2200"/>
         <source>Current Foil</source>
         <translation>Aktuelles Profil</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="857"/>
-        <location filename="../src/mainframe.cpp" line="1876"/>
+        <location filename="../src/mainframe.cpp" line="852"/>
+        <location filename="../src/mainframe.cpp" line="1871"/>
         <source>Foil</source>
         <translation>Profil</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="959"/>
-        <location filename="../src/mainframe.cpp" line="1178"/>
+        <location filename="../src/mainframe.cpp" line="954"/>
+        <location filename="../src/mainframe.cpp" line="1173"/>
         <source>3D Scales</source>
         <translation>3D Skalierung</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1085"/>
+        <location filename="../src/mainframe.cpp" line="1080"/>
         <source>&amp;File</source>
         <translation>&amp;Datei</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1119"/>
+        <location filename="../src/mainframe.cpp" line="1114"/>
         <source>&amp;?</source>
         <translation>&amp;?</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1899"/>
+        <location filename="../src/mainframe.cpp" line="1894"/>
         <source>OpPoint view</source>
         <translation>Arbeitspunt Ansicht</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1901"/>
+        <location filename="../src/mainframe.cpp" line="1896"/>
         <source>Show Operating point view</source>
         <translation>Zeige Arbeitspunkt Ansicht</translation>
     </message>
@@ -4495,12 +4495,12 @@ Reduce the mesh size</source>
         <translation type="obsolete">F5</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1904"/>
+        <location filename="../src/mainframe.cpp" line="1899"/>
         <source>Polar view</source>
         <translation>Polaren Ansicht</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1906"/>
+        <location filename="../src/mainframe.cpp" line="1901"/>
         <source>Show Polar view</source>
         <translation>Zeige Polaren Ansicht</translation>
     </message>
@@ -4533,28 +4533,28 @@ Reduce the mesh size</source>
         <translation type="obsolete">f9</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1170"/>
+        <location filename="../src/mainframe.cpp" line="1165"/>
         <source>3D Color Preferences</source>
         <translation>3D Farb Einstellungen</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1174"/>
-        <location filename="../src/mainframe.cpp" line="1912"/>
+        <location filename="../src/mainframe.cpp" line="1169"/>
+        <location filename="../src/mainframe.cpp" line="1907"/>
         <source>Polar Filter</source>
         <translation>Polaren Filter</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1183"/>
+        <location filename="../src/mainframe.cpp" line="1178"/>
         <source>3D Light Options</source>
         <translation>3D Licht Einstellungen</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1187"/>
+        <location filename="../src/mainframe.cpp" line="1182"/>
         <source>Define a New Wing</source>
         <translation>Definiere eine neue Tragfläche</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1188"/>
+        <location filename="../src/mainframe.cpp" line="1183"/>
         <source>Shows a dialogbox for editing a new wing definition</source>
         <translation>Zeigt einen Dialog zum Erstellen einer neuen Tragfläche</translation>
     </message>
@@ -4563,12 +4563,12 @@ Reduce the mesh size</source>
         <translation type="obsolete">F3</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1195"/>
+        <location filename="../src/mainframe.cpp" line="1190"/>
         <source>Define a New Plane</source>
         <translation>Definiere ein neues Modell</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1196"/>
+        <location filename="../src/mainframe.cpp" line="1191"/>
         <source>Shows a dialogbox to create a new plane definition</source>
         <translation>Zeit einen Dialog zum Erstellen eines neuen Modelles</translation>
     </message>
@@ -4577,13 +4577,13 @@ Reduce the mesh size</source>
         <translation type="obsolete">Ctrl+F3</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1199"/>
-        <location filename="../src/mainframe.cpp" line="1330"/>
+        <location filename="../src/mainframe.cpp" line="1194"/>
+        <location filename="../src/mainframe.cpp" line="1325"/>
         <source>Edit...</source>
         <translation>Bearbeiten...</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1200"/>
+        <location filename="../src/mainframe.cpp" line="1195"/>
         <source>Shows a dialogbox to edit the currently selected wing or plane</source>
         <translation>Zeigt einen Dialog zum Editieren der aktuellen Tragfläche oder des Modelles</translation>
     </message>
@@ -4592,17 +4592,17 @@ Reduce the mesh size</source>
         <translation type="obsolete">Shift+F3</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1207"/>
+        <location filename="../src/mainframe.cpp" line="1202"/>
         <source>Define a New Body</source>
         <translation>Neuen Rumpf erstellen</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1208"/>
+        <location filename="../src/mainframe.cpp" line="1203"/>
         <source>Shows a dialogbox for editing a new body definition</source>
         <translation>Zeigt einen Dialog zum Erstellen eines neuen Rumpfes</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1311"/>
+        <location filename="../src/mainframe.cpp" line="1306"/>
         <source>Show Elevator Curve</source>
         <translation>Zeige Höhenruder Kurve</translation>
     </message>
@@ -4619,17 +4619,17 @@ Reduce the mesh size</source>
         <translation type="obsolete">Batch Analyse	(Shift+F6)</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="2092"/>
+        <location filename="../src/mainframe.cpp" line="2087"/>
         <source>View Log File</source>
         <translation>Logfile anzeigen</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1212"/>
+        <location filename="../src/mainframe.cpp" line="1207"/>
         <source>Edit Current</source>
         <translation>Aktuellen editieren</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="429"/>
+        <location filename="../src/mainframe.cpp" line="424"/>
         <source>Exit</source>
         <translation>Beenden</translation>
     </message>
@@ -4682,64 +4682,64 @@ Reduce the mesh size</source>
         <translation type="obsolete">Shift+F10</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1217"/>
+        <location filename="../src/mainframe.cpp" line="1212"/>
         <source>Export Body Definition</source>
         <translation>Rupfdefinition exportieren</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1218"/>
+        <location filename="../src/mainframe.cpp" line="1213"/>
         <source>Export a body definition to a text file</source>
         <translation>Rumpfdefinition in Text-File exportieren</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1221"/>
+        <location filename="../src/mainframe.cpp" line="1216"/>
         <source>Export Body Geometry</source>
         <translation>Rupfgeometrie exportieren</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1222"/>
+        <location filename="../src/mainframe.cpp" line="1217"/>
         <source>Export a body geometry at different cross sections to a text file</source>
         <translation>Exportieren des Rumpfgeometrie an einer Schnittstelle in einen Text-File </translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1225"/>
+        <location filename="../src/mainframe.cpp" line="1220"/>
         <source>Import Body</source>
         <translation>Rumpf importieren</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1226"/>
+        <location filename="../src/mainframe.cpp" line="1221"/>
         <source>Import a body definition from a text file</source>
         <translation>Rumpfdefinition von Text-File importieren</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1229"/>
+        <location filename="../src/mainframe.cpp" line="1224"/>
         <source>Manage Bodies</source>
         <translation>Rümpfe verwalten</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1231"/>
+        <location filename="../src/mainframe.cpp" line="1226"/>
         <source>Manage the body list : Rename, Duplicate, Delete</source>
         <translation>Verwalten der Rumpfliste: Umbenennen, Duplizieren, Löschen</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1234"/>
+        <location filename="../src/mainframe.cpp" line="1229"/>
         <source>Export to AVL...</source>
         <translation>Als AVL exportieren...</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1242"/>
-        <location filename="../src/mainframe.cpp" line="1246"/>
-        <location filename="../src/mainframe.cpp" line="1925"/>
+        <location filename="../src/mainframe.cpp" line="1237"/>
+        <location filename="../src/mainframe.cpp" line="1241"/>
+        <location filename="../src/mainframe.cpp" line="1920"/>
         <source>Reset Legend Position</source>
         <translation>Legendenposition zurücksetzen</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1250"/>
+        <location filename="../src/mainframe.cpp" line="1245"/>
         <source>Reset Wing Scale</source>
         <translation>Trangflächen Skalierung zurücksetzen</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1254"/>
+        <location filename="../src/mainframe.cpp" line="1249"/>
         <source>Scale Wing</source>
         <translation>Trangfläche skalieren</translation>
     </message>
@@ -4752,55 +4752,55 @@ Reduce the mesh size</source>
         <translation type="obsolete">f7</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1263"/>
+        <location filename="../src/mainframe.cpp" line="1258"/>
         <source>Import Polar</source>
         <translation>Polaren importieren</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1267"/>
+        <location filename="../src/mainframe.cpp" line="1262"/>
         <source>Define Inertia</source>
         <translation>Trägheit definieren</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1272"/>
+        <location filename="../src/mainframe.cpp" line="1267"/>
         <source>Show Current OpPoint Only</source>
         <translation>Zeige nur aktuellen Arbeitspunkt</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1277"/>
+        <location filename="../src/mainframe.cpp" line="1272"/>
         <source>Show All OpPoints</source>
         <translation>Zeige alle Arbeitspunkte</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1281"/>
+        <location filename="../src/mainframe.cpp" line="1276"/>
         <source>Hide All OpPoints</source>
         <translation>Ausblenden aller Arbeitspunkte</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1285"/>
+        <location filename="../src/mainframe.cpp" line="1280"/>
         <source>Delete All OpPoints</source>
         <translation>Lösche alle Arbeitspunkte</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1289"/>
-        <location filename="../src/mainframe.cpp" line="1430"/>
+        <location filename="../src/mainframe.cpp" line="1284"/>
+        <location filename="../src/mainframe.cpp" line="1425"/>
         <source>Show Associated OpPoints</source>
         <translation>Zeige zugehörige Arbeitspunkte</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1293"/>
-        <location filename="../src/mainframe.cpp" line="1426"/>
+        <location filename="../src/mainframe.cpp" line="1288"/>
+        <location filename="../src/mainframe.cpp" line="1421"/>
         <source>Hide Associated OpPoints</source>
         <translation>Verbede zugehörige Arbeitspunkte</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1297"/>
-        <location filename="../src/mainframe.cpp" line="1434"/>
+        <location filename="../src/mainframe.cpp" line="1292"/>
+        <location filename="../src/mainframe.cpp" line="1429"/>
         <source>Delete Associated OpPoints</source>
         <translation>Lösche zugehörige Arbeitspunkte</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1301"/>
+        <location filename="../src/mainframe.cpp" line="1296"/>
         <source>Show Elliptic Curve</source>
         <translation>Zeige elliptische Kurve</translation>
     </message>
@@ -4809,12 +4809,12 @@ Reduce the mesh size</source>
         <translation type="obsolete">Zeige XCmRef Position</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1316"/>
+        <location filename="../src/mainframe.cpp" line="1311"/>
         <source>Show Fin Curve</source>
         <translation>Zeige Fin Kurve</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1321"/>
+        <location filename="../src/mainframe.cpp" line="1316"/>
         <source>Show Second Wing Curve</source>
         <translation>Zeige 2. Trangflächen Kurve</translation>
     </message>
@@ -4871,47 +4871,47 @@ Reduce the mesh size</source>
         <translation type="obsolete">Polar Graph 4 	(4)</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="559"/>
-        <location filename="../src/mainframe.cpp" line="1383"/>
+        <location filename="../src/mainframe.cpp" line="554"/>
+        <location filename="../src/mainframe.cpp" line="1378"/>
         <source>Reset Graph Scales</source>
         <translation>Graph Skalierung zurücksetzen</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1387"/>
-        <location filename="../src/mainframe.cpp" line="1391"/>
+        <location filename="../src/mainframe.cpp" line="1382"/>
+        <location filename="../src/mainframe.cpp" line="1386"/>
         <source>Reset All Graph Scales</source>
         <translation>Alle Graphen Skalierungen zurücksetzen</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1395"/>
-        <location filename="../src/mainframe.cpp" line="1399"/>
+        <location filename="../src/mainframe.cpp" line="1390"/>
+        <location filename="../src/mainframe.cpp" line="1394"/>
         <source>All Graph Settings</source>
         <translation>Alle Graphen Einstellungen</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1403"/>
+        <location filename="../src/mainframe.cpp" line="1398"/>
         <source>Hide Associated Polars</source>
         <translation>Verberge zugehörige Polaren</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1410"/>
+        <location filename="../src/mainframe.cpp" line="1405"/>
         <source>Show Associated Polars</source>
         <translation>Zeige zugehörige Polaren</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1414"/>
+        <location filename="../src/mainframe.cpp" line="1409"/>
         <source>Delete Associated Polars</source>
         <translation>Lösche zugehörige Polaren</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1418"/>
-        <location filename="../src/mainframe.cpp" line="2066"/>
+        <location filename="../src/mainframe.cpp" line="1413"/>
+        <location filename="../src/mainframe.cpp" line="2061"/>
         <source>Hide All Polars</source>
         <translation>Verberge alle Polaren</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1422"/>
-        <location filename="../src/mainframe.cpp" line="2063"/>
+        <location filename="../src/mainframe.cpp" line="1417"/>
+        <location filename="../src/mainframe.cpp" line="2058"/>
         <source>Show All Polars</source>
         <translation>Zeige alle Polaren</translation>
     </message>
@@ -4920,12 +4920,12 @@ Reduce the mesh size</source>
         <translation type="obsolete">F2</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1442"/>
+        <location filename="../src/mainframe.cpp" line="1437"/>
         <source>Duplicate...</source>
         <translation>Duplizieren...</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1446"/>
+        <location filename="../src/mainframe.cpp" line="1441"/>
         <source>Save as Project...</source>
         <translation>Speiche Projekt als...</translation>
     </message>
@@ -4934,32 +4934,32 @@ Reduce the mesh size</source>
         <translation type="obsolete">Bearbeiten...</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1454"/>
+        <location filename="../src/mainframe.cpp" line="1449"/>
         <source>Export ...</source>
         <translation>Exportieren...</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1458"/>
+        <location filename="../src/mainframe.cpp" line="1453"/>
         <source>Reset ...</source>
         <translation>Zurücksetzen...</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1462"/>
+        <location filename="../src/mainframe.cpp" line="1457"/>
         <source>Delete ...</source>
         <translation>Löschen...</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1470"/>
+        <location filename="../src/mainframe.cpp" line="1465"/>
         <source>Advanced Settings...</source>
         <translation>Erweiterte Einstellungen...</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1496"/>
+        <location filename="../src/mainframe.cpp" line="1491"/>
         <source>&amp;Wing-Plane</source>
         <translation>&amp;Tragfläche-Rumpf</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1501"/>
+        <location filename="../src/mainframe.cpp" line="1496"/>
         <source>Current UFO</source>
         <translation>Aktuelles UFO</translation>
     </message>
@@ -4968,54 +4968,54 @@ Reduce the mesh size</source>
         <translation type="obsolete">Rumpf</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1530"/>
+        <location filename="../src/mainframe.cpp" line="1525"/>
         <source>Current Body</source>
         <translation>Aktueller Rumpf</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1539"/>
-        <location filename="../src/mainframe.cpp" line="2251"/>
+        <location filename="../src/mainframe.cpp" line="1534"/>
+        <location filename="../src/mainframe.cpp" line="2246"/>
         <source>&amp;Polars</source>
         <translation>&amp;Polaren</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1544"/>
-        <location filename="../src/mainframe.cpp" line="2252"/>
+        <location filename="../src/mainframe.cpp" line="1539"/>
+        <location filename="../src/mainframe.cpp" line="2247"/>
         <source>Current Polar</source>
         <translation>Aktuelle Polare</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1567"/>
-        <location filename="../src/mainframe.cpp" line="1607"/>
+        <location filename="../src/mainframe.cpp" line="1562"/>
+        <location filename="../src/mainframe.cpp" line="1602"/>
         <source>Graphs</source>
         <translation>Graphen</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1585"/>
+        <location filename="../src/mainframe.cpp" line="1580"/>
         <source>&amp;OpPoint</source>
         <translation>&amp;Arbeitspunkt</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1587"/>
-        <location filename="../src/mainframe.cpp" line="2290"/>
-        <location filename="../src/mainframe.cpp" line="2330"/>
+        <location filename="../src/mainframe.cpp" line="1582"/>
+        <location filename="../src/mainframe.cpp" line="2285"/>
+        <location filename="../src/mainframe.cpp" line="2325"/>
         <source>Current OpPoint</source>
         <translation>Aktueller Arbeitspunkt</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1647"/>
-        <location filename="../src/mainframe.cpp" line="1724"/>
-        <location filename="../src/mainframe.cpp" line="2365"/>
+        <location filename="../src/mainframe.cpp" line="1642"/>
+        <location filename="../src/mainframe.cpp" line="1719"/>
+        <location filename="../src/mainframe.cpp" line="2360"/>
         <source>Current Graph</source>
         <translation>Aktueller Graph</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1813"/>
+        <location filename="../src/mainframe.cpp" line="1808"/>
         <source>UFO</source>
         <translation>UFO</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1838"/>
+        <location filename="../src/mainframe.cpp" line="1833"/>
         <source>Ready</source>
         <translation>Bereit</translation>
     </message>
@@ -5024,12 +5024,12 @@ Reduce the mesh size</source>
         <translation type="obsolete">Bestimme Cp-Graph Einstellungen	(G)</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1915"/>
+        <location filename="../src/mainframe.cpp" line="1910"/>
         <source>All Polar Graph Settings</source>
         <translation>Alle Polaren-Graphen Einstellungen</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1919"/>
+        <location filename="../src/mainframe.cpp" line="1914"/>
         <source>Reset All Polar Graph Scales</source>
         <translation>Alle Polaren Skalierungen zurücksetzen</translation>
     </message>
@@ -5058,289 +5058,289 @@ Reduce the mesh size</source>
         <translation type="obsolete">Glide ratio vs. alpha 	(5)</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1964"/>
+        <location filename="../src/mainframe.cpp" line="1959"/>
         <source>Set Style...</source>
         <translation>Gestaltung einrichten...</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1967"/>
+        <location filename="../src/mainframe.cpp" line="1962"/>
         <source>Delete associated polars</source>
         <translation>Lösche zugehörige Polaren</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1968"/>
+        <location filename="../src/mainframe.cpp" line="1963"/>
         <source>Delete all the polars associated to this foil</source>
         <translation>Lösche alle Polaren welche dieser Tragfläche zugehörig sind</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1971"/>
+        <location filename="../src/mainframe.cpp" line="1966"/>
         <source>Show only associated polars</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1974"/>
+        <location filename="../src/mainframe.cpp" line="1969"/>
         <source>Show associated polars</source>
         <translation>Zeige zugehörige Polaren</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1977"/>
+        <location filename="../src/mainframe.cpp" line="1972"/>
         <source>Hide associated polars</source>
         <translation>Verberge zugehörige Polaren</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1980"/>
+        <location filename="../src/mainframe.cpp" line="1975"/>
         <source>Save associated polars</source>
         <translation>Zugehörige Polaren speichern</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1983"/>
-        <location filename="../src/mainframe.cpp" line="1995"/>
+        <location filename="../src/mainframe.cpp" line="1978"/>
+        <location filename="../src/mainframe.cpp" line="1990"/>
         <source>Hide associated OpPoints</source>
         <translation>Verberge zugehörige Arbeitspunkte</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1986"/>
-        <location filename="../src/mainframe.cpp" line="1998"/>
+        <location filename="../src/mainframe.cpp" line="1981"/>
+        <location filename="../src/mainframe.cpp" line="1993"/>
         <source>Show associated OpPoints</source>
         <translation>Zeige zugehörige Arbeitspunkte</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1989"/>
-        <location filename="../src/mainframe.cpp" line="2001"/>
+        <location filename="../src/mainframe.cpp" line="1984"/>
+        <location filename="../src/mainframe.cpp" line="1996"/>
         <source>Delete associated OpPoints</source>
         <translation>Lösche zugehörige Arbeitspunkte</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1992"/>
+        <location filename="../src/mainframe.cpp" line="1987"/>
         <source>Export associated OpPoints</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="2005"/>
+        <location filename="../src/mainframe.cpp" line="2000"/>
         <source>Defines a single analysis/polar</source>
         <translation>Definieren einer Analyse/Polare</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="2009"/>
+        <location filename="../src/mainframe.cpp" line="2004"/>
         <source>Launches a batch of analysis calculation for a specified range or list of Reynolds numbers</source>
         <translation>Startet Massenanalyse über eine Reynolds-Zahlen Bereich</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="2012"/>
+        <location filename="../src/mainframe.cpp" line="2007"/>
         <source>Multi-threaded Batch Analysis</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="2013"/>
+        <location filename="../src/mainframe.cpp" line="2008"/>
         <source>Launches a batch of analysis calculation using all available computer CPU cores</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="2016"/>
-        <location filename="../src/mainframe.cpp" line="2082"/>
+        <location filename="../src/mainframe.cpp" line="2011"/>
+        <location filename="../src/mainframe.cpp" line="2077"/>
         <source>Delete</source>
         <translation>Löschen</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="2017"/>
+        <location filename="../src/mainframe.cpp" line="2012"/>
         <source>Deletes the currently selected polar</source>
         <translation>Löschen der ausgewählten Polare</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="2020"/>
+        <location filename="../src/mainframe.cpp" line="2015"/>
         <source>Reset</source>
         <translation>Zurücksetzen</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="2021"/>
+        <location filename="../src/mainframe.cpp" line="2016"/>
         <source>Deletes the contents of the currently selected polar</source>
         <translation>Löchen des Inhaltes der ausgewählten Polare</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="2024"/>
+        <location filename="../src/mainframe.cpp" line="2019"/>
         <source>Edit</source>
         <translation>Bearbeiten</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="2025"/>
+        <location filename="../src/mainframe.cpp" line="2020"/>
         <source>Remove the unconverged or erroneaous points of the currently selected polar</source>
         <translation>Löschen aller unkonvergierten oder fehlerhaften Punkte der ausgewählten Polare</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="2028"/>
-        <location filename="../src/mainframe.cpp" line="2079"/>
+        <location filename="../src/mainframe.cpp" line="2023"/>
+        <location filename="../src/mainframe.cpp" line="2074"/>
         <source>Export</source>
         <translation>Exportieren</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="2031"/>
+        <location filename="../src/mainframe.cpp" line="2026"/>
         <source>Export all polars</source>
         <translation>Alle Polaren exportieren</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="2034"/>
-        <location filename="../src/mainframe.cpp" line="2399"/>
+        <location filename="../src/mainframe.cpp" line="2029"/>
+        <location filename="../src/mainframe.cpp" line="2394"/>
         <source>Define Styles</source>
         <translation>Gestalltung einrichten</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="2035"/>
+        <location filename="../src/mainframe.cpp" line="2030"/>
         <source>Define the style for the boundary layer and the pressure arrows</source>
         <translation>Gestalltung der Grenzschicht und der Druck-Pfeile</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="2038"/>
+        <location filename="../src/mainframe.cpp" line="2033"/>
         <source>Manage Foils</source>
         <translation>Profile verwalten</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="2042"/>
+        <location filename="../src/mainframe.cpp" line="2037"/>
         <source>Rename</source>
         <translation>Umbenennen</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="2045"/>
+        <location filename="../src/mainframe.cpp" line="2040"/>
         <source>Show Panels</source>
         <translation>Zeige Paneele</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="2047"/>
+        <location filename="../src/mainframe.cpp" line="2042"/>
         <source>Show the foil&apos;s panels</source>
         <translation>Zeige die Profil Paneele</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="2050"/>
+        <location filename="../src/mainframe.cpp" line="2045"/>
         <source>Reset Foil Scale</source>
         <translation>Profil Skalierung zurücksetzen</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="2051"/>
+        <location filename="../src/mainframe.cpp" line="2046"/>
         <source>Resets the foil&apos;s scale to original size</source>
         <translation>Profil original Skalierung wiederherstellen</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="2054"/>
+        <location filename="../src/mainframe.cpp" line="2049"/>
         <source>Show Inviscid Curve</source>
         <translation>Zeige Inviscid-Kurve</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="2056"/>
+        <location filename="../src/mainframe.cpp" line="2051"/>
         <source>Display the Opp&apos;s inviscid curve</source>
         <translation>Zeige die Inviscid-Kurve des Arbeitspunktes</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="2059"/>
+        <location filename="../src/mainframe.cpp" line="2054"/>
         <source>Neutral Line</source>
         <translation>Neutrale-Linie</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="2069"/>
+        <location filename="../src/mainframe.cpp" line="2064"/>
         <source>Show Current Opp Only</source>
         <translation>Zeige nur aktuellen Arbeitspunkt</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="2073"/>
+        <location filename="../src/mainframe.cpp" line="2068"/>
         <source>Show All Opps</source>
         <translation>Zeige alle Arbeitspunkte</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="2076"/>
+        <location filename="../src/mainframe.cpp" line="2071"/>
         <source>Hide All Opps</source>
         <translation>Ausblenden aller Arbeitspunkte</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="2085"/>
+        <location filename="../src/mainframe.cpp" line="2080"/>
         <source>Reset XFoil</source>
         <translation>Xfoil zurücksetzen</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="2088"/>
+        <location filename="../src/mainframe.cpp" line="2083"/>
         <source>XFoil Advanced Settings</source>
         <translation>Erweiterte XFoil Einstellungen</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="2089"/>
+        <location filename="../src/mainframe.cpp" line="2084"/>
         <source>Tip : you don&apos;t want to use that option...</source>
         <translation>Tipp:Glauben Sie uns, Sie wollen diese Option nicht nutzen ;-)...</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="2128"/>
+        <location filename="../src/mainframe.cpp" line="2123"/>
         <source>Duplicate</source>
         <translation>Duplizieren</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="2131"/>
+        <location filename="../src/mainframe.cpp" line="2126"/>
         <source>Cp Variable</source>
         <translation>Cp Variablen</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="2133"/>
+        <location filename="../src/mainframe.cpp" line="2128"/>
         <source>Sets Cp vs. chord graph</source>
         <translation>Cp vs. Sehne (Chord) Graphen Einstellungen</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="2136"/>
+        <location filename="../src/mainframe.cpp" line="2131"/>
         <source>Q Variable</source>
         <translation>Q-Variable</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="2138"/>
-        <location filename="../src/mainframe.cpp" line="2142"/>
+        <location filename="../src/mainframe.cpp" line="2133"/>
+        <location filename="../src/mainframe.cpp" line="2137"/>
         <source>Sets Speed vs. chord graph</source>
         <translation>Geschwindigkeit(Speed) vs. Sehne(Chord) Graphen Einstellungen</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="2141"/>
+        <location filename="../src/mainframe.cpp" line="2136"/>
         <source>Export Cur. XFoil Results</source>
         <translation>Aktuelle XFoil Resultate exportieren</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="2145"/>
+        <location filename="../src/mainframe.cpp" line="2140"/>
         <source>Max. Shear Coefficient</source>
         <translation>Maximaler Scherungs (Shear) Koeffizient</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="2149"/>
+        <location filename="../src/mainframe.cpp" line="2144"/>
         <source>Bottom Side D* and Theta</source>
         <translation>Unterseiten D* und Theta</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="2153"/>
+        <location filename="../src/mainframe.cpp" line="2148"/>
         <source>Top Side D* and Theta</source>
         <translation>Oberseiten D* und Theta</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="2157"/>
+        <location filename="../src/mainframe.cpp" line="2152"/>
         <source>Log(Re_Theta)</source>
         <translation>Log(Re_Theta)</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="2161"/>
+        <location filename="../src/mainframe.cpp" line="2156"/>
         <source>Re_Theta</source>
         <translation>Re_Theta</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="2165"/>
+        <location filename="../src/mainframe.cpp" line="2160"/>
         <source>Amplification Ratio</source>
         <translation>Verstärkungsverhältnis (Amplification Ratio)</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="2169"/>
+        <location filename="../src/mainframe.cpp" line="2164"/>
         <source>Dissipation Coefficient</source>
         <translation>Leistungsverlusst Koeffizient (Dissipation Coefficient)</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="2173"/>
+        <location filename="../src/mainframe.cpp" line="2168"/>
         <source>Skin Friction Coefficient</source>
         <translation>Aussenhaut -Reibungs-Koeffizient (Skin Friction)</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="2177"/>
+        <location filename="../src/mainframe.cpp" line="2172"/>
         <source>Edge Velocity</source>
         <translation>Grenzgeschwindigkeit (Edge Velocity)</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="2181"/>
+        <location filename="../src/mainframe.cpp" line="2176"/>
         <source>Kinematic Shape Parameter</source>
         <translation>Kinematischer Form Parameter (Kinematic shape)</translation>
     </message>
@@ -5349,33 +5349,33 @@ Reduce the mesh size</source>
         <translation type="obsolete">JavaFoil Parameter importiern</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="2188"/>
+        <location filename="../src/mainframe.cpp" line="2183"/>
         <source>Import XFoil Polar</source>
         <translation>XFoil Polare importieren</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="2202"/>
-        <location filename="../src/mainframe.cpp" line="2464"/>
+        <location filename="../src/mainframe.cpp" line="2197"/>
+        <location filename="../src/mainframe.cpp" line="2459"/>
         <source>&amp;Foil</source>
         <translation>&amp;Profil</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="826"/>
+        <location filename="../src/mainframe.cpp" line="821"/>
         <source>Foil Actions</source>
         <translation>Profile Aktionen</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="971"/>
+        <location filename="../src/mainframe.cpp" line="966"/>
         <source>Stability</source>
         <translation>Stabilität</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1137"/>
+        <location filename="../src/mainframe.cpp" line="1132"/>
         <source>OpPoint View</source>
         <translation>Arbeitspunt Ansicht</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1143"/>
+        <location filename="../src/mainframe.cpp" line="1138"/>
         <source>Polar View</source>
         <translation>Polaren Ansicht</translation>
     </message>
@@ -5384,37 +5384,37 @@ Reduce the mesh size</source>
         <translation type="obsolete">Shift+F8</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1160"/>
+        <location filename="../src/mainframe.cpp" line="1155"/>
         <source>3D View</source>
         <translation>3D Ansicht</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1165"/>
+        <location filename="../src/mainframe.cpp" line="1160"/>
         <source>Cp View</source>
         <translation>Cp Ansicht</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="2228"/>
+        <location filename="../src/mainframe.cpp" line="2223"/>
         <source>&amp;Design</source>
         <translation>&amp;Design</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="2275"/>
+        <location filename="../src/mainframe.cpp" line="2270"/>
         <source>Polar Graphs</source>
         <translation>Polar Graphen</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="2289"/>
+        <location filename="../src/mainframe.cpp" line="2284"/>
         <source>Operating Points</source>
         <translation>Arbeitspunkte</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="2294"/>
+        <location filename="../src/mainframe.cpp" line="2289"/>
         <source>Cp Graph</source>
         <translation>Cp-Graph</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="2300"/>
+        <location filename="../src/mainframe.cpp" line="2295"/>
         <source>Current XFoil Results</source>
         <translation>Aktuelle XFoil Resultate</translation>
     </message>
@@ -5423,104 +5423,104 @@ Reduce the mesh size</source>
         <translation type="obsolete">Design Tätigkeiten</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="2391"/>
+        <location filename="../src/mainframe.cpp" line="2386"/>
         <source>Store Foil</source>
         <translation>Profil speichern</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="2392"/>
+        <location filename="../src/mainframe.cpp" line="2387"/>
         <source>Store Foil in database</source>
         <translation>Profil in Datenbank speichern</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="2395"/>
+        <location filename="../src/mainframe.cpp" line="2390"/>
         <source>Extract Foil</source>
         <translation>Profil entnehmen</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="2396"/>
+        <location filename="../src/mainframe.cpp" line="2391"/>
         <source>Extract a Foil from the database for modification</source>
         <translation>Profil aus Datenbank für Änderungen  entnehmen</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="2400"/>
+        <location filename="../src/mainframe.cpp" line="2395"/>
         <source>Define the styles for this view</source>
         <translation>Gestalltung für diese Ansicht einstellen</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="2404"/>
+        <location filename="../src/mainframe.cpp" line="2399"/>
         <source>Resets the scale to fit the screen size</source>
         <translation>Skalierung auf Ansichtsbreite zurücksetzen</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="625"/>
-        <location filename="../src/mainframe.cpp" line="2407"/>
+        <location filename="../src/mainframe.cpp" line="620"/>
+        <location filename="../src/mainframe.cpp" line="2402"/>
         <source>Insert Control Point</source>
         <translation>Kontrollpunkt einfügen</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="628"/>
-        <location filename="../src/mainframe.cpp" line="2410"/>
+        <location filename="../src/mainframe.cpp" line="623"/>
+        <location filename="../src/mainframe.cpp" line="2405"/>
         <source>Remove Control Point</source>
         <translation>Kontrollpunkt löschen</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="2413"/>
+        <location filename="../src/mainframe.cpp" line="2408"/>
         <source>Show Q-Initial</source>
         <translation>Q-Initial anzeigen</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="2417"/>
+        <location filename="../src/mainframe.cpp" line="2412"/>
         <source>Show Q-Spec</source>
         <translation>Q-Spec anzeigen</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="2421"/>
+        <location filename="../src/mainframe.cpp" line="2416"/>
         <source>Show Q-Viscous</source>
         <translation>Q-Viscous anzeigen</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="2425"/>
+        <location filename="../src/mainframe.cpp" line="2420"/>
         <source>Show Points</source>
         <translation>Punkte anzeigen</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="2429"/>
+        <location filename="../src/mainframe.cpp" line="2424"/>
         <source>Show Reflected</source>
         <translation>Zeige reflektierete</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="2440"/>
+        <location filename="../src/mainframe.cpp" line="2435"/>
         <source>Zoom X Scale</source>
         <translation>X-Skalierung zoomen</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="2441"/>
+        <location filename="../src/mainframe.cpp" line="2436"/>
         <source>Zoom X Scale Only</source>
         <translation>Nur X-Skalierung zoomen</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="2444"/>
+        <location filename="../src/mainframe.cpp" line="2439"/>
         <source>Zoom Y Scale</source>
         <translation>Y-Skalierung zoomen</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="2459"/>
+        <location filename="../src/mainframe.cpp" line="2454"/>
         <source>&amp;Graph</source>
         <translation>&amp;Graph</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="2496"/>
+        <location filename="../src/mainframe.cpp" line="2491"/>
         <source>Full Inverse</source>
         <translation>Voll-Invers</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="2497"/>
+        <location filename="../src/mainframe.cpp" line="2492"/>
         <source>Mixed Inverse</source>
         <translation>Gemischt-Invers</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="2514"/>
+        <location filename="../src/mainframe.cpp" line="2509"/>
         <source>XInverse</source>
         <translation>XInvers</translation>
     </message>
@@ -5537,177 +5537,177 @@ Reduce the mesh size</source>
 </translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="2547"/>
+        <location filename="../src/mainframe.cpp" line="2542"/>
         <source>and all associated OpPoints and Polars ?</source>
         <translation>und aller zugehörigen Arbeitspunkte und Polaren?</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="2549"/>
-        <location filename="../src/mainframe.cpp" line="3888"/>
+        <location filename="../src/mainframe.cpp" line="2544"/>
+        <location filename="../src/mainframe.cpp" line="3896"/>
         <source>Question</source>
         <translation>Frage</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="3444"/>
-        <location filename="../src/mainframe.cpp" line="3714"/>
+        <location filename="../src/mainframe.cpp" line="3452"/>
+        <location filename="../src/mainframe.cpp" line="3722"/>
         <source>Could not read the file
 </source>
         <translation>File konnte nicht gelesen werden
 </translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="100"/>
-        <location filename="../src/mainframe.cpp" line="3445"/>
+        <location filename="../src/mainframe.cpp" line="103"/>
+        <location filename="../src/mainframe.cpp" line="3453"/>
         <source>Info</source>
         <translation>Info</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="3509"/>
-        <location filename="../src/mainframe.cpp" line="3888"/>
+        <location filename="../src/mainframe.cpp" line="3517"/>
+        <location filename="../src/mainframe.cpp" line="3896"/>
         <source>Save the current project ?</source>
         <translation>Aktuelles Projekt speichern?</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="3646"/>
+        <location filename="../src/mainframe.cpp" line="3654"/>
         <source>Text File (*.txt);;Comma Separated Values (*.csv)</source>
         <translation>Text File (*.txt);;Comma Separated Values (*.csv)</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="3703"/>
-        <location filename="../src/mainframe.cpp" line="3790"/>
+        <location filename="../src/mainframe.cpp" line="3711"/>
+        <location filename="../src/mainframe.cpp" line="3798"/>
         <source>Open File</source>
         <translation>Datei öffnen</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="3705"/>
+        <location filename="../src/mainframe.cpp" line="3713"/>
         <source>Project file (*.wpa)</source>
         <translation>Project file (*.wpa)</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="113"/>
-        <location filename="../src/mainframe.cpp" line="3135"/>
-        <location filename="../src/mainframe.cpp" line="3544"/>
-        <location filename="../src/mainframe.cpp" line="3715"/>
-        <location filename="../src/mainframe.cpp" line="4108"/>
-        <location filename="../src/mainframe.cpp" line="4131"/>
-        <location filename="../src/mainframe.cpp" line="4314"/>
-        <location filename="../src/mainframe.cpp" line="4384"/>
-        <location filename="../src/mainframe.cpp" line="4730"/>
-        <location filename="../src/mainframe.cpp" line="5039"/>
-        <location filename="../src/mainframe.cpp" line="5262"/>
+        <location filename="../src/mainframe.cpp" line="116"/>
+        <location filename="../src/mainframe.cpp" line="3143"/>
+        <location filename="../src/mainframe.cpp" line="3552"/>
+        <location filename="../src/mainframe.cpp" line="3723"/>
+        <location filename="../src/mainframe.cpp" line="4116"/>
+        <location filename="../src/mainframe.cpp" line="4139"/>
+        <location filename="../src/mainframe.cpp" line="4322"/>
+        <location filename="../src/mainframe.cpp" line="4392"/>
+        <location filename="../src/mainframe.cpp" line="4738"/>
+        <location filename="../src/mainframe.cpp" line="5047"/>
+        <location filename="../src/mainframe.cpp" line="5271"/>
         <location filename="../src/objects/Foil.cpp" line="659"/>
         <source>Warning</source>
         <translation>Warnung</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="3792"/>
+        <location filename="../src/mainframe.cpp" line="3800"/>
         <source>XFLR5 file (*.dat *.plr *.wpa)</source>
         <translation>XFLR5 file (*.dat *.plr *.wpa)</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="3900"/>
-        <location filename="../src/mainframe.cpp" line="4074"/>
-        <location filename="../src/mainframe.cpp" line="4089"/>
+        <location filename="../src/mainframe.cpp" line="3908"/>
+        <location filename="../src/mainframe.cpp" line="4082"/>
+        <location filename="../src/mainframe.cpp" line="4097"/>
         <source>The project </source>
         <translation>Das Projekt</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="3900"/>
-        <location filename="../src/mainframe.cpp" line="4074"/>
-        <location filename="../src/mainframe.cpp" line="4089"/>
+        <location filename="../src/mainframe.cpp" line="3908"/>
+        <location filename="../src/mainframe.cpp" line="4082"/>
+        <location filename="../src/mainframe.cpp" line="4097"/>
         <source> has been saved</source>
         <translation>wurde gespeichert</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="4853"/>
+        <location filename="../src/mainframe.cpp" line="4861"/>
         <source>Enter the foil&apos;s new name</source>
         <translation>Geben Sie den neuen Profil-Namen ein</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="3966"/>
-        <location filename="../src/mainframe.cpp" line="3970"/>
+        <location filename="../src/mainframe.cpp" line="3974"/>
+        <location filename="../src/mainframe.cpp" line="3978"/>
         <source>Default Settings</source>
         <translation>Standardwerte</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="113"/>
+        <location filename="../src/mainframe.cpp" line="116"/>
         <source>Your system does not provide support for OpenGL.
 XFLR5 will not operate correctly.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="517"/>
+        <location filename="../src/mainframe.cpp" line="512"/>
         <source>Define the save options for operating points</source>
         <translation>Speicherpunkte für Arbeitspunkte festlegen</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="520"/>
+        <location filename="../src/mainframe.cpp" line="515"/>
         <source>Units...</source>
         <translation>Einheiten...</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="551"/>
+        <location filename="../src/mainframe.cpp" line="546"/>
         <source>Define the color and font options for all views and graphs</source>
         <translation>Farben und Fonts für alle Graphen</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="573"/>
+        <location filename="../src/mainframe.cpp" line="568"/>
         <source>More information about XFLR5</source>
         <translation>Mehr information üner XFLR5</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="576"/>
+        <location filename="../src/mainframe.cpp" line="571"/>
         <source>About Qt</source>
         <translation>Über QT</translation>
     </message>
     <message>
+        <location filename="../src/mainframe.cpp" line="574"/>
         <location filename="../src/mainframe.cpp" line="579"/>
-        <location filename="../src/mainframe.cpp" line="584"/>
         <source>Properties</source>
         <translation>Eigenschaften</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="580"/>
+        <location filename="../src/mainframe.cpp" line="575"/>
         <source>Show the properties of the currently selected polar</source>
         <translation>Eigneschalften der ausgewählten Polaren</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="635"/>
+        <location filename="../src/mainframe.cpp" line="630"/>
         <source>Reset Scales</source>
         <translation>Skalierungen zurücksetzen</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="727"/>
+        <location filename="../src/mainframe.cpp" line="722"/>
         <source>Set Table Columns</source>
         <translation>Setze Tabellen Spalten</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="730"/>
+        <location filename="../src/mainframe.cpp" line="725"/>
         <source>Reset column widths</source>
         <translation>Spaltenbreite zurücksetzen</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="733"/>
+        <location filename="../src/mainframe.cpp" line="728"/>
         <source>Load background image</source>
         <translation>Lade Hintergrundbild</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="735"/>
+        <location filename="../src/mainframe.cpp" line="730"/>
         <source>Clear background image</source>
         <translation>Hintergrundbild löschen</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1105"/>
+        <location filename="../src/mainframe.cpp" line="1100"/>
         <source>Options</source>
         <translation>Optionen</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1139"/>
+        <location filename="../src/mainframe.cpp" line="1134"/>
         <source>Switch to the Operating point view</source>
         <translation>Zur Arbeitspunkt Ansicht wechseln</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1145"/>
+        <location filename="../src/mainframe.cpp" line="1140"/>
         <source>Switch to the Polar view</source>
         <translation>Zur Polaren Ansicht wechseln</translation>
     </message>
@@ -5716,205 +5716,205 @@ XFLR5 will not operate correctly.</source>
         <translation type="obsolete">Stabilitäts Analyse</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1151"/>
+        <location filename="../src/mainframe.cpp" line="1146"/>
         <source>Switch to stability analysis post-processing</source>
         <translation>Zur Analyse post-processing wechseln</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1155"/>
+        <location filename="../src/mainframe.cpp" line="1150"/>
         <source>Root Locus View</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1157"/>
+        <location filename="../src/mainframe.cpp" line="1152"/>
         <source>Switch to root locus view</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1162"/>
+        <location filename="../src/mainframe.cpp" line="1157"/>
         <source>Switch to the 3D view</source>
         <translation>Zur 3D-Ansicht wechseln</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1167"/>
+        <location filename="../src/mainframe.cpp" line="1162"/>
         <source>Switch to the Cp view</source>
         <translation>Zur Cp-Ansicht wechseln</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1171"/>
+        <location filename="../src/mainframe.cpp" line="1166"/>
         <source>Define the style and color preferences for the 3D view</source>
         <translation>Style und Farben für die 3D Ansicht einstellen</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1175"/>
+        <location filename="../src/mainframe.cpp" line="1170"/>
         <source>Define which type of polars should be shown or hidden</source>
         <translation>Welche Polaren sollen angezeigt/versteckt werden</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1179"/>
+        <location filename="../src/mainframe.cpp" line="1174"/>
         <source>Define the scales for the 3D display of lift, moment, drag, and downwash</source>
         <translation>Skalierungen für 3D Ansicht von Auftrieb, Momenten, Widerstand und Downwash</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1184"/>
+        <location filename="../src/mainframe.cpp" line="1179"/>
         <source>Define the light options in 3D view</source>
         <translation>Lichteinstellungen in der 3D Ansicht</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1191"/>
+        <location filename="../src/mainframe.cpp" line="1186"/>
         <source>Half Wing</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1204"/>
+        <location filename="../src/mainframe.cpp" line="1199"/>
         <source>Rename the currently selected object</source>
         <translation>Objekt umbenennen</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1213"/>
+        <location filename="../src/mainframe.cpp" line="1208"/>
         <source>Edit the body of the currently selected plane</source>
         <translation>Rumpf des aktuellen Flugzeuges editieren</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1235"/>
+        <location filename="../src/mainframe.cpp" line="1230"/>
         <source>Export the current plane or wing to a text file in the format required by AVL</source>
         <translation>Exportiere Flugmodell oder Tragfläche als AVL Text File</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1239"/>
+        <location filename="../src/mainframe.cpp" line="1234"/>
         <source>Export the current operating point to a text or csv file</source>
         <translation>Exportiere aktuellen Arbeitspunkt als Text oder CSV File</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1243"/>
-        <location filename="../src/mainframe.cpp" line="1247"/>
+        <location filename="../src/mainframe.cpp" line="1238"/>
+        <location filename="../src/mainframe.cpp" line="1242"/>
         <source>Reset the legend position to its default value</source>
         <translation>Legendenposition zurücksetzen</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1251"/>
+        <location filename="../src/mainframe.cpp" line="1246"/>
         <source>Reset the wing scale to its default value</source>
         <translation>Tragflächenskalierung zurücksetzen</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1255"/>
+        <location filename="../src/mainframe.cpp" line="1250"/>
         <source>Scale the dimensions of the currently selected wing</source>
         <translation>Dimensionen der Tragfläche skalieren</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1258"/>
+        <location filename="../src/mainframe.cpp" line="1253"/>
         <source>Manage objects</source>
         <translation>Objekte verwalten</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1259"/>
+        <location filename="../src/mainframe.cpp" line="1254"/>
         <source>Rename or delete the planes and wings stored in the database</source>
         <translation>Modelle oder Tragflächen in der Datenbank umbenennen oder löschen</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1264"/>
+        <location filename="../src/mainframe.cpp" line="1259"/>
         <source>Import a polar from a text file</source>
         <translation>Polare von Text File importieren</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1268"/>
+        <location filename="../src/mainframe.cpp" line="1263"/>
         <source>Define the inertia for the current plane or wing</source>
         <translation>Trägheitsmomente für aktuelles Modell oder Tragfläche definieren</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1273"/>
+        <location filename="../src/mainframe.cpp" line="1268"/>
         <source>Hide all the curves except for the one corresponding to the currently selected operating point</source>
         <translation>Alle Kurven ausser jene für den aktuellen Arbeitspunkt verbergen</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1278"/>
+        <location filename="../src/mainframe.cpp" line="1273"/>
         <source>Show the graph curves of all operating points</source>
         <translation>Zeige Graphen für alle Arbeitspunkte</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1282"/>
+        <location filename="../src/mainframe.cpp" line="1277"/>
         <source>Hide the graph curves of all operating points</source>
         <translation>Verberge Graphen für alle Arbeitspunkte</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1286"/>
+        <location filename="../src/mainframe.cpp" line="1281"/>
         <source>Delete all the operating points of all planes and polars</source>
         <translation>Lösche alle Arbeitspunkte für alle Modelle und Polaren</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1290"/>
+        <location filename="../src/mainframe.cpp" line="1285"/>
         <source>Show the curves of all the operating points of the currently selected polar</source>
         <translation>Zeige alle Kurven für alle Arbeitspunkte der aktuellen Polare</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1294"/>
+        <location filename="../src/mainframe.cpp" line="1289"/>
         <source>Hide the curves of all the operating points of the currently selected polar</source>
         <translation>Verberge alle Kurven der Arbeitspunkte der aktuellen polare</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1298"/>
+        <location filename="../src/mainframe.cpp" line="1293"/>
         <source>Delete all the operating points of the currently selected polar</source>
         <translation>Lösche alle Arbeitspunkte der aktuellen Polare</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1302"/>
+        <location filename="../src/mainframe.cpp" line="1297"/>
         <source>Show the theoretical optimal elliptic lift curve on all graphs for which the selected variable is the local lift</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1306"/>
+        <location filename="../src/mainframe.cpp" line="1301"/>
         <source>Show XCG location</source>
         <translation>Zeige XCG Position</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1307"/>
+        <location filename="../src/mainframe.cpp" line="1302"/>
         <source>Show the position of the center of gravity defined in the analysis</source>
         <translation>Zeige COG Position in der Analyse</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1312"/>
+        <location filename="../src/mainframe.cpp" line="1307"/>
         <source>Show the graph curves for the elevator</source>
         <translation>Zeige Graphen-Kurve für das Höhenruder</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1317"/>
+        <location filename="../src/mainframe.cpp" line="1312"/>
         <source>Show the graph curves for the fin</source>
         <translation>Zeige Graphen-Kurve für das Seitenruder</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1322"/>
+        <location filename="../src/mainframe.cpp" line="1317"/>
         <source>Show the graph curves for the second wing</source>
         <translation>Zeige Graphen-Kurve für die zweite Tragfläche</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1327"/>
+        <location filename="../src/mainframe.cpp" line="1322"/>
         <source>Define an analysis for the current wing or plane</source>
         <translation>Erstelle eine Analyse für das aktuelle Modell oder Tragfläche</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1331"/>
+        <location filename="../src/mainframe.cpp" line="1326"/>
         <source>Modify the analysis parameters of this polar</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1339"/>
+        <location filename="../src/mainframe.cpp" line="1334"/>
         <source>Define a Stability Analysis</source>
         <translation>Erstelle eine Stabilitäts Analyse</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1340"/>
+        <location filename="../src/mainframe.cpp" line="1335"/>
         <source>Define a stability analysis for the current wing or plane</source>
         <translation>Erstelle eine Stabilitäts Analyse für das aktuelle Modell oder Tragfläche</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1344"/>
-        <location filename="../src/mainframe.cpp" line="1922"/>
-        <location filename="../src/mainframe.cpp" line="2433"/>
+        <location filename="../src/mainframe.cpp" line="1339"/>
+        <location filename="../src/mainframe.cpp" line="1917"/>
+        <location filename="../src/mainframe.cpp" line="2428"/>
         <source>Define Graph Settings</source>
         <translation>Bestimme Graphen Einstellungen</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1345"/>
+        <location filename="../src/mainframe.cpp" line="1340"/>
         <source>Define the settings for the selected graph</source>
         <translation>Einstellungen für aktuellen Graphen</translation>
     </message>
@@ -5927,124 +5927,124 @@ XFLR5 will not operate correctly.</source>
         <translation type="obsolete">Zeige alle vier Arbeitspunkte</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1359"/>
+        <location filename="../src/mainframe.cpp" line="1354"/>
         <source>Display only the first graph</source>
         <translation>Zeige nur den ersten Graphen</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1364"/>
+        <location filename="../src/mainframe.cpp" line="1359"/>
         <source>Display only the second graph</source>
         <translation>Zeige nur den zweiten Graphen</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1369"/>
+        <location filename="../src/mainframe.cpp" line="1364"/>
         <source>Display only the third graph</source>
         <translation>Zeige nur den dritten Graphen</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1374"/>
+        <location filename="../src/mainframe.cpp" line="1369"/>
         <source>Display only the fourth graph</source>
         <translation>Zeige nur der vierten Graphen</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1378"/>
-        <location filename="../src/mainframe.cpp" line="1949"/>
+        <location filename="../src/mainframe.cpp" line="1373"/>
+        <location filename="../src/mainframe.cpp" line="1944"/>
         <source>Highlight Current OpPoint</source>
         <translation type="unfinished">Aktuellen Arbeitspunkt hervorheben</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1380"/>
-        <location filename="../src/mainframe.cpp" line="1951"/>
+        <location filename="../src/mainframe.cpp" line="1375"/>
+        <location filename="../src/mainframe.cpp" line="1946"/>
         <source>Highlights on the polar curve the currently selected operating point</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1384"/>
+        <location filename="../src/mainframe.cpp" line="1379"/>
         <source>Reset the scale of the current operating point graph</source>
         <translation>Skalierung des aktuellen Arbeitspunkten-Graphen zurücksetzen</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1388"/>
+        <location filename="../src/mainframe.cpp" line="1383"/>
         <source>Reset the scales of all four operating point graphs</source>
         <translation>Skalierung aller Graphen zurücksetzen</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1392"/>
+        <location filename="../src/mainframe.cpp" line="1387"/>
         <source>Reset the scales of all four polar graphs</source>
         <translation>Skalierung aller Polar-Graphen zurücksetzen</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1396"/>
+        <location filename="../src/mainframe.cpp" line="1391"/>
         <source>Define the settings of all four operating point graphs</source>
         <translation>Einstellungen für alle vier Arbeitspunkt-Graphen</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1400"/>
+        <location filename="../src/mainframe.cpp" line="1395"/>
         <source>Define the settings of all four polar graphs</source>
         <translation>Einstellungen für alle vier Polaren-Graphen</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1404"/>
+        <location filename="../src/mainframe.cpp" line="1399"/>
         <source>Hide all the polar curves associated to the currently selected wing or plane</source>
         <translation>Verberge alle Polar Kurven des aktuellen Modelles oder Tragfläche</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1407"/>
+        <location filename="../src/mainframe.cpp" line="1402"/>
         <source>Show Only Associated Polars</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1411"/>
+        <location filename="../src/mainframe.cpp" line="1406"/>
         <source>Show all the polar curves associated to the currently selected wing or plane</source>
         <translation>Zeige alle Polar-Kurven für aktuelles Modell oder Tragfläche</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1415"/>
+        <location filename="../src/mainframe.cpp" line="1410"/>
         <source>Delete all the polars associated to the currently selected wing or plane</source>
         <translation>Lösche alle Polaren des aktuellen Modelles oder Tragfläche</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1419"/>
+        <location filename="../src/mainframe.cpp" line="1414"/>
         <source>Hide all the polar curves of all wings and planes</source>
         <translation>Verberge alle Polaren für alle Modelle und Tragflächen</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1423"/>
+        <location filename="../src/mainframe.cpp" line="1418"/>
         <source>Show all the polar curves of all wings and planes</source>
         <translation>Zeige alle Polaren von allen Modellen und Tragflächen</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1427"/>
+        <location filename="../src/mainframe.cpp" line="1422"/>
         <source>Hide all the operating point curves of the currently selected wing or plane</source>
         <translation>Verberge alle Arbeitspunkt-Kurven für aktuelles Modell der Tragfläche</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1431"/>
+        <location filename="../src/mainframe.cpp" line="1426"/>
         <source>Show all the operating point curves of the currently selected wing or plane</source>
         <translation>Zeige alle Arbeitspunkt-Kurven für aktuelles Modell der Tragfläche</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1435"/>
+        <location filename="../src/mainframe.cpp" line="1430"/>
         <source>Delete all the operating points of the currently selected wing or plane</source>
         <translation>Lösche alle Arbeitspunkt-Kurven für aktuelles Modell der Tragfläche</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1439"/>
+        <location filename="../src/mainframe.cpp" line="1434"/>
         <source>Delete the currently selected wing or plane</source>
         <translation>Lösche ausgewähltes Modell oder Tragfläche</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1443"/>
+        <location filename="../src/mainframe.cpp" line="1438"/>
         <source>Duplicate the currently selected wing or plane</source>
         <translation>Dupliziere ausgewähltes Modell oder Tragfläche</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1447"/>
+        <location filename="../src/mainframe.cpp" line="1442"/>
         <source>Save the currently selected wing or plane as a new separate project</source>
         <translation>Speichere ausgewähltes Modell oder Tragfläche in ein neues Projekt</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1451"/>
+        <location filename="../src/mainframe.cpp" line="1446"/>
         <source>Rename the currently selected polar</source>
         <translation>Ausgewwählte Polare umbenennen</translation>
     </message>
@@ -6053,178 +6053,178 @@ XFLR5 will not operate correctly.</source>
         <translation type="obsolete">Punkte der aktuellen Polaren ändern</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1455"/>
+        <location filename="../src/mainframe.cpp" line="1450"/>
         <source>Export the currently selected polar to a text or csv file</source>
         <translation>Exportiere aktuelle Polare als Text oder CSV File</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1459"/>
+        <location filename="../src/mainframe.cpp" line="1454"/>
         <source>Delete all the points of the currently selected polar, but keep the analysis settings</source>
         <translation>Lösche alle Punkte der aktuellen Polare; Einstellunge beibehalten</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1463"/>
+        <location filename="../src/mainframe.cpp" line="1458"/>
         <source>Delete the currently selected polar</source>
         <translation>Lösche die aktuelle Polare</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1467"/>
+        <location filename="../src/mainframe.cpp" line="1462"/>
         <source>Delete the currently selected operating point</source>
         <translation>Lösche den aktuellen Arbeitspunkt</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1471"/>
+        <location filename="../src/mainframe.cpp" line="1466"/>
         <source>Define the settings for LLT, VLM and Panel analysis</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1624"/>
+        <location filename="../src/mainframe.cpp" line="1619"/>
         <source>&amp;Analysis</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1326"/>
-        <location filename="../src/mainframe.cpp" line="2004"/>
+        <location filename="../src/mainframe.cpp" line="1321"/>
+        <location filename="../src/mainframe.cpp" line="1999"/>
         <source>Define an Analysis</source>
         <translation>Analyse definieren</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="585"/>
+        <location filename="../src/mainframe.cpp" line="580"/>
         <source>Show the properties of the currently selected operating point</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1149"/>
+        <location filename="../src/mainframe.cpp" line="1144"/>
         <source>Time Response Vew</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1349"/>
+        <location filename="../src/mainframe.cpp" line="1344"/>
         <source>Display the first two graphs</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1354"/>
+        <location filename="../src/mainframe.cpp" line="1349"/>
         <source>Display all four graphs</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1909"/>
+        <location filename="../src/mainframe.cpp" line="1904"/>
         <source>Define Cp Graph Settings</source>
         <translation>Bestimme CP-Graph Einstellungen</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1928"/>
+        <location filename="../src/mainframe.cpp" line="1923"/>
         <source>Two Polar Graphs</source>
         <translation>Zwei Polar-Graphen</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1932"/>
+        <location filename="../src/mainframe.cpp" line="1927"/>
         <source>All Polar Graphs</source>
         <translation>Alle Polar Graphen</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1943"/>
+        <location filename="../src/mainframe.cpp" line="1938"/>
         <source>Cl vs. Cd</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1944"/>
+        <location filename="../src/mainframe.cpp" line="1939"/>
         <source>Cl vs.Alpha</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1945"/>
+        <location filename="../src/mainframe.cpp" line="1940"/>
         <source>Cl vs. Xtr.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1946"/>
+        <location filename="../src/mainframe.cpp" line="1941"/>
         <source>Cm vs.Alpha</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="1947"/>
+        <location filename="../src/mainframe.cpp" line="1942"/>
         <source>Glide ratio vs. alpha</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="2008"/>
+        <location filename="../src/mainframe.cpp" line="2003"/>
         <source>Batch Analysis</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="2242"/>
+        <location filename="../src/mainframe.cpp" line="2237"/>
         <source>Analysis</source>
         <translation>Analyse</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="2403"/>
+        <location filename="../src/mainframe.cpp" line="2398"/>
         <source>Reset foil scale</source>
         <translation>Profil Skalierung zurücksetzen</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="2546"/>
+        <location filename="../src/mainframe.cpp" line="2541"/>
         <source>Are you sure you want to delete</source>
         <translation>Sind Sie sicher das Sie löschen wollen</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="3544"/>
+        <location filename="../src/mainframe.cpp" line="3552"/>
         <source>Error reading the file</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="3966"/>
+        <location filename="../src/mainframe.cpp" line="3974"/>
         <source>Are you sure you want to reset the default settings ?</source>
         <translation>Wirklich auf die Standardwerte zurücksetzen?</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="3970"/>
+        <location filename="../src/mainframe.cpp" line="3978"/>
         <source>The settings will be reset at the next session</source>
         <translation>Die Einstellungen werden beim Neustart zurückgesetzt</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="4108"/>
-        <location filename="../src/mainframe.cpp" line="5262"/>
+        <location filename="../src/mainframe.cpp" line="4116"/>
+        <location filename="../src/mainframe.cpp" line="5271"/>
         <source>Nothing to save</source>
         <translation>Nichts zu speichern</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="4117"/>
-        <location filename="../src/mainframe.cpp" line="5019"/>
+        <location filename="../src/mainframe.cpp" line="4125"/>
+        <location filename="../src/mainframe.cpp" line="5027"/>
         <source>Save the Project File</source>
         <translation>Projekt File speichern</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="4119"/>
+        <location filename="../src/mainframe.cpp" line="4127"/>
         <source>XFLR5 Project File (*.wpa)</source>
         <translation>XFLR5 Project File (*.wpa)</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="3135"/>
-        <location filename="../src/mainframe.cpp" line="4131"/>
-        <location filename="../src/mainframe.cpp" line="5039"/>
+        <location filename="../src/mainframe.cpp" line="3143"/>
+        <location filename="../src/mainframe.cpp" line="4139"/>
+        <location filename="../src/mainframe.cpp" line="5047"/>
         <source>Could not open the file for writing</source>
         <translation>Kann Datei zum Schreiben nicht öffnen</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="4175"/>
+        <location filename="../src/mainframe.cpp" line="4183"/>
         <source>Save Image</source>
         <translation>Bild speichern</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="4314"/>
-        <location filename="../src/mainframe.cpp" line="4384"/>
+        <location filename="../src/mainframe.cpp" line="4322"/>
+        <location filename="../src/mainframe.cpp" line="4392"/>
         <source>Unidentified Operating Point</source>
         <translation>Unbekannter Arbeitspunkt</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="4730"/>
+        <location filename="../src/mainframe.cpp" line="4738"/>
         <source>Obsolete format, cannot read</source>
         <translation>Veraltetes Format, lesen nicht möglich</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="5021"/>
+        <location filename="../src/mainframe.cpp" line="5029"/>
         <source>XFLR5 v6 Project File (*.wpa);;XFLR5 v5 Project File (*.*)</source>
         <translation></translation>
     </message>
@@ -6233,14 +6233,14 @@ XFLR5 will not operate correctly.</source>
         <translation type="obsolete">QFLR5 v5.00 Project File (*.wpa);;XFLR5 v4.00 Project File (*.wpa)</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="6101"/>
+        <location filename="../src/mainframe.cpp" line="6110"/>
         <source>A foil of that name already exists
 Please enter a new name</source>
         <translation>Profil mit diesem Namen existiert schon.
 Bitte neuen Namen eingeben</translation>
     </message>
     <message>
-        <location filename="../src/mainframe.cpp" line="6822"/>
+        <location filename="../src/mainframe.cpp" line="6831"/>
         <source>&amp;%1 %2</source>
         <translation>&amp;%1 %2</translation>
     </message>
@@ -6568,29 +6568,29 @@ Weitermachen?</translation>
         <translation>NACA Profile</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/NacaFoilDlg.cpp" line="50"/>
+        <location filename="../src/xdirect/NacaFoilDlg.cpp" line="51"/>
         <source>4 or 5 digits</source>
         <translation>4 oder 5 Stellen</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/NacaFoilDlg.cpp" line="51"/>
+        <location filename="../src/xdirect/NacaFoilDlg.cpp" line="52"/>
         <source>Number of Panels</source>
         <translation>Anzahl der Panels</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/NacaFoilDlg.cpp" line="74"/>
+        <location filename="../src/xdirect/NacaFoilDlg.cpp" line="77"/>
         <source>OK</source>
         <translation>Ok</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/NacaFoilDlg.cpp" line="76"/>
+        <location filename="../src/xdirect/NacaFoilDlg.cpp" line="79"/>
         <source>Cancel</source>
         <translation>Abbrechen</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/NacaFoilDlg.cpp" line="128"/>
-        <location filename="../src/xdirect/NacaFoilDlg.cpp" line="135"/>
-        <location filename="../src/xdirect/NacaFoilDlg.cpp" line="142"/>
+        <location filename="../src/xdirect/NacaFoilDlg.cpp" line="134"/>
+        <location filename="../src/xdirect/NacaFoilDlg.cpp" line="141"/>
+        <location filename="../src/xdirect/NacaFoilDlg.cpp" line="148"/>
         <source>Illegal NACA Number</source>
         <translation>Ungültige NACA Nummer</translation>
     </message>
@@ -7297,10 +7297,10 @@ Check the guidelines for explanations.</source>
         <location filename="../src/design/AFoil.cpp" line="1412"/>
         <location filename="../src/design/AFoil.cpp" line="1649"/>
         <location filename="../src/design/AFoil.cpp" line="1655"/>
-        <location filename="../src/design/AFoil.cpp" line="1959"/>
-        <location filename="../src/design/AFoil.cpp" line="1965"/>
-        <location filename="../src/design/AFoil.cpp" line="2909"/>
-        <location filename="../src/design/AFoil.cpp" line="2923"/>
+        <location filename="../src/design/AFoil.cpp" line="1961"/>
+        <location filename="../src/design/AFoil.cpp" line="1967"/>
+        <location filename="../src/design/AFoil.cpp" line="2911"/>
+        <location filename="../src/design/AFoil.cpp" line="2925"/>
         <source>Warning</source>
         <translation>Warnung</translation>
     </message>
@@ -7326,7 +7326,7 @@ Check the guidelines for explanations.</source>
     </message>
     <message>
         <location filename="../src/design/AFoil.cpp" line="1648"/>
-        <location filename="../src/design/AFoil.cpp" line="1958"/>
+        <location filename="../src/design/AFoil.cpp" line="1960"/>
         <source>Too many output points on upper surface
  Max =%1</source>
         <translation>Zuviele Punkte auf der Oberseite
@@ -7334,7 +7334,7 @@ Max = %1</translation>
     </message>
     <message>
         <location filename="../src/design/AFoil.cpp" line="1654"/>
-        <location filename="../src/design/AFoil.cpp" line="1964"/>
+        <location filename="../src/design/AFoil.cpp" line="1966"/>
         <source>Too many output points on lower surface
  Max =%1</source>
         <translation>Zu viele Punkte auf der Unterseite 
@@ -7351,43 +7351,43 @@ Max = %1</translation>
         <translation>Text Datei (*.dat)</translation>
     </message>
     <message>
-        <location filename="../src/design/AFoil.cpp" line="2311"/>
+        <location filename="../src/design/AFoil.cpp" line="2313"/>
         <source>X-Scale = %1</source>
         <translation>X-Skalierung = %1</translation>
     </message>
     <message>
-        <location filename="../src/design/AFoil.cpp" line="2313"/>
+        <location filename="../src/design/AFoil.cpp" line="2315"/>
         <source>Y-Scale = %1</source>
         <translation>Y-Skalierung = %1</translation>
     </message>
     <message>
-        <location filename="../src/design/AFoil.cpp" line="2315"/>
+        <location filename="../src/design/AFoil.cpp" line="2317"/>
         <source>x  = %1</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/design/AFoil.cpp" line="2317"/>
+        <location filename="../src/design/AFoil.cpp" line="2319"/>
         <source>y  = %1</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/design/AFoil.cpp" line="2835"/>
+        <location filename="../src/design/AFoil.cpp" line="2837"/>
         <source>Open Image File</source>
         <translation>Öffne Bilddatei</translation>
     </message>
     <message>
-        <location filename="../src/design/AFoil.cpp" line="2909"/>
-        <location filename="../src/design/AFoil.cpp" line="2923"/>
+        <location filename="../src/design/AFoil.cpp" line="2911"/>
+        <location filename="../src/design/AFoil.cpp" line="2925"/>
         <source>The minimum number of control points has been reached for this spline degree</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/design/AFoil.cpp" line="1879"/>
+        <location filename="../src/design/AFoil.cpp" line="1881"/>
         <source>Question</source>
         <translation>Frage</translation>
     </message>
     <message>
-        <location filename="../src/design/AFoil.cpp" line="1879"/>
+        <location filename="../src/design/AFoil.cpp" line="1881"/>
         <source>Discard changes to Splines ?</source>
         <translation>Änderungen verwerfen?</translation>
     </message>
@@ -7432,79 +7432,79 @@ Max = %1</translation>
         <translation type="obsolete">Splined Punkte</translation>
     </message>
     <message>
-        <location filename="../src/design/AFoil.cpp" line="2593"/>
+        <location filename="../src/design/AFoil.cpp" line="2595"/>
         <source>Name</source>
         <translation>Name</translation>
     </message>
     <message>
-        <location filename="../src/design/AFoil.cpp" line="2594"/>
+        <location filename="../src/design/AFoil.cpp" line="2596"/>
         <source>Thickness (%)</source>
         <translation>Dicke(%)</translation>
     </message>
     <message>
-        <location filename="../src/design/AFoil.cpp" line="2595"/>
         <location filename="../src/design/AFoil.cpp" line="2597"/>
+        <location filename="../src/design/AFoil.cpp" line="2599"/>
         <source>at (%)</source>
         <translation>bei (%)</translation>
     </message>
     <message>
-        <location filename="../src/design/AFoil.cpp" line="2596"/>
+        <location filename="../src/design/AFoil.cpp" line="2598"/>
         <source>Camber (%)</source>
         <translation>Wölbung (%)</translation>
     </message>
     <message>
-        <location filename="../src/design/AFoil.cpp" line="2598"/>
-        <location filename="../src/design/AFoil.cpp" line="2606"/>
+        <location filename="../src/design/AFoil.cpp" line="2600"/>
+        <location filename="../src/design/AFoil.cpp" line="2608"/>
         <source>Points</source>
         <translation>Punkte</translation>
     </message>
     <message>
-        <location filename="../src/design/AFoil.cpp" line="2599"/>
+        <location filename="../src/design/AFoil.cpp" line="2601"/>
         <source>TE Flap (</source>
         <translation>T.E.(Hinterkanten) Klappe (</translation>
     </message>
     <message>
-        <location filename="../src/design/AFoil.cpp" line="2600"/>
+        <location filename="../src/design/AFoil.cpp" line="2602"/>
         <source>TE XHinge</source>
         <translation>Hinterkaten X-Position der Aufhängung (TE XHinge)</translation>
     </message>
     <message>
-        <location filename="../src/design/AFoil.cpp" line="2601"/>
+        <location filename="../src/design/AFoil.cpp" line="2603"/>
         <source>TE YHinge</source>
         <translation>Hinterkaten Y-Position der Aufhängung (TE YHinge)</translation>
     </message>
     <message>
-        <location filename="../src/design/AFoil.cpp" line="2602"/>
+        <location filename="../src/design/AFoil.cpp" line="2604"/>
         <source>LE Flap (</source>
         <translation>L.E (Vorderkanten) Klappe (</translation>
     </message>
     <message>
-        <location filename="../src/design/AFoil.cpp" line="2603"/>
+        <location filename="../src/design/AFoil.cpp" line="2605"/>
         <source>LE XHinge</source>
         <translation>Vorderkaten X-Position der Aufhängung (LE XHinge)</translation>
     </message>
     <message>
-        <location filename="../src/design/AFoil.cpp" line="2604"/>
+        <location filename="../src/design/AFoil.cpp" line="2606"/>
         <source>LE YHinge</source>
         <translation>Vorderkaten Y-Position der Aufhängung (LE YHinge)</translation>
     </message>
     <message>
-        <location filename="../src/design/AFoil.cpp" line="2605"/>
+        <location filename="../src/design/AFoil.cpp" line="2607"/>
         <source>Show</source>
         <translation>Anzeigen</translation>
     </message>
     <message>
-        <location filename="../src/design/AFoil.cpp" line="2607"/>
+        <location filename="../src/design/AFoil.cpp" line="2609"/>
         <source>Centerline</source>
         <translation>Mittenlinie</translation>
     </message>
     <message>
-        <location filename="../src/design/AFoil.cpp" line="2608"/>
+        <location filename="../src/design/AFoil.cpp" line="2610"/>
         <source>Style</source>
         <translation>Style</translation>
     </message>
     <message>
-        <location filename="../src/design/AFoil.cpp" line="2610"/>
+        <location filename="../src/design/AFoil.cpp" line="2612"/>
         <source>Foils</source>
         <translation>Profile</translation>
     </message>
@@ -7516,81 +7516,69 @@ Max = %1</translation>
         <translation type="obsolete">Cd</translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="4193"/>
-        <location filename="../src/miarex/Miarex.cpp" line="14799"/>
-        <location filename="../src/miarex/Miarex.cpp" line="14938"/>
+        <location filename="../src/miarex/Miarex.cpp" line="4191"/>
         <source>Cl</source>
         <translation>Cl</translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="14775"/>
-        <location filename="../src/miarex/Miarex.cpp" line="14907"/>
-        <location filename="../src/miarex/Miarex.cpp" line="14914"/>
-        <location filename="../src/miarex/Miarex.cpp" line="15046"/>
         <source>Alpha</source>
-        <translation>Alpha</translation>
+        <translation type="obsolete">Alpha</translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="14802"/>
-        <location filename="../src/miarex/Miarex.cpp" line="14941"/>
         <source>Cn</source>
-        <translation>Cn</translation>
+        <translation type="obsolete">Cn</translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="14805"/>
-        <location filename="../src/miarex/Miarex.cpp" line="14944"/>
         <source>VCn</source>
-        <translation>VCn</translation>
+        <translation type="obsolete">VCn</translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="14808"/>
-        <location filename="../src/miarex/Miarex.cpp" line="14947"/>
         <source>ICn</source>
-        <translation>ICn</translation>
+        <translation type="obsolete">ICn</translation>
     </message>
     <message>
         <source>Cl/Cd</source>
         <translation type="obsolete">Cl/Cd</translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="217"/>
+        <location filename="../src/miarex/Miarex.cpp" line="219"/>
         <source>x</source>
         <translation>x</translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="218"/>
-        <location filename="../src/miarex/Miarex.cpp" line="14058"/>
+        <location filename="../src/miarex/Miarex.cpp" line="220"/>
+        <location filename="../src/miarex/Miarex.cpp" line="14113"/>
         <source>Cp</source>
         <translation>Cp</translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="264"/>
-        <location filename="../src/miarex/Miarex.cpp" line="278"/>
+        <location filename="../src/miarex/Miarex.cpp" line="266"/>
+        <location filename="../src/miarex/Miarex.cpp" line="280"/>
         <source>Real</source>
         <translation>Real</translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="265"/>
-        <location filename="../src/miarex/Miarex.cpp" line="279"/>
+        <location filename="../src/miarex/Miarex.cpp" line="267"/>
+        <location filename="../src/miarex/Miarex.cpp" line="281"/>
         <source>Imag/2.pi</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="800"/>
+        <location filename="../src/miarex/Miarex.cpp" line="802"/>
         <location filename="../src/miarex/Miarex.cpp" line="1178"/>
         <location filename="../src/miarex/Miarex.cpp" line="1273"/>
-        <location filename="../src/miarex/Miarex.cpp" line="7370"/>
-        <location filename="../src/miarex/Miarex.cpp" line="7375"/>
-        <location filename="../src/miarex/Miarex.cpp" line="7423"/>
-        <location filename="../src/miarex/Miarex.cpp" line="7430"/>
-        <location filename="../src/miarex/Miarex.cpp" line="7447"/>
-        <location filename="../src/miarex/Miarex.cpp" line="9782"/>
-        <location filename="../src/miarex/Miarex.cpp" line="9805"/>
-        <location filename="../src/miarex/Miarex.cpp" line="15073"/>
-        <location filename="../src/miarex/Miarex.cpp" line="15083"/>
-        <location filename="../src/miarex/Miarex.cpp" line="15088"/>
-        <location filename="../src/miarex/Miarex.cpp" line="15105"/>
-        <location filename="../src/miarex/Miarex.cpp" line="15126"/>
+        <location filename="../src/miarex/Miarex.cpp" line="7379"/>
+        <location filename="../src/miarex/Miarex.cpp" line="7384"/>
+        <location filename="../src/miarex/Miarex.cpp" line="7432"/>
+        <location filename="../src/miarex/Miarex.cpp" line="7439"/>
+        <location filename="../src/miarex/Miarex.cpp" line="7456"/>
+        <location filename="../src/miarex/Miarex.cpp" line="9791"/>
+        <location filename="../src/miarex/Miarex.cpp" line="9814"/>
+        <location filename="../src/miarex/Miarex.cpp" line="14851"/>
+        <location filename="../src/miarex/Miarex.cpp" line="14861"/>
+        <location filename="../src/miarex/Miarex.cpp" line="14866"/>
+        <location filename="../src/miarex/Miarex.cpp" line="14883"/>
+        <location filename="../src/miarex/Miarex.cpp" line="14904"/>
         <source>Warning</source>
         <translation>Warnung</translation>
     </message>
@@ -7613,86 +7601,84 @@ Max = %1</translation>
         <translation type="obsolete">Fin_</translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="4051"/>
+        <location filename="../src/miarex/Miarex.cpp" line="4049"/>
         <source>The modification will erase all results associated to this Plane.
 Continue ?</source>
         <translation>Die Änderung löscht alle Resulate für das Modell.
 Weitermachen?</translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="4174"/>
-        <location filename="../src/miarex/Miarex.cpp" line="4313"/>
+        <location filename="../src/miarex/Miarex.cpp" line="4172"/>
+        <location filename="../src/miarex/Miarex.cpp" line="4311"/>
         <source>Induced Angle</source>
         <translation>Induzierter Winkel (induced angle)</translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="4184"/>
+        <location filename="../src/miarex/Miarex.cpp" line="4182"/>
         <source>Total Angle</source>
         <translation>Gesamter Winkel</translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="4202"/>
+        <location filename="../src/miarex/Miarex.cpp" line="4200"/>
         <source>Local lift</source>
         <translation>Lokaler Auftrieb (local lift)</translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="4211"/>
+        <location filename="../src/miarex/Miarex.cpp" line="4209"/>
         <source>Airfoil drag</source>
         <translation>Profilwiderstand (foil drag)</translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="4220"/>
+        <location filename="../src/miarex/Miarex.cpp" line="4218"/>
         <source>Induced drag</source>
         <translation>Induzierter Widerstand (induced drag)</translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="4229"/>
+        <location filename="../src/miarex/Miarex.cpp" line="4227"/>
         <source>Total drag</source>
         <translation>Gesamtwiderstand (total drag)</translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="4238"/>
+        <location filename="../src/miarex/Miarex.cpp" line="4236"/>
         <source>Local drag</source>
         <translation>Lokaler Widerstand (local drag)</translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="4247"/>
+        <location filename="../src/miarex/Miarex.cpp" line="4245"/>
         <source>Cm Airfoil</source>
         <translation>Cm Profil</translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="14790"/>
-        <location filename="../src/miarex/Miarex.cpp" line="14929"/>
         <source>Cm</source>
-        <translation>Cm</translation>
+        <translation type="obsolete">Cm</translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="4256"/>
+        <location filename="../src/miarex/Miarex.cpp" line="4254"/>
         <source>Cm total</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="4265"/>
+        <location filename="../src/miarex/Miarex.cpp" line="4263"/>
         <source>Re</source>
         <translation>Re</translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="4274"/>
+        <location filename="../src/miarex/Miarex.cpp" line="4272"/>
         <source>Top Trans x-Pos %</source>
         <translation>Umschlagspunkt Oben (Top Trans x-Pos) %</translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="4283"/>
+        <location filename="../src/miarex/Miarex.cpp" line="4281"/>
         <source>Bot Trans x-Pos %</source>
         <translation>Umschlagspunkt unten (Bot Trans x-Pos ) %</translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="4292"/>
+        <location filename="../src/miarex/Miarex.cpp" line="4290"/>
         <source>CP x-Pos %</source>
         <translation>CP x-Pos %</translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="4304"/>
+        <location filename="../src/miarex/Miarex.cpp" line="4302"/>
         <source>BM (</source>
         <translation>BM (</translation>
     </message>
@@ -7749,7 +7735,7 @@ Weitermachen?</translation>
         <translation type="obsolete">Wurzel-Spitzen Rückfall (Root-Tip Sweep)=%1</translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="11808"/>
+        <location filename="../src/miarex/Miarex.cpp" line="11817"/>
         <source>Point is out of the flight envelope</source>
         <translation>Punkte sind ausserhalb des Flugleistungsbereichs</translation>
     </message>
@@ -7758,7 +7744,7 @@ Weitermachen?</translation>
         <translation type="obsolete">QInf = %1 </translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="11802"/>
+        <location filename="../src/miarex/Miarex.cpp" line="11811"/>
         <source>Alpha = %1 </source>
         <translation>Alpha = %1 </translation>
     </message>
@@ -7771,17 +7757,17 @@ Weitermachen?</translation>
         <translation type="obsolete">CD = %1 </translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="11824"/>
+        <location filename="../src/miarex/Miarex.cpp" line="11833"/>
         <source>Efficiency = %1 </source>
         <translation>Effizienz =%1 </translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="11828"/>
+        <location filename="../src/miarex/Miarex.cpp" line="11837"/>
         <source>Cl/Cd = %1 </source>
         <translation>Cl/Cd = %1 </translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="11832"/>
+        <location filename="../src/miarex/Miarex.cpp" line="11841"/>
         <source>GCm = %1 </source>
         <translation>GCm = %1 </translation>
     </message>
@@ -7818,24 +7804,24 @@ Die Maximalzahl ist %2
 Reduzieren sie die Anzahl der Paneele</translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="7370"/>
+        <location filename="../src/miarex/Miarex.cpp" line="7379"/>
         <source>Please define a wing or a plane object before running a calculation</source>
         <translation>Bitte definieren Sie eine Tragfläche oder ein Modell bevor Sie die Berechnung durchführen</translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="7375"/>
+        <location filename="../src/miarex/Miarex.cpp" line="7384"/>
         <source>Please define an analysis/polar before running a calculation</source>
         <translation>Bitte definieren Sie eine Analyse/Polare bevor Sie eine Berechnung durchführen</translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="7422"/>
-        <location filename="../src/miarex/Miarex.cpp" line="7429"/>
+        <location filename="../src/miarex/Miarex.cpp" line="7431"/>
+        <location filename="../src/miarex/Miarex.cpp" line="7438"/>
         <source>Could not find the wing&apos;s foil </source>
         <translation>Kann das Profil der Tragfläche nicht finden :-(</translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="7422"/>
-        <location filename="../src/miarex/Miarex.cpp" line="7429"/>
+        <location filename="../src/miarex/Miarex.cpp" line="7431"/>
+        <location filename="../src/miarex/Miarex.cpp" line="7438"/>
         <source>...
 Aborting Calculation</source>
         <translation>...
@@ -7850,60 +7836,60 @@ Berechnung wurde abgebrochen</translation>
         <translation type="obsolete">Kann das Profil des Seitenruders nicht finden</translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="7446"/>
+        <location filename="../src/miarex/Miarex.cpp" line="7455"/>
         <source>Control polars are not supported in XFLR5 v6.
 Please use stability polars instead.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="8295"/>
+        <location filename="../src/miarex/Miarex.cpp" line="8304"/>
         <source>Are you sure you want to delete the plane :
 </source>
         <translation>Sind Sie sicher das Sie das Modell löschen wollen:</translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="8296"/>
+        <location filename="../src/miarex/Miarex.cpp" line="8305"/>
         <source>Are you sure you want to delete the wing :
 </source>
         <translation>Sind Sie sicher das sie die Tragfläche löschen wollen:</translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="8297"/>
-        <location filename="../src/miarex/Miarex.cpp" line="8459"/>
-        <location filename="../src/miarex/Miarex.cpp" line="8521"/>
-        <location filename="../src/miarex/Miarex.cpp" line="10365"/>
-        <location filename="../src/miarex/Miarex.cpp" line="13052"/>
+        <location filename="../src/miarex/Miarex.cpp" line="8306"/>
+        <location filename="../src/miarex/Miarex.cpp" line="8468"/>
+        <location filename="../src/miarex/Miarex.cpp" line="8530"/>
+        <location filename="../src/miarex/Miarex.cpp" line="10374"/>
+        <location filename="../src/miarex/Miarex.cpp" line="13107"/>
         <source>Question</source>
         <translation>Frage</translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="8520"/>
+        <location filename="../src/miarex/Miarex.cpp" line="8529"/>
         <source>Are you sure you want to delete the polar :
 </source>
         <translation>Sind Sie sicher das Sie die Polare löschen wollen :</translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="8669"/>
+        <location filename="../src/miarex/Miarex.cpp" line="8678"/>
         <source>The modification will erase all results for the planes using this body.
 Continue ?</source>
         <translation>Die Änderung löscht alle Resulate für das Modell mit diesem Rumpf.
 Weitermachen?</translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="8774"/>
+        <location filename="../src/miarex/Miarex.cpp" line="8783"/>
         <source>The modification will erase all results associated to this Wing.
 Continue ?</source>
         <translation>Die Änderung löscht alle Resulate für diese Tragfläche.
 Weitermachen?</translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="8906"/>
+        <location filename="../src/miarex/Miarex.cpp" line="8915"/>
         <source>Export Wing OpPoint</source>
         <translation>Arbeitspunkt der Tragfläche exportieren</translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="8908"/>
-        <location filename="../src/miarex/Miarex.cpp" line="9230"/>
+        <location filename="../src/miarex/Miarex.cpp" line="8917"/>
+        <location filename="../src/miarex/Miarex.cpp" line="9239"/>
         <source>Text File (*.txt);;Comma Separated Values (*.csv)</source>
         <translation>Text File (*.txt);;Comma Separated Values (*.csv)</translation>
     </message>
@@ -7924,14 +7910,14 @@ Weitermachen?</translation>
         <translation type="obsolete">Cy    = </translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="8962"/>
+        <location filename="../src/miarex/Miarex.cpp" line="8971"/>
         <source>Cd    = %1     ICd   = %2     PCd   = %3
 </source>
         <translation>Cd    = %1     ICd   = %2     PCd   = %3
 </translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="8966"/>
+        <location filename="../src/miarex/Miarex.cpp" line="8975"/>
         <source>Cd=,%1,ICd=, %2,PCd=, %3
 </source>
         <translation>Cd=,%1,ICd=, %2,PCd=, %3
@@ -7970,7 +7956,7 @@ Weitermachen?</translation>
 </translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="8990"/>
+        <location filename="../src/miarex/Miarex.cpp" line="8999"/>
         <source>Bend. =</source>
         <translation>Bend. =</translation>
     </message>
@@ -7980,7 +7966,7 @@ Weitermachen?</translation>
         <translation type="obsolete">Haupt-Tragflächen Daten</translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="9145"/>
+        <location filename="../src/miarex/Miarex.cpp" line="9154"/>
         <source>Flap </source>
         <translation>Klappe</translation>
     </message>
@@ -7989,52 +7975,52 @@ Weitermachen?</translation>
         <translation type="obsolete"> Moment = </translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="9228"/>
+        <location filename="../src/miarex/Miarex.cpp" line="9237"/>
         <source>Export Polar</source>
         <translation>Polare exportieren</translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="9771"/>
+        <location filename="../src/miarex/Miarex.cpp" line="9780"/>
         <source>Open File</source>
         <translation>Datei öffnen</translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="9773"/>
+        <location filename="../src/miarex/Miarex.cpp" line="9782"/>
         <source>UFO Polar Format (*.*)</source>
         <translation>UFO Polar Format (*.*)</translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="9781"/>
+        <location filename="../src/miarex/Miarex.cpp" line="9790"/>
         <source>Could not read the file
 </source>
         <translation>File konnte nicht gelesen werden
 </translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="9802"/>
+        <location filename="../src/miarex/Miarex.cpp" line="9811"/>
         <source>No UFO with the name </source>
         <translation>Kein UFO mit diesem Namen</translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="9803"/>
+        <location filename="../src/miarex/Miarex.cpp" line="9812"/>
         <source>
 could be found. The polar(s) will not be stored</source>
         <translation>
 kann nicht gefunden werden. Die Polare(n) werden nicht gespeichert</translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="10198"/>
+        <location filename="../src/miarex/Miarex.cpp" line="10207"/>
         <source>Enter the new name for the wing polar :</source>
         <translation>Geben Sie einen neuen Namen für die Polare der Tragfläche an:</translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="10364"/>
+        <location filename="../src/miarex/Miarex.cpp" line="10373"/>
         <source>Are you sure you want to reset the content of the polar :
 </source>
         <translation>Sind Sie sicher das Sie den Inhalt der Polare zurücksetzen wollen:</translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="11779"/>
+        <location filename="../src/miarex/Miarex.cpp" line="11788"/>
         <source>abcdefghijklmnopqrstuvwxyz012345678</source>
         <translation>abcdefghijklmnopqrstuvwxyz012345678</translation>
     </message>
@@ -8083,18 +8069,6 @@ kann nicht gefunden werden. Die Polare(n) werden nicht gespeichert</translation>
         <translation type="obsolete">OpPoints hervorheben</translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="14793"/>
-        <location filename="../src/miarex/Miarex.cpp" line="14932"/>
-        <source>VCm</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../src/miarex/Miarex.cpp" line="14796"/>
-        <location filename="../src/miarex/Miarex.cpp" line="14935"/>
-        <source>ICm</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Aspect Ratio =   %1</source>
         <translation type="obsolete">Streckung   =%1</translation>
     </message>
@@ -8115,27 +8089,27 @@ kann nicht gefunden werden. Die Polare(n) werden nicht gespeichert</translation>
         <translation type="obsolete">Trangflächen Graph 4</translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="205"/>
+        <location filename="../src/miarex/Miarex.cpp" line="207"/>
         <source>Wing Polar Graph 1</source>
         <translation>Tragflächen Polar Graph 1</translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="206"/>
+        <location filename="../src/miarex/Miarex.cpp" line="208"/>
         <source>Wing Polar Graph 2</source>
         <translation>Tragflächen Polar Graph 2</translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="207"/>
+        <location filename="../src/miarex/Miarex.cpp" line="209"/>
         <source>Wing Polar Graph 3</source>
         <translation>Tragflächen Polar Graph 3</translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="208"/>
+        <location filename="../src/miarex/Miarex.cpp" line="210"/>
         <source>Wing Polar Graph 4</source>
         <translation>Tragflächen Polar Graph 4</translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="330"/>
+        <location filename="../src/miarex/Miarex.cpp" line="332"/>
         <source>Cp Graph</source>
         <translation>Cp-Graph</translation>
     </message>
@@ -8217,32 +8191,32 @@ kann nicht gefunden werden. Die Polare(n) werden nicht gespeichert</translation>
 </translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="9157"/>
+        <location filename="../src/miarex/Miarex.cpp" line="9166"/>
         <source>Main Wing Cp Coefficients
 </source>
         <translation>Haupttragflächen Cp-Koeffizienten
 </translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="9158"/>
+        <location filename="../src/miarex/Miarex.cpp" line="9167"/>
         <source>Wing Cp Coefficients
 </source>
         <translation>Tragflächen Cp-Koeffizienten</translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="9165"/>
+        <location filename="../src/miarex/Miarex.cpp" line="9174"/>
         <source> Panel     CtrlPt.x        CtrlPt.y        CtrlPt.z             Cp
 </source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="9166"/>
+        <location filename="../src/miarex/Miarex.cpp" line="9175"/>
         <source>Panel,CtrlPt.x,CtrlPt.y,CtrlPt.z,Cp
 </source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="9186"/>
+        <location filename="../src/miarex/Miarex.cpp" line="9195"/>
         <source>Strip %1
 </source>
         <translation></translation>
@@ -8264,17 +8238,17 @@ kann nicht gefunden werden. Die Polare(n) werden nicht gespeichert</translation>
         <translation type="obsolete">Seitenruder Cp-Koeffizienten</translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="9265"/>
+        <location filename="../src/miarex/Miarex.cpp" line="9274"/>
         <source>Export UFO</source>
         <translation>UFO Exportieren</translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="9267"/>
+        <location filename="../src/miarex/Miarex.cpp" line="9276"/>
         <source>AVL Text File (*.avl)</source>
         <translation>UFO Polar Format (*.*)</translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="9282"/>
+        <location filename="../src/miarex/Miarex.cpp" line="9291"/>
         <source>Project</source>
         <translation>Projekt</translation>
     </message>
@@ -8287,7 +8261,7 @@ kann nicht gefunden werden. Die Polare(n) werden nicht gespeichert</translation>
         <translation type="obsolete">Wurzel-Spitzen Rückfall (Root-Tip Sweep)=%1</translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="11783"/>
+        <location filename="../src/miarex/Miarex.cpp" line="11792"/>
         <source>abcdefghijklmnopqrstuvwxyz01234567</source>
         <translation>abcdefghijklmnopqrstuvwxyz01234567</translation>
     </message>
@@ -8308,42 +8282,42 @@ kann nicht gefunden werden. Die Polare(n) werden nicht gespeichert</translation>
         <translation type="obsolete">Die Polare existiert bereits</translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="8458"/>
+        <location filename="../src/miarex/Miarex.cpp" line="8467"/>
         <source>Are you sure you want to delete the polars associated to :
 </source>
         <translation>Sind Sie sicher das Sie die Polaren löschen wollen:
 </translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="8972"/>
+        <location filename="../src/miarex/Miarex.cpp" line="8981"/>
         <source>Cl   = </source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="8974"/>
+        <location filename="../src/miarex/Miarex.cpp" line="8983"/>
         <source>Cm   =</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="8977"/>
+        <location filename="../src/miarex/Miarex.cpp" line="8986"/>
         <source>ICn   = %1     PCn   = %2 
 </source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="8978"/>
+        <location filename="../src/miarex/Miarex.cpp" line="8987"/>
         <source>ICn=, %1,PCn=, %2
 </source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="8985"/>
+        <location filename="../src/miarex/Miarex.cpp" line="8994"/>
         <source>XNP   = %1
 </source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="8986"/>
+        <location filename="../src/miarex/Miarex.cpp" line="8995"/>
         <source>XNP=, %1
 </source>
         <translation></translation>
@@ -8355,71 +8329,71 @@ kann nicht gefunden werden. Die Polare(n) werden nicht gespeichert</translation>
 </translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="11230"/>
+        <location filename="../src/miarex/Miarex.cpp" line="11239"/>
         <source>The modification will erase all polar results associated to this Plane.
 Continue ?</source>
         <translation>Die Änderung löscht alle Polaren Resulate für das Modell.
 Weitermachen?</translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="11794"/>
-        <location filename="../src/miarex/Miarex.cpp" line="11795"/>
-        <location filename="../src/miarex/Miarex.cpp" line="11796"/>
+        <location filename="../src/miarex/Miarex.cpp" line="11803"/>
+        <location filename="../src/miarex/Miarex.cpp" line="11804"/>
+        <location filename="../src/miarex/Miarex.cpp" line="11805"/>
         <source>V = %1 </source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="11797"/>
+        <location filename="../src/miarex/Miarex.cpp" line="11806"/>
         <source>No unit defined for speed...</source>
         <translation>Keine Einheit für Geschwindigkeit defoniert...</translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="11813"/>
+        <location filename="../src/miarex/Miarex.cpp" line="11822"/>
         <source>Lift Coef. = %1 </source>
         <translation>Auftriebskoeffizient =%1 </translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="11818"/>
+        <location filename="../src/miarex/Miarex.cpp" line="11827"/>
         <source>Drag Coef. = %1 </source>
         <translation>Widerstandskoeffizient = %1 </translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="11837"/>
+        <location filename="../src/miarex/Miarex.cpp" line="11846"/>
         <source>Rolling Moment Coef. = %1 </source>
         <translation>Rollmoment Koeffizient = %1</translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="11842"/>
+        <location filename="../src/miarex/Miarex.cpp" line="11851"/>
         <source>Induced Moment Coef = %1 </source>
         <translation>Induzierter Momementen Koeffizient = %1</translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="11846"/>
+        <location filename="../src/miarex/Miarex.cpp" line="11855"/>
         <source>Profile Yawing Moment = %1 </source>
         <translation>Giermoment Koeffizient = %1 </translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="11876"/>
+        <location filename="../src/miarex/Miarex.cpp" line="11885"/>
         <source>Flap %1 Moment =%2</source>
         <translation>Klappen %1 Moment = %2</translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="11936"/>
+        <location filename="../src/miarex/Miarex.cpp" line="11945"/>
         <source>Top transition</source>
         <translation>Oberer Umschlagspunkt</translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="11964"/>
+        <location filename="../src/miarex/Miarex.cpp" line="11973"/>
         <source>Bottom transition</source>
         <translation>Unterer Umschlagspunkt</translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="12023"/>
+        <location filename="../src/miarex/Miarex.cpp" line="12032"/>
         <source>Centre of Pressure</source>
         <translation>Druckpunkt (Center of Pressure)</translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="12056"/>
+        <location filename="../src/miarex/Miarex.cpp" line="12065"/>
         <source>Moment ref. location</source>
         <translation>Momenten Referenz Punkt (moment ref location)</translation>
     </message>
@@ -8440,29 +8414,29 @@ Weitermachen?</translation>
         <translation type="obsolete">_Fin</translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="12977"/>
+        <location filename="../src/miarex/Miarex.cpp" line="13032"/>
         <source>Enter the new name for the Body :</source>
         <translation>Geben Sie einen neuen Namen für den Rumpf ein:</translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="13051"/>
+        <location filename="../src/miarex/Miarex.cpp" line="13106"/>
         <source>The body </source>
         <translation>Der Rumpf </translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="13051"/>
+        <location filename="../src/miarex/Miarex.cpp" line="13106"/>
         <source> is used by one or more planes.
  Overwrite anyway ? (Results will be lost)</source>
         <translation>wird von einem oder mehr Modellen verwendet.
 Trotzdem überschreiben? (Resultate gehen verloren)</translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="13131"/>
+        <location filename="../src/miarex/Miarex.cpp" line="13186"/>
         <source>Enter the new name for the Plane :</source>
         <translation>Geben Sie einen neuen Namen für das Modell ein:</translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="13346"/>
+        <location filename="../src/miarex/Miarex.cpp" line="13401"/>
         <source>Enter the new name for the wing :</source>
         <translation>Geben Sie einen Namen für die Tragfläche ein:</translation>
     </message>
@@ -8471,42 +8445,42 @@ Trotzdem überschreiben? (Resultate gehen verloren)</translation>
         <translation type="obsolete">Kann aktuelles Modell nicht überschreiben</translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="13991"/>
+        <location filename="../src/miarex/Miarex.cpp" line="14046"/>
         <source>Sequence</source>
         <translation>Sequenz</translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="13994"/>
+        <location filename="../src/miarex/Miarex.cpp" line="14049"/>
         <source>Start=</source>
         <translation>Start=</translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="13995"/>
+        <location filename="../src/miarex/Miarex.cpp" line="14050"/>
         <source>End=</source>
         <translation>Ende=</translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="13996"/>
+        <location filename="../src/miarex/Miarex.cpp" line="14051"/>
         <source>D=</source>
         <translation>D=</translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="14027"/>
+        <location filename="../src/miarex/Miarex.cpp" line="14082"/>
         <source>Init LLT</source>
         <translation>Initialisiere LLT</translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="14028"/>
+        <location filename="../src/miarex/Miarex.cpp" line="14083"/>
         <source>Store OpPoint</source>
         <translation>Arbeitspunkte speichern</translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="14033"/>
+        <location filename="../src/miarex/Miarex.cpp" line="14088"/>
         <source>Analyze</source>
         <translation>Analysiere</translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="13987"/>
+        <location filename="../src/miarex/Miarex.cpp" line="14042"/>
         <source>Analysis settings</source>
         <translation>Analyse Einstellungen</translation>
     </message>
@@ -8515,409 +8489,325 @@ Trotzdem überschreiben? (Resultate gehen verloren)</translation>
         <translation type="obsolete">1/2 Tragfläche</translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="14052"/>
+        <location filename="../src/miarex/Miarex.cpp" line="14107"/>
         <source>Lift</source>
         <translation>Auftrieb</translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="14053"/>
+        <location filename="../src/miarex/Miarex.cpp" line="14108"/>
         <source>Ind. Drag</source>
         <translation>Induzierter Widerstand (induced drag)</translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="14054"/>
+        <location filename="../src/miarex/Miarex.cpp" line="14109"/>
         <source>Visc. Drag</source>
         <translation>Reibungswiderstand</translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="14055"/>
+        <location filename="../src/miarex/Miarex.cpp" line="14110"/>
         <source>Trans.</source>
         <translation>Übergang.</translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="14056"/>
+        <location filename="../src/miarex/Miarex.cpp" line="14111"/>
         <source>Moment</source>
         <translation>Moment</translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="14057"/>
+        <location filename="../src/miarex/Miarex.cpp" line="14112"/>
         <source>Downw.</source>
         <translation>Abwind.</translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="14059"/>
+        <location filename="../src/miarex/Miarex.cpp" line="14114"/>
         <source>Surf. Vel.</source>
         <translation>Oberflächengeschwindigkeit.</translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="14060"/>
+        <location filename="../src/miarex/Miarex.cpp" line="14115"/>
         <source>Stream</source>
         <translation>Strömung</translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="14061"/>
+        <location filename="../src/miarex/Miarex.cpp" line="14116"/>
         <source>Animate</source>
         <translation>Animation</translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="14187"/>
+        <location filename="../src/miarex/Miarex.cpp" line="14242"/>
         <source>Display</source>
         <translation>Darstellung</translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="14226"/>
+        <location filename="../src/miarex/Miarex.cpp" line="14281"/>
         <source>X View</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="14227"/>
+        <location filename="../src/miarex/Miarex.cpp" line="14282"/>
         <source>Y View</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="14228"/>
+        <location filename="../src/miarex/Miarex.cpp" line="14283"/>
         <source>Z View</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="14229"/>
+        <location filename="../src/miarex/Miarex.cpp" line="14284"/>
         <source>Iso View</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="14781"/>
-        <location filename="../src/miarex/Miarex.cpp" line="14920"/>
-        <source>VCD</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/miarex/Miarex.cpp" line="14784"/>
-        <location filename="../src/miarex/Miarex.cpp" line="14923"/>
-        <source>ICD</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/miarex/Miarex.cpp" line="14787"/>
-        <location filename="../src/miarex/Miarex.cpp" line="14926"/>
-        <source>CD</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/miarex/Miarex.cpp" line="14811"/>
-        <location filename="../src/miarex/Miarex.cpp" line="14950"/>
-        <source>CL/CD</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/miarex/Miarex.cpp" line="14814"/>
-        <location filename="../src/miarex/Miarex.cpp" line="14953"/>
-        <source>CL^(3/2)/CD</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/miarex/Miarex.cpp" line="14817"/>
-        <location filename="../src/miarex/Miarex.cpp" line="14956"/>
-        <source>1/Rt(CL)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/miarex/Miarex.cpp" line="14820"/>
-        <location filename="../src/miarex/Miarex.cpp" line="14959"/>
-        <source>Fx (N)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/miarex/Miarex.cpp" line="14821"/>
-        <location filename="../src/miarex/Miarex.cpp" line="14960"/>
-        <source>Fx (lbf)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/miarex/Miarex.cpp" line="14824"/>
-        <location filename="../src/miarex/Miarex.cpp" line="14963"/>
-        <source>Fy (N)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/miarex/Miarex.cpp" line="14825"/>
-        <location filename="../src/miarex/Miarex.cpp" line="14964"/>
-        <source>Fy (lbf)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/miarex/Miarex.cpp" line="14828"/>
-        <location filename="../src/miarex/Miarex.cpp" line="14967"/>
-        <source>Fz (N)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/miarex/Miarex.cpp" line="14829"/>
-        <location filename="../src/miarex/Miarex.cpp" line="14968"/>
-        <source>Fz (lbf)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/miarex/Miarex.cpp" line="14844"/>
-        <location filename="../src/miarex/Miarex.cpp" line="14983"/>
         <source>Pitching Moment</source>
-        <translation>Kippmoment</translation>
+        <translation type="obsolete">Kippmoment</translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="14847"/>
-        <location filename="../src/miarex/Miarex.cpp" line="14986"/>
         <source>Rolling Moment</source>
-        <translation>Rollmoment</translation>
+        <translation type="obsolete">Rollmoment</translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="14850"/>
-        <location filename="../src/miarex/Miarex.cpp" line="14989"/>
         <source>Yawing Moment</source>
-        <translation>Giermoment</translation>
+        <translation type="obsolete">Giermoment</translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="14106"/>
+        <location filename="../src/miarex/Miarex.cpp" line="14161"/>
         <source>Curve</source>
         <translation>Kurve</translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="14107"/>
+        <location filename="../src/miarex/Miarex.cpp" line="14162"/>
         <source>Points</source>
         <translation>Punkte</translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="14115"/>
-        <location filename="../src/miarex/Miarex.cpp" line="14116"/>
+        <location filename="../src/miarex/Miarex.cpp" line="14170"/>
+        <location filename="../src/miarex/Miarex.cpp" line="14171"/>
         <source>item</source>
         <translation>Gegenstand</translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="14131"/>
+        <location filename="../src/miarex/Miarex.cpp" line="14186"/>
         <source>Style</source>
         <translation>Gestalltung</translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="14132"/>
+        <location filename="../src/miarex/Miarex.cpp" line="14187"/>
         <source>Width</source>
         <translation>Breite</translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="14133"/>
+        <location filename="../src/miarex/Miarex.cpp" line="14188"/>
         <source>Color</source>
         <translation>Farbe</translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="14102"/>
+        <location filename="../src/miarex/Miarex.cpp" line="14157"/>
         <source>Curve settings</source>
         <translation>Kurven Einstellung</translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="14165"/>
+        <location filename="../src/miarex/Miarex.cpp" line="14220"/>
         <source>Span Position</source>
         <translation>Spanten Position</translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="14172"/>
+        <location filename="../src/miarex/Miarex.cpp" line="14227"/>
         <source>Keep</source>
         <translation>Erhalten</translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="14173"/>
-        <location filename="../src/miarex/Miarex.cpp" line="14250"/>
+        <location filename="../src/miarex/Miarex.cpp" line="14228"/>
+        <location filename="../src/miarex/Miarex.cpp" line="14305"/>
         <source>Reset</source>
         <translation>Zurücksetzen</translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="14153"/>
+        <location filename="../src/miarex/Miarex.cpp" line="14208"/>
         <source>Cp Sections</source>
         <translation>Cp Abschnitte</translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="11688"/>
+        <location filename="../src/miarex/Miarex.cpp" line="11697"/>
         <source>Wing Span =</source>
         <translation>Trangflächen-Spannweite =</translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="1617"/>
+        <location filename="../src/miarex/Miarex.cpp" line="1615"/>
         <source>Current Plane</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="1618"/>
+        <location filename="../src/miarex/Miarex.cpp" line="1616"/>
         <source>Current Wing</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="1619"/>
+        <location filename="../src/miarex/Miarex.cpp" line="1617"/>
         <source>Current Object</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="5279"/>
+        <location filename="../src/miarex/Miarex.cpp" line="5277"/>
         <source>Time =</source>
         <translation>Zeit =</translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="5442"/>
+        <location filename="../src/miarex/Miarex.cpp" line="5440"/>
         <source>The total number of panels is %1. The Max Number is %2.
 A reduction of the number of panels is required</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="8981"/>
+        <location filename="../src/miarex/Miarex.cpp" line="8990"/>
         <source>XCP   = %1     YCP   = %2     ZCP   = %3  
 </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="9176"/>
+        <location filename="../src/miarex/Miarex.cpp" line="9185"/>
         <source>Cp Coefficients</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="11693"/>
+        <location filename="../src/miarex/Miarex.cpp" line="11702"/>
         <source>xyProj. Span =</source>
         <translation>Projezierte Spannweite =</translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="11698"/>
+        <location filename="../src/miarex/Miarex.cpp" line="11707"/>
         <source>Wing Area =</source>
         <translation>Flügel Fläche=</translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="11703"/>
+        <location filename="../src/miarex/Miarex.cpp" line="11712"/>
         <source>xyProj. Area =</source>
         <translation>Projezierter Tragflächeninhalt =</translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="11717"/>
+        <location filename="../src/miarex/Miarex.cpp" line="11726"/>
         <source>Plane Mass =</source>
         <translation>Flugzeugmasse= </translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="11723"/>
+        <location filename="../src/miarex/Miarex.cpp" line="11732"/>
         <source>Wing Load =</source>
         <translation>Tragflächenbelastung =</translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="11731"/>
+        <location filename="../src/miarex/Miarex.cpp" line="11740"/>
         <source>Tail Volume =</source>
         <translation>Heck-Volumen =</translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="11736"/>
+        <location filename="../src/miarex/Miarex.cpp" line="11745"/>
         <source>Root Chord =</source>
         <translation>Wurzel-Profiltiefe =</translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="11741"/>
+        <location filename="../src/miarex/Miarex.cpp" line="11750"/>
         <source>MAC =</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="11746"/>
+        <location filename="../src/miarex/Miarex.cpp" line="11755"/>
         <source>TipTwist =</source>
         <translation>Flügelspitzen Verwindung =</translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="11750"/>
+        <location filename="../src/miarex/Miarex.cpp" line="11759"/>
         <source>Aspect Ratio =</source>
         <translation>Streckungs Verhältnis =</translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="11754"/>
+        <location filename="../src/miarex/Miarex.cpp" line="11763"/>
         <source>Taper Ratio =</source>
         <translation>Aufweitungsverhältnis =</translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="11758"/>
+        <location filename="../src/miarex/Miarex.cpp" line="11767"/>
         <source>Root-Tip Sweep =</source>
         <translation>Wurzel-Spitzen Rückfall (Root-Tip Sweep) =</translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="13544"/>
+        <location filename="../src/miarex/Miarex.cpp" line="13599"/>
         <source>Enter the new name for the Polar:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="14050"/>
+        <location filename="../src/miarex/Miarex.cpp" line="14105"/>
         <source>Panel Forces</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="14051"/>
+        <location filename="../src/miarex/Miarex.cpp" line="14106"/>
         <source>Display the force 1/2.rho.V2.S.Cp acting on the panel</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="14046"/>
+        <location filename="../src/miarex/Miarex.cpp" line="14101"/>
         <source>Results</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="14088"/>
+        <location filename="../src/miarex/Miarex.cpp" line="14143"/>
         <source>Polar properties</source>
         <translation>Polar Eigenschaften</translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="14193"/>
+        <location filename="../src/miarex/Miarex.cpp" line="14248"/>
         <source>Axes</source>
         <translation>Axen</translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="14194"/>
+        <location filename="../src/miarex/Miarex.cpp" line="14249"/>
         <source>Light</source>
         <translation>Licht</translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="14195"/>
+        <location filename="../src/miarex/Miarex.cpp" line="14250"/>
         <source>Surfaces</source>
         <translation>Oberflächen</translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="14196"/>
+        <location filename="../src/miarex/Miarex.cpp" line="14251"/>
         <source>Outline</source>
         <translation>Kontur</translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="14197"/>
+        <location filename="../src/miarex/Miarex.cpp" line="14252"/>
         <source>Panels</source>
         <translation>Paneele</translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="14198"/>
+        <location filename="../src/miarex/Miarex.cpp" line="14253"/>
         <source>Foil Names</source>
         <translation>Profil Namen</translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="14199"/>
+        <location filename="../src/miarex/Miarex.cpp" line="14254"/>
         <source>Vortices</source>
         <translation>Wirbel</translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="14200"/>
+        <location filename="../src/miarex/Miarex.cpp" line="14255"/>
         <source>Masses</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="14248"/>
+        <location filename="../src/miarex/Miarex.cpp" line="14303"/>
         <source>Pick Center</source>
         <translation>Zentrum auswählen</translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="14249"/>
+        <location filename="../src/miarex/Miarex.cpp" line="14304"/>
         <source>Activate the button, then click on the object to center it in the viewport; alternatively, double click on the object</source>
         <translation>Doppelklick auf das Objekt um es zu zentrieren</translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="14262"/>
+        <location filename="../src/miarex/Miarex.cpp" line="14317"/>
         <source>Clip:</source>
         <translation>Abschneiden:</translation>
-    </message>
-    <message>
-        <location filename="../src/miarex/Miarex.cpp" line="14778"/>
-        <location filename="../src/miarex/Miarex.cpp" line="14917"/>
-        <source>CL</source>
-        <translation></translation>
     </message>
     <message>
         <source>VCd</source>
@@ -8960,28 +8850,20 @@ A reduction of the number of panels is required</source>
         <translation type="obsolete">Widerstand (lbf)</translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="14832"/>
-        <location filename="../src/miarex/Miarex.cpp" line="14971"/>
         <source>Vx </source>
-        <translation>Vx </translation>
+        <translation type="obsolete">Vx </translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="14835"/>
-        <location filename="../src/miarex/Miarex.cpp" line="14974"/>
         <source>Vz </source>
-        <translation>Vz </translation>
+        <translation type="obsolete">Vz </translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="14838"/>
-        <location filename="../src/miarex/Miarex.cpp" line="14977"/>
         <source>V </source>
-        <translation>V </translation>
+        <translation type="obsolete">V </translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="14841"/>
-        <location filename="../src/miarex/Miarex.cpp" line="14980"/>
         <source>Gamma</source>
-        <translation>Gamma</translation>
+        <translation type="obsolete">Gamma</translation>
     </message>
     <message>
         <source>PM</source>
@@ -8996,136 +8878,60 @@ A reduction of the number of panels is required</source>
         <translation type="obsolete">YM</translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="14853"/>
-        <location filename="../src/miarex/Miarex.cpp" line="14992"/>
         <source>XCP </source>
-        <translation>XCP </translation>
+        <translation type="obsolete">XCP </translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="14995"/>
         <source>YCP </source>
-        <translation>YCP </translation>
+        <translation type="obsolete">YCP </translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="14862"/>
-        <location filename="../src/miarex/Miarex.cpp" line="15001"/>
         <source>BM </source>
-        <translation>BM </translation>
+        <translation type="obsolete">BM </translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="8982"/>
+        <location filename="../src/miarex/Miarex.cpp" line="8991"/>
         <source>XCP=, %1, YCP=, %2, ZCP=, %3 
 </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="14856"/>
-        <location filename="../src/miarex/Miarex.cpp" line="14859"/>
-        <location filename="../src/miarex/Miarex.cpp" line="14998"/>
-        <source>ZCP </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/miarex/Miarex.cpp" line="14865"/>
-        <location filename="../src/miarex/Miarex.cpp" line="15004"/>
         <source>m.g.Vz (W)</source>
-        <translation>m.g.Vz (W)</translation>
+        <translation type="obsolete">m.g.Vz (W)</translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="14868"/>
-        <location filename="../src/miarex/Miarex.cpp" line="15007"/>
         <source>Efficiency</source>
-        <translation>Effizienz</translation>
+        <translation type="obsolete">Effizienz</translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="14871"/>
-        <location filename="../src/miarex/Miarex.cpp" line="15010"/>
         <source>(XCp-XCG)/MAC(%)</source>
-        <translation>(XCp-XCG)/MAC(%)</translation>
+        <translation type="obsolete">(XCp-XCG)/MAC(%)</translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="14874"/>
-        <location filename="../src/miarex/Miarex.cpp" line="15013"/>
         <source>ctrl</source>
-        <translation>ctrl</translation>
+        <translation type="obsolete">ctrl</translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="14877"/>
-        <location filename="../src/miarex/Miarex.cpp" line="15016"/>
         <source>CY</source>
-        <translation>CY</translation>
+        <translation type="obsolete">CY</translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="14880"/>
-        <location filename="../src/miarex/Miarex.cpp" line="15019"/>
-        <source>XNP</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../src/miarex/Miarex.cpp" line="14883"/>
-        <location filename="../src/miarex/Miarex.cpp" line="15022"/>
-        <source>Ph. Freq(Hz)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/miarex/Miarex.cpp" line="14886"/>
-        <location filename="../src/miarex/Miarex.cpp" line="15025"/>
-        <source>Ph. Damping</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/miarex/Miarex.cpp" line="14889"/>
-        <location filename="../src/miarex/Miarex.cpp" line="15028"/>
-        <source>SP Freq (Hz)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/miarex/Miarex.cpp" line="14892"/>
-        <location filename="../src/miarex/Miarex.cpp" line="15031"/>
-        <source>SP Damping</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/miarex/Miarex.cpp" line="14895"/>
-        <location filename="../src/miarex/Miarex.cpp" line="15034"/>
-        <source>DR Freq(Hz)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/miarex/Miarex.cpp" line="14898"/>
-        <location filename="../src/miarex/Miarex.cpp" line="15037"/>
-        <source>DR Damping</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/miarex/Miarex.cpp" line="14901"/>
-        <location filename="../src/miarex/Miarex.cpp" line="15040"/>
-        <source>Roll Damping</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/miarex/Miarex.cpp" line="14904"/>
-        <location filename="../src/miarex/Miarex.cpp" line="15043"/>
-        <source>Spiral Damping</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/miarex/Miarex.cpp" line="15073"/>
+        <location filename="../src/miarex/Miarex.cpp" line="14851"/>
         <source>OpenGL color format is not recognized... Sorry</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="15083"/>
+        <location filename="../src/miarex/Miarex.cpp" line="14861"/>
         <source>Cannot (yet ?) save 8 bit depth opengl screen images... Sorry</source>
         <translation>Kann 8bit OpenGL Bilder nicht speichern...Sorry</translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="15088"/>
+        <location filename="../src/miarex/Miarex.cpp" line="14866"/>
         <source>Cannot (yet ?) save 16 bit depth opengl screen images... Sorry</source>
         <translation>Kann 16bit OpenGL Bilder nicht speichern...Sorry</translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="15105"/>
+        <location filename="../src/miarex/Miarex.cpp" line="14883"/>
         <source>Unidentified bit depth... Sorry</source>
         <translation>Undefinierte Farbtiefe...Sorry</translation>
     </message>
@@ -9168,7 +8974,7 @@ A reduction of the number of panels is required</source>
         <translation>Y-Abstand</translation>
     </message>
     <message>
-        <location filename="../src/miarex/GL3dWingDlg.cpp" line="2281"/>
+        <location filename="../src/miarex/GL3dWingDlg.cpp" line="2280"/>
         <source>Wing definition</source>
         <translation>Tragflächen Definition</translation>
     </message>
@@ -9188,6 +8994,7 @@ A reduction of the number of panels is required</source>
     </message>
     <message>
         <location filename="../src/objects/OpPoint.cpp" line="245"/>
+        <location filename="../src/objects/Polar.cpp" line="856"/>
         <location filename="../src/xdirect/ReListDlg.cpp" line="57"/>
         <source>Re</source>
         <translation>Re</translation>
@@ -9200,24 +9007,29 @@ A reduction of the number of panels is required</source>
     </message>
     <message>
         <location filename="../src/objects/OpPoint.cpp" line="257"/>
-        <location filename="../src/objects/WOpp.cpp" line="683"/>
+        <location filename="../src/objects/WOpp.cpp" line="685"/>
+        <location filename="../src/objects/WPolar.cpp" line="1457"/>
         <source>CL</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/objects/OpPoint.cpp" line="260"/>
-        <location filename="../src/objects/WOpp.cpp" line="685"/>
+        <location filename="../src/objects/WOpp.cpp" line="687"/>
+        <location filename="../src/objects/WPolar.cpp" line="1466"/>
         <source>CD</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/objects/OpPoint.cpp" line="263"/>
-        <location filename="../src/objects/WOpp.cpp" line="699"/>
+        <location filename="../src/objects/Polar.cpp" line="832"/>
+        <location filename="../src/objects/WOpp.cpp" line="701"/>
+        <location filename="../src/objects/WPolar.cpp" line="1469"/>
         <source>Cm</source>
         <translation type="unfinished">Cm</translation>
     </message>
     <message>
         <location filename="../src/objects/OpPoint.cpp" line="266"/>
+        <location filename="../src/objects/Polar.cpp" line="829"/>
         <source>Cdp</source>
         <translation type="unfinished">Cdp</translation>
     </message>
@@ -9228,7 +9040,7 @@ A reduction of the number of panels is required</source>
     </message>
     <message>
         <location filename="../src/objects/OpPoint.cpp" line="272"/>
-        <location filename="../src/objects/WOpp.cpp" line="675"/>
+        <location filename="../src/objects/WOpp.cpp" line="677"/>
         <source>XCP</source>
         <translation type="unfinished"></translation>
     </message>
@@ -9259,22 +9071,22 @@ A reduction of the number of panels is required</source>
     </message>
     <message>
         <location filename="../src/objects/Polar.cpp" line="753"/>
-        <location filename="../src/objects/WOpp.cpp" line="635"/>
-        <location filename="../src/objects/WPolar.cpp" line="2036"/>
+        <location filename="../src/objects/WOpp.cpp" line="637"/>
+        <location filename="../src/objects/WPolar.cpp" line="2190"/>
         <source>Fixed speed</source>
         <translation>Fixe Geschwindigkeit</translation>
     </message>
     <message>
         <location filename="../src/objects/Polar.cpp" line="754"/>
-        <location filename="../src/objects/WOpp.cpp" line="636"/>
-        <location filename="../src/objects/WPolar.cpp" line="2037"/>
+        <location filename="../src/objects/WOpp.cpp" line="638"/>
+        <location filename="../src/objects/WPolar.cpp" line="2191"/>
         <source>Fixed lift</source>
         <translation>Fixer Auftrieb</translation>
     </message>
     <message>
         <location filename="../src/objects/Polar.cpp" line="755"/>
-        <location filename="../src/objects/WOpp.cpp" line="637"/>
-        <location filename="../src/objects/WPolar.cpp" line="2038"/>
+        <location filename="../src/objects/WOpp.cpp" line="639"/>
+        <location filename="../src/objects/WPolar.cpp" line="2192"/>
         <source>Fixed angle of attack</source>
         <translation>Fixer Anstelwinkel</translation>
     </message>
@@ -9296,9 +9108,63 @@ A reduction of the number of panels is required</source>
         <translation></translation>
     </message>
     <message>
+        <location filename="../src/objects/Polar.cpp" line="823"/>
+        <source>Cd</source>
+        <translation type="unfinished">Cd</translation>
+    </message>
+    <message>
+        <location filename="../src/objects/Polar.cpp" line="826"/>
+        <source>Cd x 10000</source>
+        <translation type="unfinished">Cd x 10000</translation>
+    </message>
+    <message>
+        <location filename="../src/objects/Polar.cpp" line="835"/>
+        <source>Xtr1</source>
+        <translation type="unfinished">Xtr1</translation>
+    </message>
+    <message>
+        <location filename="../src/objects/Polar.cpp" line="838"/>
+        <source>Xtr2</source>
+        <translation type="unfinished">Xtr2</translation>
+    </message>
+    <message>
+        <location filename="../src/objects/Polar.cpp" line="841"/>
+        <source>HMom</source>
+        <translation type="unfinished">HMom</translation>
+    </message>
+    <message>
+        <location filename="../src/objects/Polar.cpp" line="844"/>
+        <source>Cpmin</source>
+        <translation type="unfinished">Cpmin</translation>
+    </message>
+    <message>
+        <location filename="../src/objects/Polar.cpp" line="847"/>
+        <source>Cl/Cd</source>
+        <translation type="unfinished">Cl/Cd</translation>
+    </message>
+    <message>
+        <location filename="../src/objects/Polar.cpp" line="850"/>
+        <source>|Cl|^(3/2)/Cd</source>
+        <translation type="unfinished">|Cl|^(3/2)/Cd</translation>
+    </message>
+    <message>
+        <location filename="../src/objects/Polar.cpp" line="853"/>
+        <source>1/Rt(Cl)</source>
+        <translation type="unfinished">1/Rt(Cl)</translation>
+    </message>
+    <message>
+        <location filename="../src/objects/Polar.cpp" line="859"/>
+        <source>XCp</source>
+        <translation type="unfinished">XCp</translation>
+    </message>
+    <message>
         <location filename="../src/objects/OpPoint.cpp" line="248"/>
         <location filename="../src/objects/Polar.cpp" line="781"/>
-        <location filename="../src/objects/WOpp.cpp" line="656"/>
+        <location filename="../src/objects/Polar.cpp" line="817"/>
+        <location filename="../src/objects/Polar.cpp" line="862"/>
+        <location filename="../src/objects/WOpp.cpp" line="658"/>
+        <location filename="../src/objects/WPolar.cpp" line="1454"/>
+        <location filename="../src/objects/WPolar.cpp" line="1586"/>
         <source>Alpha</source>
         <translation>Alpha</translation>
     </message>
@@ -9335,7 +9201,8 @@ A reduction of the number of panels is required</source>
         <translation>i</translation>
     </message>
     <message>
-        <location filename="../src/objects/WOpp.cpp" line="706"/>
+        <location filename="../src/objects/WOpp.cpp" line="708"/>
+        <location filename="../src/objects/WPolar.cpp" line="1481"/>
         <location filename="../src/xinverse/PertDlg.cpp" line="158"/>
         <source>Cn</source>
         <translation>Cn</translation>
@@ -9419,44 +9286,44 @@ proceeding anyway...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/objects/Body.cpp" line="286"/>
+        <location filename="../src/objects/Body.cpp" line="271"/>
         <source>Export Body Definition</source>
         <translation type="unfinished">Rupfdefinition exportieren</translation>
     </message>
     <message>
-        <location filename="../src/objects/Body.cpp" line="288"/>
+        <location filename="../src/objects/Body.cpp" line="273"/>
         <source>Text Format (*.txt)</source>
         <translation type="unfinished">UFO Polar Format (*.*)</translation>
     </message>
     <message>
         <location filename="../src/miarex/GL3dBodyDlg.cpp" line="2379"/>
         <location filename="../src/miarex/ManageBodiesDlg.cpp" line="274"/>
-        <location filename="../src/miarex/Miarex.cpp" line="8866"/>
+        <location filename="../src/miarex/Miarex.cpp" line="8875"/>
         <source>Export Body Geometry</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/miarex/GL3dBodyDlg.cpp" line="2381"/>
         <location filename="../src/miarex/ManageBodiesDlg.cpp" line="276"/>
-        <location filename="../src/miarex/Miarex.cpp" line="8868"/>
+        <location filename="../src/miarex/Miarex.cpp" line="8877"/>
         <source>Text File (*.txt);;Comma Separated Values (*.csv)</source>
         <translation type="unfinished">Text File (*.txt);;Comma Separated Values (*.csv)</translation>
     </message>
     <message>
         <location filename="../src/miarex/GL3dBodyDlg.cpp" line="2419"/>
-        <location filename="../src/miarex/Miarex.cpp" line="9656"/>
+        <location filename="../src/miarex/Miarex.cpp" line="9665"/>
         <source>Choose the length unit to read this file :</source>
         <translation type="unfinished">Wählen Sie die Längeneinheit um diese Datei zu lesen:</translation>
     </message>
     <message>
         <location filename="../src/miarex/GL3dBodyDlg.cpp" line="2460"/>
-        <location filename="../src/miarex/Miarex.cpp" line="9700"/>
+        <location filename="../src/miarex/Miarex.cpp" line="9709"/>
         <source>Open File</source>
         <translation type="unfinished">Datei öffnen</translation>
     </message>
     <message>
         <location filename="../src/miarex/GL3dBodyDlg.cpp" line="2462"/>
-        <location filename="../src/miarex/Miarex.cpp" line="9702"/>
+        <location filename="../src/miarex/Miarex.cpp" line="9711"/>
         <source>All files (*.*)</source>
         <translation type="unfinished"></translation>
     </message>
@@ -9466,7 +9333,7 @@ proceeding anyway...</source>
     </message>
     <message>
         <location filename="../src/miarex/GL3dBodyDlg.cpp" line="2470"/>
-        <location filename="../src/miarex/Miarex.cpp" line="9710"/>
+        <location filename="../src/miarex/Miarex.cpp" line="9719"/>
         <source>Could not read the file
 </source>
         <translation type="unfinished">File konnte nicht gelesen werden
@@ -9474,8 +9341,8 @@ proceeding anyway...</source>
     </message>
     <message>
         <location filename="../src/miarex/GL3dBodyDlg.cpp" line="2471"/>
-        <location filename="../src/miarex/Miarex.cpp" line="9711"/>
-        <location filename="../src/objects/Body.cpp" line="659"/>
+        <location filename="../src/miarex/Miarex.cpp" line="9720"/>
+        <location filename="../src/objects/Body.cpp" line="640"/>
         <location filename="../src/objects/Surface.cpp" line="736"/>
         <location filename="../src/objects/WPolar.cpp" line="376"/>
         <location filename="../src/xdirect/XFoil.cpp" line="3139"/>
@@ -9483,12 +9350,12 @@ proceeding anyway...</source>
         <translation>Warnung</translation>
     </message>
     <message>
-        <location filename="../src/objects/Body.cpp" line="618"/>
+        <location filename="../src/objects/Body.cpp" line="602"/>
         <source>Error reading </source>
         <translation type="unfinished">Fehler beim Lesen</translation>
     </message>
     <message>
-        <location filename="../src/objects/Body.cpp" line="618"/>
+        <location filename="../src/objects/Body.cpp" line="602"/>
         <source>
 Frames have different number of side points</source>
         <translation type="unfinished">
@@ -9499,23 +9366,23 @@ Rahmen haben unteschiedliche Anzahl von Seitenpunkten</translation>
         <translation type="obsolete">Fehler</translation>
     </message>
     <message>
-        <location filename="../src/objects/Body.cpp" line="660"/>
+        <location filename="../src/objects/Body.cpp" line="641"/>
         <source>Please select a Frame before inserting a point</source>
         <translation type="unfinished">Bitte wählen Sie einen Rahmen bevor Sie einen Punkt einfügen</translation>
     </message>
     <message>
-        <location filename="../src/objects/WOpp.cpp" line="638"/>
-        <location filename="../src/objects/WPolar.cpp" line="2039"/>
+        <location filename="../src/objects/WOpp.cpp" line="640"/>
+        <location filename="../src/objects/WPolar.cpp" line="2193"/>
         <source>Stability analysis</source>
         <translation>Stabilitäts Analyse</translation>
     </message>
     <message>
-        <location filename="../src/objects/WPolar.cpp" line="2044"/>
+        <location filename="../src/objects/WPolar.cpp" line="2198"/>
         <source>VInf =</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/objects/WPolar.cpp" line="2049"/>
+        <location filename="../src/objects/WPolar.cpp" line="2203"/>
         <source>Alpha =</source>
         <translation></translation>
     </message>
@@ -9524,314 +9391,479 @@ Rahmen haben unteschiedliche Anzahl von Seitenpunkten</translation>
         <translation type="obsolete">Methode</translation>
     </message>
     <message>
-        <location filename="../src/objects/WOpp.cpp" line="642"/>
-        <location filename="../src/objects/WPolar.cpp" line="2060"/>
+        <location filename="../src/objects/WOpp.cpp" line="644"/>
+        <location filename="../src/objects/WPolar.cpp" line="2214"/>
         <source>LLT</source>
         <translation>LLT</translation>
     </message>
     <message>
-        <location filename="../src/objects/WOpp.cpp" line="643"/>
-        <location filename="../src/objects/WPolar.cpp" line="2061"/>
+        <location filename="../src/objects/WOpp.cpp" line="645"/>
+        <location filename="../src/objects/WPolar.cpp" line="2215"/>
         <source>3D-Panels</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/objects/WOpp.cpp" line="644"/>
-        <location filename="../src/objects/WPolar.cpp" line="2062"/>
+        <location filename="../src/objects/WOpp.cpp" line="646"/>
+        <location filename="../src/objects/WPolar.cpp" line="2216"/>
         <source>3D-Panels/VLM1</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/objects/WOpp.cpp" line="645"/>
-        <location filename="../src/objects/WPolar.cpp" line="2063"/>
+        <location filename="../src/objects/WOpp.cpp" line="647"/>
+        <location filename="../src/objects/WPolar.cpp" line="2217"/>
         <source>3D-Panels/VLM2</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/objects/WOpp.cpp" line="653"/>
+        <location filename="../src/objects/WOpp.cpp" line="655"/>
         <source>VInf</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/objects/WOpp.cpp" line="659"/>
-        <location filename="../src/objects/WPolar.cpp" line="2178"/>
+        <location filename="../src/objects/WOpp.cpp" line="661"/>
+        <location filename="../src/objects/WPolar.cpp" line="2332"/>
         <source>Mass</source>
         <translation>Masse</translation>
     </message>
     <message>
-        <location filename="../src/objects/WOpp.cpp" line="670"/>
+        <location filename="../src/objects/WOpp.cpp" line="672"/>
         <source>Control value</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/objects/WOpp.cpp" line="672"/>
+        <location filename="../src/objects/WOpp.cpp" line="674"/>
+        <location filename="../src/objects/WPolar.cpp" line="1559"/>
         <source>XNP</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/objects/WOpp.cpp" line="677"/>
+        <location filename="../src/objects/WOpp.cpp" line="679"/>
         <source>YCP</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/objects/WOpp.cpp" line="679"/>
+        <location filename="../src/objects/WOpp.cpp" line="681"/>
         <source>ZCP</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/objects/WOpp.cpp" line="687"/>
+        <location filename="../src/objects/WOpp.cpp" line="689"/>
+        <location filename="../src/objects/WPolar.cpp" line="1460"/>
         <source>VCD</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/objects/WOpp.cpp" line="689"/>
+        <location filename="../src/objects/WOpp.cpp" line="691"/>
+        <location filename="../src/objects/WPolar.cpp" line="1463"/>
         <source>ICD</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/objects/WOpp.cpp" line="691"/>
+        <location filename="../src/objects/WOpp.cpp" line="693"/>
         <source>CX</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/objects/WOpp.cpp" line="693"/>
+        <location filename="../src/objects/WOpp.cpp" line="695"/>
+        <location filename="../src/objects/WPolar.cpp" line="1556"/>
         <source>CY</source>
         <translation type="unfinished">CY</translation>
     </message>
     <message>
-        <location filename="../src/objects/WOpp.cpp" line="696"/>
+        <location filename="../src/objects/Polar.cpp" line="820"/>
+        <location filename="../src/objects/WOpp.cpp" line="698"/>
+        <location filename="../src/objects/WPolar.cpp" line="1478"/>
         <source>Cl</source>
         <translation type="unfinished">Cl</translation>
     </message>
     <message>
-        <location filename="../src/objects/WOpp.cpp" line="701"/>
+        <location filename="../src/objects/WOpp.cpp" line="703"/>
+        <location filename="../src/objects/WPolar.cpp" line="1475"/>
         <source>ICm</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/objects/WOpp.cpp" line="703"/>
+        <location filename="../src/objects/WOpp.cpp" line="705"/>
+        <location filename="../src/objects/WPolar.cpp" line="1472"/>
         <source>VCm</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/objects/WOpp.cpp" line="708"/>
+        <location filename="../src/objects/WOpp.cpp" line="710"/>
+        <location filename="../src/objects/WPolar.cpp" line="1487"/>
         <source>ICn</source>
         <translation type="unfinished">ICn</translation>
     </message>
     <message>
-        <location filename="../src/objects/WOpp.cpp" line="710"/>
+        <location filename="../src/objects/WOpp.cpp" line="712"/>
+        <location filename="../src/objects/WPolar.cpp" line="1484"/>
         <source>VCn</source>
         <translation type="unfinished">VCn</translation>
     </message>
     <message>
-        <location filename="../src/objects/WOpp.cpp" line="728"/>
+        <location filename="../src/objects/WOpp.cpp" line="730"/>
         <source>Non-dimensional Stability Derivatives:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/objects/WOpp.cpp" line="729"/>
+        <location filename="../src/objects/WOpp.cpp" line="731"/>
         <source>CXu</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/objects/WOpp.cpp" line="731"/>
+        <location filename="../src/objects/WOpp.cpp" line="733"/>
         <source>CLu</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/objects/WOpp.cpp" line="733"/>
+        <location filename="../src/objects/WOpp.cpp" line="735"/>
         <source>Cmu</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/objects/WOpp.cpp" line="735"/>
+        <location filename="../src/objects/WOpp.cpp" line="737"/>
         <source>CXa</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/objects/WOpp.cpp" line="737"/>
+        <location filename="../src/objects/WOpp.cpp" line="739"/>
         <source>CLa</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/objects/WOpp.cpp" line="739"/>
+        <location filename="../src/objects/WOpp.cpp" line="741"/>
         <source>Cma</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/objects/WOpp.cpp" line="741"/>
+        <location filename="../src/objects/WOpp.cpp" line="743"/>
         <source>CXq</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/objects/WOpp.cpp" line="743"/>
+        <location filename="../src/objects/WOpp.cpp" line="745"/>
         <source>CLq</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/objects/WOpp.cpp" line="745"/>
+        <location filename="../src/objects/WOpp.cpp" line="747"/>
         <source>Cmq</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/objects/WOpp.cpp" line="747"/>
+        <location filename="../src/objects/WOpp.cpp" line="749"/>
         <source>CYb</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/objects/WOpp.cpp" line="749"/>
+        <location filename="../src/objects/WOpp.cpp" line="751"/>
         <source>Clb</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/objects/WOpp.cpp" line="751"/>
+        <location filename="../src/objects/WOpp.cpp" line="753"/>
         <source>Cnb</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/objects/WOpp.cpp" line="753"/>
+        <location filename="../src/objects/WOpp.cpp" line="755"/>
         <source>CYp</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/objects/WOpp.cpp" line="755"/>
+        <location filename="../src/objects/WOpp.cpp" line="757"/>
         <source>Clp</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/objects/WOpp.cpp" line="757"/>
+        <location filename="../src/objects/WOpp.cpp" line="759"/>
         <source>Cnp</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/objects/WOpp.cpp" line="759"/>
+        <location filename="../src/objects/WOpp.cpp" line="761"/>
         <source>CYr</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/objects/WOpp.cpp" line="761"/>
+        <location filename="../src/objects/WOpp.cpp" line="763"/>
         <source>Clr</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/objects/WOpp.cpp" line="763"/>
+        <location filename="../src/objects/WOpp.cpp" line="765"/>
         <source>Cnr</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/objects/WOpp.cpp" line="769"/>
+        <location filename="../src/objects/WOpp.cpp" line="771"/>
         <source>Non-dimensional Control Derivatives:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/objects/WOpp.cpp" line="770"/>
+        <location filename="../src/objects/WOpp.cpp" line="772"/>
         <source>CXd</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/objects/WOpp.cpp" line="772"/>
+        <location filename="../src/objects/WOpp.cpp" line="774"/>
         <source>CYd</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/objects/WOpp.cpp" line="774"/>
+        <location filename="../src/objects/WOpp.cpp" line="776"/>
         <source>CZd</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/objects/WOpp.cpp" line="776"/>
+        <location filename="../src/objects/WOpp.cpp" line="778"/>
         <source>Cld</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/objects/WOpp.cpp" line="778"/>
+        <location filename="../src/objects/WOpp.cpp" line="780"/>
         <source>Cmd</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/objects/WOpp.cpp" line="780"/>
+        <location filename="../src/objects/WOpp.cpp" line="782"/>
         <source>Cnd</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/objects/WPolar.cpp" line="2181"/>
+        <location filename="../src/objects/WPolar.cpp" line="1490"/>
+        <source>CL/CD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/objects/WPolar.cpp" line="1493"/>
+        <source>CL^(3/2)/CD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/objects/WPolar.cpp" line="1496"/>
+        <source>1/Rt(CL)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/objects/WPolar.cpp" line="1499"/>
+        <source>Fx (N)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/objects/WPolar.cpp" line="1500"/>
+        <source>Fx (lbf)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/objects/WPolar.cpp" line="1503"/>
+        <source>Fy (N)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/objects/WPolar.cpp" line="1504"/>
+        <source>Fy (lbf)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/objects/WPolar.cpp" line="1507"/>
+        <source>Fz (N)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/objects/WPolar.cpp" line="1508"/>
+        <source>Fz (lbf)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/objects/WPolar.cpp" line="1511"/>
+        <source>Vx </source>
+        <translation type="unfinished">Vx </translation>
+    </message>
+    <message>
+        <location filename="../src/objects/WPolar.cpp" line="1514"/>
+        <source>Vz </source>
+        <translation type="unfinished">Vz </translation>
+    </message>
+    <message>
+        <location filename="../src/objects/WPolar.cpp" line="1517"/>
+        <source>V </source>
+        <translation type="unfinished">V </translation>
+    </message>
+    <message>
+        <location filename="../src/objects/WPolar.cpp" line="1520"/>
+        <source>Gamma</source>
+        <translation type="unfinished">Gamma</translation>
+    </message>
+    <message>
+        <location filename="../src/objects/WPolar.cpp" line="1523"/>
+        <source>Pitching Moment</source>
+        <translation type="unfinished">Kippmoment</translation>
+    </message>
+    <message>
+        <location filename="../src/objects/WPolar.cpp" line="1526"/>
+        <source>Rolling Moment</source>
+        <translation type="unfinished">Rollmoment</translation>
+    </message>
+    <message>
+        <location filename="../src/objects/WPolar.cpp" line="1529"/>
+        <source>Yawing Moment</source>
+        <translation type="unfinished">Giermoment</translation>
+    </message>
+    <message>
+        <location filename="../src/objects/WPolar.cpp" line="1532"/>
+        <source>XCP </source>
+        <translation type="unfinished">XCP </translation>
+    </message>
+    <message>
+        <location filename="../src/objects/WPolar.cpp" line="1535"/>
+        <source>YCP </source>
+        <translation type="unfinished">YCP </translation>
+    </message>
+    <message>
+        <location filename="../src/objects/WPolar.cpp" line="1538"/>
+        <source>ZCP </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/objects/WPolar.cpp" line="1541"/>
+        <source>BM </source>
+        <translation type="unfinished">BM </translation>
+    </message>
+    <message>
+        <location filename="../src/objects/WPolar.cpp" line="1544"/>
+        <source>m.g.Vz (W)</source>
+        <translation type="unfinished">m.g.Vz (W)</translation>
+    </message>
+    <message>
+        <location filename="../src/objects/WPolar.cpp" line="1547"/>
+        <source>Efficiency</source>
+        <translation type="unfinished">Effizienz</translation>
+    </message>
+    <message>
+        <location filename="../src/objects/WPolar.cpp" line="1553"/>
+        <source>ctrl</source>
+        <translation type="unfinished">ctrl</translation>
+    </message>
+    <message>
+        <location filename="../src/objects/WPolar.cpp" line="1562"/>
+        <source>Ph. Freq(Hz)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/objects/WPolar.cpp" line="1565"/>
+        <source>Ph. Damping</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/objects/WPolar.cpp" line="1568"/>
+        <source>SP Freq (Hz)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/objects/WPolar.cpp" line="1571"/>
+        <source>SP Damping</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/objects/WPolar.cpp" line="1574"/>
+        <source>DR Freq(Hz)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/objects/WPolar.cpp" line="1577"/>
+        <source>DR Damping</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/objects/WPolar.cpp" line="1580"/>
+        <source>Roll Damping</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/objects/WPolar.cpp" line="1583"/>
+        <source>Spiral Damping</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/objects/WPolar.cpp" line="2335"/>
         <source>CoG.x</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/objects/WPolar.cpp" line="2184"/>
+        <location filename="../src/objects/WPolar.cpp" line="2338"/>
         <source>CoG.z</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/objects/WPolar.cpp" line="2201"/>
+        <location filename="../src/objects/WPolar.cpp" line="2355"/>
         <source>B.C. = Dirichlet</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/objects/WPolar.cpp" line="2202"/>
+        <location filename="../src/objects/WPolar.cpp" line="2356"/>
         <source>B.C. = Neumann</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/objects/WPolar.cpp" line="2206"/>
+        <location filename="../src/objects/WPolar.cpp" line="2360"/>
         <source>Analysis type</source>
         <translation>Analyse Methode</translation>
     </message>
     <message>
-        <location filename="../src/objects/WPolar.cpp" line="2207"/>
+        <location filename="../src/objects/WPolar.cpp" line="2361"/>
         <source>Viscous</source>
         <translation>Reibung</translation>
     </message>
     <message>
-        <location filename="../src/objects/WPolar.cpp" line="2208"/>
+        <location filename="../src/objects/WPolar.cpp" line="2362"/>
         <source>Inviscid</source>
         <translation>Reibungslos</translation>
     </message>
     <message>
-        <location filename="../src/objects/WPolar.cpp" line="2210"/>
+        <location filename="../src/objects/WPolar.cpp" line="2364"/>
         <source>Ref. Area = </source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/objects/WPolar.cpp" line="2229"/>
+        <location filename="../src/objects/WPolar.cpp" line="2383"/>
         <source>Data points</source>
         <translation>Datenpunkte</translation>
     </message>
     <message>
-        <location filename="../src/objects/WOpp.cpp" line="664"/>
-        <location filename="../src/objects/WPolar.cpp" line="2055"/>
+        <location filename="../src/objects/WOpp.cpp" line="666"/>
+        <location filename="../src/objects/WPolar.cpp" line="2209"/>
         <source>Beta</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/objects/WPolar.cpp" line="2211"/>
+        <location filename="../src/objects/WPolar.cpp" line="2365"/>
         <source>Planform area</source>
         <translation>Grundform Fläche</translation>
     </message>
     <message>
-        <location filename="../src/objects/WPolar.cpp" line="2212"/>
+        <location filename="../src/objects/WPolar.cpp" line="2366"/>
         <source>Projected area</source>
         <translation>Projizierte Fläche</translation>
     </message>
     <message>
-        <location filename="../src/objects/WOpp.cpp" line="649"/>
-        <location filename="../src/objects/WPolar.cpp" line="2214"/>
+        <location filename="../src/objects/WOpp.cpp" line="651"/>
+        <location filename="../src/objects/WPolar.cpp" line="2368"/>
         <source>Tilted geometry</source>
         <translation>Verdrehte Geometrie</translation>
     </message>
     <message>
-        <location filename="../src/objects/WPolar.cpp" line="2218"/>
+        <location filename="../src/objects/WPolar.cpp" line="2372"/>
         <source>Ground height</source>
         <translation>Höhe über Grund</translation>
     </message>
     <message>
-        <location filename="../src/objects/WPolar.cpp" line="2222"/>
+        <location filename="../src/objects/WPolar.cpp" line="2376"/>
         <source>Density =</source>
         <translation>Dichte =</translation>
     </message>
     <message>
-        <location filename="../src/objects/WPolar.cpp" line="2225"/>
+        <location filename="../src/objects/WPolar.cpp" line="2379"/>
         <source>Viscosity =</source>
         <translation>Reibung =</translation>
     </message>
@@ -10215,18 +10247,18 @@ Kompressions-Korrekturen ungültig</translation>
     </message>
     <message>
         <location filename="../src/miarex/GLCreateLists.cpp" line="2573"/>
-        <location filename="../src/miarex/Miarex.cpp" line="11858"/>
+        <location filename="../src/miarex/Miarex.cpp" line="11867"/>
         <source>X_NP = %1 </source>
         <translation></translation>
     </message>
     <message>
         <location filename="../src/miarex/GLCreateLists.cpp" line="2579"/>
-        <location filename="../src/miarex/Miarex.cpp" line="11864"/>
+        <location filename="../src/miarex/Miarex.cpp" line="11873"/>
         <source>X_CP = %1 </source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/miarex/Miarex.cpp" line="11869"/>
+        <location filename="../src/miarex/Miarex.cpp" line="11878"/>
         <source>X_CG = %1 </source>
         <translation></translation>
     </message>
@@ -10348,44 +10380,44 @@ CpCalc: local speed too large
 <context>
     <name>QXDirect</name>
     <message>
-        <location filename="../src/xdirect/XDirect.cpp" line="189"/>
-        <location filename="../src/xdirect/XDirect.cpp" line="917"/>
-        <location filename="../src/xdirect/XDirect.cpp" line="948"/>
-        <location filename="../src/xdirect/XDirect.cpp" line="1508"/>
-        <location filename="../src/xdirect/XDirect.cpp" line="2191"/>
-        <location filename="../src/xdirect/XDirect.cpp" line="3292"/>
+        <location filename="../src/xdirect/XDirect.cpp" line="185"/>
+        <location filename="../src/xdirect/XDirect.cpp" line="904"/>
+        <location filename="../src/xdirect/XDirect.cpp" line="935"/>
+        <location filename="../src/xdirect/XDirect.cpp" line="1495"/>
+        <location filename="../src/xdirect/XDirect.cpp" line="2182"/>
+        <location filename="../src/xdirect/XDirect.cpp" line="3285"/>
         <source>Cp</source>
         <translation>Cp</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/XDirect.cpp" line="933"/>
-        <location filename="../src/xdirect/XDirect.cpp" line="1513"/>
-        <location filename="../src/xdirect/XDirect.cpp" line="3297"/>
-        <location filename="../src/xdirect/XDirect.cpp" line="4118"/>
+        <location filename="../src/xdirect/XDirect.cpp" line="920"/>
+        <location filename="../src/xdirect/XDirect.cpp" line="1500"/>
+        <location filename="../src/xdirect/XDirect.cpp" line="3290"/>
+        <location filename="../src/xdirect/XDirect.cpp" line="4112"/>
         <source>Q</source>
         <translation>Q</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/XDirect.cpp" line="1951"/>
+        <location filename="../src/xdirect/XDirect.cpp" line="1941"/>
         <source>Not enough threads available for multithreading</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/xdirect/XDirect.cpp" line="1952"/>
-        <location filename="../src/xdirect/XDirect.cpp" line="2992"/>
-        <location filename="../src/xdirect/XDirect.cpp" line="3512"/>
-        <location filename="../src/xdirect/XDirect.cpp" line="3532"/>
-        <location filename="../src/xdirect/XDirect.cpp" line="3545"/>
-        <location filename="../src/xdirect/XDirect.cpp" line="3559"/>
-        <location filename="../src/xdirect/XDirect.cpp" line="3568"/>
-        <location filename="../src/xdirect/XDirect.cpp" line="3578"/>
-        <location filename="../src/xdirect/XDirect.cpp" line="3588"/>
-        <location filename="../src/xdirect/XDirect.cpp" line="3597"/>
-        <location filename="../src/xdirect/XDirect.cpp" line="3606"/>
-        <location filename="../src/xdirect/XDirect.cpp" line="3616"/>
-        <location filename="../src/xdirect/XDirect.cpp" line="3693"/>
-        <location filename="../src/xdirect/XDirect.cpp" line="3716"/>
-        <location filename="../src/xdirect/XDirect.cpp" line="3801"/>
+        <location filename="../src/xdirect/XDirect.cpp" line="1942"/>
+        <location filename="../src/xdirect/XDirect.cpp" line="2984"/>
+        <location filename="../src/xdirect/XDirect.cpp" line="3505"/>
+        <location filename="../src/xdirect/XDirect.cpp" line="3525"/>
+        <location filename="../src/xdirect/XDirect.cpp" line="3538"/>
+        <location filename="../src/xdirect/XDirect.cpp" line="3552"/>
+        <location filename="../src/xdirect/XDirect.cpp" line="3561"/>
+        <location filename="../src/xdirect/XDirect.cpp" line="3571"/>
+        <location filename="../src/xdirect/XDirect.cpp" line="3581"/>
+        <location filename="../src/xdirect/XDirect.cpp" line="3590"/>
+        <location filename="../src/xdirect/XDirect.cpp" line="3599"/>
+        <location filename="../src/xdirect/XDirect.cpp" line="3609"/>
+        <location filename="../src/xdirect/XDirect.cpp" line="3686"/>
+        <location filename="../src/xdirect/XDirect.cpp" line="3709"/>
+        <location filename="../src/xdirect/XDirect.cpp" line="3794"/>
         <location filename="../src/xdirect/XFoil.cpp" line="105"/>
         <location filename="../src/xdirect/XFoil.cpp" line="119"/>
         <location filename="../src/xdirect/XFoil.cpp" line="1979"/>
@@ -10413,49 +10445,49 @@ CpCalc: lokale Geschwindigkeit zu groß
 Kompressions-Korrekturen ungültig</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/XDirect.cpp" line="2091"/>
-        <location filename="../src/xdirect/XDirect.cpp" line="2138"/>
-        <location filename="../src/xdirect/XDirect.cpp" line="3373"/>
-        <location filename="../src/xdirect/XDirect.cpp" line="3963"/>
-        <location filename="../src/xdirect/XDirect.cpp" line="4336"/>
-        <location filename="../src/xdirect/XDirect.cpp" line="4369"/>
-        <location filename="../src/xdirect/XDirect.cpp" line="4852"/>
+        <location filename="../src/xdirect/XDirect.cpp" line="2082"/>
+        <location filename="../src/xdirect/XDirect.cpp" line="2129"/>
+        <location filename="../src/xdirect/XDirect.cpp" line="3366"/>
+        <location filename="../src/xdirect/XDirect.cpp" line="3956"/>
+        <location filename="../src/xdirect/XDirect.cpp" line="4331"/>
+        <location filename="../src/xdirect/XDirect.cpp" line="4364"/>
+        <location filename="../src/xdirect/XDirect.cpp" line="4847"/>
         <source>Top</source>
         <translation>Oben</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/XDirect.cpp" line="2092"/>
-        <location filename="../src/xdirect/XDirect.cpp" line="2139"/>
-        <location filename="../src/xdirect/XDirect.cpp" line="3374"/>
-        <location filename="../src/xdirect/XDirect.cpp" line="3964"/>
-        <location filename="../src/xdirect/XDirect.cpp" line="4337"/>
-        <location filename="../src/xdirect/XDirect.cpp" line="4370"/>
-        <location filename="../src/xdirect/XDirect.cpp" line="4853"/>
+        <location filename="../src/xdirect/XDirect.cpp" line="2083"/>
+        <location filename="../src/xdirect/XDirect.cpp" line="2130"/>
+        <location filename="../src/xdirect/XDirect.cpp" line="3367"/>
+        <location filename="../src/xdirect/XDirect.cpp" line="3957"/>
+        <location filename="../src/xdirect/XDirect.cpp" line="4332"/>
+        <location filename="../src/xdirect/XDirect.cpp" line="4365"/>
+        <location filename="../src/xdirect/XDirect.cpp" line="4848"/>
         <source>Bot</source>
         <translation>Unten</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/XDirect.cpp" line="2240"/>
+        <location filename="../src/xdirect/XDirect.cpp" line="2232"/>
         <source>Max Shear</source>
         <translation>Maximale Scherung</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/XDirect.cpp" line="2245"/>
+        <location filename="../src/xdirect/XDirect.cpp" line="2237"/>
         <source>Top Shear</source>
         <translation>Obere Scherung</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/XDirect.cpp" line="2246"/>
+        <location filename="../src/xdirect/XDirect.cpp" line="2238"/>
         <source>Top Shear eq</source>
         <translation>Obere Scherung eq</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/XDirect.cpp" line="2247"/>
+        <location filename="../src/xdirect/XDirect.cpp" line="2239"/>
         <source>Bot Shear</source>
         <translation>Untere Scherung</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/XDirect.cpp" line="2248"/>
+        <location filename="../src/xdirect/XDirect.cpp" line="2240"/>
         <source>Bot Shear eq</source>
         <translation>Untere Scherung eq</translation>
     </message>
@@ -10465,37 +10497,37 @@ Kompressions-Korrekturen ungültig</translation>
         <translation type="obsolete">Sind Sie sicher das Sie den Arbeitspunkt löschen wollen</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/XDirect.cpp" line="188"/>
+        <location filename="../src/xdirect/XDirect.cpp" line="184"/>
         <source>X</source>
         <translation>X</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/XDirect.cpp" line="199"/>
+        <location filename="../src/xdirect/XDirect.cpp" line="195"/>
         <source>Cp Graph</source>
         <translation>Cp-Graph</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/XDirect.cpp" line="211"/>
+        <location filename="../src/xdirect/XDirect.cpp" line="207"/>
         <source>Polar Graph</source>
         <translation>Polar Graphen</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/XDirect.cpp" line="223"/>
+        <location filename="../src/xdirect/XDirect.cpp" line="219"/>
         <source>Cm Graph</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/xdirect/XDirect.cpp" line="235"/>
+        <location filename="../src/xdirect/XDirect.cpp" line="231"/>
         <source>Cz Graph</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/xdirect/XDirect.cpp" line="247"/>
+        <location filename="../src/xdirect/XDirect.cpp" line="243"/>
         <source>Tr Graph</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/xdirect/XDirect.cpp" line="259"/>
+        <location filename="../src/xdirect/XDirect.cpp" line="255"/>
         <source>User Graph</source>
         <translation></translation>
     </message>
@@ -10508,94 +10540,94 @@ CpCalc: lokale Geschwindigkeit zu groß
 Kompressions-Korrekturen ungültig</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/XDirect.cpp" line="2088"/>
+        <location filename="../src/xdirect/XDirect.cpp" line="2079"/>
         <source>Cf</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/xdirect/XDirect.cpp" line="2135"/>
+        <location filename="../src/xdirect/XDirect.cpp" line="2126"/>
         <source>Cd&apos;</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/xdirect/XDirect.cpp" line="2430"/>
+        <location filename="../src/xdirect/XDirect.cpp" line="2422"/>
         <source>Are you sure you want to delete the Operating Point
 </source>
         <translation>Sind Sie sicher das Sie den Arbeitspunkt löschen wollen</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/XDirect.cpp" line="2436"/>
-        <location filename="../src/xdirect/XDirect.cpp" line="2460"/>
-        <location filename="../src/xdirect/XDirect.cpp" line="2562"/>
+        <location filename="../src/xdirect/XDirect.cpp" line="2428"/>
+        <location filename="../src/xdirect/XDirect.cpp" line="2452"/>
+        <location filename="../src/xdirect/XDirect.cpp" line="2554"/>
         <source>Question</source>
         <translation>Frage</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/XDirect.cpp" line="2457"/>
+        <location filename="../src/xdirect/XDirect.cpp" line="2449"/>
         <source>Are you sure you want to delete the polar :
   </source>
         <translation>Sind Sie sicher das Sie die Polare :
   </translation>
     </message>
     <message>
-        <location filename="../src/xdirect/XDirect.cpp" line="2458"/>
+        <location filename="../src/xdirect/XDirect.cpp" line="2450"/>
         <source>
  and all the associated OpPoints ?</source>
         <translation>und alle Arbeitspunkte löschen wollen?</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/XDirect.cpp" line="2560"/>
+        <location filename="../src/xdirect/XDirect.cpp" line="2552"/>
         <source>Are you sure you want to delete polars and OpPoints
 </source>
         <translation>Sind Sie sicher das Sie die Polaren und die Arbeitspunkte  löschen wollen
 </translation>
     </message>
     <message>
-        <location filename="../src/xdirect/XDirect.cpp" line="2561"/>
+        <location filename="../src/xdirect/XDirect.cpp" line="2553"/>
         <source>associated to </source>
         <translation>zugehörig zu</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/XDirect.cpp" line="2611"/>
+        <location filename="../src/xdirect/XDirect.cpp" line="2603"/>
         <source>The foil has been de-rotated by %1 degrees</source>
         <translation>Das Profile wurde entdreht um %1 Grad</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/XDirect.cpp" line="2756"/>
+        <location filename="../src/xdirect/XDirect.cpp" line="2748"/>
         <source>Export Current XFoil Results</source>
         <translation>Aktuelle XFoil Resultate exportieren</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/XDirect.cpp" line="2758"/>
-        <location filename="../src/xdirect/XDirect.cpp" line="2966"/>
-        <location filename="../src/xdirect/XDirect.cpp" line="3005"/>
-        <location filename="../src/xdirect/XDirect.cpp" line="3115"/>
+        <location filename="../src/xdirect/XDirect.cpp" line="2750"/>
+        <location filename="../src/xdirect/XDirect.cpp" line="2958"/>
+        <location filename="../src/xdirect/XDirect.cpp" line="2997"/>
+        <location filename="../src/xdirect/XDirect.cpp" line="3107"/>
         <source>Text File (*.txt);;Comma Separated Values (*.csv)</source>
         <translation>Text File (*.txt);;Comma Separated Values (*.csv)</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/XDirect.cpp" line="2829"/>
+        <location filename="../src/xdirect/XDirect.cpp" line="2821"/>
         <source>
 Top Side
 </source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/xdirect/XDirect.cpp" line="2830"/>
-        <location filename="../src/xdirect/XDirect.cpp" line="2860"/>
+        <location filename="../src/xdirect/XDirect.cpp" line="2822"/>
+        <location filename="../src/xdirect/XDirect.cpp" line="2852"/>
         <source>    x         Hk     Ue/Vinf      Cf        Cd     A/A0       D*       Theta      CTq
 </source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/xdirect/XDirect.cpp" line="2831"/>
-        <location filename="../src/xdirect/XDirect.cpp" line="2861"/>
+        <location filename="../src/xdirect/XDirect.cpp" line="2823"/>
+        <location filename="../src/xdirect/XDirect.cpp" line="2853"/>
         <source>x,Hk,Ue/Vinf,Cf,Cd,A/A0,D*,Theta,CTq
 </source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/xdirect/XDirect.cpp" line="2859"/>
+        <location filename="../src/xdirect/XDirect.cpp" line="2851"/>
         <source>
 
 Bottom Side
@@ -10603,59 +10635,59 @@ Bottom Side
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/xdirect/XDirect.cpp" line="2903"/>
+        <location filename="../src/xdirect/XDirect.cpp" line="2895"/>
         <source>Export Directory</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/xdirect/XDirect.cpp" line="2934"/>
+        <location filename="../src/xdirect/XDirect.cpp" line="2926"/>
         <source>Export Foil</source>
         <translation>Profil exportieren</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/XDirect.cpp" line="2936"/>
+        <location filename="../src/xdirect/XDirect.cpp" line="2928"/>
         <source>Foil File (*.dat)</source>
         <translation>Profil File (*.dat)</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/XDirect.cpp" line="2964"/>
-        <location filename="../src/xdirect/XDirect.cpp" line="3003"/>
+        <location filename="../src/xdirect/XDirect.cpp" line="2956"/>
+        <location filename="../src/xdirect/XDirect.cpp" line="2995"/>
         <source>Export OpPoint</source>
         <translation>Arbeitspunkt exportieren</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/XDirect.cpp" line="3113"/>
+        <location filename="../src/xdirect/XDirect.cpp" line="3105"/>
         <source>Export Polar</source>
         <translation>Polare exportieren</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/XDirect.cpp" line="3501"/>
-        <location filename="../src/xdirect/XDirect.cpp" line="3682"/>
+        <location filename="../src/xdirect/XDirect.cpp" line="3494"/>
+        <location filename="../src/xdirect/XDirect.cpp" line="3675"/>
         <source>Open File</source>
         <translation>Datei öffnen</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/XDirect.cpp" line="3503"/>
+        <location filename="../src/xdirect/XDirect.cpp" line="3496"/>
         <source>XFoil Polar Format (*.*)</source>
         <translation>UFO Polar Format (*.*)</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/XDirect.cpp" line="3511"/>
-        <location filename="../src/xdirect/XDirect.cpp" line="3692"/>
+        <location filename="../src/xdirect/XDirect.cpp" line="3504"/>
+        <location filename="../src/xdirect/XDirect.cpp" line="3685"/>
         <source>Could not read the file
 </source>
         <translation>File konnte nicht gelesen werden
 </translation>
     </message>
     <message>
-        <location filename="../src/xdirect/XDirect.cpp" line="3529"/>
-        <location filename="../src/xdirect/XDirect.cpp" line="3714"/>
+        <location filename="../src/xdirect/XDirect.cpp" line="3522"/>
+        <location filename="../src/xdirect/XDirect.cpp" line="3707"/>
         <source>No Foil with the name </source>
         <translation>Kein Profil mit diesem Namen</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/XDirect.cpp" line="3530"/>
-        <location filename="../src/xdirect/XDirect.cpp" line="3715"/>
+        <location filename="../src/xdirect/XDirect.cpp" line="3523"/>
+        <location filename="../src/xdirect/XDirect.cpp" line="3708"/>
         <source>
 could be found. The polar(s) will not be stored</source>
         <translation>
@@ -10666,32 +10698,32 @@ Die Polare(n) wird nicht gespeichert</translation>
         <translation type="obsolete">Fehler beim Lesen in Zeile xx. Die Polare(b) wird nicht gespeichert</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/XDirect.cpp" line="3684"/>
+        <location filename="../src/xdirect/XDirect.cpp" line="3677"/>
         <source>JavaFoil Polar Format (*.*)</source>
         <translation>JavaFoil Polar Format (*.*)</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/XDirect.cpp" line="3801"/>
+        <location filename="../src/xdirect/XDirect.cpp" line="3794"/>
         <source>At least two foils are required</source>
         <translation>Es werden mind.zwei Profile benötigt</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/XDirect.cpp" line="3939"/>
+        <location filename="../src/xdirect/XDirect.cpp" line="3932"/>
         <source>The foil has been normalized from %1  to 1.000</source>
         <translation>Das Profil wurde normalisiert von %1 auf 1.000</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/XDirect.cpp" line="4149"/>
+        <location filename="../src/xdirect/XDirect.cpp" line="4143"/>
         <source>Enter the new name for the foil polar :</source>
         <translation>Geben Sie einen neuen Namen für die Polare der Tragfläche an:</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/XDirect.cpp" line="4405"/>
+        <location filename="../src/xdirect/XDirect.cpp" line="4400"/>
         <source>Polar File</source>
         <translation>Polaren Datei</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/XDirect.cpp" line="4405"/>
+        <location filename="../src/xdirect/XDirect.cpp" line="4400"/>
         <source>Polar File (*.plr)</source>
         <translation>Polar File (*.plr)</translation>
     </message>
@@ -10712,267 +10744,235 @@ Die Polare(n) wird nicht gespeichert</translation>
         <translation type="obsolete">Anzahl der Paneele = %1</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/XDirect.cpp" line="5221"/>
+        <location filename="../src/xdirect/XDirect.cpp" line="5219"/>
         <source>Thickness         = %1</source>
         <translation>Dicke      =%1</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/XDirect.cpp" line="5225"/>
+        <location filename="../src/xdirect/XDirect.cpp" line="5223"/>
         <source>Max. Thick.pos.   = %1</source>
         <translation>Position der maximalen Dicke   =%1</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/XDirect.cpp" line="5229"/>
+        <location filename="../src/xdirect/XDirect.cpp" line="5227"/>
         <source>Max. Camber       = %1</source>
         <translation>Maximale Wölbung     =%1</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/XDirect.cpp" line="5233"/>
+        <location filename="../src/xdirect/XDirect.cpp" line="5231"/>
         <source>Max. Camber pos.  = %1</source>
         <translation>Position maximale Wölbung  =%1</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/XDirect.cpp" line="5237"/>
+        <location filename="../src/xdirect/XDirect.cpp" line="5235"/>
         <source>Number of Panels  =  %1</source>
         <translation>Anzahl der Paneele = %1</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/XDirect.cpp" line="5243"/>
+        <location filename="../src/xdirect/XDirect.cpp" line="5241"/>
         <source>Flap Angle = %1</source>
         <translation>Klappen Winkel = %1</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/XDirect.cpp" line="5247"/>
+        <location filename="../src/xdirect/XDirect.cpp" line="5245"/>
         <source>XHinge     = %1</source>
         <translation>X-Anschlag     =%1</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/XDirect.cpp" line="5252"/>
+        <location filename="../src/xdirect/XDirect.cpp" line="5250"/>
         <source>YHinge     = %1</source>
         <translation>Y-Anschlag    =%1</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/XDirect.cpp" line="5272"/>
+        <location filename="../src/xdirect/XDirect.cpp" line="5270"/>
         <source>TE Hinge Moment/span = 123456789</source>
         <translation>TE Hinge Moment/span = 123456789</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/XDirect.cpp" line="5281"/>
+        <location filename="../src/xdirect/XDirect.cpp" line="5279"/>
         <source>Polar Type =         %1</source>
         <translation>Polar Typ =         %1</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/XDirect.cpp" line="5297"/>
-        <location filename="../src/xdirect/XDirect.cpp" line="5308"/>
+        <location filename="../src/xdirect/XDirect.cpp" line="5295"/>
+        <location filename="../src/xdirect/XDirect.cpp" line="5306"/>
         <source>Re.sqrt(Cl) = </source>
         <translation>Re sqrt(Cl)=</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/XDirect.cpp" line="5301"/>
+        <location filename="../src/xdirect/XDirect.cpp" line="5299"/>
         <source>M.sqrt(Cl) = %1</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/xdirect/XDirect.cpp" line="5330"/>
+        <location filename="../src/xdirect/XDirect.cpp" line="5328"/>
         <source>Forced Upper Trans. = %1</source>
         <translation>Erzwungener oberer Umschlag = %1</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/XDirect.cpp" line="5333"/>
+        <location filename="../src/xdirect/XDirect.cpp" line="5331"/>
         <source>Forced Lower Trans. = %1</source>
         <translation>Erzwungener unterer Umschlag = %1</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/XDirect.cpp" line="5354"/>
+        <location filename="../src/xdirect/XDirect.cpp" line="5352"/>
         <source>       Alpha = %1 </source>
         <translation>       Alpha = %1 </translation>
     </message>
     <message>
-        <location filename="../src/xdirect/XDirect.cpp" line="5358"/>
+        <location filename="../src/xdirect/XDirect.cpp" line="5356"/>
         <source>          Cl = %1</source>
         <translation>          Cl = %1</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/XDirect.cpp" line="5362"/>
+        <location filename="../src/xdirect/XDirect.cpp" line="5360"/>
         <source>          Cm = %1</source>
         <translation>          Cm = %1</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/XDirect.cpp" line="5366"/>
+        <location filename="../src/xdirect/XDirect.cpp" line="5364"/>
         <source>          Cd = %1</source>
         <translation>          Cd = %1</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/XDirect.cpp" line="5372"/>
+        <location filename="../src/xdirect/XDirect.cpp" line="5370"/>
         <source>         L/D = %1</source>
         <translation>         L/D = %1</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/XDirect.cpp" line="5377"/>
+        <location filename="../src/xdirect/XDirect.cpp" line="5375"/>
         <source>Upper Trans. = %1</source>
         <translation>Oberer Umschlag = %1</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/XDirect.cpp" line="5381"/>
+        <location filename="../src/xdirect/XDirect.cpp" line="5379"/>
         <source>Lower Trans. = %1</source>
         <translation>Unterer Umschlag = %1</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/XDirect.cpp" line="5387"/>
+        <location filename="../src/xdirect/XDirect.cpp" line="5385"/>
         <source>TE Hinge Moment/span = %1</source>
         <translation>TE Hinge Moment/span = %1</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/XDirect.cpp" line="5394"/>
+        <location filename="../src/xdirect/XDirect.cpp" line="5392"/>
         <source>LE Hinge Moment/span = %1</source>
         <translation>LE Hinge Moment/span = %1</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/XDirect.cpp" line="6363"/>
-        <location filename="../src/xdirect/XDirect.cpp" line="6408"/>
-        <location filename="../src/xdirect/XDirect.cpp" line="6414"/>
-        <location filename="../src/xdirect/XDirect.cpp" line="6459"/>
         <source>Alpha</source>
-        <translation>Alpha</translation>
+        <translation type="obsolete">Alpha</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/XDirect.cpp" line="6366"/>
-        <location filename="../src/xdirect/XDirect.cpp" line="6417"/>
-        <location filename="../src/xdirect/XDirect.cpp" line="6500"/>
+        <location filename="../src/xdirect/XDirect.cpp" line="6404"/>
         <source>Cl</source>
         <translation>Cl</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/XDirect.cpp" line="6369"/>
-        <location filename="../src/xdirect/XDirect.cpp" line="6420"/>
         <source>Cd</source>
-        <translation>Cd</translation>
+        <translation type="obsolete">Cd</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/XDirect.cpp" line="6372"/>
-        <location filename="../src/xdirect/XDirect.cpp" line="6423"/>
         <source>Cd x 10000</source>
-        <translation>Cd x 10000</translation>
+        <translation type="obsolete">Cd x 10000</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/XDirect.cpp" line="6375"/>
-        <location filename="../src/xdirect/XDirect.cpp" line="6426"/>
         <source>Cdp</source>
-        <translation>Cdp</translation>
+        <translation type="obsolete">Cdp</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/XDirect.cpp" line="6378"/>
-        <location filename="../src/xdirect/XDirect.cpp" line="6429"/>
         <source>Cm</source>
-        <translation>Cm</translation>
+        <translation type="obsolete">Cm</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/XDirect.cpp" line="6381"/>
-        <location filename="../src/xdirect/XDirect.cpp" line="6432"/>
         <source>Xtr1</source>
-        <translation>Xtr1</translation>
+        <translation type="obsolete">Xtr1</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/XDirect.cpp" line="6384"/>
-        <location filename="../src/xdirect/XDirect.cpp" line="6435"/>
         <source>Xtr2</source>
-        <translation>Xtr2</translation>
+        <translation type="obsolete">Xtr2</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/XDirect.cpp" line="6387"/>
-        <location filename="../src/xdirect/XDirect.cpp" line="6438"/>
         <source>HMom</source>
-        <translation>HMom</translation>
+        <translation type="obsolete">HMom</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/XDirect.cpp" line="6390"/>
-        <location filename="../src/xdirect/XDirect.cpp" line="6441"/>
         <source>Cpmin</source>
-        <translation>Cpmin</translation>
+        <translation type="obsolete">Cpmin</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/XDirect.cpp" line="6393"/>
-        <location filename="../src/xdirect/XDirect.cpp" line="6444"/>
         <source>Cl/Cd</source>
-        <translation>Cl/Cd</translation>
+        <translation type="obsolete">Cl/Cd</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/XDirect.cpp" line="6396"/>
-        <location filename="../src/xdirect/XDirect.cpp" line="6447"/>
         <source>|Cl|^(3/2)/Cd</source>
-        <translation>|Cl|^(3/2)/Cd</translation>
+        <translation type="obsolete">|Cl|^(3/2)/Cd</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/XDirect.cpp" line="6399"/>
-        <location filename="../src/xdirect/XDirect.cpp" line="6450"/>
         <source>1/Rt(Cl)</source>
-        <translation>1/Rt(Cl)</translation>
+        <translation type="obsolete">1/Rt(Cl)</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/XDirect.cpp" line="6402"/>
-        <location filename="../src/xdirect/XDirect.cpp" line="6453"/>
-        <location filename="../src/xdirect/XDirect.cpp" line="6501"/>
+        <location filename="../src/xdirect/XDirect.cpp" line="6405"/>
         <source>Re</source>
         <translation>Re</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/XDirect.cpp" line="6405"/>
-        <location filename="../src/xdirect/XDirect.cpp" line="6456"/>
         <source>XCp</source>
-        <translation>XCp</translation>
+        <translation type="obsolete">XCp</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/XDirect.cpp" line="6507"/>
+        <location filename="../src/xdirect/XDirect.cpp" line="6411"/>
         <source>Sequence</source>
         <translation>Sequenz</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/XDirect.cpp" line="6510"/>
+        <location filename="../src/xdirect/XDirect.cpp" line="6414"/>
         <source>Start=</source>
         <translation>Start=</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/XDirect.cpp" line="6511"/>
+        <location filename="../src/xdirect/XDirect.cpp" line="6415"/>
         <source>End=</source>
         <translation>Ende=</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/XDirect.cpp" line="6512"/>
+        <location filename="../src/xdirect/XDirect.cpp" line="6416"/>
         <source>D=</source>
         <translation>D=</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/XDirect.cpp" line="6543"/>
+        <location filename="../src/xdirect/XDirect.cpp" line="6447"/>
         <source>Viscous</source>
         <translation>Reibung</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/XDirect.cpp" line="6544"/>
+        <location filename="../src/xdirect/XDirect.cpp" line="6448"/>
         <source>Init BL</source>
         <translation>Grenzschicht initialisieren</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/XDirect.cpp" line="6548"/>
+        <location filename="../src/xdirect/XDirect.cpp" line="6452"/>
         <source>Store Opp</source>
         <translation>Arbeit speichern</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/XDirect.cpp" line="6549"/>
+        <location filename="../src/xdirect/XDirect.cpp" line="6453"/>
         <source>Analyze</source>
         <translation>analysieren</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/XDirect.cpp" line="6561"/>
+        <location filename="../src/xdirect/XDirect.cpp" line="6465"/>
         <source>Analysis settings</source>
         <translation>Analyse Einstellungen</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/XDirect.cpp" line="6566"/>
+        <location filename="../src/xdirect/XDirect.cpp" line="6470"/>
         <source>Show BL</source>
         <translation>Grenzschicht anzeigen</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/XDirect.cpp" line="6567"/>
+        <location filename="../src/xdirect/XDirect.cpp" line="6471"/>
         <source>Show Pressure</source>
         <translation>Druck anzeigen</translation>
     </message>
@@ -10985,47 +10985,47 @@ Die Polare(n) wird nicht gespeichert</translation>
         <translation type="obsolete">Hebt den aktuellen OpPoint hervor</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/XDirect.cpp" line="6570"/>
+        <location filename="../src/xdirect/XDirect.cpp" line="6474"/>
         <source>Animate</source>
         <translation>Animation</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/XDirect.cpp" line="6582"/>
+        <location filename="../src/xdirect/XDirect.cpp" line="6486"/>
         <source>Display</source>
         <translation>Darstellung</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/XDirect.cpp" line="6585"/>
+        <location filename="../src/xdirect/XDirect.cpp" line="6489"/>
         <source>Polar properties</source>
         <translation>Polaren Eigenschaft</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/XDirect.cpp" line="6594"/>
+        <location filename="../src/xdirect/XDirect.cpp" line="6498"/>
         <source>Curve</source>
         <translation>Kurve</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/XDirect.cpp" line="6595"/>
+        <location filename="../src/xdirect/XDirect.cpp" line="6499"/>
         <source>Points</source>
         <translation>Punkte</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/XDirect.cpp" line="6613"/>
+        <location filename="../src/xdirect/XDirect.cpp" line="6517"/>
         <source>Style</source>
         <translation>Gestalltung</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/XDirect.cpp" line="6614"/>
+        <location filename="../src/xdirect/XDirect.cpp" line="6518"/>
         <source>Width</source>
         <translation>Breite</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/XDirect.cpp" line="6615"/>
+        <location filename="../src/xdirect/XDirect.cpp" line="6519"/>
         <source>Color</source>
         <translation>Farbe</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/XDirect.cpp" line="6632"/>
+        <location filename="../src/xdirect/XDirect.cpp" line="6536"/>
         <source>Graph Curve Settings</source>
         <translation>Graphen Kurven Einstellungen</translation>
     </message>
@@ -11543,7 +11543,7 @@ stagnation point in mixed-inverse</source>
         <translation>Satbilitäts Polar Definition</translation>
     </message>
     <message>
-        <location filename="../src/miarex/StabPolarDlg.cpp" line="807"/>
+        <location filename="../src/miarex/StabPolarDlg.cpp" line="791"/>
         <source>Plane analysis methods</source>
         <translation type="unfinished"></translation>
     </message>
@@ -11557,7 +11557,7 @@ stagnation point in mixed-inverse</source>
         <translation type="obsolete">Aktiv (1/0)</translation>
     </message>
     <message>
-        <location filename="../src/miarex/StabPolarDlg.cpp" line="826"/>
+        <location filename="../src/miarex/StabPolarDlg.cpp" line="810"/>
         <source>Controls</source>
         <translation>Kontrollen</translation>
     </message>
@@ -11587,37 +11587,37 @@ stagnation point in mixed-inverse</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/miarex/StabPolarDlg.cpp" line="506"/>
+        <location filename="../src/miarex/StabPolarDlg.cpp" line="504"/>
         <source>Mass must be non-zero for type 7 polars</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/miarex/StabPolarDlg.cpp" line="730"/>
+        <location filename="../src/miarex/StabPolarDlg.cpp" line="714"/>
         <source>Use plane inertia</source>
         <translation>Verwende Modell Trägheit</translation>
     </message>
     <message>
-        <location filename="../src/miarex/StabPolarDlg.cpp" line="797"/>
+        <location filename="../src/miarex/StabPolarDlg.cpp" line="781"/>
         <source>VLM</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/miarex/StabPolarDlg.cpp" line="798"/>
+        <location filename="../src/miarex/StabPolarDlg.cpp" line="782"/>
         <source>3D Panels</source>
         <translation>3D Paneele</translation>
     </message>
     <message>
-        <location filename="../src/miarex/StabPolarDlg.cpp" line="801"/>
+        <location filename="../src/miarex/StabPolarDlg.cpp" line="785"/>
         <source>Wing analysis methods</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/miarex/StabPolarDlg.cpp" line="804"/>
+        <location filename="../src/miarex/StabPolarDlg.cpp" line="788"/>
         <source>Mix 3D Panels/VLM</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/miarex/StabPolarDlg.cpp" line="853"/>
+        <location filename="../src/miarex/StabPolarDlg.cpp" line="837"/>
         <source>Note: + sign means trailing edge down</source>
         <translation type="unfinished"></translation>
     </message>
@@ -11635,13 +11635,13 @@ stagnation point in mixed-inverse</source>
         <translation type="obsolete">Frage</translation>
     </message>
     <message>
-        <location filename="../src/miarex/StabPolarDlg.cpp" line="506"/>
-        <location filename="../src/miarex/StabPolarDlg.cpp" line="529"/>
+        <location filename="../src/miarex/StabPolarDlg.cpp" line="504"/>
+        <location filename="../src/miarex/StabPolarDlg.cpp" line="513"/>
         <source>Warning</source>
         <translation>Warnung</translation>
     </message>
     <message>
-        <location filename="../src/miarex/StabPolarDlg.cpp" line="529"/>
+        <location filename="../src/miarex/StabPolarDlg.cpp" line="513"/>
         <source>Must enter a name</source>
         <translation>Sie müssen einen Namen eingeben</translation>
     </message>
@@ -11650,28 +11650,28 @@ stagnation point in mixed-inverse</source>
         <translation type="obsolete">Der Polar-Name existier bereits</translation>
     </message>
     <message>
-        <location filename="../src/miarex/StabPolarDlg.cpp" line="639"/>
+        <location filename="../src/miarex/StabPolarDlg.cpp" line="623"/>
         <source>Wing Name</source>
         <translation>Tragflächen Name</translation>
     </message>
     <message>
-        <location filename="../src/miarex/StabPolarDlg.cpp" line="642"/>
+        <location filename="../src/miarex/StabPolarDlg.cpp" line="626"/>
         <source>Auto Analysis Name</source>
         <translation>Name der automatischen Analyse</translation>
     </message>
     <message>
-        <location filename="../src/miarex/StabPolarDlg.cpp" line="643"/>
-        <location filename="../src/miarex/StabPolarDlg.cpp" line="649"/>
+        <location filename="../src/miarex/StabPolarDlg.cpp" line="627"/>
+        <location filename="../src/miarex/StabPolarDlg.cpp" line="633"/>
         <source>Polar Name</source>
         <translation>Polaren Name</translation>
     </message>
     <message>
-        <location filename="../src/miarex/StabPolarDlg.cpp" line="654"/>
+        <location filename="../src/miarex/StabPolarDlg.cpp" line="638"/>
         <source>b =</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/miarex/StabPolarDlg.cpp" line="655"/>
+        <location filename="../src/miarex/StabPolarDlg.cpp" line="639"/>
         <source>f =</source>
         <translation></translation>
     </message>
@@ -11680,53 +11680,53 @@ stagnation point in mixed-inverse</source>
         <translation type="obsolete">Trägheit definieren</translation>
     </message>
     <message>
-        <location filename="../src/miarex/StabPolarDlg.cpp" line="672"/>
+        <location filename="../src/miarex/StabPolarDlg.cpp" line="656"/>
         <source>Viscous Analysis</source>
         <translation>Analyse mit Reibung</translation>
     </message>
     <message>
-        <location filename="../src/miarex/StabPolarDlg.cpp" line="676"/>
+        <location filename="../src/miarex/StabPolarDlg.cpp" line="660"/>
         <source>Note : the analysis may be of the viscous type
 only if all the flap controls are inactive</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/miarex/StabPolarDlg.cpp" line="681"/>
+        <location filename="../src/miarex/StabPolarDlg.cpp" line="665"/>
         <source>Plane and Flight Data</source>
         <translation>Modell und Flugdaten</translation>
     </message>
     <message>
-        <location filename="../src/miarex/StabPolarDlg.cpp" line="687"/>
+        <location filename="../src/miarex/StabPolarDlg.cpp" line="671"/>
         <source>Unit</source>
         <translation>Einheit</translation>
     </message>
     <message>
-        <location filename="../src/miarex/StabPolarDlg.cpp" line="688"/>
+        <location filename="../src/miarex/StabPolarDlg.cpp" line="672"/>
         <source>International</source>
         <translation>International</translation>
     </message>
     <message>
-        <location filename="../src/miarex/StabPolarDlg.cpp" line="689"/>
+        <location filename="../src/miarex/StabPolarDlg.cpp" line="673"/>
         <source>Imperial</source>
         <translation>Imperial</translation>
     </message>
     <message>
-        <location filename="../src/miarex/StabPolarDlg.cpp" line="684"/>
+        <location filename="../src/miarex/StabPolarDlg.cpp" line="668"/>
         <source>Aerodynamic Data</source>
         <translation>Aerodynamische Daten</translation>
     </message>
     <message>
-        <location filename="../src/miarex/StabPolarDlg.cpp" line="713"/>
+        <location filename="../src/miarex/StabPolarDlg.cpp" line="697"/>
         <source>Wing Planform Area</source>
         <translation>Trangflächen Grundform Fläche</translation>
     </message>
     <message>
-        <location filename="../src/miarex/StabPolarDlg.cpp" line="714"/>
+        <location filename="../src/miarex/StabPolarDlg.cpp" line="698"/>
         <source>Wing Planform Area projected on xy plane</source>
         <translation>Trangflächen Grundform Fläche auf XY Ebene projeziert</translation>
     </message>
     <message>
-        <location filename="../src/miarex/StabPolarDlg.cpp" line="717"/>
+        <location filename="../src/miarex/StabPolarDlg.cpp" line="701"/>
         <source>Reference Area for Aero Coefficients</source>
         <translation>Referenzfläche für aerodynamische Koeffizienten</translation>
     </message>
@@ -11739,12 +11739,12 @@ only if all the flap controls are inactive</source>
         <translation type="obsolete">Hinweis 3: Die Analyse ist nur dann mit Reibung wenn die Klappen inaktiv sind {2 ?}</translation>
     </message>
     <message>
-        <location filename="../src/miarex/StabPolarDlg.cpp" line="856"/>
+        <location filename="../src/miarex/StabPolarDlg.cpp" line="840"/>
         <source>OK</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/miarex/StabPolarDlg.cpp" line="858"/>
+        <location filename="../src/miarex/StabPolarDlg.cpp" line="842"/>
         <source>Cancel</source>
         <translation>Abbrechen</translation>
     </message>
@@ -11786,33 +11786,33 @@ only if all the flap controls are inactive</source>
         <translation type="obsolete">Zeit-Ansicht</translation>
     </message>
     <message>
-        <location filename="../src/miarex/StabViewDlg.cpp" line="550"/>
+        <location filename="../src/miarex/StabViewDlg.cpp" line="551"/>
         <source>Longitudinal</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/miarex/StabViewDlg.cpp" line="551"/>
+        <location filename="../src/miarex/StabViewDlg.cpp" line="552"/>
         <source>Lateral</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/miarex/StabViewDlg.cpp" line="548"/>
+        <location filename="../src/miarex/StabViewDlg.cpp" line="549"/>
         <source>Stability direction</source>
         <translation>Stabilitäts Richtung</translation>
     </message>
     <message>
-        <location filename="../src/miarex/StabViewDlg.cpp" line="567"/>
+        <location filename="../src/miarex/StabViewDlg.cpp" line="571"/>
         <source>Initial Conditions Response</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/miarex/StabViewDlg.cpp" line="569"/>
-        <location filename="../src/miarex/StabViewDlg.cpp" line="611"/>
+        <location filename="../src/miarex/StabViewDlg.cpp" line="573"/>
+        <location filename="../src/miarex/StabViewDlg.cpp" line="614"/>
         <source>Forced Response</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/miarex/StabViewDlg.cpp" line="578"/>
+        <location filename="../src/miarex/StabViewDlg.cpp" line="581"/>
         <source>Initial conditions</source>
         <translation></translation>
     </message>
@@ -11829,72 +11829,72 @@ only if all the flap controls are inactive</source>
         <translation type="obsolete">Kurve</translation>
     </message>
     <message>
-        <location filename="../src/miarex/StabViewDlg.cpp" line="565"/>
+        <location filename="../src/miarex/StabViewDlg.cpp" line="569"/>
         <source>Modal Response</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/miarex/StabViewDlg.cpp" line="636"/>
+        <location filename="../src/miarex/StabViewDlg.cpp" line="639"/>
         <source>Modal response</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/miarex/StabViewDlg.cpp" line="661"/>
+        <location filename="../src/miarex/StabViewDlg.cpp" line="663"/>
         <source>Define the total time range for the graphs</source>
         <translation>Zeitfenster für den Graphen</translation>
     </message>
     <message>
-        <location filename="../src/miarex/StabViewDlg.cpp" line="663"/>
+        <location filename="../src/miarex/StabViewDlg.cpp" line="665"/>
         <source>Define the time step for the resolution of the differential equations</source>
         <translation>Zeitschritte für die Auflösung der Differenzialgleichungen</translation>
     </message>
     <message>
-        <location filename="../src/miarex/StabViewDlg.cpp" line="679"/>
+        <location filename="../src/miarex/StabViewDlg.cpp" line="684"/>
         <source>Re-calculate the currently selected curve with the user-specified input data</source>
         <translation>Neuberechnung der ausgewählten Kurve mit Benutzerdaten</translation>
     </message>
     <message>
-        <location filename="../src/miarex/StabViewDlg.cpp" line="681"/>
+        <location filename="../src/miarex/StabViewDlg.cpp" line="686"/>
         <source>Add a new curve to the graphs, using the current user-specified input</source>
         <translation>Neue Kurve hinzufügen</translation>
     </message>
     <message>
-        <location filename="../src/miarex/StabViewDlg.cpp" line="683"/>
+        <location filename="../src/miarex/StabViewDlg.cpp" line="688"/>
         <source>Rename the currently selected curve</source>
         <translation>Ausgewählte Kurve umbenennen</translation>
     </message>
     <message>
-        <location filename="../src/miarex/StabViewDlg.cpp" line="685"/>
+        <location filename="../src/miarex/StabViewDlg.cpp" line="690"/>
         <source>Delete the currently selected curve</source>
         <translation>Ausgewählte Kurve löschen</translation>
     </message>
     <message>
-        <location filename="../src/miarex/StabViewDlg.cpp" line="562"/>
+        <location filename="../src/miarex/StabViewDlg.cpp" line="565"/>
         <source>Time Graph Params</source>
         <translation>Zeitgraph Parameter</translation>
     </message>
     <message>
-        <location filename="../src/miarex/StabViewDlg.cpp" line="725"/>
+        <location filename="../src/miarex/StabViewDlg.cpp" line="878"/>
         <source>Mode Selection</source>
         <translation>Mode Auswahl</translation>
     </message>
     <message>
-        <location filename="../src/miarex/StabViewDlg.cpp" line="761"/>
+        <location filename="../src/miarex/StabViewDlg.cpp" line="774"/>
         <source>Eigenvalues</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/miarex/StabViewDlg.cpp" line="732"/>
+        <location filename="../src/miarex/StabViewDlg.cpp" line="743"/>
         <source>F1 =</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/miarex/StabViewDlg.cpp" line="733"/>
+        <location filename="../src/miarex/StabViewDlg.cpp" line="744"/>
         <source>z =</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/miarex/StabViewDlg.cpp" line="729"/>
+        <location filename="../src/miarex/StabViewDlg.cpp" line="740"/>
         <source>Mode properties</source>
         <translation></translation>
     </message>
@@ -11904,47 +11904,47 @@ only if all the flap controls are inactive</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/miarex/StabViewDlg.cpp" line="667"/>
+        <location filename="../src/miarex/StabViewDlg.cpp" line="670"/>
         <source>Total Time</source>
         <translation>Gesamtzeit</translation>
     </message>
     <message>
-        <location filename="../src/miarex/StabViewDlg.cpp" line="709"/>
+        <location filename="../src/miarex/StabViewDlg.cpp" line="721"/>
         <source>Operating point modes</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/miarex/StabViewDlg.cpp" line="805"/>
+        <location filename="../src/miarex/StabViewDlg.cpp" line="819"/>
         <source>Speed</source>
         <translation>Geschwindigkeit</translation>
     </message>
     <message>
-        <location filename="../src/miarex/StabViewDlg.cpp" line="817"/>
+        <location filename="../src/miarex/StabViewDlg.cpp" line="831"/>
         <source>Amplitude</source>
         <translation>Amplitude</translation>
     </message>
     <message>
-        <location filename="../src/miarex/StabViewDlg.cpp" line="828"/>
+        <location filename="../src/miarex/StabViewDlg.cpp" line="845"/>
         <source>Animate</source>
         <translation>Animation</translation>
     </message>
     <message>
-        <location filename="../src/miarex/StabViewDlg.cpp" line="830"/>
+        <location filename="../src/miarex/StabViewDlg.cpp" line="847"/>
         <source>Restart</source>
         <translation>Neustart</translation>
     </message>
     <message>
-        <location filename="../src/miarex/StabViewDlg.cpp" line="832"/>
+        <location filename="../src/miarex/StabViewDlg.cpp" line="855"/>
         <source>Time Step =</source>
         <translation>Zeitschritt =</translation>
     </message>
     <message>
-        <location filename="../src/miarex/StabViewDlg.cpp" line="833"/>
+        <location filename="../src/miarex/StabViewDlg.cpp" line="856"/>
         <source>s</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/miarex/StabViewDlg.cpp" line="800"/>
+        <location filename="../src/miarex/StabViewDlg.cpp" line="815"/>
         <source>Animation</source>
         <translation>Animation</translation>
     </message>
@@ -11959,80 +11959,80 @@ only if all the flap controls are inactive</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/miarex/StabViewDlg.cpp" line="614"/>
+        <location filename="../src/miarex/StabViewDlg.cpp" line="617"/>
         <source>Control function</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/miarex/StabViewDlg.cpp" line="616"/>
+        <location filename="../src/miarex/StabViewDlg.cpp" line="619"/>
         <source>Enter the function of the control vs. time</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/miarex/StabViewDlg.cpp" line="659"/>
+        <location filename="../src/miarex/StabViewDlg.cpp" line="705"/>
         <source>Curve Settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/miarex/StabViewDlg.cpp" line="678"/>
+        <location filename="../src/miarex/StabViewDlg.cpp" line="683"/>
         <source>Recalc.</source>
         <translation>Neuberechnung </translation>
     </message>
     <message>
-        <location filename="../src/miarex/StabViewDlg.cpp" line="680"/>
+        <location filename="../src/miarex/StabViewDlg.cpp" line="685"/>
         <source>Add</source>
         <translation>Hinzufügen</translation>
     </message>
     <message>
-        <location filename="../src/miarex/StabViewDlg.cpp" line="682"/>
+        <location filename="../src/miarex/StabViewDlg.cpp" line="687"/>
         <source>Rename</source>
         <translation>Umbenennen</translation>
     </message>
     <message>
-        <location filename="../src/miarex/StabViewDlg.cpp" line="684"/>
+        <location filename="../src/miarex/StabViewDlg.cpp" line="689"/>
         <source>Delete</source>
         <translation>Löschen</translation>
     </message>
     <message>
-        <location filename="../src/miarex/StabViewDlg.cpp" line="717"/>
-        <location filename="../src/miarex/StabViewDlg.cpp" line="718"/>
-        <location filename="../src/miarex/StabViewDlg.cpp" line="719"/>
-        <location filename="../src/miarex/StabViewDlg.cpp" line="720"/>
+        <location filename="../src/miarex/StabViewDlg.cpp" line="729"/>
+        <location filename="../src/miarex/StabViewDlg.cpp" line="730"/>
+        <location filename="../src/miarex/StabViewDlg.cpp" line="731"/>
+        <location filename="../src/miarex/StabViewDlg.cpp" line="732"/>
         <source>Press Ctrl+H to highlight the mode on the root locus plot</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/miarex/StabViewDlg.cpp" line="917"/>
+        <location filename="../src/miarex/StabViewDlg.cpp" line="943"/>
         <source>u0=</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/miarex/StabViewDlg.cpp" line="918"/>
+        <location filename="../src/miarex/StabViewDlg.cpp" line="944"/>
         <source>w0=</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/miarex/StabViewDlg.cpp" line="919"/>
+        <location filename="../src/miarex/StabViewDlg.cpp" line="945"/>
         <source>q0=</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/miarex/StabViewDlg.cpp" line="926"/>
+        <location filename="../src/miarex/StabViewDlg.cpp" line="952"/>
         <source>v0=</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/miarex/StabViewDlg.cpp" line="927"/>
+        <location filename="../src/miarex/StabViewDlg.cpp" line="953"/>
         <source>p0=</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/miarex/StabViewDlg.cpp" line="928"/>
+        <location filename="../src/miarex/StabViewDlg.cpp" line="954"/>
         <source>r0=</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/miarex/StabViewDlg.cpp" line="1113"/>
+        <location filename="../src/miarex/StabViewDlg.cpp" line="1139"/>
         <source>New curve</source>
         <translation>Neue Kurve</translation>
     </message>
@@ -12149,68 +12149,68 @@ only if all the flap controls are inactive</source>
 <context>
     <name>TwoDPanelDlg</name>
     <message>
-        <location filename="../src/xdirect/TwoDPanelDlg.cpp" line="43"/>
+        <location filename="../src/xdirect/TwoDPanelDlg.cpp" line="46"/>
         <source>Global Panel Refinement</source>
         <translation>Globale Panel Verfeinerung</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/TwoDPanelDlg.cpp" line="45"/>
+        <location filename="../src/xdirect/TwoDPanelDlg.cpp" line="49"/>
         <source>Number of Panels</source>
         <translation>Anzahl der Panele</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/TwoDPanelDlg.cpp" line="46"/>
+        <location filename="../src/xdirect/TwoDPanelDlg.cpp" line="50"/>
         <source>Panel Bunching Parameter</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/xdirect/TwoDPanelDlg.cpp" line="47"/>
+        <location filename="../src/xdirect/TwoDPanelDlg.cpp" line="51"/>
         <source>TE/LE Panel Density Ratio</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/xdirect/TwoDPanelDlg.cpp" line="48"/>
+        <location filename="../src/xdirect/TwoDPanelDlg.cpp" line="52"/>
         <source>Refined area/LE Panel Density Ratio</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/xdirect/TwoDPanelDlg.cpp" line="49"/>
+        <location filename="../src/xdirect/TwoDPanelDlg.cpp" line="53"/>
         <source>Top Side Refined Area x/c limits</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/xdirect/TwoDPanelDlg.cpp" line="50"/>
+        <location filename="../src/xdirect/TwoDPanelDlg.cpp" line="54"/>
         <source>Bottom Side Refined Area x/c limits</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/xdirect/TwoDPanelDlg.cpp" line="91"/>
+        <location filename="../src/xdirect/TwoDPanelDlg.cpp" line="97"/>
         <source>OK</source>
         <translation>Ok</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/TwoDPanelDlg.cpp" line="92"/>
+        <location filename="../src/xdirect/TwoDPanelDlg.cpp" line="98"/>
         <source>Cancel</source>
         <translation>Abbrechen</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/TwoDPanelDlg.cpp" line="93"/>
+        <location filename="../src/xdirect/TwoDPanelDlg.cpp" line="99"/>
         <source>Apply</source>
         <translation>Anwenden</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/TwoDPanelDlg.cpp" line="211"/>
-        <location filename="../src/xdirect/TwoDPanelDlg.cpp" line="222"/>
+        <location filename="../src/xdirect/TwoDPanelDlg.cpp" line="223"/>
+        <location filename="../src/xdirect/TwoDPanelDlg.cpp" line="234"/>
         <source>Warning</source>
         <translation>Warnung</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/TwoDPanelDlg.cpp" line="211"/>
+        <location filename="../src/xdirect/TwoDPanelDlg.cpp" line="223"/>
         <source>Unrecognized foil format</source>
         <translation>Unbekannts Profil Format</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/TwoDPanelDlg.cpp" line="221"/>
+        <location filename="../src/xdirect/TwoDPanelDlg.cpp" line="233"/>
         <source>The total number of panels cannot exceed %1</source>
         <translation>Die gesamte Paneele Anzahl kann %1 nicht überschreiten</translation>
     </message>
@@ -13005,37 +13005,37 @@ Paneelen Methode ist nicht verfügbar</translation>
 <context>
     <name>XDirectStyleDlg</name>
     <message>
-        <location filename="../src/xdirect/XDirectStyleDlg.cpp" line="30"/>
+        <location filename="../src/xdirect/XDirectStyleDlg.cpp" line="32"/>
         <source>XDirect Styles</source>
         <translation>XDirect Gestaltung</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/XDirectStyleDlg.cpp" line="44"/>
+        <location filename="../src/xdirect/XDirectStyleDlg.cpp" line="48"/>
         <source>Neutral Line</source>
         <translation>Neutrale-Linie</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/XDirectStyleDlg.cpp" line="45"/>
+        <location filename="../src/xdirect/XDirectStyleDlg.cpp" line="49"/>
         <source>Boundary Layer</source>
         <translation>Grenzschicht</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/XDirectStyleDlg.cpp" line="46"/>
+        <location filename="../src/xdirect/XDirectStyleDlg.cpp" line="50"/>
         <source>Pressure</source>
         <translation>Druck</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/XDirectStyleDlg.cpp" line="55"/>
+        <location filename="../src/xdirect/XDirectStyleDlg.cpp" line="64"/>
         <source>OK</source>
         <translation>Ok</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/XDirectStyleDlg.cpp" line="56"/>
+        <location filename="../src/xdirect/XDirectStyleDlg.cpp" line="65"/>
         <source>Defaults</source>
         <translation>Standardwerte</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/XDirectStyleDlg.cpp" line="57"/>
+        <location filename="../src/xdirect/XDirectStyleDlg.cpp" line="66"/>
         <source>Cancel</source>
         <translation>Abbrechen</translation>
     </message>
@@ -13048,32 +13048,32 @@ Paneelen Methode ist nicht verfügbar</translation>
         <translation>XFoil Einstellungen</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/XFoilAdvancedDlg.cpp" line="43"/>
+        <location filename="../src/xdirect/XFoilAdvancedDlg.cpp" line="45"/>
         <source>VAccel</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/xdirect/XFoilAdvancedDlg.cpp" line="52"/>
+        <location filename="../src/xdirect/XFoilAdvancedDlg.cpp" line="56"/>
         <source>Iteration Limit</source>
         <translation>Maximale Iterationen</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/XFoilAdvancedDlg.cpp" line="62"/>
+        <location filename="../src/xdirect/XFoilAdvancedDlg.cpp" line="67"/>
         <source>Re-initialize BLs after an unconverged iteration</source>
         <translation>Grenzschicht bei nicht-konvergenz neu initialisieren</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/XFoilAdvancedDlg.cpp" line="63"/>
+        <location filename="../src/xdirect/XFoilAdvancedDlg.cpp" line="68"/>
         <source>Show full log report for an XFoil analysis</source>
         <translation>Zeige gesamten Logfile nach Analyse</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/XFoilAdvancedDlg.cpp" line="66"/>
+        <location filename="../src/xdirect/XFoilAdvancedDlg.cpp" line="72"/>
         <source>OK</source>
         <translation>Ok</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/XFoilAdvancedDlg.cpp" line="67"/>
+        <location filename="../src/xdirect/XFoilAdvancedDlg.cpp" line="73"/>
         <source>Cancel</source>
         <translation>Abbrechen</translation>
     </message>
@@ -13091,90 +13091,90 @@ Paneelen Methode ist nicht verfügbar</translation>
         <translation>Iteration</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/XFoilAnalysisDlg.cpp" line="104"/>
+        <location filename="../src/xdirect/XFoilAnalysisDlg.cpp" line="105"/>
         <source>Skip</source>
         <translation>überspringen</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/XFoilAnalysisDlg.cpp" line="105"/>
-        <location filename="../src/xdirect/XFoilAnalysisDlg.cpp" line="540"/>
+        <location filename="../src/xdirect/XFoilAnalysisDlg.cpp" line="106"/>
+        <location filename="../src/xdirect/XFoilAnalysisDlg.cpp" line="541"/>
         <source>Cancel</source>
         <translation>Abbrechen</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/XFoilAnalysisDlg.cpp" line="196"/>
+        <location filename="../src/xdirect/XFoilAnalysisDlg.cpp" line="197"/>
         <source>Alpha = %1</source>
         <translation>Alpha = %1</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/XFoilAnalysisDlg.cpp" line="198"/>
+        <location filename="../src/xdirect/XFoilAnalysisDlg.cpp" line="199"/>
         <source>Alfa = %1 ........ </source>
         <translation>Alpha = %1 ..........</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/XFoilAnalysisDlg.cpp" line="204"/>
-        <location filename="../src/xdirect/XFoilAnalysisDlg.cpp" line="224"/>
-        <location filename="../src/xdirect/XFoilAnalysisDlg.cpp" line="440"/>
+        <location filename="../src/xdirect/XFoilAnalysisDlg.cpp" line="205"/>
+        <location filename="../src/xdirect/XFoilAnalysisDlg.cpp" line="225"/>
+        <location filename="../src/xdirect/XFoilAnalysisDlg.cpp" line="441"/>
         <source>Invalid Analysis Settings
 CpCalc: local speed too large
  Compressibility corrections invalid </source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/xdirect/XFoilAnalysisDlg.cpp" line="216"/>
+        <location filename="../src/xdirect/XFoilAnalysisDlg.cpp" line="217"/>
         <source>Cl = %1</source>
         <translation>Cl = %1</translation>
     </message>
     <message>
-        <location filename="../src/xdirect/XFoilAnalysisDlg.cpp" line="219"/>
+        <location filename="../src/xdirect/XFoilAnalysisDlg.cpp" line="220"/>
         <source>Cl = %1 ........ </source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/xdirect/XFoilAnalysisDlg.cpp" line="307"/>
+        <location filename="../src/xdirect/XFoilAnalysisDlg.cpp" line="308"/>
         <source>   Initializing viscous analysis ...
 </source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/xdirect/XFoilAnalysisDlg.cpp" line="313"/>
-        <location filename="../src/xdirect/XFoilAnalysisDlg.cpp" line="352"/>
+        <location filename="../src/xdirect/XFoilAnalysisDlg.cpp" line="314"/>
+        <location filename="../src/xdirect/XFoilAnalysisDlg.cpp" line="353"/>
         <source>CpCalc: local speed too large
  Compressibility corrections invalid</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/xdirect/XFoilAnalysisDlg.cpp" line="319"/>
+        <location filename="../src/xdirect/XFoilAnalysisDlg.cpp" line="320"/>
         <source>   Solving BL system ...
 </source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/xdirect/XFoilAnalysisDlg.cpp" line="325"/>
+        <location filename="../src/xdirect/XFoilAnalysisDlg.cpp" line="326"/>
         <source>   Iteration %1 ...
 </source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/xdirect/XFoilAnalysisDlg.cpp" line="362"/>
+        <location filename="../src/xdirect/XFoilAnalysisDlg.cpp" line="363"/>
         <source>unconverged after %1 iterations
 </source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/xdirect/XFoilAnalysisDlg.cpp" line="364"/>
+        <location filename="../src/xdirect/XFoilAnalysisDlg.cpp" line="365"/>
         <source>--------- Unconverged -----------
 </source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/xdirect/XFoilAnalysisDlg.cpp" line="384"/>
+        <location filename="../src/xdirect/XFoilAnalysisDlg.cpp" line="385"/>
         <source>converged after %1 iterations
 </source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/xdirect/XFoilAnalysisDlg.cpp" line="558"/>
+        <location filename="../src/xdirect/XFoilAnalysisDlg.cpp" line="559"/>
         <source>Close</source>
         <translation>Schließen</translation>
     </message>

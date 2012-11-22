@@ -5301,21 +5301,21 @@ Check the guidelines for explanations.</source>
     </message>
     <message>
         <source>Alpha</source>
-        <translation>迎え角</translation>
+        <translation type="obsolete">迎え角</translation>
     </message>
     <message>
         <source>Cn</source>
-        <translation type="unfinished">
+        <translation type="obsolete">
             </translation>
     </message>
     <message>
         <source>VCn</source>
-        <translation type="unfinished">
+        <translation type="obsolete">
             </translation>
     </message>
     <message>
         <source>ICn</source>
-        <translation type="unfinished">
+        <translation type="obsolete">
             </translation>
     </message>
     <message>
@@ -5426,7 +5426,7 @@ Continue ?</source>
     </message>
     <message>
         <source>Cm</source>
-        <translation type="unfinished">
+        <translation type="obsolete">
             </translation>
     </message>
     <message>
@@ -5626,12 +5626,12 @@ could be found. The polar(s) will not be stored</source>
     </message>
     <message>
         <source>VCm</source>
-        <translation type="unfinished">
+        <translation type="obsolete">
             </translation>
     </message>
     <message>
         <source>ICm</source>
-        <translation type="unfinished">
+        <translation type="obsolete">
             </translation>
     </message>
     <message>
@@ -5943,74 +5943,74 @@ Continue ?</source>
     </message>
     <message>
         <source>VCD</source>
-        <translation type="unfinished">
+        <translation type="obsolete">
             </translation>
     </message>
     <message>
         <source>ICD</source>
-        <translation type="unfinished">
+        <translation type="obsolete">
             </translation>
     </message>
     <message>
         <source>CD</source>
-        <translation type="unfinished">
+        <translation type="obsolete">
             </translation>
     </message>
     <message>
         <source>CL/CD</source>
-        <translation>揚抗比</translation>
+        <translation type="obsolete">揚抗比</translation>
     </message>
     <message>
         <source>CL^(3/2)/CD</source>
-        <translation>CL^(3/2)/CD</translation>
+        <translation type="obsolete">CL^(3/2)/CD</translation>
     </message>
     <message>
         <source>1/Rt(CL)</source>
-        <translation>1/Rt(CL)</translation>
+        <translation type="obsolete">1/Rt(CL)</translation>
     </message>
     <message>
         <source>Fx (N)</source>
-        <translation type="unfinished">
+        <translation type="obsolete">
             </translation>
     </message>
     <message>
         <source>Fx (lbf)</source>
-        <translation type="unfinished">
+        <translation type="obsolete">
             </translation>
     </message>
     <message>
         <source>Fy (N)</source>
-        <translation type="unfinished">
+        <translation type="obsolete">
             </translation>
     </message>
     <message>
         <source>Fy (lbf)</source>
-        <translation type="unfinished">
+        <translation type="obsolete">
             </translation>
     </message>
     <message>
         <source>Fz (N)</source>
-        <translation type="unfinished">
+        <translation type="obsolete">
             </translation>
     </message>
     <message>
         <source>Fz (lbf)</source>
-        <translation type="unfinished">
+        <translation type="obsolete">
             </translation>
     </message>
     <message>
         <source>Pitching Moment</source>
-        <translation type="unfinished">
+        <translation type="obsolete">
             </translation>
     </message>
     <message>
         <source>Rolling Moment</source>
-        <translation type="unfinished">
+        <translation type="obsolete">
             </translation>
     </message>
     <message>
         <source>Yawing Moment</source>
-        <translation type="unfinished">
+        <translation type="obsolete">
             </translation>
     </message>
     <message>
@@ -6142,96 +6142,96 @@ Continue ?</source>
     </message>
     <message>
         <source>CL</source>
-        <translation type="unfinished">
+        <translation type="obsolete">
             </translation>
     </message>
     <message>
         <source>Vx </source>
-        <translation>Vx </translation>
+        <translation type="obsolete">Vx </translation>
     </message>
     <message>
         <source>Vz </source>
-        <translation>Vz </translation>
+        <translation type="obsolete">Vz </translation>
     </message>
     <message>
         <source>V </source>
-        <translation>V </translation>
+        <translation type="obsolete">V </translation>
     </message>
     <message>
         <source>Gamma</source>
-        <translation>ガンマ</translation>
+        <translation type="obsolete">ガンマ</translation>
     </message>
     <message>
         <source>XCP </source>
-        <translation>XCP </translation>
+        <translation type="obsolete">XCP </translation>
     </message>
     <message>
         <source>YCP </source>
-        <translation>YCP </translation>
+        <translation type="obsolete">YCP </translation>
     </message>
     <message>
         <source>BM </source>
-        <translation>BM </translation>
+        <translation type="obsolete">BM </translation>
     </message>
     <message>
         <source>m.g.Vz (W)</source>
-        <translation>m.g.Vz (W)</translation>
+        <translation type="obsolete">m.g.Vz (W)</translation>
     </message>
     <message>
         <source>Efficiency</source>
-        <translation type="unfinished">
+        <translation type="obsolete">
             </translation>
     </message>
     <message>
         <source>(XCp-XCG)/MAC(%)</source>
-        <translation>(XCp-XCG)/MAC(%)</translation>
+        <translation type="obsolete">(XCp-XCG)/MAC(%)</translation>
     </message>
     <message>
         <source>ctrl</source>
-        <translation>ctrl</translation>
+        <translation type="obsolete">ctrl</translation>
     </message>
     <message>
         <source>CY</source>
-        <translation type="unfinished">
+        <translation type="obsolete">
             </translation>
     </message>
     <message>
         <source>XNP</source>
-        <translation type="unfinished">
+        <translation type="obsolete">
             </translation>
     </message>
     <message>
         <source>Ph. Freq(Hz)</source>
-        <translation>Ph. Freq(Hz)</translation>
+        <translation type="obsolete">Ph. Freq(Hz)</translation>
     </message>
     <message>
         <source>Ph. Damping</source>
-        <translation>Ph. Damping</translation>
+        <translation type="obsolete">Ph. Damping</translation>
     </message>
     <message>
         <source>SP Freq (Hz)</source>
-        <translation>SP Freq (Hz)</translation>
+        <translation type="obsolete">SP Freq (Hz)</translation>
     </message>
     <message>
         <source>SP Damping</source>
-        <translation>SP Damping</translation>
+        <translation type="obsolete">SP Damping</translation>
     </message>
     <message>
         <source>DR Freq(Hz)</source>
-        <translation>DR Freq(Hz)</translation>
+        <translation type="obsolete">DR Freq(Hz)</translation>
     </message>
     <message>
         <source>DR Damping</source>
-        <translation>DR Damping</translation>
+        <translation type="obsolete">DR Damping</translation>
     </message>
     <message>
         <source>Roll Damping</source>
-        <translation type="unfinished">
+        <translation type="obsolete">
             </translation>
     </message>
     <message>
         <source>Spiral Damping</source>
-        <translation type="unfinished">
+        <translation type="obsolete">
             </translation>
     </message>
     <message>
@@ -6260,10 +6260,6 @@ Continue ?</source>
     <message>
         <source>XCP=, %1, YCP=, %2, ZCP=, %3 
 </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>ZCP </source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -7225,6 +7221,183 @@ CpCalc: local speed too large
         <source>ZCP</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Cd</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cd x 10000</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Xtr1</source>
+        <translation type="unfinished">
+             {1?}</translation>
+    </message>
+    <message>
+        <source>Xtr2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>HMom</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cpmin</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cl/Cd</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>|Cl|^(3/2)/Cd</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>1/Rt(Cl)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>XCp</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>CL/CD</source>
+        <translation type="unfinished">揚抗比</translation>
+    </message>
+    <message>
+        <source>CL^(3/2)/CD</source>
+        <translation type="unfinished">CL^(3/2)/CD</translation>
+    </message>
+    <message>
+        <source>1/Rt(CL)</source>
+        <translation type="unfinished">1/Rt(CL)</translation>
+    </message>
+    <message>
+        <source>Fx (N)</source>
+        <translation type="unfinished">
+            </translation>
+    </message>
+    <message>
+        <source>Fx (lbf)</source>
+        <translation type="unfinished">
+            </translation>
+    </message>
+    <message>
+        <source>Fy (N)</source>
+        <translation type="unfinished">
+            </translation>
+    </message>
+    <message>
+        <source>Fy (lbf)</source>
+        <translation type="unfinished">
+            </translation>
+    </message>
+    <message>
+        <source>Fz (N)</source>
+        <translation type="unfinished">
+            </translation>
+    </message>
+    <message>
+        <source>Fz (lbf)</source>
+        <translation type="unfinished">
+            </translation>
+    </message>
+    <message>
+        <source>Vx </source>
+        <translation type="unfinished">Vx </translation>
+    </message>
+    <message>
+        <source>Vz </source>
+        <translation type="unfinished">Vz </translation>
+    </message>
+    <message>
+        <source>V </source>
+        <translation type="unfinished">V </translation>
+    </message>
+    <message>
+        <source>Gamma</source>
+        <translation type="unfinished">ガンマ</translation>
+    </message>
+    <message>
+        <source>Pitching Moment</source>
+        <translation type="unfinished">
+            </translation>
+    </message>
+    <message>
+        <source>Rolling Moment</source>
+        <translation type="unfinished">
+            </translation>
+    </message>
+    <message>
+        <source>Yawing Moment</source>
+        <translation type="unfinished">
+            </translation>
+    </message>
+    <message>
+        <source>XCP </source>
+        <translation type="unfinished">XCP </translation>
+    </message>
+    <message>
+        <source>YCP </source>
+        <translation type="unfinished">YCP </translation>
+    </message>
+    <message>
+        <source>ZCP </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>BM </source>
+        <translation type="unfinished">BM </translation>
+    </message>
+    <message>
+        <source>m.g.Vz (W)</source>
+        <translation type="unfinished">m.g.Vz (W)</translation>
+    </message>
+    <message>
+        <source>Efficiency</source>
+        <translation type="unfinished">
+            </translation>
+    </message>
+    <message>
+        <source>ctrl</source>
+        <translation type="unfinished">ctrl</translation>
+    </message>
+    <message>
+        <source>Ph. Freq(Hz)</source>
+        <translation type="unfinished">Ph. Freq(Hz)</translation>
+    </message>
+    <message>
+        <source>Ph. Damping</source>
+        <translation type="unfinished">Ph. Damping</translation>
+    </message>
+    <message>
+        <source>SP Freq (Hz)</source>
+        <translation type="unfinished">SP Freq (Hz)</translation>
+    </message>
+    <message>
+        <source>SP Damping</source>
+        <translation type="unfinished">SP Damping</translation>
+    </message>
+    <message>
+        <source>DR Freq(Hz)</source>
+        <translation type="unfinished">DR Freq(Hz)</translation>
+    </message>
+    <message>
+        <source>DR Damping</source>
+        <translation type="unfinished">DR Damping</translation>
+    </message>
+    <message>
+        <source>Roll Damping</source>
+        <translation type="unfinished">
+            </translation>
+    </message>
+    <message>
+        <source>Spiral Damping</source>
+        <translation type="unfinished">
+            </translation>
+    </message>
 </context>
 <context>
     <name>QXDirect</name>
@@ -7551,7 +7724,7 @@ could be found. The polar(s) will not be stored</source>
     </message>
     <message>
         <source>Alpha</source>
-        <translation>迎え角</translation>
+        <translation type="obsolete">迎え角</translation>
     </message>
     <message>
         <source>Cl</source>
@@ -7560,57 +7733,57 @@ could be found. The polar(s) will not be stored</source>
     </message>
     <message>
         <source>Cd</source>
-        <translation type="unfinished">
+        <translation type="obsolete">
             </translation>
     </message>
     <message>
         <source>Cd x 10000</source>
-        <translation type="unfinished">
+        <translation type="obsolete">
             </translation>
     </message>
     <message>
         <source>Cdp</source>
-        <translation type="unfinished">
+        <translation type="obsolete">
             </translation>
     </message>
     <message>
         <source>Cm</source>
-        <translation type="unfinished">
+        <translation type="obsolete">
             </translation>
     </message>
     <message>
         <source>Xtr1</source>
-        <translation type="unfinished">
+        <translation type="obsolete">
             </translation>
     </message>
     <message>
         <source>Xtr2</source>
-        <translation type="unfinished">
+        <translation type="obsolete">
             </translation>
     </message>
     <message>
         <source>HMom</source>
-        <translation type="unfinished">
+        <translation type="obsolete">
             </translation>
     </message>
     <message>
         <source>Cpmin</source>
-        <translation type="unfinished">
+        <translation type="obsolete">
             </translation>
     </message>
     <message>
         <source>Cl/Cd</source>
-        <translation type="unfinished">
+        <translation type="obsolete">
             </translation>
     </message>
     <message>
         <source>|Cl|^(3/2)/Cd</source>
-        <translation type="unfinished">
+        <translation type="obsolete">
             </translation>
     </message>
     <message>
         <source>1/Rt(Cl)</source>
-        <translation type="unfinished">
+        <translation type="obsolete">
             </translation>
     </message>
     <message>
@@ -7620,7 +7793,7 @@ could be found. The polar(s) will not be stored</source>
     </message>
     <message>
         <source>XCp</source>
-        <translation type="unfinished">
+        <translation type="obsolete">
             </translation>
     </message>
     <message>
