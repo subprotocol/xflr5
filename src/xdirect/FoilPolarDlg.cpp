@@ -446,6 +446,7 @@ void FoilPolarDlg::OnPolarType()
 void FoilPolarDlg::SetPlrName()
 {
 	ReadParams();
+	double Re = m_Reynolds/1000000.;
 
 	if(m_bAutoName)
 	{
@@ -453,23 +454,22 @@ void FoilPolarDlg::SetPlrName()
 		{
 			case FIXEDSPEEDPOLAR:
 			{
-				m_PlrName = QString("T1_Al%1_M%2").arg(m_ASpec,5,'f',2).arg(m_Mach,4,'f',2);
+				m_PlrName = QString("T1_Re%1_M%2").arg(Re,5,'f',2).arg(m_Mach,4,'f',2);
 				break;
 			}
 			case FIXEDLIFTPOLAR:
 			{
-				m_PlrName = QString("T2_Al%1_M%2").arg(m_ASpec,5,'f',2).arg(m_Mach,4,'f',2);
+				m_PlrName = QString("T2_Re%1_M%2").arg(Re,5,'f',2).arg(m_Mach,4,'f',2);
 				break;
 			}
 			case RUBBERCHORDPOLAR:
 			{
-				m_PlrName = QString("T3_Al%1_M%2").arg(m_ASpec,5,'f',2).arg(m_Mach,4,'f',2);
+				m_PlrName = QString("T3_Re%1_M%2").arg(Re,5,'f',2).arg(m_Mach,4,'f',2);
 				break;
 			}
 			case(FIXEDAOAPOLAR):
 			{
-				double Re = m_Reynolds/1000000.;
-				m_PlrName=QString("T%1_Re%2_M%3").arg(m_PolarType+1).arg(Re,4,'f',3).arg(m_Mach,4,'f',2);
+				m_PlrName = QString("T%1_Al%2_M%3").arg(m_PolarType).arg(m_ASpec,5,'f',2).arg(m_Mach,4,'f',2);
 				break;
 			}
 			default:
@@ -486,7 +486,24 @@ void FoilPolarDlg::SetPlrName()
 		m_pctrlAnalysisName->setText(m_PlrName);
 	}
 }
+/*
+if(m_bAutoName)
+{
+	if(m_PolarType!=FIXEDAOAPOLAR)
+	{
+		double Re = m_Reynolds/1000000.;
+		m_PlrName=QString("T%1_Re%2_M%3").arg(m_PolarType).arg(Re,4,'f',3).arg(m_Mach,4,'f',2);
+	}
+	else
+	{
+		m_PlrName = QString("T%1_Al%2_M%3").arg(m_PolarType).arg(m_ASpec,5,'f',2).arg(m_Mach,4,'f',2);
+	}
+	QString str = QString("_N%1").arg(m_NCrit,3,'f',1);
+	m_PlrName += str;
 
+	m_pctrlAnalysisName->setText(m_PlrName);
+}
+*/
 
 
 

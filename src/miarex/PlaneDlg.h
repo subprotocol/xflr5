@@ -32,6 +32,9 @@
 #include "../objects/Plane.h"
 #include "../misc/FloatEdit.h"
 
+
+/** The class to define and edit planes. SUes */
+
 class PlaneDlg : public QDialog
 {
 	Q_OBJECT
@@ -74,16 +77,16 @@ private:
 	void reject();
 
 private:
-	static QList <void*> *s_poaWing;
-	static QList <void*> *s_poaBody;
+	static QList <void*> *s_poaWing;     /**< A pointer to the list of CWing objects */
+	static QList <void*> *s_poaBody;     /**< A pointer to the list of CBody objects */
 
-	static void * s_pMiarex;
-	static void * s_pMainFrame;
+	static void * s_pMiarex;     /**< A pointer to the QMiarex widget */
+	static void * s_pMainFrame;  /**< A pointer to the mainframe window*/
 
-	static CWing s_SaveWing;
+	CWing m_SaveWing;  /**< a local CWing object used to back-up the wing currently being edited */
 
-	CPlane * m_pPlane;
-	bool m_bChanged;
+	CPlane * m_pPlane; /**< A pointer to the plane which is currently edited in this dialog window */
+	bool m_bChanged;   /**< Set to true whenever the data in the window has been changed */
 	bool m_bAcceptName;
 	
 private:

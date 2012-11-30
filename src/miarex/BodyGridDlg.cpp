@@ -29,7 +29,6 @@
 #include <QPushButton>
 #include "../mainframe.h"
 #include "../globals.h"
-#include "../objects/Wing.h"
 #include "../misc/LinePickerDlg.h"
 #include "BodyGridDlg.h"
 

@@ -1884,7 +1884,7 @@ void GLCreateStreamLines(void *pQMiarex, CWing *Wing[MAXWINGS], CVector *pNode, 
 
 		m = 0;
 
-		for (iWing=0; iWing<4; iWing++)
+		for (iWing=0; iWing<MAXWINGS; iWing++)
 		{
 			if(Wing[iWing])
 			{

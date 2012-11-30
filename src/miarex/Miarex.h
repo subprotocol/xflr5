@@ -363,6 +363,11 @@ public:
 
 //____________________Variables______________________________________
 //
+public:
+	static void *s_pMainFrame;          // a pointer to the frame class
+	static void *s_p2dWidget;
+	static void *s_p3dWidget;
+
 private:
 
 	//the dialog boxes are declared as member variables to enable translations... seems to be a Qt bug
@@ -435,15 +440,14 @@ private:
     GLLightDlg   *m_pGLLightDlg;
 
 
-private:
 	QLabel *m_pctrlUnit1, *m_pctrlUnit2, *m_pctrlUnit3;
-protected:
 
-	CVector m_Node[2*VLMMAXMATSIZE];		// the node array for the currently loaded UFO
-	CVector m_TempWakeNode[2*VLMMAXMATSIZE];	// the temporary wake node array during relaxation calc
 
-	double m_aij[VLMMAXMATSIZE*VLMMAXMATSIZE];    // coefficient matrix
-	double m_aijRef[VLMMAXMATSIZE*VLMMAXMATSIZE]; // coefficient matrix
+	CVector m_Node[2*VLMMAXMATSIZE];		/**< the node array for the currently loaded UFO*/
+	CVector m_TempWakeNode[2*VLMMAXMATSIZE];	/**< the temporary wake node array during relaxation calc*/
+
+	double m_aij[VLMMAXMATSIZE*VLMMAXMATSIZE];    /**< coefficient matrix*/
+	double m_aijRef[VLMMAXMATSIZE*VLMMAXMATSIZE]; /**< coefficient matrix*/
 	double m_RHS[VLMMAXMATSIZE*VLMMAXRHS];			// RHS vector
 	double m_RHSRef[VLMMAXMATSIZE*VLMMAXRHS];		// RHS vector
 
@@ -645,10 +649,6 @@ public:
 	bool m_bAutoCpScale;		//true if the Cp scale should be set automatically
 	bool m_bLongitudinal;         // true if longitudinal stability results are to be displayed, false if lateral
 	bool m_bICd, m_bVCd, m_bStream, m_bSpeeds;  	// defines whether the corresponfing data should be displayed
-
-	static void *s_pMainFrame;          // a pointer to the frame class
-	static void *s_p2dWidget;
-	static void *s_p3dWidget;
 
 	int m_MatSize;			    // the matrix size
 	int m_WakeSize;				// Size of the Matrix if there is a wake
