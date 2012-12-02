@@ -1706,7 +1706,7 @@ void PanelAnalysisDlg::OnCancelAnalysis()
 	m_bCancel = true;
 	m_bSkip = true;
 	m_bExit = true;
-	if(m_bIsFinished) done(1);
+    if(m_bIsFinished) { m_bCancel = false; done(1); }
 }
 
 
@@ -2388,6 +2388,7 @@ void PanelAnalysisDlg::StartAnalysis()
 	}
 
 	m_bIsFinished = true;
+    m_bCancel = false;
 	m_pctrlCancel->setText(tr("Close"));
 }
 
