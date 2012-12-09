@@ -9301,7 +9301,7 @@ void QMiarex::OnExporttoAVL()
 				  .arg(m_pCurWing->m_MAChord*pMainFrame->m_mtoUnit,       8, 'f', 3)
 				  .arg(m_pCurWing->m_PlanformSpan*pMainFrame->m_mtoUnit,  8, 'f', 3);
 	out << strong;
-	out << "# Note : check consistency of area unit above with length units of the file";
+    out << "# Note : check consistency of area unit above with length units of the file\n";
 
 	if(m_pCurPlane)
 		strong = QString("%1  %2  %3          | Xref   Yref   Zref\n")
