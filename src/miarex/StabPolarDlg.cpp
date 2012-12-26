@@ -90,6 +90,7 @@ void StabPolarDlg::Connect()
 	connect(m_pctrlUnit1,   SIGNAL(clicked()), this, SLOT(OnUnit()));
 	connect(m_pctrlUnit2,   SIGNAL(clicked()), this, SLOT(OnUnit()));
 	connect(m_pctrlViscous, SIGNAL(clicked()), this, SLOT(OnViscous()));
+    connect(m_pctrlIgnoreBody, SIGNAL(clicked()), this, SLOT(OnIgnoreBody()));
 	connect(m_pctrlArea1, SIGNAL(clicked()),this, SLOT(OnArea()));
 	connect(m_pctrlArea2, SIGNAL(clicked()),this, SLOT(OnArea()));
 
@@ -382,6 +383,8 @@ void StabPolarDlg::InitDialog(CPlane *pPlane, CWing *pWing, CWPolar *pWPolar)
 
 	m_pctrlPlaneInertia->setChecked(s_StabPolar.m_bAutoInertia);
 	m_pctrlViscous->setChecked(s_StabPolar.m_bViscous);
+    m_pctrlIgnoreBody->setEnabled(m_pPlane && m_pPlane->Body());
+    m_pctrlIgnoreBody->setChecked(s_StabPolar.m_bIgnoreBody && m_pPlane && m_pPlane->Body());
 //	m_pctrlAVLControls->setChecked(s_StabPolar.m_bThinSurfaces);
 
 	OnAutoInertia();
@@ -527,7 +530,11 @@ void StabPolarDlg::OnViscous()
 	SetWPolarName();
 }
 
-
+void StabPolarDlg::OnIgnoreBody()
+{
+    s_StabPolar.m_bIgnoreBody = m_pctrlIgnoreBody->isChecked();
+    SetWPolarName();
+}
 
 void StabPolarDlg::OnWPolarName()
 {
@@ -586,6 +593,7 @@ void StabPolarDlg::ReadParams()
 	s_StabPolar.m_CoGIxz = m_pctrlIxz->Value()  / pMainFrame->m_kgtoUnit / pMainFrame->m_mtoUnit / pMainFrame->m_mtoUnit;
 
 	s_StabPolar.m_bViscous = m_pctrlViscous->isChecked();
+    s_StabPolar.m_bIgnoreBody = m_pctrlIgnoreBody->isChecked();
 }
 
 
@@ -659,11 +667,13 @@ void StabPolarDlg::SetupLayout()
 	PlaneFlightLayout->addWidget(m_pctrlViscous);
 	QLabel *lab11 = new QLabel(tr("Note : the analysis may be of the viscous type\nonly if all the flap controls are inactive"));
 	PlaneFlightLayout->addWidget(lab11);
+    m_pctrlIgnoreBody = new QCheckBox(tr("Ignore Body"));
+//    PlaneFlightLayout->addWidget(m_pctrlIgnoreBody);
 	PlaneFlightLayout->addStretch(1);
 
 
 	QGroupBox *PlaneGroup = new QGroupBox(tr("Plane and Flight Data"));
-	PlaneGroup->setLayout(PlaneFlightLayout);
+    PlaneGroup->setLayout(PlaneFlightLayout);
 
 	QGroupBox *AeroDataGroup = new QGroupBox(tr("Aerodynamic Data"));
 	{
@@ -788,6 +798,7 @@ void StabPolarDlg::SetupLayout()
 		m_pctrlPanelMethod = new QRadioButton(tr("Mix 3D Panels/VLM"));
 		QHBoxLayout *PlaneMethodLayout = new QHBoxLayout;
 		PlaneMethodLayout->addWidget(m_pctrlPanelMethod);
+        PlaneMethodLayout->addWidget(m_pctrlIgnoreBody);
 		QGroupBox *PlaneMethodBox = new QGroupBox(tr("Plane analysis methods"));
 		PlaneMethodBox->setLayout(PlaneMethodLayout);
 
@@ -1041,6 +1052,10 @@ void StabPolarDlg::SetWPolarName()
 	{
 		WPolarName += "-Inviscid";
 	}
+    if(s_StabPolar.m_bIgnoreBody)
+    {
+        WPolarName += "-IgnoreBody";
+    }
 	if(s_StabPolar.m_RefAreaType==PROJECTEDAREA) WPolarName += "-proj_area";
 	
 	

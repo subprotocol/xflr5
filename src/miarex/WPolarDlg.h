@@ -64,6 +64,7 @@ private slots:
 	void OnAutoName();
 	void OnTiltedGeom();
 	void OnViscous();
+    void OnIgnoreBody();
 	void OnGroundEffect();
 	void OnWPolarType();
 	void OnEditingFinished();
@@ -101,6 +102,7 @@ private:
 	QCheckBox *m_pctrlPlaneInertia;
 	QCheckBox *m_pctrlGroundEffect;
 	QCheckBox *m_pctrlViscous;
+    QCheckBox *m_pctrlIgnoreBody;
 	QCheckBox *m_pctrlTiltGeom;
 	QCheckBox *m_pctrlAutoName;
 

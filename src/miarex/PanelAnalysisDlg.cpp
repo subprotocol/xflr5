@@ -1043,11 +1043,13 @@ void PanelAnalysisDlg::ComputePlane(double Alpha, double QInf, int qrhs)
 
 		if(m_pBody && m_pWPolar->m_AnalysisMethod==PANELMETHOD)
 		{
-			AddString(tr("       Calculating body...")+"\n");
 			double ICm = 0.0;
-            m_pBody->ComputeAero(m_Cp+qrhs*m_MatSize+pos, XCP, YCP, ZCP, ICm, m_GRm, m_GYm, Alpha, m_pWPolar->m_CoG);
-			m_ICm += ICm;
-			m_GCm += ICm;
+            if (!m_pWPolar->m_bIgnoreBody) {
+                AddString(tr("       Calculating body...")+"\n");
+                m_pBody->ComputeAero(m_Cp+qrhs*m_MatSize+pos, XCP, YCP, ZCP, ICm, m_GRm, m_GYm, Alpha, m_pWPolar->m_CoG);
+            }
+            m_ICm += ICm;
+            m_GCm += ICm;
 
 			//the body does not shed any wake --> no induced lift or drag
 		}

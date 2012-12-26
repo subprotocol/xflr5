@@ -40,7 +40,8 @@ CWPolar::CWPolar()
 	m_bThinSurfaces = true;
 	m_bWakeRollUp   = false;
 	m_bTiltedGeom   = false;
-	m_bViscous      = true;
+    m_bViscous      = true;
+    m_bIgnoreBody   = true;
 //	m_bPolar        = true;
 	m_bGround       = false;
 	m_bDirichlet    = true;
@@ -1075,6 +1076,7 @@ void CWPolar::DuplicateSpec(CWPolar *pWPolar)
 	m_bShowPoints     = pWPolar->m_bShowPoints;
 	m_bTiltedGeom     = pWPolar->m_bTiltedGeom;
 	m_bViscous        = pWPolar->m_bViscous;
+    m_bIgnoreBody     = pWPolar->m_bIgnoreBody;
 	m_bVLM1           = pWPolar->m_bVLM1;
 	m_bWakeRollUp     = pWPolar->m_bWakeRollUp;
 	m_AnalysisMethod  = pWPolar->m_AnalysisMethod;
@@ -1720,7 +1722,8 @@ bool CWPolar::SerializeWPlr(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 	float f,r0,r1,r2,r3,i0,i1,i2,i3;
 	int i, j, k;
 
-	m_PolarFormat = 1023;
+    m_PolarFormat = 1024;
+    // 1024 : added ignore body flag
 	// 1023 : added ZCP position
 	// 1022 : added XNP position and provision for 50 more variables
 	// 1021 : XFLR5 v6.02 - deleted autoinertia for older format polars
@@ -1766,6 +1769,7 @@ bool CWPolar::SerializeWPlr(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 		if (m_bTiltedGeom)   ar << 1; else ar << 0;
 		if (m_bDirichlet)    ar << 0; else ar << 1;
 		if (m_bViscous)      ar << 1; else ar << 0;
+        if (m_bIgnoreBody)   ar << 1; else ar << 0;
 		if (m_bGround)       ar << 1; else ar << 0;
 		ar << (float)m_Height;
 
@@ -1923,6 +1927,11 @@ bool CWPolar::SerializeWPlr(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 			if (n!=0 && n!=1) return false;
 			if(n) m_bViscous =true; else m_bViscous = false;
 		}
+        if(m_PolarFormat>=1024) {
+            ar >> n;
+            if (n!=0 && n!=1) return false;
+            if(n) m_bIgnoreBody =true; else m_bIgnoreBody = false;
+        }
 
 		if(m_PolarFormat>=1010)
 		{
@@ -2360,6 +2369,10 @@ void CWPolar::GetPolarProperties(QString &PolarProperties, bool bData)
 	PolarProperties += QObject::tr("Analysis type")+" = ";
 	if(m_bViscous) PolarProperties += QObject::tr("Viscous")+"\n";
 	else           PolarProperties += QObject::tr("Inviscid")+"\n";
+
+    PolarProperties += QObject::tr("Body option")+" = ";
+    if(m_bIgnoreBody) PolarProperties += QObject::tr("Body Ignored")+"\n";
+    else           PolarProperties += QObject::tr("Body Considered")+"\n";
 
 	PolarProperties += QObject::tr("Ref. Area = ");
 	if(m_RefAreaType==1) PolarProperties += QObject::tr("Planform area")+"\n";

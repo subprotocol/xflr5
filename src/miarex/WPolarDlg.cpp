@@ -93,7 +93,9 @@ void WPolarDlg::Connect()
 	connect(m_pctrlAutoName, SIGNAL(clicked()), this, SLOT(OnAutoName()));
 //	connect(m_pctrlWakeRollUp, SIGNAL(clicked()), this, SLOT(OnWakeRollUp()));
 	connect(m_pctrlTiltGeom, SIGNAL(clicked()), this, SLOT(OnTiltedGeom()));
-	connect(m_pctrlViscous, SIGNAL(clicked()), this, SLOT(OnViscous()));
+    connect(m_pctrlViscous, SIGNAL(clicked()), this, SLOT(OnViscous()));
+    connect(m_pctrlIgnoreBody, SIGNAL(clicked()), this, SLOT(OnIgnoreBody()));
+
 	connect(m_pctrlGroundEffect, SIGNAL(clicked()), this, SLOT(OnGroundEffect()));
 	connect(m_pctrlPlaneInertia, SIGNAL(clicked()), this, SLOT(OnPlaneInertia()));
 
@@ -152,6 +154,7 @@ void WPolarDlg::EnableControls()
 
 	m_pctrlViscous->setEnabled(s_WPolar.m_AnalysisMethod==PANELMETHOD);
 	m_pctrlTiltGeom->setEnabled(s_WPolar.m_AnalysisMethod==PANELMETHOD);
+    m_pctrlIgnoreBody->setEnabled(m_pPlane && m_pPlane->Body());
 	m_pctrlBeta->setEnabled(s_WPolar.m_AnalysisMethod==PANELMETHOD);
 	m_pctrlGroundEffect->setEnabled(s_WPolar.m_AnalysisMethod==PANELMETHOD);
 	m_pctrlHeight->setEnabled(m_pctrlGroundEffect->isChecked() && s_WPolar.m_AnalysisMethod==PANELMETHOD);
@@ -262,6 +265,7 @@ void WPolarDlg::InitDialog(CPlane *pPlane, CWing *pWing, CWPolar *pWPolar)
 
 	if(s_WPolar.m_bViscous)		m_pctrlViscous->setChecked(true);
 	if(s_WPolar.m_bTiltedGeom)	m_pctrlTiltGeom->setChecked(true);
+    if(s_WPolar.m_bIgnoreBody)  m_pctrlIgnoreBody->setChecked(m_pPlane && m_pPlane->Body());
 //	if(s_WPolar.m_bWakeRollUp) 	m_pctrlWakeRollUp->setChecked(true);
 
 	OnTiltedGeom();
@@ -434,6 +438,12 @@ void WPolarDlg::OnViscous()
 	EnableControls();
 }
 
+void WPolarDlg::OnIgnoreBody()
+{
+    s_WPolar.m_bIgnoreBody = m_pctrlIgnoreBody->isChecked();
+    SetWPolarName();
+    EnableControls();
+}
 
 void WPolarDlg::OnGroundEffect()
 {
@@ -737,6 +747,8 @@ void WPolarDlg::SetupLayout()
 		m_pctrlPanelMethod = new QRadioButton(tr("Mix 3D Panels/VLM"));
 		QHBoxLayout *PlaneMethodLayout = new QHBoxLayout;
 		PlaneMethodLayout->addWidget(m_pctrlPanelMethod);
+        m_pctrlIgnoreBody = new QCheckBox(tr("Ignore body"));
+        PlaneMethodLayout->addWidget(m_pctrlIgnoreBody);
 		QGroupBox *PlaneMethodBox = new QGroupBox("Plane analysis methods");
 		PlaneMethodBox->setLayout(PlaneMethodLayout);
 
@@ -783,6 +795,7 @@ void WPolarDlg::SetupLayout()
 		m_pctrlTiltGeom = new QCheckBox(tr("Tilt. Geom."));
 		OptionsLayout->addWidget(m_pctrlViscous);
 		OptionsLayout->addWidget(m_pctrlTiltGeom);
+//        OptionsLayout->addWidget(m_pctrlIgnoreBody);
 		OptionsGroup->setLayout(OptionsLayout);
 	}
 
@@ -918,6 +931,11 @@ void WPolarDlg::SetWPolarName()
 	{
 		WPolarName += "-Inviscid";
 	}
+
+    if(s_WPolar.m_bIgnoreBody)
+    {
+        WPolarName += "-IgnoreBody";
+    }
 
 	if(s_WPolar.m_bGround)
 	{

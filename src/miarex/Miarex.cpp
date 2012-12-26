@@ -5418,7 +5418,7 @@ bool QMiarex::InitializePanels()
 
 	// add the number of body panels
 	bool bBodyEl = false;
-	if(m_pCurBody)
+    if(m_pCurBody && !m_pCurWPolar->m_bIgnoreBody)
 	{
 		if(m_pCurBody->m_LineType==BODYPANELTYPE)
 		{
@@ -5633,7 +5633,7 @@ bool QMiarex::Intersect(CVector const &LA, CVector const &LB, CVector const &TA,
 	//	U is the ray's direction
 	//	LA, LB, TA, TB define a quadrangle in 3D space.
 	//	N is the normal to the quadrangle
-	//	I is the resulting intersection point of the ray and the quadrangle, if inside the quadrangle
+    //	I is the resulting intersection point of the ray and the quadrangle, if inside the quadrangle
 	//	dist = |AI|
 	//	The return value is true if intersection inside the quadrangle, false otherwise
 	//
@@ -12082,7 +12082,7 @@ void QMiarex::PanelAnalyze(double V0, double VMax, double VDelta, bool bSequence
 	{
 		if(!m_pSurface[i]->m_bIsTipRight)
 		{
-			if(m_pSurface[i]->m_bJoinRight) JoinSurfaces(m_pSurface[i], m_pSurface[i+1], pl, pr);
+            if(m_pSurface[i]->m_bJoinRight) JoinSurfaces(m_pSurface[i], m_pSurface[i+1], pl, pr);
 		}
 		pl  = pr;
 		pr += m_pSurface[i+1]->m_NElements;
