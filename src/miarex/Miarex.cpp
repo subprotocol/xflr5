@@ -5418,7 +5418,7 @@ bool QMiarex::InitializePanels()
 
 	// add the number of body panels
 	bool bBodyEl = false;
-    if(m_pCurBody && !m_pCurWPolar->m_bIgnoreBody)
+    if(m_pCurBody && !(m_pCurWPolar && m_pCurWPolar->m_bIgnoreBody))
 	{
 		if(m_pCurBody->m_LineType==BODYPANELTYPE)
 		{

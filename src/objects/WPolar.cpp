@@ -41,7 +41,7 @@ CWPolar::CWPolar()
 	m_bWakeRollUp   = false;
 	m_bTiltedGeom   = false;
     m_bViscous      = true;
-    m_bIgnoreBody   = true;
+    m_bIgnoreBody   = false;
 //	m_bPolar        = true;
 	m_bGround       = false;
 	m_bDirichlet    = true;
@@ -2372,7 +2372,7 @@ void CWPolar::GetPolarProperties(QString &PolarProperties, bool bData)
 
     PolarProperties += QObject::tr("Body option")+" = ";
     if(m_bIgnoreBody) PolarProperties += QObject::tr("Body Ignored")+"\n";
-    else           PolarProperties += QObject::tr("Body Considered")+"\n";
+    else           PolarProperties += QObject::tr("Body Included")+"\n";
 
 	PolarProperties += QObject::tr("Ref. Area = ");
 	if(m_RefAreaType==1) PolarProperties += QObject::tr("Planform area")+"\n";

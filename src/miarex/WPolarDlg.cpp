@@ -497,7 +497,6 @@ void WPolarDlg::OnOK()
 		m_pctrlWeight->setFocus();
 		return;
 	}
-
 	if(m_pPlane && s_WPolar.m_AnalysisMethod==PANELMETHOD) s_WPolar.m_bThinSurfaces = true;
 
 	accept();
