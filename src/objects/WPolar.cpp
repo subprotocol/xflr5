@@ -1769,7 +1769,7 @@ bool CWPolar::SerializeWPlr(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 		if (m_bTiltedGeom)   ar << 1; else ar << 0;
 		if (m_bDirichlet)    ar << 0; else ar << 1;
 		if (m_bViscous)      ar << 1; else ar << 0;
-        if (m_bIgnoreBody)   ar << 1; else ar << 0;
+//       if (m_bIgnoreBody)   ar << 1; else ar << 0;
 		if (m_bGround)       ar << 1; else ar << 0;
 		ar << (float)m_Height;
 
@@ -1849,7 +1849,8 @@ bool CWPolar::SerializeWPlr(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 
 			//int provision
 //			if(m_bAVLControls) ar<<1; else ar<<0;
-			ar << 1;
+
+			if (m_bIgnoreBody)   ar << 1; else ar << 0;
 			for(int i=1; i<20; i++) ar<<i;
 		}
 
@@ -1927,11 +1928,12 @@ bool CWPolar::SerializeWPlr(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 			if (n!=0 && n!=1) return false;
 			if(n) m_bViscous =true; else m_bViscous = false;
 		}
-        if(m_PolarFormat>=1024) {
+/*		if(m_PolarFormat>=1024)
+		{
             ar >> n;
             if (n!=0 && n!=1) return false;
             if(n) m_bIgnoreBody =true; else m_bIgnoreBody = false;
-        }
+		}*/
 
 		if(m_PolarFormat>=1010)
 		{
@@ -2173,8 +2175,10 @@ bool CWPolar::SerializeWPlr(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 			for(int i=0; i<20; i++) ar>>f;
 
 			//int provision
-			ar>>n;
-//			if(n) m_bAVLControls = true; else m_bAVLControls=false;
+			ar >> n;
+			if (n!=0 && n!=1) return false;
+			if(n) m_bIgnoreBody =true; else m_bIgnoreBody = false;
+
 			for(int i=1; i<20; i++) ar>>n;
 		}
 	}
