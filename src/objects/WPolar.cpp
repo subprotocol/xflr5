@@ -1933,7 +1933,7 @@ bool CWPolar::SerializeWPlr(QDataStream &ar, bool bIsStoring, int ProjectFormat)
             ar >> n;
             if (n!=0 && n!=1) return false;
             if(n) m_bIgnoreBody =true; else m_bIgnoreBody = false;
-		}*/
+        }*/
 
 		if(m_PolarFormat>=1010)
 		{
@@ -2175,9 +2175,11 @@ bool CWPolar::SerializeWPlr(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 			for(int i=0; i<20; i++) ar>>f;
 
 			//int provision
-			ar >> n;
-			if (n!=0 && n!=1) return false;
-			if(n) m_bIgnoreBody =true; else m_bIgnoreBody = false;
+            ar >> n;
+            if (m_PolarFormat >= 1024) {
+                if (n!=0 && n!=1) return false;
+                if(n) m_bIgnoreBody =true; else m_bIgnoreBody = false;
+            } else m_bIgnoreBody = false;
 
 			for(int i=1; i<20; i++) ar>>n;
 		}

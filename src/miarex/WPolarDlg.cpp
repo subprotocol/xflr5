@@ -746,7 +746,7 @@ void WPolarDlg::SetupLayout()
 		m_pctrlPanelMethod = new QRadioButton(tr("Mix 3D Panels/VLM"));
 		QHBoxLayout *PlaneMethodLayout = new QHBoxLayout;
 		PlaneMethodLayout->addWidget(m_pctrlPanelMethod);
-        m_pctrlIgnoreBody = new QCheckBox(tr("Ignore body"));
+        m_pctrlIgnoreBody = new QCheckBox(tr("Ignore Body"));
         PlaneMethodLayout->addWidget(m_pctrlIgnoreBody);
 		QGroupBox *PlaneMethodBox = new QGroupBox("Plane analysis methods");
 		PlaneMethodBox->setLayout(PlaneMethodLayout);
