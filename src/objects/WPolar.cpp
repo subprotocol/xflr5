@@ -1971,6 +1971,7 @@ bool CWPolar::SerializeWPlr(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 		if(k==1)      m_WPolarType = FIXEDSPEEDPOLAR;
 		else if(k==2) m_WPolarType = FIXEDLIFTPOLAR;
 		else if(k==4) m_WPolarType = FIXEDAOAPOLAR;
+		else if(k==6) m_WPolarType = STABILITYPOLAR; // former control polars
 		else if(k==7) m_WPolarType = STABILITYPOLAR;
 		else return false;
 

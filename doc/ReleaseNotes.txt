@@ -22,6 +22,7 @@ xflr5 v6.09.02 Beta, December xxxth, 2012
 	- Corrected a crash bug in plane inertia definition
 	- Corrected the automatic polar name for foils
 	- Corrected the bugs in body edition
+	- Corrected loading issues of old files
 	- More code cleaning
 
 
