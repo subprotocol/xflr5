@@ -341,6 +341,7 @@ bool CWOpp::SerializeWOpp(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 		if(k==1)      m_AnalysisMethod=LLTMETHOD;
 		else if(k==2) m_AnalysisMethod=VLMMETHOD;
 		else if(k==3) m_AnalysisMethod=PANELMETHOD;
+		else if(k==4) m_AnalysisMethod=VLMMETHOD;
 		else return false;
 
 		if(ArchiveFormat>=1005)

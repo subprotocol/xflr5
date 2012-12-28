@@ -288,8 +288,8 @@ void MainFrame::AddFoil(CFoil *pFoil)
 
 	pFoil->InitFoil();
 	g_pCurFoil = pFoil;
-
 }
+
 
 CPolar* MainFrame::AddPolar(CPolar *pPolar)
 {

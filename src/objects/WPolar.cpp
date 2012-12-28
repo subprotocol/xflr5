@@ -25,6 +25,7 @@
 #include "../mainframe.h"
 #include "../miarex/Miarex.h"
 #include <math.h>
+#include <QtDebug>
 #include <QMessageBox>
 
 
@@ -41,8 +42,7 @@ CWPolar::CWPolar()
 	m_bWakeRollUp   = false;
 	m_bTiltedGeom   = false;
     m_bViscous      = true;
-    m_bIgnoreBody   = false;
-//	m_bPolar        = true;
+	m_bIgnoreBodyPanels = false;
 	m_bGround       = false;
 	m_bDirichlet    = true;
 //	m_bAVLControls  = false;
@@ -1076,7 +1076,7 @@ void CWPolar::DuplicateSpec(CWPolar *pWPolar)
 	m_bShowPoints     = pWPolar->m_bShowPoints;
 	m_bTiltedGeom     = pWPolar->m_bTiltedGeom;
 	m_bViscous        = pWPolar->m_bViscous;
-    m_bIgnoreBody     = pWPolar->m_bIgnoreBody;
+	m_bIgnoreBodyPanels = pWPolar->m_bIgnoreBodyPanels;
 	m_bVLM1           = pWPolar->m_bVLM1;
 	m_bWakeRollUp     = pWPolar->m_bWakeRollUp;
 	m_AnalysisMethod  = pWPolar->m_AnalysisMethod;
@@ -1850,7 +1850,7 @@ bool CWPolar::SerializeWPlr(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 			//int provision
 //			if(m_bAVLControls) ar<<1; else ar<<0;
 
-			if (m_bIgnoreBody)   ar << 1; else ar << 0;
+			if (m_bIgnoreBodyPanels) ar << 1; else ar << 0;
 			for(int i=1; i<20; i++) ar<<i;
 		}
 
@@ -1867,6 +1867,7 @@ bool CWPolar::SerializeWPlr(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 		}
 		ReadCString(ar, m_UFOName);
 		ReadCString(ar, m_PlrName);
+
 		ar>> f;
 		m_WArea = f;
 		if (m_WArea<0) return false;
@@ -1890,7 +1891,7 @@ bool CWPolar::SerializeWPlr(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 		if(k==1)      m_AnalysisMethod=LLTMETHOD;
 		else if(k==2) m_AnalysisMethod=VLMMETHOD;
 		else if(k==3) m_AnalysisMethod=PANELMETHOD;
-		else return false;
+		else if(k==4) m_AnalysisMethod=VLMMETHOD;
 
 		if(m_AnalysisMethod==VLMMETHOD)
 		{
@@ -2169,6 +2170,7 @@ bool CWPolar::SerializeWPlr(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 			m_bAutoInertia = false;
 			m_CoGIxx = m_CoGIyy = m_CoGIzz = m_CoGIxz = 0.0;
 		}
+
 		if(m_PolarFormat>=1022)
 		{
 			//float provision
@@ -2178,8 +2180,8 @@ bool CWPolar::SerializeWPlr(QDataStream &ar, bool bIsStoring, int ProjectFormat)
             ar >> n;
             if (m_PolarFormat >= 1024) {
                 if (n!=0 && n!=1) return false;
-                if(n) m_bIgnoreBody =true; else m_bIgnoreBody = false;
-            } else m_bIgnoreBody = false;
+				if(n) m_bIgnoreBodyPanels = true; else m_bIgnoreBodyPanels = false;
+			} else m_bIgnoreBodyPanels = false;
 
 			for(int i=1; i<20; i++) ar>>n;
 		}
@@ -2193,12 +2195,15 @@ bool CWPolar::SerializeWPlr(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 void CWPolar::GetPolarProperties(QString &PolarProperties, bool bData)
 {
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
+	QMiarex *pMiarex= (QMiarex*)s_pMiarex;
 	QString strong, lenunit, massunit, speedunit;
 	GetLengthUnit(lenunit, pMainFrame->m_LengthUnit);
 	GetWeightUnit(massunit, pMainFrame->m_WeightUnit);
 	GetSpeedUnit(speedunit, pMainFrame->m_SpeedUnit);
 
 	QString inertiaunit = massunit+"."+lenunit+QString::fromUtf8("²");
+
+	CPlane *pPlane = pMiarex->GetPlane(m_UFOName);
 
 	PolarProperties.clear();
 
@@ -2237,8 +2242,6 @@ void CWPolar::GetPolarProperties(QString &PolarProperties, bool bData)
 	if(m_WPolarType==STABILITYPOLAR)
 	{
 		int j;
-		QMiarex *pMiarex= (QMiarex*)s_pMiarex;
-		CPlane *pPlane = pMiarex->GetPlane(m_UFOName);
 		int iCtrl = 0;
 
 		strong = "AVL type controls\n";
@@ -2376,9 +2379,12 @@ void CWPolar::GetPolarProperties(QString &PolarProperties, bool bData)
 	if(m_bViscous) PolarProperties += QObject::tr("Viscous")+"\n";
 	else           PolarProperties += QObject::tr("Inviscid")+"\n";
 
-    PolarProperties += QObject::tr("Body option")+" = ";
-    if(m_bIgnoreBody) PolarProperties += QObject::tr("Body Ignored")+"\n";
-    else           PolarProperties += QObject::tr("Body Included")+"\n";
+	if(pPlane)
+	{
+		PolarProperties += QObject::tr("Body option")+" = ";
+		if(m_bIgnoreBodyPanels) PolarProperties += QObject::tr("Body Panels Ignored")+"\n";
+		//    else              PolarProperties += QObject::tr("Body Included")+"\n";
+	}
 
 	PolarProperties += QObject::tr("Ref. Area = ");
 	if(m_RefAreaType==1) PolarProperties += QObject::tr("Planform area")+"\n";
