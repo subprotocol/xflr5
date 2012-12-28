@@ -5417,24 +5417,27 @@ bool QMiarex::InitializePanels()
 	}
 
 	// add the number of body panels
+	//create the body elements only if there is a body, and the analysis is not of the VLM Type
 	bool bBodyEl = false;
-    if(m_pCurBody && !(m_pCurWPolar && m_pCurWPolar->m_bIgnoreBody))
+	if(m_pCurBody)
 	{
-		if(m_pCurBody->m_LineType==BODYPANELTYPE)
+		if(!m_pCurWPolar) bBodyEl = true;//no risk...
+		else if(m_pCurWPolar->m_AnalysisMethod==PANELMETHOD && !m_pCurWPolar->m_bIgnoreBodyPanels)
 		{
-			nx = 0;
-			for(int i=0; i<m_pCurBody->FrameSize()-1; i++) nx+=m_pCurBody->m_xPanels[i];
-			nh = 0;
-			for(int i=0; i<m_pCurBody->SideLineCount()-1; i++) nh+=m_pCurBody->m_hPanels[i];
-			m_MatSize += nx*nh*2;
+			bBodyEl = true;
+			if(m_pCurBody->m_LineType==BODYPANELTYPE)
+			{
+				nx = 0;
+				for(int i=0; i<m_pCurBody->FrameSize()-1; i++) nx+=m_pCurBody->m_xPanels[i];
+				nh = 0;
+				for(int i=0; i<m_pCurBody->SideLineCount()-1; i++) nh+=m_pCurBody->m_hPanels[i];
+				m_MatSize += nx*nh*2;
+			}
+			else m_MatSize += 2 * m_pCurBody->m_nxPanels * m_pCurBody->m_nhPanels;
 		}
-		else m_MatSize += 2 * m_pCurBody->m_nxPanels * m_pCurBody->m_nhPanels;
-
-		//create the body elements only if there is a body, and the analysis is not of the VLM Type
-		if(!m_pCurWPolar)                                     bBodyEl = true;//no risk...
-		else if(m_pCurWPolar->m_AnalysisMethod==PANELMETHOD)  bBodyEl = true;
-		else                                                  bBodyEl = false;
+		else bBodyEl = false;
 	}
+
 	if(m_MatSize>VLMMAXMATSIZE)
 	{
 		strong = QString(tr("The total number of panels is %1. The Max Number is %2.\nA reduction of the number of panels is required"))

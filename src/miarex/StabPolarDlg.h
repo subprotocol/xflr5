@@ -60,7 +60,7 @@ private slots:
 	void OnArea();
 	void OnEditingFinished();
 	void OnViscous();
-    void OnIgnoreBody();
+	void OnIgnoreBodyPanels();
 	void OnUnit();
 	void OnCellChanged(QWidget *pWidget);
 	void OnMethod();
@@ -91,7 +91,7 @@ private:
 	QCheckBox *m_pctrlViscous;
 	QCheckBox *m_pctrlAutoName;
 	QCheckBox *m_pctrlPlaneInertia;
-    QCheckBox *m_pctrlIgnoreBody;
+	QCheckBox *m_pctrlIgnoreBodyPanels;
 //	QCheckBox *m_pctrlAVLControls;
 
 	QRadioButton *m_pctrlUnit1, *m_pctrlUnit2;

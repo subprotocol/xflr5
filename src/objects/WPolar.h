@@ -88,7 +88,7 @@ private:
 	bool m_bDirichlet;
 	bool m_bTiltedGeom;
 	bool m_bViscous;
-    bool m_bIgnoreBody;
+	bool m_bIgnoreBodyPanels;
 
 	int m_NXWakePanels;
 	double m_TotalWakeLength;

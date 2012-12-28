@@ -205,7 +205,7 @@ bool PanelAnalysisDlg::AlphaLoop()
 	qApp->processEvents();
 
 	str = QString(tr("   Solving the problem... ")+"\n");
-	AddString(str);
+	AddString("\n"+str);
 
 	BuildInfluenceMatrix();
 	if (m_bCancel) return true;
@@ -1044,7 +1044,8 @@ void PanelAnalysisDlg::ComputePlane(double Alpha, double QInf, int qrhs)
 		if(m_pBody && m_pWPolar->m_AnalysisMethod==PANELMETHOD)
 		{
 			double ICm = 0.0;
-            if (!m_pWPolar->m_bIgnoreBody) {
+			if (!m_pWPolar->m_bIgnoreBodyPanels)
+			{
                 AddString(tr("       Calculating body...")+"\n");
                 m_pBody->ComputeAero(m_Cp+qrhs*m_MatSize+pos, XCP, YCP, ZCP, ICm, m_GRm, m_GYm, Alpha, m_pWPolar->m_CoG);
             }
@@ -1891,8 +1892,8 @@ bool PanelAnalysisDlg::ReLoop()
 	}
 	else Alpha = m_Alpha;
 
-	str = QString(tr("\n   Solving the problem... ")+"\n");
-	AddString(str);
+	str = QString(tr("   Solving the problem... ")+"\n");
+	AddString("\n"+str);
 
 	BuildInfluenceMatrix();
 	if (m_bCancel) return true;
@@ -2463,7 +2464,7 @@ bool PanelAnalysisDlg::UnitLoop()
 	qApp->processEvents();
 
 	str = QString(tr("   Solving the problem... ")+"\n");
-	AddString(str);
+	AddString("\n"+str);
 
 	for (n=0; n<nrhs; n++)
 	{
@@ -2734,11 +2735,11 @@ bool PanelAnalysisDlg::ControlLoop()
 		nrhs = VLMMAXRHS;
 	}
 
-	double TotalTime = 10.0*(double)m_MatSize/400.      //BuildInfluenceMatrix
+	double TotalTime = 10.0*(double)m_MatSize/400.       //BuildInfluenceMatrix
 					 + 10.                               //CreateRHS
 					 + 30.*(double)m_MatSize/400.        //SolveUnitRHS
 					 + 10*(double)m_MatSize/400          //ComputeFarField
-					 + 2+5*6                                 //ComputeStabDer
+					 + 2+5*6                             //ComputeStabDer
 					 + 1                                 //ComputeOnBodyCp
 					 + 5;                                //ComputeAeroCoefs
 	TotalTime *= (double)nrhs;
@@ -2751,7 +2752,8 @@ bool PanelAnalysisDlg::ControlLoop()
 	m_bTrace = true;
 
 	str = QString("   Solving the problem... \n\n");
-	AddString(str);
+	AddString("\n"+str);
+
 	for (i=0; i<nrhs; i++)
 	{
 		// create the geometry for the control parameter
