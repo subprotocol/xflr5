@@ -115,6 +115,13 @@ protected:
 	double m_AlphaMin, m_AlphaMax, m_AlphaInc;
 	double m_ClMin, m_ClMax, m_ClInc;
 
+	double m_NCrit;
+	double m_XTopTr;
+	double m_XBotTr;
+	double *m_ReList;
+	double *m_MachList;
+	double *m_NCritList;
+
 	bool m_bOutput;
 	bool m_bAlpha;
 	bool m_bFromList;
@@ -127,12 +134,6 @@ protected:
 
 	int m_Iterations;
 	int m_IterLim;
-	double m_NCrit;
-	double m_XTopTr;
-	double m_XBotTr;
-	double *m_ReList;
-	double *m_MachList;
-	double *m_NCritList;
 
 	int m_NRe;
 
