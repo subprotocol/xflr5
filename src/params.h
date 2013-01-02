@@ -23,7 +23,7 @@
 #define MAXCHORDPANELS	   50 // max number of panels in the chordwise direction
 #define VLMMAXMATSIZE    5000 // max number of VLM panels over the whole plane
 #define VLMHALF          2500
-#define VLMMAXRHS          50 // max number of points which may be calculated in a single sequence
+#define VLMMAXRHS         100 // max number of points which may be calculated in a single sequence
 #define MAXCONTROLS        40 // max controls per wing section
 #define MAXBODYFRAMES      60
 #define MAXSIDELINES       40

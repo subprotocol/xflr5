@@ -72,7 +72,7 @@ MainFrame::MainFrame(QWidget *parent, Qt::WFlags flags)
 	: QMainWindow(parent, flags)
 {
 
-	m_VersionName = QString::fromLatin1("XFLR5 v6.09.01 beta");
+	m_VersionName = QString::fromLatin1("XFLR5 v6.09.02 beta");
 	QString jpegPluginPath;
 
 	//Jpeg format requires a specific plugin to be loaded dynmically at run time
@@ -3221,8 +3221,7 @@ bool MainFrame::LoadPolarFileV3(QDataStream &ar, bool bIsStoring, int ArchiveFor
 		pPolar = new CPolar();
 
 		pPolar->m_Color = GetColor(1);
-		pPolar->Serialize(ar, bIsStoring);
-		if (!pPolar->m_FoilName.length())
+		if (!pPolar->Serialize(ar, bIsStoring))
 		{
 			delete pPolar;
 			return false;
@@ -4763,8 +4762,8 @@ CFoil * MainFrame::ReadPolarFile(QDataStream &ar)
 			pPolar = new CPolar();
 
 			pPolar->m_Color = QColor(56,128,188,127);
-			pPolar->Serialize(ar, false);
-			if (!pPolar->m_FoilName.length())
+			;
+			if (!pPolar->Serialize(ar, false))
 			{
 				delete pPolar;
 				return pFoil;

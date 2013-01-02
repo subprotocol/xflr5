@@ -1041,14 +1041,11 @@ void PanelAnalysisDlg::ComputePlane(double Alpha, double QInf, int qrhs)
 			}
 		}
 
-		if(m_pBody && m_pWPolar->m_AnalysisMethod==PANELMETHOD)
+		if(m_pBody && m_pWPolar->m_AnalysisMethod==PANELMETHOD && !m_pWPolar->m_bIgnoreBodyPanels)
 		{
 			double ICm = 0.0;
-			if (!m_pWPolar->m_bIgnoreBodyPanels)
-			{
-                AddString(tr("       Calculating body...")+"\n");
-                m_pBody->ComputeAero(m_Cp+qrhs*m_MatSize+pos, XCP, YCP, ZCP, ICm, m_GRm, m_GYm, Alpha, m_pWPolar->m_CoG);
-            }
+			AddString(tr("       Calculating body...")+"\n");
+			m_pBody->ComputeAero(m_Cp+qrhs*m_MatSize+pos, XCP, YCP, ZCP, ICm, m_GRm, m_GYm, Alpha, m_pWPolar->m_CoG);
             m_ICm += ICm;
             m_GCm += ICm;
 

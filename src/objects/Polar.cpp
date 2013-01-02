@@ -24,6 +24,8 @@
 #include "../mainframe.h"
 #include "../globals.h"
 #include "../xdirect/XFoil.h"
+#include <QtDebug>
+
 
 
 void *CPolar::s_pMainFrame;
@@ -403,7 +405,7 @@ void CPolar::Copy(CPolar *pPolar)
 	}
 }
 
-void CPolar::Serialize(QDataStream &ar, bool bIsStoring)
+bool CPolar::Serialize(QDataStream &ar, bool bIsStoring, bool bTrace)
 {
 	int i, j, n, l, k;
 	int ArchiveFormat;// identifies the format of the file
@@ -449,6 +451,8 @@ void CPolar::Serialize(QDataStream &ar, bool bIsStoring)
 		}
 
         ar << m_ACrit << m_XTop << m_XBot;
+
+		return true;
 	}
     else
     {
@@ -458,8 +462,7 @@ void CPolar::Serialize(QDataStream &ar, bool bIsStoring)
 		ar >> ArchiveFormat;
 		if (ArchiveFormat <1001 ||ArchiveFormat>1100)
 		{
-			m_FoilName ="";
-			return;
+			return false;
 		}
 
 		ReadCString(ar, m_FoilName);
@@ -475,9 +478,9 @@ void CPolar::Serialize(QDataStream &ar, bool bIsStoring)
 			m_PlrName[j] = char(ch);
 		}*/
 
-		if(m_FoilName =="" || m_PlrName =="" ) {
-			m_FoilName ="";
-			return;
+		if(m_FoilName =="" || m_PlrName =="" )
+		{
+			return false;
 		}
 
 		ar >>k;
@@ -485,20 +488,20 @@ void CPolar::Serialize(QDataStream &ar, bool bIsStoring)
 		else if(k==2) m_PolarType = FIXEDLIFTPOLAR;
 		else if(k==3) m_PolarType = RUBBERCHORDPOLAR;
 		else if(k==4) m_PolarType = FIXEDAOAPOLAR;
-		else {
-			m_FoilName ="";
-			return;
+		else
+		{
+			return false;
 		}
 
 		ar >> m_MaType >> m_ReType;
 
-		if(m_MaType!=1 && m_MaType!=2 && m_MaType!=3) {
-			m_FoilName ="";
-			return;
+		if(m_MaType!=1 && m_MaType!=2 && m_MaType!=3)
+		{
+			return false;
 		}
-		if(m_ReType!=1 && m_ReType!=2 && m_ReType!=3) {
-			m_FoilName ="";
-			return;
+		if(m_ReType!=1 && m_ReType!=2 && m_ReType!=3)
+		{
+			return false;
 		}
 
 		ar >> iRe;
@@ -526,8 +529,7 @@ void CPolar::Serialize(QDataStream &ar, bool bIsStoring)
 			ar >> l;
             if(l!=0 && l!=1 )
             {
-				m_FoilName ="";
-				return;
+				return false;
 			}
 			if (l) m_bIsVisible =true; else m_bIsVisible = false;
 		}
@@ -535,8 +537,7 @@ void CPolar::Serialize(QDataStream &ar, bool bIsStoring)
 		ar >> l;
         if(l!=0 && l!=1 )
         {
-			m_FoilName ="";
-			return;
+			return false;
 		}
 		if (l) m_bShowPoints =true; else m_bShowPoints = false;
 			
@@ -576,6 +577,7 @@ void CPolar::Serialize(QDataStream &ar, bool bIsStoring)
 					}
 				}
 			}
+//if(bTrace) qDebug() << i<<Alpha<<Cd<< Cdp<< Cl<<Cm<< XTr1<< XTr2<< HMom<< Cpmn<< Re<< XCp;
 			if(!bExists)
 			{
 				AddPoint(Alpha, Cd, Cdp, Cl, Cm, XTr1, XTr2, HMom, Cpmn, Re, XCp);
@@ -584,7 +586,9 @@ void CPolar::Serialize(QDataStream &ar, bool bIsStoring)
 		if(ArchiveFormat>=1003)
 			ar >> m_ACrit >> m_XTop >> m_XBot;
 	}
+	return true;
 }
+
 
 void CPolar::Remove(int i)
 {
@@ -603,6 +607,7 @@ void CPolar::Remove(int i)
     m_Re.removeAt(i);
     m_XCp.removeAt(i);
 }
+
 
 void CPolar::GetAlphaLimits(double &amin, double &amax)
 {

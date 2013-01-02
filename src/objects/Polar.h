@@ -70,7 +70,7 @@ private:
 
 	CPolar();
 
-	void Serialize(QDataStream &ar, bool bIsStoring);
+	bool Serialize(QDataStream &ar, bool bIsStoring, bool bTrace=false);
 
 	void AddPoint(double Alpha, double Cd, double Cdp, double Cl, double Cm,
 				  double Xtr1, double Xtr2, double HMom, double Cpmn, double Reynolds, double XCp);
