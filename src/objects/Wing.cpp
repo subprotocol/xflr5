@@ -106,7 +106,6 @@ CWing::CWing()
 
 	m_QInf0    = 0.0;
 
-	m_pXFile     = NULL;
 	m_pPanel     = NULL;
 	m_pWakeNode  = NULL;
 	m_pWakePanel = NULL;
@@ -152,6 +151,10 @@ CWing::CWing()
 	m_TLength[1] = 1.0;
 	m_TOffset[0] = 0.;
 	m_TOffset[1] = 0.060;
+	m_RightFoil.append(" ");
+	m_RightFoil.append(" ");
+	m_LeftFoil.append(" ");
+	m_LeftFoil.append(" ");
 
 	double length = m_TLength[0];
 	for (i=0; i<=MAXSPANSECTIONS; i++)
@@ -159,13 +162,6 @@ CWing::CWing()
 		length += m_TLength[i];
 		m_TPos[i]     = length;
 		m_XPanelDist[i] =  1;
-	}
-
-
-	for (i=0;i<=MAXSPANSECTIONS; i++)
-	{
-		m_RFoil.append(" ");
-		m_LFoil.append(" ");
 	}
 }
 
@@ -207,8 +203,8 @@ void CWing::ComputeGeometry()
 
 	for (k=0; k<m_NPanel; k++)
 	{
-		pFoilA = pMainFrame->GetFoil(m_RFoil[k]);
-		pFoilB = pMainFrame->GetFoil(m_RFoil[k+1]);
+		pFoilA = pMainFrame->GetFoil(m_RightFoil.at(k));
+		pFoilB = pMainFrame->GetFoil(m_RightFoil.at(k+1));
 		surface   += m_TLength[k+1]*(m_TChord[k]+m_TChord[k+1])/2.0;//m2
 		xysurface += (m_TLength[k+1]*(m_TChord[k]+m_TChord[k+1])/2.0)*cos(m_TDihedral[k]*PI/180.0);
 		m_ProjectedSpan += m_TLength[k+1]*cos(m_TDihedral[k]*PI/180.0);
@@ -248,14 +244,14 @@ void CWing::ComputeGeometry()
 
 	for (i=1; i<=m_NPanel; i++)
 	{
-		pFoilA = pMainFrame->GetFoil(m_RFoil[i-1]);
-		pFoilB = pMainFrame->GetFoil(m_RFoil[i]);
+		pFoilA = pMainFrame->GetFoil(m_RightFoil.at(i-1));
+		pFoilB = pMainFrame->GetFoil(m_RightFoil.at(i));
 		if(pFoilA && pFoilB && (!m_bIsFin || (m_bIsFin && m_bSymFin) || (m_bIsFin && m_bDoubleFin)))
 		{
 			if(pFoilA->m_bTEFlap && pFoilB->m_bTEFlap && fabs(m_TPos[i]-m_TPos[i-1])>MinPanelSize)	m_nFlaps++;
 		}
-		pFoilA = pMainFrame->GetFoil(m_LFoil[i-1]);
-		pFoilB = pMainFrame->GetFoil(m_LFoil[i]);
+		pFoilA = pMainFrame->GetFoil(m_LeftFoil[i-1]);
+		pFoilB = pMainFrame->GetFoil(m_LeftFoil[i]);
 		if(pFoilA && pFoilB)
 		{
 			if(pFoilA->m_bTEFlap && pFoilB->m_bTEFlap && fabs(m_TPos[i]-m_TPos[i-1])>MinPanelSize)	m_nFlaps++;
@@ -519,8 +515,8 @@ void CWing::CreateSurfaces(CVector const &T, double XTilt, double YTilt)
 	{
 		if (fabs(m_TPos[j]-m_TPos[j+1]) > MinPanelSize)
 		{
-			m_Surface[is].m_pFoilA   = pMainFrame->GetFoil(m_LFoil[j+1]);
-			m_Surface[is].m_pFoilB   = pMainFrame->GetFoil(m_LFoil[j]);
+			m_Surface[is].m_pFoilA   = pMainFrame->GetFoil(m_LeftFoil[j+1]);
+			m_Surface[is].m_pFoilB   = pMainFrame->GetFoil(m_LeftFoil[j]);
 
 			m_Surface[is].m_Length   =  m_TPos[j+1] - m_TPos[j];
 
@@ -591,8 +587,8 @@ void CWing::CreateSurfaces(CVector const &T, double XTilt, double YTilt)
 		{
 			if (fabs(m_TPos[j]-m_TPos[j+1]) > MinPanelSize)
 			{
-				m_Surface[is].m_pFoilA   = pMainFrame->GetFoil(m_RFoil[j]);
-				m_Surface[is].m_pFoilB   = pMainFrame->GetFoil(m_RFoil[j+1]);
+				m_Surface[is].m_pFoilA   = pMainFrame->GetFoil(m_RightFoil.at(j));
+				m_Surface[is].m_pFoilB   = pMainFrame->GetFoil(m_RightFoil.at(j+1));
 
 				m_Surface[is].m_Length   =  m_TPos[j+1] - m_TPos[j];
 
@@ -766,7 +762,7 @@ void CWing::ComputeChords(int NStation)
 	else
 	{
 		//VLM Mesh based
-		m_NStation    = 0;
+		m_NStation = 0;
 		m = 0;
 
 		x0 = m_Surface[m_NSurfaces/2].m_LA.x;
@@ -908,10 +904,10 @@ void CWing::Duplicate(CWing *pWing)
 	m_ProjectedSpan = pWing->m_ProjectedSpan;
 	m_PlanformArea  = pWing->m_PlanformArea;
 	m_ProjectedArea = pWing->m_ProjectedArea;
-	m_AR			 = pWing->m_AR;
-	m_TR			 = pWing->m_TR;
-	m_GChord		 = pWing->m_GChord;
-	m_MAChord		 = pWing->m_MAChord;
+	m_AR            = pWing->m_AR;
+	m_TR            = pWing->m_TR;
+	m_GChord        = pWing->m_GChord;
+	m_MAChord       = pWing->m_MAChord;
 	m_WingName      = pWing->m_WingName;
 	m_bSymetric     = pWing->m_bSymetric;
 	m_bIsFin        = pWing->m_bIsFin;
@@ -929,13 +925,20 @@ void CWing::Duplicate(CWing *pWing)
 		m_NYPanels[i]   = pWing->m_NYPanels[i];
 		m_XPanelDist[i] = pWing->m_XPanelDist[i];
 		m_YPanelDist[i] = pWing->m_YPanelDist[i];
-		m_RFoil[i]      = pWing->m_RFoil[i];
-		m_LFoil[i]      = pWing->m_LFoil[i];
 		m_TTwist[i]     = pWing->m_TTwist[i];
 		m_TDihedral[i]  = pWing->m_TDihedral[i];
 		m_TZPos[i]      = pWing->m_TZPos[i];
 		m_TYProj[i]     = pWing->m_TYProj[i];
 	}
+
+	m_RightFoil.clear();
+	m_LeftFoil.clear();
+	for(int iFoil=0; iFoil<=pWing->m_NPanel; iFoil++)
+	{
+		m_RightFoil.append(pWing->m_RightFoil.at(iFoil));
+		m_LeftFoil.append(pWing->m_LeftFoil.at(iFoil));
+	}
+
 
 	m_nFlaps = pWing->m_nFlaps;
 
@@ -1146,8 +1149,10 @@ double CWing::C4(double yob, double xRef)
 	double Chord, Offset, tau;
 	double C4 = 0.0;
 	double y = fabs(yob*m_PlanformSpan/2.0);
-	for(int i=0; i<m_NPanel; i++){
-		if(m_TPos[i]<= y && y <=m_TPos[i+1]){
+	for(int i=0; i<m_NPanel; i++)
+	{
+		if(m_TPos[i]<= y && y <=m_TPos[i+1])
+		{
 			tau = (y - m_TPos[i])/(m_TPos[i+1]-m_TPos[i]);
 			Chord  = m_TChord[i]  + tau * (m_TChord[i+1] - m_TChord[i]);
 			Offset = m_TOffset[i] + tau * (m_TOffset[i+1] - m_TOffset[i]);
@@ -1155,7 +1160,6 @@ double CWing::C4(double yob, double xRef)
 			return C4;
 		}
 	}
-
 	return C4;
 }
 
@@ -1207,8 +1211,8 @@ void CWing::GetFoils(CFoil **pFoil0, CFoil **pFoil1, double y, double &t)
 			if (m_TPos[i]<=y && y<=m_TPos[i+1])
 			{
 
-				*pFoil0 = pMainFrame->GetFoil(m_RFoil[i]);
-				*pFoil1 = pMainFrame->GetFoil(m_RFoil[i+1]);
+				*pFoil0 = pMainFrame->GetFoil(m_RightFoil.at(i));
+				*pFoil1 = pMainFrame->GetFoil(m_RightFoil.at(i+1));
 				t = (y-m_TPos[i])/(m_TPos[i+1] - m_TPos[i]);
 				return;
 			}
@@ -1222,8 +1226,8 @@ void CWing::GetFoils(CFoil **pFoil0, CFoil **pFoil1, double y, double &t)
 		{
 			if (m_TPos[i]<=y && y<m_TPos[i+1])
 			{
-				*pFoil0 = pMainFrame->GetFoil(m_LFoil[i]);
-				*pFoil1 = pMainFrame->GetFoil(m_LFoil[i+1]);
+				*pFoil0 = pMainFrame->GetFoil(m_LeftFoil[i]);
+				*pFoil1 = pMainFrame->GetFoil(m_LeftFoil[i+1]);
 				t = (y-m_TPos[i])/(m_TPos[i+1] - m_TPos[i]);
 				return;
 			}
@@ -1719,8 +1723,8 @@ bool CWing::SerializeWing(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 
 		ar << m_NPanel;
 
-		for (i=0; i<=m_NPanel; i++) WriteCString(ar, m_RFoil[i]);
-		for (i=0; i<=m_NPanel; i++) WriteCString(ar, m_LFoil[i]);
+		for (i=0; i<=m_NPanel; i++) WriteCString(ar, m_RightFoil.at(i));
+		for (i=0; i<=m_NPanel; i++) WriteCString(ar, m_LeftFoil.at(i));
 		for (i=0; i<=m_NPanel; i++) ar << (float)m_TChord[i];
 		for (i=0; i<=m_NPanel; i++) ar << (float)m_TPos[i];
 		for (i=0; i<=m_NPanel; i++) ar << (float)m_TOffset[i];
@@ -1797,8 +1801,21 @@ bool CWing::SerializeWing(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 			m_WingName = "";
 			return false;
 		}
-		for (i=0; i<=m_NPanel; i++) ReadCString(ar, m_RFoil[i]);
-		for (i=0; i<=m_NPanel; i++) ReadCString(ar, m_LFoil[i]);
+
+		QString strFoil;
+		m_RightFoil.clear();
+		m_LeftFoil.clear();
+		for (i=0; i<=m_NPanel; i++)
+		{
+			ReadCString(ar, strFoil);
+			m_RightFoil.append(strFoil);
+		}
+		for (i=0; i<=m_NPanel; i++)
+		{
+			ReadCString(ar, strFoil);
+			m_LeftFoil.append(strFoil);
+		}
+
 		for (i=0; i<=m_NPanel; i++)
 		{
 			ar >> f; m_TChord[i]=f;

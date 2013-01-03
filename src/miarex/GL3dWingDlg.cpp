@@ -340,8 +340,8 @@ void GL3dWingDlg::FillTableRow(int row)
 	m_pWingModel->setData(ind, m_pWing->m_TTwist[row]);
 
 	ind = m_pWingModel->index(row, 5, QModelIndex());
-	if(m_bRightSide) m_pWingModel->setData(ind, m_pWing->m_RFoil[row]);
-	else             m_pWingModel->setData(ind, m_pWing->m_LFoil[row]);
+	if(m_bRightSide) m_pWingModel->setData(ind, m_pWing->m_RightFoil.at(row));
+	else             m_pWingModel->setData(ind, m_pWing->m_LeftFoil.at(row));
 
 	if(row<=m_pWing->m_NPanel)
 	{
@@ -1499,9 +1499,11 @@ void GL3dWingDlg::OnDeleteSection()
 		m_pWing->m_NYPanels[k]   = m_pWing->m_NYPanels[k+1];
 		m_pWing->m_XPanelDist[k] = m_pWing->m_XPanelDist[k+1];
 		m_pWing->m_YPanelDist[k] = m_pWing->m_YPanelDist[k+1];
-		m_pWing->m_RFoil[k]      = m_pWing->m_RFoil[k+1];
-		m_pWing->m_LFoil[k]      = m_pWing->m_LFoil[k+1];
 	}
+
+	m_pWing->m_RightFoil.removeAt(m_iSection);
+	m_pWing->m_LeftFoil.removeAt(m_iSection);
+
 	m_pWing->m_NPanel--;
 
 	m_pWing->m_NYPanels[m_iSection-1] = ny;
@@ -1598,6 +1600,9 @@ void GL3dWingDlg::OnInsertBefore()
 	int k,n, ny;
 
 	n  = m_iSection;
+
+	m_pWing->m_RightFoil.append("");
+	m_pWing->m_LeftFoil.append("");
 	for (k=m_pWing->m_NPanel; k>=n; k--)
 	{
 		m_pWing->m_TPos[k+1]      = m_pWing->m_TPos[k];
@@ -1609,8 +1614,8 @@ void GL3dWingDlg::OnInsertBefore()
 		m_pWing->m_NYPanels[k+1]   = m_pWing->m_NYPanels[k];
 		m_pWing->m_XPanelDist[k+1] = m_pWing->m_XPanelDist[k];
 		m_pWing->m_YPanelDist[k+1] = m_pWing->m_YPanelDist[k];
-		m_pWing->m_RFoil[k+1]      = m_pWing->m_RFoil[k];
-		m_pWing->m_LFoil[k+1]      = m_pWing->m_LFoil[k];
+		m_pWing->m_RightFoil[k+1]  = m_pWing->m_RightFoil[k];
+		m_pWing->m_LeftFoil[k+1]   = m_pWing->m_LeftFoil[k];
 	}
 
 	ny = m_pWing->m_NYPanels[n-1];
@@ -1655,6 +1660,8 @@ void GL3dWingDlg::OnInsertAfter()
 	if(n<0) n=m_pWing->m_NPanel;
 	ny = m_pWing->m_NYPanels[n];
 
+	m_pWing->m_RightFoil.append("");
+	m_pWing->m_LeftFoil.append("");
 	for (k=m_pWing->m_NPanel+1; k>n; k--)
 	{
 		m_pWing->m_TPos[k]       = m_pWing->m_TPos[k-1];
@@ -1666,9 +1673,10 @@ void GL3dWingDlg::OnInsertAfter()
 		m_pWing->m_NYPanels[k]   = m_pWing->m_NYPanels[k-1];
 		m_pWing->m_XPanelDist[k] = m_pWing->m_XPanelDist[k-1];
 		m_pWing->m_YPanelDist[k] = m_pWing->m_YPanelDist[k-1];
-		m_pWing->m_RFoil[k]      = m_pWing->m_RFoil[k-1];
-		m_pWing->m_LFoil[k]      = m_pWing->m_LFoil[k-1];
+		m_pWing->m_RightFoil[k]  = m_pWing->m_RightFoil[k-1];
+		m_pWing->m_LeftFoil[k]   = m_pWing->m_LeftFoil[k-1];
 	}
+
 
 	if(n<m_pWing->m_NPanel)
 	{
@@ -1688,8 +1696,8 @@ void GL3dWingDlg::OnInsertAfter()
 	m_pWing->m_NYPanels[n+1]   = m_pWing->m_NYPanels[n];
 	m_pWing->m_XPanelDist[n+1] = m_pWing->m_XPanelDist[n];
 	m_pWing->m_YPanelDist[n+1] = m_pWing->m_YPanelDist[n];
-	m_pWing->m_RFoil[n+1]      = m_pWing->m_RFoil[n];
-	m_pWing->m_LFoil[n+1]      = m_pWing->m_LFoil[n];
+	m_pWing->m_RightFoil[n+1]  = m_pWing->m_RightFoil[n];
+	m_pWing->m_LeftFoil[n+1]   = m_pWing->m_LeftFoil[n];
 
 	m_pWing->m_NYPanels[n+1] = qMax(1,(int)(ny/2));
 	m_pWing->m_NYPanels[n]   = qMax(1,ny-m_pWing->m_NYPanels[n+1]);
@@ -1738,7 +1746,7 @@ void GL3dWingDlg::OnOK()
 	{
 		for (int i=0; i<=m_pWing->m_NPanel; i++)
 		{
-			m_pWing->m_LFoil[i]   = m_pWing->m_RFoil[i];
+			m_pWing->m_LeftFoil[i]   = m_pWing->m_RightFoil.at(i);
 		}
 	}
 
@@ -1837,7 +1845,7 @@ void GL3dWingDlg::OnSymetric()
 		m_pctrlRightSide->setChecked(true);
 		for(int i=0; i<m_pWing->m_NPanel; i++)
 		{
-			m_pWing->m_LFoil[i] = m_pWing->m_RFoil[i];
+			m_pWing->m_LeftFoil[i] = m_pWing->m_RightFoil.at(i);
 		}
 	}
 	else
@@ -1938,13 +1946,13 @@ void GL3dWingDlg::ReadSectionData(int sel)
 	strong =pItem->text();
 	if(m_pWing->m_bSymetric)
 	{
-		m_pWing->m_RFoil[sel] = strong;
-		m_pWing->m_LFoil[sel] = strong;
+		m_pWing->m_RightFoil[sel] = strong;
+		m_pWing->m_LeftFoil[sel] = strong;
 	}
 	else
 	{
-		if(m_bRightSide)	m_pWing->m_RFoil[sel] = strong;
-		else                m_pWing->m_LFoil[sel] = strong;
+		if(m_bRightSide)	m_pWing->m_RightFoil[sel] = strong;
+		else                m_pWing->m_LeftFoil[sel] = strong;
 	}
 
 	pItem = m_pWingModel->item(sel,6);

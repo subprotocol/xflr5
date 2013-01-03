@@ -25,7 +25,7 @@
 #include "WPolar.h"
 #include "Surface.h"
 #include "Panel.h"
-#include <QFile>
+
 
 class CWing
 {
@@ -126,7 +126,6 @@ private:
 	static CVector *m_pWakeNode;			//pointer to the VLM wake node array
 	static CPanel *m_pWakePanel;			//pointer to the VLM Wake Panel array
 
-	QFile * m_pXFile;	// a pointer to the output .log file
 
 	static bool s_bVLMSymetric;	// true if the vlm calculation is symmetric
 
@@ -188,8 +187,8 @@ private:
 
 	QString m_WingDescription;
 
-	QStringList m_RFoil;			// name of the right foils
-	QStringList m_LFoil;			// name of the left foils
+	QStringList m_RightFoil;			// name of the right foils
+	QStringList m_LeftFoil;			// name of the left foils
 
 	CVector m_Vd[MAXSPANSTATIONS];		// downwash vector at span stations
 	CVector m_F[MAXSPANSTATIONS];		// lift vector at span stations

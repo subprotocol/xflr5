@@ -110,7 +110,7 @@ SOURCES += \
     src/threedwidget.cpp \
     src/twodwidget.cpp \
     src/miarex/NURBSDomDoc.cpp \
-    src/xdirect/EditPlrDlg.cpp
+	src/xdirect/EditPlrDlg.cpp
 
 HEADERS += \
 	src/XFLR5Application.h \

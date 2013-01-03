@@ -7428,17 +7428,17 @@ void QMiarex::OnAnalyze()
 		{
 			for (l=0; l<=m_pWingList[iw]->m_NPanel; l++)
 			{
-				if (!pMainFrame->GetFoil(m_pWingList[iw]->m_RFoil[l]))
+				if (!pMainFrame->GetFoil(m_pWingList[iw]->m_RightFoil[l]))
 				{
 					QString strong;
-					strong = m_pWingList[iw]->m_WingName + ": "+tr("Could not find the wing's foil ")+ m_pWingList[iw]->m_RFoil[l] +tr("...\nAborting Calculation");
+					strong = m_pWingList[iw]->m_WingName + ": "+tr("Could not find the wing's foil ")+ m_pWingList[iw]->m_RightFoil[l] +tr("...\nAborting Calculation");
 					QMessageBox::warning(pMainFrame, tr("Warning"), strong);
 					return;
 				}
-				if (!pMainFrame->GetFoil(m_pWingList[iw]->m_LFoil[l]))
+				if (!pMainFrame->GetFoil(m_pWingList[iw]->m_LeftFoil[l]))
 				{
 					QString strong;
-					strong = m_pWingList[iw]->m_WingName + ": "+tr("Could not find the wing's foil ")+ m_pWingList[iw]->m_LFoil[l] +tr("...\nAborting Calculation");
+					strong = m_pWingList[iw]->m_WingName + ": "+tr("Could not find the wing's foil ")+ m_pWingList[iw]->m_LeftFoil[l] +tr("...\nAborting Calculation");
 					QMessageBox::warning(pMainFrame, tr("Warning"), strong);
 					return;
 				}

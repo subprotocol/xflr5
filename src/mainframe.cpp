@@ -5371,7 +5371,7 @@ bool MainFrame::SerializeUFOProject(QDataStream &ar, int ProjectFormat)
 	{
 		for (i=0; i<=pWing->m_NPanel; i++)
 		{
-			pFoil = GetFoil(pWing->m_RFoil[i]);
+			pFoil = GetFoil(pWing->m_RightFoil[i]);
 			bFound = false;
 			for(j=0;j<FoilList.size();j++)
 			{
@@ -5387,7 +5387,7 @@ bool MainFrame::SerializeUFOProject(QDataStream &ar, int ProjectFormat)
 		{
 			for (i=0; i<=pWing->m_NPanel; i++)
 			{
-				pFoil = GetFoil(pWing->m_LFoil[i]);
+				pFoil = GetFoil(pWing->m_LeftFoil[i]);
 				bFound = false;
 				for(j=0;j<FoilList.size();j++)
 				{
@@ -5405,7 +5405,7 @@ bool MainFrame::SerializeUFOProject(QDataStream &ar, int ProjectFormat)
 	{
 		for (i=0; i<=pStab->m_NPanel; i++)
 		{
-			pFoil = GetFoil(pStab->m_RFoil[i]);
+			pFoil = GetFoil(pStab->m_RightFoil[i]);
 			bFound = false;
 			for(j=0;j<FoilList.size();j++)
 			{
@@ -5421,7 +5421,7 @@ bool MainFrame::SerializeUFOProject(QDataStream &ar, int ProjectFormat)
 		{
 			for (i=0; i<=pStab->m_NPanel; i++)
 			{
-				pFoil = GetFoil(pStab->m_LFoil[i]);
+				pFoil = GetFoil(pStab->m_LeftFoil[i]);
 				bFound = false;
 				for(j=0;j<FoilList.size();j++)
 				{
@@ -5438,7 +5438,7 @@ bool MainFrame::SerializeUFOProject(QDataStream &ar, int ProjectFormat)
 	{
 		for (i=0; i<=pFin->m_NPanel; i++)
 		{
-			pFoil = GetFoil(pFin->m_RFoil[i]);
+			pFoil = GetFoil(pFin->m_RightFoil[i]);
 			bFound = false;
 			for(j=0;j<FoilList.size();j++)
 			{
@@ -5454,7 +5454,7 @@ bool MainFrame::SerializeUFOProject(QDataStream &ar, int ProjectFormat)
 		{
 			for (i=0; i<=pFin->m_NPanel; i++)
 			{
-				pFoil = GetFoil(pFin->m_LFoil[i]);
+				pFoil = GetFoil(pFin->m_LeftFoil[i]);
 				bFound = false;
 				for(j=0;j<FoilList.size();j++)
 				{
