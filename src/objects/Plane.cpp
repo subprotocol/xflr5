@@ -115,8 +115,8 @@ void CPlane::ComputeVolumeInertia(double &Mass, CVector & CoG, double &CoGIxx, d
 	double Ixx, Iyy, Izz, Ixz, PlaneMass;
 	CVector Pt;
 	CVector CoGBody;
-	CVector CoGWing[4];
-	CWing *pWing[4];
+	CVector CoGWing[MAXWINGS];
+	CWing *pWing[MAXWINGS];
 	pWing[0] = pWing[1] = pWing[2] = pWing[3] = NULL;
 
 

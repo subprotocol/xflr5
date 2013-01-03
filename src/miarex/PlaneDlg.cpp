@@ -527,7 +527,7 @@ void PlaneDlg::OnPlaneName()
 void PlaneDlg::OnOK()
 {
 	int j, n;
-	QMiarex *pMiarex = (QMiarex*)s_pMiarex;
+//	QMiarex *pMiarex = (QMiarex*)s_pMiarex;
 	QString strong;
 	ReadParams();
 

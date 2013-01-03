@@ -1481,7 +1481,7 @@ void GL3dWingDlg::OnDeleteSection()
 	}
 	m_pctrlWingTable->closePersistentEditor(m_pctrlWingTable->currentIndex());
 
-	int ny, k, size;
+	int ny, size;
 
 	size = m_pWingModel->rowCount();
 	if(size<=2) return;
@@ -2608,7 +2608,7 @@ void GL3dWingDlg::UpdateView()
 
 int GL3dWingDlg::VLMGetPanelTotal()
 {
-	QMiarex    *pMiarex = (QMiarex*)s_pMiarex;
+//	QMiarex    *pMiarex = (QMiarex*)s_pMiarex;
 	double MinPanelSize;
 	if(QMiarex::s_MinPanelSize>0.0) MinPanelSize = QMiarex::s_MinPanelSize;
 	else                            MinPanelSize = m_pWing->m_PlanformSpan/1000.0;

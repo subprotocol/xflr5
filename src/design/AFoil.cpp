@@ -2037,7 +2037,7 @@ void QAFoil::OnSplineControls()
 
 void QAFoil::OnSplines()
 {
-	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+//	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
 	m_StackSize = 0;
 	m_StackPos = 0;
 	TakePicture();
@@ -2049,7 +2049,7 @@ void QAFoil::OnSplines()
 
 void QAFoil::OnSplinedPoints()
 {
-	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+//	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
 	m_StackSize = 0;
 	m_StackPos = 0;
 	TakePicture();
@@ -2714,7 +2714,6 @@ void QAFoil::StorePicture()
 
 void QAFoil::TakePicture()
 {
-	int i;
 	m_bStored = false;
 	m_pSF->CopyToPicture(&m_TmpPic);
 }

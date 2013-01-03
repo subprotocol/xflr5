@@ -250,8 +250,8 @@ void CWing::ComputeVolumeInertia(CVector &CoG, double &CoGIxx, double &CoGIyy, d
 	//     CoG  = center of gravity position
 	//     CoGIxx, CoGIyy, CoGIzz, CoGIxz = inertia of properties calculated at the CoG
 	//
-	double ElemVolume[NXSTATIONS*NYSTATIONS*MAXSPANSECTIONS*2];
-	CVector PtVolume[NXSTATIONS*NYSTATIONS*MAXSPANSECTIONS*2];
+	static double ElemVolume[NXSTATIONS*NYSTATIONS*MAXSPANSECTIONS*2];
+	static CVector PtVolume[NXSTATIONS*NYSTATIONS*MAXSPANSECTIONS*2];
 	int j,k,l;
 	double rho, LocalSpan, LocalVolume;
 	double LocalChord,  LocalArea,  tau;
@@ -455,7 +455,7 @@ void CWing::CreateSurfaces(CVector const &T, double XTilt, double YTilt)
 	double MinPanelSize;
 
 	MainFrame *pMainFrame  = (MainFrame*)s_pMainFrame;
-	QMiarex   *pMiarex     = (QMiarex*)s_pMiarex;
+//	QMiarex   *pMiarex     = (QMiarex*)s_pMiarex;
 
 	if(QMiarex::s_MinPanelSize>0.0) MinPanelSize = QMiarex::s_MinPanelSize;
 	else                            MinPanelSize = 0.0;
@@ -2014,7 +2014,7 @@ void CWing::ScaleTwist(double Twist)
 
 int CWing::VLMGetPanelTotal()
 {
-	QMiarex *pMiarex = (QMiarex*) s_pMiarex;
+//	QMiarex *pMiarex = (QMiarex*) s_pMiarex;
 	double MinPanelSize;
 
 	if(QMiarex::s_MinPanelSize>0.0) MinPanelSize = QMiarex::s_MinPanelSize;

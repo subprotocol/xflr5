@@ -310,6 +310,11 @@ void FoilPolarDlg::InitDialog()
 			m_rbtype4->setChecked(true);
 			break;
 		}
+		default:
+		{
+			m_rbtype1->setChecked(true);
+			break;
+		}
 	}
 
 	GetLengthUnit(str, pMainFrame->m_LengthUnit);
