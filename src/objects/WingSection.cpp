@@ -29,14 +29,14 @@ WingSection::WingSection()
 	m_XPanelDist = 0;
 	m_YPanelDist = 0;
 
-	m_TChord    = 0.0;
-	m_TLength   = 0.0;
-	m_TPos      = 0.0;
-	m_TYProj    = 0.0;
-	m_TOffset   = 0.0;
-	m_TDihedral = 0.0;
-	m_TZPos     = 0.0;
-	m_TTwist    = 0.0;
+	m_Chord    = 0.0;
+	m_Length   = 0.0;
+	m_YPosition      = 0.0;
+	m_YProj    = 0.0;
+	m_Offset   = 0.0;
+	m_Dihedral = 0.0;
+	m_ZPos     = 0.0;
+	m_Twist    = 0.0;
 
 	m_RightFoilName.clear();
 	m_LeftFoilName.clear();

@@ -96,7 +96,6 @@ GL3dWingDlg::GL3dWingDlg(QWidget *pParent) : QDialog(pParent)
 	m_bOutline           = true;
 	m_bVLMPanels         = true;
 	m_bAxes              = true;
-	m_bglLight           = true;
 	m_bPickCenter        = false;
 	m_bShowLight         = false;
 	m_bRightSide  = true;
@@ -144,7 +143,7 @@ bool GL3dWingDlg::CheckWing()
 
 	for (int k=1; k<m_pWing->NWingSection(); k++)
 	{
-		if(m_pWing->TPos(k)*1.00001 < m_pWing->TPos(k-1))
+		if(m_pWing->YPosition(k)*1.00001 < m_pWing->YPosition(k-1))
 		{
 			QMessageBox::warning(this, tr("Warning"), tr("Warning : Panel sequence is inconsistent"));
 			return false;
@@ -325,19 +324,19 @@ void GL3dWingDlg::FillTableRow(int row)
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 
 	ind = m_pWingModel->index(row, 0, QModelIndex());
-	m_pWingModel->setData(ind, m_pWing->TPos(row) * pMainFrame->m_mtoUnit);
+	m_pWingModel->setData(ind, m_pWing->YPosition(row) * pMainFrame->m_mtoUnit);
 
 	ind = m_pWingModel->index(row, 1, QModelIndex());
-	m_pWingModel->setData(ind, m_pWing->TChord(row) * pMainFrame->m_mtoUnit);
+	m_pWingModel->setData(ind, m_pWing->Chord(row) * pMainFrame->m_mtoUnit);
 
 	ind = m_pWingModel->index(row, 2, QModelIndex());
-	m_pWingModel->setData(ind, m_pWing->TOffset(row) * pMainFrame->m_mtoUnit);
+	m_pWingModel->setData(ind, m_pWing->Offset(row) * pMainFrame->m_mtoUnit);
 
 	ind = m_pWingModel->index(row, 3, QModelIndex());
-	m_pWingModel->setData(ind, m_pWing->TDihedral(row));
+	m_pWingModel->setData(ind, m_pWing->Dihedral(row));
 
 	ind = m_pWingModel->index(row, 4, QModelIndex());
-	m_pWingModel->setData(ind, m_pWing->TTwist(row));
+	m_pWingModel->setData(ind, m_pWing->Twist(row));
 
 	ind = m_pWingModel->index(row, 5, QModelIndex());
 	if(m_bRightSide) m_pWingModel->setData(ind, m_pWing->RightFoil(row));
@@ -666,7 +665,7 @@ void GL3dWingDlg::GLCreateSectionHighlight()
 	for(j=0; j<m_pWing->NWingSection(); j++)
 	{
 		if(j==m_iSection) break;
-		if(fabs(m_pWing->TPos(j+1)-m_pWing->TPos(j)) > QMiarex::s_MinPanelSize)
+		if(fabs(m_pWing->YPosition(j+1)-m_pWing->YPosition(j)) > QMiarex::s_MinPanelSize)
 			section++;
 	}
 
@@ -990,7 +989,7 @@ void GL3dWingDlg::GLRenderView()
 			glCallList(SECTIONHIGHLIGHT);
 		}
 
-		if(m_bglLight)
+		if(GLLightDlg::IsLightOn())
 		{
 			glEnable(GL_LIGHTING);
 			glEnable(GL_LIGHT0);
@@ -1058,7 +1057,6 @@ bool GL3dWingDlg::InitDialog(CWing *pWing)
 	m_bSurfaces = pMiarex->m_bSurfaces;
 	m_bOutline = pMiarex->m_bOutline;
 	m_bVLMPanels = pMiarex->m_bVLMPanels;
-	m_bglLight = pMiarex->m_bglLight;
 
 	GetAreaUnit(str, pMainFrame->m_AreaUnit);
 	m_pctrlAreaUnit1->setText(str);
@@ -1097,7 +1095,7 @@ bool GL3dWingDlg::InitDialog(CWing *pWing)
 	m_pctrlOutline->setChecked(m_bOutline);
 	m_pctrlAxes->setChecked(m_bAxes);
 	m_pctrlPanels->setChecked(m_bVLMPanels);
-	m_pctrlLight->setChecked(m_bglLight);
+	m_pctrlLight->setChecked(GLLightDlg::IsLightOn());
 	m_pctrlFoilNames->setChecked(m_bFoilNames);
 	m_pctrlShowMasses->setChecked(m_bShowMasses);
 
@@ -1577,7 +1575,7 @@ void GL3dWingDlg::OnInertia()
 
 void GL3dWingDlg::OnLight()
 {
-	m_bglLight = m_pctrlLight->isChecked();
+	GLLightDlg::SetLightOn(m_pctrlLight->isChecked());
 	UpdateView();
 }
 
@@ -1602,11 +1600,11 @@ void GL3dWingDlg::OnInsertBefore()
 
 	m_pWing->InsertSection(m_iSection);
 
-	m_pWing->TPos(n)       = (m_pWing->TPos(n+1)      + m_pWing->TPos(n-1))     /2.0;
-	m_pWing->TChord(n)     = (m_pWing->TChord(n+1)    + m_pWing->TChord(n-1))   /2.0;
-	m_pWing->TOffset(n)    = (m_pWing->TOffset(n+1)   + m_pWing->TOffset(n-1))  /2.0;
-	m_pWing->TTwist(n)     = (m_pWing->TTwist(n+1)    + m_pWing->TTwist(n-1))   /2.0;
-	m_pWing->TDihedral(n)  = (m_pWing->TDihedral(n+1) + m_pWing->TDihedral(n-1))/2.0;
+	m_pWing->YPosition(n)       = (m_pWing->YPosition(n+1)      + m_pWing->YPosition(n-1))     /2.0;
+	m_pWing->Chord(n)     = (m_pWing->Chord(n+1)    + m_pWing->Chord(n-1))   /2.0;
+	m_pWing->Offset(n)    = (m_pWing->Offset(n+1)   + m_pWing->Offset(n-1))  /2.0;
+	m_pWing->Twist(n)     = (m_pWing->Twist(n+1)    + m_pWing->Twist(n-1))   /2.0;
+	m_pWing->Dihedral(n)  = (m_pWing->Dihedral(n+1) + m_pWing->Dihedral(n-1))/2.0;
 
 	m_pWing->XPanelDist(n) = m_pWing->XPanelDist(n-1);
 	m_pWing->YPanelDist(n) = m_pWing->YPanelDist(n-1);
@@ -1654,20 +1652,20 @@ void GL3dWingDlg::OnInsertAfter()
 
 	if(n<m_pWing->NWingSection()-2)
 	{
-		m_pWing->TPos(n+1)      = (m_pWing->TPos(n)      + m_pWing->TPos(n+2))     /2.0;
-		m_pWing->TChord(n+1)    = (m_pWing->TChord(n)    + m_pWing->TChord(n+2))   /2.0;
-		m_pWing->TOffset(n+1)   = (m_pWing->TOffset(n)   + m_pWing->TOffset(n+2))  /2.0;
-		m_pWing->TTwist(n+1)    = (m_pWing->TTwist(n)    + m_pWing->TTwist(n+2))   /2.0;
+		m_pWing->YPosition(n+1)      = (m_pWing->YPosition(n)      + m_pWing->YPosition(n+2))     /2.0;
+		m_pWing->Chord(n+1)    = (m_pWing->Chord(n)    + m_pWing->Chord(n+2))   /2.0;
+		m_pWing->Offset(n+1)   = (m_pWing->Offset(n)   + m_pWing->Offset(n+2))  /2.0;
+		m_pWing->Twist(n+1)    = (m_pWing->Twist(n)    + m_pWing->Twist(n+2))   /2.0;
 	}
 	else
 	{
-		m_pWing->TPos(n+1)     = m_pWing->TPos(n)*1.1;
-		m_pWing->TChord(n+1)   = m_pWing->TChord(n)/1.1;
-		m_pWing->TOffset(n+1)  = m_pWing->TOffset(n) + m_pWing->TChord(n) - m_pWing->TChord(n) ;
-		m_pWing->TTwist(n+1)     = m_pWing->TTwist(n);
+		m_pWing->YPosition(n+1)     = m_pWing->YPosition(n)*1.1;
+		m_pWing->Chord(n+1)   = m_pWing->Chord(n)/1.1;
+		m_pWing->Offset(n+1)  = m_pWing->Offset(n) + m_pWing->Chord(n) - m_pWing->Chord(n) ;
+		m_pWing->Twist(n+1)     = m_pWing->Twist(n);
 	}
 
-	m_pWing->TDihedral(n+1)  = m_pWing->TDihedral(n);
+	m_pWing->Dihedral(n+1)  = m_pWing->Dihedral(n);
 	m_pWing->NXPanels(n+1)   = m_pWing->NXPanels(n);
 	m_pWing->NYPanels(n+1)   = m_pWing->NYPanels(n);
 	m_pWing->XPanelDist(n+1) = m_pWing->XPanelDist(n);
@@ -1769,7 +1767,7 @@ void GL3dWingDlg::OnResetMesh()
 void GL3dWingDlg::OnScaleWing()
 {
     WingScaleDlg dlg(this);
-	dlg.InitDialog(m_pWing->m_PlanformSpan, m_pWing->TChord(0), m_pWing->AverageSweep(), m_pWing->TTwist(m_pWing->NWingSection()-1));
+	dlg.InitDialog(m_pWing->m_PlanformSpan, m_pWing->Chord(0), m_pWing->AverageSweep(), m_pWing->Twist(m_pWing->NWingSection()-1));
 
 	if(QDialog::Accepted == dlg.exec())
 	{
@@ -1891,31 +1889,31 @@ void GL3dWingDlg::ReadSectionData(int sel)
 	strong =pItem->text();
 	strong.replace(" ","");
 	d =strong.toDouble(&bOK);
-	if(bOK) m_pWing->TPos(sel) =d / pMainFrame->m_mtoUnit;
+	if(bOK) m_pWing->YPosition(sel) =d / pMainFrame->m_mtoUnit;
 
 	pItem = m_pWingModel->item(sel,1);
 	strong =pItem->text();
 	strong.replace(" ","");
 	d =strong.toDouble(&bOK);
-	if(bOK) m_pWing->TChord(sel) =d / pMainFrame->m_mtoUnit;
+	if(bOK) m_pWing->Chord(sel) =d / pMainFrame->m_mtoUnit;
 
 	pItem = m_pWingModel->item(sel,2);
 	strong =pItem->text();
 	strong.replace(" ","");
 	d =strong.toDouble(&bOK);
-	if(bOK) m_pWing->TOffset(sel) =d / pMainFrame->m_mtoUnit;
+	if(bOK) m_pWing->Offset(sel) =d / pMainFrame->m_mtoUnit;
 
 	pItem = m_pWingModel->item(sel,3);
 	strong =pItem->text();
 	strong.replace(" ","");
 	d =strong.toDouble(&bOK);
-	if(bOK) m_pWing->TDihedral(sel) =d;
+	if(bOK) m_pWing->Dihedral(sel) =d;
 
 	pItem = m_pWingModel->item(sel,4);
 	strong =pItem->text();
 	strong.replace(" ","");
 	d =strong.toDouble(&bOK);
-	if(bOK) m_pWing->TTwist(sel) =d;
+	if(bOK) m_pWing->Twist(sel) =d;
 
 	pItem = m_pWingModel->item(sel,5);
 	strong =pItem->text();
@@ -2618,7 +2616,7 @@ int GL3dWingDlg::VLMGetPanelTotal()
 	{
 			//do not create a surface if its length is less than the critical size
 //			if(fabs(m_pWing->TPos[j]-m_pWing->TPos(j+1))/m_pWing->m_Span >0.001){
-			if (fabs(m_pWing->TPos(i)-m_pWing->TPos(i+1)) > MinPanelSize)
+			if (fabs(m_pWing->YPosition(i)-m_pWing->YPosition(i+1)) > MinPanelSize)
 				total +=m_pWing->NXPanels(i)*m_pWing->NYPanels(i);
 	}
 //	if(!m_bMiddle) total *=2;
@@ -2657,7 +2655,7 @@ bool GL3dWingDlg::VLMSetAutoMesh(int total)
 //		d2 = 5./2./m_pWing->m_Span/m_pWing->m_Span/m_pWing->m_Span *8. * pow(m_pWing->TPos(i+1),3) + 0.5;
 //		m_pWing->NYPanels(i) = (int) (NYTotal * (0.8*d1+0.2*d2)* (m_pWing->TPos(i+1)-m_pWing->TPos(i))/m_pWing->m_Span);
 
-		m_pWing->NYPanels(i) = (int)(fabs(m_pWing->TPos(i+1) - m_pWing->TPos(i))* (double)NYTotal/m_pWing->m_PlanformSpan);
+		m_pWing->NYPanels(i) = (int)(fabs(m_pWing->YPosition(i+1) - m_pWing->YPosition(i))* (double)NYTotal/m_pWing->m_PlanformSpan);
 
 		m_pWing->NXPanels(i) = (int) (size/NYTotal);
 		m_pWing->NXPanels(i) = qMin(m_pWing->NXPanels(i), MAXCHORDPANELS);

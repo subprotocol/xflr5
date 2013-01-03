@@ -35,14 +35,14 @@ public:
 	int m_XPanelDist;		// VLM Panel distribution type, for each Wing Panel
 	int m_YPanelDist;		// VLM Panel distribution type, for each Wing Panel
 
-	double m_TChord;		// Chord length at each panel side
-	double m_TLength;		// the length of each panel
-	double m_TPos;		// b-position of each panel end on developed surface
-	double m_TYProj;		// b-position of each panel end projected on horizontal surface
-	double m_TOffset;		// b-position of each panel end
-	double m_TDihedral;	// b-position of each panel end
-	double m_TZPos;		// vertical offset - calculation result only
-	double m_TTwist;		//Twist value of each foil (measured to the wing root)
+	double m_Chord;		// Chord length at each panel side
+	double m_Length;		// the length of each panel
+	double m_YPosition;		// b-position of each panel end on developed surface
+	double m_YProj;		// b-position of each panel end projected on horizontal surface
+	double m_Offset;		// b-position of each panel end
+	double m_Dihedral;	// b-position of each panel end
+	double m_ZPos;		// vertical offset - calculation result only
+	double m_Twist;		//Twist value of each foil (measured to the wing root)
 
 	QString m_RightFoilName, m_LeftFoilName;
 };

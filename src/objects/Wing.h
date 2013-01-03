@@ -63,7 +63,7 @@ public:
 	double AverageSweep();
 	double TotalMass();
 	double C4(double yob, double xRef);
-	double ZPos(double y);
+	double ZPosition(double y);
 	double Beta(int m, int k);
 
 	CVector CoG() {return m_CoG;}
@@ -94,15 +94,15 @@ public:
 	void GetFoils(CFoil **pFoil0, CFoil **pFoil1, double y, double &t);
 	void Duplicate(CWing *pWing);
 	void ComputeChords(int NStation=0);
-	void ComputeChords(int NStation, double *Chord, double *Offset, double *Twist);
+	void ComputeChords(int NStation, double *chord, double *offset, double *twist);
 	void ComputeDihedrals();
 	void ComputeGeometry();
 	void ComputeVolumeInertia(CVector &CoG, double &CoGIxx, double &CoGIyy, double &CoGIzz, double &CoGIxz);
 	void ComputeBodyAxisInertia();
 
 //	void InsertSection(double TPos, double TChord, double TOffset, double TZPos, double Twist, QString Foil,int NChord, int NSpan, int SSpan);
-	void ScaleSweep(double Sweep);
-	void ScaleTwist(double Twist);
+	void ScaleSweep(double sweep);
+	void ScaleTwist(double twist);
 	void ScaleSpan(double NewSpan);
 	void ScaleChord(double NewChord);
 	bool SerializeWing(QDataStream &ar, bool bIsStoring, int ProjectFormat);
@@ -123,14 +123,14 @@ public:
 	void RemoveWingSection(int const iSection);
 	int NWingSection() {return m_WingSection.count();};
 
-	double &TChord(const int &iSection);
-	double &TTwist(const int &iSection);
-	double &TPos(const int &iSection);
-	double &TDihedral(const int &iSection);
-	double &TOffset(const int &iSection);
-	double &TLength(const int &iSection);
-	double &TYProj(const int &iSection);
-	double &TZPos(const int &iSection);
+	double &Chord(const int &iSection);
+	double &Twist(const int &iSection);
+	double &YPosition(const int &iSection);
+	double &Dihedral(const int &iSection);
+	double &Offset(const int &iSection);
+	double &Length(const int &iSection);
+	double &YProj(const int &iSection);
+	double &ZPosition(const int &iSection);
 
 	int &NXPanels(const int &iSection);
 	int &NYPanels(const int &iSection);
@@ -140,11 +140,11 @@ public:
 	QString &RightFoil(const int &iSection);
 	QString &LeftFoil(const int &iSection);
 
-	double RootChord()  {return m_WingSection.first()->m_TChord;};
-	double TipChord()   {return m_WingSection.last()->m_TChord;};
-	double TipTwist()   {return m_WingSection.last()->m_TTwist;};
-	double TipOffset()  {return m_WingSection.last()->m_TOffset;};
-	double TipPos()     {return m_WingSection.last()->m_TPos;};
+	double RootChord()  {return m_WingSection.first()->m_Chord;};
+	double TipChord()   {return m_WingSection.last()->m_Chord;};
+	double TipTwist()   {return m_WingSection.last()->m_Twist;};
+	double TipOffset()  {return m_WingSection.last()->m_Offset;};
+	double TipPos()     {return m_WingSection.last()->m_YPosition;};
 
 //__________________________Variables_______________________
 private:

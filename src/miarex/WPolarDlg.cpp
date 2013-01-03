@@ -993,7 +993,7 @@ void WPolarDlg::SetReynolds()
 
 	if(s_WPolar.m_WPolarType ==FIXEDSPEEDPOLAR)
 	{
-		double RRe = m_pWing->TChord(0) * s_WPolar.m_QInf/s_WPolar.m_Viscosity;
+		double RRe = m_pWing->Chord(0) * s_WPolar.m_QInf/s_WPolar.m_Viscosity;
 		ReynoldsFormat(str, RRe);
 		strange = tr("Root Re =");
 		m_pctrlRRe->setText(strange+str);
@@ -1016,7 +1016,7 @@ void WPolarDlg::SetReynolds()
 		strange = tr("Vinf.sqrt(Cl) =");
 		m_pctrlQInfCl->setText(strange+str);
 
-		double RRe = m_pWing->TChord(0) * QCl/s_WPolar.m_Viscosity;
+		double RRe = m_pWing->Chord(0) * QCl/s_WPolar.m_Viscosity;
 		ReynoldsFormat(str, RRe);
 		strange = tr("Root Re.sqrt(Cl) =");
 		m_pctrlRRe->setText(strange+str);

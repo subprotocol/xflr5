@@ -133,11 +133,11 @@ CWing::CWing()
 
 	ComputeGeometry();
 
-	double length = TLength(0);
+	double length = Length(0);
 	for (int is=0; is<m_WingSection.size(); is++)
 	{
-		length += TLength(is);
-		TPos(is)     = length;
+		length += Length(is);
+		YPosition(is)     = length;
 		XPanelDist(is) =  1;
 	}
 }
@@ -148,7 +148,7 @@ void CWing::ComputeDihedrals()
 {
 	for (int is=0; is<NWingSection()-1; is++)
 	{
-		TDihedral(is) = 180.0/PI* atan2(TZPos(is+1)-TZPos(is), TPos(is+1)-TPos(is));
+		Dihedral(is) = 180.0/PI* atan2(ZPosition(is+1)-ZPosition(is), YPosition(is+1)-YPosition(is));
 	}
 }
 
@@ -165,13 +165,13 @@ void CWing::ComputeGeometry()
 
 	double surface = 0.0;
 	double xysurface = 0.0;
-	TLength(0) = 0.0;
-	TYProj(0)  = TPos(0);
+	Length(0) = 0.0;
+	YProj(0)  = YPosition(0);
 	for (is=1; is<NWingSection(); is++)
-		TLength(is) = TPos(is) - TPos(is-1);
+		Length(is) = YPosition(is) - YPosition(is-1);
 	for (is=1; is<NWingSection(); is++)
 	{
-		TYProj(is) = TYProj(is-1) + TLength(is) * cos(TDihedral(is-1)*PI/180.0);
+		YProj(is) = YProj(is-1) + Length(is) * cos(Dihedral(is-1)*PI/180.0);
 	}
 //qDebug()<<"TipPos"<<TipPos();
 	m_PlanformSpan  = 2.0 * TipPos();
@@ -183,12 +183,12 @@ void CWing::ComputeGeometry()
 	{
 		pFoilA = pMainFrame->GetFoil(RightFoil(is));
 		pFoilB = pMainFrame->GetFoil(RightFoil(is+1));
-		surface   += TLength(is+1)*(TChord(is)+TChord(is+1))/2.0;//m2
-		xysurface += (TLength(is+1)*(TChord(is)+TChord(is+1))/2.0)*cos(TDihedral(is)*PI/180.0);
-		m_ProjectedSpan += TLength(is+1)*cos(TDihedral(is)*PI/180.0);
+		surface   += Length(is+1)*(Chord(is)+Chord(is+1))/2.0;//m2
+		xysurface += (Length(is+1)*(Chord(is)+Chord(is+1))/2.0)*cos(Dihedral(is)*PI/180.0);
+		m_ProjectedSpan += Length(is+1)*cos(Dihedral(is)*PI/180.0);
 
-		m_MAChord += IntegralC2(TPos(is), TPos(is+1), TChord(is), TChord(is+1));
-		m_yMac    += IntegralCy(TPos(is), TPos(is+1), TChord(is), TChord(is+1));
+		m_MAChord += IntegralC2(YPosition(is), YPosition(is+1), Chord(is), Chord(is+1));
+		m_yMac    += IntegralCy(YPosition(is), YPosition(is+1), Chord(is), Chord(is+1));
 	}
 
 	m_ProjectedSpan *=2.0;
@@ -226,13 +226,13 @@ void CWing::ComputeGeometry()
 		pFoilB = pMainFrame->GetFoil(RightFoil(is));
 		if(pFoilA && pFoilB && (!m_bIsFin || (m_bIsFin && m_bSymFin) || (m_bIsFin && m_bDoubleFin)))
 		{
-			if(pFoilA->m_bTEFlap && pFoilB->m_bTEFlap && fabs(TPos(is)-TPos(is-1))>MinPanelSize)	m_nFlaps++;
+			if(pFoilA->m_bTEFlap && pFoilB->m_bTEFlap && fabs(YPosition(is)-YPosition(is-1))>MinPanelSize)	m_nFlaps++;
 		}
 		pFoilA = pMainFrame->GetFoil(LeftFoil(is-1));
 		pFoilB = pMainFrame->GetFoil(LeftFoil(is));
 		if(pFoilA && pFoilB)
 		{
-			if(pFoilA->m_bTEFlap && pFoilB->m_bTEFlap && fabs(TPos(is)-TPos(is-1))>MinPanelSize)	m_nFlaps++;
+			if(pFoilA->m_bTEFlap && pFoilB->m_bTEFlap && fabs(YPosition(is)-YPosition(is-1))>MinPanelSize)	m_nFlaps++;
 		}
 	}
 }
@@ -448,7 +448,7 @@ void CWing::CreateSurfaces(CVector const &T, double XTilt, double YTilt)
 	//
 
 	int j, nSurf;
-	CVector PLA, PTA, PLB, PTB, Offset, T1;
+	CVector PLA, PTA, PLB, PTB, offset, T1;
 	CVector Trans(T.x, 0.0, T.z);
 	CVector O(0.0,0.0,0.0);
 	CVector VNormal[MAXSPANSECTIONS+1], VNSide[MAXSPANSECTIONS+1];
@@ -470,10 +470,10 @@ void CWing::CreateSurfaces(CVector const &T, double XTilt, double YTilt)
 
 	for(int is=0; is<NWingSection()-1;is++)
 	{
-		if (fabs(TPos(is)-TPos(is+1)) > MinPanelSize)
+		if (fabs(YPosition(is)-YPosition(is+1)) > MinPanelSize)
 		{
 			VNormal[nSurf].Set(0.0, 0.0, 1.0);
-			VNormal[nSurf].RotateX(O, TDihedral(is));
+			VNormal[nSurf].RotateX(O, Dihedral(is));
 			nSurf++;
 		}
 	}
@@ -492,19 +492,19 @@ void CWing::CreateSurfaces(CVector const &T, double XTilt, double YTilt)
 	int iSurf = m_NSurfaces-1;
 	for (int jss=0; jss<NWingSection()-1; jss++)
 	{
-		if (fabs(TPos(jss)-TPos(jss+1)) > MinPanelSize)
+		if (fabs(YPosition(jss)-YPosition(jss+1)) > MinPanelSize)
 		{
 			m_Surface[iSurf].m_pFoilA   = pMainFrame->GetFoil(LeftFoil(jss+1));
 			m_Surface[iSurf].m_pFoilB   = pMainFrame->GetFoil(LeftFoil(jss));
 
-			m_Surface[iSurf].m_Length   =  TPos(jss+1) - TPos(jss);
+			m_Surface[iSurf].m_Length   =  YPosition(jss+1) - YPosition(jss);
 
-			PLA.x =  TOffset(jss+1);		PLB.x =  TOffset(jss);
-			PLA.y = -TPos(jss+1);			PLB.y = -TPos(jss);
-			PLA.z =  0.0;					PLB.z =  0.0;
-			PTA.x =  PLA.x+TChord(jss+1);	PTB.x = PLB.x+TChord(jss);
-			PTA.y =  PLA.y;					PTB.y = PLB.y;
-			PTA.z =  0.0;					PTB.z =  0.0;
+			PLA.x =  Offset(jss+1);         PLB.x =  Offset(jss);
+			PLA.y = -YPosition(jss+1);      PLB.y = -YPosition(jss);
+			PLA.z =  0.0;                   PLB.z =  0.0;
+			PTA.x =  PLA.x+Chord(jss+1);    PTB.x = PLB.x+Chord(jss);
+			PTA.y =  PLA.y;	                PTB.y = PLB.y;
+			PTA.z =  0.0;                   PTB.z =  0.0;
 
 			m_Surface[iSurf].m_LA.Copy(PLA);
 			m_Surface[iSurf].m_TA.Copy(PTA);
@@ -513,12 +513,12 @@ void CWing::CreateSurfaces(CVector const &T, double XTilt, double YTilt)
 
 			m_Surface[iSurf].SetNormal(); // is (0,0,1)
 
-			m_Surface[iSurf].RotateX(m_Surface[iSurf].m_LB, -TDihedral(jss));
+			m_Surface[iSurf].RotateX(m_Surface[iSurf].m_LB, -Dihedral(jss));
 			m_Surface[iSurf].NormalA.Set(VNSide[nSurf+1].x, -VNSide[nSurf+1].y, VNSide[nSurf+1].z);
 			m_Surface[iSurf].NormalB.Set(VNSide[nSurf].x,   -VNSide[nSurf].y,   VNSide[nSurf].z);
 
-			m_Surface[iSurf].m_TwistA   =  TTwist(jss+1);
-			m_Surface[iSurf].m_TwistB   =  TTwist(jss);
+			m_Surface[iSurf].m_TwistA   =  Twist(jss+1);
+			m_Surface[iSurf].m_TwistB   =  Twist(jss);
 			m_Surface[iSurf].SetTwist1();
 
 
@@ -564,19 +564,19 @@ void CWing::CreateSurfaces(CVector const &T, double XTilt, double YTilt)
 		iSurf = nSurf;
 		for (int jss=0; jss<NWingSection()-1; jss++)
 		{
-			if (fabs(TPos(jss)-TPos(jss+1)) > MinPanelSize)
+			if (fabs(YPosition(jss)-YPosition(jss+1)) > MinPanelSize)
 			{
 				m_Surface[iSurf].m_pFoilA   = pMainFrame->GetFoil(RightFoil(jss));
 				m_Surface[iSurf].m_pFoilB   = pMainFrame->GetFoil(RightFoil(jss+1));
 
-				m_Surface[iSurf].m_Length   =  TPos(jss+1) - TPos(jss);
+				m_Surface[iSurf].m_Length   =  YPosition(jss+1) - YPosition(jss);
 
-				PLA.x = TOffset(jss);        PLB.x = TOffset(jss+1);
-				PLA.y = TPos(jss);           PLB.y = TPos(jss+1);
-				PLA.z = 0.0;                 PLB.z = 0.0;
-				PTA.x = PLA.x+TChord(jss);   PTB.x = PLB.x+TChord(jss+1);
-				PTA.y = PLA.y;               PTB.y = PLB.y;
-				PTA.z = 0.0;                 PTB.z = 0.0;
+				PLA.x = Offset(jss);        PLB.x = Offset(jss+1);
+				PLA.y = YPosition(jss);     PLB.y = YPosition(jss+1);
+				PLA.z = 0.0;                PLB.z = 0.0;
+				PTA.x = PLA.x+Chord(jss);   PTB.x = PLB.x+Chord(jss+1);
+				PTA.y = PLA.y;              PTB.y = PLB.y;
+				PTA.z = 0.0;                PTB.z = 0.0;
 
 				m_Surface[iSurf].m_LA.Copy(PLA);
 				m_Surface[iSurf].m_TA.Copy(PTA);
@@ -585,12 +585,12 @@ void CWing::CreateSurfaces(CVector const &T, double XTilt, double YTilt)
 
 				m_Surface[iSurf].SetNormal(); // is (0,0,1)
 
-				m_Surface[iSurf].RotateX(m_Surface[iSurf].m_LA, TDihedral(jss));
+				m_Surface[iSurf].RotateX(m_Surface[iSurf].m_LA, Dihedral(jss));
 				m_Surface[iSurf].NormalA.Set(VNSide[iSurf-nSurf].x,   VNSide[iSurf-nSurf].y,   VNSide[iSurf-nSurf].z);
 				m_Surface[iSurf].NormalB.Set(VNSide[iSurf-nSurf+1].x, VNSide[iSurf-nSurf+1].y, VNSide[iSurf-nSurf+1].z);
 
-				m_Surface[iSurf].m_TwistA   =  TTwist(jss);
-				m_Surface[iSurf].m_TwistB   =  TTwist(jss+1);
+				m_Surface[iSurf].m_TwistA   =  Twist(jss);
+				m_Surface[iSurf].m_TwistB   =  Twist(jss+1);
 				m_Surface[iSurf].SetTwist1();
 
 				if(jss>0)
@@ -648,22 +648,22 @@ void CWing::CreateSurfaces(CVector const &T, double XTilt, double YTilt)
 			m_NSurfaces*=2;
 			//rotate surfaces symetrically
 			int ns2 = (int)(m_NSurfaces/2);
-			Offset.Set(0.0, -T.y, 0.0);
+			offset.Set(0.0, -T.y, 0.0);
 			for(int jSurf=0; jSurf<ns2; jSurf++)
 			{
 				m_Surface[jSurf].RotateX(Or, +XTilt);
 				m_Surface[jSurf].RotateZ(Or, YTilt);
 				m_Surface[jSurf].Translate(Trans);
-				m_Surface[jSurf].Translate(Offset);
+				m_Surface[jSurf].Translate(offset);
 				m_Surface[jSurf].m_bIsInSymPlane = false;
 			}
-			Offset.y = -Offset.y;
+			offset.y = -offset.y;
 			for(int jSurf=ns2; jSurf< m_NSurfaces; jSurf++)
 			{
 				m_Surface[jSurf].RotateX(Or, -XTilt);
 				m_Surface[jSurf].RotateZ(Or, -YTilt);
 				m_Surface[jSurf].Translate(Trans);
-				m_Surface[jSurf].Translate(Offset);
+				m_Surface[jSurf].Translate(offset);
 				m_Surface[jSurf].m_bIsInSymPlane = false;
 			}
 			m_Surface[ns2].m_bIsTipRight = true;
@@ -698,7 +698,7 @@ void CWing::CreateSurfaces(CVector const &T, double XTilt, double YTilt)
 
 	if(m_NSurfaces>1) m_Surface[(int)(m_NSurfaces/2)-1].m_bJoinRight   = true;
 	//check for a center gap greater than 1/10mm
-	if(TPos(0)>0.0001) 	m_Surface[(int)(m_NSurfaces/2)-1].m_bJoinRight   = false;
+	if(YPosition(0)>0.0001) 	m_Surface[(int)(m_NSurfaces/2)-1].m_bJoinRight   = false;
 
 	if(m_bIsFin && m_bDoubleFin) m_Surface[(int)(m_NSurfaces/2)-1].m_bJoinRight   = false;
 
@@ -728,11 +728,11 @@ void CWing::ComputeChords(int NStation)
 			y = fabs(yob * m_PlanformSpan/2);
 			for (int is=0; is<NWingSection(); is++)
 			{
-				if(TPos(is) < y && y <=TPos(is+1))
+				if(YPosition(is) < y && y <=YPosition(is+1))
 				{
-					tau = (y-TPos(is))/(TPos(is+1)-TPos(is));
-					m_Chord[k]  = TChord(is)+(TChord(is+1)-TChord(is)) * tau;
-					m_Offset[k] = TOffset(is)+(TOffset(is+1)-TOffset(is)) * tau;
+					tau = (y-YPosition(is))/(YPosition(is+1)-YPosition(is));
+					m_Chord[k]  = Chord(is)+(Chord(is+1)-Chord(is)) * tau;
+					m_Offset[k] = Offset(is)+(Offset(is+1)-Offset(is)) * tau;
 					break;
 				}
 			}
@@ -788,7 +788,7 @@ void CWing::ComputeChords(int NStation)
 
 
 
-void CWing::ComputeChords(int NStation, double *Chord, double *Offset, double *Twist)
+void CWing::ComputeChords(int NStation, double *chord, double *offset, double *twist)
 {
 	//
 	// Calculates the chord lengths at each position of the NStation in LLT calculations
@@ -809,11 +809,11 @@ void CWing::ComputeChords(int NStation, double *Chord, double *Offset, double *T
 			y = fabs(yob * m_PlanformSpan/2);
 			for (int is=0; is<NWingSection(); is++)
 			{
-				if(TPos(is) < y && y <=TPos(is+1))
+				if(YPosition(is) < y && y <=YPosition(is+1))
 				{
-					tau = (y-TPos(is))/(TPos(is+1)-TPos(is));
-					Chord[k]  = TChord(is)+(TChord(is+1)-TChord(is)) * tau;
-					Offset[k] = TOffset(is)+(TOffset(is+1)-TOffset(is)) * tau;
+					tau = (y-YPosition(is))/(YPosition(is+1)-YPosition(is));
+					chord[k]  = Chord(is)+(Chord(is+1)-Chord(is)) * tau;
+					offset[k] = Offset(is)+(Offset(is+1)-Offset(is)) * tau;
 					break;
 				}
 			}
@@ -853,13 +853,13 @@ void CWing::ComputeChords(int NStation, double *Chord, double *Offset, double *T
 			for (int k=0; k<m_Surface[j].m_NYPanels; k++)
 			{
 				//calculate chords and offsets at each station
-				Chord[m]     = m_Surface[j].GetChord(k);
+				chord[m]     = m_Surface[j].GetChord(k);
 //				m_StripArea[m] = m_Chord[m]* m_Surface[j].Getdl(k);
 
 				m_Surface[j].GetLeadingPt(k, C);
-				Offset[m] = C.x-x0;
+				offset[m] = C.x-x0;
 
-				Twist[m]  = m_Surface[j].GetTwist(k);
+				twist[m]  = m_Surface[j].GetTwist(k);
 				m++;
 			}
 		}
@@ -898,18 +898,18 @@ void CWing::Duplicate(CWing *pWing)
 	for (int is=0; is<pWing->m_WingSection.size(); is++)
 	{
 		AppendWingSection();
-		TChord(is)     = pWing->TChord(is);
-		TPos(is)       = pWing->TPos(is);
-		TOffset(is)    = pWing->TOffset(is);
-		TLength(is)    = pWing->TLength(is);
+		Chord(is)     = pWing->Chord(is);
+		YPosition(is)       = pWing->YPosition(is);
+		Offset(is)    = pWing->Offset(is);
+		Length(is)    = pWing->Length(is);
 		NXPanels(is)   = pWing->NXPanels(is) ;
 		NYPanels(is)   = pWing->NYPanels(is);
 		XPanelDist(is) = pWing->XPanelDist(is);
 		YPanelDist(is) = pWing->YPanelDist(is);
-		TTwist(is)     = pWing->TTwist(is);
-		TDihedral(is)  = pWing->TDihedral(is);
-		TZPos(is)      = pWing->TZPos(is);
-		TYProj(is)     = pWing->TYProj(is);
+		Twist(is)     = pWing->Twist(is);
+		Dihedral(is)  = pWing->Dihedral(is);
+		ZPosition(is)      = pWing->ZPosition(is);
+		YProj(is)     = pWing->YProj(is);
 
 		RightFoil(is)  = pWing->RightFoil(is);
 		LeftFoil(is)   = pWing->LeftFoil(is);
@@ -1112,7 +1112,7 @@ double CWing::AverageSweep()
 {
 	//returns the wing's average sweep from root to tip
 	//measured at the quarter chord
-	double xroot = TChord(0)/4.0;
+	double xroot = Chord(0)/4.0;
 	double xtip  = TipOffset() + TipChord()/4.0;
 //	double sweep = (atan2(xtip-xroot, m_PlanformSpan/2.0)) * 180.0/PI;
 	return (atan2(xtip-xroot, m_PlanformSpan/2.0)) * 180.0/PI;
@@ -1122,17 +1122,17 @@ double CWing::AverageSweep()
 double CWing::C4(double yob, double xRef)
 {
 	//returns the quarter-chord point xposition relative to XCmRef
-	double Chord, Offset, tau;
+	double chord, offset, tau;
 	double C4 = 0.0;
 	double y = fabs(yob*m_PlanformSpan/2.0);
 	for(int is=0; is<NWingSection()-1; is++)
 	{
-		if(TPos(is)<= y && y <=TPos(is+1))
+		if(YPosition(is)<= y && y <=YPosition(is+1))
 		{
-			tau = (y - TPos(is))/(TPos(is+1)-TPos(is));
-			Chord  = TChord(is)  + tau * (TChord(is+1) - TChord(is));
-			Offset = TOffset(is) + tau * (TOffset(is+1) - TOffset(is));
-			C4 = Offset + Chord/4.0 - xRef;
+			tau = (y - YPosition(is))/(YPosition(is+1)-YPosition(is));
+			chord  = Chord(is)  + tau * (Chord(is+1) - Chord(is));
+			offset = Offset(is) + tau * (Offset(is+1) - Offset(is));
+			C4 = offset + chord/4.0 - xRef;
 			return C4;
 		}
 	}
@@ -1142,18 +1142,18 @@ double CWing::C4(double yob, double xRef)
 
 double CWing::Chord(double yob)
 {
-	double Chord = 0.0;
+	double chord = 0.0;
 	double tau;
 	double y;
 
 	y= fabs(yob*m_PlanformSpan/2.0);//geometry is symetric
 	for(int is=0; is<NWingSection()-1; is++)
 	{
-		if(TPos(is)<=y && y <=TPos(is+1))
+		if(YPosition(is)<=y && y <=YPosition(is+1))
 		{
-			tau = (y - TPos(is))/(TPos(is+1)-TPos(is));
-			Chord = TChord(is) + tau * (TChord(is+1) - TChord(is));
-			return Chord;
+			tau = (y - YPosition(is))/(YPosition(is+1)-YPosition(is));
+			chord = Chord(is) + tau * (Chord(is+1) - Chord(is));
+			return chord;
 		}
 	}
 	return -1.0;
@@ -1165,10 +1165,10 @@ double CWing::Dihedral(double yob)
 	double y= fabs(yob*m_PlanformSpan/2.0);//geometry is symetric
 	for(int is=0; is<NWingSection()-1; is++)
 	{
-		if(TPos(is)<= y && y <=TPos(is+1))
+		if(YPosition(is)<= y && y <=YPosition(is+1))
 		{
-			if(yob>=0) return TDihedral(is);
-			else  return -TDihedral(is);
+			if(yob>=0) return Dihedral(is);
+			else  return -Dihedral(is);
 		}
 	}
 	return 0.0;
@@ -1184,12 +1184,12 @@ void CWing::GetFoils(CFoil **pFoil0, CFoil **pFoil1, double y, double &t)
 		//search Right wing
 		for (int is=0; is<NWingSection()-1; is++)
 		{
-			if (TPos(is)<=y && y<=TPos(is+1))
+			if (YPosition(is)<=y && y<=YPosition(is+1))
 			{
 
 				*pFoil0 = pMainFrame->GetFoil(RightFoil(is));
 				*pFoil1 = pMainFrame->GetFoil(RightFoil(is+1));
-				t = (y-TPos(is))/(TPos(is+1) - TPos(is));
+				t = (y-YPosition(is))/(YPosition(is+1) - YPosition(is));
 				return;
 			}
 		}
@@ -1200,11 +1200,11 @@ void CWing::GetFoils(CFoil **pFoil0, CFoil **pFoil1, double y, double &t)
 		y = -y;
 		for (int is=0; is<NWingSection()-1; is++)
 		{
-			if (TPos(is)<=y && y<TPos(is+1))
+			if (YPosition(is)<=y && y<YPosition(is+1))
 			{
 				*pFoil0 = pMainFrame->GetFoil(LeftFoil(is));
 				*pFoil1 = pMainFrame->GetFoil(LeftFoil(is+1));
-				t = (y-TPos(is))/(TPos(is+1) - TPos(is));
+				t = (y-YPosition(is))/(YPosition(is+1) - YPosition(is));
 				return;
 			}
 		}
@@ -1232,16 +1232,16 @@ double CWing::TotalMass()
 double CWing::Offset(double yob)
 {
 	double tau, y;
-	double Offset = 0.0;
+	double offset = 0.0;
 
 	y= fabs(yob*m_PlanformSpan/2.0);
 	for(int is=0; is<NWingSection()-1; is++)
 	{
-		if(TPos(is)<= y && y <=TPos(is+1))
+		if(YPosition(is)<= y && y <=YPosition(is+1))
 		{
-			tau = (y - TPos(is))/(TPos(is+1)-TPos(is));
-			Offset = TOffset(is) + tau * (TOffset(is+1) - TOffset(is));
-			return Offset;
+			tau = (y - YPosition(is))/(YPosition(is+1)-YPosition(is));
+			offset = Offset(is) + tau * (Offset(is+1) - Offset(is));
+			return offset;
 		}
 	}
 
@@ -1259,10 +1259,10 @@ double CWing::Twist(double y)
 		//right wing
 		for (int is=0; is<NWingSection(); is++)
 		{
-			if(TPos(is) <= y && y <=TPos(is+1))
+			if(YPosition(is) <= y && y <=YPosition(is+1))
 			{
-				tau = (y-TPos(is))/(TPos(is+1)-TPos(is));
-				return TTwist(is)+(TTwist(is+1)-TTwist(is)) * tau;
+				tau = (y-YPosition(is))/(YPosition(is+1)-YPosition(is));
+				return Twist(is)+(Twist(is+1)-Twist(is)) * tau;
 			}
 		}
 	}
@@ -1272,10 +1272,10 @@ double CWing::Twist(double y)
 		y=fabs(y);
 		for (int is=0; is<NWingSection()-1; is++)
 		{
-			if(TPos(is) <= y && y <=TPos(is+1))
+			if(YPosition(is) <= y && y <=YPosition(is+1))
 			{
-				tau = (y-TPos(is))/(TPos(is+1)-TPos(is));
-				return TTwist(is)+(TTwist(is+1)-TTwist(is)) * tau;
+				tau = (y-YPosition(is))/(YPosition(is+1)-YPosition(is));
+				return Twist(is)+(Twist(is+1)-Twist(is)) * tau;
 			}
 		}
 	}
@@ -1300,17 +1300,17 @@ void CWing::GetViewYZPos(double xrel, double y, double &yv, double &zv, int pos)
 //	if(fy<=0.0) return 0.0;
 	for (int is=0; is<NWingSection()-1; is++)
 	{
-		if(TPos(is)< fy && fy<=TPos(is+1))
+		if(YPosition(is)< fy && fy<=YPosition(is+1))
 		{
 			for (int ks=0; ks<is; ks++)
 			{
 				//TODO Potential bug, check original
-				yv += TLength(ks+1) * cos(TDihedral(ks)*PI/180.0);
-				zv += TLength(ks+1) * sin(TDihedral(ks)*PI/180.0);
+				yv += Length(ks+1) * cos(Dihedral(ks)*PI/180.0);
+				zv += Length(ks+1) * sin(Dihedral(ks)*PI/180.0);
 			}
-			tau = (fy - TPos(is))/(TPos(is+1)-TPos(is));
-			yv += tau * TLength(is+1) * cos(TDihedral(is)*PI/180.0);
-			zv += tau * TLength(is+1) * sin(TDihedral(is)*PI/180.0);
+			tau = (fy - YPosition(is))/(YPosition(is+1)-YPosition(is));
+			yv += tau * Length(is+1) * cos(Dihedral(is)*PI/180.0);
+			zv += tau * Length(is+1) * sin(Dihedral(is)*PI/180.0);
 
 			yv *= sign;
 			//	add washout calculated about chord quarter line :
@@ -1350,17 +1350,17 @@ double CWing::yrel(double SpanPos)
 	double y = fabs(SpanPos);
 	for(int is=0; is<NWingSection()-1; is++)
 	{
-		if(TPos(is)<=y && y <TPos(is+1))
+		if(YPosition(is)<=y && y <YPosition(is+1))
 		{
-			if(SpanPos>0) return  (y-TPos(is))/(TPos(is+1)-TPos(is));
-			else          return  (y-TPos(is+1))/(TPos(is)-TPos(is+1));
+			if(SpanPos>0) return  (y-YPosition(is))/(YPosition(is+1)-YPosition(is));
+			else          return  (y-YPosition(is+1))/(YPosition(is)-YPosition(is+1));
 		}
 	}
 	return 1.0;
 }
 
 
-double CWing::ZPos(double y)
+double CWing::ZPosition(double y)
 {
 	double tau;
 	double ZPos =0.0;
@@ -1369,14 +1369,14 @@ double CWing::ZPos(double y)
 	if(y<=0.0) return 0.0;
 	for (int is=0; is<NWingSection()-1; is++)
 	{
-		if(TPos(is)< y && y<=TPos(is+1))
+		if(YPosition(is)< y && y<=YPosition(is+1))
 		{
 			for (int iss=0; iss<is; iss++)
 			{
-				ZPos+=TLength(iss+1) * sin(TDihedral(iss)*PI/180.0);
+				ZPos+=Length(iss+1) * sin(Dihedral(iss)*PI/180.0);
 			}
-			tau = (y - TPos(is))/(TPos(is+1)-TPos(is));
-			ZPos += tau * TLength(is+1) * sin(TDihedral(is)*PI/180.0);
+			tau = (y - YPosition(is))/(YPosition(is+1)-YPosition(is));
+			ZPos += tau * Length(is+1) * sin(Dihedral(is)*PI/180.0);
 			return ZPos;
 		}
 	}
@@ -1647,11 +1647,11 @@ void CWing::ScaleChord(double NewChord)
 {
 	// Scales the wing chord-wise so that the root chord is set to the NewChord value
 
-	double ratio = NewChord/TChord(0);
+	double ratio = NewChord/Chord(0);
 	for (int is=0; is<m_WingSection.size(); is++)
 	{
-		TChord(is)    *= ratio;
-		TOffset(is)   *= ratio;
+		Chord(is)    *= ratio;
+		Offset(is)   *= ratio;
 	}
 	ComputeGeometry();
 }
@@ -1663,8 +1663,8 @@ void CWing::ScaleSpan(double NewSpan)
 
 	for (int is=0; is<m_WingSection.size(); is++)
 	{
-		TPos(is)      *= NewSpan/m_PlanformSpan;
-		TLength(is)   *= NewSpan/m_PlanformSpan;
+		YPosition(is)      *= NewSpan/m_PlanformSpan;
+		Length(is)   *= NewSpan/m_PlanformSpan;
 	}
 	ComputeGeometry();
 }
@@ -1703,11 +1703,11 @@ bool CWing::SerializeWing(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 
 		for (i=0; i<NWingSection(); i++) WriteCString(ar, RightFoil(i));
 		for (i=0; i<NWingSection(); i++) WriteCString(ar, LeftFoil(i));
-		for (i=0; i<NWingSection(); i++) ar << (float)TChord(i);
-		for (i=0; i<NWingSection(); i++) ar << (float)TPos(i);
-		for (i=0; i<NWingSection(); i++) ar << (float)TOffset(i);
-		for (i=0; i<NWingSection(); i++) ar << (float)TDihedral(i);
-		for (i=0; i<NWingSection(); i++) ar << (float)TTwist(i);
+		for (i=0; i<NWingSection(); i++) ar << (float)Chord(i);
+		for (i=0; i<NWingSection(); i++) ar << (float)YPosition(i);
+		for (i=0; i<NWingSection(); i++) ar << (float)Offset(i);
+		for (i=0; i<NWingSection(); i++) ar << (float)Dihedral(i);
+		for (i=0; i<NWingSection(); i++) ar << (float)Twist(i);
 
 //		ar << (float)m_XCmRef;
 		ar << 0.0f;
@@ -1797,8 +1797,8 @@ bool CWing::SerializeWing(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 
 		for (int is=0; is<=NPanel; is++)
 		{
-			ar >> f; TChord(is)=f;
-			if (fabs(TChord(is)) <0.0)
+			ar >> f; Chord(is)=f;
+			if (fabs(Chord(is)) <0.0)
 			{
 				m_WingName = "";
 				return false;
@@ -1807,8 +1807,8 @@ bool CWing::SerializeWing(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 
 		for (int is=0; is<=NPanel; is++)
 		{
-			ar >> f; TPos(is)=f;
-			if (fabs(TPos(is)) <0.0)
+			ar >> f; YPosition(is)=f;
+			if (fabs(YPosition(is)) <0.0)
 			{
 				m_WingName = "";
 				return false;
@@ -1816,7 +1816,7 @@ bool CWing::SerializeWing(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 		}
 		for (int is=0; is<=NPanel; is++)
 		{
-			ar >> f; TOffset(is)=f;
+			ar >> f; Offset(is)=f;
 		}
 
 		if(ArchiveFormat<1007)
@@ -1824,19 +1824,19 @@ bool CWing::SerializeWing(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 			//convert mm to m
 			for (int is=0; is<=NPanel; is++)
 			{
-				TPos(is)    /= 1000.0;
-				TChord(is)  /= 1000.0;
-				TOffset(is) /= 1000.0;
+				YPosition(is)    /= 1000.0;
+				Chord(is)  /= 1000.0;
+				Offset(is) /= 1000.0;
 			}
 
 		}
 		for (int is=0; is<=NPanel; is++)
 		{
-			ar >> f; TDihedral(is)=f;
+			ar >> f; Dihedral(is)=f;
 		}
 		for (int is=0; is<=NPanel; is++)
 		{
-			ar >> f; TTwist(is)=f;
+			ar >> f; Twist(is)=f;
 		}
 
 		ar >> f; //m_XCmRef=f;
@@ -1953,14 +1953,14 @@ bool CWing::SerializeWing(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 
 
 
-void CWing::ScaleSweep(double Sweep)
+void CWing::ScaleSweep(double sweep)
 {
 	//
 	// Sets the average sweep measured at the quarter-chord to the new value Sweep
 	//
 	double OldTipOffset = TipOffset();
-	double NewTipOffset = TChord(0)/4.0
-						 + tan(Sweep*PI/180.0)*m_PlanformSpan/2.0
+	double NewTipOffset = Chord(0)/4.0
+						 + tan(sweep*PI/180.0)*m_PlanformSpan/2.0
 						 - TipChord()/4.0;
 	if(fabs(OldTipOffset)>0.00001)
 	{
@@ -1968,7 +1968,7 @@ void CWing::ScaleSweep(double Sweep)
 		double ratio = NewTipOffset/OldTipOffset;
 		for(int is=1; is<NWingSection(); is++)
 		{
-			TOffset(is) *= ratio;
+			Offset(is) *= ratio;
 		}
 	}
 	else
@@ -1976,14 +1976,14 @@ void CWing::ScaleSweep(double Sweep)
 		//set each panel's offset
 		for(int is=1; is<NWingSection(); is++)
 		{
-			TOffset(is) = NewTipOffset*TPos(is)/(m_PlanformSpan/2.0);
+			Offset(is) = NewTipOffset*YPosition(is)/(m_PlanformSpan/2.0);
 		}
 	}
 	ComputeGeometry();
 }
 
 
-void CWing::ScaleTwist(double Twist)
+void CWing::ScaleTwist(double twist)
 {
 	//
 	// Scales the twist to the new value
@@ -1991,11 +1991,11 @@ void CWing::ScaleTwist(double Twist)
 	if(fabs(TipTwist())>0.0001)
 	{
 		//scale each panel's twist
-		double ratio = Twist/TipTwist();
+		double ratio = twist/TipTwist();
 
 		for(int is=1; is<NWingSection(); is++)
 		{
-			TTwist(is) *= ratio;
+			Twist(is) *= ratio;
 		}
 	}
 	else
@@ -2003,7 +2003,7 @@ void CWing::ScaleTwist(double Twist)
 		//Set each panel's twist in the ratio of the span position
 		for(int is=1; is<NWingSection(); is++)
 		{
-			TTwist(is) = Twist*TPos(is)/(m_PlanformSpan/2.0);
+			Twist(is) = twist*YPosition(is)/(m_PlanformSpan/2.0);
 		}
 	}
 	ComputeGeometry();
@@ -2023,7 +2023,7 @@ int CWing::VLMGetPanelTotal()
 	for (int is=0; is<NWingSection()-1; is++)
 	{
 		//do not create a surface if its length is less than the critical size
-		if (fabs(TPos(is)-TPos(is+1)) > MinPanelSize)	total +=NXPanels(is)*NYPanels(is);
+		if (fabs(YPosition(is)-YPosition(is+1)) > MinPanelSize)	total +=NXPanels(is)*NYPanels(is);
 	}
 //	if(!m_bMiddle) total *=2;
 	if(!m_bIsFin) return total*2;
@@ -2330,14 +2330,14 @@ bool CWing::IsWingNode(int nNode)
 
 
 
-double & CWing::TOffset(const int &iSection)   {return m_WingSection[iSection]->m_TOffset;}
-double & CWing::TDihedral(const int &iSection) {return m_WingSection[iSection]->m_TDihedral;}
-double & CWing::TChord(const int &iSection)    {return m_WingSection[iSection]->m_TChord;}
-double & CWing::TTwist(const int &iSection)    {return m_WingSection[iSection]->m_TTwist;}
-double & CWing::TPos(const int &iSection)      {return m_WingSection[iSection]->m_TPos;}
-double & CWing::TLength(const int &iSection)   {return m_WingSection[iSection]->m_TLength;}
-double & CWing::TYProj(const int &iSection)    {return m_WingSection[iSection]->m_TYProj;}
-double & CWing::TZPos(const int &iSection)     {return m_WingSection[iSection]->m_TZPos;}
+double & CWing::Offset(const int &iSection)    {return m_WingSection[iSection]->m_Offset;}
+double & CWing::Dihedral(const int &iSection)  {return m_WingSection[iSection]->m_Dihedral;}
+double & CWing::Chord(const int &iSection)     {return m_WingSection[iSection]->m_Chord;}
+double & CWing::Twist(const int &iSection)     {return m_WingSection[iSection]->m_Twist;}
+double & CWing::YPosition(const int &iSection) {return m_WingSection[iSection]->m_YPosition;}
+double & CWing::Length(const int &iSection)    {return m_WingSection[iSection]->m_Length;}
+double & CWing::YProj(const int &iSection)     {return m_WingSection[iSection]->m_YProj;}
+double & CWing::ZPosition(const int &iSection) {return m_WingSection[iSection]->m_ZPos;}
 
 
 int & CWing::NXPanels(const int &iSection)   {return m_WingSection[iSection]->m_NXPanels;}
@@ -2380,11 +2380,11 @@ bool CWing::AppendWingSection(double Chord, double Twist, double Pos, double Dih
 	if(m_WingSection.size()>MAXSPANSECTIONS) return false;
 
 	m_WingSection.append(new WingSection());
-	m_WingSection.last()->m_TChord     = Chord;
-	m_WingSection.last()->m_TTwist     = Twist;
-	m_WingSection.last()->m_TPos       = Pos ;
-	m_WingSection.last()->m_TDihedral  = Dihedral;
-	m_WingSection.last()->m_TOffset    = Offset ;
+	m_WingSection.last()->m_Chord     = Chord;
+	m_WingSection.last()->m_Twist     = Twist;
+	m_WingSection.last()->m_YPosition       = Pos ;
+	m_WingSection.last()->m_Dihedral  = Dihedral;
+	m_WingSection.last()->m_Offset    = Offset ;
 
 	m_WingSection.last()->m_NXPanels   = NXPanels ;
 	m_WingSection.last()->m_NYPanels   = NYPanels;

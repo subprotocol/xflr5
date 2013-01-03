@@ -39,14 +39,14 @@ CPlane::CPlane()
 
 	m_Stab.m_WingName      = QObject::tr("Elevator");
 	m_Stab.m_bIsFin        = false;
-	m_Stab.TChord(0)     = 0.100;
-	m_Stab.TChord(1)     = 0.080;
-	m_Stab.TPos(0)       =   0.0;
-	m_Stab.TPos(1)       = 0.150;
-	m_Stab.TLength(0)    =   0.0;
-	m_Stab.TLength(1)    = 0.150;
-	m_Stab.TOffset(0)    =   0.0;
-	m_Stab.TOffset(1)    = 0.020;
+	m_Stab.Chord(0)     = 0.100;
+	m_Stab.Chord(1)     = 0.080;
+	m_Stab.YPosition(0)       =   0.0;
+	m_Stab.YPosition(1)       = 0.150;
+	m_Stab.Length(0)    =   0.0;
+	m_Stab.Length(1)    = 0.150;
+	m_Stab.Offset(0)    =   0.0;
+	m_Stab.Offset(1)    = 0.020;
 	m_Stab.NXPanels(0)   = 3;
 	m_Stab.NYPanels(0)   = 3;
 	m_Stab.YPanelDist(0) = 1;
@@ -55,14 +55,14 @@ CPlane::CPlane()
 
 	m_Fin.m_WingName      = QObject::tr("Fin");
 	m_Fin.m_bIsFin        = true;
-	m_Fin.TChord(0)     = 0.100;
-	m_Fin.TChord(1)     = 0.060;
-	m_Fin.TPos(0)       = 0.000;
-	m_Fin.TPos(1)       = 0.120;
-	m_Fin.TLength(0)    = 0.000;
-	m_Fin.TLength(1)    = 0.120;
-	m_Fin.TOffset(0)    = 0.000;
-	m_Fin.TOffset(1)    = 0.040;
+	m_Fin.Chord(0)     = 0.100;
+	m_Fin.Chord(1)     = 0.060;
+	m_Fin.YPosition(0)       = 0.000;
+	m_Fin.YPosition(1)       = 0.120;
+	m_Fin.Length(0)    = 0.000;
+	m_Fin.Length(1)    = 0.120;
+	m_Fin.Offset(0)    = 0.000;
+	m_Fin.Offset(1)    = 0.040;
 	m_Fin.NXPanels(0)   = 3;
 	m_Fin.NYPanels(0)   = 3;
 	m_Fin.YPanelDist(0) = 1;
@@ -304,15 +304,15 @@ void CPlane::ComputePlane(void)
 	int i;
 	if(m_bStab)
 	{
-		double SLA = m_WingLE[2].x + m_Stab.TChord(0)/4.0 - m_Wing.TChord(0)/4.0;
+		double SLA = m_WingLE[2].x + m_Stab.Chord(0)/4.0 - m_Wing.Chord(0)/4.0;
 		double area = m_Wing.m_ProjectedArea;
 		if(m_bBiplane) area += m_Wing2.m_ProjectedArea;
 
 		double ProjectedArea = 0.0;
 		for (i=0;i<m_Stab.NWingSection()-1; i++)
 		{
-			ProjectedArea += m_Stab.TLength(i+1)*(m_Stab.TChord(i)+m_Stab.TChord(i+1))/2.0
-							*cos(m_Stab.TDihedral(i)*PI/180.0)*cos(m_Stab.TDihedral(i)*PI/180.0);//m2
+			ProjectedArea += m_Stab.Length(i+1)*(m_Stab.Chord(i)+m_Stab.Chord(i+1))/2.0
+							*cos(m_Stab.Dihedral(i)*PI/180.0)*cos(m_Stab.Dihedral(i)*PI/180.0);//m2
 		
 		}
 		ProjectedArea *=2.0;

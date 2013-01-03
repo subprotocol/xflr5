@@ -97,15 +97,15 @@ void PlaneDlg::ComputePlane(void)
 {
 	if(m_pPlane->Stab())
 	{
-		double SLA = m_pPlane->m_WingLE[2].x + m_pPlane->Stab()->TChord(0)/4.0 - m_pPlane->m_WingLE[0].x -m_pPlane->Wing()->TChord(0)/4.0;
+		double SLA = m_pPlane->m_WingLE[2].x + m_pPlane->Stab()->Chord(0)/4.0 - m_pPlane->m_WingLE[0].x -m_pPlane->Wing()->Chord(0)/4.0;
 		double area = m_pPlane->Wing()->m_ProjectedArea;
 		if(m_pPlane->Wing2()) area += m_pPlane->Wing2()->m_ProjectedArea;
 
 		double ProjectedArea = 0.0;
 		for (int i=0;i<m_pPlane->Stab()->NWingSection()-1; i++)
 		{
-			ProjectedArea += m_pPlane->Stab()->TLength(i+1)*(m_pPlane->Stab()->TChord(i)+m_pPlane->Stab()->TChord(i+1))/2.0
-							*cos(m_pPlane->Stab()->TDihedral(i)*PI/180.0)*cos(m_pPlane->Stab()->TDihedral(i)*PI/180.0);
+			ProjectedArea += m_pPlane->Stab()->Length(i+1)*(m_pPlane->Stab()->Chord(i)+m_pPlane->Stab()->Chord(i+1))/2.0
+							*cos(m_pPlane->Stab()->Dihedral(i)*PI/180.0)*cos(m_pPlane->Stab()->Dihedral(i)*PI/180.0);
 
 		}
 		ProjectedArea *=2.0;
@@ -549,13 +549,13 @@ void PlaneDlg::OnOK()
 	int nSurfaces = 0;
 	for (j=0; j<m_pPlane->Wing()->NWingSection()-1; j++)
 	{
-		if(fabs(m_pPlane->Wing()->TPos(j)-m_pPlane->Wing()->TPos(j+1)) > QMiarex::s_MinPanelSize) nSurfaces+=2;
+		if(fabs(m_pPlane->Wing()->YPosition(j)-m_pPlane->Wing()->YPosition(j+1)) > QMiarex::s_MinPanelSize) nSurfaces+=2;
 	}
 	if(m_pPlane->Stab())
 	{
 		for (j=0; j<m_pPlane->Stab()->NWingSection()-1; j++)
 		{
-			if(fabs(m_pPlane->Stab()->TPos(j)-m_pPlane->Stab()->TPos(j+1)) > QMiarex::s_MinPanelSize) nSurfaces+=2;
+			if(fabs(m_pPlane->Stab()->YPosition(j)-m_pPlane->Stab()->YPosition(j+1)) > QMiarex::s_MinPanelSize) nSurfaces+=2;
 		}
 	}
 
@@ -563,7 +563,7 @@ void PlaneDlg::OnOK()
 	{
 		for (j=0; j<m_pPlane->Fin()->NWingSection()-1; j++)
 		{
-			if(fabs(m_pPlane->Fin()->TPos(j)-m_pPlane->Fin()->TPos(j+1)) > QMiarex::s_MinPanelSize)
+			if(fabs(m_pPlane->Fin()->YPosition(j)-m_pPlane->Fin()->YPosition(j+1)) > QMiarex::s_MinPanelSize)
 			{
 				if((m_pPlane->m_bSymFin) || (m_pPlane->m_bDoubleFin && m_pPlane->m_bDoubleSymFin))
 					nSurfaces += 2;
@@ -794,7 +794,7 @@ void PlaneDlg::SetResults()
 	ComputePlane();
 	if(m_pPlane->Stab())
 	{
-		double SLA = m_pPlane->m_WingLE[2].x + m_pPlane->Stab()->TChord(0)/4.0 - m_pPlane->Wing()->TChord(0)/4.0;
+		double SLA = m_pPlane->m_WingLE[2].x + m_pPlane->Stab()->Chord(0)/4.0 - m_pPlane->Wing()->Chord(0)/4.0;
 		str = QString("%1").arg(SLA*pMainFrame->m_mtoUnit,5,'f',2);
 	}
 	else  str=" ";

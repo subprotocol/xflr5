@@ -26,7 +26,7 @@
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QLabel>
-
+#include <QtDebug>
 
 float GLLightDlg::s_Ambient, GLLightDlg::s_Diffuse, GLLightDlg::s_Specular;
 float GLLightDlg::s_MatAmbient, GLLightDlg::s_MatDiffuse, GLLightDlg::s_MatSpecular, GLLightDlg::s_MatEmission;
@@ -484,10 +484,12 @@ bool GLLightDlg::SaveSettings(QSettings *pSettings)
 	return true;
 }
 
+
 void GLLightDlg::showEvent(QShowEvent *event)
 {
 	SetParams();
 	SetEnabled();
+	Apply();
 }
 
 
@@ -495,6 +497,7 @@ void GLLightDlg::OnLight()
 {
 	s_bLight = m_pctrlLight->isChecked();
 	SetEnabled();
+	Apply();
 }
 
 

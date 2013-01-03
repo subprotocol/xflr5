@@ -646,7 +646,6 @@ public:
 	QColor m_CpColor;
 	int m_CpStyle, m_CpWidth;
 	bool m_bShowCp, m_bShowCpPoints;
-	bool m_bglLight;
 	bool m_bAutoCpScale;		//true if the Cp scale should be set automatically
 	bool m_bLongitudinal;         // true if longitudinal stability results are to be displayed, false if lateral
 	bool m_bICd, m_bVCd, m_bStream, m_bSpeeds;  	// defines whether the corresponfing data should be displayed

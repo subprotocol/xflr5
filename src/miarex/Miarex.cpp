@@ -457,7 +457,6 @@ QMiarex::QMiarex(QWidget *parent)
 	m_bOutline           = true;
 	m_bVLMPanels         = false;
 	m_bAxes              = true;
-	m_bglLight           = true;
 	m_bPickCenter        = false;
 	m_bAutoCpScale	     = false;
 	m_bShowCpScale       = true;
@@ -1770,7 +1769,7 @@ void QMiarex::SetControls()
 	m_pctrlIDrag->setChecked(m_bICd);
 	m_pctrlVDrag->setChecked(m_bVCd);
 	m_pctrlAxes->setChecked(m_bAxes);
-	m_pctrlLight->setChecked(m_bglLight);
+	m_pctrlLight->setChecked(GLLightDlg::IsLightOn());
 	m_pctrlSurfaces->setChecked(m_bSurfaces);
 	m_pctrlOutline->setChecked(m_bOutline);
 	m_pctrlStream->setChecked(m_bStream);
@@ -4699,7 +4698,7 @@ void QMiarex::GLCallViewLists()
 		if(m_pCurPlane)  glTranslated(-(m_pCurPlane)->BodyPos().x, 0.0, -(m_pCurPlane)->BodyPos().z);
 	}
 
-	if(m_bglLight)
+	if(GLLightDlg::IsLightOn())
 	{
 		glEnable(GL_LIGHTING);
 		glEnable(GL_LIGHT0);
@@ -9650,8 +9649,7 @@ void QMiarex::OnImportBody()
 	if(!pNewBody) return;
 
 
-	double mtoUnit,zo;
-	zo = 0.0;
+	double mtoUnit;
 
 //	FrameSize() = 0;
 
@@ -9907,7 +9905,7 @@ void QMiarex::OnLiftScale(int pos)
 
 void QMiarex::OnLight()
 {
-	m_bglLight = m_pctrlLight->isChecked();
+	GLLightDlg::s_bLight = m_pctrlLight->isChecked();
 //	m_bResetglGeom = true;
 	UpdateView();
 }
@@ -10479,7 +10477,7 @@ void QMiarex::OnScaleWing()
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 
     m_pWingScaleDlg->move(pMainFrame->m_DlgPos);
-	m_pWingScaleDlg->InitDialog(m_pCurWing->m_PlanformSpan, m_pCurWing->TChord(0), m_pCurWing->AverageSweep(), m_pCurWing->TipTwist());
+	m_pWingScaleDlg->InitDialog(m_pCurWing->m_PlanformSpan, m_pCurWing->Chord(0), m_pCurWing->AverageSweep(), m_pCurWing->TipTwist());
 
     if(QDialog::Accepted == m_pWingScaleDlg->exec())
 	{
@@ -11072,16 +11070,12 @@ void QMiarex::OnSetupLight()
 	if(m_iView!=W3DVIEW && m_iView!=WSTABVIEW) return;
 	ThreeDWidget *p3dWidget = (ThreeDWidget*)s_p3dWidget;
 
-	GLLightDlg::s_bLight = m_bglLight;
     m_pGLLightDlg->m_p3DWidget= s_p3dWidget;
 /*    QSize size = QSize(400,400);
     QPoint pos = QPoint(100,50);
     m_pGLLightDlg->resize(size);
     m_pGLLightDlg->move(pos); */
     m_pGLLightDlg->show();
-
-	m_bglLight = GLLightDlg::s_bLight;
-
 
 	double LightFactor;
 	if(m_pCurWing) LightFactor =  (GLfloat)pow(m_pCurWing->m_PlanformSpan/2.0,0.1);
@@ -11621,18 +11615,18 @@ void QMiarex::PaintWing(QPainter &painter, QPoint ORef, double scale)
 	O.ry() = ORef.y();
 	for (i=0; i<m_pCurWing->NWingSection()-1;i++)
 	{
-		O.rx() +=(int)(m_pCurWing->TLength(i)*scalex);
-		painter.drawLine(O.x(),                                           O.y()+(int)(m_pCurWing->TOffset(i)*scaley),
-						 O.x()+(int)(m_pCurWing->TLength(i+1)*scalex),  O.y()+(int)(m_pCurWing->TOffset(i+1)*scaley));
+		O.rx() +=(int)(m_pCurWing->Length(i)*scalex);
+		painter.drawLine(O.x(),                                           O.y()+(int)(m_pCurWing->Offset(i)*scaley),
+						 O.x()+(int)(m_pCurWing->Length(i+1)*scalex),  O.y()+(int)(m_pCurWing->Offset(i+1)*scaley));
 
-		painter.drawLine(O.x()+(int)(m_pCurWing->TLength(i+1)*scalex),  O.y()+(int)(m_pCurWing->TOffset(i+1)*scaley),
-						 O.x()+(int)(m_pCurWing->TLength(i+1)*scalex),  O.y()+(int)((m_pCurWing->TOffset(i+1)+m_pCurWing->TChord(i+1))*scaley));
+		painter.drawLine(O.x()+(int)(m_pCurWing->Length(i+1)*scalex),  O.y()+(int)(m_pCurWing->Offset(i+1)*scaley),
+						 O.x()+(int)(m_pCurWing->Length(i+1)*scalex),  O.y()+(int)((m_pCurWing->Offset(i+1)+m_pCurWing->Chord(i+1))*scaley));
 
-		painter.drawLine(O.x()+(int)(m_pCurWing->TLength(i+1)*scalex),  O.y()+(int)((m_pCurWing->TOffset(i+1)+m_pCurWing->TChord(i+1))*scaley),
-						 O.x(),                                         O.y() +(int)((m_pCurWing->TOffset(i)+m_pCurWing->TChord(i))*scaley));
+		painter.drawLine(O.x()+(int)(m_pCurWing->Length(i+1)*scalex),  O.y()+(int)((m_pCurWing->Offset(i+1)+m_pCurWing->Chord(i+1))*scaley),
+						 O.x(),                                         O.y() +(int)((m_pCurWing->Offset(i)+m_pCurWing->Chord(i))*scaley));
 
-		painter.drawLine(O.x(),                                         O.y() +(int)((m_pCurWing->TOffset(i)+m_pCurWing->TChord(i))*scaley),
-						 O.x(),                                         O.y()+(int)(m_pCurWing->TOffset(i)*scaley));
+		painter.drawLine(O.x(),                                         O.y() +(int)((m_pCurWing->Offset(i)+m_pCurWing->Chord(i))*scaley),
+						 O.x(),                                         O.y()+(int)(m_pCurWing->Offset(i)*scaley));
 	}
 	if(!m_bHalfWing)
 	{
@@ -11642,18 +11636,18 @@ void QMiarex::PaintWing(QPainter &painter, QPoint ORef, double scale)
 
 		for (i=0; i<m_pCurWing->NWingSection()-1;i++)
 		{
-			O.rx() -= (int)(m_pCurWing->TLength(i)*scalex);
-			painter.drawLine(O.x(),						                     O.y()+(int)(m_pCurWing->TOffset(i)*scaley),
-							 O.x()-(int)(m_pCurWing->TLength(i+1)*scalex), O.y()+(int)(m_pCurWing->TOffset(i+1)*scaley));
+			O.rx() -= (int)(m_pCurWing->Length(i)*scalex);
+			painter.drawLine(O.x(),						                     O.y()+(int)(m_pCurWing->Offset(i)*scaley),
+							 O.x()-(int)(m_pCurWing->Length(i+1)*scalex), O.y()+(int)(m_pCurWing->Offset(i+1)*scaley));
 
-			painter.drawLine(O.x()-(int)(m_pCurWing->TLength(i+1)*scalex), O.y()+(int)(m_pCurWing->TOffset(i+1)*scaley),
-							 O.x()-(int)(m_pCurWing->TLength(i+1)*scalex), O.y()+(int)((m_pCurWing->TOffset(i+1)+m_pCurWing->TChord(i+1))*scaley));
+			painter.drawLine(O.x()-(int)(m_pCurWing->Length(i+1)*scalex), O.y()+(int)(m_pCurWing->Offset(i+1)*scaley),
+							 O.x()-(int)(m_pCurWing->Length(i+1)*scalex), O.y()+(int)((m_pCurWing->Offset(i+1)+m_pCurWing->Chord(i+1))*scaley));
 
-			painter.drawLine(O.x()-(int)(m_pCurWing->TLength(i+1)*scalex), O.y()+(int)((m_pCurWing->TOffset(i+1)+m_pCurWing->TChord(i+1))*scaley),
-							 O.x(),                                        O.y() +(int)((m_pCurWing->TOffset(i)+m_pCurWing->TChord(i))*scaley));
+			painter.drawLine(O.x()-(int)(m_pCurWing->Length(i+1)*scalex), O.y()+(int)((m_pCurWing->Offset(i+1)+m_pCurWing->Chord(i+1))*scaley),
+							 O.x(),                                        O.y() +(int)((m_pCurWing->Offset(i)+m_pCurWing->Chord(i))*scaley));
 
-			painter.drawLine(O.x(),                                        O.y() +(int)((m_pCurWing->TOffset(i)+m_pCurWing->TChord(i))*scaley),
-							 O.x(),                                        O.y()+(int)(m_pCurWing->TOffset(i)*scaley));
+			painter.drawLine(O.x(),                                        O.y() +(int)((m_pCurWing->Offset(i)+m_pCurWing->Chord(i))*scaley),
+							 O.x(),                                        O.y()+(int)(m_pCurWing->Offset(i)*scaley));
 		}
 	}
 
@@ -11744,7 +11738,7 @@ void QMiarex::PaintWingLegend(QPainter &painter)
 		D+=dheight;
 	}
 
-	str1 = QString(tr("Root Chord =")+"   %1 ").arg(m_pCurWing->TChord(0)*pMainFrame->m_mtoUnit, 11,'f', 3);
+	str1 = QString(tr("Root Chord =")+"   %1 ").arg(m_pCurWing->Chord(0)*pMainFrame->m_mtoUnit, 11,'f', 3);
 	Result = str1+length;
 	painter.drawText(LeftPos, ZPos+D, Result);
 	D+=dheight;

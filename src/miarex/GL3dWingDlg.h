@@ -199,7 +199,6 @@ private:
 	bool m_bEnableName;
 	bool m_bDragPoint;
 	bool m_bArcball;			//true if the arcball is to be displayed
-	bool m_bglLight;
 	bool m_bCrossPoint;			//true if the control point on the arcball is to be displayed
 	bool m_bPickCenter;			//true if the user is in the process of picking a new center for OpenGL display
 	bool m_bSurfaces, m_bOutline, m_bAxes, m_bVLMPanels;

@@ -2392,7 +2392,7 @@ void GLDrawWingLegend(void *pQMiarex, CWing *pWing, CPlane *pPlane, CWPolar *pWP
 			pGLWidget->renderText(LeftPos, ZPos, str1, pMainFrame->m_TextFont);
 
 			ZPos +=dD;
-			Result = QString(QObject::tr("Root Chord     = %1 ")).arg(pWing->TChord(0)*pMainFrame->m_mtoUnit, a,'f',b);
+			Result = QString(QObject::tr("Root Chord     = %1 ")).arg(pWing->Chord(0)*pMainFrame->m_mtoUnit, a,'f',b);
 			pGLWidget->renderText(LeftPos, ZPos, Result+length, pMainFrame->m_TextFont);
 			ZPos +=dD;
 
@@ -2448,7 +2448,7 @@ void GLDrawWingLegend(void *pQMiarex, CWing *pWing, CPlane *pPlane, CWPolar *pWP
 				ZPos +=dD;
 			}
 
-			Result = QString(QObject::tr("Tip Twist      = %1")).arg(pWing->TTwist(pWing->NWingSection()-1),c,'f',d);
+			Result = QString(QObject::tr("Tip Twist      = %1")).arg(pWing->Twist(pWing->NWingSection()-1),c,'f',d);
 			pGLWidget->renderText(LeftPos, ZPos, Result, pMainFrame->m_TextFont);
 			ZPos +=dD;
 
