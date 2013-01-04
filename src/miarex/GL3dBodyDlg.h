@@ -69,6 +69,7 @@ private slots:
 	void On3DReset();
 	void On3DPickCenter();
 	void OnBodyStyle();
+	void OnBodyInertia();
 	void OnEdgeWeight();
 	void OnExportBodyDef();
 	void OnExportBodyGeom();
@@ -140,6 +141,7 @@ private:
 	void GLDrawBodyLegend();
 	void GLDrawBodyLineScale();
 	void GLDrawBodyFrameScale();
+	void GLDrawMasses();
 	void SetControls();
 	void SetScales();
 	void SetRectangles();
@@ -206,7 +208,7 @@ private:
 	QAction *m_pInsertPoint, *m_pRemovePoint, *m_pScaleBody;
 	QAction *m_pShowCurFrameOnly, *m_pResetScales;
 	QAction *m_pUndo, *m_pRedo;
-	QAction *m_pExportBodyDef, *m_pImportBodyDef, *m_pExportBodyGeom, *m_pTranslateBody;// *m_pSetupLight;
+	QAction *m_pExportBodyDef, *m_pImportBodyDef, *m_pExportBodyGeom, *m_pTranslateBody, *m_pBodyInertia;// *m_pSetupLight;
 	QAction *m_pGrid;
 
 	CBody m_TmpPic;

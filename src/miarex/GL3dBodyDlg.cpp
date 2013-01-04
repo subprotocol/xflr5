@@ -20,6 +20,7 @@
 *****************************************************************************/
 
 
+#include "../miarex/Miarex.h"
 #include "../mainframe.h"
 #include "../threedwidget.h"
 #include "../globals.h"
@@ -184,6 +185,9 @@ GL3dBodyDlg::GL3dBodyDlg(QWidget *pParent): QDialog(pParent)
 
 	m_pImportBodyDef = new QAction(tr("Import Body Definition from File"), this);
 	connect(m_pImportBodyDef, SIGNAL(triggered()), this, SLOT(OnImportBodyDef()));
+
+	m_pBodyInertia = new QAction(tr("Define Inertia")+"\tF12", this);
+	connect(m_pBodyInertia, SIGNAL(triggered()), this, SLOT(OnBodyInertia()));
 
 	m_pTranslateBody = new QAction(tr("Translate"), this);
 	connect(m_pTranslateBody, SIGNAL(triggered()), this, SLOT(OnTranslateBody()));
@@ -375,7 +379,6 @@ void GL3dBodyDlg::GLCreateBodyOverlay()
 
 	QColor color;
 //	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
-//	QMiarex* pMiarex= (QMiarex*)s_pMiarex;
 
 	if(!m_pBody)
 	{
@@ -1724,18 +1727,67 @@ void GL3dBodyDlg::GLRenderBody()
 				glCallList(BODYMESHBASE);
 //				glCallList(BODYMESHBASE+MAXBODIES);
 			}
+
+			glDisable(GL_CLIP_PLANE1);
+			glDisable(GL_CLIP_PLANE2);
+			glDisable(GL_CLIP_PLANE3);
+			glDisable(GL_CLIP_PLANE4);
+
+			if(m_bShowMasses) GLDrawMasses();
 		}
 		glPopMatrix();
 
-		glDisable(GL_CLIP_PLANE1);
-		glDisable(GL_CLIP_PLANE2);
-		glDisable(GL_CLIP_PLANE3);
-		glDisable(GL_CLIP_PLANE4);
 	}
 	glPopMatrix();
 	glFinish();
 }
 
+
+
+void GL3dBodyDlg::GLDrawMasses()
+{
+	//
+	// draws the point masses, the object masses, and the CG position on the OpenGL viewport
+	//
+	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
+	QString MassUnit;
+	GetWeightUnit(MassUnit, pMainFrame->m_WeightUnit);
+
+	double radius = .01;//2cm
+
+
+	if(m_pBody)
+	{
+//		glColor3d(m_MassColor.redF()*.75, m_MassColor.greenF()*.75, m_MassColor.blueF()*.75);
+
+		for(int im=0; im<m_pBody->m_MassValue.size(); im++)
+		{
+			glPushMatrix();
+			{
+				glTranslated(m_pBody->m_MassPosition[im].x,m_pBody->m_MassPosition[im].y,m_pBody->m_MassPosition[im].z);
+				m_3dWidget.GLRenderSphere(QColor(255,190,110),radius,18,18);
+				glColor3d(pMainFrame->m_TextColor.redF(), pMainFrame->m_TextColor.greenF(), pMainFrame->m_TextColor.blueF());
+				m_3dWidget.renderText(0.0, 0.0, 0.0+.02,
+									  m_pBody->m_MassTag[im]
+									  +QString(" %1").arg(m_pBody->m_MassValue[im]*pMainFrame->m_kgtoUnit, 7,'g',3)
+									  +MassUnit);
+			}
+			glPopMatrix();
+		}
+	}
+
+	//plot CG
+	glPushMatrix();
+	{
+		glTranslated(m_pBody->m_CoG.x,m_pBody->m_CoG.y,m_pBody->m_CoG.z);
+		m_3dWidget.GLRenderSphere(QColor(255,0,0),radius,18,18);
+		glColor3d(pMainFrame->m_TextColor.redF(), pMainFrame->m_TextColor.greenF(), pMainFrame->m_TextColor.blueF());
+		m_3dWidget.renderText(0.0, 0.0, 0.0+.02,
+							  "CoG "+QString("%1").arg(m_pBody->TotalMass()*pMainFrame->m_kgtoUnit, 7,'g',3) + MassUnit,
+							  pMainFrame->m_TextFont);
+	}
+	glPopMatrix();
+}
 
 
 
@@ -1798,6 +1850,11 @@ void GL3dBodyDlg::keyPressEvent(QKeyEvent *event)
 			UpdateView();
 			break;
 		}
+		case Qt::Key_F12:
+		{
+			OnBodyInertia();
+			break;
+		}
 		default:
 			event->ignore();
 	}
@@ -1825,7 +1882,7 @@ bool GL3dBodyDlg::LoadSettings(QSettings *pSettings)
 	pSettings->beginGroup("GL3dBody");
 	{
         m_BodyGridDlg->m_bGrid      = pSettings->value("Grid").toBool();
-        m_BodyGridDlg->m_bMinGrid   = pSettings->value("MinGrid").toBool();
+		m_BodyGridDlg->m_bMinGrid   = pSettings->value("MinGrid").toBool();
         m_BodyGridDlg->m_bGrid2     = pSettings->value("Grid2").toBool();
         m_BodyGridDlg->m_bMinGrid2  = pSettings->value("MinGrid2").toBool();
         m_BodyGridDlg->m_Style      = pSettings->value("Style").toInt();
@@ -2341,6 +2398,20 @@ void GL3dBodyDlg::OnBodyStyle()
 		m_bResetglBody = true;
 		UpdateView();
 	}
+}
+
+
+void GL3dBodyDlg::OnBodyInertia()
+{
+	if(!m_pBody) return;
+	InertiaDlg dlg(this);
+	dlg.m_pBody  = m_pBody;
+	dlg.m_pPlane = NULL;
+	dlg.m_pWing  = NULL;
+	dlg.InitDialog();
+	dlg.move(pos().x()+25, pos().y()+25);
+	if(dlg.exec()==QDialog::Accepted) m_bChanged=true;
+	m_pBody->ComputeBodyAxisInertia();
 }
 
 
@@ -3521,6 +3592,8 @@ void GL3dBodyDlg::SetupLayout()
 			BodyMenu->addAction(m_pExportBodyDef);
 			BodyMenu->addAction(m_pExportBodyGeom);
 			BodyMenu->addSeparator();
+			BodyMenu->addAction(m_pBodyInertia);
+			BodyMenu->addSeparator();
 			BodyMenu->addAction(m_pTranslateBody);
 			BodyMenu->addAction(m_pScaleBody);
 			BodyMenu->addSeparator();
@@ -3799,6 +3872,8 @@ void GL3dBodyDlg::ShowContextMenu(QContextMenuEvent * event)
 	CtxMenu->addAction(m_pImportBodyDef);
 	CtxMenu->addAction(m_pExportBodyDef);
 	CtxMenu->addAction(m_pExportBodyGeom);
+	CtxMenu->addSeparator();
+	CtxMenu->addAction(m_pBodyInertia);;
 
 	QPoint CltPt = event->pos();
 	m_ptPopUp.rx() = CltPt.x();

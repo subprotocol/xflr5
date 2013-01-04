@@ -5057,16 +5057,16 @@ void QMiarex::GLDrawMasses()
 				if(m_pCurPlane)
 				{
 					glTranslated(m_pCurPlane->WingLE(iw).x,
-							   m_pCurPlane->WingLE(iw).y,
-							   m_pCurPlane->WingLE(iw).z);
+								 m_pCurPlane->WingLE(iw).y,
+								 m_pCurPlane->WingLE(iw).z);
 					if(m_pWingList[iw]->m_bIsFin) glTranslated(0.0,0.0, m_pWingList[iw]->m_ProjectedSpan/4.0);
 					else                          glTranslated(0.0, m_pWingList[iw]->m_ProjectedSpan/4.0,0.0);
 
 
 					p3dWidget->renderText(0.0, 0.0, zdist,
-									  m_pWingList[iw]->m_WingName+
-									  QString(" %1").arg(m_pWingList[iw]->m_VolumeMass*pMainFrame->m_kgtoUnit, 7,'g',3)+
-									  MassUnit);
+										  m_pWingList[iw]->m_WingName+
+										  QString(" %1").arg(m_pWingList[iw]->m_VolumeMass*pMainFrame->m_kgtoUnit, 7,'g',3)+
+										  MassUnit);
 				}
 			}
 			glPopMatrix();
@@ -5079,22 +5079,23 @@ void QMiarex::GLDrawMasses()
 					if(m_pCurPlane)
 					{
 						glTranslated(m_pCurPlane->WingLE(iw).x,
-								   m_pCurPlane->WingLE(iw).y,
-								   m_pCurPlane->WingLE(iw).z);
+									 m_pCurPlane->WingLE(iw).y,
+									 m_pCurPlane->WingLE(iw).z);
 					}
 					glTranslated(m_pWingList[iw]->m_MassPosition[im].x,
-							   m_pWingList[iw]->m_MassPosition[im].y,
-							   m_pWingList[iw]->m_MassPosition[im].z);
+								 m_pWingList[iw]->m_MassPosition[im].y,
+								 m_pWingList[iw]->m_MassPosition[im].z);
 					p3dWidget->GLRenderSphere(m_MassColor,radius,18,18);
 					p3dWidget->renderText(0.0, 0.0, 0.0 +.02,
-									  m_pWingList[iw]->m_MassTag[im]
-									  +QString(" %1").arg(m_pWingList[iw]->m_MassValue[im]*pMainFrame->m_kgtoUnit, 7,'g',3)
-									  +MassUnit);
+										  m_pWingList[iw]->m_MassTag[im]
+										  +QString(" %1").arg(m_pWingList[iw]->m_MassValue[im]*pMainFrame->m_kgtoUnit, 7,'g',3)
+										  +MassUnit);
 				}
 				glPopMatrix();
 			}
 		}
 	}
+
 	if(m_pCurPlane)
 	{
 		glColor3d(m_MassColor.redF(), m_MassColor.greenF(), m_MassColor.blueF());

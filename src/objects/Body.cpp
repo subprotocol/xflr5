@@ -440,6 +440,7 @@ bool CBody::Gauss(double *A, int n, double *B, int m)
 
 
 
+
 double CBody::Length()
 {
 	return fabs(m_SplineSurface.m_pFrame.last()->m_Position.x - m_SplineSurface.m_pFrame.first()->m_Position.x);
@@ -1653,8 +1654,8 @@ void CBody::ComputeVolumeInertia(CVector &CoG, double &CoGIxx, double &CoGIyy, d
 double CBody::TotalMass()
 {
 	double TotalMass = m_VolumeMass;
-	for(int i=0; i<m_MassValue.size(); i++)
-		TotalMass += m_MassValue[i];
+	for(int im=0; im<m_MassValue.size(); im++)
+		TotalMass += m_MassValue.at(im);
 	return TotalMass;
 }
 

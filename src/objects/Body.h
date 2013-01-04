@@ -50,6 +50,7 @@ public:
 	int ReadFrame(QTextStream &in, int &Line, CFrame *pFrame, double const &Unit);
 
 	double Length();
+
 	double Getu(double x);
 	double Getv(double u, CVector r, bool bRight);
 	double GetSectionArcLength(double x);

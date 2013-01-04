@@ -232,6 +232,8 @@ void W3dPrefsDlg::OnWingColor()
 	repaint();
 }
 
+
+
 void W3dPrefsDlg::On3DAxis()
 {
     LinePickerDlg LPdlg(this);
