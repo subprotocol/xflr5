@@ -1,4 +1,4 @@
-	
+﻿	
 *******************************************************************************
 
 
@@ -16,7 +16,7 @@
 
 
 
-xflr5 v6.09.02 Beta, January 5th, 2012
+xflr5 v6.09.03 Beta, January 5th, 2013
 	- Added an option in the polar definition dialog to ignore the body in the plane analysis
 	- Corrected the bug which created straight streamlines after a failed analysis
 	- Corrected a crash bug in plane inertia definition
@@ -25,6 +25,9 @@ xflr5 v6.09.02 Beta, January 5th, 2012
 	- Corrected loading issues of old files
 	- Restored the max number of points in a plane calculation to 100, with correspondig increase in memory usage
 	- More code cleaning
+
+xflr5 v6.09.02 Beta, January xxxth, 2012
+	- Not released
 
 
 xflr5 v6.09.01 Beta, November 18th, 2012
