@@ -1,0 +1,8 @@
+#!/bin/sh
+
+if [ ! -e XFLR5.app/Contents/MacOS/translations ]
+then
+	mkdir XFLR5.app/Contents/MacOS/translations
+fi
+cp translations/*.qm XFLR5.app/Contents/MacOS/translations
+	
