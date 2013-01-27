@@ -490,7 +490,7 @@ bool CPolar::Serialize(QDataStream &ar, bool bIsStoring, bool bTrace)
 		else if(k==4) m_PolarType = FIXEDAOAPOLAR;
 		else
 		{
-			return false;
+			m_PolarType = FIXEDSPEEDPOLAR;
 		}
 
 		ar >> m_MaType >> m_ReType;

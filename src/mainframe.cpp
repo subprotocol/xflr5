@@ -3221,6 +3221,8 @@ bool MainFrame::LoadPolarFileV3(QDataStream &ar, bool bIsStoring, int ArchiveFor
 		pPolar = new CPolar();
 
 		pPolar->m_Color = GetColor(1);
+		if(i==278)
+			int nada=0;
 		if (!pPolar->Serialize(ar, bIsStoring))
 		{
 			delete pPolar;
