@@ -429,7 +429,7 @@ bool CPolar::Serialize(QDataStream &ar, bool bIsStoring, bool bTrace)
 		else if(m_PolarType==FIXEDLIFTPOLAR)   ar<<2;
 		else if(m_PolarType==RUBBERCHORDPOLAR) ar<<3;
 		else if(m_PolarType==FIXEDAOAPOLAR)    ar<<4;
-		else ar << 0;
+		else                                   ar<<1;
 
 		ar << m_MaType << m_ReType  ;
         ar << (int)m_Reynolds << (float)m_Mach ;
@@ -488,10 +488,8 @@ bool CPolar::Serialize(QDataStream &ar, bool bIsStoring, bool bTrace)
 		else if(k==2) m_PolarType = FIXEDLIFTPOLAR;
 		else if(k==3) m_PolarType = RUBBERCHORDPOLAR;
 		else if(k==4) m_PolarType = FIXEDAOAPOLAR;
-		else
-		{
-			m_PolarType = FIXEDSPEEDPOLAR;
-		}
+		else          m_PolarType = FIXEDSPEEDPOLAR;
+
 
 		ar >> m_MaType >> m_ReType;
 

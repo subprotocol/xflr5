@@ -10117,9 +10117,9 @@ void QMiarex::OnReadAnalysisData()
 	}
 	else if(m_pCurWPolar && m_pCurWPolar->m_WPolarType==STABILITYPOLAR)
 	{
-		m_ControlMin   = m_pctrlAlphaMin->Value()         /pMainFrame->m_mstoUnit;
-		m_ControlMax   = m_pctrlAlphaMax->Value()         /pMainFrame->m_mstoUnit;
-		m_ControlDelta = fabs(m_pctrlAlphaDelta->Value()) /pMainFrame->m_mstoUnit;
+		m_ControlMin   = m_pctrlAlphaMin->Value();
+		m_ControlMax   = m_pctrlAlphaMax->Value();
+		m_ControlDelta = fabs(m_pctrlAlphaDelta->Value());
 		if(fabs(m_ControlDelta)<0.001)
 		{
 			m_ControlDelta = 0.001;
@@ -12811,7 +12811,7 @@ void QMiarex::Set3DScale()
 	{
 		//wing along X axis will take 3/4 of the screen
 		m_glScaled = (GLfloat)(3./4.*2.0*m_GLScale/m_pCurWing->m_PlanformSpan);
-//qDebug()<<"Span"<<m_pCurWing->m_PlanformSpan;
+
 		m_glViewportTrans.x = 0.0;
 		m_glViewportTrans.y = 0.0;
 		m_glViewportTrans.z = 0.0;
@@ -15288,7 +15288,7 @@ void QMiarex::SetControlPositions(CPanel *pPanel, CVector *pNode, double t, int 
 						angle = m_pCurWPolar->m_ControlGain[NCtrls] * t; //maxcontrol is the gain
 
 						if(pWing->m_Surface[j].m_pFoilA->m_TEFlapAngle && pWing->m_Surface[j].m_pFoilA->m_TEFlapAngle)
-							TotalAngle = angle + (pWing->m_Surface[j].m_pFoilA->m_TEFlapAngle + pWing->m_Surface[j].m_pFoilB->m_TEFlapAngle)/2.0;
+							TotalAngle = angle + (pWing->m_Surface[j].m_pFoilA->m_TEFlapAngle + pWing->m_Surface[j].m_pFoilB->m_TEFlapAngle)/2.0;						
 						else
 							TotalAngle = angle;
 

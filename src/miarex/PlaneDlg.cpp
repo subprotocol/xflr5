@@ -17,7 +17,7 @@
 	along with this program; if not, write to the Free Software
 	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-*****************************************************************************/
+****************************************************************************/
 
 #include <QGridLayout>
 #include <QVBoxLayout>
@@ -843,288 +843,308 @@ void PlaneDlg::SetupLayout()
 	QGroupBox *NameBox = new QGroupBox(tr("Plane Description"));
 	{
 		QVBoxLayout *NameLayout = new QVBoxLayout;
-		m_pctrlPlaneName = new QLineEdit(tr("Plane Name"));
-	//	m_pctrlPlaneName->setMinimumWidth(120);
-		m_pctrlPlaneDescription = new QTextEdit();
-		m_pctrlPlaneDescription->setToolTip(tr("Enter here a short description for the plane"));
-		QLabel *PlaneDescription = new QLabel(tr("Description:"));
-		m_pctrlPlaneInertia = new QPushButton(tr("Plane Inertia"));
-		NameLayout->addWidget(m_pctrlPlaneName);
-		NameLayout->addWidget(PlaneDescription);
-		NameLayout->addWidget(m_pctrlPlaneDescription);
-		NameLayout->addWidget(m_pctrlPlaneInertia);
+		{
+			m_pctrlPlaneName = new QLineEdit(tr("Plane Name"));
+		//	m_pctrlPlaneName->setMinimumWidth(120);
+			m_pctrlPlaneDescription = new QTextEdit();
+			m_pctrlPlaneDescription->setToolTip(tr("Enter here a short description for the plane"));
+			QLabel *PlaneDescription = new QLabel(tr("Description:"));
+			m_pctrlPlaneInertia = new QPushButton(tr("Plane Inertia"));
+			NameLayout->addWidget(m_pctrlPlaneName);
+			NameLayout->addWidget(PlaneDescription);
+			NameLayout->addWidget(m_pctrlPlaneDescription);
+			NameLayout->addWidget(m_pctrlPlaneInertia);
+		}
 		NameBox->setLayout(NameLayout);
 	}
 
 	QGroupBox *MainWingBox = new QGroupBox(tr("Main Wing"));
 	{
-		QGridLayout *MainWing = new QGridLayout;
-		m_pctrlDefineWing = new QPushButton(tr("Define"));
-		m_pctrlImportWing = new QPushButton(tr("Import"));
-		m_pctrlExportWing = new QPushButton(tr("Export"));
-		QLabel *lab1 = new QLabel(tr("x="));
-		QLabel *lab2 = new QLabel(tr("z="));
-		QLabel *lab3 = new QLabel(tr("Tilt Angle="));
-		lab1->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
-		lab2->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
-		lab3->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
-		m_pctrlXLEWing = new FloatEdit(0.00);
-		m_pctrlZLEWing = new FloatEdit(0.00);
-		m_pctrlWingTilt = new FloatEdit(0.0,2);
-		m_pctrlLen1 = new QLabel("mm");
-		m_pctrlLen2 = new QLabel("mm");
-		QLabel *lab4 = new QLabel(QString::fromUtf8("°"));
-		MainWing->addWidget(m_pctrlDefineWing, 1,1);
-		MainWing->addWidget(m_pctrlImportWing, 2,1);
-		MainWing->addWidget(m_pctrlExportWing, 3,1);
-		MainWing->addWidget(lab1,1,2);
-		MainWing->addWidget(lab2,2,2);
-		MainWing->addWidget(lab3,3,2);
-		MainWing->addWidget(m_pctrlXLEWing,1,3);
-		MainWing->addWidget(m_pctrlZLEWing,2,3);
-		MainWing->addWidget(m_pctrlWingTilt,3,3);
-		MainWing->addWidget(m_pctrlLen1,1,4);
-		MainWing->addWidget(m_pctrlLen2,2,4);
-		MainWing->addWidget(lab4,3,4);
-		MainWingBox->setLayout(MainWing);
+		QGridLayout *MainWingLayout = new QGridLayout;
+		{
+			m_pctrlDefineWing = new QPushButton(tr("Define"));
+			m_pctrlImportWing = new QPushButton(tr("Import"));
+			m_pctrlExportWing = new QPushButton(tr("Export"));
+			QLabel *lab1 = new QLabel(tr("x="));
+			QLabel *lab2 = new QLabel(tr("z="));
+			QLabel *lab3 = new QLabel(tr("Tilt Angle="));
+			lab1->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+			lab2->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+			lab3->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+			m_pctrlXLEWing = new FloatEdit(0.00);
+			m_pctrlZLEWing = new FloatEdit(0.00);
+			m_pctrlWingTilt = new FloatEdit(0.0,2);
+			m_pctrlLen1 = new QLabel("mm");
+			m_pctrlLen2 = new QLabel("mm");
+			QLabel *lab4 = new QLabel(QString::fromUtf8("°"));
+			MainWingLayout->addWidget(m_pctrlDefineWing, 1,1);
+			MainWingLayout->addWidget(m_pctrlImportWing, 2,1);
+			MainWingLayout->addWidget(m_pctrlExportWing, 3,1);
+			MainWingLayout->addWidget(lab1,1,2);
+			MainWingLayout->addWidget(lab2,2,2);
+			MainWingLayout->addWidget(lab3,3,2);
+			MainWingLayout->addWidget(m_pctrlXLEWing,1,3);
+			MainWingLayout->addWidget(m_pctrlZLEWing,2,3);
+			MainWingLayout->addWidget(m_pctrlWingTilt,3,3);
+			MainWingLayout->addWidget(m_pctrlLen1,1,4);
+			MainWingLayout->addWidget(m_pctrlLen2,2,4);
+			MainWingLayout->addWidget(lab4,3,4);
+		}
+		MainWingBox->setLayout(MainWingLayout);
 	}
 
 	QGroupBox *MainWing2Box = new QGroupBox(tr("Wing 2"));
 	{
-		QGridLayout *MainWing2 = new QGridLayout;
-		m_pctrlBiplane = new QCheckBox(tr("Biplane"));
-		MainWing2->addWidget(m_pctrlBiplane,1,1);
-		m_pctrlDefineWing2 = new QPushButton(tr("Define"));
-		m_pctrlImportWing2 = new QPushButton(tr("Import"));
-		m_pctrlExportWing2 = new QPushButton(tr("Export"));
-		QLabel *lab11 = new QLabel(tr("x="));
-		QLabel *lab12 = new QLabel(tr("z="));
-		QLabel *lab13 = new QLabel(tr("Tilt Angle="));
-		lab11->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
-		lab12->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
-		lab13->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
-		m_pctrlXLEWing2 = new FloatEdit(0.00);
-		m_pctrlZLEWing2 = new FloatEdit(0.00);
-		m_pctrlWingTilt2 = new FloatEdit(0.0,2);
-		m_pctrlLen3 = new QLabel("mm");
-		m_pctrlLen4 = new QLabel("mm");
-		QLabel *lab14 = new QLabel(QString::fromUtf8("°"));
-		MainWing2->addWidget(m_pctrlDefineWing2, 2,1);
-		MainWing2->addWidget(m_pctrlImportWing2, 3,1);
-		MainWing2->addWidget(m_pctrlExportWing2, 4,1);
-		MainWing2->addWidget(lab11,2,2);
-		MainWing2->addWidget(lab12,3,2);
-		MainWing2->addWidget(lab13,4,2);
-		MainWing2->addWidget(m_pctrlXLEWing2,2,3);
-		MainWing2->addWidget(m_pctrlZLEWing2,3,3);
-		MainWing2->addWidget(m_pctrlWingTilt2,4,3);
-		MainWing2->addWidget(m_pctrlLen3,2,4);
-		MainWing2->addWidget(m_pctrlLen4,3,4);
-		MainWing2->addWidget(lab14,4,4);
-		MainWing2Box->setLayout(MainWing2);
+		QGridLayout *MainWing2Layout = new QGridLayout;
+		{
+			m_pctrlBiplane = new QCheckBox(tr("Biplane"));
+			MainWing2Layout->addWidget(m_pctrlBiplane,1,1);
+			m_pctrlDefineWing2 = new QPushButton(tr("Define"));
+			m_pctrlImportWing2 = new QPushButton(tr("Import"));
+			m_pctrlExportWing2 = new QPushButton(tr("Export"));
+			QLabel *lab11 = new QLabel(tr("x="));
+			QLabel *lab12 = new QLabel(tr("z="));
+			QLabel *lab13 = new QLabel(tr("Tilt Angle="));
+			lab11->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+			lab12->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+			lab13->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+			m_pctrlXLEWing2 = new FloatEdit(0.00);
+			m_pctrlZLEWing2 = new FloatEdit(0.00);
+			m_pctrlWingTilt2 = new FloatEdit(0.0,2);
+			m_pctrlLen3 = new QLabel("mm");
+			m_pctrlLen4 = new QLabel("mm");
+			QLabel *lab14 = new QLabel(QString::fromUtf8("°"));
+			MainWing2Layout->addWidget(m_pctrlDefineWing2, 2,1);
+			MainWing2Layout->addWidget(m_pctrlImportWing2, 3,1);
+			MainWing2Layout->addWidget(m_pctrlExportWing2, 4,1);
+			MainWing2Layout->addWidget(lab11,2,2);
+			MainWing2Layout->addWidget(lab12,3,2);
+			MainWing2Layout->addWidget(lab13,4,2);
+			MainWing2Layout->addWidget(m_pctrlXLEWing2,2,3);
+			MainWing2Layout->addWidget(m_pctrlZLEWing2,3,3);
+			MainWing2Layout->addWidget(m_pctrlWingTilt2,4,3);
+			MainWing2Layout->addWidget(m_pctrlLen3,2,4);
+			MainWing2Layout->addWidget(m_pctrlLen4,3,4);
+			MainWing2Layout->addWidget(lab14,4,4);
+		}
+		MainWing2Box->setLayout(MainWing2Layout);
 	}
 
 	QGroupBox *StabBox = new QGroupBox(tr("Elevator"));
 	{
 		QGridLayout *StabLayout = new QGridLayout;
-		m_pctrlStabCheck = new QCheckBox(tr("Elevator"));
-		m_pctrlDefineStab = new QPushButton(tr("Define"));
-		QLabel *lab21 = new QLabel(tr("x="));
-		QLabel *lab22 = new QLabel(tr("z="));
-		QLabel *lab23 = new QLabel(tr("Tilt Angle="));
-		lab21->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
-		lab22->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
-		lab23->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
-		m_pctrlXLEStab = new FloatEdit(550.00);
-		m_pctrlZLEStab = new FloatEdit(550.00);
-		m_pctrlStabTilt = new FloatEdit(0.0,1);
-		m_pctrlLen5 = new QLabel("mm");
-		m_pctrlLen6 = new QLabel("mm");
-		QLabel *lab24 = new QLabel(QString::fromUtf8("°"));
-		StabLayout->addWidget(m_pctrlStabCheck,1,1);
-		StabLayout->addWidget(m_pctrlDefineStab, 2,1);
-		StabLayout->addWidget(lab21,2,2);
-		StabLayout->addWidget(lab22,4,2);
-		StabLayout->addWidget(lab23,5,2);
-		StabLayout->addWidget(m_pctrlXLEStab,2,3);
-		StabLayout->addWidget(m_pctrlZLEStab,4,3);
-		StabLayout->addWidget(m_pctrlStabTilt,5,3);
-		StabLayout->addWidget(m_pctrlLen5,2,4);
-		StabLayout->addWidget(m_pctrlLen6,4,4);
-		StabLayout->addWidget(lab24,5,4);
+		{
+			m_pctrlStabCheck = new QCheckBox(tr("Elevator"));
+			m_pctrlDefineStab = new QPushButton(tr("Define"));
+			QLabel *lab21 = new QLabel(tr("x="));
+			QLabel *lab22 = new QLabel(tr("z="));
+			QLabel *lab23 = new QLabel(tr("Tilt Angle="));
+			lab21->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+			lab22->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+			lab23->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+			m_pctrlXLEStab = new FloatEdit(550.00);
+			m_pctrlZLEStab = new FloatEdit(550.00);
+			m_pctrlStabTilt = new FloatEdit(0.0,2);
+			m_pctrlLen5 = new QLabel("mm");
+			m_pctrlLen6 = new QLabel("mm");
+			QLabel *lab24 = new QLabel(QString::fromUtf8("°"));
+			StabLayout->addWidget(m_pctrlStabCheck,1,1);
+			StabLayout->addWidget(m_pctrlDefineStab, 2,1);
+			StabLayout->addWidget(lab21,2,2);
+			StabLayout->addWidget(lab22,4,2);
+			StabLayout->addWidget(lab23,5,2);
+			StabLayout->addWidget(m_pctrlXLEStab,2,3);
+			StabLayout->addWidget(m_pctrlZLEStab,4,3);
+			StabLayout->addWidget(m_pctrlStabTilt,5,3);
+			StabLayout->addWidget(m_pctrlLen5,2,4);
+			StabLayout->addWidget(m_pctrlLen6,4,4);
+			StabLayout->addWidget(lab24,5,4);
+		}
 		StabBox->setLayout(StabLayout);
 	}
 
 	QGroupBox *FinBox = new QGroupBox(tr("Fin"));
 	{
 		QGridLayout *FinLayout = new QGridLayout;
-		m_pctrlFinCheck = new QCheckBox(tr("Fin"));
-		m_pctrlDefineFin = new QPushButton(tr("Define"));
-		m_pctrlDoubleFin = new QCheckBox(tr("Double Fin"));
-		m_pctrlSymFin = new QCheckBox(tr("Two-sided Fin"));
-		QLabel *lab31 = new QLabel(tr("x="));
-		QLabel *lab32 = new QLabel(tr("y="));
-		QLabel *lab33 = new QLabel(tr("z="));
-		QLabel *lab34 = new QLabel(tr("Tilt Angle="));
-		lab31->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
-		lab32->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
-		lab33->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
-		lab34->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
-		m_pctrlXLEFin = new FloatEdit(600.00);
-		m_pctrlYLEFin = new FloatEdit(0.00);
-		m_pctrlZLEFin = new FloatEdit(50.00);
-		m_pctrlFinTilt = new FloatEdit(0.0,2);
-		m_pctrlLen7= new QLabel("mm");
-		m_pctrlLen8 = new QLabel("mm");
-		m_pctrlLen9 = new QLabel("mm");
-		QLabel *lab35 = new QLabel(QString::fromUtf8("°"));
-		FinLayout->addWidget(m_pctrlFinCheck,1,1);
-		FinLayout->addWidget(m_pctrlDefineFin, 2,1);
-		FinLayout->addWidget(m_pctrlSymFin, 3,1);
-		FinLayout->addWidget(m_pctrlDoubleFin, 4,1);
-		FinLayout->addWidget(lab31,2,2);
-		FinLayout->addWidget(lab32,3,2);
-		FinLayout->addWidget(lab33,4,2);
-		FinLayout->addWidget(lab34,5,2);
-		FinLayout->addWidget(m_pctrlXLEFin,2,3);
-		FinLayout->addWidget(m_pctrlYLEFin,3,3);
-		FinLayout->addWidget(m_pctrlZLEFin,4,3);
-		FinLayout->addWidget(m_pctrlFinTilt,5,3);
-		FinLayout->addWidget(m_pctrlLen7,2,4);
-		FinLayout->addWidget(m_pctrlLen8,3,4);
-		FinLayout->addWidget(m_pctrlLen9,4,4);
-		FinLayout->addWidget(lab35,5,4);
+		{
+			m_pctrlFinCheck = new QCheckBox(tr("Fin"));
+			m_pctrlDefineFin = new QPushButton(tr("Define"));
+			m_pctrlDoubleFin = new QCheckBox(tr("Double Fin"));
+			m_pctrlSymFin = new QCheckBox(tr("Two-sided Fin"));
+			QLabel *lab31 = new QLabel(tr("x="));
+			QLabel *lab32 = new QLabel(tr("y="));
+			QLabel *lab33 = new QLabel(tr("z="));
+			QLabel *lab34 = new QLabel(tr("Tilt Angle="));
+			lab31->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+			lab32->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+			lab33->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+			lab34->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+			m_pctrlXLEFin = new FloatEdit(600.00);
+			m_pctrlYLEFin = new FloatEdit(0.00);
+			m_pctrlZLEFin = new FloatEdit(50.00);
+			m_pctrlFinTilt = new FloatEdit(0.0,2);
+			m_pctrlLen7= new QLabel("mm");
+			m_pctrlLen8 = new QLabel("mm");
+			m_pctrlLen9 = new QLabel("mm");
+			QLabel *lab35 = new QLabel(QString::fromUtf8("°"));
+			FinLayout->addWidget(m_pctrlFinCheck,1,1);
+			FinLayout->addWidget(m_pctrlDefineFin, 2,1);
+			FinLayout->addWidget(m_pctrlSymFin, 3,1);
+			FinLayout->addWidget(m_pctrlDoubleFin, 4,1);
+			FinLayout->addWidget(lab31,2,2);
+			FinLayout->addWidget(lab32,3,2);
+			FinLayout->addWidget(lab33,4,2);
+			FinLayout->addWidget(lab34,5,2);
+			FinLayout->addWidget(m_pctrlXLEFin,2,3);
+			FinLayout->addWidget(m_pctrlYLEFin,3,3);
+			FinLayout->addWidget(m_pctrlZLEFin,4,3);
+			FinLayout->addWidget(m_pctrlFinTilt,5,3);
+			FinLayout->addWidget(m_pctrlLen7,2,4);
+			FinLayout->addWidget(m_pctrlLen8,3,4);
+			FinLayout->addWidget(m_pctrlLen9,4,4);
+			FinLayout->addWidget(lab35,5,4);
+		}
 		FinBox->setLayout(FinLayout);
 	}
 
 	QGroupBox *BodyBox = new QGroupBox(tr("Body"));
 	{
 		QHBoxLayout *BodyName = new QHBoxLayout;
-		QLabel *BodyWarning = new QLabel(tr("Warning:\nIncluding the body in the analysis is not recommended.\nCheck the guidelines for explanations."));
-		m_pctrlBody = new QCheckBox(tr("Body"));
-		m_pctrlEditBody = new QPushButton(tr("Edit..."));
-		m_pctrlBodyList = new QComboBox;
-		BodyName->addWidget(m_pctrlBody);
-		BodyName->addWidget(m_pctrlBodyList);
-		BodyName->addWidget(m_pctrlEditBody);
-	//	m_pctrlBodyList->setMinimumWidth(250);
-		BodyName->addStretch(1);
+		{
+			m_pctrlBody = new QCheckBox(tr("Body"));
+			m_pctrlEditBody = new QPushButton(tr("Edit..."));
+			m_pctrlBodyList = new QComboBox;
+			BodyName->addWidget(m_pctrlBody);
+			BodyName->addWidget(m_pctrlBodyList);
+			BodyName->addWidget(m_pctrlEditBody);
+		//	m_pctrlBodyList->setMinimumWidth(250);
+			BodyName->addStretch(1);
+		}
 		QGridLayout *BodyPos = new QGridLayout;
-		BodyPos->setColumnStretch(0,3);
-		BodyPos->setColumnStretch(1,0);
-		BodyPos->setColumnStretch(2,0);
-		m_pctrlXBody = new FloatEdit(0.00);
-		m_pctrlZBody = new FloatEdit(0.00);
-		QLabel *lab41 = new QLabel(tr("x="));
-		QLabel *lab42 = new QLabel(tr("z="));
-		m_pctrlLen10 = new QLabel("mm");
-		m_pctrlLen11 = new QLabel("mm");
-		BodyPos->addWidget(lab41,1,1);
-		BodyPos->addWidget(m_pctrlXBody,1,2);
-		BodyPos->addWidget(m_pctrlLen10,1,3);
-		BodyPos->addWidget(lab42,2,1);
-		BodyPos->addWidget(m_pctrlZBody,2,2);
-		BodyPos->addWidget(m_pctrlLen11,2,3);
+		{
+			BodyPos->setColumnStretch(0,3);
+			BodyPos->setColumnStretch(1,0);
+			BodyPos->setColumnStretch(2,0);
+			m_pctrlXBody = new FloatEdit(0.00);
+			m_pctrlZBody = new FloatEdit(0.00);
+			QLabel *lab41 = new QLabel(tr("x="));
+			QLabel *lab42 = new QLabel(tr("z="));
+			m_pctrlLen10 = new QLabel("mm");
+			m_pctrlLen11 = new QLabel("mm");
+			BodyPos->addWidget(lab41,1,1);
+			BodyPos->addWidget(m_pctrlXBody,1,2);
+			BodyPos->addWidget(m_pctrlLen10,1,3);
+			BodyPos->addWidget(lab42,2,1);
+			BodyPos->addWidget(m_pctrlZBody,2,2);
+			BodyPos->addWidget(m_pctrlLen11,2,3);
+		}
 		QVBoxLayout *BodyLayout = new QVBoxLayout;
-		BodyLayout->addWidget(BodyWarning);
-		BodyLayout->addLayout(BodyName);
-		BodyLayout->addLayout(BodyPos);
+		{
+			QLabel *BodyWarning = new QLabel(tr("Warning:\nIncluding the body in the analysis is not recommended.\nCheck the guidelines for explanations."));
+			BodyLayout->addWidget(BodyWarning);
+			BodyLayout->addLayout(BodyName);
+			BodyLayout->addLayout(BodyPos);
+		}
 		BodyBox->setLayout(BodyLayout);
 	}
 
-	QLabel *lab101 = new QLabel(tr("Wing Area = "));
-	QLabel *lab102 = new QLabel(tr("Wing Span = "));
-	QLabel *lab103 = new QLabel(tr("Elev. Area = "));
-	QLabel *lab104 = new QLabel(tr("Elev. Lever Arm = "));
-	QLabel *lab105 = new QLabel(tr("Fin Area = "));
-	QLabel *lab106 = new QLabel(tr("TailVolume = "));
-	QLabel *lab108 = new QLabel(tr("Total Panels = "));
-	lab101->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
-	lab102->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
-	lab103->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
-	lab104->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
-	lab105->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
-	lab106->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
-	lab108->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
-	m_pctrlWingSurface    = new QLabel("1.00");
-	m_pctrlStabSurface    = new QLabel("2.00");
-	m_pctrlWingSpan       = new QLabel("3.00");
-	m_pctrlStabLeverArm   = new QLabel("4.00");
-	m_pctrlFinSurface     = new QLabel("5.00");
-	m_pctrlStabVolume     = new QLabel("6.00");
-	m_pctrlVLMTotalPanels = new QLabel("1234");
-	m_pctrlWingSurface->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
-	m_pctrlStabSurface->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
-	m_pctrlWingSpan->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
-	m_pctrlStabLeverArm->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
-	m_pctrlFinSurface->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
-	m_pctrlStabVolume->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
-	m_pctrlVLMTotalPanels->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
-
-	m_pctrlSurf1 = new QLabel("dm2");
-	m_pctrlSurf2 = new QLabel("dm2");
-	m_pctrlSurf3 = new QLabel("dm2");
-	m_pctrlLen12 = new QLabel("mm");
-	m_pctrlLen13 = new QLabel("mm");
-	m_pctrlVolume = new QLabel("mm3");
 	QGridLayout *Data1Layout = new QGridLayout;
-	Data1Layout->addWidget(lab101, 1, 1);
-	Data1Layout->addWidget(m_pctrlWingSurface,1,2);
-	Data1Layout->addWidget(m_pctrlSurf1, 1, 3);
-	Data1Layout->addWidget(lab102, 2, 1);
-	Data1Layout->addWidget(m_pctrlWingSpan, 2, 2);
-	Data1Layout->addWidget(m_pctrlLen12, 2, 3);
-	Data1Layout->addWidget(lab103, 3, 1);
-	Data1Layout->addWidget(m_pctrlStabSurface, 3, 2);
-	Data1Layout->addWidget(m_pctrlSurf2, 3, 3);
-	Data1Layout->addWidget(lab104, 4, 1);
-	Data1Layout->addWidget(m_pctrlStabLeverArm, 4, 2);
-	Data1Layout->addWidget(m_pctrlLen13, 4, 3);
+	{
+		QLabel *lab101 = new QLabel(tr("Wing Area = "));
+		QLabel *lab102 = new QLabel(tr("Wing Span = "));
+		QLabel *lab103 = new QLabel(tr("Elev. Area = "));
+		QLabel *lab104 = new QLabel(tr("Elev. Lever Arm = "));
+		lab101->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+		lab102->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+		lab103->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+		lab104->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+		m_pctrlWingSurface    = new QLabel("1.00");
+		m_pctrlStabSurface    = new QLabel("2.00");
+		m_pctrlWingSpan       = new QLabel("3.00");
+		m_pctrlStabLeverArm   = new QLabel("4.00");
+		m_pctrlFinSurface     = new QLabel("5.00");
+		m_pctrlStabVolume     = new QLabel("6.00");
+		m_pctrlVLMTotalPanels = new QLabel("1234");
+		m_pctrlWingSurface->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+		m_pctrlStabSurface->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+		m_pctrlWingSpan->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+		m_pctrlStabLeverArm->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+
+		m_pctrlSurf1 = new QLabel("dm2");
+		m_pctrlSurf2 = new QLabel("dm2");
+		m_pctrlSurf3 = new QLabel("dm2");
+		m_pctrlLen12 = new QLabel("mm");
+		m_pctrlLen13 = new QLabel("mm");
+		m_pctrlVolume = new QLabel("mm3");
+		Data1Layout->addWidget(lab101, 1, 1);
+		Data1Layout->addWidget(m_pctrlWingSurface,1,2);
+		Data1Layout->addWidget(m_pctrlSurf1, 1, 3);
+		Data1Layout->addWidget(lab102, 2, 1);
+		Data1Layout->addWidget(m_pctrlWingSpan, 2, 2);
+		Data1Layout->addWidget(m_pctrlLen12, 2, 3);
+		Data1Layout->addWidget(lab103, 3, 1);
+		Data1Layout->addWidget(m_pctrlStabSurface, 3, 2);
+		Data1Layout->addWidget(m_pctrlSurf2, 3, 3);
+		Data1Layout->addWidget(lab104, 4, 1);
+		Data1Layout->addWidget(m_pctrlStabLeverArm, 4, 2);
+		Data1Layout->addWidget(m_pctrlLen13, 4, 3);
+	}
+
 	QGridLayout *Data2Layout = new QGridLayout;
-	Data2Layout->addWidget(lab105, 1, 1);
-	Data2Layout->addWidget(m_pctrlFinSurface, 1, 2);
-	Data2Layout->addWidget(m_pctrlSurf3, 1, 3);
-	Data2Layout->addWidget(lab106, 2, 1);
-	Data2Layout->addWidget(m_pctrlStabVolume, 2, 2);
-	Data2Layout->addWidget(lab108, 3, 1);
-	Data2Layout->addWidget(m_pctrlVLMTotalPanels, 3, 2);
+	{
+		QLabel *lab105 = new QLabel(tr("Fin Area = "));
+		QLabel *lab106 = new QLabel(tr("TailVolume = "));
+		QLabel *lab108 = new QLabel(tr("Total Panels = "));
+		lab105->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+		lab106->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+		lab108->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+		m_pctrlFinSurface->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+		m_pctrlStabVolume->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+		m_pctrlVLMTotalPanels->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+		Data2Layout->addWidget(lab105, 1, 1);
+		Data2Layout->addWidget(m_pctrlFinSurface, 1, 2);
+		Data2Layout->addWidget(m_pctrlSurf3, 1, 3);
+		Data2Layout->addWidget(lab106, 2, 1);
+		Data2Layout->addWidget(m_pctrlStabVolume, 2, 2);
+		Data2Layout->addWidget(lab108, 3, 1);
+		Data2Layout->addWidget(m_pctrlVLMTotalPanels, 3, 2);
+	}
 
-
-	QHBoxLayout *CommandButtons = new QHBoxLayout;
-	OKButton = new QPushButton(tr("OK"));
-	CancelButton = new QPushButton(tr("Cancel"));
-	CommandButtons->addStretch(1);
-	CommandButtons->addWidget(OKButton);
-	CommandButtons->addStretch(1);
-	CommandButtons->addWidget(CancelButton);
-	CommandButtons->addStretch(1);
+	QHBoxLayout *CommandButtonsLayout = new QHBoxLayout;
+	{
+		OKButton = new QPushButton(tr("OK"));
+		CancelButton = new QPushButton(tr("Cancel"));
+		CommandButtonsLayout->addStretch(1);
+		CommandButtonsLayout->addWidget(OKButton);
+		CommandButtonsLayout->addStretch(1);
+		CommandButtonsLayout->addWidget(CancelButton);
+		CommandButtonsLayout->addStretch(1);
+	}
 
 
 	QGridLayout *GeomLayout = new QGridLayout;
-	GeomLayout->addWidget(NameBox,1,1);
-	GeomLayout->addWidget(BodyBox,1,2);
-	GeomLayout->addWidget(MainWingBox,2,1);
-	GeomLayout->addWidget(MainWing2Box,2,2);
-	GeomLayout->addWidget(StabBox,3,1);
-	GeomLayout->addWidget(FinBox,3,2);
-	GeomLayout->addLayout(Data1Layout,4,1);
-	GeomLayout->addLayout(Data2Layout,4,2);
+	{
+		GeomLayout->addWidget(NameBox,1,1);
+		GeomLayout->addWidget(BodyBox,1,2);
+		GeomLayout->addWidget(MainWingBox,2,1);
+		GeomLayout->addWidget(MainWing2Box,2,2);
+		GeomLayout->addWidget(StabBox,3,1);
+		GeomLayout->addWidget(FinBox,3,2);
+		GeomLayout->addLayout(Data1Layout,4,1);
+		GeomLayout->addLayout(Data2Layout,4,2);
+	}
 
 
 	QVBoxLayout *MainLayout = new QVBoxLayout;
-	MainLayout->addStretch(1);
-	MainLayout->addLayout(GeomLayout);
-	MainLayout->addStretch(1);
-	MainLayout->addLayout(CommandButtons);
-	MainLayout->addStretch(1);
-
+	{
+		MainLayout->addStretch(1);
+		MainLayout->addLayout(GeomLayout);
+		MainLayout->addStretch(1);
+		MainLayout->addLayout(CommandButtonsLayout);
+		MainLayout->addStretch(1);
+	}
 	setLayout(MainLayout);
 }
-
-
-
-
-
 
 
 

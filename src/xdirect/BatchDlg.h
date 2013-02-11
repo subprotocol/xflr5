@@ -106,6 +106,7 @@ protected:
 	static void* s_pXDirect;
 	static void * s_pMainFrame;
 	static bool s_bCurrentFoil;
+	enumPolarType m_PolarType;
 
 	double	m_Mach;
 
@@ -130,7 +131,6 @@ protected:
 	bool m_bCancel, m_bSkipPoint, m_bSkipPolar;
 	bool m_bIsRunning;
 
-	enumPolarType m_PolarType;
 
 	int m_Iterations;
 	int m_IterLim;
