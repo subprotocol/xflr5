@@ -128,6 +128,7 @@ private:
 
 	void SetupLayout();
 	void SetViewControls();
+	void SetTableUnits();
 
 	void GLInverseMatrix();
 	void GLCreateBody2DBodySection();

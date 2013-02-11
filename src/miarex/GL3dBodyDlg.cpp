@@ -192,6 +192,7 @@ GL3dBodyDlg::GL3dBodyDlg(QWidget *pParent): QDialog(pParent)
 	m_pTranslateBody = new QAction(tr("Translate"), this);
 	connect(m_pTranslateBody, SIGNAL(triggered()), this, SLOT(OnTranslateBody()));
 	SetupLayout();
+	SetTableUnits();
 
 	connect(m_pInsertPoint,      SIGNAL(triggered()), this, SLOT(OnInsert()));
 	connect(m_pRemovePoint,      SIGNAL(triggered()), this, SLOT(OnRemove()));
@@ -238,6 +239,26 @@ GL3dBodyDlg::GL3dBodyDlg(QWidget *pParent): QDialog(pParent)
 
 	setMouseTracking(true);
 }
+
+
+
+void GL3dBodyDlg::SetTableUnits()
+{
+	MainFrame *pMainFrame = (MainFrame*)(s_pMainFrame);
+	QString length;
+
+	GetLengthUnit(length, pMainFrame->m_LengthUnit);
+	m_pFrameModel->setHeaderData(0, Qt::Horizontal, "x ("+length+")");
+	m_pFrameModel->setHeaderData(1, Qt::Horizontal, tr("NPanels"));
+	m_pctrlFrameTable->setModel(m_pFrameModel);
+
+	m_pPointModel->setHeaderData(0, Qt::Horizontal, "y ("+length+")");
+	m_pPointModel->setHeaderData(1, Qt::Horizontal, "z ("+length+")");
+	m_pPointModel->setHeaderData(2, Qt::Horizontal, tr("NPanels"));
+
+}
+
+
 
 GL3dBodyDlg::~GL3dBodyDlg()
 {
@@ -3473,9 +3494,7 @@ void GL3dBodyDlg::SetupLayout()
 {
 	int i;
 	QString str;
-	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
-	QString length;
-	GetLengthUnit(length, pMainFrame->m_LengthUnit);
+//	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 
 	QSizePolicy szPolicyExpanding;
 	szPolicyExpanding.setHorizontalPolicy(QSizePolicy::Expanding);
@@ -3789,9 +3808,6 @@ void GL3dBodyDlg::SetupLayout()
 	m_pFrameModel = new QStandardItemModel;
 	m_pFrameModel->setRowCount(10);//temporary
 	m_pFrameModel->setColumnCount(2);
-	m_pFrameModel->setHeaderData(0, Qt::Horizontal, "x ("+length+")");
-	m_pFrameModel->setHeaderData(1, Qt::Horizontal, tr("NPanels"));
-	m_pctrlFrameTable->setModel(m_pFrameModel);
 
 	QItemSelectionModel *selectionModelFrame = new QItemSelectionModel(m_pFrameModel);
 	m_pctrlFrameTable->setSelectionModel(selectionModelFrame);
@@ -3810,9 +3826,6 @@ void GL3dBodyDlg::SetupLayout()
 	m_pPointModel = new QStandardItemModel;
 	m_pPointModel->setRowCount(10);//temporary
 	m_pPointModel->setColumnCount(3);
-	m_pPointModel->setHeaderData(0, Qt::Horizontal, "y ("+length+")");
-	m_pPointModel->setHeaderData(1, Qt::Horizontal, "z ("+length+")");
-	m_pPointModel->setHeaderData(2, Qt::Horizontal, tr("NPanels"));
 	m_pctrlPointTable->setModel(m_pPointModel);
 	QItemSelectionModel *selectionModelPoint = new QItemSelectionModel(m_pPointModel);
 	m_pctrlPointTable->setSelectionModel(selectionModelPoint);
@@ -3889,6 +3902,7 @@ void GL3dBodyDlg::ShowContextMenu(QContextMenuEvent * event)
 
 void GL3dBodyDlg::showEvent(QShowEvent *event)
 {
+	SetTableUnits();
 	m_bChanged    = false;
 	m_bResetglBody = true;
 	m_bIs3DScaleSet = false;
