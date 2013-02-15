@@ -719,7 +719,12 @@ void PlaneDlg::SetParams()
 	{
 		pos = m_pctrlBodyList->findText(m_pPlane->m_pBody->m_BodyName);
 		m_pctrlBodyList->setCurrentIndex(pos);
-	}
+        m_pctrlBody->setEnabled(true);
+        m_pctrlBodyList->setEnabled(true);
+        m_pctrlXBody->setEnabled(true);
+        m_pctrlZBody->setEnabled(true);
+        m_pctrlEditBody->setEnabled(true);
+    }
 	else
 	{
 		if(m_pctrlBodyList->count())
@@ -823,7 +828,8 @@ void PlaneDlg::SetResults()
 
 	if(m_pPlane->Fin())
 	{
-		if(m_pPlane->m_bDoubleFin ||m_pPlane->m_bSymFin)  total += 2*m_pPlane->Fin()->VLMGetPanelTotal();
+        //if(m_pPlane->m_bSymFin)  total += 2*m_pPlane->Fin()->VLMGetPanelTotal();
+        if(m_pPlane->m_bDoubleFin ||m_pPlane->m_bSymFin)  total += 2*m_pPlane->Fin()->VLMGetPanelTotal();
 		else                                              total +=   m_pPlane->Fin()->VLMGetPanelTotal();
 		total += m_pPlane->Fin()->NXPanels(m_pPlane->Fin()->NWingSection()-2);
 	}
