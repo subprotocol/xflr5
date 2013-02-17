@@ -51,7 +51,14 @@ extern CFoil *g_pCurFoil;
 QAFoil::QAFoil(QWidget *parent)
 	: QWidget(parent)
 {
-	m_hcCross = QCursor(Qt::CrossCursor);
+
+	QFile file("qss/appwidget.css");
+	if(file.open(QFile::ReadOnly))
+	{
+		QString styleSheet = QLatin1String(file.readAll());
+		setStyleSheet(styleSheet);
+		ensurePolished();
+	}	m_hcCross = QCursor(Qt::CrossCursor);
 	m_hcMove  = QCursor(Qt::ClosedHandCursor);
 
 	m_StackPos = m_StackSize = 0;

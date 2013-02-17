@@ -64,6 +64,14 @@ QXDirect::QXDirect(QWidget *parent) : QWidget(parent)
 {
 	SetupLayout();
 
+	QFile file("qss/appwidget.css");
+	if(file.open(QFile::ReadOnly))
+	{
+		QString styleSheet = QLatin1String(file.readAll());
+		setStyleSheet(styleSheet);
+		ensurePolished();
+	}
+
 	m_pXFoil = NULL;
 	m_pXFoil = new XFoil();
 

@@ -38,14 +38,14 @@ public:
 		x  = 0.0;
 		y  = 0.0;
 		z  = 0.0;
-	};
+	}
 
 	CVector(double const &xi, double const &yi, double const &zi)
 	{
 		x  = xi;
 		y  = yi;
 		z  = zi;
-	};
+	}
 
 	//inline operators
 	double operator[](const int &i)
@@ -60,41 +60,41 @@ public:
 	{
 		//used only to compare point positions
 		return (V.x-x)*(V.x-x) + (V.y-y)*(V.y-y) + (V.z-z)*(V.z-z)<0.000000001;
-	};
+	}
 	
 	void operator =(CVector const &T)
 	{
 		x = T.x;
 		y = T.y;
 		z = T.z;
-	};
+	}
 	
 	void operator+=(CVector const &T)
 	{
 		x += T.x;
 		y += T.y;
 		z += T.z;
-	};
+	}
 	
 	void operator-=(CVector const &T)
 	{
 		x -= T.x;
 		y -= T.y;
 		z -= T.z;
-	};
+	}
 
 	void operator*=(double const &d)
 	{
 		x *= d;
 		y *= d;
 		z *= d;
-	};
+	}
 				   
 	CVector operator *(double const &d)
 	{
 		CVector T(x*d, y*d, z*d);
 		return T;
-	};
+	}
 	
 	CVector operator *(CVector const &T)
 	{
@@ -103,26 +103,26 @@ public:
 		C.y = -x*T.z + z*T.x;
 		C.z =  x*T.y - y*T.x;
 		return C;
-	};
+	}
 	
 	CVector operator /(double const &d)
 	{
 		CVector T(x/d, y/d, z/d);
 		return T;
-	};
+	}
 	
 	CVector operator +(CVector const &V) const
 	{
 		CVector T(x+V.x, y+V.y, z+V.z);
 		return T;
-	};
+	}
 	
 
 	CVector operator -(CVector const &V) const
 	{
 		CVector T(x-V.x, y-V.y, z-V.z);
 		return T;
-	};
+	}
 
 	
 	//inline methods
@@ -131,21 +131,21 @@ public:
 		x = V.x;
 		y = V.y;
 		z = V.z;
-	};
+	}
 	
 	void Set(double const &x0, double const &y0, double const &z0)
 	{	
 		x = x0;
 		y = y0;
 		z = z0;
-	};
+	}
 	
 	void Set(CVector const &V)
 	{	
 		x = V.x;
 		y = V.y;
 		z = V.z;
-	};
+	}
 
 	void Normalize()
 	{
@@ -154,37 +154,37 @@ public:
 		x/=abs;
 		y/=abs;
 		z/=abs;
-	};
+	}
 		
 	double VAbs()
 	{
 		return sqrt(x*x+y*y+z*z);
-	};
+	}
 	
 	double dot(CVector const &V)
 	{	
 		return x*V.x + y*V.y + z*V.z;
-	};
+	}
 	
 	bool IsSame(CVector const &V)
 	{
 		//used only to compare point positions
 		return (V.x-x)*(V.x-x) + (V.y-y)*(V.y-y) + (V.z-z)*(V.z-z)<0.000000001;
-	};
+	}
 
 	void Translate(CVector const &T)
 	{
 		x += T.x;
 		y += T.y;
 		z += T.z;
-	};
+	}
 
 	void Translate(const double &tx, const double &ty, const double &tz)
 	{
 		x += tx;
 		y += ty;
 		z += tz;
-	};
+	}
 
 	int size() const
 	{

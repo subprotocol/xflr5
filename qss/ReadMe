@@ -1,0 +1,7 @@
+Copy this qss directory in the application's executable folder 
+
+If you hate the style:
+- change it to your linking
+- remove the qss folder altogether to revert to the default OS style
+
+If you create a nice style, please share it on the sourceforge discussion page. It may be added for release together with the application.

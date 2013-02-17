@@ -40,6 +40,15 @@ extern CFoil* g_pCurFoil;
 QXInverse::QXInverse(QWidget *parent)
 	: QWidget(parent)
 {
+
+	QFile file("qss/appwidget.css");
+	if(file.open(QFile::ReadOnly))
+	{
+		QString styleSheet = QLatin1String(file.readAll());
+		setStyleSheet(styleSheet);
+		ensurePolished();
+	}
+
 	m_bFullInverse = false;
 
 	m_pXFoil = NULL;

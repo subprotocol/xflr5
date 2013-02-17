@@ -49,6 +49,15 @@ double QMiarex::s_MinPanelSize = 0.0001;
 QMiarex::QMiarex(QWidget *parent)
 	: QWidget(parent)
 {
+
+	QFile file("qss/appwidget.css");
+	if(file.open(QFile::ReadOnly))
+	{
+		QString styleSheet = QLatin1String(file.readAll());
+		setStyleSheet(styleSheet);
+		ensurePolished();
+	}
+
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	//construct and initialize everything
 	m_pWingDlg = new GL3dWingDlg(pMainFrame);

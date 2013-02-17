@@ -1,0 +1,356 @@
+.QWidget {
+   background-color: beige;
+}
+
+QWidget {
+ background: QLinearGradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #eee, stop: 1 #ddf);
+}
+
+#mainFrame {
+ border: 3px solid gray;
+ border-radius: 40px;
+ background: red;
+ }
+
+/* Nice Windows-XP-style password character. */
+QLineEdit[echoMode="2"] {
+    lineedit-password-character: 9679;
+}
+
+/* We provide a min-width and min-height for push buttons
+   so that they look elegant regardless of the width of the text. */
+QPushButton {
+ color: darkgreen;
+ background: white;
+ border-width: 3px;
+ border-color: #299;
+ border-style: solid;
+ border-radius: 13;
+ padding: 3px;
+ font-size: 13px;
+ padding-left: 5px;
+ padding-right: 5px;
+ min-width: 50px;
+ max-width: 300px;
+ min-height: 17px;
+ max-height: 29px;
+}
+
+QPushButton:hover {
+   background-color: khaki;
+}
+
+QPushButton:disabled
+{
+	background-color: darkgrey;
+}
+
+ 
+QPushButton#redButton {
+ color: red;
+ background-color: beige;
+ border-width: 3px;
+ border-color: #999;
+ border-style: solid;
+ border-radius: 7;
+}
+  
+QPushButton#blueButton {
+ color: lightblue;
+ background-color: beige;
+ border-color: #999;
+ border-style: solid;
+ border-radius: 7;
+ min-width: 150px;
+}
+  
+ QPushButton#redButton:hover {
+   background-color: khaki;
+}
+  
+ QPushButton#blueButton:hover {
+   background-color: khaki;
+}
+
+
+QPushButton#redButton:disabled
+{
+	background-color: darkgrey;
+}
+
+
+QPushButton#blueButton:disabled
+{
+	background-color: darkgrey;
+}
+
+QLabel#flightStatus {
+ font-size: 11px;
+ color : darkgrey;
+ font: italic;
+}
+
+QLabel#timerDisplay {
+ font-size: 1px;
+ color : green;
+}
+
+
+QLabel#timerLabel {
+ font: bold;
+ font-size: 11px;
+ color : darkgreen;
+}
+
+QLabel#overwriteWarning {
+ font: bold;
+ font-size: 11px;
+ color : red;
+ background: white;
+	
+}
+
+/* Increase the padding, so the text is shifted when the button is
+   pressed. */
+QPushButton:pressed {
+    padding-left: 5px;
+    padding-top: 5px;
+    background-color: #d0d67c;
+}
+
+QLabel, QAbstractButton {
+    font: bold;
+}
+
+/* Mark mandatory fields with a brownish color. */
+.mandatory {
+    color: brown;
+}
+
+/* Bold text on status bar looks awful. */
+QStatusBar QLabel {
+   font: normal;
+}
+
+QStatusBar::item {
+    border-width: 1;
+    border-color: darkkhaki;
+    border-style: solid;
+    border-radius: 2;
+}
+
+QComboBox, QLineEdit, QSpinBox, QTextEdit, QListView {
+    background-color: cornsilk;
+    selection-color: #0a214c; 
+    selection-background-color: #C19A6B;
+}
+
+QListView {
+    show-decoration-selected: 1;
+}
+
+QListView::item:hover {
+    background-color: wheat;
+}
+
+
+/* We reserve 1 pixel space in padding. When we get the focus,
+   we kill the padding and enlarge the border. This makes the items
+   glow. */
+QLineEdit, QFrame {
+    border-width: 2px;
+    padding: 1px;
+    border-style: solid;
+    border-color: darkkhaki;
+    border-radius: 5px;
+}
+
+/* As mentioned above, eliminate the padding and increase the border. */
+QLineEdit:focus, QFrame:focus {
+    border-width: 3px;
+    padding: 0px;
+}
+
+/* A QLabel is a QFrame ... */
+QLabel {
+    border: none;
+    padding: 0;
+    background: none;
+}
+
+/* A QToolTip is a QLabel ... */
+QToolTip {
+    border: 2px solid darkkhaki;
+    padding: 5px;
+    border-radius: 3px;
+    opacity: 200;
+}
+
+/* Nice to have the background color change when hovered. */
+QRadioButton:hover {
+    background-color: wheat;
+}
+
+
+/* Force the dialog's buttons to follow the Windows guidelines. */
+QDialogButtonBox {
+    button-layout: 0;
+}
+
+
+QTableView#roundTable
+{
+ background: white;	
+}
+
+
+QTableView#scoreTable
+{
+ background: white;	
+}
+
+
+QTabWidget::pane { /* The tab widget frame */
+	border-top: 2px solid #C2C7CB;
+}
+
+QTabWidget::tab-bar {
+	left: 5px; /* move to the right by 5px */
+}
+
+/* Style the tab using the tab sub-control. Note that
+it reads QTabBar _not_ QTabWidget */
+QTabBar::tab {
+	background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+							stop: 0 #E1E1E1, stop: 0.4 #DDDDDD,
+							stop: 0.5 #D8D8D8, stop: 1.0 #D3D3D3);
+	border: 2px solid #C4C4C3;
+	border-bottom-color: #C2C7CB; /* same as the pane color */
+	border-top-left-radius: 4px;
+	border-top-right-radius: 4px;
+	min-width: 8ex;
+	padding: 2px;
+}
+
+QTabBar::tab:selected, QTabBar::tab:hover {
+	background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+							stop: 0 #fafafa, stop: 0.4 #f4f4f4,
+							stop: 0.5 #e7e7e7, stop: 1.0 #fafafa);
+}
+
+QTabBar::tab:selected {
+	font: bold;
+	border-color: #9B9B9B;
+	border-bottom-color: #C2C7CB; /* same as pane color */
+}
+
+QTabBar::tab:!selected {
+	color: darkgrey;
+	margin-top: 2px; /* make non-selected tabs look smaller */
+}
+
+
+
+ QCheckBox {
+     spacing: 5px;
+ }
+
+ QCheckBox::indicator {
+  height:23px;
+ }
+
+ QCheckBox::indicator:unchecked {
+     image: url(./qss/images/checkbox_unchecked.png);
+ }
+
+ QCheckBox::indicator:unchecked:hover {
+     image: url(./qss/images/checkbox_unchecked_hover.png);
+ }
+
+ QCheckBox::indicator:unchecked:pressed {
+     image: url(./qss/images/checkbox_unchecked_pressed.png);
+ }
+
+ QCheckBox::indicator:checked {
+     image: url(./qss/images/checkbox_checked.png);
+ }
+
+ QCheckBox::indicator:checked:hover {
+     image: url(./qss/images/checkbox_checked_hover.png);
+ }
+
+ QCheckBox::indicator:checked:pressed {
+     image: url(./qss/images/checkbox_checked_pressed.png);
+ }
+
+
+
+ QRadioButton::indicator {
+     width: 13px;
+     height: 13px;
+ }
+
+ QRadioButton::indicator::unchecked {
+     image: url(./qss/images/radiobutton_unchecked.png);
+ }
+
+ QRadioButton::indicator:unchecked:hover {
+     image: url(./qss/images/radiobutton_unchecked_hover.png);
+ }
+
+ QRadioButton::indicator:unchecked:pressed {
+     image: url(./qss/images/radiobutton_unchecked_pressed.png);
+ }
+
+ QRadioButton::indicator::checked {
+     image: url(./qss/images/radiobutton_checked.png);
+ }
+
+ QRadioButton::indicator:checked:hover {
+     image: url(./qss/images/radiobutton_checked_hover.png);
+ }
+
+ QRadioButton::indicator:checked:pressed {
+     image: url(./qss/images/radiobutton_checked_pressed.png);
+ }
+
+
+ 
+  QScrollBar:horizontal {
+     border: 2px solid grey;
+     background: #32CC99;
+     height: 15px;
+     margin: 0px 20px 0 20px;
+ }
+ QScrollBar::handle:horizontal {
+     background: white;
+     min-width: 20px;
+ }
+ QScrollBar::add-line:horizontal {
+     border: 2px solid grey;
+     background: #32CC99;
+     width: 20px;
+     subcontrol-position: right;
+     subcontrol-origin: margin;
+ }
+
+ QScrollBar::sub-line:horizontal {
+     border: 2px solid grey;
+     background: #32CC99;
+     width: 20px;
+     subcontrol-position: left;
+     subcontrol-origin: margin;
+ }
+
+ QScrollBar:left-arrow:horizontal, QScrollBar::right-arrow:horizontal {
+     border: 2px solid grey;
+     width: 3px;
+     height: 3px;
+     background: white;
+ }
+
+ QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal {
+     background: none;
+ }
+ 
+ 
