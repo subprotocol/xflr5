@@ -50,14 +50,6 @@ QMiarex::QMiarex(QWidget *parent)
 	: QWidget(parent)
 {
 
-	QFile file("qss/appwidget.css");
-	if(file.open(QFile::ReadOnly))
-	{
-		QString styleSheet = QLatin1String(file.readAll());
-		setStyleSheet(styleSheet);
-		ensurePolished();
-	}
-
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	//construct and initialize everything
 	m_pWingDlg = new GL3dWingDlg(pMainFrame);
@@ -576,7 +568,8 @@ QMiarex::QMiarex(QWidget *parent)
 	connect(m_pctrlAlphaDelta, SIGNAL(editingFinished()), this, SLOT(OnReadAnalysisData()));
 }
 
-QMiarex::~QMiarex() {
+QMiarex::~QMiarex()
+{
     delete m_pPlaneDlg;
     delete m_pWingDlg;
     delete m_pGraphDlg;
@@ -10047,13 +10040,12 @@ void QMiarex::OnNewPlane()
 	int i;
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	CPlane* pPlane = new CPlane;
-    PlaneDlg PDlg(this);
-	PDlg.m_pPlane = pPlane;
+	m_pPlaneDlg->m_pPlane = pPlane;
 	CPlane* pOldPlane = NULL;
-	PDlg.m_bAcceptName = true;
-	PDlg.InitDialog();
+	m_pPlaneDlg->m_bAcceptName = true;
+	m_pPlaneDlg->InitDialog();
 
-	if(QDialog::Accepted == PDlg.exec())
+	if(QDialog::Accepted == m_pPlaneDlg->exec())
 	{
 		pMainFrame->SetSaveState(false);
 

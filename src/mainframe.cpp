@@ -107,6 +107,14 @@ MainFrame::MainFrame(QWidget *parent, Qt::WFlags flags)
 	setWindowTitle(m_VersionName);
 	setWindowIcon(QIcon(":/images/xflr5_64.png"));
 
+	QFile file("qss/appwidget.css");
+	if(file.open(QFile::ReadOnly))
+	{
+		QString styleSheet = QLatin1String(file.readAll());
+		qApp->setStyleSheet(styleSheet);
+		ensurePolished();
+	}
+
     m_UnitsDlg = new UnitsDlg(this);
     m_DisplaySettingsDlg = new DisplaySettingsDlg(this);
     m_RenameDlg = new RenameDlg(this);
