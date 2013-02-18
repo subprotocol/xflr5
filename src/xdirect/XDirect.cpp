@@ -2399,7 +2399,10 @@ void QXDirect::OnDefinePolar()
 void QXDirect::OnDeleteCurFoil()
 {
 	MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
-	DeleteFoil(true);
+	g_pCurFoil = pMainFrame->DeleteFoil(g_pCurFoil,true);
+	m_pCurOpp = NULL;
+	m_pCurPolar = NULL;
+
 	pMainFrame->UpdateFoils();
 
 	if(m_bPolar) CreatePolarCurves();

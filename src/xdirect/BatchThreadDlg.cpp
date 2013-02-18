@@ -590,7 +590,7 @@ void BatchThreadDlg::OnFoilList()
 {
 	QXDirect  *pXDirect   = (QXDirect*)s_pXDirect;
     FoilSelectionDlg dlg(this);
-	dlg.SetSelectionMode(true);
+//	dlg.SetSelectionMode(true);
 	dlg.m_poaFoil = pXDirect->m_poaFoil;
 
 	dlg.m_FoilList.clear();

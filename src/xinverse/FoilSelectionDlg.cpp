@@ -40,42 +40,39 @@ FoilSelectionDlg::FoilSelectionDlg(QWidget *pParent) : QDialog(pParent)
 void FoilSelectionDlg::SetupLayout()
 {
 	QVBoxLayout *MainLayout = new QVBoxLayout;
+	{
+		m_pctrlNameList = new QListWidget;
+		m_pctrlNameList->setMinimumHeight(300);
+		m_pctrlNameList->setSelectionMode(QAbstractItemView::MultiSelection);
 
-	m_pctrlNameList = new QListWidget;
-	m_pctrlNameList->setMinimumHeight(300);
-	m_pctrlNameList->setSelectionMode(QAbstractItemView::SingleSelection);
-	
+		QHBoxLayout *CommandButtons = new QHBoxLayout;
+		{
+			QPushButton *OKButton = new QPushButton(tr("OK"));
+			OKButton->setAutoDefault(false);
+			QPushButton *CancelButton = new QPushButton(tr("Cancel"));
+			CancelButton->setAutoDefault(false);
+			CommandButtons->addStretch(1);
+			CommandButtons->addWidget(OKButton);
+			CommandButtons->addStretch(1);
+			CommandButtons->addWidget(CancelButton);
+			CommandButtons->addStretch(1);
+			connect(OKButton, SIGNAL(clicked()),this, SLOT(OnOK()));
+			connect(CancelButton, SIGNAL(clicked()), this, SLOT(reject()));
+		}
+
+		MainLayout->addStretch(1);
+		MainLayout->addWidget(m_pctrlNameList);
+		MainLayout->addStretch(1);
+		MainLayout->addLayout(CommandButtons);
+		MainLayout->addStretch(1);
+	}
+
 	connect(m_pctrlNameList, SIGNAL(itemClicked(QListWidgetItem *)),       this, SLOT(OnSelChangeList(QListWidgetItem *)));
 	connect(m_pctrlNameList, SIGNAL(itemDoubleClicked(QListWidgetItem *)), this, SLOT(OnDoubleClickList(QListWidgetItem *)));
-
-	QHBoxLayout *CommandButtons = new QHBoxLayout;
-	QPushButton *OKButton = new QPushButton(tr("OK"));
-	OKButton->setAutoDefault(false);
-	QPushButton *CancelButton = new QPushButton(tr("Cancel"));
-	CancelButton->setAutoDefault(false);
-	CommandButtons->addStretch(1);
-	CommandButtons->addWidget(OKButton);
-	CommandButtons->addStretch(1);
-	CommandButtons->addWidget(CancelButton);
-	CommandButtons->addStretch(1);
-	connect(OKButton, SIGNAL(clicked()),this, SLOT(OnOK()));
-	connect(CancelButton, SIGNAL(clicked()), this, SLOT(reject()));
-
-	MainLayout->addStretch(1);
-	MainLayout->addWidget(m_pctrlNameList);
-	MainLayout->addStretch(1);
-	MainLayout->addLayout(CommandButtons);
-	MainLayout->addStretch(1);
 
 	setLayout(MainLayout);
 }
 
-
-void FoilSelectionDlg::SetSelectionMode(bool bMultiple)
-{
-	if(bMultiple) m_pctrlNameList->setSelectionMode(QAbstractItemView::MultiSelection);
-	else          m_pctrlNameList->setSelectionMode(QAbstractItemView::SingleSelection);
-}
 
 
 void FoilSelectionDlg::OnOK()

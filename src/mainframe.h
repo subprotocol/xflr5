@@ -193,7 +193,7 @@ private:
 	bool LoadPolarFileV3(QDataStream &ar, bool bIsStoring, int ArchiveFormat=0);
 	bool SerializeProject(QDataStream &ar, bool bIsStoring, int ProjectFormat =6);
 	bool SerializeUFOProject(QDataStream &ar, int ProjectFormat=5);
-	bool DeleteFoil(CFoil *pFoil, bool bAsk=true);
+	CFoil *DeleteFoil(CFoil *pFoil, bool bAsk=true);
 
 	void AddFoil(CFoil *pFoil);
 	void RenameFoil(CFoil *pFoil);
@@ -386,6 +386,7 @@ private:
 
 	int m_iApp;
 
+	bool m_bStyleSheets;
 	bool m_bSaved;
 	bool m_bSaveOpps;
 	bool m_bSaveWOpps;

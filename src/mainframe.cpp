@@ -107,13 +107,6 @@ MainFrame::MainFrame(QWidget *parent, Qt::WFlags flags)
 	setWindowTitle(m_VersionName);
 	setWindowIcon(QIcon(":/images/xflr5_64.png"));
 
-	QFile file("qss/appwidget.css");
-	if(file.open(QFile::ReadOnly))
-	{
-		QString styleSheet = QLatin1String(file.readAll());
-		qApp->setStyleSheet(styleSheet);
-		ensurePolished();
-	}
 
     m_UnitsDlg = new UnitsDlg(this);
     m_DisplaySettingsDlg = new DisplaySettingsDlg(this);
@@ -147,6 +140,7 @@ MainFrame::MainFrame(QWidget *parent, Qt::WFlags flags)
 
 	m_ImageFormat = 2;
 	m_ExportFileType = 1;
+	m_bStyleSheets  = false;
 	m_bReverseZoom  = false;
 	m_bAlphaChannel = true;
 	m_bSaveOpps     = false;
@@ -188,6 +182,18 @@ MainFrame::MainFrame(QWidget *parent, Qt::WFlags flags)
 
 	SetUnits(m_LengthUnit, m_AreaUnit, m_SpeedUnit, m_WeightUnit, m_ForceUnit, m_MomentUnit,
 			 m_mtoUnit, m_m2toUnit, m_mstoUnit, m_kgtoUnit, m_NtoUnit, m_NmtoUnit);
+
+
+	if(m_bStyleSheets)
+	{
+		QFile file("qss/appwidget.css");
+		if(file.open(QFile::ReadOnly))
+		{
+			QString styleSheet = QLatin1String(file.readAll());
+			qApp->setStyleSheet(styleSheet);
+			ensurePolished();
+		}
+	}
 
 	pXDirect->SetAnalysisParams();
 	CreateActions();
@@ -2534,12 +2540,12 @@ void MainFrame::CreateXInverseToolbar()
 
 
 
-bool MainFrame::DeleteFoil(CFoil *pFoil, bool bAsk)
+CFoil* MainFrame::DeleteFoil(CFoil *pFoil, bool bAsk)
 {
 	QXDirect *pXDirect = (QXDirect*)m_pXDirect;
 	if(!pFoil || !pFoil->m_FoilName.length()) return false;
 	QString strong;
-	CFoil *pOldFoil;
+	CFoil *pOldFoil, *pNextFoil=NULL;
 	OpPoint * pOpPoint;
 	CPolar* pPolar;
 	int j;
@@ -2576,9 +2582,11 @@ bool MainFrame::DeleteFoil(CFoil *pFoil, bool bAsk)
 		pOldFoil = (CFoil*)m_oaFoil.at(j);
 		if (pOldFoil == pFoil)
 		{
+			if(j>0)                    pNextFoil = (CFoil*)m_oaFoil.at(j-1);
+			else if(m_oaFoil.size()>1) pNextFoil = (CFoil*)m_oaFoil.at(1);
+			else                       pNextFoil = NULL;
 			m_oaFoil.removeAt(j);
 			delete pOldFoil;
-			if(g_pCurFoil == pOldFoil)           g_pCurFoil = NULL;
 			if(g_pCurFoil == pOldFoil) g_pCurFoil = NULL;
 			break;
 		}
@@ -2589,7 +2597,7 @@ bool MainFrame::DeleteFoil(CFoil *pFoil, bool bAsk)
 	pXDirect->SetControls();
 	SetSaveState(false);
 
-	return true;
+	return pNextFoil;
 }
 
 
@@ -3436,7 +3444,8 @@ bool MainFrame::LoadSettings()
 			else break;
 		}while(n<MAXRECENTFILES);
 
-		m_bReverseZoom = settings.value("ReverseZoom", false).toBool();
+		m_bStyleSheets  = settings.value("StyleSheets", false).toBool();
+		m_bReverseZoom  = settings.value("ReverseZoom", false).toBool();
 		m_bAlphaChannel = settings.value("AlphaChannel", true).toBool();
 	}
 
@@ -4414,6 +4423,7 @@ void MainFrame::OnStyle()
 
     m_DisplaySettingsDlg->m_pMainFrame = this;
     m_DisplaySettingsDlg->move(m_DlgPos);
+	m_DisplaySettingsDlg->m_bStyleSheets    = m_bStyleSheets;
     m_DisplaySettingsDlg->m_BackgroundColor = m_BackgroundColor;
     m_DisplaySettingsDlg->m_TextColor       = m_TextColor;
     m_DisplaySettingsDlg->m_TextFont        = m_TextFont;
@@ -4425,6 +4435,7 @@ void MainFrame::OnStyle()
 
     if(m_DisplaySettingsDlg->exec() ==QDialog::Accepted)
 	{
+		m_bStyleSheets    = m_DisplaySettingsDlg->m_pctrlStyleSheets->isChecked();
         m_BackgroundColor = m_DisplaySettingsDlg->m_BackgroundColor;
         m_TextColor       = m_DisplaySettingsDlg->m_TextColor;
         m_TextFont        = m_DisplaySettingsDlg->m_TextFont;
@@ -5141,6 +5152,7 @@ void MainFrame::SaveSettings()
 		settings.setValue("DlgPos_x", m_DlgPos.x());
 		settings.setValue("DlgPos_y", m_DlgPos.y());
 		settings.setValue("RecentFileSize", m_RecentFiles.size());
+		settings.setValue("StyleSheets", m_bStyleSheets);
 		settings.setValue("ReverseZoom", m_bReverseZoom);
 		settings.setValue("AlphaChannel", m_bAlphaChannel);
 
@@ -6606,7 +6618,6 @@ void MainFrame::UpdateFoils()
 	m_pctrlFoil->clear();
 
 	CFoil *pFoil;
-	g_pCurFoil = g_pCurFoil;
 
 	for (i=0; i<m_oaFoil.size(); i++)
 	{

@@ -1573,9 +1573,9 @@ void QAFoil::OnDelete()
 	if(!g_pCurFoil) return;
 
 	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
-	pMainFrame->DeleteFoil(g_pCurFoil);
+	CFoil *pNextFoil = pMainFrame->DeleteFoil(g_pCurFoil);
 	FillFoilTable();
-	SelectFoil();
+	SelectFoil(pNextFoil);
 	UpdateView();
 }
 

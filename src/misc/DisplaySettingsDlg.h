@@ -58,7 +58,7 @@ private:
 	QPushButton *m_pctrlTextFont;
 	QPushButton *m_pctrlGraphSettings;
 	QPushButton *OKButton, *CancelButton;
-	QCheckBox *m_pctrlReverseZoom, *m_pctrlAlphaChannel;
+	QCheckBox *m_pctrlReverseZoom, *m_pctrlAlphaChannel, *m_pctrlStyleSheets;
 
 	QComboBox *m_pctrlStyles;
 	QString m_StyleName;
@@ -72,6 +72,7 @@ private:
 	QGraph m_MemGraph;
 	bool m_bIsGraphModified;
 	bool m_bReverseZoom, m_bAlphaChannel;
+	bool m_bStyleSheets;
 
 };
 

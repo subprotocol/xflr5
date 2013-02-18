@@ -1017,7 +1017,7 @@ void BatchDlg::OnFoilList()
 {
 	QXDirect  *pXDirect   = (QXDirect*)s_pXDirect;
     FoilSelectionDlg dlg(this);
-	dlg.SetSelectionMode(true);
+//	dlg.SetSelectionMode(true);
 	dlg.m_poaFoil = pXDirect->m_poaFoil;
 	if(m_pFoil) dlg.m_FoilName = m_pFoil->m_FoilName;
 	dlg.m_FoilList.clear();

@@ -40,6 +40,7 @@ DisplaySettingsDlg::DisplaySettingsDlg(QWidget *pParent) : QDialog(pParent)
 	m_bIsGraphModified = false;
 	m_bReverseZoom = false;
 	m_bAlphaChannel = true;
+	m_bStyleSheets = false;
 	SetupLayout();
 
 	connect(m_pctrlStyles, SIGNAL(activated(const QString &)),this, SLOT(OnStyleChanged(const QString &)));
@@ -72,48 +73,64 @@ void DisplaySettingsDlg::SetupLayout()
 	m_pctrlStyles->addItems(QStyleFactory::keys());
 	m_pctrlStyles->setCurrentIndex(m_pctrlStyles->findText(defaultStyle));
 
+	m_pctrlStyleSheets = new QCheckBox(tr("Use Stylesheets"));
 
-	m_pctrlGraphSettings  = new QPushButton(tr("All Graph Settings"));
-	m_pctrlGraphSettings->setMinimumWidth(120);
-	QHBoxLayout *GraphLayout = new QHBoxLayout;
-	GraphLayout->addWidget(m_pctrlGraphSettings);
 	QGroupBox *GraphBox = new QGroupBox(tr("Graph Settings"));
-	GraphBox->setLayout(GraphLayout);
+	{
+		QHBoxLayout *GraphLayout = new QHBoxLayout;
+		{
+			m_pctrlGraphSettings  = new QPushButton(tr("All Graph Settings"));
+			m_pctrlGraphSettings->setMinimumWidth(120);
+			GraphLayout->addWidget(m_pctrlGraphSettings);
+		}
+		GraphBox->setLayout(GraphLayout);
+	}
 
 
-	QHBoxLayout *BackLayout = new QHBoxLayout;
-	m_pctrlBackColor      = new ColorButton;
-	m_pctrlBackColor->setMinimumWidth(120);
-	BackLayout->addWidget(m_pctrlBackColor);
 	QGroupBox *BackBox = new QGroupBox(tr("Background Color"));
-	BackBox->setLayout(BackLayout);
+	{
+		QHBoxLayout *BackLayout = new QHBoxLayout;
+		{
+			m_pctrlBackColor      = new ColorButton;
+			m_pctrlBackColor->setMinimumWidth(120);
+			BackLayout->addWidget(m_pctrlBackColor);
+		}
+		BackBox->setLayout(BackLayout);
+	}
 
-	QHBoxLayout *FontLayout = new QHBoxLayout;
-	m_pctrlTextFont       = new QPushButton;
-	m_pctrlTextClr        = new QPushButton(tr("Text Color"));
-	m_pctrlTextFont->setMinimumWidth(120);
-	m_pctrlTextClr->setMinimumWidth(120);
-	FontLayout->addWidget(m_pctrlTextFont);
-	FontLayout->addWidget(m_pctrlTextClr);
 	QGroupBox *FontBox = new QGroupBox(tr("Font"));
-	FontBox->setLayout(FontLayout);
+	{
+		QHBoxLayout *FontLayout = new QHBoxLayout;
+		{
+			m_pctrlTextFont       = new QPushButton;
+			m_pctrlTextClr        = new QPushButton(tr("Text Color"));
+			m_pctrlTextFont->setMinimumWidth(120);
+			m_pctrlTextClr->setMinimumWidth(120);
+			FontLayout->addWidget(m_pctrlTextFont);
+			FontLayout->addWidget(m_pctrlTextClr);
+		}
+		FontBox->setLayout(FontLayout);
+	}
 
 	m_pctrlReverseZoom = new QCheckBox(tr("Reverse zoom direction using mouse wheel"));
 	m_pctrlAlphaChannel = new QCheckBox(tr("Enable 3D transparency"));
 
 	QHBoxLayout *CommandButtons = new QHBoxLayout;
-	OKButton = new QPushButton(tr("OK"));
-	OKButton->setAutoDefault(false);
-	CancelButton = new QPushButton(tr("Cancel"));
-	CancelButton->setAutoDefault(false);
-	CommandButtons->addStretch(1);
-	CommandButtons->addWidget(OKButton);
-	CommandButtons->addStretch(1);
-	CommandButtons->addWidget(CancelButton);
-	CommandButtons->addStretch(1);
+	{
+		OKButton = new QPushButton(tr("OK"));
+		OKButton->setAutoDefault(false);
+		CancelButton = new QPushButton(tr("Cancel"));
+		CancelButton->setAutoDefault(false);
+		CommandButtons->addStretch(1);
+		CommandButtons->addWidget(OKButton);
+		CommandButtons->addStretch(1);
+		CommandButtons->addWidget(CancelButton);
+		CommandButtons->addStretch(1);
+	}
 
 	MainLayout->addStretch(1);
 	MainLayout->addWidget(m_pctrlStyles);
+	MainLayout->addWidget(m_pctrlStyleSheets);
 	MainLayout->addStretch(1);
 	MainLayout->addWidget(BackBox);
 	MainLayout->addStretch(1);
@@ -135,6 +152,7 @@ void DisplaySettingsDlg::SetupLayout()
 
 void DisplaySettingsDlg::InitDialog()
 {
+	m_pctrlStyleSheets->setChecked(m_bStyleSheets);
 	m_MemGraph.CopySettings(m_pRefGraph);
 	m_pctrlBackColor->SetColor(m_BackgroundColor);
 	QString FontName = m_TextFont.family() + QString(" %1").arg(m_TextFont.pointSize());

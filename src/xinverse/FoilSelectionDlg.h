@@ -45,7 +45,6 @@ private slots:
 
 private:
 	void SetupLayout();
-	void SetSelectionMode(bool bMultiple);
 	void InitDialog();
 
 	QListWidget *m_pctrlNameList;
