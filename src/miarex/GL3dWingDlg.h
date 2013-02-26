@@ -87,6 +87,7 @@ private slots:
 	void OnInsertBefore();
 	void OnInsertAfter();
 	void OnDeleteSection();
+	void OnResetSection();
 	void OnResetMesh();
 	void OnScaleWing();
 	void OnInertia();
@@ -158,7 +159,7 @@ private:
 	QRadioButton *m_pctrlLeftSide, *m_pctrlRightSide;
 	ColorButton *m_pctrlWingColor;
 	QPushButton *m_pctrlResetMesh, *m_pctrlScaleWing;
-	QPushButton *m_pctrlInsertBefore, *m_pctrlInsertAfter, *m_pctrlDeleteSection;
+	QPushButton *m_pctrlInsertBefore, *m_pctrlInsertAfter, *m_pctrlDeleteSection, *m_pctrlResetSection;
 	QLabel *m_pctrlWingSpan, *m_pctrlWingArea, *m_pctrlMAC, *m_pctrlGeomChord;
 	QLabel *m_pctrlMACSpanPos, *m_pctrlAspectRatio, *m_pctrlTaperRatio, *m_pctrlSweep, *m_pctrlNFlaps;
 	QLabel *m_pctrlVLMPanels, *m_pctrl3DPanels;
@@ -185,7 +186,7 @@ private:
 	QAction *m_pResetScales;
 
 	QMenu *m_pContextMenu;
-	QAction *m_pInsertBefore, *m_pInsertAfter, *m_pDeleteSection;
+	QAction *m_pInsertBefore, *m_pInsertAfter, *m_pDeleteSection, *m_pResetSection;
 
 	QWidget *m_pctrlControlsWidget;
 
