@@ -273,7 +273,8 @@ macx {
     QMAKE_INFO_PLIST = mac/Info.plist
     ICON = mac/xflr5.icns
 }
-OTHER_FILES += doc/ReleaseNotes.txt
+OTHER_FILES += doc/ReleaseNotes.txt \
+    qss/appwidget.css
 
 
 #QMAKE_CFLAGS+=-pg

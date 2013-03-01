@@ -51,6 +51,7 @@ QMiarex::QMiarex(QWidget *parent)
 {
 
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
+
 	//construct and initialize everything
 	m_pWingDlg = new GL3dWingDlg(pMainFrame);
 	m_pPlaneDlg = new PlaneDlg(pMainFrame);

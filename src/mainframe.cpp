@@ -140,7 +140,7 @@ MainFrame::MainFrame(QWidget *parent, Qt::WFlags flags)
 
 	m_ImageFormat = 2;
 	m_ExportFileType = 1;
-	m_bStyleSheets  = false;
+	m_bStyleSheets  = true;
 	m_bReverseZoom  = false;
 	m_bAlphaChannel = true;
 	m_bSaveOpps     = false;
@@ -190,7 +190,10 @@ MainFrame::MainFrame(QWidget *parent, Qt::WFlags flags)
 		if(file.open(QFile::ReadOnly))
 		{
 			QString styleSheet = QLatin1String(file.readAll());
-			qApp->setStyleSheet(styleSheet);
+			pAFoil->setStyleSheet(styleSheet);
+			pXDirect->setStyleSheet(styleSheet);
+			pMiarex->setStyleSheet(styleSheet);
+			pXInverse->setStyleSheet(styleSheet);
 			ensurePolished();
 		}
 	}

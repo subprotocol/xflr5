@@ -159,7 +159,7 @@ private:
 	QRadioButton *m_pctrlLeftSide, *m_pctrlRightSide;
 	ColorButton *m_pctrlWingColor;
 	QPushButton *m_pctrlResetMesh, *m_pctrlScaleWing;
-	QPushButton *m_pctrlInsertBefore, *m_pctrlInsertAfter, *m_pctrlDeleteSection, *m_pctrlResetSection;
+	QPushButton *m_pctrlInsertBefore, *m_pctrlInsertAfter, *m_pctrlDeleteSection;
 	QLabel *m_pctrlWingSpan, *m_pctrlWingArea, *m_pctrlMAC, *m_pctrlGeomChord;
 	QLabel *m_pctrlMACSpanPos, *m_pctrlAspectRatio, *m_pctrlTaperRatio, *m_pctrlSweep, *m_pctrlNFlaps;
 	QLabel *m_pctrlVLMPanels, *m_pctrl3DPanels;

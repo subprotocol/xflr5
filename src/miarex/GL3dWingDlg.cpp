@@ -203,10 +203,6 @@ void GL3dWingDlg::contextMenuEvent(QContextMenuEvent *event)
 
 void GL3dWingDlg::Connect()
 {
-	connect(m_pInsertBefore, SIGNAL(triggered()), this, SLOT(OnInsertBefore()));
-	connect(m_pInsertAfter, SIGNAL(triggered()), this, SLOT(OnInsertAfter()));
-	connect(m_pDeleteSection, SIGNAL(triggered()), this, SLOT(OnDeleteSection()));
-	connect(m_pResetSection, SIGNAL(triggered()), this, SLOT(OnResetSection()));
 
 	connect(m_pResetScales, SIGNAL(triggered()), this, SLOT(On3DReset()));
 //	connect(m_pctrlSetupLight, SIGNAL(clicked()), SLOT(OnSetupLight()));
@@ -231,7 +227,7 @@ void GL3dWingDlg::Connect()
 	connect(m_pctrlInsertBefore, SIGNAL(clicked()),this, SLOT(OnInsertBefore()));
 	connect(m_pctrlInsertAfter, SIGNAL(clicked()),this, SLOT(OnInsertAfter()));
 	connect(m_pctrlDeleteSection, SIGNAL(clicked()),this, SLOT(OnDeleteSection()));
-	connect(m_pctrlResetSection, SIGNAL(clicked()),this, SLOT(OnResetSection()));
+
 	connect(m_pctrlResetMesh, SIGNAL(clicked()),this, SLOT(OnResetMesh()));
 	connect(m_pctrlScaleWing, SIGNAL(clicked()),this, SLOT(OnScaleWing()));
 	connect(m_pctrlWingColor, SIGNAL(clicked()),this, SLOT(OnWingColor()));
@@ -1225,6 +1221,7 @@ void GL3dWingDlg::MouseDoubleClickEvent(QMouseEvent *event)
 	UpdateView();
 }
 
+
 void GL3dWingDlg::MouseMoveEvent(QMouseEvent *event)
 {
 	QPoint point(event->pos().x(), event->pos().y());
@@ -1367,8 +1364,6 @@ void GL3dWingDlg::MouseReleaseEvent(QMouseEvent *event)
 	m_glViewportTrans.z =  (MatOut[2][0]*m_glRotCenter.x + MatOut[2][1]*m_glRotCenter.y + MatOut[2][2]*m_glRotCenter.z);
 
 }
-
-
 
 
 
@@ -1693,26 +1688,28 @@ void GL3dWingDlg::OnInsertAfter()
 	UpdateView();
 }
 
+
+
 void GL3dWingDlg::OnResetSection()
 {
 	int n = m_iSection;
 
 	if((0 < n) && (n < (m_pWing->NWingSection()-1)))
 	{
-	        double ratio;
-	        ratio = (m_pWing->YPosition(n) - m_pWing->YPosition(n - 1)) / (m_pWing->YPosition(n + 1) - m_pWing->YPosition(n - 1));
-                
-	        m_pWing->Chord   (n) = m_pWing->Chord   (n-1) + ratio * (m_pWing->Chord   (n+1) - m_pWing->Chord   (n-1));
-	        m_pWing->Offset  (n) = m_pWing->Offset  (n-1) + ratio * (m_pWing->Offset  (n+1) - m_pWing->Offset  (n-1));
-	        m_pWing->Twist   (n) = m_pWing->Twist   (n-1) + ratio * (m_pWing->Twist   (n+1) - m_pWing->Twist   (n-1));
-                
-                // same code here that in OnResetMesh
-	        FillDataTable();
-	        SetWingData();
-	        ComputeGeometry();
-	        m_bChanged = true;
-	        m_bResetglWing = true;
-	        UpdateView();
+		double ratio;
+		ratio = (m_pWing->YPosition(n) - m_pWing->YPosition(n - 1)) / (m_pWing->YPosition(n + 1) - m_pWing->YPosition(n - 1));
+
+		m_pWing->Chord   (n) = m_pWing->Chord   (n-1) + ratio * (m_pWing->Chord   (n+1) - m_pWing->Chord   (n-1));
+		m_pWing->Offset  (n) = m_pWing->Offset  (n-1) + ratio * (m_pWing->Offset  (n+1) - m_pWing->Offset  (n-1));
+		m_pWing->Twist   (n) = m_pWing->Twist   (n-1) + ratio * (m_pWing->Twist   (n+1) - m_pWing->Twist   (n-1));
+
+		// same code here that in OnResetMesh
+		FillDataTable();
+		SetWingData();
+		ComputeGeometry();
+		m_bChanged = true;
+		m_bResetglWing = true;
+		UpdateView();
 	}
 }
 
@@ -2134,14 +2131,12 @@ void GL3dWingDlg::SetCurrentSection(int section)
 		m_pctrlInsertAfter->setEnabled(false);
 		m_pctrlInsertBefore->setEnabled(false);
 		m_pctrlDeleteSection->setEnabled(false);
-		m_pctrlResetSection->setEnabled(false);
 	}
 	else
 	{
 		m_pctrlInsertAfter->setEnabled(true);
 		m_pctrlInsertBefore->setEnabled(true);
 		m_pctrlDeleteSection->setEnabled(true);
-		m_pctrlResetSection->setEnabled(true);
 
 		QString str;
 		str = tr("Insert after section") +" %1";
@@ -2155,10 +2150,6 @@ void GL3dWingDlg::SetCurrentSection(int section)
 		str = tr("Delete section") +" %1";
 		str = QString(str).arg(m_iSection+1);
 		m_pctrlDeleteSection->setText(str);
-
-		str = tr("Reset section") +" %1";
-		str = QString(str).arg(m_iSection+1);
-		m_pctrlResetSection->setText(str);
 	}
 	m_bResetglSectionHighlight = true;
 }
@@ -2272,7 +2263,6 @@ void GL3dWingDlg::SetupLayout()
 			m_pctrlInsertBefore   = new QPushButton("Insert Before");
 			m_pctrlInsertAfter    = new QPushButton("Insert After");
 			m_pctrlDeleteSection  = new QPushButton("Delete Section");
-			m_pctrlResetSection   = new QPushButton("Reset Section");
 
 			SymLayout->addWidget(m_pctrlSymetric);
 			SymLayout->addWidget(m_pctrlRightSide);
@@ -2281,7 +2271,6 @@ void GL3dWingDlg::SetupLayout()
 			SymLayout->addWidget(m_pctrlInsertBefore);
 			SymLayout->addWidget(m_pctrlInsertAfter);
 			SymLayout->addWidget(m_pctrlDeleteSection);
-			SymLayout->addWidget(m_pctrlResetSection);
 		}
 
 		QHBoxLayout *NameLayout = new QHBoxLayout;
