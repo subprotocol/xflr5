@@ -203,6 +203,10 @@ void GL3dWingDlg::contextMenuEvent(QContextMenuEvent *event)
 
 void GL3dWingDlg::Connect()
 {
+	connect(m_pInsertBefore, SIGNAL(triggered()), this, SLOT(OnInsertBefore()));
+	connect(m_pInsertAfter, SIGNAL(triggered()), this, SLOT(OnInsertAfter()));
+	connect(m_pDeleteSection, SIGNAL(triggered()), this, SLOT(OnDeleteSection()));
+	connect(m_pResetSection, SIGNAL(triggered()), this, SLOT(OnResetSection()));
 
 	connect(m_pResetScales, SIGNAL(triggered()), this, SLOT(On3DReset()));
 //	connect(m_pctrlSetupLight, SIGNAL(clicked()), SLOT(OnSetupLight()));

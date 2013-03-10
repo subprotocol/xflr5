@@ -1,7 +1,8 @@
 # -------------------------------------------------
 # Project created by QtCreator 2009-02-14T15:30:46
 # -------------------------------------------------
-QT += opengl + xml
+CONFIG += qt
+QT += opengl xml
 TEMPLATE = app
 SOURCES += \
 	src/XFLR5Application.cpp \
@@ -246,7 +247,7 @@ unix {
     
     # MAKE INSTALL
     INSTALLS += target
-#    target.path = $$BINDIR
+    target.path = $$BINDIR
 }
 
 macx { 
