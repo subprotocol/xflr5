@@ -17,6 +17,12 @@
 
 
 
+xflr5 v6.09.05 beta, March 20th, 2013
+	- Modified the project load method to keep the data even for corrupted files
+	- Other minor enhancements
+
+
+
 xflr5 v6.09.04 Release candidate, March 2nd, 2013
 	- Added optional stylesheets for application toolbars
 	- Added a feature to reset a wing section to interpolated values between two adjacent sections
