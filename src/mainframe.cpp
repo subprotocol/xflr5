@@ -3569,8 +3569,8 @@ enumApp MainFrame::LoadXFLR5File(QString PathName)
 				else
 				{
 					QApplication::restoreOverrideCursor();
-					QMessageBox::warning(this,tr("Warning"), tr("Error reading the file"));
-					DeleteProject();
+					QMessageBox::warning(this,tr("Warning"), tr("Error reading the file")+"\n"+tr("Saved the valid part"));
+//					DeleteProject();
 				}
 
 				AddRecentFile(PathName);
@@ -5977,6 +5977,8 @@ bool MainFrame::SerializeProject(QDataStream &ar, bool bIsStoring, int ProjectFo
 			{
 				pPOpp = new CPOpp();
 
+				if(i==173)
+					int nada=0;
 				if (!pPOpp->SerializePOpp(ar, bIsStoring, ProjectFormat))
 				{
 					if(pPOpp) delete pPOpp;

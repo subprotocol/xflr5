@@ -4043,6 +4043,11 @@ void QMiarex::EditCurPlane()
 
     if(QDialog::Accepted == m_pPlaneDlg->exec())
 	{
+		if(m_pPlaneDlg->m_bDescriptionChanged)
+		{
+			pMainFrame->SetSaveState(false);
+			m_pCurPlane->rPlaneDescription() = pModPlane->PlaneDescription();
+		}
         if(m_pPlaneDlg->m_bChanged)
 		{
 			if(bHasResults)
@@ -8781,6 +8786,11 @@ void QMiarex::OnEditUFO()
 
     if(QDialog::Accepted == m_pWingDlg->exec())
 	{
+		if(m_pWingDlg->m_bDescriptionChanged)
+		{
+			pMainFrame->SetSaveState(false);
+			m_pCurWing->rWingDescription() = pModWing->WingDescription();
+		}
         if(m_pWingDlg->m_bChanged)
 		{
 			if(bHasResults)

@@ -83,22 +83,23 @@ GL3dWingDlg::GL3dWingDlg(QWidget *pParent) : QDialog(pParent)
 
 	m_bResetglSectionHighlight = true;
 	m_bResetglWing             = true;
-	m_bFoilNames         = false;
-	m_bShowMasses        = false;
-	m_bChanged           = false;
-	m_bEnableName        = true;
-	m_bAcceptName        = true;
-	m_bTrans             = false;
-	m_bDragPoint         = false;
-	m_bArcball           = false;
-	m_bCrossPoint        = false;
-	m_bSurfaces          = true;
-	m_bOutline           = true;
-	m_bVLMPanels         = true;
-	m_bAxes              = true;
-	m_bPickCenter        = false;
-	m_bShowLight         = false;
-	m_bRightSide  = true;
+	m_bFoilNames               = false;
+	m_bShowMasses              = false;
+	m_bEnableName              = true;
+	m_bAcceptName              = true;
+	m_bTrans                   = false;
+	m_bDragPoint               = false;
+	m_bArcball                 = false;
+	m_bCrossPoint              = false;
+	m_bSurfaces                = true;
+	m_bOutline                 = true;
+	m_bVLMPanels               = true;
+	m_bAxes                    = true;
+	m_bPickCenter              = false;
+	m_bShowLight               = false;
+	m_bRightSide               = true;
+	m_bChanged                 =  false;
+	m_bDescriptionChanged      = false;
 
 	m_LastPoint.setX(0);
 	m_LastPoint.setY(0);
@@ -209,7 +210,6 @@ void GL3dWingDlg::Connect()
 	connect(m_pResetSection, SIGNAL(triggered()), this, SLOT(OnResetSection()));
 
 	connect(m_pResetScales, SIGNAL(triggered()), this, SLOT(On3DReset()));
-//	connect(m_pctrlSetupLight, SIGNAL(clicked()), SLOT(OnSetupLight()));
 
 	connect(m_pctrlIso, SIGNAL(clicked()),this, SLOT(On3DIso()));
 	connect(m_pctrlX, SIGNAL(clicked()),this, SLOT(On3DFront()));
@@ -228,17 +228,19 @@ void GL3dWingDlg::Connect()
 	connect(m_pctrlSurfaces,   SIGNAL(clicked()), this, SLOT(OnSurfaces()));
 	connect(m_pctrlOutline,    SIGNAL(clicked()), this, SLOT(OnOutline()));
 
-	connect(m_pctrlInsertBefore, SIGNAL(clicked()),this, SLOT(OnInsertBefore()));
-	connect(m_pctrlInsertAfter, SIGNAL(clicked()),this, SLOT(OnInsertAfter()));
-	connect(m_pctrlDeleteSection, SIGNAL(clicked()),this, SLOT(OnDeleteSection()));
+	connect(m_pctrlInsertBefore,  SIGNAL(clicked()), this, SLOT(OnInsertBefore()));
+	connect(m_pctrlInsertAfter,   SIGNAL(clicked()), this, SLOT(OnInsertAfter()));
+	connect(m_pctrlDeleteSection, SIGNAL(clicked()), this, SLOT(OnDeleteSection()));
 
-	connect(m_pctrlResetMesh, SIGNAL(clicked()),this, SLOT(OnResetMesh()));
-	connect(m_pctrlScaleWing, SIGNAL(clicked()),this, SLOT(OnScaleWing()));
-	connect(m_pctrlWingColor, SIGNAL(clicked()),this, SLOT(OnWingColor()));
-	connect(m_pctrlSymetric, SIGNAL(clicked()),this, SLOT(OnSymetric()));
-	connect(m_pctrlRightSide, SIGNAL(clicked()),this, SLOT(OnSide()));
-	connect(m_pctrlLeftSide, SIGNAL(clicked()),this, SLOT(OnSide()));
-	connect(m_pctrlInertiaButton, SIGNAL(clicked()),this, SLOT(OnInertia()));
+	connect(m_pctrlResetMesh,     SIGNAL(clicked()), this, SLOT(OnResetMesh()));
+	connect(m_pctrlScaleWing,     SIGNAL(clicked()), this, SLOT(OnScaleWing()));
+	connect(m_pctrlWingColor,     SIGNAL(clicked()), this, SLOT(OnWingColor()));
+	connect(m_pctrlSymetric,      SIGNAL(clicked()), this, SLOT(OnSymetric()));
+	connect(m_pctrlRightSide,     SIGNAL(clicked()), this, SLOT(OnSide()));
+	connect(m_pctrlLeftSide,      SIGNAL(clicked()), this, SLOT(OnSide()));
+	connect(m_pctrlInertiaButton, SIGNAL(clicked()), this, SLOT(OnInertia()));
+
+	connect(m_pctrlWingDescription, SIGNAL(textChanged()), this, SLOT(OnDescriptionChanged()));
 }
 
 
@@ -1459,6 +1461,11 @@ void GL3dWingDlg::OnClipPlane(int pos)
 }
 
 
+void GL3dWingDlg::OnDescriptionChanged()
+{
+	m_bDescriptionChanged=true;
+}
+
 
 void GL3dWingDlg::OnCellChanged(QWidget *pWidget)
 {
@@ -1889,6 +1896,7 @@ void GL3dWingDlg::ReadParams()
 	QString strange = m_pctrlWingDescription->toPlainText();
 	if(strange == tr("Wing Description")) strange="";
 	m_pWing->m_WingDescription = strange;
+	qDebug()<<"Reading"<< m_pWing->m_WingDescription;
 
 	for (int i=0; i< m_pWingModel->rowCount();  i++)
 	{

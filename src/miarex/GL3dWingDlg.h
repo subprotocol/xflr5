@@ -79,6 +79,7 @@ private slots:
 	void OnShowMasses();
 
 	void OnOK();
+	void OnDescriptionChanged();
 	void OnCellChanged(QWidget *pWidget);
 	void OnItemClicked(const QModelIndex &index);
 	void OnWingColor();
@@ -194,7 +195,7 @@ private:
 
 	bool m_bAcceptName;
 	bool m_bRightSide;
-	bool m_bChanged;
+	bool m_bChanged, m_bDescriptionChanged;
 	bool m_bTrans;
 	bool m_bStored;
 	bool m_bEnableName;

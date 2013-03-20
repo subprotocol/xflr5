@@ -454,8 +454,8 @@ bool CWOpp::SerializeWOpp(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 		for (k=0; k<=m_NStation; k++)
 		{
 			ar >> f1;
-			if(m_AnalysisMethod==1  && ArchiveFormat<=1004) m_SpanPos[k] = -f1;
-			else                                            m_SpanPos[k] =  f1;
+			if(m_AnalysisMethod==LLTMETHOD  && ArchiveFormat<=1004) m_SpanPos[k] = -f1;
+			else                                                    m_SpanPos[k] =  f1;
 			if(ArchiveFormat>=1012)
 			{
 				ar >> f2;

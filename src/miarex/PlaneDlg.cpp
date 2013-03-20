@@ -24,6 +24,7 @@
 #include <QHBoxLayout>
 #include <QGroupBox>
 #include <QMessageBox>
+#include <QtDebug>
 #include <math.h>
 
 
@@ -47,8 +48,10 @@ PlaneDlg::PlaneDlg(QWidget *parent) :QDialog(parent)
 	m_pPlane = NULL;
 
 
-	m_bAcceptName    = true;
-	m_bChanged      = false;
+	m_bAcceptName         = true;
+	m_bChanged            = false;
+	m_bDescriptionChanged = false;
+
 	SetupLayout();
 
 	connect(m_pctrlBiplane,   SIGNAL(clicked()), this, SLOT(OnBiplane()));
@@ -75,6 +78,8 @@ PlaneDlg::PlaneDlg(QWidget *parent) :QDialog(parent)
 
 	connect(m_pctrlBody, SIGNAL(clicked()), this, SLOT(OnBodyCheck()));
 	connect(m_pctrlBodyList,  SIGNAL(activated(int)),    this, SLOT(OnSelChangeBodyList(int)));
+
+	connect(m_pctrlPlaneDescription, SIGNAL(textChanged()), this, SLOT(OnDescriptionChanged()));
 
 	connect(m_pctrlWingTilt, SIGNAL(editingFinished()), this, SLOT(OnChanged()));
 	connect(m_pctrlStabTilt, SIGNAL(editingFinished()), this, SLOT(OnChanged()));
@@ -260,9 +265,16 @@ void PlaneDlg::OnBodyCheck()
 
 void PlaneDlg::OnChanged()
 {
+	qDebug()<<"onChanged";
 	m_bChanged = true;
 	ReadParams();
 	SetResults();
+}
+
+
+void PlaneDlg::OnDescriptionChanged()
+{
+	m_bDescriptionChanged = true;
 }
 
 

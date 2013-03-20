@@ -54,6 +54,7 @@ private slots:
 	void OnDefineFin();
 	void OnDefineStab();
 	void OnChanged();
+	void OnDescriptionChanged();
 	void OnImportWing();
 	void OnPlaneName();
 	void OnSymFin();
@@ -87,6 +88,7 @@ private:
 
 	CPlane * m_pPlane; /**< A pointer to the plane which is currently edited in this dialog window */
 	bool m_bChanged;   /**< Set to true whenever the data in the window has been changed */
+	bool m_bDescriptionChanged;
 	bool m_bAcceptName;
 	
 private:
