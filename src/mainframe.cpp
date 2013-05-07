@@ -5977,8 +5977,6 @@ bool MainFrame::SerializeProject(QDataStream &ar, bool bIsStoring, int ProjectFo
 			{
 				pPOpp = new CPOpp();
 
-				if(i==173)
-					int nada=0;
 				if (!pPOpp->SerializePOpp(ar, bIsStoring, ProjectFormat))
 				{
 					if(pPOpp) delete pPOpp;
