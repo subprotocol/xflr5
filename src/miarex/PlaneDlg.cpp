@@ -265,7 +265,6 @@ void PlaneDlg::OnBodyCheck()
 
 void PlaneDlg::OnChanged()
 {
-	qDebug()<<"onChanged";
 	m_bChanged = true;
 	ReadParams();
 	SetResults();

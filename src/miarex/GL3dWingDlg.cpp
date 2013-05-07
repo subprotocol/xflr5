@@ -1896,7 +1896,6 @@ void GL3dWingDlg::ReadParams()
 	QString strange = m_pctrlWingDescription->toPlainText();
 	if(strange == tr("Wing Description")) strange="";
 	m_pWing->m_WingDescription = strange;
-	qDebug()<<"Reading"<< m_pWing->m_WingDescription;
 
 	for (int i=0; i< m_pWingModel->rowCount();  i++)
 	{

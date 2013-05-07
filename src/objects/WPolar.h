@@ -50,6 +50,7 @@ public:
 	void Export(QTextStream &out, int FileType, bool bDataOnly=false);
 	void GetPolarProperties(QString &Properties, bool bData=false);
 	void Remove(int i);
+	void Remove(double alpha);
 	void SetInertia(void *ptr, bool bPlane);
 	void *GetUFOPlrVariable(int iVar);
 	void ResetWPlr();

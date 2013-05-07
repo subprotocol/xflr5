@@ -25,7 +25,6 @@
 #include "../mainframe.h"
 #include "../miarex/Miarex.h"
 #include <math.h>
-#include <QtDebug>
 #include <QMessageBox>
 
 
@@ -1587,6 +1586,19 @@ void CWPolar::GetUFOPlrVariableName(int iVar, QString &Name)
 		default:
 			Name = QObject::tr("Alpha");
 			break;
+	}
+}
+
+
+void CWPolar::Remove(double alpha)
+{
+	for(int ia=0;ia<m_Alpha.size(); ia++)
+	{
+		if(fabs(m_Alpha.at(ia)-alpha)<PRECISION)
+		{
+			Remove(ia);
+			break;
+		}
 	}
 
 }

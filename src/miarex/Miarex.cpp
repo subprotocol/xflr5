@@ -8062,8 +8062,7 @@ void QMiarex::OnDefineWPolar()
 
 	MainFrame* pMainFrame = (MainFrame*)s_pMainFrame;
 
-	CWPolar* pNewWPolar       = new CWPolar;
-	pNewWPolar->m_WMAChord     = m_pCurWing->m_MAChord;
+	CWPolar* pNewWPolar  = new CWPolar;
 
     WPolarDlg dlg(this);
 	dlg.InitDialog(m_pCurPlane, m_pCurWing);
@@ -8080,6 +8079,8 @@ void QMiarex::OnDefineWPolar()
 		pNewWPolar->DuplicateSpec(&WPolarDlg::s_WPolar);
 		pNewWPolar->m_UFOName = UFOName();
 		pNewWPolar->m_PlrName = dlg.s_WPolar.m_PlrName;
+
+		pNewWPolar->m_WMAChord = m_pCurWing->m_MAChord;
 
 		if(pNewWPolar->m_RefAreaType==PLANFORMAREA)
 		{
@@ -8335,8 +8336,12 @@ void QMiarex::OnDeleteCurWOpp()
 
 	MainFrame* pMainFrame = (MainFrame*)s_pMainFrame;
 	int i;
+
+	double alpha=-9999999;
+
 	if(m_pCurPOpp)
 	{
+		alpha = m_pCurPOpp->m_Alpha;
 		CPOpp* pPOpp;
 		for (i = m_poaPOpp->size()-1; i>=0; i--)
 		{
@@ -8361,6 +8366,7 @@ void QMiarex::OnDeleteCurWOpp()
 	}
 	else if(m_pCurWOpp)
 	{
+		alpha = m_pCurWOpp->m_Alpha;
 		CWOpp* pWOpp;
 		for (i = m_poaWOpp->size()-1; i>=0; i--)
 		{
@@ -8399,6 +8405,11 @@ void QMiarex::OnDeleteCurWOpp()
 		else if(m_iView==WSTABVIEW) CreateStabilityCurves();
 
 		UpdateView();
+	}
+
+	if(m_pCurWPolar)
+	{
+		m_pCurWPolar->Remove(alpha);
 	}
 
 	SetControls();
