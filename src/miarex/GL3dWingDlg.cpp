@@ -121,6 +121,9 @@ GL3dWingDlg::GL3dWingDlg(QWidget *pParent) : QDialog(pParent)
 	m_pInsertAfter   = new QAction(tr("Insert after"), this);
 	m_pDeleteSection = new QAction(tr("Delete section"), this);
 	m_pResetSection  = new QAction(tr("Reset section"), this);
+	m_pImportWingAct = new QAction(tr("Import Wing from File..."), this);
+	m_pExportWingAct = new QAction(tr("Export Wing to File..."), this);
+
 
 	m_pContextMenu = new QMenu(tr("Section"),this);
 	m_pContextMenu->addAction(m_pInsertBefore);
@@ -241,6 +244,8 @@ void GL3dWingDlg::Connect()
 	connect(m_pctrlInertiaButton, SIGNAL(clicked()), this, SLOT(OnInertia()));
 
 	connect(m_pctrlWingDescription, SIGNAL(textChanged()), this, SLOT(OnDescriptionChanged()));
+	connect(m_pImportWingBtn, SIGNAL(clicked()),this, SLOT(OnImportWing()));
+	connect(m_pExportWingBtn, SIGNAL(clicked()),this, SLOT(OnExportWing()));
 }
 
 
@@ -2550,6 +2555,14 @@ void GL3dWingDlg::SetupLayout()
 		WingModCommands->addWidget(m_pctrlInertiaButton);
 	//	WingModCommands->addWidget(m_pctrlSetupLight);
 	}
+        
+	QHBoxLayout *WingFileCommands = new QHBoxLayout;
+	{
+		m_pImportWingBtn = new QPushButton(tr("Import Wing"));
+		m_pExportWingBtn = new QPushButton(tr("Export Wing"));
+		WingFileCommands->addWidget(m_pImportWingBtn);
+		WingFileCommands->addWidget(m_pExportWingBtn);    
+	}
 
 
 	QHBoxLayout *CommandButtons = new QHBoxLayout;
@@ -2573,6 +2586,7 @@ void GL3dWingDlg::SetupLayout()
 		All3DControls->addLayout(ThreeDViewControls);
 		All3DControls->addStretch(1);
 		All3DControls->addLayout(WingModCommands);
+		All3DControls->addLayout(WingFileCommands);
 		All3DControls->addStretch(1);
 		All3DControls->addSpacing(20);
 		All3DControls->addLayout(CommandButtons);
@@ -2729,5 +2743,33 @@ void  GL3dWingDlg::WheelEvent(QWheelEvent *event)
 }
 
 
+void GL3dWingDlg::OnImportWing()
+{
+	QString path_to_file;
+	path_to_file = QFileDialog::getOpenFileName(0, 
+												QString("Open File"), 
+												((MainFrame*)this->s_pMainFrame)->m_LastDirName,
+												QString("XFLR5 Wing file (*.xwimp)"));
+	m_pWing->ImportDefinition(path_to_file);
+	this->InitDialog(m_pWing);
+	this->ReadParams();
+	this->SetWingData();
+	m_bChanged = true;
+	m_bResetglWing = true;
+	this->UpdateView();
+	
+}
 
+void GL3dWingDlg::OnExportWing()
+{
+	QString path_to_file;
+	path_to_file = QFileDialog::getSaveFileName(0, 
+												QString("Save File"), 
+												((MainFrame*)this->s_pMainFrame)->m_LastDirName,
+												QString("XFLR5 Wing file (*.xwimp)"));
+	if (!path_to_file.endsWith(".xwimp")) {
+		path_to_file.append(".xwimp");
+	}
+	m_pWing->ExportDefinition(path_to_file);
+}
 

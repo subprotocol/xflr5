@@ -92,6 +92,8 @@ private slots:
 	void OnResetMesh();
 	void OnScaleWing();
 	void OnInertia();
+	void OnImportWing();
+	void OnExportWing();
 
 
 private:
@@ -185,6 +187,9 @@ private:
 	QSlider *m_pctrlClipPlanePos;
 
 	QAction *m_pResetScales;
+	
+	QAction *m_pExportWingAct, *m_pImportWingAct;
+	QPushButton *m_pExportWingBtn, *m_pImportWingBtn;
 
 	QMenu *m_pContextMenu;
 	QAction *m_pInsertBefore, *m_pInsertAfter, *m_pDeleteSection, *m_pResetSection;

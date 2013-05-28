@@ -17,7 +17,7 @@
 	along with this program; if not, write to the Free Software
 	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-********************** *******************************************************/
+*****************************************************************************/
 
 #include "mainframe.h"
 #include "globals.h"
@@ -2647,7 +2647,7 @@ void MainFrame::DeletePlane(void *pPlanePtr, bool bResultsOnly)
 			{
 				pWPolar->ResetWPlr();
 				//results only... means that the areas and spans have been edited... update polar
-				if( pWPolar->m_RefAreaType==1)
+				if( pWPolar->m_RefAreaType==PLANFORMAREA)
 				{
 					pWPolar->m_WArea     = pMiarex->m_pCurWing->m_PlanformArea;
 					pWPolar->m_WSpan     = pMiarex->m_pCurWing->m_PlanformSpan;
@@ -3810,19 +3810,38 @@ void MainFrame::OnLanguage()
 
 void MainFrame::OnLoadFile()
 {
+	QStringList PathNames;
 	QString PathName;
+	int App  = NOAPP;
+	bool warn_non_airfoil_multiload = false;
 	QXDirect *pXDirect = (QXDirect*)m_pXDirect;
 	QMiarex *pMiarex = (QMiarex*)m_pMiarex;
 	pMiarex->m_bArcball = false;
 
-	PathName = QFileDialog::getOpenFileName(this, tr("Open File"),
-											m_LastDirName,
-											tr("XFLR5 file (*.dat *.plr *.wpa)"));
-	if(!PathName.length()) return;
-	int pos = PathName.lastIndexOf("/");
-	if(pos>0) m_LastDirName = PathName.left(pos);
+	PathNames = QFileDialog::getOpenFileNames(this, tr("Open File"),
+												m_LastDirName,
+												tr("XFLR5 file (*.dat *.plr *.wpa)"));
+	if(!PathNames.size()) return;
+	if(PathNames.size() > 1) {
+		for (unsigned i = 0; i < PathNames.size(); i++) {
+			PathName = PathNames.at(i);
+			if (PathName.endsWith(".dat")) {
+				App = LoadXFLR5File(PathName);
+			} else {
+				warn_non_airfoil_multiload = true;
+			}
+		}
+		if (warn_non_airfoil_multiload) {
+			QMessageBox::warning(0, QObject::tr("Warning"), QObject::tr("Multiple file loading only available to airfoil files.\nNon *.dat files will be ignored."));
+		}
+	} else {
+		PathName = PathNames.at(0);
+		if(!PathName.length()) return;
+		int pos = PathName.lastIndexOf("/");
+		if(pos>0) m_LastDirName = PathName.left(pos);
 
-	int App = LoadXFLR5File(PathName);
+		App = LoadXFLR5File(PathName);
+	}
 	if(m_iApp==NOAPP)
 	{
 		m_iApp = App;

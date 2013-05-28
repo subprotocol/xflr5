@@ -29,6 +29,10 @@
 
 #include <math.h>
 #include <QtDebug>
+#include <QFile>
+#include <QTranslator>
+#include <QDesktopWidget>
+#include <QtGui>
 
 #include "Wing.h"
 #include "../mainframe.h"
@@ -142,6 +146,120 @@ CWing::CWing()
 	}
 }
 
+void CWing::ImportDefinition(QString path_to_file)
+{
+	//Import the wing geometry from a text file
+	
+	QFile fp(path_to_file);
+	double ypos;
+	double chord;
+	double offset;
+	double dihedral;
+	double twist;
+	int nx;
+	int ny;
+	int x_pan_dist;
+	int y_pan_dist;
+	char right_buff[512];
+	char left_buff[512];
+	QString left_af, right_af;
+	unsigned counter = 0;
+
+	
+	try{
+		if (!fp.open(QIODevice::ReadOnly)) {
+			QMessageBox::warning(0, QObject::tr("Warning"), QObject::tr("Could not open the file for reading"));
+			return;
+		} else {
+			QTextStream infile(&fp);
+			m_WingSection.clear();
+			this->m_WingName = infile.readLine();
+			while (true){
+				counter++;
+				infile >> ypos >> chord >> offset >> dihedral >> twist >> nx >> ny >> x_pan_dist >> y_pan_dist >> right_buff >> left_buff;
+				qDebug()<<counter<<" ";
+				if (infile.atEnd()){
+					fp.close();
+					break;
+				}
+				//Append the sections convert from mm to m
+				if (!AppendWingSection(chord,
+										twist,
+										ypos,
+										dihedral,
+										offset,
+										nx,
+										ny,
+										x_pan_dist,
+										y_pan_dist,
+										QString(QString(QLatin1String(right_buff)).replace(QString("/_/"), QString(" "))),
+										QString(QString(QLatin1String(left_buff)).replace(QString("/_/"), QString(" ")))
+										)) {
+					QMessageBox::warning(0,QObject::tr("Warning"),QObject::tr("Total number of wing sections exceeds MAXSPANSECTIONS.\nWing will be truncated.\n"));
+					break;
+				}
+			}
+		}
+
+		//Build the Geometry
+		ComputeGeometry();
+		double length = Length(0);
+		for (int is=0; is<m_WingSection.size(); is++)
+		{
+			length += Length(is);
+			YPosition(is)     = length;
+			XPanelDist(is) =  1;
+		}
+	}
+	catch (iostream::failure e){
+		QMessageBox::warning(0,QObject::tr("Warning"),QObject::tr("Unable to import wing definition\n"));
+	}
+}
+
+void CWing::ExportDefinition(QString path_to_file)
+{
+	//Import the wing geometry from a text file
+	
+	double ypos;
+	double chord;
+	double offset;
+	double dihedral;
+	double twist;
+	int nx;
+	int ny;
+
+	try{
+	QFile fp(path_to_file);
+		if (!fp.open(QIODevice::WriteOnly)) {
+			QMessageBox::warning(0, QObject::tr("Warning"), QObject::tr("Could not open the file for writing"));
+			return;
+		} else {
+			QTextStream out_file(&fp);
+			//Iterate the wing sections are write out the data...
+			out_file << this->m_WingName << endl;
+			for (int is=0; is<m_WingSection.size(); is++) {
+				out_file << YPosition(is) << " " << Chord(is) << " " << Offset(is) \
+						<< " " << Dihedral(is) << " " << Twist(is) << " " << NXPanels(is) \
+						<< " " << NYPanels(is) << " " << XPanelDist(is) << " " << YPanelDist(is);
+				if(RightFoil(is).isEmpty()){
+					out_file  << " " << "/_/";
+				} else {
+					out_file  << " " << RightFoil(is).replace(QString(" "), QString("/_/")).toLatin1().data();
+				}
+				if(LeftFoil(is).isEmpty()) {
+					out_file  << " " << "/_/";
+				} else {
+					out_file  << " " << LeftFoil(is).replace(QString(" "), QString("/_/")).toLatin1().data();
+				}
+				out_file << endl;
+			}
+			fp.close();
+		}
+	}
+	catch (iostream::failure e){
+		QMessageBox::warning(0,QObject::tr("Warning"),QObject::tr("Unable to import wing definition\n"));
+	}
+}
 
 
 void CWing::ComputeDihedrals()

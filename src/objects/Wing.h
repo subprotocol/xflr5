@@ -53,6 +53,9 @@ public:
 
 	CWing();   // standard constructor
 
+	void ImportDefinition(QString path_to_file);
+	void ExportDefinition(QString path_to_file);
+
 	void GetViewYZPos(double xrel, double y, double &yv, double &zv, int pos);
 
 	double yrel(double SpanPos);
