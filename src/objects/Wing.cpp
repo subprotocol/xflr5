@@ -58,6 +58,7 @@ CWing::CWing()
 	memset(m_Twist, 0, sizeof(m_Twist));
 	memset(m_Cl, 0, sizeof(m_Cl));
 	memset(m_PCd, 0, sizeof(m_PCd));
+    memset(m_xCm, 0, sizeof(m_xCm));
 	memset(m_ICd, 0, sizeof(m_ICd));
 	memset(m_Cm, 0, sizeof(m_Cm));
 	memset(m_CmAirf, 0, sizeof(m_CmAirf));
@@ -2175,12 +2176,13 @@ void CWing::PanelComputeOnBody(double QInf, double Alpha, double *Cp, double *Ga
 
 
 	int  j, k, l, p, m, nFlap, coef;
-	double CPStrip, tau, NForce, cosa, sina;
+    double CPStrip, tau, NForce, cosa, sina, moment, ViscousMomentC4;
 	CVector HingeLeverArm,  PtC4Strip, PtLEStrip, ForcePt, SurfaceNormal, LeverArmC4CoG, LeverArmPanelC4, LeverArmPanelCoG;
-	CVector Force, PanelForce, StripForce, DragVector, Moment0, HingeMoment, DragMoment, GeomMoment;
+    CVector Force, PanelForce, StripForce, StripMoment, DragVector, Moment0, MomentForce, MomentForcePt, HingeMoment, DragMoment, GeomMoment;
 	CVector WindNormal, WindDirection;
+    CVector DistanceC4Strip;
 	CVector Origin(0.0,0.0,0.0);
-
+    CVector YAxis(0.0, 1.0, 0.0);
 	//initialize
 	m_GRm =0.0;
 	m_GCm = m_VCm = m_ICm = 0.0;
@@ -2264,8 +2266,9 @@ void CWing::PanelComputeOnBody(double QInf, double Alpha, double *Cp, double *Ga
 				LeverArmPanelCoG   = ForcePt - CoG;                                 // m
 
 
+
 				Moment0 = LeverArmPanelC4 * PanelForce;                             // N.m/q
-				m_CmAirf[m]  += Moment0.y;                                          // N.m/q
+                m_CmAirf[m]  += Moment0.y;                                          // N.m/q
 
 				GeomMoment += LeverArmPanelCoG * PanelForce;                        // N.m/q
 
@@ -2278,7 +2281,7 @@ void CWing::PanelComputeOnBody(double QInf, double Alpha, double *Cp, double *Ga
 				{
 					if(m_Surface[j].IsFlapPanel(p))
 					{
-						//then p is on the flap, so add its contribution
+                        //then p is on the flap, so add its contribution
 						HingeLeverArm = ForcePt - m_Surface[j].m_HingePoint;
 						HingeMoment = HingeLeverArm * PanelForce;//N.m/q
 						m_FlapMoment[nFlap] += HingeMoment.dot(m_Surface[j].m_HingeVector)* pWPolar->m_Density * QInf * QInf/2.0;  //N.m
@@ -2293,10 +2296,25 @@ void CWing::PanelComputeOnBody(double QInf, double Alpha, double *Cp, double *Ga
 			m_XCPSpanAbs[m]    =  CPStrip/NForce ;
 
 			// add viscous properties, if required
-			if(pWPolar->m_bViscous) DragVector.x = m_PCd[m] * m_StripArea[m];// N/q //TODO : orient along wind direction rather than x-axis
-			else                    DragVector.x = 0.0;
-			// global moments, in N.m/q
-			DragMoment =  LeverArmC4CoG * DragVector;
+            if(pWPolar->m_bViscous) {
+                DragVector = WindDirection / WindDirection.VAbs();
+                DragVector *= m_PCd[m] * m_StripArea[m];
+            } else
+                DragVector.x = 0.0;
+            // global moments, in N.m/q
+            //DragMoment =  LeverArmC4CoG * DragVector;
+            DragMoment.x = DragMoment.y = DragMoment.z = 0.0;
+
+            if (pWPolar->m_bViscous) {
+                StripMoment = StripForce * DragVector; StripMoment.Normalize(); StripMoment *= m_xCm[m] * m_StripArea[m] * m_Chord[m];
+            //    GeomMoment.x = StripForce * DragVector; GeomMoment.Normalize();
+                GeomMoment = YAxis * StripMoment.dot(YAxis);
+                if (m_Cl[m] < 0.0) GeomMoment.y = -GeomMoment.y;
+            //    GeomMoment *= m_xCm[m] * m_StripArea[m] * m_Chord[m];
+
+                GeomMoment = GeomMoment + (PtC4Strip - CoG) * (StripForce+DragVector);
+                m_CmAirf[m] = GeomMoment.VAbs();
+            }
 
 			m_GRm += GeomMoment.dot(WindDirection);
 
@@ -2305,11 +2323,13 @@ void CWing::PanelComputeOnBody(double QInf, double Alpha, double *Cp, double *Ga
 //			m_IYm += -m_ICd[m] * m_StripArea[m] * PtC4Strip.y ;
 			m_IYm += GeomMoment.dot(WindNormal);
 
-			m_VCm += DragMoment.y;
+      //      if (!pWPolar->m_bViscous)
+            m_VCm += DragMoment.y;
 			m_ICm += GeomMoment.y;
 
-			m_CmAirf[m]    *= 1.0                          /m_Chord[m]/m_StripArea[m];
-			m_Cm[m]         = (GeomMoment.y + DragMoment.y)/m_Chord[m]/m_StripArea[m];
+
+            m_CmAirf[m]    *= 1.0                          /m_Chord[m]/m_StripArea[m];
+            m_Cm[m]         = (GeomMoment.y + DragMoment.y)/m_Chord[m]/m_StripArea[m];
 			m++;
 		}
 		//do not consider right tip patch
@@ -2380,6 +2400,9 @@ void CWing::PanelComputeViscous(double QInf, double Alpha, CWPolar *pWPolar, dou
 			m_PCd[m]    = GetVar(pMiarex->m_poaPolar, 2, m_Surface[j].m_pFoilA, m_Surface[j].m_pFoilB, m_Re[m], m_Cl[m], tau, bOutRe, bError);
 			bPointOutRe = bOutRe || bPointOutRe;
 			if(bError) bPointOutCl = true;
+            m_xCm[m]    = GetVar(pMiarex->m_poaPolar, 4, m_Surface[j].m_pFoilA, m_Surface[j].m_pFoilB, m_Re[m], m_Cl[m], tau, bOutRe, bError);
+            bPointOutRe = bOutRe || bPointOutRe;
+            if(bError) bPointOutCl = true;
 			m_XTrTop[m] = GetVar(pMiarex->m_poaPolar, 5, m_Surface[j].m_pFoilA, m_Surface[j].m_pFoilB, m_Re[m], m_Cl[m], tau, bOutRe, bError);
 			bPointOutRe = bOutRe || bPointOutRe;
 			if(bError) bPointOutCl = true;
