@@ -26,9 +26,7 @@
 #include <QStatusBar>
 
 #include "XInverse.h" 
-#include "InverseOptionsDlg.h"
 #include "FoilSelectionDlg.h"
-#include "PertDlg.h"
 #include "../globals.h"
 #include "../mainframe.h"
 #include "../objects/Foil.h"
@@ -36,10 +34,17 @@
 
 extern CFoil* g_pCurFoil;
 
+void *QXInverse::s_pMainFrame;
+void *QXInverse::s_p2DWidget;
 
 QXInverse::QXInverse(QWidget *parent)
 	: QWidget(parent)
 {
+	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
+	m_pGraphDlg        = new GraphDlg(pMainFrame);
+	m_pXInverseStyleDlg = new InverseOptionsDlg(pMainFrame);
+	m_pPertDlg         = new PertDlg(pMainFrame);
+
 	m_bFullInverse = false;
 
 	m_pXFoil = NULL;
@@ -125,6 +130,12 @@ QXInverse::QXInverse(QWidget *parent)
 	}
 }
 
+QXInverse::~QXInverse()
+{
+	delete m_pPertDlg;
+	delete m_pGraphDlg;
+	delete m_pXInverseStyleDlg;
+}
 
 void QXInverse::CancelMark()
 {
@@ -161,7 +172,7 @@ void QXInverse::CancelSpline()
 
 void QXInverse::CheckActions()
 {
-	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	pMainFrame->InvQInitial->setChecked(m_pQCurve->IsVisible());
 	pMainFrame->InvQSpec->setChecked(m_pMCurve->IsVisible());
 	pMainFrame->InvQViscous->setChecked(m_pQVCurve->IsVisible());
@@ -271,7 +282,7 @@ void QXInverse::DrawGrid(QPainter &painter, double scale)
 	double scalex,scaley;
 	int TickSize, xTextOff;
 
-	MainFrame * pMainFrame = (MainFrame*)m_pMainFrame;
+	MainFrame * pMainFrame = (MainFrame*)s_pMainFrame;
 
 	TickSize = 5;
 	scalex= scale;
@@ -436,7 +447,7 @@ bool QXInverse::InitXFoil(CFoil * pFoil)
 	//loads pFoil in XFoil, calculates normal vectors, and sets results in current foil
 	if(!pFoil) return  false;
 
-	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	XFoil *pXFoil = (XFoil*)m_pXFoil;
 
 	m_pModFoil->m_FoilName = pFoil->m_FoilName + tr(" Modified");
@@ -573,13 +584,13 @@ void QXInverse::keyReleaseEvent(QKeyEvent *event)
 			if(m_bZoomXOnly)
 			{
 				m_bZoomXOnly = false;
-				MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+				MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 				pMainFrame->m_pctrlInvZoomX->setChecked(false);
 			}
 			if(m_bZoomYOnly)
 			{
 				m_bZoomYOnly = false;
-				MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+				MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 				pMainFrame->m_pctrlInvZoomY->setChecked(false);
 			}
 			break;
@@ -883,7 +894,7 @@ void QXInverse::mouseMoveEvent(QMouseEvent *event)
 	}
 	if(m_QGraph.IsInDrawRect(point))
 	{
-		MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
+		MainFrame* pMainFrame = (MainFrame*)s_pMainFrame;
 		pMainFrame->statusBar()->showMessage(QString("X = %1, Y = %2").arg(m_QGraph.ClientTox(event->x())).arg(m_QGraph.ClientToy(event->y())));
 		m_pCurGraph = &m_QGraph;
 	}
@@ -895,7 +906,7 @@ void QXInverse::mouseMoveEvent(QMouseEvent *event)
 
 void QXInverse::mousePressEvent(QMouseEvent *event)
 {
-	TwoDWidget *p2DWidget = (TwoDWidget*)m_p2DWidget;
+	TwoDWidget *p2DWidget = (TwoDWidget*)s_p2DWidget;
 	bool bCtrl, bShift;
 	bCtrl = bShift = false;
 	if(event->modifiers() & Qt::ControlModifier) bCtrl  = true;
@@ -984,7 +995,7 @@ void QXInverse::mousePressEvent(QMouseEvent *event)
 void QXInverse::mouseReleaseEvent(QMouseEvent *event)
 {
 	XFoil *pXFoil = (XFoil*)m_pXFoil;
-	TwoDWidget *p2DWidget = (TwoDWidget*)m_p2DWidget;
+	TwoDWidget *p2DWidget = (TwoDWidget*)s_p2DWidget;
 	m_bTrans = false;
 
 	static int tmp, width, height;
@@ -1250,11 +1261,13 @@ void QXInverse::OnExecute()
 	UpdateView();
 }
 
+
+
 void QXInverse::OnExtractFoil()
 {
 	//Extracts a foil from the database for display and modification
 
-	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 
     FoilSelectionDlg dlg(this);
 	dlg.move(pMainFrame->m_DlgPos);
@@ -1302,29 +1315,29 @@ void QXInverse::OnFilter()
 
 void QXInverse::OnGraphSettings()
 {
-	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 
-    m_GraphDlg->move(pMainFrame->m_DlgPos);
-    m_GraphDlg->m_iGraphType = 31;
-    m_GraphDlg->m_XSel = 0;
-    m_GraphDlg->m_YSel = 0;
-    m_GraphDlg->m_pGraph = &m_QGraph;
+	m_pGraphDlg->move(pMainFrame->m_DlgPos);
+	m_pGraphDlg->m_iGraphType = 31;
+	m_pGraphDlg->m_XSel = 0;
+	m_pGraphDlg->m_YSel = 0;
+	m_pGraphDlg->m_pGraph = &m_QGraph;
 
 
 	QGraph graph;
 	graph.CopySettings(&m_QGraph);
-    m_GraphDlg->m_pMemGraph = &m_QGraph;
-    m_GraphDlg->m_pGraph = &m_QGraph;
-    m_GraphDlg->SetParams();
+	m_pGraphDlg->m_pMemGraph = &m_QGraph;
+	m_pGraphDlg->m_pGraph = &m_QGraph;
+	m_pGraphDlg->SetParams();
 
-    if(m_GraphDlg->exec() == QDialog::Accepted)
+	if(m_pGraphDlg->exec() == QDialog::Accepted)
 	{
 	}
 	else
 	{
 		m_QGraph.CopySettings(&graph);
 	}
-    pMainFrame->m_DlgPos = m_GraphDlg->pos();
+	pMainFrame->m_DlgPos = m_pGraphDlg->pos();
 	UpdateView();
 }
 
@@ -1348,7 +1361,7 @@ void QXInverse::OnInsertCtrlPt()
 
 void QXInverse::OnInverseApp()
 {
-	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	m_bFullInverse = pMainFrame->m_pctrlFullInverse->isChecked();
 
 	if(m_bFullInverse)
@@ -1366,10 +1379,9 @@ void QXInverse::OnInverseApp()
 
 void QXInverse::OnInverseStyles()
 {
-    InverseOptionsDlg dlg(this);
-	dlg.m_pXInverse = this;
-	dlg.InitDialog();
-	dlg.exec();
+	m_pXInverseStyleDlg->m_pXInverse = this;
+	m_pXInverseStyleDlg->InitDialog();
+	m_pXInverseStyleDlg->exec();
 }
 
 
@@ -1430,20 +1442,20 @@ void QXInverse::OnPertubate()
 	int m;
 	pXFoil->pert_init(1);
 
-    PertDlg dlg(this);
+
 	for (m=0; m<=qMin(32, pXFoil->nc); m++)
 	{
-		dlg.m_cnr[m] = (double)real(pXFoil->cn[m]);
-		dlg.m_cni[m] = (double)imag(pXFoil->cn[m]);
+		m_pPertDlg->m_cnr[m] = (double)real(pXFoil->cn[m]);
+		m_pPertDlg->m_cni[m] = (double)imag(pXFoil->cn[m]);
 	}
-	dlg.m_nc = qMin(32, pXFoil->nc);
-	dlg.InitDialog();
+	m_pPertDlg->m_nc = qMin(32, pXFoil->nc);
+	m_pPertDlg->InitDialog();
 
-	if(dlg.exec() == QDialog::Accepted)
+	if(m_pPertDlg->exec() == QDialog::Accepted)
 	{
 		for (m=0; m<=qMin(32, pXFoil->nc); m++)
 		{
-			pXFoil->cn[m] = complex<double>(dlg.m_cnr[m],dlg.m_cni[m]);
+			pXFoil->cn[m] = complex<double>(m_pPertDlg->m_cnr[m],m_pPertDlg->m_cni[m]);
 		}
 
 		pXFoil->pert_process(1);
@@ -1521,7 +1533,7 @@ void QXInverse::OnRemoveCtrlPt()
 	{
 		if(!m_Spline.RemovePoint(m_Spline.m_iHighlight))
 		{
-			MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+			MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 			QMessageBox::warning(pMainFrame,tr("Warning"), tr("The minimum number of control points has been reached for this spline degree"));
 			return;
 		}
@@ -1611,7 +1623,7 @@ void QXInverse::OnSmooth()
 void QXInverse::OnStoreFoil()
 {
 	if(!m_bLoaded) return;
-	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 
 	CFoil* pFoil = new CFoil();
 	pFoil->CopyFoil(m_pModFoil);
@@ -1643,7 +1655,7 @@ void QXInverse::OnZoomIn()
 		if(m_fScale/m_fRefScale <32.0)
 		{
 			m_bZoomPlus = true;
-			MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+			MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 			pMainFrame->m_pctrlInvZoomIn->setChecked(true);
 		}
 		else
@@ -1662,7 +1674,7 @@ void QXInverse::OnZoomX()
 	ReleaseZoom();
 	m_bZoomYOnly = false;
 	m_bZoomXOnly = !m_bZoomXOnly;
-	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	pMainFrame->m_pctrlInvZoomX->setChecked(m_bZoomXOnly);
 	pMainFrame->m_pctrlInvZoomY->setChecked(m_bZoomYOnly);
 }
@@ -1673,7 +1685,7 @@ void QXInverse::OnZoomY()
 	ReleaseZoom();
 	m_bZoomXOnly = false;
 	m_bZoomYOnly = !m_bZoomYOnly;
-	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	pMainFrame->m_pctrlInvZoomX->setChecked(m_bZoomXOnly);
 	pMainFrame->m_pctrlInvZoomY->setChecked(m_bZoomYOnly);
 }
@@ -1690,7 +1702,7 @@ void QXInverse::OnTangentSpline()
 
 void QXInverse::PaintGraph(QPainter &painter)
 {
-	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	painter.save();
 
 //  draw  the graph	
@@ -1779,7 +1791,7 @@ void QXInverse::PaintFoil(QPainter &painter)
 //draw the reference and modified foils  
 	XFoil *pXFoil = (XFoil*)m_pXFoil;
 	double alpha = pXFoil->alqsp[1]*180./PI;
-	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 
 	QPen TextPen(pMainFrame->m_TextColor);
 
@@ -1867,7 +1879,7 @@ void QXInverse::PaintView(QPainter &painter)
 {
 	painter.save();
 
-	MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
+	MainFrame* pMainFrame = (MainFrame*)s_pMainFrame;
 
 	painter.fillRect(m_rCltRect, pMainFrame->m_BackgroundColor);
 	PaintGraph(painter);
@@ -1906,7 +1918,7 @@ void QXInverse::ReleaseZoom()
 	m_bZoomPlus  = false;
 	m_ZoomRect.setRight(m_ZoomRect.left()-1);
 	m_ZoomRect.setTop(m_ZoomRect.bottom()+1);
-	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	pMainFrame->m_pctrlInvZoomIn->setChecked(false);
 }
 
@@ -2040,7 +2052,7 @@ void QXInverse::SetFoil()
 
 bool QXInverse::SetParams()
 {
-	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	XFoil *pXFoil = (XFoil*)m_pXFoil;
 	CFoil*pFoil;
 
@@ -2401,9 +2413,9 @@ void QXInverse::Smooth(int Pos1, int Pos2)
 
 void QXInverse::UpdateView()
 {
-	TwoDWidget *p2DWidget = (TwoDWidget*)m_p2DWidget;
+	TwoDWidget *p2DWidget = (TwoDWidget*)s_p2DWidget;
 
-	if(m_p2DWidget)
+	if(s_p2DWidget)
 	{
 		p2DWidget->update();
 	}
@@ -2414,7 +2426,7 @@ void QXInverse::wheelEvent(QWheelEvent *event)
 {
 	ReleaseZoom();
 
-	MainFrame * pMainFrame = (MainFrame*)m_pMainFrame;
+	MainFrame * pMainFrame = (MainFrame*)s_pMainFrame;
 	static double ZoomFactor;
 	if(event->delta()>0)
 	{

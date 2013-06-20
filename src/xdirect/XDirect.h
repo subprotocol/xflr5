@@ -261,12 +261,14 @@ private:
 	EditPlrDlg *m_pEditPlrDlg;
 	XFoilAnalysisDlg *m_pXFoilAnalysisDlg;
 	XFoilAdvancedDlg *m_pXFoilAdvancedDlg;
-	TwoDPanelDlg *m_pTwoDPanelDlg;
 	FoilPolarDlg *m_pFPDlg;
 	BatchDlg *m_pBDlg;
 	BatchThreadDlg *m_pBatchThreadDlg;
-	InterpolateFoilsDlg *m_pIFDlg;
+	XDirectStyleDlg *m_pXDirectStyleDlg;
 	ManageFoilsDlg *m_pManageFoilsDlg;
+
+	TwoDPanelDlg *m_pTwoDPanelDlg;
+	InterpolateFoilsDlg *m_pIFDlg;
 	NacaFoilDlg *m_pNacaFoilDlg;
 	FoilCoordDlg *m_pFoilCoordDlg;
 	FoilGeomDlg *m_pFoilGeomDlg;
@@ -274,7 +276,6 @@ private:
 	LEDlg *m_pLEDlg;
 	FlapDlg *m_pFlapDlg;
 	CAddDlg *m_pCAddDlg;
-	XDirectStyleDlg *m_pXDirectStyleDlg;
 
 
 	QStackedWidget *m_pctrlMiddleControls;

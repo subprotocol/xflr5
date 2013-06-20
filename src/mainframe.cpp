@@ -893,7 +893,9 @@ void MainFrame::CreateAFoilToolbar()
 
 void MainFrame::CreateDockWindows()
 {
+	QAFoil::s_pMainFrame           = this;
 	QXDirect::s_pMainFrame         = this;
+	QXInverse::s_pMainFrame        = this;
 	QMiarex::s_pMainFrame          = this;
 	WAdvancedDlg::s_pMainFrame     = this;
 	WPolarDlg::s_pMainFrame        = this;
@@ -1040,14 +1042,14 @@ void MainFrame::CreateDockWindows()
 	pXDirect->m_poaPolar = &m_oaPolar;
 	pXDirect->m_poaOpp   = &m_oaOpp;
 
-	pAFoil->m_pMainFrame = this;
-	pAFoil->m_p2DWidget  = m_p2DWidget;
+	QAFoil::s_p2DWidget  = m_p2DWidget;
 	pAFoil->m_poaFoil    = &m_oaFoil;
 	pAFoil->m_pXFoil     = pXDirect->m_pXFoil;
 
-	pXInverse->m_pMainFrame       = this;
+	QXInverse::s_p2DWidget        = m_p2DWidget;
+	pXInverse->s_pMainFrame       = this;
 	pXInverse->m_pXFoil           = pXDirect->m_pXFoil;
-	pXInverse->m_p2DWidget        = m_p2DWidget;
+	pXInverse->s_p2DWidget        = m_p2DWidget;
 	pXInverse->m_poaFoil          = &m_oaFoil;
 
 

@@ -61,9 +61,11 @@ QXDirect::QXDirect(QWidget *parent) : QWidget(parent)
 	m_pBDlg             = new BatchDlg(pMainFrame);
 	m_pBatchThreadDlg   = new BatchThreadDlg(pMainFrame);
 	m_pXFoilAdvancedDlg = new XFoilAdvancedDlg(pMainFrame);
+	m_pXDirectStyleDlg  = new XDirectStyleDlg(pMainFrame);
+	m_pManageFoilsDlg   = new ManageFoilsDlg(pMainFrame);
+
 	m_pTwoDPanelDlg     = new TwoDPanelDlg(pMainFrame);
 	m_pIFDlg            = new InterpolateFoilsDlg(pMainFrame);
-	m_pManageFoilsDlg   = new ManageFoilsDlg(pMainFrame);
 	m_pNacaFoilDlg      = new NacaFoilDlg(pMainFrame);
 	m_pFoilCoordDlg     = new FoilCoordDlg(pMainFrame);
 	m_pFoilGeomDlg      = new FoilGeomDlg(pMainFrame);
@@ -71,7 +73,6 @@ QXDirect::QXDirect(QWidget *parent) : QWidget(parent)
 	m_pLEDlg            = new LEDlg(pMainFrame);
 	m_pFlapDlg          = new FlapDlg(pMainFrame);
 	m_pCAddDlg          = new CAddDlg(pMainFrame);
-	m_pXDirectStyleDlg  = new XDirectStyleDlg(pMainFrame);
 
 
 	m_CurveStyle = 0;
@@ -331,7 +332,6 @@ QXDirect::~QXDirect()
 	delete m_pFlapDlg;
 	delete m_pCAddDlg;
 	delete m_pXDirectStyleDlg;
-
 }
 
 

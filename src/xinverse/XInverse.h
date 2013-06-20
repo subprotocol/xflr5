@@ -32,6 +32,8 @@
 #include <QStackedWidget>
 #include <QVBoxLayout>
 #include <QSettings>
+#include "InverseOptionsDlg.h"
+#include "PertDlg.h"
 #include "../misc/FloatEdit.h"
 #include "../xdirect/XFoil.h"
 #include "../graph/QGraph.h"
@@ -51,6 +53,8 @@ class QXInverse : public QWidget
 
 public:
 	QXInverse(QWidget *parent = NULL);
+	~QXInverse();
+
 	void SetupLayout();
 	void InitDialog();
  
@@ -132,7 +136,9 @@ private:
 
 private:
 
-    GraphDlg *m_GraphDlg;
+	GraphDlg *m_pGraphDlg;
+	InverseOptionsDlg *m_pXInverseStyleDlg;
+	PertDlg *m_pPertDlg;
 
 	QTextEdit *m_pctrlOutput;
 	QLabel *m_pctrlSpecif;
@@ -153,8 +159,8 @@ private:
 	QWidget *m_pctrlMInvWidget,*m_pctrlFInvWidget;
 	QStackedWidget *m_pctrlStackedInv;
 
-	void * m_p2DWidget;
-	void * m_pMainFrame;
+	static void * s_p2DWidget;
+	static void * s_pMainFrame;
 
 	void *m_pXFoil;
 

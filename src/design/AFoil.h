@@ -39,6 +39,15 @@
 #include "../objects/Foil.h"
 #include "../objects/Sf.h"
 #include "../xdirect/XFoil.h"
+#include "../xdirect/NacaFoilDlg.h"
+#include "../xdirect/CAddDlg.h"
+#include "../xdirect/TwoDPanelDlg.h"
+#include "../xdirect/TEGapDlg.h"
+#include "../xdirect/LEDlg.h"
+#include "../xdirect/FlapDlg.h"
+#include "../xdirect/FoilCoordDlg.h"
+#include "../xdirect/FoilGeomDlg.h"
+#include "../xdirect/InterpolateFoilsDlg.h"
 
 
 class QAFoil : public QWidget
@@ -64,6 +73,8 @@ class QAFoil : public QWidget
 
 public:
 	QAFoil(QWidget *parent = NULL);
+	~QAFoil();
+
 	void SetupLayout();
 	void InitDialog();
  
@@ -159,14 +170,26 @@ private:
 
 private:
 
+	TwoDPanelDlg *m_pTwoDPanelDlg;
+	InterpolateFoilsDlg *m_pIFDlg;
+	NacaFoilDlg *m_pNacaFoilDlg;
+	FoilCoordDlg *m_pFoilCoordDlg;
+	FoilGeomDlg *m_pFoilGeomDlg;
+	TEGapDlg *m_pTEGapDlg;
+	LEDlg *m_pLEDlg;
+	FlapDlg *m_pFlapDlg;
+	CAddDlg *m_pCAddDlg;
+
+
+
 	LineButton *m_pctrlFoilStyle;
 
 	QTableView *m_pctrlFoilTable;
 	QStandardItemModel *m_pFoilModel;
 	FoilTableDelegate *m_pFoilDelegate;
 
-	void * m_p2DWidget;
-	void * m_pMainFrame;
+	static void * s_p2DWidget;
+	static void * s_pMainFrame;
 
 	bool m_bScale;
 	bool m_bZoomPlus;
