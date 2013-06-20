@@ -71,7 +71,6 @@ QPointer<MainFrame> MainFrame::_self = 0L;
 MainFrame::MainFrame(QWidget *parent, Qt::WFlags flags)
 	: QMainWindow(parent, flags)
 {
-
 	m_VersionName = QString::fromLatin1("XFLR5 v6.09.06");
 	QString jpegPluginPath;
 
