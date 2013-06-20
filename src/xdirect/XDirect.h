@@ -28,15 +28,37 @@
 #include <QRadioButton>
 #include <QCheckBox>
 #include <QStackedWidget>
+#include "../misc/RenameDlg.h"
 #include "../misc/LineButton.h"
 #include "../misc/LineCbBox.h"
 #include "../misc/LineDelegate.h"
 #include "../misc/FloatEdit.h"
+#include "../misc/PolarFilterDlg.h"
+#include "../misc/ObjectPropsDlg.h"
 #include "../objects/Polar.h"
 #include "../objects/Foil.h"
 #include "../objects/OpPoint.h"
 #include "../graph/QGraph.h"
+#include "../graph/GraphDlg.h"
 #include "XFoil.h"
+#include "EditPlrDlg.h"
+#include "XFoilAnalysisDlg.h"
+#include "XFoilAdvancedDlg.h"
+#include "FoilPolarDlg.h"
+#include "BatchDlg.h"
+#include "BatchThreadDlg.h"
+#include "TwoDPanelDlg.h"
+#include "InterpolateFoilsDlg.h"
+#include "NacaFoilDlg.h"
+#include "ManageFoilsDlg.h"
+
+#include "FoilCoordDlg.h"
+#include "FoilGeomDlg.h"
+#include "TEGapDlg.h"
+#include "LEDlg.h"
+#include "FlapDlg.h"
+#include "CAddDlg.h"
+#include "XDirectStyleDlg.h"
 
 
 class QXDirect : public QWidget
@@ -228,7 +250,32 @@ protected:
 
 	OpPoint* AddOpPoint(CPolar *pPolar = NULL, bool bStoreOpp=false);
 
+
+
 private:
+	//the dialog boxes are declared as member variables to enable translations... seems to be a Qt bug
+	PolarFilterDlg *m_pPolarFilterDlg;
+	ObjectPropsDlg *m_pObjectPropsDlg;
+	GraphDlg *m_pGraphDlg;
+	RenameDlg *m_pRenameDlg;
+	EditPlrDlg *m_pEditPlrDlg;
+	XFoilAnalysisDlg *m_pXFoilAnalysisDlg;
+	XFoilAdvancedDlg *m_pXFoilAdvancedDlg;
+	TwoDPanelDlg *m_pTwoDPanelDlg;
+	FoilPolarDlg *m_pFPDlg;
+	BatchDlg *m_pBDlg;
+	BatchThreadDlg *m_pBatchThreadDlg;
+	InterpolateFoilsDlg *m_pIFDlg;
+	ManageFoilsDlg *m_pManageFoilsDlg;
+	NacaFoilDlg *m_pNacaFoilDlg;
+	FoilCoordDlg *m_pFoilCoordDlg;
+	FoilGeomDlg *m_pFoilGeomDlg;
+	TEGapDlg *m_pTEGapDlg;
+	LEDlg *m_pLEDlg;
+	FlapDlg *m_pFlapDlg;
+	CAddDlg *m_pCAddDlg;
+	XDirectStyleDlg *m_pXDirectStyleDlg;
+
 
 	QStackedWidget *m_pctrlMiddleControls;
 
@@ -338,8 +385,8 @@ private:
 	QFile m_XFile;		//output file for the analysis
 
 
-	void *m_pMainFrame;
-	void *m_p2DWidget;
+	static void *s_pMainFrame;
+	static void *s_p2DWidget;
 
 
 	QColor m_crFoilColor, m_crBLColor, m_crPressureColor, m_crNeutralColor; //foil display parameters

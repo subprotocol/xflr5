@@ -39,7 +39,7 @@ class WPolarDlg : public QDialog
 	friend class MainFrame;
 
 public:
-    WPolarDlg(QWidget *pParent);
+	WPolarDlg(QWidget *pParent=NULL);
 
 private:
 	void keyPressEvent(QKeyEvent *event);

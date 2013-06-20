@@ -100,7 +100,7 @@ public:
 	bool SetCamber(double f, double u);
 
 	void CopyFoil(CFoil *pSrcFoil);
-	void Serialize(QDataStream &ar, bool bIsStoring, int ProjectFormat=5);
+	bool Serialize(QDataStream &ar, bool bIsStoring, int ProjectFormat=5);
 	void SetFlap();
 	void SetTEFlap();
 	void SetLEFlap();

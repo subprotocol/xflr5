@@ -30,7 +30,6 @@
 #include "Miarex.h"
 #include "./GLCreateLists.h"
 #include "./GLCreateBodyLists.h"
-#include "WPolarDlg.h"
 #include "StabPolarDlg.h"
 #include "../mainframe.h"
 #include "../twodwidget.h"
@@ -67,7 +66,10 @@ QMiarex::QMiarex(QWidget *parent)
 	m_pPolarFilterDlg = new PolarFilterDlg(pMainFrame);
 	m_pW3dPrefsDlg = new W3dPrefsDlg(pMainFrame);
 	m_pModDlg = new ModDlg(pMainFrame);
-
+	m_pWPolarDlg =  new WPolarDlg(pMainFrame);
+	m_pStabPolarDlg = new StabPolarDlg(pMainFrame);
+	m_pUnitsDlg     = new UnitsDlg(pMainFrame);
+	m_pObjectPropsDlg = new ObjectPropsDlg(pMainFrame);
 
 	m_pXFile      = NULL;
 	m_pPanelDlg   = NULL;
@@ -567,6 +569,8 @@ QMiarex::QMiarex(QWidget *parent)
 	connect(m_pctrlAlphaDelta, SIGNAL(editingFinished()), this, SLOT(OnReadAnalysisData()));
 }
 
+
+
 QMiarex::~QMiarex()
 {
     delete m_pPlaneDlg;
@@ -583,8 +587,14 @@ QMiarex::~QMiarex()
     delete m_pGLLightDlg;
     delete m_pModDlg;
     delete m_pPolarFilterDlg;
-    delete m_pW3dPrefsDlg;
+	delete m_pW3dPrefsDlg;;
+	delete m_pWPolarDlg;
+	delete m_pStabPolarDlg;
+	delete m_pUnitsDlg;
+	delete m_pObjectPropsDlg;
 }
+
+
 
 CBody* QMiarex::AddBody(CBody *pBody)
 {
@@ -7795,7 +7805,7 @@ void QMiarex::OnAdvancedSettings()
 	// The user has requested an edition of the advanced settings
 	//
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
-    m_pWAdvancedDlg->move(pMainFrame->m_DlgPos);
+//    m_pWAdvancedDlg->move(pMainFrame->m_DlgPos);
     m_pWAdvancedDlg->m_AlphaPrec       = LLTAnalysis::s_CvPrec;
     m_pWAdvancedDlg->m_Relax           = LLTAnalysis::s_RelaxMax;
     m_pWAdvancedDlg->m_NStation        = LLTAnalysis::s_NLLTStations;
@@ -7838,7 +7848,7 @@ void QMiarex::OnAdvancedSettings()
 		m_bResetglWake    = true;
 		UpdateView();
 	}
-    pMainFrame->m_DlgPos = m_pWAdvancedDlg->pos();
+//    pMainFrame->m_DlgPos = m_pWAdvancedDlg->pos();
 }
 
 
@@ -7974,12 +7984,11 @@ void QMiarex::OnDefineStabPolar()
 	StabPolarDlg::s_StabPolar.m_bThinSurfaces = WPolarDlg::s_WPolar.m_bThinSurfaces;
 
 
-    StabPolarDlg m_StabPolarDlg(this);
 
-	m_StabPolarDlg.InitDialog(m_pCurPlane, m_pCurWing);
-	m_StabPolarDlg.move(pMainFrame->m_DlgPos);
-	int res = m_StabPolarDlg.exec();
-	pMainFrame->m_DlgPos = m_StabPolarDlg.pos();
+	m_pStabPolarDlg->InitDialog(m_pCurPlane, m_pCurWing);
+	m_pStabPolarDlg->move(pMainFrame->m_DlgPos);
+	int res = m_pStabPolarDlg->exec();
+	pMainFrame->m_DlgPos = m_pStabPolarDlg->pos();
 
 	if(res == QDialog::Accepted)
 	{
@@ -8064,13 +8073,12 @@ void QMiarex::OnDefineWPolar()
 
 	CWPolar* pNewWPolar  = new CWPolar;
 
-    WPolarDlg dlg(this);
-	dlg.InitDialog(m_pCurPlane, m_pCurWing);
+	m_pWPolarDlg->InitDialog(m_pCurPlane, m_pCurWing);
 
-	dlg.move(pMainFrame->m_DlgPos);
+	m_pWPolarDlg->move(pMainFrame->m_DlgPos);
 
-	int res = dlg.exec();
-	pMainFrame->m_DlgPos = dlg.pos();
+	int res = m_pWPolarDlg->exec();
+	pMainFrame->m_DlgPos = m_pWPolarDlg->pos();
 
 	if (res == QDialog::Accepted)
 	{
@@ -8078,7 +8086,7 @@ void QMiarex::OnDefineWPolar()
 		pMainFrame->SetSaveState(false);
 		pNewWPolar->DuplicateSpec(&WPolarDlg::s_WPolar);
 		pNewWPolar->m_UFOName = UFOName();
-		pNewWPolar->m_PlrName = dlg.s_WPolar.m_PlrName;
+		pNewWPolar->m_PlrName = m_pWPolarDlg->s_WPolar.m_PlrName;
 
 		pNewWPolar->m_WMAChord = m_pCurWing->m_MAChord;
 
@@ -9011,12 +9019,12 @@ void QMiarex::OnExportCurWOpp()
 	else        strong = QString(tr("ICn=, %1,PCn=, %2\n")).arg(m_pCurWOpp->m_IYm, 11, 'f', 6).arg(m_pCurWOpp->m_GYm, 11, 'f', 6);
 	out << strong;
 
-    if(exporttype==1) strong = QString(tr("XCP   = %1     YCP   = %2     ZCP   = %3  \n")).arg(m_pCurWOpp->m_XCP, 11, 'f', 6).arg(m_pCurWOpp->m_YCP, 11, 'f', 6).arg(m_pCurWOpp->m_ZCP, 11, 'f', 6);
-    else        strong = QString(tr("XCP=, %1, YCP=, %2, ZCP=, %3 \n")).arg(m_pCurWOpp->m_XCP, 11, 'f', 6).arg(m_pCurWOpp->m_YCP, 11, 'f', 6).arg(m_pCurWOpp->m_ZCP, 11, 'f', 6);
+	if(exporttype==1) strong = QString("XCP   = %1     YCP   = %2     ZCP   = %3  \n").arg(m_pCurWOpp->m_XCP, 11, 'f', 6).arg(m_pCurWOpp->m_YCP, 11, 'f', 6).arg(m_pCurWOpp->m_ZCP, 11, 'f', 6);
+	else        strong = QString("XCP=, %1, YCP=, %2, ZCP=, %3 \n").arg(m_pCurWOpp->m_XCP, 11, 'f', 6).arg(m_pCurWOpp->m_YCP, 11, 'f', 6).arg(m_pCurWOpp->m_ZCP, 11, 'f', 6);
 	out << strong;
 
-	if(exporttype==1) strong = QString(tr("XNP   = %1\n")).arg(m_pCurWOpp->m_XNP, 11, 'f', 6);
-	else        strong = QString(tr("XNP=, %1\n")).arg(m_pCurWOpp->m_XNP, 11, 'f', 6);
+	if(exporttype==1) strong = QString("XNP   = %1\n").arg(m_pCurWOpp->m_XNP, 11, 'f', 6);
+	else        strong = QString("XNP=, %1\n").arg(m_pCurWOpp->m_XNP, 11, 'f', 6);
 	out << strong;
 
 
@@ -9676,21 +9684,20 @@ void QMiarex::OnImportBody()
 
 //	FrameSize() = 0;
 
-    UnitsDlg Dlg(this);
 
-	Dlg.m_bLengthOnly = true;
-	Dlg.m_Length    = pMainFrame->m_LengthUnit;
-	Dlg.m_Area      = pMainFrame->m_AreaUnit;
-	Dlg.m_Speed     = pMainFrame->m_SpeedUnit;
-	Dlg.m_Weight    = pMainFrame->m_WeightUnit;
-	Dlg.m_Force     = pMainFrame->m_ForceUnit;
-	Dlg.m_Moment    = pMainFrame->m_MomentUnit;
-	Dlg.m_Question = QObject::tr("Choose the length unit to read this file :");
-	Dlg.InitDialog();
+	m_pUnitsDlg->m_bLengthOnly = true;
+	m_pUnitsDlg->m_Length    = pMainFrame->m_LengthUnit;
+	m_pUnitsDlg->m_Area      = pMainFrame->m_AreaUnit;
+	m_pUnitsDlg->m_Speed     = pMainFrame->m_SpeedUnit;
+	m_pUnitsDlg->m_Weight    = pMainFrame->m_WeightUnit;
+	m_pUnitsDlg->m_Force     = pMainFrame->m_ForceUnit;
+	m_pUnitsDlg->m_Moment    = pMainFrame->m_MomentUnit;
+	m_pUnitsDlg->m_Question = QObject::tr("Choose the length unit to read this file :");
+	m_pUnitsDlg->InitDialog();
 
-	if(Dlg.exec() == QDialog::Accepted)
+	if(m_pUnitsDlg->exec() == QDialog::Accepted)
 	{
-		switch(Dlg.m_Length)
+		switch(m_pUnitsDlg->m_Length)
 		{
 			case 0:{//mdm
 				mtoUnit  = 1000.0;
@@ -10164,9 +10171,7 @@ void QMiarex::OnReadAnalysisData()
 
 void QMiarex::OnPolarFilter()
 {
-	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
-
-    m_pPolarFilterDlg->move(pMainFrame->m_DlgPos);
+//    m_pPolarFilterDlg->move(pMainFrame->m_DlgPos);
     m_pPolarFilterDlg->m_bMiarex = true;
     m_pPolarFilterDlg->m_bType1 = m_bType1;
     m_pPolarFilterDlg->m_bType2 = m_bType2;
@@ -10194,7 +10199,7 @@ void QMiarex::OnPolarFilter()
 			UpdateView();
 		}
 	}
-    pMainFrame->m_DlgPos = m_pPolarFilterDlg->pos();
+//    pMainFrame->m_DlgPos = m_pPolarFilterDlg->pos();
 }
 
 
@@ -15156,28 +15161,28 @@ void QMiarex::wheelEvent(QWheelEvent *event)
 void QMiarex::OnWPolarProps()
 {
 	if(!m_pCurWPolar) return;
-	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
-    ObjectPropsDlg dlg(this);
-	dlg.m_pMiarex = this;
-	dlg.m_pWPolar = m_pCurWPolar;
-	dlg.InitDialog();
-	dlg.move(pMainFrame->m_DlgPos);
-	dlg.exec();
-	pMainFrame->m_DlgPos = dlg.pos();
+	m_pObjectPropsDlg->m_pXDirect = NULL;
+	m_pObjectPropsDlg->m_pOpp = NULL;
+	m_pObjectPropsDlg->m_pPolar = NULL;
+	m_pObjectPropsDlg->m_pMiarex = this;
+	m_pObjectPropsDlg->m_pWOpp = NULL;
+	m_pObjectPropsDlg->m_pWPolar = m_pCurWPolar;
+	m_pObjectPropsDlg->InitDialog();
+	m_pObjectPropsDlg->exec();
 }
 
 
 void QMiarex::OnWOppProps()
 {
 	if(!m_pCurWOpp) return;
-	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
-    ObjectPropsDlg dlg(this);
-	dlg.m_pMiarex = this;
-	dlg.m_pWOpp = m_pCurWOpp;
-	dlg.InitDialog();
-	dlg.move(pMainFrame->m_DlgPos);
-	dlg.exec();
-	pMainFrame->m_DlgPos = dlg.pos();
+	m_pObjectPropsDlg->m_pXDirect = NULL;
+	m_pObjectPropsDlg->m_pOpp = NULL;
+	m_pObjectPropsDlg->m_pPolar = NULL;
+	m_pObjectPropsDlg->m_pMiarex = this;
+	m_pObjectPropsDlg->m_pWOpp = m_pCurWOpp;
+	m_pObjectPropsDlg->m_pWPolar = NULL;
+	m_pObjectPropsDlg->InitDialog();
+	m_pObjectPropsDlg->exec();
 }
 
 

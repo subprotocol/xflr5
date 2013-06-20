@@ -38,36 +38,10 @@ CWPolar WPolarDlg::s_WPolar;
 WPolarDlg::WPolarDlg(QWidget *pParent) : QDialog(pParent)
 {
 	setWindowTitle(tr("Analysis Definition"));
-	m_pWing      = NULL;
-	m_pPlane     = NULL;
 
+	m_pPlane     = NULL;
 
 	m_bAutoName = true;
-
-/*	s_WPolar.m_WPolarType = FIXEDSPEEDPOLAR;
-	s_WPolar.m_AnalysisMethod = LLTMETHOD;
-
-	s_WPolar.m_QInf       = 10.0;//m/s
-	s_WPolar.m_Mass       = 0.0;
-	s_WPolar.m_ASpec      = 0.0;
-	s_WPolar.m_Beta       = 0.0;
-	s_WPolar.m_Density    = 1.225;
-	s_WPolar.m_Viscosity  = 1.5e-5;
-	s_WPolar.m_Height     = 0.0;
-	s_WPolar.m_NXWakePanels    = 1;
-	s_WPolar.m_TotalWakeLength = 100.0;//x mac
-	s_WPolar.m_WakePanelFactor = 1.1;
-	s_WPolar.m_CoG.Set(0.0,0.0,0.0);
-	s_WPolar.m_bThinSurfaces = true;
-	s_WPolar.m_bTiltedGeom   = false;
-	s_WPolar.m_bWakeRollUp   = false;
-	s_WPolar.m_bViscous      = true;
-	s_WPolar.m_bGround       = false;
-	s_WPolar.m_RefAreaType = 1;
-	s_WPolar.m_bAutoInertia = false;*/
-
-	m_pWing	   = NULL;
-	m_pPlane     = NULL;
 
 	m_WingLoad   = 0.0;
 
@@ -76,6 +50,7 @@ WPolarDlg::WPolarDlg(QWidget *pParent) : QDialog(pParent)
 	SetupLayout();
 	Connect();
 }
+
 
 void WPolarDlg::Connect()
 {

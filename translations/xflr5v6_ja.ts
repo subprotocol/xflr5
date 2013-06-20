@@ -766,6 +766,10 @@ CpCalc: local speed too large
         <source>Cancel</source>
         <translation>キャンセル</translation>
     </message>
+    <message>
+        <source>Use Stylesheets</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>EditPlrDlg</name>
@@ -1411,6 +1415,10 @@ CpCalc: local speed too large
         <source>Context Menu</source>
         <translation>コンテキストメニュー</translation>
     </message>
+    <message>
+        <source>Define Inertia</source>
+        <translation type="unfinished">慣性の設定</translation>
+    </message>
 </context>
 <context>
     <name>GL3dWingDlg</name>
@@ -1700,6 +1708,26 @@ Reduce the mesh size</source>
     <message>
         <source>Cancel</source>
         <translation>キャンセル</translation>
+    </message>
+    <message>
+        <source>Reset section</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Import Wing from File...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Export Wing to File...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Import Wing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Export Wing</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4420,6 +4448,10 @@ Please enter a new name</source>
         <source>Export associated OpPoints</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Saved the valid part</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ManageBodiesDlg</name>
@@ -4835,7 +4867,7 @@ Continue ?</source>
     <message>
         <source>
    Solving the problem... </source>
-        <translation>
+        <translation type="obsolete">
    解析中... </translation>
     </message>
     <message>
@@ -5410,13 +5442,13 @@ Continue ?</source>
     <message>
         <source>XNP   = %1
 </source>
-        <translation>XNP   = %1
+        <translation type="obsolete">XNP   = %1
 </translation>
     </message>
     <message>
         <source>XNP=, %1
 </source>
-        <translation>XNP=, %1
+        <translation type="obsolete">XNP=, %1
 </translation>
     </message>
     <message>
@@ -6251,16 +6283,6 @@ Continue ?</source>
         <source>Unidentified bit depth... Sorry</source>
         <translation type="unfinished">
             </translation>
-    </message>
-    <message>
-        <source>XCP   = %1     YCP   = %2     ZCP   = %3  
-</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>XCP=, %1, YCP=, %2, ZCP=, %3 
-</source>
-        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -7398,6 +7420,39 @@ CpCalc: local speed too large
         <translation type="unfinished">
             </translation>
     </message>
+    <message>
+        <source>Body option</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Body Panels Ignored</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not open the file for reading</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Total number of wing sections exceeds MAXSPANSECTIONS.
+Wing will be truncated.
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unable to import wing definition
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not open the file for writing</source>
+        <translation type="unfinished">
+            </translation>
+    </message>
+    <message>
+        <source>Multiple file loading only available for airfoil files.
+Non *.dat files will be ignored.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QXDirect</name>
@@ -8463,6 +8518,10 @@ only if all the flap controls are inactive</source>
         <source>Cancel</source>
         <translation>キャンセル</translation>
     </message>
+    <message>
+        <source>Ignore Body Panels</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>StabViewDlg</name>
@@ -8758,7 +8817,11 @@ only if all the flap controls are inactive</source>
     </message>
     <message>
         <source>does not exist</source>
-        <translation>は存在しません</translation>
+        <translation type="obsolete">は存在しません</translation>
+    </message>
+    <message>
+        <source> does not exist</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -9236,6 +9299,10 @@ only if all the flap controls are inactive</source>
     <message>
         <source>Wing Loading = </source>
         <translation>翼面荷重 </translation>
+    </message>
+    <message>
+        <source>Ignore Body Panels</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

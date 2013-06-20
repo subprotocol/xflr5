@@ -124,15 +124,10 @@ bool OpPoint::Serialize(QDataStream &ar, bool bIsStoring, int ArchiveFormat)
         ar >> n >> nd1 >> nd2 >> nd3;
         ar >> a >> b;
         if(a) m_bVisc = true; else m_bVisc = false;
-        if(a!=0 && a!=1){
-            m_strFoilName = "";
-            return false;
-        }
+		if(a!=0 && a!=1) return false;
+
         if(b) m_bDispSurf = true; else m_bDispSurf = false;
-        if(b!=0 && b!=1){
-            m_strFoilName = "";
-            return false;
-        }
+		if(b!=0 && b!=1) return false;
 
         ar >> f; Cl = f;
         ar >> f; Cm = f;
@@ -180,18 +175,12 @@ bool OpPoint::Serialize(QDataStream &ar, bool bIsStoring, int ArchiveFormat)
 			ReadCOLORREF(ar, m_Color);
 
 			ar >> a ;
-			if(a!=0 && a!=1)
-			{
-                m_strFoilName = "";
-                return false;
-            }
+			if(a!=0 && a!=1) return false;
             if(a) m_bIsVisible = true; else m_bIsVisible = false;
 
             ar >> a ;
-            if(a!=0 && a!=1){
-                m_strFoilName = "";
-                return false;
-            }
+			if(a!=0 && a!=1) return false;
+
             if(a) m_bShowPoints = true; else m_bShowPoints = false;
         }
 	}

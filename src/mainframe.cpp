@@ -39,8 +39,6 @@
 #include "misc/AboutQ5.h"
 #include "misc/ObjectPropsDlg.h"
 #include "misc/LinePickerDlg.h"
-#include "misc/SaveOptionsDlg.h"
-#include "misc/TranslatorDlg.h"
 #include "graph/GraphDlg.h"
 #include "xdirect/XDirect.h"
 #include "xdirect/BatchDlg.h"
@@ -71,6 +69,7 @@ QPointer<MainFrame> MainFrame::_self = 0L;
 MainFrame::MainFrame(QWidget *parent, Qt::WFlags flags)
 	: QMainWindow(parent, flags)
 {
+
 	m_VersionName = QString::fromLatin1("XFLR5 v6.09.06");
 	QString jpegPluginPath;
 
@@ -107,9 +106,11 @@ MainFrame::MainFrame(QWidget *parent, Qt::WFlags flags)
 	setWindowIcon(QIcon(":/images/xflr5_64.png"));
 
 
-    m_UnitsDlg = new UnitsDlg(this);
-    m_DisplaySettingsDlg = new DisplaySettingsDlg(this);
-    m_RenameDlg = new RenameDlg(this);
+	m_pUnitsDlg = new UnitsDlg(this);
+	m_pDisplaySettingsDlg = new DisplaySettingsDlg(this);
+	m_pRenameDlg = new RenameDlg(this);
+	m_pTranslatorDlg = new TranslatorDlg(this);
+	m_pSaveOptionsDlg = new SaveOptionsDlg(this);
 
 	if(!QGLFormat::hasOpenGL())
 	{
@@ -251,12 +252,16 @@ MainFrame::MainFrame(QWidget *parent, Qt::WFlags flags)
 	SetMenus();
 }
 
+
 MainFrame::~MainFrame()
 {
-    delete m_UnitsDlg;
-    delete m_RenameDlg;
-    delete m_DisplaySettingsDlg;
+	delete m_pUnitsDlg;
+	delete m_pRenameDlg;
+	delete m_pDisplaySettingsDlg;
+	delete m_pTranslatorDlg;
+	delete m_pSaveOptionsDlg;
 }
+
 
 void MainFrame::AboutQt()
 {
@@ -271,6 +276,8 @@ void MainFrame::AboutQt()
             );
 #endif // QT_NO_MESSAGEBOX
 }
+
+
 
 void MainFrame::AboutQFLR5()
 {
@@ -430,8 +437,7 @@ void MainFrame::AddRecentFile(const QString &PathName)
 
 void MainFrame::closeEvent (QCloseEvent * event)
 {
-
-	//	QMiarex * pMiarex = (QMiarex*)m_pMiarex;
+//	QMiarex * pMiarex = (QMiarex*)m_pMiarex;
 //	pMiarex->m_GL3dView.hide();
 //	pMiarex->m_GL3dView.close();
 
@@ -887,6 +893,7 @@ void MainFrame::CreateAFoilToolbar()
 
 void MainFrame::CreateDockWindows()
 {
+	QXDirect::s_pMainFrame         = this;
 	QMiarex::s_pMainFrame          = this;
 	WAdvancedDlg::s_pMainFrame     = this;
 	WPolarDlg::s_pMainFrame        = this;
@@ -1022,8 +1029,7 @@ void MainFrame::CreateDockWindows()
 	pMiarex->m_poaFoil   = &m_oaFoil;
 	pMiarex->m_poaPolar  = &m_oaPolar;
 
-	pXDirect->m_pMainFrame             = this;
-	pXDirect->m_p2DWidget              = m_p2DWidget;
+	QXDirect::s_p2DWidget              = m_p2DWidget;
 	pXDirect->m_pCpGraph->m_pParent    = m_p2DWidget;
 	pXDirect->m_pPolarGraph->m_pParent = m_p2DWidget;
 	pXDirect->m_pTrGraph->m_pParent    = m_p2DWidget;
@@ -3222,8 +3228,7 @@ bool MainFrame::LoadPolarFileV3(QDataStream &ar, bool bIsStoring, int ArchiveFor
 	{
 		pFoil = new CFoil();
 
-		pFoil->Serialize(ar, bIsStoring);
-		if (!pFoil->m_FoilName.length())
+		if (!pFoil->Serialize(ar, bIsStoring))
 		{
 			delete pFoil;
 			return false;
@@ -3780,7 +3785,6 @@ void MainFrame::OnInsertProject()
 
 void MainFrame::OnLanguage()
 {
-    TranslatorDlg dlg(this);
 	QDir TranslationsDir;
 #ifdef Q_WS_MAC
 	TranslationsDir.setPath(qApp->applicationDirPath());
@@ -3792,15 +3796,15 @@ void MainFrame::OnLanguage()
 	TranslationsDir.setPath("/usr/share/xflr5");
 #endif
 
-	dlg.m_TranslationDirPath = TranslationsDir.canonicalPath() + "/translations" ;
-	dlg.m_LanguageFilePath = m_LanguageFilePath;
-	dlg.InitDialog();
-	dlg.move(m_DlgPos);
-	if(dlg.exec()==QDialog::Accepted)
+	m_pTranslatorDlg->m_TranslationDirPath = TranslationsDir.canonicalPath() + "/translations" ;
+	m_pTranslatorDlg->m_LanguageFilePath = m_LanguageFilePath;
+	m_pTranslatorDlg->InitDialog();
+//	dlg.move(m_DlgPos);
+	if(m_pTranslatorDlg->exec()==QDialog::Accepted)
 	{
-		m_LanguageFilePath = dlg.m_LanguageFilePath;
+		m_LanguageFilePath = m_pTranslatorDlg->m_LanguageFilePath;
 	}
-	m_DlgPos = dlg.pos();
+//	m_DlgPos = dlg.pos();
 }
 
 
@@ -3831,7 +3835,7 @@ void MainFrame::OnLoadFile()
 			}
 		}
 		if (warn_non_airfoil_multiload) {
-			QMessageBox::warning(0, QObject::tr("Warning"), QObject::tr("Multiple file loading only available to airfoil files.\nNon *.dat files will be ignored."));
+			QMessageBox::warning(0, QObject::tr("Warning"), QObject::tr("Multiple file loading only available for airfoil files.\nNon *.dat files will be ignored."));
 		}
 	} else {
 		PathName = PathNames.at(0);
@@ -4095,15 +4099,13 @@ void MainFrame::OnRestoreToolbars()
 
 void MainFrame::OnSaveOptions()
 {
-    SaveOptionsDlg dlg(this);
-	dlg.InitDialog(m_bSaveOpps, m_bSaveWOpps);
-	dlg.move(m_DlgPos);
-	if(dlg.exec()==QDialog::Accepted)
+
+	m_pSaveOptionsDlg->InitDialog(m_bSaveOpps, m_bSaveWOpps);
+	if(m_pSaveOptionsDlg->exec()==QDialog::Accepted)
 	{
-		m_bSaveOpps  = dlg.m_bOpps;
-		m_bSaveWOpps = dlg.m_bWOpps;
+		m_bSaveOpps  = m_pSaveOptionsDlg->m_bOpps;
+		m_bSaveWOpps = m_pSaveOptionsDlg->m_bWOpps;
 	}
-	m_DlgPos = dlg.pos();
 }
 
 
@@ -4442,37 +4444,37 @@ void MainFrame::OnStyle()
 	QMiarex *pMiarex     = (QMiarex*)m_pMiarex;
 //	QXInverse *pXInverse = (QXInverse*)m_pXInverse;
 
-    m_DisplaySettingsDlg->m_pMainFrame = this;
-    m_DisplaySettingsDlg->move(m_DlgPos);
-	m_DisplaySettingsDlg->m_bStyleSheets    = m_bStyleSheets;
-    m_DisplaySettingsDlg->m_BackgroundColor = m_BackgroundColor;
-    m_DisplaySettingsDlg->m_TextColor       = m_TextColor;
-    m_DisplaySettingsDlg->m_TextFont        = m_TextFont;
-    m_DisplaySettingsDlg->m_pRefGraph       = &m_RefGraph;
-    m_DisplaySettingsDlg->m_StyleName       = m_StyleName;
-    m_DisplaySettingsDlg->m_bReverseZoom    = m_bReverseZoom;
-    m_DisplaySettingsDlg->m_bAlphaChannel   = m_bAlphaChannel;
-    m_DisplaySettingsDlg->InitDialog();
+	m_pDisplaySettingsDlg->m_pMainFrame = this;
+//    m_DisplaySettingsDlg->move(m_DlgPos);
+	m_pDisplaySettingsDlg->m_bStyleSheets    = m_bStyleSheets;
+	m_pDisplaySettingsDlg->m_BackgroundColor = m_BackgroundColor;
+	m_pDisplaySettingsDlg->m_TextColor       = m_TextColor;
+	m_pDisplaySettingsDlg->m_TextFont        = m_TextFont;
+	m_pDisplaySettingsDlg->m_pRefGraph       = &m_RefGraph;
+	m_pDisplaySettingsDlg->m_StyleName       = m_StyleName;
+	m_pDisplaySettingsDlg->m_bReverseZoom    = m_bReverseZoom;
+	m_pDisplaySettingsDlg->m_bAlphaChannel   = m_bAlphaChannel;
+	m_pDisplaySettingsDlg->InitDialog();
 
-    if(m_DisplaySettingsDlg->exec() ==QDialog::Accepted)
+	if(m_pDisplaySettingsDlg->exec() ==QDialog::Accepted)
 	{
-		m_bStyleSheets    = m_DisplaySettingsDlg->m_pctrlStyleSheets->isChecked();
-        m_BackgroundColor = m_DisplaySettingsDlg->m_BackgroundColor;
-        m_TextColor       = m_DisplaySettingsDlg->m_TextColor;
-        m_TextFont        = m_DisplaySettingsDlg->m_TextFont;
-        m_StyleName       = m_DisplaySettingsDlg->m_StyleName;
-        m_bReverseZoom    = m_DisplaySettingsDlg->m_pctrlReverseZoom->isChecked();
-        m_bAlphaChannel   = m_DisplaySettingsDlg->m_pctrlAlphaChannel->isChecked();
+		m_bStyleSheets    = m_pDisplaySettingsDlg->m_pctrlStyleSheets->isChecked();
+		m_BackgroundColor = m_pDisplaySettingsDlg->m_BackgroundColor;
+		m_TextColor       = m_pDisplaySettingsDlg->m_TextColor;
+		m_TextFont        = m_pDisplaySettingsDlg->m_TextFont;
+		m_StyleName       = m_pDisplaySettingsDlg->m_StyleName;
+		m_bReverseZoom    = m_pDisplaySettingsDlg->m_pctrlReverseZoom->isChecked();
+		m_bAlphaChannel   = m_pDisplaySettingsDlg->m_pctrlAlphaChannel->isChecked();
 		pMiarex->m_bResetglGeom = true;
 		pMiarex->m_bResetglBody = true;
 		pMiarex->m_bResetglLegend = true;
 
-        if(m_DisplaySettingsDlg->m_bIsGraphModified)
+		if(m_pDisplaySettingsDlg->m_bIsGraphModified)
 		{
 			SetGraphSettings(&m_RefGraph);
 		}
 	}
-    m_DlgPos = m_DisplaySettingsDlg->pos();
+//    m_DlgPos = m_DisplaySettingsDlg->pos();
 
 	pXDirect->m_pCpGraph->SetInverted(true);
 	pMiarex->m_CpGraph.SetInverted(true);
@@ -4482,26 +4484,26 @@ void MainFrame::OnStyle()
 
 void MainFrame::OnUnits()
 {
-    m_UnitsDlg->move(m_DlgPos);
-    m_UnitsDlg->m_Length = m_LengthUnit;
-    m_UnitsDlg->m_Area   = m_AreaUnit;
-    m_UnitsDlg->m_Weight = m_WeightUnit;
-    m_UnitsDlg->m_Speed  = m_SpeedUnit;
-    m_UnitsDlg->m_Force  = m_ForceUnit;
-    m_UnitsDlg->m_Moment = m_MomentUnit;
-    m_UnitsDlg->InitDialog();
+//    m_UnitsDlg->move(m_DlgPos);
+	m_pUnitsDlg->m_Length = m_LengthUnit;
+	m_pUnitsDlg->m_Area   = m_AreaUnit;
+	m_pUnitsDlg->m_Weight = m_WeightUnit;
+	m_pUnitsDlg->m_Speed  = m_SpeedUnit;
+	m_pUnitsDlg->m_Force  = m_ForceUnit;
+	m_pUnitsDlg->m_Moment = m_MomentUnit;
+	m_pUnitsDlg->InitDialog();
 
-    if(m_UnitsDlg->exec()==QDialog::Accepted)
+	if(m_pUnitsDlg->exec()==QDialog::Accepted)
 	{
-        m_LengthUnit = m_UnitsDlg->m_Length;
-        m_AreaUnit   = m_UnitsDlg->m_Area;
-        m_WeightUnit = m_UnitsDlg->m_Weight;
-        m_SpeedUnit  = m_UnitsDlg->m_Speed;
-        m_ForceUnit  = m_UnitsDlg->m_Force;
-        m_MomentUnit = m_UnitsDlg->m_Moment;
+		m_LengthUnit = m_pUnitsDlg->m_Length;
+		m_AreaUnit   = m_pUnitsDlg->m_Area;
+		m_WeightUnit = m_pUnitsDlg->m_Weight;
+		m_SpeedUnit  = m_pUnitsDlg->m_Speed;
+		m_ForceUnit  = m_pUnitsDlg->m_Force;
+		m_MomentUnit = m_pUnitsDlg->m_Moment;
 
 		SetUnits(m_LengthUnit, m_AreaUnit, m_SpeedUnit, m_WeightUnit, m_ForceUnit, m_MomentUnit,
-				 m_mtoUnit, m_m2toUnit, m_mstoUnit, m_kgtoUnit, m_NtoUnit, m_NmtoUnit);
+		m_mtoUnit, m_m2toUnit, m_mstoUnit, m_kgtoUnit, m_NtoUnit, m_NmtoUnit);
 
 		SetSaveState(false);
 
@@ -4511,7 +4513,7 @@ void MainFrame::OnUnits()
 			pMiarex->UpdateUnits();
 		}
 	}
-    m_DlgPos = m_UnitsDlg->pos();
+//    m_DlgPos = m_UnitsDlg->pos();
 }
 
 
@@ -4786,8 +4788,7 @@ CFoil * MainFrame::ReadPolarFile(QDataStream &ar)
 		for (i=0;i<n; i++)
 		{
 			pFoil = new CFoil();
-			pFoil->Serialize(ar, false);
-			if (!pFoil->m_FoilName.length())
+			if (!pFoil->Serialize(ar, false))
 			{
 				delete pFoil;
 				return NULL;
@@ -4896,16 +4897,16 @@ void MainFrame::RenameFoil(CFoil *pFoil)
 			NameList.append(pOldFoil->m_FoilName);
 		}
 
-        m_RenameDlg->move(m_DlgPos);
-        m_RenameDlg->m_pstrArray = & NameList;
-        m_RenameDlg->m_strQuestion = tr("Enter the foil's new name");
-        m_RenameDlg->m_strName = OldName;
+		m_pRenameDlg->move(m_DlgPos);
+		m_pRenameDlg->m_pstrArray = & NameList;
+		m_pRenameDlg->m_strQuestion = tr("Enter the foil's new name");
+		m_pRenameDlg->m_strName = OldName;
 		bool bExists = false;
-        m_RenameDlg->InitDialog();
-        int resp = m_RenameDlg->exec();
-        m_DlgPos = m_RenameDlg->pos();
+		m_pRenameDlg->InitDialog();
+		int resp = m_pRenameDlg->exec();
+		m_DlgPos = m_pRenameDlg->pos();
 
-        strong = m_RenameDlg->m_strName;
+		strong = m_pRenameDlg->m_strName;
 
 		if(QDialog::Accepted == resp)
 		{
@@ -5995,8 +5996,6 @@ bool MainFrame::SerializeProject(QDataStream &ar, bool bIsStoring, int ProjectFo
 			{
 				pPOpp = new CPOpp();
 
-				if(i==173)
-					int nada=0;
 				if (!pPOpp->SerializePOpp(ar, bIsStoring, ProjectFormat))
 				{
 					if(pPOpp) delete pPOpp;
@@ -6148,21 +6147,21 @@ CFoil* MainFrame::SetModFoil(CFoil* pNewFoil, bool bKeepExistingFoil)
 				NameList.append(pFoil->m_FoilName);
 			}
 
-            m_RenameDlg->move(m_DlgPos);
-            m_RenameDlg->m_pstrArray = & NameList;
-            m_RenameDlg->m_strQuestion = tr("A foil of that name already exists\nPlease enter a new name");
-            m_RenameDlg->m_strName = pNewFoil->m_FoilName;
-            m_RenameDlg->InitDialog();
+			m_pRenameDlg->move(m_DlgPos);
+			m_pRenameDlg->m_pstrArray = & NameList;
+			m_pRenameDlg->m_strQuestion = tr("A foil of that name already exists\nPlease enter a new name");
+			m_pRenameDlg->m_strName = pNewFoil->m_FoilName;
+			m_pRenameDlg->InitDialog();
 
 			bool exists = false;
 			QString strong;
-            int resp = m_RenameDlg->exec();
-            m_DlgPos = m_RenameDlg->pos();
-            strong = m_RenameDlg->m_strName;
+			int resp = m_pRenameDlg->exec();
+			m_DlgPos = m_pRenameDlg->pos();
+			strong = m_pRenameDlg->m_strName;
 
 			if(QDialog::Accepted == resp)
 			{
-                strong = m_RenameDlg->m_strName;
+				strong = m_pRenameDlg->m_strName;
 				for (l=0; l<m_oaFoil.size(); l++)
 				{
 					pOldFoil = (CFoil*)m_oaFoil.at(l);

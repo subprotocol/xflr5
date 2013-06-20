@@ -42,6 +42,8 @@
 #include "objects/OpPoint.h"
 #include "graph/QGraph.h"
 #include "misc/DisplaySettingsDlg.h"
+#include "misc/SaveOptionsDlg.h"
+#include "misc/TranslatorDlg.h"
 #include "misc/RenameDlg.h"
 #include "misc/UnitsDlg.h"
 
@@ -221,9 +223,12 @@ public:
 
 private:
 	//the dialog boxes are declared as member variables to enable translations... seems to be a Qt bug
-    DisplaySettingsDlg *m_DisplaySettingsDlg;
-    RenameDlg *m_RenameDlg;
-    UnitsDlg *m_UnitsDlg;
+	DisplaySettingsDlg *m_pDisplaySettingsDlg;
+	SaveOptionsDlg *m_pSaveOptionsDlg;
+	TranslatorDlg *m_pTranslatorDlg;
+    RenameDlg *m_pRenameDlg;
+    UnitsDlg *m_pUnitsDlg;
+
 
 	void *m_pXInverse;
 	void *m_pXDirect;

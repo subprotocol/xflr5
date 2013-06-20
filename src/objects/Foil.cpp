@@ -874,7 +874,7 @@ double CFoil::NormalizeGeometry()
 }
 
 
-void CFoil::Serialize(QDataStream &ar, bool bIsStoring, int ProjectFormat)
+bool CFoil::Serialize(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 {
 	// saves or loads the foil to the archive ar
 
@@ -915,6 +915,7 @@ void CFoil::Serialize(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 		{
 			ar << (float)x[j] << (float)y[j];
 		}
+		return true;
 	}
 	else 
 	{
@@ -959,11 +960,8 @@ void CFoil::Serialize(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 
 		ar >> f >> f >> f; //formerly transition parameters
 		ar >> nb;
-		if(nb>IBX)
-		{
-			m_FoilName = "";
-			return;
-		}
+		if(nb>IBX) return false;
+
 		for (j=0; j<nb; j++)
 		{
 			ar >> f >> ff;
@@ -972,11 +970,8 @@ void CFoil::Serialize(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 		if(ArchiveFormat>=1001)
 		{
 			ar >> n;
-			if(n>IBX)
-			{
-				m_FoilName = "";
-				return;
-			}
+			if(n>IBX) return false;
+
 			for (j=0; j<n; j++)
 			{
 				ar >> f >> ff;
@@ -995,6 +990,7 @@ void CFoil::Serialize(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 			memcpy(y,yb, sizeof(yb));
 			n=nb;
 		}
+		return true;
 	}
 }
 

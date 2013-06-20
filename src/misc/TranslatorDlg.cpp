@@ -94,6 +94,7 @@ void TranslatorDlg::InitDialog()
 	QStringList qmFiles = findQmFiles();
 	qmFiles.sort();
 	qmFileForLanguage.insert("English", "English");
+	m_pctrlLanguageList->clear();
 	m_pctrlLanguageList->addItem("English (default)");
 
 	for (int i=0; i<qmFiles.count(); ++i)
@@ -119,7 +120,7 @@ QStringList TranslatorDlg::findQmFiles()
 	QDir dir(m_TranslationDirPath);
 	if(!dir.exists())
 	{
-		QMessageBox::warning(this, tr("Warning"), tr("The directory ")+dir.path()+tr("does not exist"));
+		QMessageBox::warning(this, tr("Warning"), tr("The directory ")+dir.path()+tr(" does not exist"));
 	}
 
 	QStringList fileNames = dir.entryList(QStringList("*.qm"), QDir::Files,

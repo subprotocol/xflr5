@@ -39,10 +39,18 @@
 #include "../objects/ArcBall.h"
 #include "GL3dWingDlg.h"
 #include "GL3dBodyDlg.h"
+#include "GL3DScales.h"
+#include "StabViewDlg.h"
+#include "PlaneDlg.h"
+#include "WingScaleDlg.h"
+#include "InertiaDlg.h"
+#include "WPolarDlg.h"
+#include "StabPolarDlg.h"
 #include "PanelAnalysisDlg.h"
 #include "LLTAnalysisDlg.h"
 #include "ManageBodiesDlg.h"
 #include "ManageUFOsDlg.h"
+#include "../misc/UnitsDlg.h"
 #include "../misc/ModDlg.h"
 #include "../misc/RenameDlg.h"
 #include "../misc/ProgressDlg.h"
@@ -51,11 +59,6 @@
 #include "../misc/W3dPrefsDlg.h"
 #include "../misc/GLLightDlg.h"
 #include "../graph/GraphDlg.h"
-#include "GL3DScales.h"
-#include "StabViewDlg.h"
-#include "PlaneDlg.h"
-#include "WingScaleDlg.h"
-#include "InertiaDlg.h"
 
 #include "../misc/FloatEdit.h"
 #include "../misc/LineButton.h"
@@ -382,7 +385,10 @@ private:
     GraphDlg *m_pGraphDlg;
     WingScaleDlg *m_pWingScaleDlg;
     W3dPrefsDlg *m_pW3dPrefsDlg;
-
+	WPolarDlg *m_pWPolarDlg;
+	StabPolarDlg *m_pStabPolarDlg;
+	UnitsDlg *m_pUnitsDlg;
+	ObjectPropsDlg *m_pObjectPropsDlg;
 
 	QTimer *m_pTimerWOpp, *m_pTimerMode;
 

@@ -45,7 +45,7 @@ class StabPolarDlg : public QDialog
 	friend class MainFrame;
 
 public:
-    StabPolarDlg(QWidget *pParent);
+	StabPolarDlg(QWidget *pParent=NULL);
 	void InitDialog(CPlane *pPlane, CWing *pWing, CWPolar *pWPolar=NULL);
 
 private:
