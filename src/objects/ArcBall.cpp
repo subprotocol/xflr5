@@ -60,8 +60,8 @@ ArcBall::ArcBall(void)
 	ab_quat[14]	=  0.0f;
 	ab_quat[15]	=  1.0f;
 
-	memcpy(ab_last, ab_quat, 16*sizeof(double));
-	memcpy(ab_next, ab_quat, 16*sizeof(double));
+	memcpy(ab_last, ab_quat, 16*sizeof(float));
+	memcpy(ab_next, ab_quat, 16*sizeof(float));
 
 	// the distance from the origin to the eye
 	ab_zoom  = 1.0;
@@ -109,7 +109,7 @@ void ArcBall::GetMatrix()
 }
 
 
-// find the intersection with the plane through the visible edge
+/** find the intersection with the plane through the visible edge*/
 void ArcBall::EdgeCoords(CVector m, CVector &V)
 {
 	// find the intersection of the edge plane and the ray
@@ -129,7 +129,7 @@ void ArcBall::EdgeCoords(CVector m, CVector &V)
 }
 
 
-// update current arcball rotation
+/** update current arcball rotation*/
 void ArcBall::Move(int mx, int my)
 {
 	if(ab_planar)
@@ -187,7 +187,7 @@ void ArcBall::Move(int mx, int my)
 
 
 
-// reset the rotation matrix
+/** reset the rotation matrix*/
 void ArcBall::QuatIdentity(float* q)
 {
 	q[0] =1; q[1] =0; q[2] =0; q[3] =0;
@@ -197,7 +197,7 @@ void ArcBall::QuatIdentity(float* q)
 }
 
 
-// copy a rotation matrix
+/** copy a rotation matrix*/
 void ArcBall::QuatCopy(float* dst, float* src)
 {
 	dst[0]=src[0]; dst[1]=src[1]; dst[2] =src[2];
@@ -206,7 +206,7 @@ void ArcBall::QuatCopy(float* dst, float* src)
 }
 
 
-// convert the quaternion into a rotation matrix
+/** convert the quaternion into a rotation matrix*/
 void ArcBall::QuattoMatrix(float* q, Quaternion Qt)
 {
 	x2 = Qt.qx*Qt.qx;
@@ -232,7 +232,7 @@ void ArcBall::QuattoMatrix(float* q, Quaternion Qt)
 	q[10]= (float)(1 - 2*x2 - 2*y2);
 }
 
-// multiply two rotation matrices
+/** multiply two rotation matrices*/
 void ArcBall::QuatNext(float* dest, float* left, float* right)
 {
 	dest[0] = left[0]*right[0] + left[1]*right[4] + left[2] *right[8];
@@ -247,7 +247,7 @@ void ArcBall::QuatNext(float* dest, float* left, float* right)
 }
 
 
-// reset the arcball
+/** reset the arcball*/
 void ArcBall::Reset()
 {
 	QuatIdentity(ab_quat);
@@ -255,7 +255,7 @@ void ArcBall::Reset()
 }
 
 
-// affect the arcball's orientation on openGL
+/** affect the arcball's orientation on openGL*/
 void ArcBall::Rotate()
 {
 	glMultMatrixf(ab_quat);
@@ -358,7 +358,7 @@ void ArcBall::SphereCoords(int const &mx, int const &my, CVector &V)
 
 
 
-// begin arcball rotation
+/** begin arcball rotation*/
 void ArcBall::Start(int mx, int my)
 {
 	// saves a copy of the current rotation for comparison
@@ -371,7 +371,7 @@ void ArcBall::Start(int mx, int my)
 }
 
 
-
+/** Convert screen coordinates to GL view coordinates*/
 void ArcBall::ClientToGL(int const &x, int const &y, double &glx, double &gly)
 {
 	double h2, w2;
