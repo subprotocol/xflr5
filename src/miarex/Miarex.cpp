@@ -3898,8 +3898,8 @@ void QMiarex::DrawWPolarLegend(QPainter &painter, QPoint place, int bottom)
 		{
 			pWPolar = (CWPolar*)m_poaWPolar->at(l);
 
-			if (pWPolar->m_Alpha.size() &&
-				pWPolar->m_bIsVisible  &&
+			if ( pWPolar->m_Alpha.size() &&
+				(pWPolar->m_bIsVisible || pWPolar->m_bShowPoints) &&
 			   ((pWPolar->m_WPolarType==STABILITYPOLAR && m_iView==WSTABVIEW) || m_iView!=WSTABVIEW) &&
 				  pWPolar->m_UFOName == str.at(k) &&
 				((pWPolar->m_WPolarType==FIXEDSPEEDPOLAR && m_bType1) ||
@@ -3941,15 +3941,18 @@ void QMiarex::DrawWPolarLegend(QPainter &painter, QPoint place, int bottom)
 					}
 					else if(m_iView==WSTABVIEW && (!pWPolar->m_bIsVisible && !pWPolar->m_bShowPoints))
 					{
+						int nada = 0;
 					}
 					else if(m_iView==WSTABVIEW && pWPolar->m_WPolarType!=STABILITYPOLAR)
 					{
+						int nadaz = 0;
 					}
 					else if((pWPolar->m_WPolarType==FIXEDSPEEDPOLAR && !m_bType1) ||
 							(pWPolar->m_WPolarType==FIXEDLIFTPOLAR  && !m_bType2) ||
 							(pWPolar->m_WPolarType==FIXEDAOAPOLAR   && !m_bType4) ||
 							(pWPolar->m_WPolarType==STABILITYPOLAR  && !m_bType7))
 					{
+						int nadazddd = 0;
 					}
 					else
 					{
@@ -7941,6 +7944,11 @@ void QMiarex::OnCurWOppOnly()
 }
 
 
+/**
+* The user has requested a change to the color of the active curve.
+* The curve may be for a polar curve or for an oppoint.
+* Changes the style and modifies the content of the comboboxes
+*/
 void QMiarex::OnCurveColor()
 {
 	QColor Color = QColorDialog::getColor(m_CurveColor);
@@ -7951,6 +7959,11 @@ void QMiarex::OnCurveColor()
 }
 
 
+/**
+* The user has requested a change to the style of the active curve.
+* The curve may be for a polar curve or for an oppoint.
+* Changes the style and modifies the content of the comboboxes
+*/
 void QMiarex::OnCurveStyle(int index)
 {
 	m_CurveStyle = index;
@@ -7959,6 +7972,12 @@ void QMiarex::OnCurveStyle(int index)
 }
 
 
+
+/**
+* The user has requested a change to the width of the active curve.
+* The curve may be for a polar curve or for an oppoint.
+* Changes the style and modifies the content of the comboboxes
+*/
 void QMiarex::OnCurveWidth(int index)
 {
 	m_CurveWidth = index+1;
@@ -7967,12 +7986,11 @@ void QMiarex::OnCurveWidth(int index)
 }
 
 
-
+/**
+* The user has requested the creation of a new stability polar
+*/
 void QMiarex::OnDefineStabPolar()
 {
-	//
-	// The user has requested the creation of a new stability polar
-	//
 
 	StopAnimate();
 	m_bArcball = false;
@@ -7982,7 +8000,6 @@ void QMiarex::OnDefineStabPolar()
 	StabPolarDlg::s_StabPolar.m_Density       = WPolarDlg::s_WPolar.m_Density;
 	StabPolarDlg::s_StabPolar.m_RefAreaType   = WPolarDlg::s_WPolar.m_RefAreaType;
 	StabPolarDlg::s_StabPolar.m_bThinSurfaces = WPolarDlg::s_WPolar.m_bThinSurfaces;
-
 
 
 	m_pStabPolarDlg->InitDialog(m_pCurPlane, m_pCurWing);
@@ -8059,11 +8076,11 @@ void QMiarex::OnDefineStabPolar()
 }
 
 
+/**
+ *The user has requested the creation of a new performance polar
+ */
 void QMiarex::OnDefineWPolar()
 {
-	//
-	// The user has requested the creation of a new performance polar
-	//
 
 	if(!m_pCurWing) return;
 
@@ -8132,11 +8149,12 @@ void QMiarex::OnDefineWPolar()
 }
 
 
+/**
+ * The user wants to edit the analysis parameters of the currently selected polar.
+ * A new WPolar object is created. The user may choose to overwrite or not the existing WPolar.
+ */
 void QMiarex::OnEditCurWPolar()
 {
-	//
-	// The user has wants to edit the parameters of the currently selected polar
-	//
 
 	StopAnimate();
 

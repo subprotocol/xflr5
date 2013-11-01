@@ -721,7 +721,7 @@ void BatchThreadDlg::SetPlrName(CPolar *pNewPolar)
 	{
 		double R = pNewPolar->m_Reynolds/1000000.;
 		pNewPolar->m_PlrName = QString("T%1_Re%2_M%3")
-								 .arg(pNewPolar->m_PolarType)
+								 .arg(pNewPolar->m_PolarType+1)
 								 .arg(R,0,'f',3)
 								 .arg( pNewPolar->m_Mach,0,'f',2);
 	}

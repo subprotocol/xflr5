@@ -16,6 +16,10 @@
 
 
 
+xflr5 v6.09.06, November 2013
+	- corrected the automatic polar name of foils in multithreaded analysis
+	- other minor corrections and enhancements
+
 
 xflr5 v6.09.05 beta, March 20th, 2013
 	- Modified the project load method to keep the data even for corrupted files

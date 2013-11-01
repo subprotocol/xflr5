@@ -91,7 +91,7 @@ MainFrame::MainFrame(QWidget *parent, Qt::WFlags flags)
 	jpegPluginPath = dir.canonicalPath() + "/imageformats/libqjpeg.so";
 #endif
 
-        if (dir.exists(jpegPluginPath))
+	if (dir.exists(jpegPluginPath))
 	{
 		QPluginLoader jpegPluginLoad(jpegPluginPath);
 		jpegPluginLoad.load();

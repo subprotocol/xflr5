@@ -366,7 +366,7 @@ void StabPolarDlg::InitDialog(CPlane *pPlane, CWing *pWing, CWPolar *pWPolar)
 
 	if(s_StabPolar.m_AnalysisMethod==LLTMETHOD)
 	{
-		s_StabPolar.m_AnalysisMethod = VLMMETHOD;
+		s_StabPolar.m_AnalysisMethod = PANELMETHOD;
 		s_StabPolar.m_bThinSurfaces = true;
 	}
 
