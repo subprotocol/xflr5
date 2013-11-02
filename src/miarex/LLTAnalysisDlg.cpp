@@ -531,7 +531,7 @@ bool LLTAnalysisDlg::ReLoop()
 void LLTAnalysisDlg::UpdateGraph(int x, double y)
 {
 	CCurve *pCurve = m_IterGraph.GetCurve(0);
-	pCurve->AddPoint((double)x,y);
+	pCurve->AppendPoint((double)x,y);
 	UpdateView();
 }
 

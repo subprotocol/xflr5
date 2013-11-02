@@ -112,9 +112,9 @@ void QGraph::DrawCurve(int nIndex, QPainter &painter)
 	QBrush FillBrush(m_BkColor);
 	painter.setBrush(FillBrush);
 
-	QPen CurvePen(pCurve->GetColor());
-	CurvePen.setStyle(GetStyle(pCurve->GetStyle()));
-	CurvePen.setWidth((int)pCurve->GetWidth());
+	QPen CurvePen(pCurve->color());
+	CurvePen.setStyle(GetStyle(pCurve->style()));
+	CurvePen.setWidth((int)pCurve->width());
 	painter.setPen(CurvePen);
 
 	Min.setX(int(xmin/m_scalex) +m_ptoffset.x());
@@ -160,7 +160,7 @@ void QGraph::DrawCurve(int nIndex, QPainter &painter)
 		{
 			//highlight
 			QColor HighColor(0,40, 150);
-			CurvePen.setWidth((int)pCurve->GetWidth());
+			CurvePen.setWidth((int)pCurve->width());
 			CurvePen.setColor(HighColor);
 			painter.setPen(CurvePen);
 			To.setX(int(pCurve->x[point]/m_scalex+m_ptoffset.x()));
@@ -567,13 +567,13 @@ void QGraph::DrawLegend(QPainter &painter, QPoint &Place, QFont &LegendFont, QCo
 		pCurve = (CCurve*) m_oaCurves[nc];
 		if(pCurve->IsVisible())
 		{
-			pCurve->GetTitle(strong);
+			pCurve->title(strong);
 			if(pCurve->n>0 && strong.length())//is there anything to draw ?
 			{
 
-				LegendPen.setColor(pCurve->GetColor());
-				LegendPen.setStyle(GetStyle(pCurve->GetStyle()));
-				LegendPen.setWidth(pCurve->GetWidth());
+				LegendPen.setColor(pCurve->color());
+				LegendPen.setStyle(GetStyle(pCurve->style()));
+				LegendPen.setWidth(pCurve->width());
 
 				painter.setPen(LegendPen);
 
@@ -628,7 +628,7 @@ void QGraph::ExportToFile(QFile &XFile, int FileType)
 		{
 			maxpoints = qMax(maxpoints,pCurve->n); 
 
-			pCurve->GetTitle(strong);
+			pCurve->title(strong);
 			if(FileType==1)	out << "     "<<m_XTitle<<"       "<< strong <<"    ";
 			else            out << m_XTitle<<","<< strong << ", , ";
 

@@ -346,7 +346,7 @@ CCurve* Graph::GetCurve(QString CurveTitle)
 		pCurve = (CCurve*)m_oaCurves.at(i);
 		if(pCurve)
 		{
-			pCurve->GetTitle(strong);
+			pCurve->title(strong);
 			if(strong==CurveTitle) return pCurve;
 		}
 	}
@@ -995,8 +995,8 @@ bool Graph::SetXScale()
 				pCurve = (CCurve*)m_oaCurves[nc];
 				if ((pCurve->IsVisible() ||pCurve->PointsVisible())  && pCurve->n>0)
 				{
-					Cxmin = qMin(Cxmin, pCurve->GetxMin());
-					Cxmax = qMax(Cxmax, pCurve->GetxMax());
+					Cxmin = qMin(Cxmin, pCurve->xMin());
+					Cxmax = qMax(Cxmax, pCurve->xMax());
 				}
 			}
 
@@ -1160,8 +1160,8 @@ bool Graph::SetYScale()
 				pCurve = (CCurve*)m_oaCurves[nc];
 				if ((pCurve->IsVisible() ||pCurve->PointsVisible()) && pCurve->n>0)
 				{
-					Cymin = qMin(Cymin, pCurve->GetyMin());
-					Cymax = qMax(Cymax, pCurve->GetyMax());
+					Cymin = qMin(Cymin, pCurve->yMin());
+					Cymax = qMax(Cymax, pCurve->yMax());
 				}
 			}
 			if(Cymax<=Cymin)
@@ -1322,7 +1322,7 @@ CCurve*  Graph::GetClosestPoint(const double &x, const double &y, double &xSel, 
 	for(i=0; i<m_oaCurves.size(); i++)
 	{
 		pOldCurve = (CCurve*)m_oaCurves.at(i);
-		pOldCurve->GetClosestPoint(x, y, x1, y1, dist, n1);
+		pOldCurve->closestPoint(x, y, x1, y1, dist, n1);
 		if(dist<dmax)
 		{
 			dmax = dist;
@@ -1347,7 +1347,7 @@ CCurve* Graph::GetCurvePoint(const int &xClt, const int &yClt,int &nSel)
 	for(i=0; i<m_oaCurves.size(); i++)
 	{
 		pOldCurve = (CCurve*)m_oaCurves.at(i);
-		pOldCurve->GetClosestPoint(x, y, x1, y1, dist, n);
+		pOldCurve->closestPoint(x, y, x1, y1, dist, n);
 
 		xc = xToClient(x1);
 		yc = yToClient(y1);
@@ -1377,10 +1377,10 @@ bool Graph::SelectPoint(QString const &CurveName, int sel)
 	for(int i=0; i<m_oaCurves.size(); i++)
 	{
 		pCurve = (CCurve*)m_oaCurves.at(i);
-		pCurve->GetTitle(str);
+		pCurve->title(str);
 		if(str == CurveName)
 		{
-			if(sel>pCurve->GetCount())
+			if(sel>pCurve->count())
 			{
 				pCurve->SetSelected(-1);
 				return false;				

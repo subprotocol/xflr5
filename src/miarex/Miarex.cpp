@@ -1,7 +1,7 @@
 /****************************************************************************
 
 	Miarex
-			Copyright (C) 2008-2012 Andre Deperrois adeperrois@xflr5.com
+			Copyright (C) 2008-2013 Andre Deperrois adeperrois@xflr5.com
 
 	This program is free software; you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -18,11 +18,6 @@
 	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 *****************************************************************************/
-
-//
-// This class is associated to the MMI of 3D analysis
-// It dispatches user commands towards object definition, analysis and post-processing
-//
 
 
 #include <QGLWidget>
@@ -44,7 +39,11 @@ void *QMiarex::s_p3dWidget;
 double QMiarex::s_CoreSize = 0.000001;
 double QMiarex::s_MinPanelSize = 0.0001;
 
-
+/**
+ * The constructor which initializes all of the variables and objects used in the class
+ *
+ * @param parent: a pointer to the parent window; null by default
+ */
 QMiarex::QMiarex(QWidget *parent)
 	: QWidget(parent)
 {
@@ -107,9 +106,7 @@ QMiarex::QMiarex(QWidget *parent)
 	m_MaxWakeIter     = 5;
 	m_WakeInterNodes  = 6;
 	m_bResetWake      = true;
-	m_bSetNewWake     = true;
 	m_bSequence       = false;
-	m_bBreak          = false;
 
 	m_bHighlightOpp = false;
 
@@ -304,8 +301,6 @@ QMiarex::QMiarex(QWidget *parent)
 	m_CpWidth = 1;
 	m_bShowCpPoints = false;
 	m_bShowCp       = true;
-
-
 
 	m_iView = W3DVIEW;
 	m_iWingView = 1;
@@ -570,7 +565,12 @@ QMiarex::QMiarex(QWidget *parent)
 }
 
 
-
+/**
+ * Miarex::~QMiarex public class destructor
+ *
+ * Not really necessary. Qt does the cleanup pretty well by itself
+ * Old C++ practice
+ */
 QMiarex::~QMiarex()
 {
     delete m_pPlaneDlg;
@@ -595,12 +595,15 @@ QMiarex::~QMiarex()
 }
 
 
-
+/**
+ * Inserts the body pointed by pBody in the array of body objects,
+ * The position is in alphabetical order by the body name
+ * @param a pointer to the CBody object to be inserted
+ * @return a pointer to the input CBody object, or NULL if the CBody could not be inserted
+ */
 CBody* QMiarex::AddBody(CBody *pBody)
 {
 	//
-	// Adds the body pointed by pBody to the array of body objects
-	// Places it in alphabetical order
 	//
 	bool bExists   = false;
 	bool bInserted = false;
@@ -661,11 +664,15 @@ CBody* QMiarex::AddBody(CBody *pBody)
 }
 
 
-
+/**
+ * Inserts a plane in the array of plane objects
+ * @param pPlane: the plane to be inserted
+ * @return a pointer to the input CPlane object, or NULL if the CPlane could not be inserted
+ */
 CPlane* QMiarex::AddPlane(CPlane *pPlane)
 {
 	//
-	// Adds the plane pointed by pPlane to the array of plane objects
+	//
 	//
 	int i,j;
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
@@ -723,21 +730,20 @@ CPlane* QMiarex::AddPlane(CPlane *pPlane)
 }
 
 
+/**
+* Creates the plane's operating point,
+* fills it with the input resulting from the VLM or 3D-panel analysis,
+* and inserts it in the array of plane operating points
+*
+* In output, fills the pPOpp object and returns the pointer
+*@param bPointOut: if true, part of the oppoint viscous properties could not be interpolated
+*@param Cp: the array of Cp value for each panel
+*@param Gamma: the array of circulation or doublet strengths Gamma for each panel
+*@param Sigma: the array of source strengths for a panel analysis
+*@param pPOpp: A point to the CPOpp object to be inserted
+*/
 void QMiarex::AddPOpp(bool bPointOut, double *Cp, double *Gamma, double *Sigma, CPOpp *pPOpp)
 {
-	//
-	// Creates the plane's operating point,
-	// fills it with the input resulting from the VLM or 3D-panel analysis,
-	// and inserts it in the array of plane operating points
-	//
-	// In input, takes 
-	//   - the array of Cp distribution
-	//   - the array of circulation or doublet strengths Gamma
-	//   - the array of source strengths Sigma
-	//   - the data stored in the PanelAnalysisDlg current instances
-	//
-	// In output, fills the pPOpp object and returns the pointer
-	// 
 
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	CPOpp *pOldPOpp=NULL;
@@ -1085,13 +1091,14 @@ void QMiarex::AddPOpp(bool bPointOut, double *Cp, double *Gamma, double *Sigma, 
 }
 
 
-
+/**
+ * Adds the wing pointed by pWing to the array of wing objects
+ * places it in alphabetical order
+ *@param  pWing a pointer to the instand of the wing to be inserted in the array
+ *@return the pointer to the wing which was inserted, or NULL if the insertion failed
+*/
 CWing* QMiarex::AddWing(CWing *pWing)
 {
-	//
-	// Adds the wing pointed by pWing to the array of wing objects
-	// places it in alphabetical order
-	//
 	int i,j;
 	bool bExists   = false;
 	bool bInserted = false;
@@ -1155,24 +1162,19 @@ CWing* QMiarex::AddWing(CWing *pWing)
 }
 
 
-
+/**
+* Creates the operating point for the active wing, fills it with the data passed in input, and inserts it in the array of wing operating points
+*
+*@param QInf the operating point's velocity
+*@param Alpha the operating point's aoa
+*@param bPointOut true if the inerpolation of viscous properties was unsuccessfull
+*@param Gamma a pointer to the array of doublet or circulation strengths
+*@param Sigma a pointer to the array of source strengths
+*@param Cp a pointer to the array of Cp Coeffcients
+*
+*/
 void QMiarex::AddWOpp(double QInf, double Alpha, bool bPointOut, double *Gamma, double *Sigma, double *Cp)
 {
-	//
-	// Creates the wing's operating point
-	// Fills it with the input resulting from the LLT, VLM or 3D-panel analysis,
-	// and inserts it in the array of wing operating points
-	//
-	// In input, takes 
-	//   - the array of Cp distribution
-	//   - the array of circulation or doublet strengths Gamma
-	//   - the array of source strengths Sigma
-	//   - the data stored in the LLTAnalysisDlg or PanelAnalysisDlg current instances
-	//   - the data stored in the current wing object
-	//
-	// In output, fills the pWOpp object and returns the pointer
-	// 
-
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	int i,j,l;
 	if(!m_bKeepOutOpps && bPointOut) return;
@@ -1520,12 +1522,14 @@ void QMiarex::AddWOpp(double QInf, double Alpha, bool bPointOut, double *Gamma, 
 }
 
 
+/**
+* Adds the WPolar pointed by pWPolar to the m_oaWPolar array.
+* Inserts it in alphabetical order using the UFO Name and the polar name
+*@param pWPolar a pointer to the instance of the CWPolar object to be inserted
+*@return a pointer  to the instance of the CWPolar object which has been inserted, or NULL if the operation failed
+*/
 CWPolar* QMiarex::AddWPolar(CWPolar *pWPolar)
 {
-	// 
-	// Adds the WPolar pointed by pWPolar to the m_oaWPolar array
-	// Inserts it in alphabetical order
-	//
 	int i,j,k,l,p;
 	bool bExists   = false;
 	bool bInserted = false;
@@ -1612,13 +1616,12 @@ CWPolar* QMiarex::AddWPolar(CWPolar *pWPolar)
 }
 
 
-
+/**
+* Checks and enables all buttons and actions
+* depending on the currently active objects
+*/
 void QMiarex::SetControls()
 {
-	//
-	// Checks and enables all buttons and actions
-	// depending on the currently selected objects
-	//
 	MainFrame* pMainFrame = (MainFrame*)s_pMainFrame;
 	QString str_translation;
 	if(pMainFrame->m_UFOType=="Plane")     str_translation=tr("Current Plane");
@@ -1790,6 +1793,9 @@ void QMiarex::SetControls()
 }
 
 
+/**
+ * Sets the checkboxes of the x, y and z view to their default false value
+ */
 void QMiarex::SetViewControls()
 {
 	m_pctrlX->setChecked(false);
@@ -1800,12 +1806,11 @@ void QMiarex::SetViewControls()
 
 
 
+/**
+ * Creates the curves of the Cp graph at the selected span positions
+ */
 void QMiarex::CreateCpCurves()
 {
-	//
-	// Creates the curves of the Cp graph at the selected span positions
-	//
-	//
 	int p,pp,i;
 	bool bFound;
 	double SpanPos, SpanInc;
@@ -1891,7 +1896,7 @@ void QMiarex::CreateCpCurves()
 
 					for (pp=p; pp<p+coef*m_pWingList[iw]->m_Surface[0].m_NXPanels; pp++)
 					{
-						pCurve->AddPoint(m_Panel[pp].CollPt.x, m_pWOpp[iw]->m_Cp[pp]);
+						pCurve->AppendPoint(m_Panel[pp].CollPt.x, m_pWOpp[iw]->m_Cp[pp]);
 					}
 				}
 			}
@@ -1900,7 +1905,15 @@ void QMiarex::CreateCpCurves()
 }
 
 
-
+/**
+ * Creates the body panels for the active CBody object
+ * The panels are created in the following order
+ *    - for the port side  first, then for the starboard side
+ *    - from bottom to top
+ *    - from tip to tail
+ * The panels are appended to the existing array of panels
+ * @return the number of panels which have been created and appended
+ */
 int QMiarex::CreateBodyElements()
 {
 	//
@@ -2267,18 +2280,22 @@ int QMiarex::CreateBodyElements()
 }
 
 
+/**
+* Creates the panel elements for the active surface.
+* The panels are appended at the end of the existing array of panel
+* The panels are created from left to right on a surface
+* The panels are created depending on the current WPolar:
+*   No WPolar --> panel elements on top & bottom surfaces, just for cosmetics
+*   VLM       --> panel elements on mid camber line from T.E. to L.E.
+*   3D Panels --> panel elements on left tip surface
+*                 panel elements on each strip, starting on the bottom T.E. to the L.E back to the opt T.E
+*                 panel elements on right tip surface
+*
+*@param a pointer to the surface for which the panels will be created
+*@return the number of panels which have been created and appended
+*/
 int QMiarex::CreateWingElements(CSurface *pSurface)
-{
-	//
-	// Creates the panel elements that will be used either by the VLM or the Panel method.
-	// The panels are created from left to right on a surface
-	// The panels are created depending on the current WPolar:
-	// No WPolar --> panel elements on top & bottom surfaces, just for cosmetics
-	// VLM       --> panel elements on mid camber line from T.E. to L.E.
-	// 3D Panels --> panel elements on left tip surface
-	//               panel elements on each strip, starting on the bottom T.E. to the L.E back to the opt T.E
-	//               panel elements on right tip surface
-	
+{	
 	//TODO : for  a gap at the wing's center, need to separate m_iPL and m_iPR at the tips;
 	bool bNoJoinFlap ;
 	int k,l;
@@ -2642,11 +2659,12 @@ int QMiarex::CreateWingElements(CSurface *pSurface)
 }
 
 
+/**
+* Creates a column of wake elements shed from a panel at the trailing edge of the wing's surface
+* @param PanelIndex the index of the panel on the trailing edge of the surface which will shed the column of wake panels
+*/
 bool QMiarex::CreateWakeElems(int PanelIndex)
 {
-	//
-	// Creates the wake elements for the 3D panel method.
-	//
 	if(!m_pCurWPolar) return false;
 	if(!m_Panel[PanelIndex].m_bIsTrailing) return false;
 	//creates elements trailing panel p
@@ -2765,14 +2783,15 @@ bool QMiarex::CreateWakeElems(int PanelIndex)
 
 
 
+/**
+* Creates the operating point associated to a plane's wing pointed by pWing
+* Uses the wing's geometric data and the current instance of the LLT, VLM or Panel analysis dialog box
+* Returns the pointer pWOpp to the operating point which has been created
+*@param pWOpp  a pointer to the CWOpp object which is to be filled with the results of the analysis which has been completed
+*@param to the wing object for which the CWOpp will be created
+*/
 void QMiarex::CreateWOpp(CWOpp *pWOpp, CWing *pWing)
 {
-	//
-	// Creates the operating point associated to a plane's wing pointed by pWing
-	// Uses the wing's geometric data
-	// and the current instance of the LLT, VLM or Panel analysis dialog box
-	// Returns the pointer pWOpp to the operating point which has been created
-	//
 	int i,j;
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	CWOpp *pOldWOpp = NULL;
@@ -2861,12 +2880,11 @@ void QMiarex::CreateWOpp(CWOpp *pWOpp, CWing *pWing)
 }
 
 
+/**
+* Creates the curves for the graphs in the operating point view
+*/
 void QMiarex::CreateWOppCurves()
 {
-	//
-	// Creates the Graph curves for the graphs in the operating point view
-	//
-
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	
 	CWOpp *pWOpp = NULL;;
@@ -2943,7 +2961,7 @@ void QMiarex::CreateWOppCurves()
 				{
 					x = m_pCurWOpp->m_SpanPos[i];
 					y = maxlift*sqrt(1.0-x*x/m_pCurWOpp->m_Span/m_pCurWOpp->m_Span*4.0);
-					pCurve->AddPoint(x*pMainFrame->m_mtoUnit,y);
+					pCurve->AppendPoint(x*pMainFrame->m_mtoUnit,y);
 				}
 			}
 		}
@@ -2951,11 +2969,11 @@ void QMiarex::CreateWOppCurves()
 }
 
 
+/**
+* Resets and fills the polar graphs curves with the data from the CWPolar objects
+*/
 void QMiarex::CreateWPolarCurves()
 {
-	//
-	//resets and creates the WPolar graphs curves
-	//
 	CWPolar *pWPolar;
 	CCurve *pCurve[4];
 
@@ -2986,11 +3004,11 @@ void QMiarex::CreateWPolarCurves()
 }
 
 
+/**
+* Resets and fills the stability graphs curves with the data from the CWPolar objects
+*/
 void QMiarex::CreateStabilityCurves()
 {
-	//
-	// Creates the curves of the stability graphs
-	//
 	if(m_iStabilityView==STABTIMEVIEW)
 	{
 		if(m_StabilityResponseType==1)  CreateStabRungeKuttaCurves();
@@ -3003,14 +3021,12 @@ void QMiarex::CreateStabilityCurves()
 }
 
 
+/**
+* Builds the initial condition response due to perturbations from steady state
+* The time response is calculated analytically based on the knowledge of the eigenvalues and eigenvectors
+*/
 void QMiarex::CreateStabTimeCurves()
 {
-	//
-	// Builds the initial condition response due to perturbations from steady state
-	// The time response is calculated analytically based on the knowledge 
-	// of the eigenvalues and eigenvectors
-	//
-
 	complex<double> M[16];// the modal matrix
 	complex<double> InvM[16];// the inverse of the modal matrix
 	complex<double> q[4],q0[4],y[4];//the part of each mode in the solution
@@ -3020,7 +3036,6 @@ void QMiarex::CreateStabTimeCurves()
 	CCurve *pCurve0, *pCurve1, *pCurve2, *pCurve3;
 	QString strong, CurveTitle;
 
-	m_bBreak = false;
 
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	StabViewDlg *pStabView =(StabViewDlg*)pMainFrame->m_pStabView;
@@ -3107,23 +3122,24 @@ void QMiarex::CreateStabTimeCurves()
 			y[3] = *(M+4*3+0) * q[0] +*(M+4*3+1) * q[1] +*(M+4*3+2) * q[2] +*(M+4*3+3) * q[3];
 			if(abs(q[0])>1.e10 || abs(q[1])>1.e10 || abs(q[2])>1.e10  || abs(q[3])>1.e10 ) break;
 
-			pCurve0->AddPoint(t, y[0].real());
-			if(m_bLongitudinal) pCurve1->AddPoint(t, y[1].real());
-			else                pCurve1->AddPoint(t, y[1].real()*180.0/PI);
-			pCurve2->AddPoint(t, y[2].real()*180.0/PI);
-			pCurve3->AddPoint(t, y[3].real()*180.0/PI);
+			pCurve0->AppendPoint(t, y[0].real());
+			if(m_bLongitudinal) pCurve1->AppendPoint(t, y[1].real());
+			else                pCurve1->AppendPoint(t, y[1].real()*180.0/PI);
+			pCurve2->AppendPoint(t, y[2].real()*180.0/PI);
+			pCurve3->AppendPoint(t, y[3].real()*180.0/PI);
 		}
 	}
 }
 
 
 
+/**
+* Builds the forced response from the state matrix and the forced input matrix
+* using a Runge-Kutta integration scheme.
+* The forced input is interpolated in the control history defined in the input table.
+*/
 void QMiarex::CreateStabRungeKuttaCurves()
 {
-	// Builds the forced response from the state matrix and the forced input matrix
-	// using a Runge-Kutta integration scheme
-	// The forced input is interpolated in the control history defined in the input table
-
 	static int i, j, TotalPoints, PlotInterval;
 
 	static double t, dt, ctrl_t;
@@ -3132,7 +3148,6 @@ void QMiarex::CreateStabRungeKuttaCurves()
 	static double m[5][4];
 	static double y[4], yp[4];
 	QString CurveTitle;
-	m_bBreak = false;
 
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	StabViewDlg *pStabView =(StabViewDlg*)pMainFrame->m_pStabView;
@@ -3184,10 +3199,10 @@ void QMiarex::CreateStabRungeKuttaCurves()
 	// initial conditions to 0
 	t = 0.0;
 	y[0] = y[1] = y[2] = y[3] = 0.0;
-	pCurve0->AddPoint(0.0, y[0]);
-	pCurve1->AddPoint(0.0, y[1]);
-	pCurve2->AddPoint(0.0, y[2]);
-	pCurve3->AddPoint(0.0, y[3]);
+	pCurve0->AppendPoint(0.0, y[0]);
+	pCurve1->AppendPoint(0.0, y[1]);
+	pCurve2->AppendPoint(0.0, y[2]);
+	pCurve3->AppendPoint(0.0, y[3]);
 
 	//Runge-Kutta method
 	for(i=0; i<TotalPoints; i++)
@@ -3274,17 +3289,17 @@ void QMiarex::CreateStabRungeKuttaCurves()
 		{
 			if(m_bLongitudinal)
 			{
-				pCurve0->AddPoint(t, y[0]*pMainFrame->m_mstoUnit);
-				pCurve1->AddPoint(t, y[1]*pMainFrame->m_mstoUnit);
-				pCurve2->AddPoint(t, y[2]*180.0/PI);//deg/s
-				pCurve3->AddPoint(t, y[3]*180.0/PI);//deg
+				pCurve0->AppendPoint(t, y[0]*pMainFrame->m_mstoUnit);
+				pCurve1->AppendPoint(t, y[1]*pMainFrame->m_mstoUnit);
+				pCurve2->AppendPoint(t, y[2]*180.0/PI);//deg/s
+				pCurve3->AppendPoint(t, y[3]*180.0/PI);//deg
 			}
 			else
 			{
-				pCurve0->AddPoint(t, y[0]*pMainFrame->m_mstoUnit);
-				pCurve1->AddPoint(t, y[1]*180.0/PI);//deg/s
-				pCurve2->AddPoint(t, y[2]*180.0/PI);//deg/s
-				pCurve3->AddPoint(t, y[3]*180.0/PI);//deg
+				pCurve0->AppendPoint(t, y[0]*pMainFrame->m_mstoUnit);
+				pCurve1->AppendPoint(t, y[1]*180.0/PI);//deg/s
+				pCurve2->AppendPoint(t, y[2]*180.0/PI);//deg/s
+				pCurve3->AppendPoint(t, y[3]*180.0/PI);//deg
 			}
 		}
 	}
@@ -3295,11 +3310,11 @@ void QMiarex::CreateStabRungeKuttaCurves()
 }
 
 
+/**
+* Resets and fills the curves of the root locus graph with the data from the CWPolar objects
+*/
 void QMiarex::CreateStabRLCurves()
 {
-	//
-	// Resets and creates the curves of the root locus graph
-	//
 	CWPolar *pWPolar;
 
 	// we have eight modes, 4 longitudinal and 4 lateral
@@ -3394,7 +3409,10 @@ void QMiarex::CreateStabRLCurves()
 	}
 }
 
-
+/**
+ * Deletes the CBody object from the array
+ * @param pThisBody the pointer to the CBody bject to be deleted
+ */
 void QMiarex::DeleteBody(CBody *pThisBody)
 {
 	if(!pThisBody)	return;
@@ -3423,11 +3441,14 @@ void QMiarex::DeleteBody(CBody *pThisBody)
 }
 
 
+/**
+* Draws the legend of the Cp graph
+*@param painter the instance of the QPainter object associated to the active view
+*@param the top left postition where the legend is to be drawn
+*@param the y coordinate of the bottom of the drawing rectangle
+*/
 void QMiarex::DrawCpLegend(QPainter &painter, QPoint place, int bottom)
 {
-	// 
-	// Draws the legend of the Cp graph
-	//
 	painter.save();
 	MainFrame* pMainFrame = (MainFrame*)s_pMainFrame;
 	int LegendSize, LegendWidth, dny, x1, i, ny;
@@ -3459,21 +3480,21 @@ void QMiarex::DrawCpLegend(QPainter &painter, QPoint place, int bottom)
 				ny=0;
 			}
 
-			CurvePen.setColor(pCurve->GetColor());
-			CurvePen.setStyle(GetStyle(pCurve->GetStyle()));
-			CurvePen.setWidth(pCurve->GetWidth());
+			CurvePen.setColor(pCurve->color());
+			CurvePen.setStyle(GetStyle(pCurve->style()));
+			CurvePen.setWidth(pCurve->width());
 			painter.setPen(CurvePen);
 
 			painter.drawLine(place.x() + (int)(1.5*LegendSize), place.y() + (int)(1.*dny*ny),
 							 place.x() + (int)(2.5*LegendSize), place.y() + (int)(1.*dny*ny));
 
-			if(pCurve->m_bShowPoints)
+			if(pCurve->PointsVisible())
 			{
 				x1 = place.x() + (int)(2.0*LegendSize);
 				painter.drawRect(x1-2, place.y() + (int)(1.*dny*ny)-2,4,4);
 			}
 
-			pCurve->GetTitle(strong);
+			pCurve->title(strong);
 			painter.setPen(TextPen);
 			painter.drawText(place.x() + (int)(3*LegendSize),place.y() + (int)(1.*dny*ny), strong);
 		}
@@ -3483,11 +3504,14 @@ void QMiarex::DrawCpLegend(QPainter &painter, QPoint place, int bottom)
 
 
 
+/**
+* Draws the legend for the time response graph- 4 curves
+*@param painter the instance of the QPainter object associated to the active view
+*@param the top left postition where the legend is to be drawn
+*@param the y coordinate of the bottom of the drawing rectangle
+*/
 void QMiarex::DrawStabTimeLegend(QPainter &painter, QPoint place, int bottom)
 {
-	//
-	// Draws the legend for the time response graph- 4 curves
-	//
 	painter.save();
 	MainFrame* pMainFrame = (MainFrame*)s_pMainFrame;
 	int LegendSize, LegendWidth, dny, x1, i, ny;
@@ -3518,21 +3542,21 @@ void QMiarex::DrawStabTimeLegend(QPainter &painter, QPoint place, int bottom)
 				ny=0;
 			}
 
-			CurvePen.setColor(pCurve->GetColor());
-			CurvePen.setStyle(GetStyle(pCurve->GetStyle()));
-			CurvePen.setWidth(pCurve->GetWidth());
+			CurvePen.setColor(pCurve->color());
+			CurvePen.setStyle(GetStyle(pCurve->style()));
+			CurvePen.setWidth(pCurve->width());
 			painter.setPen(CurvePen);
 
 			painter.drawLine(place.x() + (int)(1.5*LegendSize), place.y() + (int)(1.*dny*ny),
 							 place.x() + (int)(2.5*LegendSize), place.y() + (int)(1.*dny*ny));
 
-			if(pCurve->m_bShowPoints)
+			if(pCurve->PointsVisible())
 			{
 				x1 = place.x() + (int)(2.0*LegendSize);
 				painter.drawRect(x1-2, place.y() + (int)(1.*dny*ny)-2,4,4);
 			}
 
-			pCurve->GetTitle(strong);
+			pCurve->title(strong);
 			painter.setPen(TextPen);
 			painter.drawText(place.x() + (int)(3*LegendSize),
 							 place.y() + (int)(1.*dny*ny)+(int)(dny/3), strong);
@@ -3542,11 +3566,14 @@ void QMiarex::DrawStabTimeLegend(QPainter &painter, QPoint place, int bottom)
 }
 
 
+/**
+* Draws the legend for the WOpp graph
+*@param painter the instance of the QPainter object associated to the active view
+*@param the top left postition where the legend is to be drawn
+*@param the y coordinate of the bottom of the drawing rectangle
+*/
 void QMiarex::DrawWOppLegend(QPainter &painter, QPoint place, int bottom)
 {
-	//
-	// Draws the legend for the WOpp graph
-	//
 	painter.save();
 
 	MainFrame* pMainFrame = (MainFrame*)s_pMainFrame;
@@ -3822,13 +3849,14 @@ void QMiarex::DrawWOppLegend(QPainter &painter, QPoint place, int bottom)
 
 
 
-
+/**
+* Draws the legend of the polar graphs
+*@param painter the instance of the QPainter object associated to the active view
+*@param the top left postition where the legend is to be drawn
+*@param the y coordinate of the bottom of the drawing rectangle
+*/
 void QMiarex::DrawWPolarLegend(QPainter &painter, QPoint place, int bottom)
 {
-	//
-	// Draws the legend of the polar graphs
-	//
-
 	painter.save();
 
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
@@ -3941,18 +3969,15 @@ void QMiarex::DrawWPolarLegend(QPainter &painter, QPoint place, int bottom)
 					}
 					else if(m_iView==WSTABVIEW && (!pWPolar->m_bIsVisible && !pWPolar->m_bShowPoints))
 					{
-						int nada = 0;
 					}
 					else if(m_iView==WSTABVIEW && pWPolar->m_WPolarType!=STABILITYPOLAR)
 					{
-						int nadaz = 0;
 					}
 					else if((pWPolar->m_WPolarType==FIXEDSPEEDPOLAR && !m_bType1) ||
 							(pWPolar->m_WPolarType==FIXEDLIFTPOLAR  && !m_bType2) ||
 							(pWPolar->m_WPolarType==FIXEDAOAPOLAR   && !m_bType4) ||
 							(pWPolar->m_WPolarType==STABILITYPOLAR  && !m_bType7))
 					{
-						int nadazddd = 0;
 					}
 					else
 					{
@@ -3984,12 +4009,11 @@ void QMiarex::DrawWPolarLegend(QPainter &painter, QPoint place, int bottom)
 }
 
 
+/**
+* Duplicates the currently selected plane, if any and opens it for edition
+*/
 void QMiarex::DuplicatePlane()
 {
-	//
-	// Duplicate the currently selected plane, if any
-	// and opens it for edition
-	//
 	if(!m_pCurPlane) return;
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	CPlane* pNewPlane= new CPlane;
@@ -4013,11 +4037,12 @@ void QMiarex::DuplicatePlane()
 }
 
 
+
+/**
+* Opens the edition dialog box for the currently selected plane
+*/
 void QMiarex::EditCurPlane()
 {
-	//
-	// Opens the edition dialog box for the currently selected plane
-	//
 	int i;
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	if(!m_pCurPlane) return;
@@ -4121,7 +4146,10 @@ void QMiarex::EditCurPlane()
 }
 
 
-
+/**
+ * Initializes the style combo box for the graph curves
+ * Selects the styles of the active curve
+ */
 void QMiarex::FillComboBoxes(bool bEnable)
 {
 	if(!bEnable)
@@ -4167,11 +4195,15 @@ void QMiarex::FillComboBoxes(bool bEnable)
 
 
 
+/**
+* Fills the existing active curve with the WOpp data
+*@param pWOpp  a pointer to the instance of the CWOpp object from which the data is to be extracted
+*@param pGraph a pointer to the instance of the Graph object to which the curve belongs
+*@param pCurve a pointer to the instance of the CCurve object to be filled with the data from the CWOpp object
+*/
 void QMiarex::FillWOppCurve(CWOpp *pWOpp, Graph *pGraph, CCurve *pCurve)
 {
-	//
-	// The curve has been created, fill the curve with the WOpp data
-	//
+	if(!pCurve) return;
 	int Var = pGraph->GetYVariable();
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	int nStart, i;
@@ -4184,7 +4216,7 @@ void QMiarex::FillWOppCurve(CWOpp *pWOpp, Graph *pGraph, CCurve *pCurve)
 		{
 			for (i=nStart; i<pWOpp->m_NStation; i++)
 			{
-				pCurve->AddPoint(pWOpp->m_SpanPos[i]*pMainFrame->m_mtoUnit, pWOpp->m_Ai[i]);
+				pCurve->AppendPoint(pWOpp->m_SpanPos[i]*pMainFrame->m_mtoUnit, pWOpp->m_Ai[i]);
 			}
 			pGraph->SetYTitle(tr("Induced Angle"));
 			break;
@@ -4193,7 +4225,7 @@ void QMiarex::FillWOppCurve(CWOpp *pWOpp, Graph *pGraph, CCurve *pCurve)
 		{
 			for (i=nStart; i<pWOpp->m_NStation; i++)
 			{
-				pCurve->AddPoint(pWOpp->m_SpanPos[i]*pMainFrame->m_mtoUnit,
+				pCurve->AppendPoint(pWOpp->m_SpanPos[i]*pMainFrame->m_mtoUnit,
 					pWOpp->m_Alpha + pWOpp->m_Ai[i] + pWOpp->m_Twist[i]);
 			}
 			pGraph->SetYTitle(tr("Total Angle"));
@@ -4203,7 +4235,7 @@ void QMiarex::FillWOppCurve(CWOpp *pWOpp, Graph *pGraph, CCurve *pCurve)
 		{
 			for (i=nStart; i<pWOpp->m_NStation; i++)
 			{
-				pCurve->AddPoint(pWOpp->m_SpanPos[i]*pMainFrame->m_mtoUnit, pWOpp->m_Cl[i]);
+				pCurve->AppendPoint(pWOpp->m_SpanPos[i]*pMainFrame->m_mtoUnit, pWOpp->m_Cl[i]);
 			}
 			pGraph->SetYTitle(tr("Cl"));
 			break;
@@ -4212,7 +4244,7 @@ void QMiarex::FillWOppCurve(CWOpp *pWOpp, Graph *pGraph, CCurve *pCurve)
 		{
 			for (i=nStart; i<pWOpp->m_NStation; i++)
 			{
-				pCurve->AddPoint(pWOpp->m_SpanPos[i]*pMainFrame->m_mtoUnit, pWOpp->m_Cl[i] * pWOpp->m_Chord[i]/pWOpp->m_MAChord);
+				pCurve->AppendPoint(pWOpp->m_SpanPos[i]*pMainFrame->m_mtoUnit, pWOpp->m_Cl[i] * pWOpp->m_Chord[i]/pWOpp->m_MAChord);
 			}
 			pGraph->SetYTitle(tr("Local lift"));
 			break;
@@ -4221,7 +4253,7 @@ void QMiarex::FillWOppCurve(CWOpp *pWOpp, Graph *pGraph, CCurve *pCurve)
 		{
 			for (i=nStart; i<pWOpp->m_NStation; i++)
 			{
-				pCurve->AddPoint(pWOpp->m_SpanPos[i]*pMainFrame->m_mtoUnit, pWOpp->m_PCd[i]);
+				pCurve->AppendPoint(pWOpp->m_SpanPos[i]*pMainFrame->m_mtoUnit, pWOpp->m_PCd[i]);
 			}
 			pGraph->SetYTitle(tr("Airfoil drag"));
 			break;
@@ -4230,7 +4262,7 @@ void QMiarex::FillWOppCurve(CWOpp *pWOpp, Graph *pGraph, CCurve *pCurve)
 		{
 			for (i=nStart; i<pWOpp->m_NStation; i++)
 			{
-				pCurve->AddPoint(pWOpp->m_SpanPos[i]*pMainFrame->m_mtoUnit, pWOpp->m_ICd[i]);
+				pCurve->AppendPoint(pWOpp->m_SpanPos[i]*pMainFrame->m_mtoUnit, pWOpp->m_ICd[i]);
 			}
 			pGraph->SetYTitle(tr("Induced drag"));
 			break;
@@ -4239,7 +4271,7 @@ void QMiarex::FillWOppCurve(CWOpp *pWOpp, Graph *pGraph, CCurve *pCurve)
 		{
 			for (i=nStart; i<pWOpp->m_NStation; i++)
 			{
-				pCurve->AddPoint(pWOpp->m_SpanPos[i]*pMainFrame->m_mtoUnit, pWOpp->m_PCd[i]+ pWOpp->m_ICd[i]);
+				pCurve->AppendPoint(pWOpp->m_SpanPos[i]*pMainFrame->m_mtoUnit, pWOpp->m_PCd[i]+ pWOpp->m_ICd[i]);
 			}
 			pGraph->SetYTitle(tr("Total drag"));
 			break;
@@ -4248,7 +4280,7 @@ void QMiarex::FillWOppCurve(CWOpp *pWOpp, Graph *pGraph, CCurve *pCurve)
 		{
 			for (i=nStart; i<pWOpp->m_NStation; i++)
 			{
-				pCurve->AddPoint(pWOpp->m_SpanPos[i]*pMainFrame->m_mtoUnit, (pWOpp->m_PCd[i]+ pWOpp->m_ICd[i])* pWOpp->m_Chord[i]/pWOpp->m_MAChord);
+				pCurve->AppendPoint(pWOpp->m_SpanPos[i]*pMainFrame->m_mtoUnit, (pWOpp->m_PCd[i]+ pWOpp->m_ICd[i])* pWOpp->m_Chord[i]/pWOpp->m_MAChord);
 			}
 			pGraph->SetYTitle(tr("Local drag"));
 			break;
@@ -4257,7 +4289,7 @@ void QMiarex::FillWOppCurve(CWOpp *pWOpp, Graph *pGraph, CCurve *pCurve)
 		{
 			for (i=nStart; i<pWOpp->m_NStation; i++)
 			{
-				pCurve->AddPoint(pWOpp->m_SpanPos[i]*pMainFrame->m_mtoUnit, pWOpp->m_CmAirf[i]);
+				pCurve->AppendPoint(pWOpp->m_SpanPos[i]*pMainFrame->m_mtoUnit, pWOpp->m_CmAirf[i]);
 			}
 			pGraph->SetYTitle(tr("Cm Airfoil"));
 			break;
@@ -4266,7 +4298,7 @@ void QMiarex::FillWOppCurve(CWOpp *pWOpp, Graph *pGraph, CCurve *pCurve)
 		{
 			for (i=nStart; i<pWOpp->m_NStation; i++)
 			{
-				pCurve->AddPoint(pWOpp->m_SpanPos[i]*pMainFrame->m_mtoUnit, pWOpp->m_Cm[i]);
+				pCurve->AppendPoint(pWOpp->m_SpanPos[i]*pMainFrame->m_mtoUnit, pWOpp->m_Cm[i]);
 			}
 			pGraph->SetYTitle(tr("Cm total"));
 			break;
@@ -4275,7 +4307,7 @@ void QMiarex::FillWOppCurve(CWOpp *pWOpp, Graph *pGraph, CCurve *pCurve)
 		{
 			for (i=nStart; i<pWOpp->m_NStation; i++)
 			{
-				pCurve->AddPoint(pWOpp->m_SpanPos[i]*pMainFrame->m_mtoUnit, pWOpp->m_Re[i]);
+				pCurve->AppendPoint(pWOpp->m_SpanPos[i]*pMainFrame->m_mtoUnit, pWOpp->m_Re[i]);
 			}
 			pGraph->SetYTitle(tr("Re"));
 			break;
@@ -4284,7 +4316,7 @@ void QMiarex::FillWOppCurve(CWOpp *pWOpp, Graph *pGraph, CCurve *pCurve)
 		{
 			for (i=nStart; i<pWOpp->m_NStation; i++)
 			{
-				pCurve->AddPoint(pWOpp->m_SpanPos[i]*pMainFrame->m_mtoUnit, pWOpp->m_XTrTop[i]);
+				pCurve->AppendPoint(pWOpp->m_SpanPos[i]*pMainFrame->m_mtoUnit, pWOpp->m_XTrTop[i]);
 			}
 			pGraph->SetYTitle(tr("Top Trans x-Pos %"));
 			break;
@@ -4293,7 +4325,7 @@ void QMiarex::FillWOppCurve(CWOpp *pWOpp, Graph *pGraph, CCurve *pCurve)
 		{
 			for (i=nStart; i<pWOpp->m_NStation; i++)
 			{
-				pCurve->AddPoint(pWOpp->m_SpanPos[i]*pMainFrame->m_mtoUnit, pWOpp->m_XTrBot[i]);
+				pCurve->AppendPoint(pWOpp->m_SpanPos[i]*pMainFrame->m_mtoUnit, pWOpp->m_XTrBot[i]);
 			}
 			pGraph->SetYTitle(tr("Bot Trans x-Pos %"));
 			break;
@@ -4302,7 +4334,7 @@ void QMiarex::FillWOppCurve(CWOpp *pWOpp, Graph *pGraph, CCurve *pCurve)
 		{
 			for (i=nStart; i<pWOpp->m_NStation; i++)
 			{
-				pCurve->AddPoint(pWOpp->m_SpanPos[i]*pMainFrame->m_mtoUnit, pWOpp->m_XCPSpanRel[i]*100.0);
+				pCurve->AppendPoint(pWOpp->m_SpanPos[i]*pMainFrame->m_mtoUnit, pWOpp->m_XCPSpanRel[i]*100.0);
 			}
 			pGraph->SetYTitle(tr("CP x-Pos %"));
 			break;
@@ -4311,7 +4343,7 @@ void QMiarex::FillWOppCurve(CWOpp *pWOpp, Graph *pGraph, CCurve *pCurve)
 		{
 			for (i=nStart; i<pWOpp->m_NStation; i++)
 			{
-				pCurve->AddPoint(pWOpp->m_SpanPos[i]*pMainFrame->m_mtoUnit,
+				pCurve->AppendPoint(pWOpp->m_SpanPos[i]*pMainFrame->m_mtoUnit,
 					pWOpp->m_BendingMoment[i] * pMainFrame->m_NmtoUnit);
 			}
 			QString str;
@@ -4323,7 +4355,7 @@ void QMiarex::FillWOppCurve(CWOpp *pWOpp, Graph *pGraph, CCurve *pCurve)
 		{
 			for (i=nStart; i<pWOpp->m_NStation; i++)
 			{
-				pCurve->AddPoint(pWOpp->m_SpanPos[i]*pMainFrame->m_mtoUnit, pWOpp->m_Ai[i]);
+				pCurve->AppendPoint(pWOpp->m_SpanPos[i]*pMainFrame->m_mtoUnit, pWOpp->m_Ai[i]);
 			}
 			pGraph->SetYTitle(tr("Induced Angle"));
 		}
@@ -4331,14 +4363,14 @@ void QMiarex::FillWOppCurve(CWOpp *pWOpp, Graph *pGraph, CCurve *pCurve)
 }
 
 
-
+/**
+* Fills the curve of the stability graph with the data from the pWPolar oject for the seleted mode
+*@param pCurve  a pointer to the instance of the CCurve object to be filled with the data from the CWPolar object
+*@param pWPolar a pointer to the instance of the CWPolar object from which the data is to be extracted
+*@param iMode the index of the mode for which the curve is to be created
+*/
 void QMiarex::FillStabCurve(CCurve *pCurve, CWPolar *pWPolar, int iMode)
 {
-	//
-	// The curve object has been created
-	// Fill it with the variable data specified by iMode
-	//
-
 	static int i;
 	static double x,y;
 	static QString UFOName;
@@ -4355,7 +4387,7 @@ void QMiarex::FillStabCurve(CCurve *pCurve, CWPolar *pWPolar, int iMode)
 		x = pWPolar->m_EigenValue[iMode][i].real();
 		y = pWPolar->m_EigenValue[iMode][i].imag()/2./PI;
 
-		pCurve->AddPoint(x, y);
+		pCurve->AppendPoint(x, y);
 		if(m_pCurWOpp && m_bHighlightOpp)
 		{
 			if(fabs(pWPolar->m_Ctrl[i]-m_pCurWOpp->m_Ctrl)<0.0001)
@@ -4374,12 +4406,15 @@ void QMiarex::FillStabCurve(CCurve *pCurve, CWPolar *pWPolar, int iMode)
 }
 
 
+/**
+* Fills the polar curve object which has been created with the variable data specified by XVar and YVar.
+*@param pCurve a pointer to the curve to fill with the data
+*@param pWPolar a pointer to the instance of the CWPolar object from which the data will be extracted
+*@param XVar the index of the variable to appear on the x-axis
+*@param YVar the index of the variable to appear on the y-axis
+*/
 void QMiarex::FillWPlrCurve(CCurve *pCurve, CWPolar *pWPolar, int XVar, int YVar)
 {
-	//
-	//The Wpolar curve object has been created
-	//Fill it with the variable data specified by XVar and YVar
-	//
 	bool bAdd;
 	int i;
 	double x,y;
@@ -4426,7 +4461,7 @@ void QMiarex::FillWPlrCurve(CCurve *pCurve, CWPolar *pWPolar, int XVar, int YVar
 
 		if(bAdd)
 		{
-			pCurve->AddPoint(x,y);
+			pCurve->AppendPoint(x,y);
 			if(m_pCurWOpp && m_bHighlightOpp)
 			{
 				if(fabs(pWPolar->m_Alpha[i]-m_pCurWOpp->m_Alpha)<0.0001)
@@ -4448,11 +4483,13 @@ void QMiarex::FillWPlrCurve(CCurve *pCurve, CWPolar *pWPolar, int XVar, int YVar
 }
 
 
+/**
+* Returns a pointer to the body with the name BodyName
+*@param BodyName the QString holding the name of the body
+*@return a pointer to the body with the requested body name, or NULL if none has been found
+*/
 CBody * QMiarex::GetBody(QString BodyName)
 {
-	//
-	// returns a pointer to the body with the name BodyName
-	//
 	int i;
 	CBody* pBody;
 	for (i=0; i<m_poaBody->size(); i++)
@@ -4465,12 +4502,13 @@ CBody * QMiarex::GetBody(QString BodyName)
 
 
 
+/**
+* Returns a pointer to the OpPoint with the name of the current plane and current WPolar, and which matches the input parameter
+* @param x the aoa, of velocity, or control parameter for which the CPOpp object is requested
+* @return a pointer to the instance of the CPOpp object, or NULL if non has been found
+*/
 CPOpp * QMiarex::GetPOpp(double x)
 {
-	//
-	// returns a pointer to the WOpp corresponding to aoa Alpha,
-	// and with the name of the current plane and current WPolar
-	//
 	int i;
 	if(!m_pCurPlane || !m_pCurWPolar) return NULL;
 
@@ -4490,11 +4528,66 @@ CPOpp * QMiarex::GetPOpp(double x)
 }
 
 
-QGraph* QMiarex::GetGraph(QPoint &pt)
+/**
+* Returns a pointer to the polar with the name of the input parameter
+* @param WPolarName the name of the CWPolar object
+* @return a pointer to the instance of the CWPolar object, or NULL if non has been found
+*/
+CWPolar* QMiarex::GetWPolar(QString WPolarName)
 {
 	//
-	// returns a pointer to the graph in which the point pt lies
+	// returns a pointer to the WPolar with name WPolarName
+	// or returns NULL if non with that name for the current UFO
 	//
+	CWPolar *pWPolar;
+	QString UFOName;
+	int i;
+	if(m_pCurPlane)     UFOName = m_pCurPlane->PlaneName();
+	else if(m_pCurWing) UFOName = m_pCurWing->WingName();
+	else return NULL;
+
+	for (i=0; i<m_poaWPolar->size(); i++)
+	{
+		pWPolar = (CWPolar*) m_poaWPolar->at(i);
+		if (pWPolar->m_UFOName == UFOName && pWPolar->m_PlrName == WPolarName) return pWPolar;
+	}
+	return NULL;
+}
+
+
+
+/**
+* Returns a pointer to the OpPoint with the name of the current wing and current WPolar, and which matches the input parameter
+* @param x the aoa, of velocity, or control parameter for which the CWOpp object is requested
+* @return a pointer to the instance of the CWOpp object, or NULL if non has been found
+*/
+CWOpp* QMiarex::GetWOpp(double x)
+{
+	if(!m_pCurWing || !m_pCurWPolar) return NULL;
+	int i;
+	CWOpp* pWOpp;
+
+	for (i=0; i<m_poaWOpp->size(); i++)
+	{
+		pWOpp = (CWOpp*)m_poaWOpp->at(i);
+		if ((pWOpp->m_WingName==m_pCurWing->WingName()) &&(pWOpp->m_PlrName==m_pCurWPolar->m_PlrName))
+		{
+			if(m_pCurWPolar->m_WPolarType<FIXEDAOAPOLAR && fabs(pWOpp->m_Alpha - x)<0.005)                   return pWOpp;
+			else if(m_pCurWPolar->m_WPolarType==FIXEDAOAPOLAR && fabs(pWOpp->m_QInf - x)<0.005)  return pWOpp;
+			else if(m_pCurWPolar->m_WPolarType==STABILITYPOLAR && fabs(pWOpp->m_Ctrl - x)<0.005) return pWOpp;
+		}
+	}
+	return NULL;
+}
+
+
+/**
+* Returns a pointer to the graph in which the point pt lies
+*@param a reference to the QPoint object which holds the mouse input in client coordinates
+*@param a pointer to the instance of the QGraph which contains the client point
+*/
+QGraph* QMiarex::GetGraph(QPoint &pt)
+{
 	if(m_iView==WOPPVIEW)
 	{
 		if(m_iWingView==1)
@@ -4567,11 +4660,13 @@ QGraph* QMiarex::GetGraph(QPoint &pt)
 
 
 
+/**
+* Returns a pointer to the plane with the name PlaneName
+*@param PlaneName a QString object with the name of the requested CPlane object
+*@return a pointer to the instance of the CPlane object, or NULL if non has been found
+*/
 CPlane * QMiarex::GetPlane(QString PlaneName)
 {
-	//
-	// returns a pointer to the plane with the name PlaneName
-	//
 	int i;
 	CPlane* pPlane;
 	for (i=0; i<m_poaPlane->size(); i++)
@@ -4584,12 +4679,13 @@ CPlane * QMiarex::GetPlane(QString PlaneName)
 
 
 
-
+/**
+* Returns a pointer to the wing with the name WingName
+*@param WingName a QString object with the name of the requested CWing object
+*@return a pointer to the instance of the CWing object, or NULL if non has been found
+*/
 CWing * QMiarex::GetWing(QString WingName)
 {
-	//
-	// returns a pointer to the wing with the name WingName
-	//
 	if(!WingName.length()) return NULL;
 
 	int i;
@@ -4603,60 +4699,13 @@ CWing * QMiarex::GetWing(QString WingName)
 }
 
 
-CWOpp* QMiarex::GetWOpp(double x)
-{
-	//
-	// returns a pointer to the WOpp corresponding to aoa Alpha,
-	// and with the name of the current wing and current WPolar
-	//
-	if(!m_pCurWing || !m_pCurWPolar) return NULL;
-	int i;
-	CWOpp* pWOpp;
 
-	for (i=0; i<m_poaWOpp->size(); i++)
-	{
-		pWOpp = (CWOpp*)m_poaWOpp->at(i);
-		if ((pWOpp->m_WingName==m_pCurWing->WingName()) &&(pWOpp->m_PlrName==m_pCurWPolar->m_PlrName))
-		{
-			if(m_pCurWPolar->m_WPolarType<FIXEDAOAPOLAR && fabs(pWOpp->m_Alpha - x)<0.005)                   return pWOpp;
-			else if(m_pCurWPolar->m_WPolarType==FIXEDAOAPOLAR && fabs(pWOpp->m_QInf - x)<0.005)  return pWOpp;
-			else if(m_pCurWPolar->m_WPolarType==STABILITYPOLAR && fabs(pWOpp->m_Ctrl - x)<0.005) return pWOpp;
-		}
-	}
-	return NULL;
-}
-
-
-
-CWPolar* QMiarex::GetWPolar(QString WPolarName)
-{
-	//
-	// returns a pointer to the WPolar with name WPolarName
-	// or returns NULL if non with that name for the current UFO
-	//
-	CWPolar *pWPolar;
-	QString UFOName;
-	int i;
-	if(m_pCurPlane)     UFOName = m_pCurPlane->PlaneName();
-	else if(m_pCurWing) UFOName = m_pCurWing->WingName();
-	else return NULL;
-
-	for (i=0; i<m_poaWPolar->size(); i++)
-	{
-		pWPolar = (CWPolar*) m_poaWPolar->at(i);
-		if (pWPolar->m_UFOName == UFOName && pWPolar->m_PlrName == WPolarName) return pWPolar;
-	}
-	return NULL;
-}
-
-
+/**
+* Calls the existing OpenGL lists for display in the 3D view.
+* The list have been created previously by a call to GLDraw3D
+*/
 void QMiarex::GLCallViewLists()
 {
-	//
-	// Calls the existing OpenGL lists for display in the 3D view
-	// the list have been created previously by a call to GLDraw3D
-	//
-
 	glDisable(GL_LIGHTING);
 	glDisable(GL_LIGHT0);
 
@@ -4774,11 +4823,11 @@ void QMiarex::GLCallViewLists()
 }
 
 
+/**
+* Creates the OpenGL lists for 3D display
+*/
 void QMiarex::GLDraw3D()
 {
-	//
-	// creates the OpenGL lists for 3D display
-	//
 	if (!m_pCurWing)
 	{
 		m_bResetglGeom = true;
@@ -5051,11 +5100,11 @@ void QMiarex::GLDraw3D()
 }
 
 
+/**
+ * Draws the point masses, the object masses, and the CG position in the OpenGL viewport
+*/
 void QMiarex::GLDrawMasses()
 {
-	//
-	// draws the point masses, the object masses, and the CG position on the OpenGL viewport
-	//
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	ThreeDWidget *p3dWidget = (ThreeDWidget*)s_p3dWidget;
 	QString MassUnit;
@@ -5204,11 +5253,11 @@ void QMiarex::GLDrawMasses()
 }
 
 
+/**
+* Prints the foil names on the OpenGl viewport
+*/
 void QMiarex::GLDrawFoils()
 {
-	//
-	// Prints the foil names on the OpenGl viewport
-	//
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	ThreeDWidget *p3dWidget = (ThreeDWidget*)s_p3dWidget;
 	int j;
@@ -5243,11 +5292,11 @@ void QMiarex::GLDrawFoils()
 }
 
 
+/**
+* Inverses by transposition the 3x3 rotation matrix used in the 3D display
+*/
 void QMiarex::GLInverseMatrix()
 {
-	//
-	// inverses the rotation matrix by transposition
-	//
 	int i,j;
 
 	for(i=0 ; i<3; i++)
@@ -5259,11 +5308,11 @@ void QMiarex::GLInverseMatrix()
 	}
 }
 
+/**
+* Renders the OpenGl 3D view
+*/
 void QMiarex::GLRenderView()
 {
-	//
-	// Renders the OpenGl 3D view
-	//
 	ThreeDWidget *p3dWidget = (ThreeDWidget*)s_p3dWidget;
 	double LightFactor;
 	if(m_pCurWing) LightFactor =  (GLfloat)pow(m_pCurWing->m_PlanformSpan/2.0,.1);
@@ -5385,24 +5434,22 @@ void QMiarex::GLRenderView()
 }
 
 
+/**
+ * Following the selection of a wing or a plane, this subroutine creates the panels
+ * associated to all of the surface objects.
+ *
+ * m_Panel is the array of panels in the following order
+ *         main wing left side, main wing right side
+ *         elevator
+ *         fin
+ *         body
+ * Each panel gets the index of its symmetric, if any, else this index is set to -1
+ *
+ * A copy of the panels is saved to the MemPanel and MemNode arrays
+ *@return true if successful, false if the panels could not be properly created ot if no object is active
+*/
 bool QMiarex::InitializePanels()
 {
-	//
-	// Following the selection of a wing or a plane, this subroutine creates the panels
-	// associated to the surface objects.
-	//
-	// The surface objects have already been created
-	//
-	// m_Panel is the array of panels in the following order
-	//         main wing left side, main wing right side
-	//         elevator 
-	//         fin
-	//         body
-	// Each panel gets the index of its symmetric, if any, else this index is set to -1
-	//
-	// A copy of the panels is saved to the MemPanel and MemNode arrays
-	//
-
 	if(!m_pCurWing) return false;
 	int j, k, l, Nel, p, pp, HalfSize, nx, nh;
 	QString strong;
@@ -5576,12 +5623,12 @@ bool QMiarex::InitializePanels()
 }
 
 
-CWOpp* QMiarex::InsertWOpp(CWOpp *pNewPoint)
+/**
+ * Adds a new CWOpp to the existing array
+ * @param pNewPoint a pointer to the instance of the CWOpp object to be inserted in the array
+*/
+void QMiarex::InsertWOpp(CWOpp *pNewPoint)
 {
-	//
-	// loads a WOpPoint from a file
-	// adds it to the WOpp array
-	//
 	int i;
 	bool bIsInserted = false;
 	CWOpp* pWOpp;
@@ -5638,26 +5685,26 @@ CWOpp* QMiarex::InsertWOpp(CWOpp *pNewPoint)
 		}
 	}
 	if (!bIsInserted) 	m_poaWOpp->append(pNewPoint);
-	return pNewPoint;
+//	return pNewPoint;
 }
 
 
 
 
+/**
+ * Returns the intersection of a ray with the object's panels
+ * The ray is defined by a mouse click and is perpendicular to the viewport
+ *@param A is the ray's origin,
+ *@param U is the ray's direction
+ *@param LA, LB, TA, TB define a quadrangle in 3D space.
+ *@param N is the normal to the quadrangle
+ *@param &I is the resulting intersection point of the ray and the quadrangle, if inside the quadrangle
+ *@param &dist = |AI|
+ *@return true if the intersection is inside the quadrangle, false otherwise
+*/
 bool QMiarex::Intersect(CVector const &LA, CVector const &LB, CVector const &TA, CVector const &TB, CVector const &Normal,
 			   CVector const &A,  CVector const &U,  CVector &I, double &dist)
 {
-	//
-	// Returns the intersection of a ray with the object's panels
-	// The ray is defined by a mouse click and is perpendicular to the viewport
-	//	A is the ray's origin,
-	//	U is the ray's direction
-	//	LA, LB, TA, TB define a quadrangle in 3D space.
-	//	N is the normal to the quadrangle
-    //	I is the resulting intersection point of the ray and the quadrangle, if inside the quadrangle
-	//	dist = |AI|
-	//	The return value is true if intersection inside the quadrangle, false otherwise
-	//
 	bool b1, b2, b3, b4;
 	double r,s;
 
@@ -5731,6 +5778,12 @@ bool QMiarex::Intersect(CVector const &LA, CVector const &LB, CVector const &TA,
 
 
 
+/**
+ * Checks if the input point is close to a wake node within the tolerances set in the CVector class
+ * Returns the index of a node if found, else returns -1
+ *@param Pt : the point to identify
+ *@return the index of the node with coordinates equal to the input Pt
+*/
 int QMiarex::IsWakeNode(CVector &Pt)
 {
 	//
@@ -5745,11 +5798,14 @@ int QMiarex::IsWakeNode(CVector &Pt)
 }
 
 
+/**
+ * Checks if the input point is close to a mesh node within the tolerances set in the CVector class
+ * Returns the index of a node if found, else returns -1
+ *@param Pt : the point to identify
+ *@return the index of the node with coordinates equal to the input Pt
+*/
 int QMiarex::IsNode(CVector &Pt)
 {
-	//
-	// returns the index of a node if found, else returns NULL
-	//
 	int in;
 //	for (in=0; in<m_nNodes; in++)
 	// explore in reverse order, since we have better chance of 
@@ -5764,18 +5820,19 @@ int QMiarex::IsNode(CVector &Pt)
 
 
 
+/**
+ * At panels on the side of the surfaces, connects the element to the next surface
+ *
+ * In the case where the number of chordwise panels is different between two adjacent surfaces,
+ * We need to correct the ideal connection that was set in the CreateElements() method.
+ * This is the case for instance for a flap.
+ * The algorithm below is artisanal and not robust... ideally the connections should be set manually
+ *
+ * Uses VSAERO method
+ *
+*/
 void QMiarex::JoinSurfaces(CSurface *pLeftSurf, CSurface *pRightSurf, int pl, int pr)
 {
-	// 
-	// At panels on the side of the surfaces, connects the element tothe next surface
-	//
-	// In the case where the number of chordwise panels is different between two adjacent surfaces,
-	// We need to correct the ideal connection that was set in the CreateElements() method.
-	// This is the case for instance for a flap.
-	// The algorith below is not robust... ideally the connections should be set manually
-	//
-	// Use VSAERO method
-	//
 
 	if(!m_pCurWPolar || m_pCurWPolar->m_AnalysisMethod!=PANELMETHOD) return;//panel analysis only
 
@@ -5927,11 +5984,12 @@ void QMiarex::JoinSurfaces(CSurface *pLeftSurf, CSurface *pRightSurf, int pl, in
 }
 
 
+/**
+ * Dispatches the key press event
+ * @param event the QKeyEvent sent by Qt
+ */
 void QMiarex::keyPressEvent(QKeyEvent *event)
 {
-	//
-	// Capture and dispatch user keyboard input
-	//
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	switch (event->key())
 	{
@@ -5958,7 +6016,6 @@ void QMiarex::keyPressEvent(QKeyEvent *event)
 		{
 
 			StopAnimate();
-			m_bBreak = true;
 			if(m_pCurGraph) m_pCurGraph->DeselectPoint();
 			
             if(m_pGLLightDlg->isVisible()) m_pGLLightDlg->hide();
@@ -6254,7 +6311,10 @@ void QMiarex::keyPressEvent(QKeyEvent *event)
 	}
 }
 
-
+/**
+ * Dispatches the key release event
+ * @param event the QKeyEvent sent by Qt
+ */
 void QMiarex::keyReleaseEvent(QKeyEvent *event)
 {
 	switch (event->key())
@@ -6277,11 +6337,19 @@ void QMiarex::keyReleaseEvent(QKeyEvent *event)
 }
 
 
+/**
+ * Launches the LLT analysis and updates the display after the analysis
+ *@param V0 : the start angle
+ *@param VMax : the maximal angle
+ *@param VDelta : the increment angle
+ *@param bSequence : if true, the analysis will be run for the whole range between V0 and VMax;
+ * if not, the analysis will be run for V0 only
+ *@param bInitCalc : if true, the starting point for convergence iterations will be reset to the default
+ * if not, the iterations will start at the last calculated point
+ *
+*/
 void QMiarex::LLTAnalyze(double V0, double VMax, double VDelta, bool bSequence, bool bInitCalc)
 {
-	//
-	// Lanuches the LLT analysis in the LLTAnalysisDlg class
-	// 
 
 	if(!m_pCurWing || !m_pCurWPolar) return;
 
@@ -6312,11 +6380,13 @@ void QMiarex::LLTAnalyze(double V0, double VMax, double VDelta, bool bSequence, 
 }
 
 
+/**
+ * Loads the user's saved settings from the configuration file and maps the data.
+ *@param a pointer to the QSettings object loaded in the MainFrame class
+ *@return true if the settings have been loaded successfully
+ */
 bool QMiarex::LoadSettings(QSettings *pSettings)
 {
-	//
-	// Loads the user's saved settings for 3D analysis
-	//
 	int r,g,b;
 	QString strong;
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
@@ -6577,11 +6647,12 @@ bool QMiarex::LoadSettings(QSettings *pSettings)
 }
 
 
+/**
+ * Dispatches the mouse double-click event
+ * @param event a point to the QMouseEvent sent by Qt
+ */
 void QMiarex::mouseDoubleClickEvent (QMouseEvent * event)
 {
-	//
-	// capture and dispatch user mouse input
-	//
 	if(m_iView==W3DVIEW || (m_iView==WSTABVIEW && m_iStabilityView==STAB3DVIEW))
 	{
 		QPoint point = event->pos();
@@ -6606,7 +6677,7 @@ void QMiarex::mouseDoubleClickEvent (QMouseEvent * event)
 		if(pCloseCurve)
 		{
 			QString CurveName;
-			pCloseCurve->GetTitle(CurveName);
+			pCloseCurve->title(CurveName);
 			if(m_iView==WPOLARVIEW)
 			{
 			}
@@ -6630,11 +6701,12 @@ void QMiarex::mouseDoubleClickEvent (QMouseEvent * event)
 }
 
 
+/**
+ * Dispatches the mouse move event
+ * @param event a point to the QMouseEvent sent by Qt
+ */
 void QMiarex::mouseMoveEvent(QMouseEvent *event)
 {
-	//
-	// capture and dispatch user mouse input
-	//
 	if(!hasFocus()) setFocus();
 	static CVector Real;
 	static bool bCtrl;
@@ -6791,11 +6863,12 @@ void QMiarex::mouseMoveEvent(QMouseEvent *event)
 
 
 
+/**
+ * Dispatches the mouse press event
+ * @param event a point to the QMouseEvent sent by Qt
+ */
 void QMiarex::mousePressEvent(QMouseEvent *event)
 {
-	//
-	// capture and dispatch user mouse input
-	//
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	StabViewDlg *pStabView =(StabViewDlg*)pMainFrame->m_pStabView;
 	ThreeDWidget *p3dWidget = (ThreeDWidget*)s_p3dWidget;
@@ -6924,7 +6997,7 @@ void QMiarex::mousePressEvent(QMouseEvent *event)
 					m_pCurRLStabGraph->DeselectPoint();
 					for(k=0;k<m_pCurRLStabGraph->GetCurveCount(); k++)
 					{
-						m_pCurRLStabGraph->GetCurve(k)->GetTitle(str);
+						m_pCurRLStabGraph->GetCurve(k)->title(str);
 						if(str==m_pCurWPolar->m_PlrName+suffix)
 						{
 							m_pCurRLStabGraph->GetCurve(k)->SetSelected(jsel);
@@ -6953,11 +7026,12 @@ void QMiarex::mousePressEvent(QMouseEvent *event)
 }
 
 
+/**
+ * Dispatches the mouse release event
+ * @param event a point to the QMouseEvent sent by Qt
+ */
 void QMiarex::mouseReleaseEvent(QMouseEvent *event)
-{	
-	//
-	// capture and dispatch user mouse input
-	//
+{
 	if(m_iView==W3DVIEW || (m_iView==WSTABVIEW && m_iStabilityView==STAB3DVIEW))
 	{
 		QGLWidget* p3dWidget = (QGLWidget*)s_p3dWidget;
@@ -6988,12 +7062,11 @@ void QMiarex::mouseReleaseEvent(QMouseEvent *event)
 
 
 
+/**
+ * Updates the display after the user has requested a switch to the OpenGL 3D view
+ */
 void QMiarex::On3DView()
 {
-	//
-
-	// The user has requested a switch to the OpenGL 3D view
-	//
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 
 	m_bArcball = false;
@@ -7028,11 +7101,11 @@ void QMiarex::On3DView()
 
 
 
+/**
+ * Updates the display after the user has toggled the switch for the display of Cp coefficients
+ */
 void QMiarex::On3DCp()
 {
-	//
-	// The user has toggled the switch for the display of Cp coefficients
-	//
 	m_b3DCp = m_pctrlCp->isChecked();
 
 	if(m_b3DCp)
@@ -7046,11 +7119,11 @@ void QMiarex::On3DCp()
 }
 
 
+/**
+ * Updates the display after the user has requested a perspective view in the 3D display
+ */
 void QMiarex::On3DIso()
 {
-	//
-	// The user has requested a perspective view in the 3D display
-	//
 	SetViewControls();
 	m_pctrlIso->setChecked(true);
 	m_ArcBall.ab_quat[0]	= -0.65987748f;
@@ -7076,11 +7149,11 @@ void QMiarex::On3DIso()
 
 
 
+/**
+ *  Updates the display after the user has requested a top view in the 3D display
+*/
 void QMiarex::On3DTop()
 {
-	//
-	// The user has requested a top view in the 3D display
-	//
 	SetViewControls();
 	m_pctrlZ->setChecked(true);
 	m_ArcBall.SetQuat(sqrt(2.0)/2.0, 0.0, 0.0, -sqrt(2.0)/2.0);
@@ -7089,11 +7162,11 @@ void QMiarex::On3DTop()
 }
 
 
+/**
+ * Updates the display after the user has requested a left view in the 3D display
+*/
 void QMiarex::On3DLeft()
 {
-	//
-	// The user has requested a left view in the 3D display
-	//
 	SetViewControls();
 	m_pctrlY->setChecked(true);
 	m_ArcBall.SetQuat(sqrt(2.0)/2.0, -sqrt(2.0)/2.0, 0.0, 0.0);// rotate by 90 deg around x
@@ -7102,11 +7175,11 @@ void QMiarex::On3DLeft()
 }
 
 
+/**
+ * Updates the display after the user has requested a front view in the 3D display
+*/
 void QMiarex::On3DFront()
 {
-	//
-	// The user has requested a front view in the 3D display
-	//
 	SetViewControls();
 	m_pctrlX->setChecked(true);
 
@@ -7119,11 +7192,11 @@ void QMiarex::On3DFront()
 }
 
 
+/**
+ * Updates the display after the user has requested a reset of the scales in the 3D view
+*/
 void QMiarex::On3DReset()
 {
-	//
-	// The user has requested a reset of the scales in the 3D view
-	//
 	m_glViewportTrans.Set(0.0, 0.0, 0.0);
 	m_bPickCenter   = false;
 	m_bIs3DScaleSet = false;
@@ -7133,11 +7206,12 @@ void QMiarex::On3DReset()
 }
 
 
+/**
+ * The user has requested a modification of the styles for the 3D view
+ * Launhes the dialog box, reads the data, and updates the view
+*/
 void QMiarex::On3DPrefs()
 {
-	//
-	// The user has requested a modification of the styles for the 3D view
-	//
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
     m_pW3dPrefsDlg->move(pMainFrame->m_DlgPos);
 //	m_pW3dPrefsDlg->m_pMiarex = this;
@@ -7237,21 +7311,23 @@ void QMiarex::On3DPrefs()
 
 
 
+/**
+ * The user has pressed the button which initiates a pick of the rotation center in 3D view
+ * Sets the internal flag to true
+ * The action will be processed in the ::mousePressEvent() function
+ */
 void QMiarex::On3DPickCenter()
 {
-	//
-	// The user has toggled the switch for a pick of the rotation center in 3D view
-	//
 	m_bPickCenter = m_pctrlPickCenter->isChecked();
 }
 
 
 
+/**
+ * Updates the display after the user has requested a reset of the scale of all WOpp graphs
+ */
 void QMiarex::OnAllWingGraphScales()
 {
-	//
-	// The user has requested a reset of the scale of all WOpp graphs
-	//
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	if(m_iView == WOPPVIEW)
 	{
@@ -7281,11 +7357,11 @@ void QMiarex::OnAllWingGraphScales()
 }
 
 
+/**
+ * Updates the display after the user has requested a reset of the scale of all WPolar graphs
+*/
 void QMiarex::OnAllWPolarGraphScales()
 {
-	//
-	// The user has requested a reset of the scale of all WPolar graphs
-	//
 	if(m_iView==WPOLARVIEW)
 	{
 		for(int ig=0; ig<4; ig++)
@@ -7320,12 +7396,12 @@ void QMiarex::OnAllWPolarGraphScales()
 }
 
 
-
+/**
+ * The user has requested an edition of the settings for all WOpp graphs
+ * Launches the dialog box and updates the graphs
+ */
 void QMiarex::OnAllWingGraphSettings()
 {
-	//
-	// The user has requested an edition of the settings for all WOpp graphs
-	//
 	QGraph graph;
 	graph.CopySettings(m_WingGraph);
     m_pGraphDlg->m_pMemGraph = &graph;
@@ -7348,11 +7424,12 @@ void QMiarex::OnAllWingGraphSettings()
 }
 
 
+/**
+ * The user has requested an edition of the settings for all WPolar graphs
+ * Launches the dialog box and updates the graphs
+ */
 void QMiarex::OnAllWPolarGraphSettings()
 {
-	//
-	// The user has requested an edition of the settings for all WPolar graphs
-	//
 	QGraph graph;
 	graph.CopySettings(m_WPlrGraph);
     m_pGraphDlg->m_pMemGraph = &graph;
@@ -7375,7 +7452,9 @@ void QMiarex::OnAllWPolarGraphSettings()
 	UpdateView();
 }
 
-
+/**
+ * Updates the display following a user toggl of the axis the display in the 3D view
+ */
 void QMiarex::OnAxes()
 {
 	m_bAxes = m_pctrlAxes->isChecked();
@@ -7383,12 +7462,15 @@ void QMiarex::OnAxes()
 }
 
 
+/**
+ * The user has requested a launch of the analysis
+ * Reads a last time the intput parameters from th control box
+ * Checks the foils
+ * Launches the analysis
+ * Updates the active view
+*/
 void QMiarex::OnAnalyze()
 {
-	//
-	// The user has requested a launch of the analysis
-	//
-
 	int l;
 	double V0, VMax, VDelta;
 	bool bHigh = m_bHighlightOpp;
@@ -7411,8 +7493,7 @@ void QMiarex::OnAnalyze()
 	m_pctrlStream->setChecked(false);
 	m_pctrlSurfVel->setChecked(false);
 
-
-	// may sure that the latest parameters are loaded
+	// make sure that the latest parameters are loaded
 	OnReadAnalysisData();
 
 	if(m_pCurWPolar->m_WPolarType==FIXEDAOAPOLAR)
@@ -7438,7 +7519,7 @@ void QMiarex::OnAnalyze()
 		V0 = VMax = VDelta = 0.0;
 	}
 
-	// check if all the foils are in hte database...
+	// check if all the foils are in the database...
 	// ...could have been deleted or renamed or not imported with AVL wing or whatever
 	for(int iw=0; iw<MAXWINGS; iw++)
 	{
@@ -7497,12 +7578,12 @@ void QMiarex::OnAnalyze()
 
 
 
+/**
+ * Launches the animation of the WOpp display
+ * Will display all the available WOpps for this WPolar in sequence
+*/
 void QMiarex::OnAnimateWOpp()
 {
-	//
-	// Launch the animation of the WOpp display
-	// Will display all the available WOpps for this WPolar in sequence
-	//
 	if(!m_pCurWing || !m_pCurWPolar || m_iView==WPOLARVIEW)
 	{
 		m_bAnimateWOpp = false;
@@ -7559,14 +7640,13 @@ void QMiarex::OnAnimateWOpp()
 }
 
 
+/**
+ * A signal has been received from the timer to update the 3D mode display
+ * So calculates the state corresponding to the time m_ModeTime and displays it
+ *@param if true, the time position of the modal response will be incremented after the display
+*/
 void QMiarex::OnAnimateModeSingle(bool bStep)
 {
-	//
-	// A signal has been received from the timer to update the 3D mode display
-	// So calculate the state corresponding to the time m_ModeTime
-	// and display it
-	//
-
 	static double t, sigma, s2, omega, o2, theta_sum, psi_sum, norm;
 	double *vabs, *phi;
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
@@ -7645,14 +7725,12 @@ void QMiarex::OnAnimateModeSingle(bool bStep)
 }
 
 
-
+/**
+* A signal has been received from the timer to update the WOPP display
+* So displays the next WOpp in the sequence.
+*/
 void QMiarex::OnAnimateWOppSingle()
 {
-	//
-	// A signal has been received from the timer to update the WOPP display
-	// So display the next WOpp in the sequence
-	//
-
 	static bool bIsValid, bSkipOne;
 	static int size, pos;
 	static CPOpp *pPOpp;
@@ -7770,11 +7848,11 @@ void QMiarex::OnAnimateWOppSingle()
 }
 
 
+/**
+* Modfies the animation after the user has changed the animation speed for the WOpp display
+*/
 void QMiarex::OnAnimateWOppSpeed(int val)
 {
-	//
-	// The user has changed the animation speed for the WOpp display
-	//
 	if(m_pTimerWOpp->isActive())
 	{
 		m_pTimerWOpp->setInterval(800-val);
@@ -7782,11 +7860,11 @@ void QMiarex::OnAnimateWOppSpeed(int val)
 }
 
 
+/**
+* In the pperating point view, adjusts the graph's scale to the wing's span
+*/
 void QMiarex::OnAdjustToWing()
 {
-	//
-	// The user has requested an adjustment of the graph's scale to the wing's span
-	//
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	if(!m_pCurWing) return;
 
@@ -7802,12 +7880,13 @@ void QMiarex::OnAdjustToWing()
 }
 
 
+/**
+ * The user has requested an edition of the advanced settings
+ * Launches the dialog box and maps the returned data
+*/
 void QMiarex::OnAdvancedSettings()
 {
-	//
-	// The user has requested an edition of the advanced settings
-	//
-	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
+//	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 //    m_pWAdvancedDlg->move(pMainFrame->m_DlgPos);
     m_pWAdvancedDlg->m_AlphaPrec       = LLTAnalysis::s_CvPrec;
     m_pWAdvancedDlg->m_Relax           = LLTAnalysis::s_RelaxMax;
@@ -7855,12 +7934,12 @@ void QMiarex::OnAdvancedSettings()
 }
 
 
+/**
+* The user has modified the position of the clip plane in the 3D view
+*@param pos the new z position in viewport coordinates of the clipping plane
+*/
 void QMiarex::OnClipPlane(int pos)
 {
-	//
-	// The user has modified the position of the clip plane in the 3D view
-	//
-
 	double planepos =  (double)pos/100.0;
 	m_ClipPlanePos = sinh(planepos) * 0.5;
 	UpdateView();
@@ -7868,12 +7947,11 @@ void QMiarex::OnClipPlane(int pos)
 
 
 
+/**
+* The user has modified the position span section to display in the Cp view
+*/
 void QMiarex::OnCpSection(int pos)
 {
-	//
-	// The user has modified the position span section to display in the Cp view
-	//
-
 	m_CurSpanPos = (double)pos/100.0;
 	m_pctrlSpanPos->SetValue(m_CurSpanPos);
 	CreateCpCurves();
@@ -7881,11 +7959,11 @@ void QMiarex::OnCpSection(int pos)
 }
 
 
+/**
+* The user has modified the position span section to display in the Cp view
+*/
 void QMiarex::OnCpPosition()
 {
-	//
-	// The user has modified the position span section to display in the Cp view
-	//
 	m_CurSpanPos = m_pctrlSpanPos->Value();
 	m_pctrlCpSectionSlider->setValue((int)(m_CurSpanPos*100.0));
 	CreateCpCurves();
@@ -7893,12 +7971,11 @@ void QMiarex::OnCpPosition()
 }
 
 
+/**
+* The user has switched to the Cp view
+*/
 void QMiarex::OnCpView()
 {
-	//
-	// The user has switched to the Cp view
-	//
-
 	if (m_bAnimateWOpp) StopAnimate();
 
 	if(m_iView==WCPVIEW)
@@ -7923,11 +8000,11 @@ void QMiarex::OnCpView()
 
 
 
+/**
+* The user has requested a display only of the current operating point
+*/
 void QMiarex::OnCurWOppOnly()
 {
-	//
-	// The user has requested a display only of the current operating point
-	//
 
 	m_bCurWOppOnly = !m_bCurWOppOnly;
 	if(m_iView==WOPPVIEW)
@@ -8077,7 +8154,8 @@ void QMiarex::OnDefineStabPolar()
 
 
 /**
- *The user has requested the creation of a new performance polar
+ * The user has requested the creation of a new performance polar.
+ * A new WPolar object is created and is attached to the owning plane or wing.
  */
 void QMiarex::OnDefineWPolar()
 {
@@ -8234,12 +8312,11 @@ void QMiarex::OnEditCurWPolar()
 
 
 
+/**
+ * The user has requested a deletion of all the WOpps or POpps associated to the active WPolar.
+ */
 void QMiarex::OnDeleteAllWPlrOpps()
 {
-	//
-	// The user has requested a deletion of all the WOpps or POpps associated to the current WPolar
-	//
-
 	if(!m_pCurWPolar) return;
 
 	MainFrame* pMainFrame = (MainFrame*)s_pMainFrame;
@@ -8287,11 +8364,11 @@ void QMiarex::OnDeleteAllWPlrOpps()
 }
 
 
+/**
+ * The user has requested a deletion of all the WOpps or POpps
+ */
 void QMiarex::OnDeleteAllWOpps()
 {
-	//
-	// The user has requested a deletion of all the WOpps or POpps
-	//
 
 	MainFrame* pMainFrame = (MainFrame*)s_pMainFrame;
 	pMainFrame->SetSaveState(false);
@@ -8325,12 +8402,11 @@ void QMiarex::OnDeleteAllWOpps()
 }
 
 
+/**
+* The user has requested a deletion of the current wing of plane
+*/
 void QMiarex::OnDeleteCurUFO()
 {
-	//
-	// The user has requested a deletion of the current wing of plane
-	//
-
 	if(!m_pCurWing) return;
 	m_bAnimateWOpp = false;
 
@@ -8354,12 +8430,11 @@ void QMiarex::OnDeleteCurUFO()
 }
 
 
+/**
+ * The user has requested a deletion of the current operating point
+ */
 void QMiarex::OnDeleteCurWOpp()
 {
-	//
-	// The user has requested a deletion of the current operating point
-	//
-
 	MainFrame* pMainFrame = (MainFrame*)s_pMainFrame;
 	int i;
 
@@ -8444,12 +8519,11 @@ void QMiarex::OnDeleteCurWOpp()
 
 
 
+/**
+* The user has requested a deletion of all operating point associated to the wing or plane
+*/
 void QMiarex::OnDeleteUFOWOpps()
 {
-	//
-	// The user has requested a deletion of all operating point associated to the wing or plane
-	//
-
 	CPOpp *pPOpp;
 	CWOpp *pWOpp;
 	int i;
@@ -8494,12 +8568,12 @@ void QMiarex::OnDeleteUFOWOpps()
 }
 
 
+
+/**
+* The user has requested a deletion of all WPolars associated to the wing or plane
+*/
 void QMiarex::OnDeleteUFOWPolars()
 {
-	//
-	// The user has requested a deletion of all WPolars associated to the wing or plane
-	//
-
 	if(!m_pCurWing) return;
 
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
@@ -8554,11 +8628,11 @@ void QMiarex::OnDeleteUFOWPolars()
 }
 
 
+/**
+ * The user has requested a deletion of the current WPolar object
+ */
 void QMiarex::OnDeleteCurWPolar()
 {
-	//
-	// The user has requested a deletion of the current WPolar object
-	//
 
 	if(!m_pCurWPolar) return;
 	m_bAnimateWOpp = false;
@@ -8623,18 +8697,20 @@ void QMiarex::OnDeleteCurWPolar()
 }
 
 
-
+/**
+ * The user has toggled the checkbox for the display of the downwash
+ */
 void QMiarex::OnDownwash()
 {
-	//
-	// The user has toggled the switch for the display of the downwash
-	//
 
 	m_bDownwash = m_pctrlDownwash->isChecked();
 	UpdateView();
 }
 
-
+/**
+ * The user hase changed the position of the slider for the drag display
+ * @param pos the slider's new position
+ */
 void QMiarex::OnDragScale(int pos)
 {
 	m_DragScale    = pos/100.0/sqrt(1.01-pos/100.0);
@@ -8644,11 +8720,13 @@ void QMiarex::OnDragScale(int pos)
 
 
 
+/**
+ * The user has requested a duplication of the currently selected wing or plane
+ */
 void QMiarex::OnDuplicateCurUFO()
 {
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 
-	//Duplicate the currently selected wing
 	if(!m_pCurWing)	return;
 
 	if(m_pCurPlane)
@@ -8679,7 +8757,10 @@ void QMiarex::OnDuplicateCurUFO()
 	}
 }
 
-
+/**
+ * The user has requested an edition of the current body
+ * Launch the edition interface, and on return, insert the body i.a.w. user instructions
+ */
 void QMiarex::OnEditCurBody()
 {
 	if(!m_pCurBody || !m_pCurPlane) return;
@@ -8776,10 +8857,12 @@ void QMiarex::OnEditCurBody()
 
 
 
-
+/**
+ * The user has requested an edition of the current wing or plane
+ * Launches the dialog box, and maps the data depending on whether the user wants to overwrite, create a new object, or has cancelled the request.
+ */
 void QMiarex::OnEditUFO()
 {
-	//Edit the currently selected wing
 	if(!m_pCurWing)	return;
 
 	if(m_pCurPlane)
@@ -8900,14 +8983,20 @@ void QMiarex::OnEditUFO()
 }
 
 
-
+/**
+ * Exports the definition of the active body to a text file
+ *@todo would be advantageously replaced by an international standard format
+ */
 void QMiarex::OnExportBodyDef()
 {
 	if(!m_pCurBody) return;
 	m_pCurBody->ExportDefinition();
 }
 
-
+/**
+ * Exports the points of the active body to a text file
+ *@todo would be advantageously replaced by an international standard format
+ */
 void QMiarex::OnExportBodyGeom()
 {
 	if(!m_pCurBody) return;
@@ -8942,9 +9031,11 @@ void QMiarex::OnExportBodyGeom()
 }
 
 
+/**
+ * Exports the data from the active WOpp to the text file
+ */
 void QMiarex::OnExportCurWOpp()
 {
-	//Exprt the currently selected WOpp to the text file
 	if(!m_pCurWOpp)return ;// is there anything to export ?
 
 	int iStrip,j,k,l,p, coef;
@@ -9271,7 +9362,9 @@ void QMiarex::OnExportCurWOpp()
 }
 
 
-
+/**
+ * Exports the data from the active polar to a text file
+ */
 void QMiarex::OnExportCurWPolar()
 {
 	if (!m_pCurWPolar) return;
@@ -9308,7 +9401,10 @@ void QMiarex::OnExportCurWPolar()
 }
 
 
-
+/**
+ * Exports the geometrical data of the acitve wing or plane to a text file readable by AVL
+ *@todo AVL expects consistency of the units, need to check all lines and cases
+ */
 void QMiarex::OnExporttoAVL()
 {
 	if (!m_pCurWing) return;
@@ -9383,7 +9479,9 @@ void QMiarex::OnExporttoAVL()
 }
 
 
-
+/**
+ * The user has toggled the display switch for the fin curve in the OpPoint view
+ */
 void QMiarex::OnFinCurve()
 {
 	m_bShowWingCurve[3] = !m_bShowWingCurve[3];
@@ -9396,6 +9494,25 @@ void QMiarex::OnFinCurve()
 }
 
 
+
+/**
+ * The user has toggled the display switch for the elevator curve in the OpPoint view
+ */
+void QMiarex::OnStabCurve()
+{
+	m_bShowWingCurve[2] = !m_bShowWingCurve[2];
+//	CheckMenus();
+
+	if (m_iView==WOPPVIEW)    CreateWOppCurves();
+	else if(m_iView==WCPVIEW) CreateCpCurves();
+
+	UpdateView();
+}
+
+
+/**
+ * The user has toggled the display of the foil names in the 3D view
+ */
 void QMiarex::OnFoilNames()
 {
 	m_bFoilNames = m_pctrlFoilNames->isChecked();
@@ -9403,6 +9520,9 @@ void QMiarex::OnFoilNames()
 }
 
 
+/**
+ * The user has toggled the display of the masses in the 3D view
+ */
 void QMiarex::OnMasses()
 {
 	m_bShowMasses = m_pctrlMasses->isChecked();
@@ -9410,7 +9530,9 @@ void QMiarex::OnMasses()
 }
 
 
-
+/**
+ * The user has changed one of the scale in the GL3DScale widget
+ */
 void QMiarex::OnGL3DScale()
 {
 	if(m_iView != W3DVIEW)
@@ -9428,6 +9550,9 @@ void QMiarex::OnGL3DScale()
 }
 
 
+/**
+ * The user has requested an edition of the settings of the active graph
+ */
 void QMiarex::OnGraphSettings()
 {
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
@@ -9496,7 +9621,9 @@ void QMiarex::OnGraphSettings()
 
 
 
-
+/**
+ * The user has toggled the display of the half-wing in the OpPoint view
+ */
 void QMiarex::OnHalfWing()
 {
 	m_bHalfWing = !m_bHalfWing;
@@ -9512,7 +9639,9 @@ void QMiarex::OnHalfWing()
 }
 
 
-
+/**
+ * The user has requested that all polars curves be hidden
+ */
 void QMiarex::OnHideAllWPolars()
 {
 	int i;
@@ -9533,10 +9662,12 @@ void QMiarex::OnHideAllWPolars()
 
 
 
+/**
+ * The user has requested that all curves of the oppoints associated to the active polar be hidden
+ */
 void QMiarex::OnHideAllWPlrOpps()
 {
 	int i;
-	//Switch all WOpps view to on for the current UFO and WPolar
 	m_bCurWOppOnly = false;
 
 	CPOpp *pPOpp;
@@ -9577,10 +9708,12 @@ void QMiarex::OnHideAllWPlrOpps()
 }
 
 
+/**
+ * The user has requested that all oppoint curves be hidden
+ */
 void QMiarex::OnHideAllWOpps()
 {
 	int i;
-	//Switch all WOpps view to on for the current UFO and WPolar
 	m_bCurWOppOnly = false;
 
 	CPOpp *pPOpp;
@@ -9608,9 +9741,11 @@ void QMiarex::OnHideAllWOpps()
 }
 
 
+/**
+ * The user has requested that all curves of the oppoints associated to the active wing or plane be hidden
+ */
 void QMiarex::OnHideUFOWOpps()
 {
-	//Switch all WOpps view to off for the current UFO
 	CPOpp *pPOpp;
 	CWOpp *pWOpp;
 	int i;
@@ -9642,6 +9777,9 @@ void QMiarex::OnHideUFOWOpps()
 }
 
 
+/**
+ * The user has requested that all curves of the oppoints associated to the active polar be hidden
+ */
 void QMiarex::OnHideUFOWPolars()
 {
 	if(!m_pCurWing) return;
@@ -9672,7 +9810,10 @@ void QMiarex::OnHideUFOWPolars()
 }
 
 
-
+/**
+ * The user has requested that the current point be highlighted in the selected graph
+ *@todo not quite robust - check and improve
+ */
 void QMiarex::OnHighlightWOpp()
 {
 	if(m_iView!=WPOLARVIEW && !(m_iView==WSTABVIEW && m_iStabilityView==STABPOLARVIEW)) return;
@@ -9690,18 +9831,17 @@ void QMiarex::OnHighlightWOpp()
 }
 
 
-
+/**
+ * The user has requested the import of a body definition from a text file.
+ * Createss a new CBody object, fills it with the data from the text file, and adds it to the array
+ */
 void QMiarex::OnImportBody()
 {
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	CBody *pNewBody = new CBody();
 	if(!pNewBody) return;
 
-
 	double mtoUnit;
-
-//	FrameSize() = 0;
-
 
 	m_pUnitsDlg->m_bLengthOnly = true;
 	m_pUnitsDlg->m_Length    = pMainFrame->m_LengthUnit;
@@ -9812,6 +9952,11 @@ void QMiarex::OnImportBody()
 }
 
 
+/**
+ * The user has requested the import of a polar definition from a text file.
+ * Createss a new CWPolar object, fills it with the data from the text file, and adds it to the array
+ *@todo not used often, nor thouroughly tested
+ */
 void QMiarex::OnImportWPolar()
 {
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
@@ -9912,12 +10057,18 @@ void QMiarex::OnImportWPolar()
 }
 
 
+/**
+ * Toggles the flag which requests the initialization of the start parameters at the launch of an LLT analysis
+ */
 void QMiarex::OnInitLLTCalc()
 {
 	m_bInitLLTCalc = m_pctrlInitLLTCalc->isChecked();
 }
 
-
+/**
+ * The user has requested to store the active curve in the Cp graph display
+ * Duplicates the curve and adds it to the graph
+ */
 void QMiarex::OnKeepCpSection()
 {
 	CCurve *pCurve, *pNewCurve;
@@ -9941,7 +10092,9 @@ void QMiarex::OnKeepCpSection()
 }
 
 
-
+/**
+ * The user has modified the scale of the lift display
+ */
 void QMiarex::OnLiftScale(int pos)
 {
 	m_LiftScale    = pos/100.0/sqrt(1.01-pos/100.0);
@@ -9950,7 +10103,9 @@ void QMiarex::OnLiftScale(int pos)
 }
 
 
-
+/**
+ * The user has toggled the switch of the light - much like in real life ?
+ */
 void QMiarex::OnLight()
 {
 	GLLightDlg::s_bLight = m_pctrlLight->isChecked();
@@ -9958,7 +10113,9 @@ void QMiarex::OnLight()
 	UpdateView();
 }
 
-
+/**
+ * The user has requested the launch of the dialog box used to manage the array of bodies
+ */
 void QMiarex::OnManageBodies()
 {
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
@@ -9971,6 +10128,10 @@ void QMiarex::OnManageBodies()
     pMainFrame->m_DlgPos = m_pManageBodiesDlg->pos();
 }
 
+
+/**
+ * The user has requested the launch of the dialog box used to manage the array of planes
+ */
 void QMiarex::OnManageUFOs()
 {
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
@@ -9995,14 +10156,19 @@ void QMiarex::OnManageUFOs()
 }
 
 
-
+/**
+ * The user has toggled the display of moments in the 3D view
+ **/
 void QMiarex::OnMoment()
 {
 	m_bMoments = m_pctrlMoment->isChecked();
 	UpdateView();
 }
 
-
+/**
+ * The user has requested the creation of a new body.
+ * Launches the dialog box, and stores the body in the array i.a.w. user instructions
+ */
 void QMiarex::OnNewBody()
 {
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
@@ -10022,12 +10188,14 @@ void QMiarex::OnNewBody()
 }
 
 
+/**
+ * The user has requested the creation of a new wing.
+ * Launches the dialog box, and stores the wing in the array i.a.w. user instructions
+ */
 void QMiarex::OnNewWing()
 {
 	MainFrame* pMainFrame = (MainFrame*)s_pMainFrame;
 
-	//Define a wing from scratch
-	//On exit, check if the wing's name is already used
 	int i;
 	CWing *pOldWing;
 	CWing* pWing = new CWing;
@@ -10080,6 +10248,10 @@ void QMiarex::OnNewWing()
 }
 
 
+/**
+ * The user has requested the creation of a new plane.
+ * Launches the dialog box, and stores the plane in the array i.a.w. user instructions
+ */
 void QMiarex::OnNewPlane()
 {
 	int i;
@@ -10129,6 +10301,9 @@ void QMiarex::OnNewPlane()
 }
 
 
+/**
+ *The user has toggled the switch for the display of the outline of the surfaces in 3D view
+ */
 void QMiarex::OnOutline()
 {
 	m_bOutline = m_pctrlOutline->isChecked();
@@ -10136,13 +10311,18 @@ void QMiarex::OnOutline()
 }
 
 
+/**
+ *The user has toggled the switch for the display of the panels in 3D view
+ */
 void QMiarex::OnPanels()
 {
 	m_bVLMPanels = m_pctrlPanels->isChecked();
 	UpdateView();
 }
 
-
+/**
+ * Reads the analysis input from the dialog boxes
+ */
 void QMiarex::OnReadAnalysisData()
 {
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
@@ -10186,7 +10366,9 @@ void QMiarex::OnReadAnalysisData()
 	}
 }
 
-
+/**
+ * The user has requested a change to the type of polars which ought to be displayed
+ */
 void QMiarex::OnPolarFilter()
 {
 //    m_pPolarFilterDlg->move(pMainFrame->m_DlgPos);
@@ -10221,10 +10403,12 @@ void QMiarex::OnPolarFilter()
 }
 
 
+/**
+ * The user has requested that the active polar be renames
+ * Changes the polar name and updates the references in all child oppoints
+ */
 void QMiarex::OnRenameCurWPolar()
 {
-	//Rename the currently selected Wing Polar
-
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	if(!m_pCurWPolar) return;
 	if(!m_pCurWing) return;
@@ -10388,6 +10572,10 @@ void QMiarex::OnRenameCurWPolar()
 
 
 
+/**
+ * The user has requested that the active wing ot plane be renames
+ * Changes the name and updates the references in all child polars and oppoints
+ */
 void QMiarex::OnRenameCurUFO()
 {
 	//Rename the currently selected UFO
@@ -10401,7 +10589,9 @@ void QMiarex::OnRenameCurUFO()
 	UpdateView();
 }
 
-
+/**
+ * The user has requested a deletion of all the previously stored curves in the Cp Graph
+ */
 void QMiarex::OnResetCpSection()
 {
 	for(int i=m_CpGraph.GetCurveCount()-1; i>3 ;i--)	m_CpGraph.DeleteCurve(i);
@@ -10410,7 +10600,10 @@ void QMiarex::OnResetCpSection()
 	UpdateView();
 }
 
-
+/**
+ * The user has requested that the results data of the current CWPolar object be deleted.
+ * Deletes it and all its child operating points, and updates the graphs
+ */
 void QMiarex::OnResetCurWPolar()
 {
 	if (!m_pCurWPolar) return;
@@ -10471,6 +10664,9 @@ void QMiarex::OnResetCurWPolar()
 }
 
 
+/**
+ * The user has requested that the wing scale be reset to its default value in the operating point graph view
+ */
 void QMiarex::OnResetWingGraphScale()
 {
 	//resets the scale of the current graph
@@ -10494,6 +10690,9 @@ void QMiarex::OnResetWingGraphScale()
 }
 
 
+/**
+ * The user has requested that the wing scale be reset to its default value in the 3D view
+ */
 void QMiarex::OnResetWingScale()
 {
 	m_bIs2DScaleSet = false;
@@ -10502,6 +10701,9 @@ void QMiarex::OnResetWingScale()
 }
 
 
+/**
+ * The user has requested that the position of the legend be reset to its default in the operating point graph view
+ */
 void QMiarex::OnResetWOppLegend()
 {
 	SetWingLegendPos();
@@ -10509,13 +10711,20 @@ void QMiarex::OnResetWOppLegend()
 }
 
 
+/**
+ * The user has requested that the position of the legend be reset to its default in the polar graph view
+ */
 void QMiarex::OnResetWPlrLegend()
 {
 	SetWPlrLegendPos();
 	UpdateView();
 }
 
-
+/**
+ * The user has requested that the size of the active wing be scaled.
+ * Launches the dialog box, creates a new wing, and overwrites the existing wing or plane,
+ * or creates a new one i.a.w. user instructions.
+ */
 void QMiarex::OnScaleWing()
 {
 	if(!m_pCurWing) return;
@@ -10578,6 +10787,9 @@ void QMiarex::OnScaleWing()
 }
 
 
+/**
+ * The user has toggled the switch for a sequential analyis
+ */
 void QMiarex::OnSequence()
 {
 	m_bSequence = m_pctrlSequence->isChecked();
@@ -10586,41 +10798,10 @@ void QMiarex::OnSequence()
 }
 
 
-void QMiarex::OnShowUFOWOpps()
-{
-	//Switch all WOpps view to off for the current UFO
-	CPOpp *pPOpp;
-	CWOpp *pWOpp;
-	int i;
-	for (i=0; i< m_poaWOpp->size(); i++)
-	{
-		pWOpp = (CWOpp*)m_poaWOpp->at(i);
-		if (pWOpp->m_WingName == m_pCurWPolar->m_UFOName)
-		{
-			pWOpp->m_bIsVisible = true;
-		}
-	}
-	for (i=0; i< m_poaPOpp->size(); i++)
-	{
-		pPOpp = (CPOpp*)m_poaPOpp->at(i);
-		if (pPOpp->m_PlaneName == m_pCurWPolar->m_UFOName)
-		{
-			pPOpp->m_bIsVisible = true;
-		}
-	}
 
-	if (m_iView==WOPPVIEW)      CreateWOppCurves();
-	else if(m_iView==WCPVIEW)   CreateCpCurves();
-	else if(m_iView==WSTABVIEW) CreateStabilityCurves();
-
-	MainFrame* pMainFrame = (MainFrame*)s_pMainFrame;
-	pMainFrame->SetSaveState(false);
-	SetCurveParams();
-	UpdateView();
-}
-
-
-
+/**
+ * The user has requested the display of all the operating point curves
+ */
 void QMiarex::OnShowAllWOpps()
 {
 	MainFrame* pMainFrame = (MainFrame*)s_pMainFrame;
@@ -10654,6 +10835,9 @@ void QMiarex::OnShowAllWOpps()
 
 
 
+/**
+ * The user has requested the display of all the polar curves
+ */
 void QMiarex::OnShowAllWPolars()
 {
 	int i;
@@ -10673,6 +10857,106 @@ void QMiarex::OnShowAllWPolars()
 }
 
 
+/**
+ * The user has requested the display exclusively of all the polar curves associated to the active wing or plane.
+ * The display of all other polar curves is turned off
+ */
+void QMiarex::OnShowUFOWPolarsOnly()
+{
+	if(!m_pCurWing) return;
+	int i;
+	QString UFOName;
+	if(m_pCurPlane)     UFOName = m_pCurPlane->PlaneName();
+	else if(m_pCurWing) UFOName = m_pCurWing->WingName();
+	else return;
+
+	MainFrame* pMainFrame = (MainFrame*)s_pMainFrame;
+	CWPolar *pWPolar;
+	for (i=0; i<m_poaWPolar->size(); i++)
+	{
+		pWPolar = (CWPolar*)m_poaWPolar->at(i);
+		pWPolar->m_bIsVisible = (pWPolar->m_UFOName == UFOName);
+	}
+
+	if(m_iView==WPOLARVIEW)		CreateWPolarCurves();
+	else if(m_iView==WSTABVIEW)	CreateStabilityCurves();
+
+	SetCurveParams();
+	pMainFrame->SetSaveState(false);
+	UpdateView();
+}
+
+
+
+/**
+ * The user has requested the display of all the polar curves associated to the active wing or plane
+ */
+void QMiarex::OnShowUFOWPolars()
+{
+	if(!m_pCurWing) return;
+	int i;
+	QString UFOName;
+	if(m_pCurPlane)     UFOName = m_pCurPlane->PlaneName();
+	else if(m_pCurWing) UFOName = m_pCurWing->WingName();
+	else return;
+
+	MainFrame* pMainFrame = (MainFrame*)s_pMainFrame;
+	CWPolar *pWPolar;
+	for (i=0; i<m_poaWPolar->size(); i++)
+	{
+		pWPolar = (CWPolar*)m_poaWPolar->at(i);
+		if (pWPolar->m_UFOName == UFOName) pWPolar->m_bIsVisible = true;
+	}
+
+	if(m_iView==WPOLARVIEW)		CreateWPolarCurves();
+	else if(m_iView==WSTABVIEW)	CreateStabilityCurves();
+
+	SetCurveParams();
+	pMainFrame->SetSaveState(false);
+	UpdateView();
+}
+
+
+
+/**
+ * The user has requested the display of all the operating point curves for the active wing or plane
+ */
+void QMiarex::OnShowUFOWOpps()
+{
+	CPOpp *pPOpp;
+	CWOpp *pWOpp;
+	int i;
+	for (i=0; i< m_poaWOpp->size(); i++)
+	{
+		pWOpp = (CWOpp*)m_poaWOpp->at(i);
+		if (pWOpp->m_WingName == m_pCurWPolar->m_UFOName)
+		{
+			pWOpp->m_bIsVisible = true;
+		}
+	}
+	for (i=0; i< m_poaPOpp->size(); i++)
+	{
+		pPOpp = (CPOpp*)m_poaPOpp->at(i);
+		if (pPOpp->m_PlaneName == m_pCurWPolar->m_UFOName)
+		{
+			pPOpp->m_bIsVisible = true;
+		}
+	}
+
+	if (m_iView==WOPPVIEW)      CreateWOppCurves();
+	else if(m_iView==WCPVIEW)   CreateCpCurves();
+	else if(m_iView==WSTABVIEW) CreateStabilityCurves();
+
+	MainFrame* pMainFrame = (MainFrame*)s_pMainFrame;
+	pMainFrame->SetSaveState(false);
+	SetCurveParams();
+	UpdateView();
+}
+
+
+/**
+ * The user has requested the display of all the operating point curves for the active polar
+ */
 void QMiarex::OnShowAllWPlrOpps()
 {
 	int i;
@@ -10716,7 +11000,9 @@ void QMiarex::OnShowAllWPlrOpps()
 	UpdateView();
 }
 
-
+/**
+ * The user has toggled the display of the elliptic curve in the lift graph in the operating point view
+ */
 void QMiarex::OnShowEllipticCurve()
 {
 	m_bShowElliptic = !m_bShowElliptic;
@@ -10727,7 +11013,9 @@ void QMiarex::OnShowEllipticCurve()
 }
 
 
-
+/**
+ * The user has toggled the display of the moment reference point in the operating point view
+ */
 void QMiarex::OnShowXCmRef()
 {
 	//Show the Moment reference point
@@ -10736,7 +11024,9 @@ void QMiarex::OnShowXCmRef()
 	UpdateView();
 }
 
-
+/**
+ * The user has toggled the display of the forces acting on the panels in the 3D view
+ */
 void QMiarex::OnPanelForce()
 {
 	m_bPanelForce	 = m_pctrlPanelForce->isChecked();
@@ -10752,6 +11042,9 @@ void QMiarex::OnPanelForce()
 }
 
 
+/**
+ * The user has toggled the display of the lift in the operating point view or in the 3D view
+ */
 void QMiarex::OnShowLift()
 {
 	m_bXCP	 = m_pctrlLift->isChecked();
@@ -10761,6 +11054,10 @@ void QMiarex::OnShowLift()
 	}
 }
 
+
+/**
+ * The user has toggled the display of the induced drag forces in the 3D view
+ */
 void QMiarex::OnShowIDrag()
 {
 	m_bICd = m_pctrlIDrag->isChecked();
@@ -10772,6 +11069,9 @@ void QMiarex::OnShowIDrag()
 }
 
 
+/**
+ * The user has toggled the display of the viscous drag forces in the 3D view
+ */
 void QMiarex::OnShowVDrag()
 {
 	m_bVCd = m_pctrlVDrag->isChecked();
@@ -10783,6 +11083,9 @@ void QMiarex::OnShowVDrag()
 }
 
 
+/**
+ * The user has toggled the display of the laminar to turbulent transition lines in the 3D view
+ */
 void QMiarex::OnShowTransitions()
 {
 	m_bXTop = m_pctrlTrans->isChecked();
@@ -10793,7 +11096,9 @@ void QMiarex::OnShowTransitions()
 	}
 }
 
-
+/**
+ * The user has toggled the display of the active curve
+ */
 void QMiarex::OnShowCurve()
 {
 	m_bCurveVisible = m_pctrlShowCurve->isChecked();
@@ -10802,60 +11107,9 @@ void QMiarex::OnShowCurve()
 }
 
 
-
-void QMiarex::OnShowUFOWPolarsOnly()
-{
-	if(!m_pCurWing) return;
-	int i;
-	QString UFOName;
-	if(m_pCurPlane)     UFOName = m_pCurPlane->PlaneName();
-	else if(m_pCurWing) UFOName = m_pCurWing->WingName();
-	else return;
-
-	MainFrame* pMainFrame = (MainFrame*)s_pMainFrame;
-	CWPolar *pWPolar;
-	for (i=0; i<m_poaWPolar->size(); i++)
-	{
-		pWPolar = (CWPolar*)m_poaWPolar->at(i);
-		pWPolar->m_bIsVisible = (pWPolar->m_UFOName == UFOName);
-	}
-
-	if(m_iView==WPOLARVIEW)		CreateWPolarCurves();
-	else if(m_iView==WSTABVIEW)	CreateStabilityCurves();
-
-	SetCurveParams();
-	pMainFrame->SetSaveState(false);
-	UpdateView();
-}
-
-
-void QMiarex::OnShowUFOWPolars()
-{
-	if(!m_pCurWing) return;
-	int i;
-	QString UFOName;
-	if(m_pCurPlane)     UFOName = m_pCurPlane->PlaneName();
-	else if(m_pCurWing) UFOName = m_pCurWing->WingName();
-	else return;
-
-	MainFrame* pMainFrame = (MainFrame*)s_pMainFrame;
-	CWPolar *pWPolar;
-	for (i=0; i<m_poaWPolar->size(); i++)
-	{
-		pWPolar = (CWPolar*)m_poaWPolar->at(i);
-		if (pWPolar->m_UFOName == UFOName) pWPolar->m_bIsVisible = true;
-	}
-
-	if(m_iView==WPOLARVIEW)		CreateWPolarCurves();
-	else if(m_iView==WSTABVIEW)	CreateStabilityCurves();
-
-	SetCurveParams();
-	pMainFrame->SetSaveState(false);
-	UpdateView();
-}
-
-
-
+/**
+ * The user has requested the display of the top left graph only
+ **/
 void QMiarex::OnSingleGraph1()
 {
 	if(m_iView==WSTABVIEW)
@@ -10888,7 +11142,9 @@ void QMiarex::OnSingleGraph1()
 }
 
 
-
+/**
+ * The user has requested the display of the top right graph only
+ **/
 void QMiarex::OnSingleGraph2()
 {
 	if(m_iView==WSTABVIEW)
@@ -10921,6 +11177,9 @@ void QMiarex::OnSingleGraph2()
 }
 
 
+/**
+ * The user has requested the display of the bottom left graph only
+ **/
 void QMiarex::OnSingleGraph3()
 {
 	if(m_iView==WSTABVIEW)
@@ -10951,6 +11210,9 @@ void QMiarex::OnSingleGraph3()
 }
 
 
+/**
+ * The user has requested the display of the bottom right graph only
+ **/
 void QMiarex::OnSingleGraph4()
 {
 	if(m_iView==WSTABVIEW)
@@ -10981,18 +11243,9 @@ void QMiarex::OnSingleGraph4()
 }
 
 
-void QMiarex::OnStabCurve()
-{
-	m_bShowWingCurve[2] = !m_bShowWingCurve[2];
-//	CheckMenus();
-
-	if (m_iView==WOPPVIEW)    CreateWOppCurves();
-	else if(m_iView==WCPVIEW) CreateCpCurves();
-
-	UpdateView();
-}
-
-
+/**
+ * The user has toggled the display of stability results between longitudinal and lateral directions
+ */
 void QMiarex::OnStabilityDirection()
 {
 	//the user has clicked either the longitudinal or lateral mode display
@@ -11026,8 +11279,9 @@ void QMiarex::OnStabilityDirection()
 }
 
 
-
-
+/**
+ * The user has requested to change the display of stability results to the time view
+ */
 void QMiarex::OnTimeView()
 {
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
@@ -11045,7 +11299,9 @@ void QMiarex::OnTimeView()
 	UpdateView();
 }
 
-
+/**
+ * The user has requested to change the display of stability results to the root locus view
+ */
 void QMiarex::OnRootLocusView()
 {
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
@@ -11061,6 +11317,9 @@ void QMiarex::OnRootLocusView()
 }
 
 
+/**
+ * The user has requested to change the display of stability results to the modal view
+ */
 void QMiarex::OnModalView()
 {
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
@@ -11075,7 +11334,9 @@ void QMiarex::OnModalView()
 }
 
 
-
+/**
+ * The user has toggled the display of the streamlines in the 3D view
+ */
 void QMiarex::OnStreamlines()
 {
 	m_bStream = m_pctrlStream->isChecked();
@@ -11086,6 +11347,11 @@ void QMiarex::OnStreamlines()
 	if(m_iView==W3DVIEW) UpdateView();
 }
 
+
+
+/**
+ * The user has toggled the display of the surfaces in the 3D view
+ */
 void QMiarex::OnSurfaces()
 {
 	m_bSurfaces = m_pctrlSurfaces->isChecked();
@@ -11099,6 +11365,9 @@ void QMiarex::OnSurfaces()
 
 
 
+/**
+ * The user has toggled the display of the velocity vectors on the surfaces in the 3D view
+ */
 void QMiarex::OnSurfaceSpeeds()
 {
 	m_bSpeeds = m_pctrlSurfVel->isChecked();
@@ -11109,7 +11378,9 @@ void QMiarex::OnSurfaceSpeeds()
 	if(m_iView==W3DVIEW) UpdateView();
 }
 
-
+/**
+ * The user has requested a modification of the light settings in the 3D view
+ */
 void QMiarex::OnSetupLight()
 {
 	if(m_iView!=W3DVIEW && m_iView!=WSTABVIEW) return;
@@ -11130,7 +11401,9 @@ void QMiarex::OnSetupLight()
 }
 
 
-
+/**
+ * The user has toggled the request to store or not the operating points of an analysis
+ */
 void QMiarex::OnStoreWOpp()
 {
 	m_bStoreWOpp = m_pctrlStoreWOpp->isChecked();
@@ -11138,7 +11411,9 @@ void QMiarex::OnStoreWOpp()
 
 
 
-
+/**
+ * The user has requested to switch to the two graph view top-left and top-right
+ */
 void QMiarex::OnTwoGraphs()
 {
 	if(m_iView==WOPPVIEW)
@@ -11170,6 +11445,9 @@ void QMiarex::OnTwoGraphs()
 }
 
 
+/**
+ * The user has requested to switch to the four graph view
+ */
 void QMiarex::OnFourGraphs()
 {
 
@@ -11200,7 +11478,10 @@ void QMiarex::OnFourGraphs()
 }
 
 
-
+/**
+ * The user has changed the scale of the velocity display in 3D view
+ * @param pos the new position of the slider
+ */
 void QMiarex::OnVelocityScale(int pos)
 {
 	m_VelocityScale    = pos/100.0/sqrt(1.01-pos/100.0);
@@ -11208,14 +11489,20 @@ void QMiarex::OnVelocityScale(int pos)
 	UpdateView();
 }
 
-
+/**
+ * The user has toggled the display of the vortices in 3D view
+ *@deprecated Option disabled, only used for development
+ */
 void QMiarex::OnVortices()
 {
 	m_bVortices = m_pctrlVortices->isChecked();
 	UpdateView();
 }
 
-
+/**
+ * The user has toggled the display of the curves for the second wing in case of a bi-plane
+ *@todo not thouroughly tested
+ */
 void QMiarex::OnWing2Curve()
 {
 	m_bShowWingCurve[1] = !m_bShowWingCurve[1];
@@ -11228,7 +11515,11 @@ void QMiarex::OnWing2Curve()
 }
 
 
-
+/**
+ * The user has requested the edition of the inertia data for the current wing or plane
+ * Updates the inertia, resets the depending polars, and deletes the obsolete operating points
+ * Updates the display
+ */
 void QMiarex::OnUFOInertia()
 {
 	MainFrame* pMainFrame = (MainFrame*)s_pMainFrame;
@@ -11369,7 +11660,9 @@ void QMiarex::OnUFOInertia()
 }
 
 
-
+/**
+ * The user ha requested to switch to the operating point view
+ */
 void QMiarex::OnWOpps()
 {
 	MainFrame* pMainFrame = (MainFrame*)s_pMainFrame;
@@ -11398,6 +11691,9 @@ void QMiarex::OnWOpps()
 
 
 
+/**
+ * The user ha requested to switch to the polar view
+ */
 void QMiarex::OnWPolars()
 {
 	MainFrame* pMainFrame = (MainFrame*)s_pMainFrame;
@@ -11425,7 +11721,10 @@ void QMiarex::OnWPolars()
 }
 
 
-
+/**
+ * Dispatching method for the update of the client area of the active twodwidget
+ * @param painter a reference to the QPainter object on which the view shall be drawn
+ */
 void QMiarex::PaintView(QPainter &painter)
 {
 	MainFrame* pMainFrame = (MainFrame*)s_pMainFrame;
@@ -11633,10 +11932,14 @@ void QMiarex::PaintView(QPainter &painter)
 	painter.restore();
 }
 
-
+/**
+ * Draws the wing in the 2D operating point view
+ * @param painter a reference to the QPainter object on which the view shall be drawn
+ * @param ORef the origin of the tip of the root chord, in client coordinates
+ * @param scale the scaling factor with which to draw the wing
+ */
 void QMiarex::PaintWing(QPainter &painter, QPoint ORef, double scale)
 {
-	//Draws the wing on the 2D WOpp view
 	if(!m_pCurWing)	return;
 	static int i;
 //	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
@@ -11705,6 +12008,10 @@ void QMiarex::PaintWing(QPainter &painter, QPoint ORef, double scale)
 }
 
 
+/**
+ * Draws the wing legend in the 2D operating point view
+ * @param painter a reference to the QPainter object on which the view shall be drawn
+ */
 void QMiarex::PaintWingLegend(QPainter &painter)
 {
 	if(!m_pCurWing) return;
@@ -11812,6 +12119,10 @@ void QMiarex::PaintWingLegend(QPainter &painter)
 }
 
 
+/**
+ * Draws the legend of the operating point in the 2D operating point view
+ * @param painter a reference to the QPainter object on which the view shall be drawn
+ */
 void QMiarex::PaintCurWOppLegend(QPainter &painter)
 {
 	if(!m_pCurWOpp) return;
@@ -11935,6 +12246,13 @@ void QMiarex::PaintCurWOppLegend(QPainter &painter)
 
 
 
+
+/**
+ * Draws the laminar to turbulent translition lines in the operating view
+ * @param painter a reference to the QPainter object on which the view shall be drawn
+ * @param ORef the origin of the tip of the root chord, in client coordinates
+ * @param scale the scaling factor with which to draw the wing
+ */
 void QMiarex::PaintXTr(QPainter & painter, QPoint ORef, double scale)
 {
 	//Draws the transition lines on the 2D view
@@ -12017,6 +12335,14 @@ void QMiarex::PaintXTr(QPainter & painter, QPoint ORef, double scale)
 	painter.restore();
 }
 
+
+
+/**
+ * Draws the lift line and the position of the center of pressure in the operating view
+ * @param painter a reference to the QPainter object on which the view shall be drawn
+ * @param ORef the origin of the tip of the root chord, in client coordinates
+ * @param scale the scaling factor with which to draw the wing
+ */
 void QMiarex::PaintXCP(QPainter & painter, QPoint ORef, double scale)
 {
 	//Draws the lift line and center of pressure position on the the 2D view
@@ -12075,6 +12401,12 @@ void QMiarex::PaintXCP(QPainter & painter, QPoint ORef, double scale)
 }
 
 
+/**
+ * Draws the position of the reference point for the moments in the operating view
+ * @param painter a reference to the QPainter object on which the view shall be drawn
+ * @param ORef the origin of the tip of the root chord, in client coordinates
+ * @param scale the scaling factor with which to draw the wing
+ */
 void QMiarex::PaintXCmRef(QPainter & painter, QPoint ORef, double scale)
 {
 	//Draws the moment reference point on the 2D view
@@ -12108,7 +12440,13 @@ void QMiarex::PaintXCmRef(QPainter & painter, QPoint ORef, double scale)
 	painter.restore();
 }
 
-
+/**
+ * Launches a 3D panel analysis
+ * @param V0 the initial aoa
+ * @param VMax the final aoa
+ * @param VDelta the increment
+ * @param bSequence if true, the analysis will run for a sequence of aoa from V0 to Vmax, if not only V0 shall be calculated
+ */
 void QMiarex::PanelAnalyze(double V0, double VMax, double VDelta, bool bSequence)
 {
 	if(!m_pCurWing || !m_pCurWPolar) return;
@@ -12192,10 +12530,13 @@ void QMiarex::PanelAnalyze(double V0, double VMax, double VDelta, bool bSequence
 }
 
 
-
-QString QMiarex::RenameUFO(QString UFOName)
+/**
+ * Renames the active wing or plane
+ * Updates the references in child polars and oppoints
+ * @param UFOName the new name for the wing or plane
+ */
+void QMiarex::RenameUFO(QString UFOName)
 {
-	//Rename the currently selected UFO
 	QString OldName;
 	CWOpp *pWOpp;
 	CPOpp *pPOpp;
@@ -12226,7 +12567,7 @@ QString QMiarex::RenameUFO(QString UFOName)
 				pPOpp->m_PlaneName = pPlane->PlaneName();
 			}
 		}
-		return pPlane->PlaneName();
+//		return pPlane->PlaneName();
 	}
 	else if(pWing)
 	{
@@ -12247,12 +12588,16 @@ QString QMiarex::RenameUFO(QString UFOName)
 				pWOpp->m_WingName = pWing->m_WingName;
 			}
 		}
-		return pWing->m_WingName;
+//		return pWing->m_WingName;
 	}
-	return "";
+//	return "";
 }
 
-
+/**
+ * Rotates all the panels about the y-axis
+ * @param Angle the rotation angle in degrees
+ * @param P the point of origin of the rotation
+ */
 void QMiarex::RotateGeomY(double const &Angle, CVector const &P)
 {
 	int n, p, pw, kw, lw;
@@ -12321,6 +12666,15 @@ void QMiarex::RotateGeomY(double const &Angle, CVector const &P)
 }
 
 
+/**
+ * Rotates all the panels about the z-axis
+ * @param pPanel a pointer to the array of surface mesh panels
+ * @param pNode  a pointer to the array of surface panel nodes
+ * @param pWakePanel a pointer to the array of wake mesh panels
+ * @param pWakeNode  a pointer to the array of wake panel nodes
+ * @param beta the rotation angle in degrees
+ * @param P the point of origin of the rotation
+ */
 void QMiarex::RotateGeomZ(CPanel *pPanel, CVector *pNode, CPanel *pWakePanel, CVector *pWakeNode, double const &Beta, CVector const &P)
 {
 	int n, p, pw, kw, lw;
@@ -12385,7 +12739,11 @@ void QMiarex::RotateGeomZ(CPanel *pPanel, CVector *pNode, CPanel *pWakePanel, CV
 	}
 }
 
-
+/**
+ * Saves the user settings to the QSettings object
+ * @param pSettings a pointer to the QSettings object
+ * @return true if the save was successfull, false if an error was encountered
+ */
 bool QMiarex::SaveSettings(QSettings *pSettings)
 {
 	QString strong;
@@ -12668,7 +13026,9 @@ bool QMiarex::SaveSettings(QSettings *pSettings)
 }
 
 
-
+/**
+ * Sets an automatic scale for the wing in the operating point view, depending on wing span.
+ */
 void QMiarex::Set2DScale()
 {
 	if(m_bIs2DScaleSet && !m_bAutoScales) return;
@@ -12733,10 +13093,11 @@ void QMiarex::Set2DScale()
 }
 
 
-
+/**
+ * Adjusts the new rotation center after a translation or a rotation
+ */
 void QMiarex::Set3DRotationCenter()
 {
-	//adjust the new rotation center after a translation or a rotation
 	int i,j;
 
 	for(i=0; i<4; i++)
@@ -12748,13 +13109,13 @@ void QMiarex::Set3DRotationCenter()
 	m_glRotCenter.z = MatOut[2][0]*(m_glViewportTrans.x) + MatOut[2][1]*(-m_glViewportTrans.y) + MatOut[2][2]*m_glViewportTrans.z;
 }
 
-
-
+/**
+* Adjusts the new rotation center after the user has picked a point on the screen
+* Finds the closest panel under the point and changes the rotation vector and viewport translation
+*@param the point clicked by the user, in client coordinates
+*/
 void QMiarex::Set3DRotationCenter(QPoint point)
 {
-	//adjusts the new rotation center after the user has picked a point on the screen
-	//finds the closest panel under the point,
-	//and changes the rotation vector and viewport translation
 	int  i, j, p;
 	CVector I, A, B, AA, BB, PP, U;
 	double dmin, dist;
@@ -12842,6 +13203,9 @@ void QMiarex::Set3DRotationCenter(QPoint point)
 }
 
 
+/**
+ * Sets an automatic scale for the wing or plane in the 3D view, depending on wing span.
+ */
 void QMiarex::Set3DScale()
 {
 	if(m_iView!=W3DVIEW && (m_iView!=WSTABVIEW || m_iStabilityView!=STAB3DVIEW)) return;
@@ -12888,7 +13252,9 @@ void QMiarex::Set3DScale()
 }
 
 
-
+/**
+ * Initializes the input parameters depending onthe type of the active polar
+ */
 void QMiarex::SetAnalysisParams()
 {
 	MainFrame* pMainFrame = (MainFrame*)s_pMainFrame;
@@ -12943,6 +13309,9 @@ void QMiarex::SetAnalysisParams()
 }
 
 
+/**
+ * Initializes the input parameters in the style dialog boxes depending on the type of view and on the active polar or operating point
+ */
 void QMiarex::SetCurveParams()
 {
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
@@ -12968,9 +13337,9 @@ void QMiarex::SetCurveParams()
 		StabViewDlg *pStabView =(StabViewDlg*)pMainFrame->m_pStabView;
 		if(pStabView->m_pCurve)
 		{
-			m_CurveColor = pStabView->m_pCurve->GetColor();
-			m_CurveStyle = pStabView->m_pCurve->GetStyle();
-			m_CurveWidth = pStabView->m_pCurve->GetWidth();
+			m_CurveColor = pStabView->m_pCurve->color();
+			m_CurveStyle = pStabView->m_pCurve->style();
+			m_CurveWidth = pStabView->m_pCurve->width();
 			m_pctrlShowCurve->setChecked(pStabView->m_pCurve->IsVisible());
 			m_pctrlShowPoints->setChecked(pStabView->m_pCurve->PointsVisible());
 			FillComboBoxes();
@@ -13050,7 +13419,11 @@ void QMiarex::SetCurveParams()
 }
 
 
-
+/**
+ * Inserts a modified CBody object in the array, i.a.w. user instructions
+ * @param pModBody a pointer to the instance of the CBody object to be inserted
+ * @return true if the body was successfully inserted, false otherwise
+ */
 bool QMiarex::SetModBody(CBody *pModBody)
 {
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
@@ -13069,12 +13442,10 @@ bool QMiarex::SetModBody(CBody *pModBody)
 		NameList.append(pBody->m_BodyName);
 	}
 
-
     m_pRenameDlg->m_pstrArray = & NameList;
     m_pRenameDlg->m_strQuestion = tr("Enter the new name for the Body :");
     m_pRenameDlg->m_strName = pModBody->m_BodyName;
     m_pRenameDlg->InitDialog();
-
 
 	while (bExists)
 	{
@@ -13196,7 +13567,11 @@ bool QMiarex::SetModBody(CBody *pModBody)
 
 
 
-
+/**
+ * Inserts a modified CPlane object in the array, i.a.w. user instructions
+ * @param pModPlane a pointer to the instance of the CPlane object to be inserted
+ * @return true if the plane was successfully inserted, false otherwise
+ */
 bool QMiarex::SetModPlane(CPlane *pModPlane)
 {
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
@@ -13415,6 +13790,11 @@ bool QMiarex::SetModPlane(CPlane *pModPlane)
 
 
 
+/**
+ * Inserts a modified CWing object in the array, i.a.w. user instructions
+ * @param pModWing a pointer to the instance of the CWing object to be inserted
+ * @return true if the wing was successfully inserted, false otherwise
+ */
 bool QMiarex::SetModWing(CWing *pModWing)
 {
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
@@ -13611,14 +13991,12 @@ bool QMiarex::SetModWing(CWing *pModWing)
 }
 
 
-QString QMiarex::UFOName()
-{
-	if(m_pCurPlane)     return m_pCurPlane->PlaneName();
-	else if(m_pCurWing) return m_pCurWing->WingName();
-	else return "";
-}
 
-
+/**
+ * Inserts a modified CWPolar object in the array, i.a.w. user instructions
+ * @param pModWPolar a pointer to the instance of the CWPolar object to be inserted
+ * @return true if the polr was successfully inserted, false otherwise
+ */
 bool QMiarex::SetModWPolar(CWPolar *pModWPolar)
 {
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
@@ -13735,14 +14113,17 @@ bool QMiarex::SetModWPolar(CWPolar *pModWPolar)
 	return false ;//useless...
 }
 
-
-
+/**
+* Searches for an operating point with aoa or velocity or control paramter x, for the active polar
+* Sets it as active, if valid
+* else sets the current WOpp, if any
+* else sets the comboBox's first, if any
+* else sets it to NULL
+*@param bCurrent, if true, uses the x value of the current operating point; this is useful if the user has changed the polar, but wants to display the same aoa for instance
+*@return true if a new valid operating point has been selected
+*/
 bool QMiarex::SetPOpp(bool bCurrent, double x)
 {
-	// set the WOpp, if valid
-	// else set the current WOpp, if any
-	// else set the comboBox's first, if any
-	// else set it to NULL
 	if(!m_pCurPlane) return false;
 
 	CPOpp *pPOpp = NULL;
@@ -13820,7 +14201,7 @@ bool QMiarex::SetPOpp(bool bCurrent, double x)
 			m_pPanelDlg->m_pWPolar        = m_pCurWPolar;
 			int nCtrls;
 			QString strong;
-			SetControlPositions(m_Panel, m_Node, m_pCurPOpp->m_Ctrl, nCtrls,strong, false);
+			SetControlPositions(m_Panel, m_Node, m_pCurPOpp->m_Ctrl, nCtrls, strong, false);
 			m_bResetglMesh = true;
 		}
 	}
@@ -13850,7 +14231,9 @@ bool QMiarex::SetPOpp(bool bCurrent, double x)
 	return true;
 }
 
-
+/**
+ * Sets the scale for the 2d or 3d selected view
+ */
 void QMiarex::SetScale()
 {
 	if(m_iView==W3DVIEW || (m_iView==WSTABVIEW&& m_iStabilityView==STAB3DVIEW)) Set3DScale();
@@ -13858,7 +14241,12 @@ void QMiarex::SetScale()
 }
 
 
-void QMiarex::SetUFO(QString UFOName, bool bNoPolar)
+/**
+ * Sets the active wing or plane
+ * Sets an active polar and operating point for this plane, if any are available
+ * @param UFOName the name of the wing or plane to be set as active
+ */
+void QMiarex::SetUFO(QString UFOName)
 {
 	QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
 	int i;
@@ -14040,18 +14428,14 @@ void QMiarex::SetUFO(QString UFOName, bool bNoPolar)
 		}
 	}
 
-
-	if(!bNoPolar)
+	if (m_pCurWPolar)
 	{
-		if (m_pCurWPolar)
-		{
-			// try to set the same as the existing polar... Special for Marc
-			SetWPlr(false, m_pCurWPolar->m_PlrName);
-		}
-		else
-		{
-			SetWPlr();
-		}
+		// try to set the same as the existing polar
+		SetWPlr(false, m_pCurWPolar->m_PlrName);
+	}
+	else
+	{
+		SetWPlr();
 	}
 
 	SetScale();
@@ -14064,6 +14448,9 @@ void QMiarex::SetUFO(QString UFOName, bool bNoPolar)
 
 
 
+/**
+ * Constructs the layout of the QMiarex widget
+ */
 void QMiarex::SetupLayout()
 {
 	QSizePolicy szPolicyExpanding;
@@ -14103,9 +14490,9 @@ void QMiarex::SetupLayout()
 				m_pctrlUnit2 = new QLabel(QString::fromUtf8("°"));
 				m_pctrlUnit3 = new QLabel(QString::fromUtf8("°"));
 
-			/*	m_pctrlAlphaMin->setMinimumHeight(20);
-				m_pctrlAlphaMax->setMinimumHeight(20);
-				m_pctrlAlphaDelta->setMinimumHeight(20);*/
+//				m_pctrlAlphaMin->setMinimumHeight(20);
+//				m_pctrlAlphaMax->setMinimumHeight(20);
+//				m_pctrlAlphaDelta->setMinimumHeight(20);
 				m_pctrlAlphaMin->setAlignment(Qt::AlignRight);
 				m_pctrlAlphaMax->setAlignment(Qt::AlignRight);
 				m_pctrlAlphaDelta->setAlignment(Qt::AlignRight);
@@ -14397,6 +14784,10 @@ void QMiarex::SetupLayout()
 
 
 
+/**
+ * Sets the scale of the graphs in the operating point view.
+ *The scale is set i.a.w. with wing span, if any
+ */
 void QMiarex::SetWGraphScale()
 {
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
@@ -14427,7 +14818,12 @@ void QMiarex::SetWGraphScale()
 	}
 }
 
-
+/**
+ * Sets the active polar
+ * Builds the array of panels depending on the polar type
+ * @param bCurrent if true, the active polar is set anew
+ * @param WPlrName the name of the polar to set for the active wing or plane
+ */
 void QMiarex::SetWPlr(bool bCurrent, QString WPlrName)
 {
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
@@ -14621,7 +15017,9 @@ void QMiarex::SetWPlr(bool bCurrent, QString WPlrName)
 }
 
 
-
+/**
+ * Sets the position for the legend in the operating point view
+ */
 void QMiarex::SetWingLegendPos()
 {
 	int h  = m_r2DCltRect.height();
@@ -14663,6 +15061,9 @@ void QMiarex::SetWingLegendPos()
 }
 
 
+/**
+ * Sets the position for the legend in the polar view
+ */
 void QMiarex::SetWPlrLegendPos()
 {
 	int h  = m_r2DCltRect.height();
@@ -14700,7 +15101,13 @@ void QMiarex::SetWPlrLegendPos()
 	}
 }
 
-
+/**
+ * Sets the active WOpp
+ * If a plane is active rather than a wing, a CPOpp will be set instead
+ *@param bCurrent if true, the active wopp is set anew
+ *@param x the aoa or velocity or control parameter of the operating point to set
+ *@return true if an operating point was successfully set
+ */
 bool QMiarex::SetWOpp(bool bCurrent, double x)
 {
 //	m_bResetglMesh   = true;
@@ -14832,7 +15239,9 @@ bool QMiarex::SetWOpp(bool bCurrent, double x)
 	return true;
 }
 
-
+/**
+ * Sets the y-axis titles of the stability time response graphs, depending on the selected units
+ */
 void QMiarex::SetStabGraphTitles()
 {
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
@@ -14855,7 +15264,9 @@ void QMiarex::SetStabGraphTitles()
 	}
 }
 
-
+/**
+ * Sets the x and y axis titles of the polar graphs
+ */
 void QMiarex::SetWGraphTitles(Graph* pGraph)
 {
 	QString Title;
@@ -14869,7 +15280,11 @@ void QMiarex::SetWGraphTitles(Graph* pGraph)
 }
 
 
-
+/**
+ * Overrides the parent's widget showEvent method
+ * Fills the main dialog box with default or selected data
+ * @param event unused
+ */
 void QMiarex::showEvent(QShowEvent *event)
 {
 	SetAnalysisParams();
@@ -14878,7 +15293,10 @@ void QMiarex::showEvent(QShowEvent *event)
 
 
 
-
+/**
+ * Captures the pixels of the client area and writes them to a file
+ * @param FileName the name of the destination image file
+ */
 void QMiarex::SnapClient(QString const &FileName)
 {
 	int NbBytes, bitsPerPixel;
@@ -14963,7 +15381,9 @@ void QMiarex::SnapClient(QString const &FileName)
 
 
 
-
+/**
+ * Cancels the animation whatever the active view
+ */
 void QMiarex::StopAnimate()
 {
 	m_bAnimateWOpp = false;
@@ -14992,7 +15412,9 @@ void QMiarex::StopAnimate()
 }
 
 
-
+/**
+ * Updates the active curve with the data from the currently active operating points or polars.
+ */
 void QMiarex::UpdateCurve()
 {
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
@@ -15061,10 +15483,11 @@ void QMiarex::UpdateCurve()
 }
 
 
-
+/**
+ * Updates the graphs and the views after a change of units
+*/
 void QMiarex::UpdateUnits()
 {
-	//The units have been changed, so update the graphs and the views
 	if(m_iView==WPOLARVIEW)
 	{
 		CreateWPolarCurves();
@@ -15093,7 +15516,9 @@ void QMiarex::UpdateUnits()
 }
 
 
-
+/**
+ * Dispatches the drawing request depending on the type of the active view
+ */
 void QMiarex::UpdateView()
 {
 	TwoDWidget *p2dWidget = (TwoDWidget*)s_p2dWidget;
@@ -15110,7 +15535,10 @@ void QMiarex::UpdateView()
 
 
 
-
+/**
+ * Overrides the parent's widget wheel event
+ * @param event the QWheelEvent sent by Qt
+ */
 void QMiarex::wheelEvent(QWheelEvent *event)
 {
 	//The mouse button has been wheeled
@@ -15176,6 +15604,9 @@ void QMiarex::wheelEvent(QWheelEvent *event)
 }
 
 
+/**
+ * The user has requested a detailed display of the data of the active polar
+ */
 void QMiarex::OnWPolarProps()
 {
 	if(!m_pCurWPolar) return;
@@ -15190,6 +15621,9 @@ void QMiarex::OnWPolarProps()
 }
 
 
+/**
+ * The user has requested a detailed display of the data of the active operating point
+ */
 void QMiarex::OnWOppProps()
 {
 	if(!m_pCurWOpp) return;
@@ -15203,13 +15637,18 @@ void QMiarex::OnWOppProps()
 	m_pObjectPropsDlg->exec();
 }
 
-
+/**
+ * Called by a stability analysis to modify the panels and nodes by setting the control positions to the specified position t
+ * The panels and nodes to be rotated are pointed by pPanel and pNode
+ * @param pPanel a pointer to the array of surface panels to be rotated
+ * @param pNode  a pointer to the array of mesh nodes to be rotated
+ * @param t the value of the control parameter which defines the amount of rotation
+ * @param &NCtrls - unused @todo check and remove
+ * @param &out the output message for the log file
+ * @param bBCOnly, if true, then only the control points and normal vector and rotates; if not,the whole geometry is rotated
+ */
 void QMiarex::SetControlPositions(CPanel *pPanel, CVector *pNode, double t, int &NCtrls, QString &out, bool bBCOnly)
 {
-	// Modifies the panels and nodes by setting the control positions to the specified position t
-	// The panels and nodes to be rotated are pointed by pPanel and pNode
-	// if bBCOnly, then only the control points and normal vector and rotates
-	// if not,     the whole geometry is rotated
 	if(!m_pCurWPolar) return;
 	if(!m_pCurPlane && ! m_pCurWing) return;
 
@@ -15384,17 +15823,29 @@ void QMiarex::SetControlPositions(CPanel *pPanel, CVector *pNode, double t, int 
 }
 
 
-double QMiarex::GetCoreSize()
+/**
+ * returns the value of the core size of the vortices for the VLM analysis
+ * @return the core size
+ */
+double QMiarex::coreSize()
 {
 	return s_CoreSize;
 }
 
+/**
+ * Sets the value of the core size of the vortices for the VLM analysis
+ * @param the new core size
+ */
 void QMiarex::SetCoreSize(double CoreSize)
 {
 	s_CoreSize = CoreSize;
 }
 
-
+/**
+ * Overrides the parent's widget method
+ * Displays the appropriate context menu depending on the view
+ * @param event
+ */
 void QMiarex::contextMenuEvent (QContextMenuEvent * event)
 {
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
@@ -15404,4 +15855,17 @@ void QMiarex::contextMenuEvent (QContextMenuEvent * event)
 	if(pMainFrame->m_pctrlCentralWidget->currentIndex()==0) p2dWidget->contextMenuEvent(event);
 	else                                                    p3dWidget->contextMenuEvent(event);
 }
+
+/**
+ * Returns the name of the active wing or plane
+ * @return the name of the active wing or plane
+ */
+QString QMiarex::UFOName()
+{
+	if(m_pCurPlane)     return m_pCurPlane->PlaneName();
+	else if(m_pCurWing) return m_pCurWing->WingName();
+	else return "";
+}
+
+
 

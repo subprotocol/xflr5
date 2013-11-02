@@ -1807,7 +1807,7 @@ void GLCreateStreamLines(void *pQMiarex, CWing *Wing[MAXWINGS], CVector *pNode, 
 		return;
 	}
 
-	double memcoresize = pMiarex->GetCoreSize();
+	double memcoresize = pMiarex->coreSize();
 	pMiarex->SetCoreSize(0.0005); //mm, just for the time needed to build the streamlines
 
 	CWing *pWing;

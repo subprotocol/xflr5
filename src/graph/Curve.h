@@ -19,6 +19,15 @@
 
 *****************************************************************************/
 
+/*! \file
+ *
+ * The class which define a CCurve object for the graphs
+ *
+ * \author Andre Deperrois
+ *
+ */
+
+
 
 #ifndef CURVE_H
 #define CURVE_H
@@ -27,67 +36,60 @@
 #include "../objects/CVector.h"
 #include <QColor>
 
-class CCurve : public QObject
+class CCurve
 {
 	friend class Graph;
 
 public:
 	CCurve();
 
-	CVector GetPoint(int ref);
+	int     AppendPoint(double xn, double yn);
+	void    BWStyle(QColor &color, int &style, int &width);
+	void    BWStyle();
+	int     closestPoint(double xs, double ys, double &dist);
+	void    closestPoint(double xs, double ys, double &dist, int &n);
+	void    closestPoint(double const &xs, double const &ys, double &xSel, double &ySel, double &dist, int &nSel);
+	QColor  color();
+	void    Copy(CCurve *pCurve);
+	int     count();
+	int     GetSelected();
+	bool    IsVisible();
+	CVector point(int ref);
+	bool    PointsVisible();
+	void    ResetCurve();
+	void    ShowPoints(bool bShow);
+	void    SetVisible(bool bVisible);
+	void    SetColor(QColor clr);
+	void    SetStyle(int nStyle);
+	void    SetSelected(int n);
+	void    SetWidth(int nWidth);
+	void    SetTitle(QString Title);
+	int     style();
+	void    title(QString &string);
+	int     width();
+	QString title();
+	double  xMin();
+	double  xMax();
+	double  yMin();
+	double  yMax();
 
-	bool PointsVisible();
-	bool IsVisible();
-
-	void Copy(CCurve *pCurve);
-	void GetTitle(QString &string);
- 	void ShowPoints(bool bShow);
-	void SetVisible(bool bVisible);
-	void SetColor(QColor clr);
-	void SetStyle(int nStyle);
-	void SetSelected(int n);
-	void SetWidth(int nWidth);
-	void SetTitle(QString Title);
-	void GetBWStyle(QColor &color, int &style, int &width);
-	void GetBWStyle();
-	void ResetCurve();
-
-	QString GetTitle();
-	
-	double GetxMin();
-	double GetxMax();
-	double GetyMin();
-	double GetyMax();
-
-	int AddPoint(double xn, double yn);
-	int GetStyle();
-	int GetWidth();
-	int GetSelected();
-	int GetCount();
-
-	int GetClosestPoint(double xs, double ys, double &dist);
-	void GetClosestPoint(double xs, double ys, double &dist, int &n);
-	void GetClosestPoint(double const &xs, double const &ys, double &xSel, double &ySel, double &dist, int &nSel);
-
-	QColor  GetColor();
 
 	//	Curve Data
-	int n;
-	double x[1000];
-	double y[1000];
-	bool m_bShowPoints;
+	int n;                   /**< the number of data points of this curve. @todo replace with a QList */
+	double x[1000];          /**< the array of the points x-coordinates */
+	double y[1000];          /**< the array of the points y-coordinates */
 
 
 private:	
-	bool m_bIsVisible;
-	QColor CurveColor;
-	QString m_CurveName;
-	int CurveStyle;
-	int CurveWidth;
-	int m_iSelected;
-	void *m_pParentGraph;
+	bool m_bIsVisible;        /**< true if the curve is visible */
+	bool m_bShowPoints;       /**< true if the curve's points are visible */
+	QColor CurveColor;        /**< the curve's display color */
+	QString m_CurveName;      /**< the curves's name */
+	int CurveStyle;           /**< the index of the curve's display style */
+	int CurveWidth;           /**< the width of the curve's display */
+	int m_iSelected;          /**< the index of the curve's currently selected point, or -1 if none is selected */
+	void *m_pParentGraph;     /**< a pointer to the parent graph to which this curve belongs */
 };
-
 
 
 #endif

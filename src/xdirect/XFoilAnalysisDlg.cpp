@@ -329,8 +329,8 @@ bool XFoilAnalysisDlg::Iterate()
 
 		if(m_pXFoil->ViscousIter())
 		{
-			if(pCurve0) pCurve0->AddPoint((double)m_Iterations, m_pXFoil->rmsbl);
-			if(pCurve1) pCurve1->AddPoint((double)m_Iterations, m_pXFoil->rmxbl);
+			if(pCurve0) pCurve0->AppendPoint((double)m_Iterations, m_pXFoil->rmsbl);
+			if(pCurve1) pCurve1->AppendPoint((double)m_Iterations, m_pXFoil->rmxbl);
 			m_Iterations++;
 		}
 		else

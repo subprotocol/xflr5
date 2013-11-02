@@ -1057,7 +1057,7 @@ void StabViewDlg::OnRenameCurve()
 	QString NewName = "Test Name";
     NewNameDlg dlg(this);
 	dlg.move(pMainFrame->m_DlgPos);
-	dlg.m_OldName = m_pCurve->GetTitle();
+	dlg.m_OldName = m_pCurve->title();
 	dlg.InitDialog();
 
 	if(dlg.exec() != QDialog::Accepted) return;
@@ -1089,7 +1089,7 @@ void StabViewDlg::OnSelChangeCurve(int sel)
 	QMiarex * pMiarex = (QMiarex*)s_pMiarex;
 	QString strong = m_pctrlCurveList->itemText(sel);
 	m_pCurve = pMiarex->m_TimeGraph[0].GetCurve(strong);
-	m_pCurve->GetTitle(strong);
+	m_pCurve->title(strong);
 	
 	pMiarex->SetCurveParams();
 }
@@ -1100,7 +1100,7 @@ void StabViewDlg::OnAddCurve()
 	AddCurve();
 	if(m_pCurve)
 	{
-		int pos =m_pctrlCurveList->findText(m_pCurve->GetTitle());
+		int pos =m_pctrlCurveList->findText(m_pCurve->title());
 		m_pctrlCurveList->setCurrentIndex(pos);
 	}
 	OnPlotStabilityGraph();
@@ -1111,7 +1111,7 @@ void StabViewDlg::OnDeleteCurve()
 {
 	QMiarex * pMiarex = (QMiarex*)s_pMiarex;
 	if(!m_pCurve) return;
-	QString CurveTitle = m_pCurve->GetTitle();
+	QString CurveTitle = m_pCurve->title();
 	for(int ig=0; ig<4; ig++)	pMiarex->m_TimeGraph[ig].DeleteCurve(CurveTitle);
 	m_pCurve = NULL;
 
@@ -1146,7 +1146,7 @@ void StabViewDlg::AddCurve()
 		if(ig==0) m_pCurve = pCurve;
 	}
 
-	m_pctrlCurveList->addItem(pCurve->GetTitle());
+	m_pctrlCurveList->addItem(pCurve->title());
 	m_pctrlPlotStabGraph->setEnabled(pMiarex->m_pCurWOpp && m_pctrlCurveList->count());
 	m_pctrlRenameCurve->setEnabled(pMiarex->m_pCurWOpp && m_pctrlCurveList->count());
 	m_pctrlDeleteCurve->setEnabled(pMiarex->m_pCurWOpp && m_pctrlCurveList->count());
@@ -1164,12 +1164,12 @@ void StabViewDlg::FillCurveList()
 	QString strong;
 	for(int i=0; i<pMiarex->m_TimeGraph[0].GetCurveCount(); i++)
 	{
-		pMiarex->m_TimeGraph[0].GetCurve(i)->GetTitle(strong);
+		pMiarex->m_TimeGraph[0].GetCurve(i)->title(strong);
 		m_pctrlCurveList->addItem(strong);
 	}
 	if(m_pCurve)
 	{
-		int sel = m_pctrlCurveList->findText(m_pCurve->GetTitle());
+		int sel = m_pctrlCurveList->findText(m_pCurve->title());
 		m_pctrlCurveList->setCurrentIndex(sel);
 	}
 }

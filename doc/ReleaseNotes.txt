@@ -7,7 +7,7 @@
                      A tool for the design of Airfoils, Wings and Planes
                           operating at low Reynolds numbers
 
-						  Copyright (C) 2003-2012
+						  Copyright (C) 2003-2013
 
                                      Andre Deperrois
 
@@ -15,9 +15,11 @@
 *******************************************************************************
 
 
-
-xflr5 v6.09.06, November 2013
+xflr5 v6.09.06, November xxx, 2013
 	- corrected the automatic polar name of foils in multithreaded analysis
+	- added import/export of the wing geometry via plain-text files
+	- fixed the bug which caused the pitching moment to be zero
+	- defined the main dialog boxes as member variables rather than on the heap to enable their translation
 	- other minor corrections and enhancements
 
 

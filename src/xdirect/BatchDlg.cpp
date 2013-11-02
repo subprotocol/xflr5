@@ -925,8 +925,8 @@ void BatchDlg::OutputIter(int iter)
 	XFoil *pXFoil = (XFoil*)s_pXFoil;
 	if(iter)
 	{
-		m_RmsGraph.GetCurve(0)->AddPoint(iter, pXFoil->rmsbl);
-		m_RmsGraph.GetCurve(1)->AddPoint(iter, pXFoil->rmxbl);
+		m_RmsGraph.GetCurve(0)->AppendPoint(iter, pXFoil->rmsbl);
+		m_RmsGraph.GetCurve(1)->AppendPoint(iter, pXFoil->rmxbl);
 		UpdateGraph();
 	}
 }

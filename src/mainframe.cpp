@@ -4298,7 +4298,7 @@ void MainFrame::OnSelChangeUFO(int i)
 	QString strong;
 //	int sel = m_pctrlUFO->currentIndex();
 	if (i >=0) strong = m_pctrlUFO->itemText(i);
-	pMiarex->SetUFO(strong,true);
+	pMiarex->SetUFO(strong);
 
 	m_iApp = MIAREX;
 	UpdateWPolars();

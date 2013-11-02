@@ -923,11 +923,11 @@ void QXDirect::FillOppCurve(OpPoint *pOpp, Graph *pGraph, CCurve *pCurve, bool b
 			{
 				if(!bInviscid)
 				{
-					if(pOpp->m_bVisc) pCurve->AddPoint(pOpp->x[j], pOpp->Cpv[j]);
+					if(pOpp->m_bVisc) pCurve->AppendPoint(pOpp->x[j], pOpp->Cpv[j]);
 				}
 				else
 				{
-					pCurve->AddPoint(pOpp->x[j], pOpp->Cpi[j]);
+					pCurve->AppendPoint(pOpp->x[j], pOpp->Cpi[j]);
 				}
 			}
 			pGraph->SetYTitle(tr("Cp"));
@@ -939,11 +939,11 @@ void QXDirect::FillOppCurve(OpPoint *pOpp, Graph *pGraph, CCurve *pCurve, bool b
 			{
 				if(!bInviscid)
 				{
-					if(pOpp->m_bVisc) pCurve->AddPoint(pOpp->x[j], pOpp->Qv[j]);
+					if(pOpp->m_bVisc) pCurve->AppendPoint(pOpp->x[j], pOpp->Qv[j]);
 				}
 				else
 				{
-					pCurve->AddPoint(pOpp->x[j], pOpp->Qi[j]);
+					pCurve->AppendPoint(pOpp->x[j], pOpp->Qi[j]);
 				}
 			}
 			pGraph->SetYTitle(tr("Q"));
@@ -955,10 +955,10 @@ void QXDirect::FillOppCurve(OpPoint *pOpp, Graph *pGraph, CCurve *pCurve, bool b
 			{
 				if(!bInviscid)
 				{
-					if(pOpp->m_bVisc) pCurve->AddPoint(pOpp->x[j], pOpp->Cpv[j]);
+					if(pOpp->m_bVisc) pCurve->AppendPoint(pOpp->x[j], pOpp->Cpv[j]);
 				}
 				else{
-					pCurve->AddPoint(pOpp->x[j], pOpp->Cpi[j]);
+					pCurve->AppendPoint(pOpp->x[j], pOpp->Cpi[j]);
 				}
 			}
 			pGraph->SetYTitle(tr("Cp"));
@@ -995,12 +995,12 @@ void QXDirect::FillPolarCurve(CCurve *pCurve, CPolar *pPolar, int XVar, int YVar
 				{
 					if((*pY)[i]>0.0)
 					{
-						pCurve->AddPoint(1.0/sqrt((*pX)[i]), 1.0/sqrt((*pY)[i]));
+						pCurve->AppendPoint(1.0/sqrt((*pX)[i]), 1.0/sqrt((*pY)[i]));
 					}
 				}
 				else
 				{
-					pCurve->AddPoint(1.0/sqrt((*pX)[i]), (*pY)[i]*fy);
+					pCurve->AppendPoint(1.0/sqrt((*pX)[i]), (*pY)[i]*fy);
 				}
 			}
 		}
@@ -1009,12 +1009,12 @@ void QXDirect::FillPolarCurve(CCurve *pCurve, CPolar *pPolar, int XVar, int YVar
 			{
 				if((*pY)[i]>0.0)
 				{
-					pCurve->AddPoint((*pX)[i]*fx, 1.0/sqrt((*pY)[i]));
+					pCurve->AppendPoint((*pX)[i]*fx, 1.0/sqrt((*pY)[i]));
 				}
 			}
 			else
 			{
-				pCurve->AddPoint((*pX)[i]*fx, (*pY)[i]*fy);
+				pCurve->AppendPoint((*pX)[i]*fx, (*pY)[i]*fy);
 			}
 		}
 		if(m_pCurOpp && m_bHighlightOpp)
@@ -2121,11 +2121,11 @@ void QXDirect::OnCfPlot()
 
 	for (i=2; i<=nside1-1; i++)
 	{
-		pTopCurve->AddPoint(x[i][1], y[i][1]);
+		pTopCurve->AppendPoint(x[i][1], y[i][1]);
 	}
 	for (i=2; i<=nside2-1; i++)
 	{
-		pBotCurve->AddPoint(x[i][2], y[i][2]);
+		pBotCurve->AppendPoint(x[i][2], y[i][2]);
 	}
 	m_pCpGraph->SetXScale();
 	SetFoilScale();
@@ -2168,11 +2168,11 @@ void QXDirect::OnCdPlot()
 
 	for (i=2; i<=nside1-1; i++)
 	{
-		pTopCurve->AddPoint(x[i][1], y[i][1]);
+		pTopCurve->AppendPoint(x[i][1], y[i][1]);
 	}
 	for (i=2; i<=nside2-1; i++)
 	{
-		pBotCurve->AddPoint(x[i][2], y[i][2]);
+		pBotCurve->AppendPoint(x[i][2], y[i][2]);
 	}
 	m_pCpGraph->SetXScale();
 	SetFoilScale();
@@ -2271,11 +2271,11 @@ void QXDirect::OnCtPlot()
 	int it1 = m_pXFoil->itran[1];
 	int it2 = m_pXFoil->itran[2];
 
-	for (i=it1; i<=nside1-1; i++)	pCurve0->AddPoint(x[i][1], m_pXFoil->ctau[i][1]);
-	for (i=2; i<=nside1-1; i++)		pCurve1->AddPoint(x[i][1], m_pXFoil->ctq[i][1]);
+	for (i=it1; i<=nside1-1; i++)	pCurve0->AppendPoint(x[i][1], m_pXFoil->ctau[i][1]);
+	for (i=2; i<=nside1-1; i++)		pCurve1->AppendPoint(x[i][1], m_pXFoil->ctq[i][1]);
 
-	for (i=it2; i<=nside2-1; i++)	pCurve2->AddPoint(x[i][2], m_pXFoil->ctau[i][2]);
-	for (i=2; i<=nside2-1; i++)		pCurve3->AddPoint(x[i][2], m_pXFoil->ctq[i][2]);
+	for (i=it2; i<=nside2-1; i++)	pCurve2->AppendPoint(x[i][2], m_pXFoil->ctau[i][2]);
+	for (i=2; i<=nside2-1; i++)		pCurve3->AppendPoint(x[i][2], m_pXFoil->ctq[i][2]);
 
 	m_pCpGraph->SetXScale();
 	SetFoilScale();
@@ -2665,8 +2665,8 @@ void QXDirect::OnDtPlot()
 	m_pXFoil->CreateXBL(x, nside1, nside2);
 
 	for (i=2; i<nside1; i++){
-		pCurve1->AddPoint(x[i][1], m_pXFoil->dstr[i][1]);
-		pCurve2->AddPoint(x[i][1], m_pXFoil->thet[i][1]);
+		pCurve1->AppendPoint(x[i][1], m_pXFoil->dstr[i][1]);
+		pCurve2->AppendPoint(x[i][1], m_pXFoil->thet[i][1]);
 	}
 
 	m_pCpGraph->SetXScale();
@@ -2701,8 +2701,8 @@ void QXDirect::OnDbPlot()
 
 	for (i=2; i<nside2; i++)
 	{
-		pCurve1->AddPoint(x[i][2], m_pXFoil->dstr[i][2]);
-		pCurve2->AddPoint(x[i][2], m_pXFoil->thet[i][2]);
+		pCurve1->AppendPoint(x[i][2], m_pXFoil->dstr[i][2]);
+		pCurve2->AppendPoint(x[i][2], m_pXFoil->thet[i][2]);
 	}
 
 	m_pCpGraph->SetXScale();
@@ -3395,11 +3395,11 @@ void QXDirect::OnHPlot()
 
 	for (i=2; i<=nside1-1; i++)
 	{
-		pTopCurve->AddPoint(x[i][1], y[i][1]);
+		pTopCurve->AppendPoint(x[i][1], y[i][1]);
 	}
 	for (i=2; i<=nside2-1; i++)
 	{
-		pBotCurve->AddPoint(x[i][2], y[i][2]);
+		pBotCurve->AppendPoint(x[i][2], y[i][2]);
 	}
 
 	m_pCpGraph->SetXScale();
@@ -3979,11 +3979,11 @@ void QXDirect::OnNPlot()
 
 	for (i=2; i<=m_pXFoil->itran[1]-2; i++)
 	{
-		pTopCurve->AddPoint(x[i][1], y[i][1]);
+		pTopCurve->AppendPoint(x[i][1], y[i][1]);
 	}
 	for (i=2; i<=m_pXFoil->itran[2]-2; i++)
 	{
-		pBotCurve->AddPoint(x[i][2], y[i][2]);
+		pBotCurve->AppendPoint(x[i][2], y[i][2]);
 	}
 	m_pCpGraph->SetXScale();
 	SetFoilScale();
@@ -4341,8 +4341,8 @@ void QXDirect::OnRtPlot()
 	m_pXFoil->CreateXBL(x, nside1, nside2);
 	m_pXFoil->FillRTheta(y, nside1, nside2);
 
-	for (i=2; i<=nside1-1; i++)	pTopCurve->AddPoint(x[i][1], y[i][1]);
-	for (i=2; i<=nside2-1; i++) pBotCurve->AddPoint(x[i][2], y[i][2]);
+	for (i=2; i<=nside1-1; i++)	pTopCurve->AppendPoint(x[i][1], y[i][1]);
+	for (i=2; i<=nside2-1; i++) pBotCurve->AppendPoint(x[i][2], y[i][2]);
 
 	m_pCpGraph->SetXScale();
 	SetFoilScale();
@@ -4377,12 +4377,12 @@ void QXDirect::OnRtLPlot()
 	for (i=2; i<=nside1-1; i++){
 		if (y[i][1]>0.0) y[i][1] = log10( y[i][1] );
 		else             y[i][1] = 0.0;
-		pTopCurve->AddPoint(x[i][1], y[i][1]);
+		pTopCurve->AppendPoint(x[i][1], y[i][1]);
 	}
 	for (i=2; i<=nside2-1; i++){
 		if (y[i][2]>0.0) y[i][2] = log10( y[i][2] );
 		else             y[i][2] = 0.0;
-		pBotCurve->AddPoint(x[i][2], y[i][2]);
+		pBotCurve->AppendPoint(x[i][2], y[i][2]);
 	}
 	m_pCpGraph->SetXScale();
 	SetFoilScale();
@@ -4864,11 +4864,11 @@ void QXDirect::OnUePlot()
 
 	for (i=2; i<=nside1-1; i++)
 	{
-		pTopCurve->AddPoint(x[i][1], y[i][1]);
+		pTopCurve->AppendPoint(x[i][1], y[i][1]);
 	}
 	for (i=2; i<=nside2-1; i++)
 	{
-		pBotCurve->AddPoint(x[i][2], y[i][2]);
+		pBotCurve->AppendPoint(x[i][2], y[i][2]);
 	}
 	m_pCpGraph->SetXScale();
 	SetFoilScale();

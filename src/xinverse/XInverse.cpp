@@ -250,7 +250,7 @@ void QXInverse::CreateQCurve()
 	{
 		x = 1.0 - pXFoil->sspec[i];
 		y = pXFoil->qcomp(pXFoil->qspec[1][i])/pXFoil->qinf;
-		m_pQCurve->AddPoint(x,y);
+		m_pQCurve->AppendPoint(x,y);
 	}
 }
 
@@ -270,8 +270,8 @@ void QXInverse::CreateMCurve()
 	{
 		x = 1.0 - pXFoil->sspec[i];
 		y = pXFoil->qcomp(pXFoil->qspec[1][i])/pXFoil->qinf;
-		m_pMCurve->AddPoint(x,y);
-		m_pReflectedCurve->AddPoint(pXFoil->sspec[i],-y);
+		m_pMCurve->AppendPoint(x,y);
+		m_pReflectedCurve->AppendPoint(pXFoil->sspec[i],-y);
 	}
 }
 
@@ -649,7 +649,7 @@ void QXInverse::mouseMoveEvent(QMouseEvent *event)
 
 	if(m_bGetPos)
 	{
-		m_tmpPos = m_pMCurve->GetClosestPoint(m_QGraph.ClientTox(point.x()), m_QGraph.ClientToy(point.y()), dist);
+		m_tmpPos = m_pMCurve->closestPoint(m_QGraph.ClientTox(point.x()), m_QGraph.ClientToy(point.y()), dist);
 		UpdateView();
 	}
 	else if(m_bZoomPlus && (event->buttons() & Qt::LeftButton))
@@ -698,7 +698,7 @@ void QXInverse::mouseMoveEvent(QMouseEvent *event)
 			{
 				// user is dragging end point
 				// find closest graph point
-				ipt = m_pMCurve->GetClosestPoint(m_QGraph.ClientTox(point.x()), m_QGraph.ClientToy(point.y()), dist);
+				ipt = m_pMCurve->closestPoint(m_QGraph.ClientTox(point.x()), m_QGraph.ClientToy(point.y()), dist);
 				m_SplineLeftPos = ipt;
 				xpt = m_pMCurve->x[ipt];
 				ypt = m_pMCurve->y[ipt];
@@ -722,7 +722,7 @@ void QXInverse::mouseMoveEvent(QMouseEvent *event)
 			{
 				// user is dragging end point
 				// find closest graph point
-				ipt = m_pMCurve->GetClosestPoint(m_QGraph.ClientTox(point.x()), m_QGraph.ClientToy(point.y()), dist);
+				ipt = m_pMCurve->closestPoint(m_QGraph.ClientTox(point.x()), m_QGraph.ClientToy(point.y()), dist);
 				m_SplineRightPos = ipt;
 				xpt = m_pMCurve->x[ipt];
 				ypt = m_pMCurve->y[ipt];
@@ -1061,11 +1061,11 @@ void QXInverse::mouseReleaseEvent(QMouseEvent *event)
 	{
 		if(m_nPos == 0)
 		{
-			m_Pos1 = m_pMCurve->GetClosestPoint(m_QGraph.ClientTox(point.x()), m_QGraph.ClientToy(point.y()), dist);
+			m_Pos1 = m_pMCurve->closestPoint(m_QGraph.ClientTox(point.x()), m_QGraph.ClientToy(point.y()), dist);
 		}
 		if(m_nPos == 1)
 		{
-			m_Pos2 = m_pMCurve->GetClosestPoint(m_QGraph.ClientTox(point.x()), m_QGraph.ClientToy(point.y()), dist);
+			m_Pos2 = m_pMCurve->closestPoint(m_QGraph.ClientTox(point.x()), m_QGraph.ClientToy(point.y()), dist);
 		}
 		m_nPos++;
 		if(m_nPos == 2) 
@@ -2034,10 +2034,10 @@ void QXInverse::SetFoil()
 			qv2 = pXFoil->qcomp(pXFoil->qvis[i]  ) - 0.25*dqv;
 			x = 1.0 - sp1;
 			y = qv1/pXFoil->qinf;
-			m_pQVCurve->AddPoint(x,y);
+			m_pQVCurve->AppendPoint(x,y);
 			x = 1.0 - sp2;
 			y = qv2/pXFoil->qinf;
-			m_pQVCurve->AddPoint(x,y);
+			m_pQVCurve->AppendPoint(x,y);
 		}
 		m_pQVCurve->SetVisible(true);
 	}
@@ -2106,7 +2106,7 @@ bool QXInverse::SetParams()
 	if (g_pCurFoil && pXFoil->m_FoilName==g_pCurFoil->m_FoilName && pXFoil->lqspec)
 	{
 		m_pRefFoil->CopyFoil(g_pCurFoil);
-		m_pRefFoil->m_FoilColor = m_pQCurve->GetColor();
+		m_pRefFoil->m_FoilColor = m_pQCurve->color();
 //		m_pXFoil->m_FoilName    = m_pRefFoil->m_FoilName ;
 //		InitXFoil(m_pRefFoil);
 
@@ -2119,7 +2119,7 @@ bool QXInverse::SetParams()
 		{
 			pFoil = (CFoil*)m_poaFoil->at(0);
 			m_pRefFoil->CopyFoil(pFoil);
-			m_pRefFoil->m_FoilColor = m_pQCurve->GetColor();
+			m_pRefFoil->m_FoilColor = m_pQCurve->color();
 			pXFoil->m_FoilName      = m_pRefFoil->m_FoilName ;
 			InitXFoil(m_pRefFoil);
 		}
