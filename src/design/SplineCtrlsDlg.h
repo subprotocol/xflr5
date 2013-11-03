@@ -23,7 +23,7 @@
 #define SPLINECTRLSDLG_H
 
 #include "../misc/FloatEdit.h"
-#include "../objects/Sf.h"
+#include "../objects/SplineFoil.h"
 #include "../misc/FloatEditDelegate.h"
 
 

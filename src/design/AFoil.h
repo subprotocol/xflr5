@@ -37,7 +37,7 @@
 #include "../misc/FloatEdit.h"
 #include "../misc/LineButton.h"
 #include "../objects/Foil.h"
-#include "../objects/Sf.h"
+#include "../objects/SplineFoil.h"
 #include "../xdirect/XFoil.h"
 #include "../xdirect/NacaFoilDlg.h"
 #include "../xdirect/CAddDlg.h"
