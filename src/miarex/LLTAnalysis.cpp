@@ -92,8 +92,8 @@ void LLTAnalysis::LLTInitCl(double &QInf, double const Alpha)
 {
 	//Initializes the Reynolds numbers and lift coefficients for the initial iteration in LLT
 
-	CFoil *pFoil0 = NULL;
-	CFoil *pFoil1 = NULL;
+	Foil *pFoil0 = NULL;
+	Foil *pFoil1 = NULL;
 	double yob, tau;
 	int k;
 	bool bOutRe, bError;
@@ -134,8 +134,8 @@ double LLTAnalysis::Eta(int m)
 
 void LLTAnalysis::LLTComputeWing(double QInf, double Alpha, QString &ErrorMessage)
 {
-	CFoil* pFoil0 = NULL;
-	CFoil* pFoil1 = NULL;
+	Foil* pFoil0 = NULL;
+	Foil* pFoil1 = NULL;
 
 	int m;
 	QString strange;
@@ -338,7 +338,7 @@ bool LLTAnalysis::LLTSetLinearSolution(double Alpha)
 	memset(aij, 0, sizeof(aij));
 	memset(rhs, 0, sizeof(rhs));
 
-	CFoil *pFoil0, *pFoil1;
+	Foil *pFoil0, *pFoil1;
 	int i,j,p;
 	double fr  = s_NLLTStations;
 	double fj, t0, st0, snt0, c, a0, slope, tau, yob;
@@ -442,8 +442,8 @@ double LLTAnalysis::AlphaInduced(int k)
 int LLTAnalysis::LLTIterate(double &QInf, double Alpha)
 {
 	int k ;
-	CFoil* pFoil0  = NULL;
-	CFoil* pFoil1  = NULL;
+	Foil* pFoil0  = NULL;
+	Foil* pFoil1  = NULL;
 	double a, yob, tau, anext;
 	bool bOutRe, bError;
 	int iter = 0;

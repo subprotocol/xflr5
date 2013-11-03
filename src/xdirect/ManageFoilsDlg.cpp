@@ -205,7 +205,7 @@ void ManageFoilsDlg::FillTableRow(int row)
 	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
 	QString str, strong;
 	QModelIndex ind;
-	CFoil *pFoil = (CFoil*)pMainFrame->m_oaFoil.at(row);
+	Foil *pFoil = (Foil*)pMainFrame->m_oaFoil.at(row);
 
 	ind = m_pFoilModel->index(row, 0, QModelIndex());
 	m_pFoilModel->setData(ind,pFoil->m_FoilName);

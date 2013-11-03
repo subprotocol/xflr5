@@ -19,46 +19,41 @@
 
 *****************************************************************************/
  
-#ifndef CFRAME_H
-#define CFRAME_H
+#ifndef FRAME_H
+#define FRAME_H
 
 #include "CVector.h"
 #include <QDataStream>
 #include <QList>
 
-class CFrame
+class Frame
 {
 public:
-	CFrame(int nCtrlPts=0);
-	~CFrame();
-    bool SerializeFrame(QDataStream &ar, bool bIsStoring);
+	Frame(int nCtrlPts=0);
+	~Frame();
 
-	int IsPoint(CVector const &Point, double const &ZoomFactor);
-	void AppendPoint(CVector const& Pt);
-	void InsertPoint(int n);
-	void InsertPoint(int n, const CVector &Pt);
-	int InsertPoint(CVector const &Real, int iAxis);
-	bool RemovePoint(int n);
-
-	void CopyFrame(CFrame *pFrame);
-	void CopyPoints(QList<CVector> *m_pPointList);
-
-	void SetPosition(CVector Pos);
-	void SetuPosition(double u);
-	void SetvPosition(double v);
-	void SetwPosition(double w);
-
-	void RotateFrameY(double Angle);
-
-	int PointCount() {return m_CtrlPoint.size();};
-
+	void   AppendPoint(CVector const& Pt);
+	void   CopyFrame(Frame *pFrame);
+	void   CopyPoints(QList<CVector> *m_pPointList);
 	double Height();
+	int    IsPoint(CVector const &Point, double const &ZoomFactor);
+	void   InsertPoint(int n);
+	void   InsertPoint(int n, const CVector &Pt);
+	int    InsertPoint(CVector const &Real, int iAxis);
+	int    PointCount() {return m_CtrlPoint.size();}
+	bool   RemovePoint(int n);
+	void   RotateFrameY(double Angle);
+	bool   SerializeFrame(QDataStream &ar, bool bIsStoring);
+	void   SetPosition(CVector Pos);
+	void   SetuPosition(double u);
+	void   SetvPosition(double v);
+	void   SetwPosition(double w);
 	double zPos();
 
-	int m_iHighlight, m_iSelect;
 
-	CVector m_Position;
 	QList <CVector> m_CtrlPoint;	// the point's positions
+	int m_iHighlight, m_iSelect;
+	CVector m_Position;
 };
 
 

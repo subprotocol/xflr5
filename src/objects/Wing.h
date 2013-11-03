@@ -19,22 +19,22 @@
 
 *****************************************************************************/
 
-#ifndef CWING_H
-#define CWING_H
+#ifndef WING_H
+#define WING_H
 
 #include "WPolar.h"
 #include "Surface.h"
 #include "Panel.h"
 #include "WingSection.h"
 
-class CWing
+class Wing
 {
 	friend class QMiarex;
 	friend class MainFrame;
-	friend class CWPolar;
-	friend class CPOpp;
-	friend class CPlane;
-	friend class CSurface;
+	friend class WPolar;
+	friend class PlaneOpp;
+	friend class Plane;
+	friend class Surface;
 	friend class WingDlg;
 	friend class LLTAnalysisDlg;
 	friend class LLTAnalysis;
@@ -51,7 +51,7 @@ class CWing
 	// Construction
 public:
 
-	CWing();   // standard constructor
+	Wing();   // standard constructor
 
 	void ImportDefinition(QString path_to_file);
 	void ExportDefinition(QString path_to_file);
@@ -82,20 +82,20 @@ public:
 	void VLMSetBending();
 
 	void PanelTrefftz(double QInf, double Alpha, double *Mu, double *Sigma, int pos, CVector &Force, double &WingIDrag,
-							 CWPolar *pWPolar, CPanel *pWakePanel, CVector *pWakeNode);
+							 WPolar *pWPolar, Panel *pWakePanel, CVector *pWakeNode);
     void PanelComputeOnBody(double QInf, double Alpha, double *Cp, double *Gamma, double &XCP, double &YCP, double &ZCP,
 						 double &GCm, double &VCm, double &ICm, double &GRm, double &GYm, double &VYm,double &IYm,
-						 CWPolar *pWPolar, CVector CoG);
+						 WPolar *pWPolar, CVector CoG);
 
 
-	void PanelComputeViscous(double QInf, double Alpha, CWPolar *pWPolar, double &WingVDrag, bool bViscous, QString &OutString);
+	void PanelComputeViscous(double QInf, double Alpha, WPolar *pWPolar, double &WingVDrag, bool bViscous, QString &OutString);
 	void PanelSetBending(bool bThinSurface);
 
 	bool IsWingPanel(int nPanel);
 	bool IsWingNode(int nNode);
 
-	void GetFoils(CFoil **pFoil0, CFoil **pFoil1, double y, double &t);
-	void Duplicate(CWing *pWing);
+	void GetFoils(Foil **pFoil0, Foil **pFoil1, double y, double &t);
+	void Duplicate(Wing *pWing);
 	void ComputeChords(int NStation=0);
 	void ComputeChords(int NStation, double *chord, double *offset, double *twist);
 	void ComputeDihedrals();
@@ -155,7 +155,7 @@ private:
 	static void* s_pMiarex;	//pointer to the Miarex Application window
 	static void* s_p3DPanelDlg;//pointer to the 3DPanel analysis dialog class
 	static CVector *m_pWakeNode;			//pointer to the VLM wake node array
-	static CPanel *m_pWakePanel;			//pointer to the VLM Wake Panel array
+	static Panel *m_pWakePanel;			//pointer to the VLM Wake Panel array
 
 
 	static bool s_bVLMSymetric;	// true if the vlm calculation is symmetric
@@ -227,7 +227,7 @@ public:
 	int m_NSurfaces; 	// The number of VLM Surfaces (=2 x Wing Panels)
 //	int m_NPanel;		// number of span panels in wing definition
 
-	CSurface m_Surface[2*MAXSPANSECTIONS];
+	Surface m_Surface[2*MAXSPANSECTIONS];
 
 	QList<WingSection*> m_WingSection;
 	
@@ -242,7 +242,7 @@ public:
 	CVector m_CoG;
 
 	int m_MatSize;	// Max Size for the VLMMatrix
-	CPanel *m_pPanel;			//pointer to the VLM Panel array
+	Panel *m_pPanel;			//pointer to the VLM Panel array
 
 };
 

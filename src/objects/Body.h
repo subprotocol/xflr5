@@ -19,8 +19,8 @@
 
 *****************************************************************************/
 
-#ifndef CBODY_H
-#define CBODY_H
+#ifndef BODY_H
+#define BODY_H
 
 #include "Panel.h"
 #include "NURBSSurface.h"
@@ -28,10 +28,10 @@
 #include <QColor>
 
 
-class CBody
+class Body
 {
 public:
-	CBody();
+	Body();
 
 	bool Gauss(double *A, int n, double *B, int m);
 	bool IsInNURBSBody(CVector Pt);
@@ -47,7 +47,7 @@ public:
 	int InsertPoint(CVector Real);
 	int IsFramePos(CVector Real, double ZoomFactor);
 	int RemoveFrame(int n);
-	int ReadFrame(QTextStream &in, int &Line, CFrame *pFrame, double const &Unit);
+	int ReadFrame(QTextStream &in, int &Line, Frame *pFrame, double const &Unit);
 
 	double Length();
 
@@ -60,7 +60,7 @@ public:
     void ComputeAero(double *Cp, double &XCP, double &YCP, double &ZCP,
 					 double &GCm, double &GRm, double &GYm, double &Alpha, CVector &CoG);
 //	void ComputeCenterLine();
-	void Duplicate(CBody *pBody);
+	void Duplicate(Body *pBody);
 	void ExportGeometry(QTextStream &outStream, int type, double mtoUnit, int nx, int nh);
 	void GetPoint(double u, double v, bool bRight, CVector &Pt);
 	void InsertSideLine(int SideLine);
@@ -75,9 +75,9 @@ public:
 	void SetPanelPos();
 	void SetEdgeWeight(double uw, double vw);
 
-	CFrame *Frame(int k);
-	CFrame *ActiveFrame();
-	void SetActiveFrame(CFrame *pFrame);
+	Frame *getFrame(int k);
+	Frame *activeFrame();
+	void SetActiveFrame(Frame *pFrame);
 	double FramePosition(int iFrame);
 	int FrameSize()       {return m_SplineSurface.FrameSize();};
 	int FramePointCount() {return m_SplineSurface.FramePointCount();};
@@ -124,7 +124,7 @@ public:
 
 	CVector m_LEPosition;
 
-	CPanel *m_pPanel;
+	Panel *m_pPanel;
 
 	//allocate temporary variables to
 	//avoid lengthy memory allocation times on the stack

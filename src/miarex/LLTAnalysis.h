@@ -55,8 +55,8 @@ private:
     double AlphaInduced(int k);
 
     void *m_pParent;
-    CWing * m_pWing;
-    CWPolar *m_pWPolar;
+    Wing * m_pWing;
+    WPolar *m_pWPolar;
 
     QList<void *> *m_poaPolar;			// a pointer to the foil polar array
 

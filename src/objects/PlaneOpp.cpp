@@ -20,12 +20,12 @@
 *****************************************************************************/
 
 
-#include "POpp.h"
+#include "PlaneOpp.h"
 #include "../globals.h"
 
 
 
-CPOpp::CPOpp()
+PlaneOpp::PlaneOpp()
 {
 	m_PlaneName   = "";
 	m_PlrName     = "";
@@ -58,7 +58,7 @@ CPOpp::CPOpp()
 
 
 
-bool CPOpp::SerializePOpp(QDataStream &ar, bool bIsStoring, int ProjectFormat)
+bool PlaneOpp::SerializePOpp(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 {
 	int ArchiveFormat;
 	int a, k;

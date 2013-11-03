@@ -4007,7 +4007,7 @@ bool XFoil::Initialize()
 
 
 
-bool XFoil::InitXFoilGeometry(CFoil *pFoil)
+bool XFoil::InitXFoilGeometry(Foil *pFoil)
 {
 	//loads pFoil in XFoil,
 	//calculates normal vectors,
@@ -4058,7 +4058,7 @@ bool XFoil::InitXFoilGeometry(CFoil *pFoil)
 
 
 
-bool XFoil::InitXFoilAnalysis(CPolar *pPolar)
+bool XFoil::InitXFoilAnalysis(Polar *pPolar)
 {
 	//Sets Analysis parameters in XFoil
 	if(!pPolar) return false;
@@ -13202,7 +13202,7 @@ void XFoil::lerscl(double *x, double *xp, double* y, double *yp,
 
 
 
-void XFoil::SetFoilFlap(CFoil *pFoil)
+void XFoil::SetFoilFlap(Foil *pFoil)
 {
 	Initialize();
 	m_bTrace = false;

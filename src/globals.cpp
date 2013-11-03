@@ -1551,7 +1551,7 @@ bool LinBairstow(double *p, complex<double> *root, int n)
 
 
 
-double GetVar(QList<void*>*m_poaPolar, int nVar, CFoil *pFoil0, CFoil *pFoil1, double Re, double Cl, double Tau, bool &bOutRe, bool &bError)
+double GetVar(QList<void*>*m_poaPolar, int nVar, Foil *pFoil0, Foil *pFoil1, double Re, double Cl, double Tau, bool &bOutRe, bool &bError)
 {
 	bool IsOutRe = false;
 	bool IsError  = false;
@@ -1584,7 +1584,7 @@ double GetVar(QList<void*>*m_poaPolar, int nVar, CFoil *pFoil0, CFoil *pFoil1, d
 }
 
 
-void * GetPlrVariable(CPolar *pPolar, int iVar)
+void * GetPlrVariable(Polar *pPolar, int iVar)
 {
 	// returns a pointer to the variable array defined by its index iVar
 
@@ -1635,7 +1635,7 @@ void * GetPlrVariable(CPolar *pPolar, int iVar)
 }
 
 
-double GetPlrPointFromAlpha(QList<void*>*m_poaPolar, CFoil *pFoil, double Re, double Alpha, int PlrVar, bool &bOutRe, bool &bError)
+double GetPlrPointFromAlpha(QList<void*>*m_poaPolar, Foil *pFoil, double Re, double Alpha, int PlrVar, bool &bOutRe, bool &bError)
 {
 /*	Var
 	0 =	m_Alpha;
@@ -1654,7 +1654,7 @@ double GetPlrPointFromAlpha(QList<void*>*m_poaPolar, CFoil *pFoil, double Re, do
 	double Var1, Var2, u;
 	amin = amax = Var1 = Var2 = u = 0.0;
 	int i;
-	CPolar *pPolar;
+	Polar *pPolar;
 
 	bOutRe = false;
 	bError = false;
@@ -1673,7 +1673,7 @@ double GetPlrPointFromAlpha(QList<void*>*m_poaPolar, CFoil *pFoil, double Re, do
 	// Are there any Type 1 polars available for this foil ?
 	for (i = 0; i< m_poaPolar->size(); i++)
 	{
-		pPolar = (CPolar*)m_poaPolar->at(i);
+		pPolar = (Polar*)m_poaPolar->at(i);
 		if((pPolar->m_PolarType==FIXEDSPEEDPOLAR) && (pPolar->m_FoilName == pFoil->m_FoilName))
 		{
 			n++;
@@ -1684,15 +1684,15 @@ double GetPlrPointFromAlpha(QList<void*>*m_poaPolar, CFoil *pFoil, double Re, do
 //more than one polar - interpolate between  - tough job
 
 	//First Find the two polars with Reynolds number surrounding wanted Re
-	CPolar * pPolar1 = NULL;
-	CPolar * pPolar2 = NULL;
+	Polar * pPolar1 = NULL;
+	Polar * pPolar2 = NULL;
 	int nPolars = m_poaPolar->size();
 	//Type 1 Polars are sorted by crescending Re Number
 
 	//if Re is less than that of the first polar, use this one
 	for (i=0; i< nPolars; i++)
 	{
-		pPolar = (CPolar*)m_poaPolar->at(i);
+		pPolar = (Polar*)m_poaPolar->at(i);
 		if((pPolar->m_PolarType==FIXEDSPEEDPOLAR) && (pPolar->m_FoilName == pFoil->m_FoilName) && pPolar->m_Alpha.size()>0)
 		{
 			// we have found the first type 1 polar for this foil
@@ -1734,7 +1734,7 @@ double GetPlrPointFromAlpha(QList<void*>*m_poaPolar, CFoil *pFoil, double Re, do
 	// if not Find the two polars
 	for (i=0; i< nPolars; i++)
 	{
-		pPolar = (CPolar*)m_poaPolar->at(i);
+		pPolar = (Polar*)m_poaPolar->at(i);
 		if((pPolar->m_PolarType==FIXEDSPEEDPOLAR) && (pPolar->m_FoilName == pFoil->m_FoilName)  && pPolar->m_Alpha.size()>0)
 		{
 			// we have found the first type 1 polar for this foil
@@ -1886,7 +1886,7 @@ double GetPlrPointFromAlpha(QList<void*>*m_poaPolar, CFoil *pFoil, double Re, do
 }
 
 
-double GetPlrPointFromCl(QList<void*>*m_poaPolar, CFoil *pFoil, double Re, double Cl, int PlrVar, bool &bOutRe, bool &bError)
+double GetPlrPointFromCl(QList<void*>*m_poaPolar, Foil *pFoil, double Re, double Cl, int PlrVar, bool &bOutRe, bool &bError)
 {
 /*	Var
 	0 =	m_Alpha;
@@ -1900,7 +1900,7 @@ double GetPlrPointFromCl(QList<void*>*m_poaPolar, CFoil *pFoil, double Re, doubl
 */
 	QList <double> *pX;
 	double Clmin, Clmax;
-	CPolar *pPolar;
+	Polar *pPolar;
 	double Var1, Var2, u, dist;
 	Var1 = Var2 = u = dist = 0.0;
 	int pt;
@@ -1921,7 +1921,7 @@ double GetPlrPointFromCl(QList<void*>*m_poaPolar, CFoil *pFoil, double Re, doubl
 	// Are there any Type 1 polars available for this foil ?
 	for (i = 0; i< m_poaPolar->size(); i++)
 	{
-		pPolar = (CPolar*)m_poaPolar->at(i);
+		pPolar = (Polar*)m_poaPolar->at(i);
 		if((pPolar->m_PolarType==FIXEDSPEEDPOLAR) && (pPolar->m_FoilName == pFoil->m_FoilName))
 		{
 			n++;
@@ -1932,15 +1932,15 @@ double GetPlrPointFromCl(QList<void*>*m_poaPolar, CFoil *pFoil, double Re, doubl
 //more than one polar - interpolate between  - tough job
 
 	//First Find the two polars with Reynolds number surrounding wanted Re
-	CPolar * pPolar1 = NULL;
-	CPolar * pPolar2 = NULL;
+	Polar * pPolar1 = NULL;
+	Polar * pPolar2 = NULL;
 	int nPolars = m_poaPolar->size();
 	//Type 1 Polars are sorted by crescending Re Number
 
 	//if Re is less than that of the first polar, use this one
 	for (i=0; i< nPolars; i++)
 	{
-		pPolar = (CPolar*)m_poaPolar->at(i);
+		pPolar = (Polar*)m_poaPolar->at(i);
 		if((pPolar->m_PolarType==FIXEDSPEEDPOLAR) && (pPolar->m_FoilName == pFoil->m_FoilName) && pPolar->m_Cl.size()>0)
 		{
 			// we have found the first type 1 polar for this foil
@@ -1981,7 +1981,7 @@ double GetPlrPointFromCl(QList<void*>*m_poaPolar, CFoil *pFoil, double Re, doubl
 	// if not Find the two polars
 	for (i=0; i< nPolars; i++)
 	{
-		pPolar = (CPolar*)m_poaPolar->at(i);
+		pPolar = (Polar*)m_poaPolar->at(i);
 		if((pPolar->m_PolarType==FIXEDSPEEDPOLAR) && (pPolar->m_FoilName == pFoil->m_FoilName)  && pPolar->m_Cl.size()>0)
 		{
 			// we have found the first type 1 polar for this foil
@@ -2224,7 +2224,7 @@ double GetPlrPointFromCl(QList<void*>*m_poaPolar, CFoil *pFoil, double Re, doubl
 }
 
 
-double GetCl(QList<void*>*m_poaPolar, CFoil *pFoil0, CFoil *pFoil1, double Re, double Alpha, double Tau, bool &bOutRe, bool &bError)
+double GetCl(QList<void*>*m_poaPolar, Foil *pFoil0, Foil *pFoil1, double Re, double Alpha, double Tau, bool &bOutRe, bool &bError)
 {
 	double Cl0, Cl1;
 	bool IsOutRe = false;
@@ -2252,7 +2252,7 @@ double GetCl(QList<void*>*m_poaPolar, CFoil *pFoil0, CFoil *pFoil1, double Re, d
 }
 
 
-double GetCm0(QList<void*>*m_poaPolar, CFoil *pFoil0, CFoil *pFoil1, double Re, double Tau, bool &bOutRe, bool &bError)
+double GetCm0(QList<void*>*m_poaPolar, Foil *pFoil0, Foil *pFoil1, double Re, double Tau, bool &bOutRe, bool &bError)
 {
 	//Find 0-lift angle for local foil
 	double Alpha;
@@ -2297,7 +2297,7 @@ double GetCm0(QList<void*>*m_poaPolar, CFoil *pFoil0, CFoil *pFoil1, double Re, 
 }
 
 
-double GetCm(QList<void*>*m_poaPolar, CFoil *pFoil0, CFoil *pFoil1, double Re, double Alpha, double Tau, bool &bOutRe, bool &bError)
+double GetCm(QList<void*>*m_poaPolar, Foil *pFoil0, Foil *pFoil1, double Re, double Alpha, double Tau, bool &bOutRe, bool &bError)
 {
 	double Cm0, Cm1;
 	bool IsOutRe = false;
@@ -2325,7 +2325,7 @@ double GetCm(QList<void*>*m_poaPolar, CFoil *pFoil0, CFoil *pFoil1, double Re, d
 }
 
 
-double GetCd(QList<void*>*m_poaPolar, CFoil *pFoil0, CFoil *pFoil1, double Re, double Alpha, double Tau, double AR, bool &bOutRe, bool &bError)
+double GetCd(QList<void*>*m_poaPolar, Foil *pFoil0, Foil *pFoil1, double Re, double Alpha, double Tau, double AR, bool &bOutRe, bool &bError)
 {
 	//For LLT calculations
 	//returns the interpolated viscous drag
@@ -2359,7 +2359,7 @@ double GetCd(QList<void*>*m_poaPolar, CFoil *pFoil0, CFoil *pFoil1, double Re, d
 }
 
 
-double GetXCp(QList<void*>*m_poaPolar, CFoil *pFoil0, CFoil *pFoil1, double Re, double Alpha, double Tau, bool &bOutRe, bool &bError)
+double GetXCp(QList<void*>*m_poaPolar, Foil *pFoil0, Foil *pFoil1, double Re, double Alpha, double Tau, bool &bOutRe, bool &bError)
 {
 	//For LLT calculations
 	//returns the interpolated center of pressure position
@@ -2389,7 +2389,7 @@ double GetXCp(QList<void*>*m_poaPolar, CFoil *pFoil0, CFoil *pFoil1, double Re, 
 }
 
 
-double GetXTr(QList<void*>*m_poaPolar, CFoil *pFoil0, CFoil *pFoil1, double Re, double Alpha, double Tau, bool bTop, bool &bOutRe, bool &bError)
+double GetXTr(QList<void*>*m_poaPolar, Foil *pFoil0, Foil *pFoil1, double Re, double Alpha, double Tau, bool bTop, bool &bOutRe, bool &bError)
 {
 	//For LLT calculations
 	//returns the interpolated position of the transition on the  surface specified by bTop
@@ -2431,7 +2431,7 @@ double GetXTr(QList<void*>*m_poaPolar, CFoil *pFoil0, CFoil *pFoil1, double Re, 
 }
 
 
-double GetZeroLiftAngle(QList<void*>*m_poaPolar, CFoil *pFoil0, CFoil *pFoil1, double Re, double Tau)
+double GetZeroLiftAngle(QList<void*>*m_poaPolar, Foil *pFoil0, Foil *pFoil1, double Re, double Tau)
 {
 	//returns the 0-lift angle of the foil, at Reynolds=Re
 	//if the polar doesn't reach to 0-lift, returns Alpha0 = 0;
@@ -2440,7 +2440,7 @@ double GetZeroLiftAngle(QList<void*>*m_poaPolar, CFoil *pFoil0, CFoil *pFoil1, d
 	int i;
 	//Find the two polars which enclose Reynolds
 	int size = 0;
-	CPolar *pPolar, *pPolar1, *pPolar2;
+	Polar *pPolar, *pPolar1, *pPolar2;
 
 	if(!pFoil0) Alpha00 = 0.0;
 	else
@@ -2449,14 +2449,14 @@ double GetZeroLiftAngle(QList<void*>*m_poaPolar, CFoil *pFoil0, CFoil *pFoil1, d
 		pPolar2 = NULL;
 		for (i=0; i<m_poaPolar->size(); i++)
 		{
-			pPolar = (CPolar*)m_poaPolar->at(i);
+			pPolar = (Polar*)m_poaPolar->at(i);
 			if(pPolar->m_FoilName == pFoil0->m_FoilName) size++;
 		}
 		if(size)
 		{
 			for (i=0; i<m_poaPolar->size(); i++)
 			{
-				pPolar = (CPolar*)m_poaPolar->at(i);
+				pPolar = (Polar*)m_poaPolar->at(i);
 				if(pPolar->m_FoilName == pFoil0->m_FoilName)
 				{
 					if(pPolar->m_Reynolds < Re) pPolar1 = pPolar;
@@ -2464,7 +2464,7 @@ double GetZeroLiftAngle(QList<void*>*m_poaPolar, CFoil *pFoil0, CFoil *pFoil1, d
 			}
 			for (i=0; i<m_poaPolar->size(); i++)
 			{
-				pPolar = (CPolar*)m_poaPolar->at(i);
+				pPolar = (Polar*)m_poaPolar->at(i);
 				if(pPolar->m_FoilName == pFoil0->m_FoilName)
 				{
 					if(pPolar->m_Reynolds > Re)
@@ -2491,14 +2491,14 @@ double GetZeroLiftAngle(QList<void*>*m_poaPolar, CFoil *pFoil0, CFoil *pFoil1, d
 		pPolar2 = NULL;
 		for (i=0; i<m_poaPolar->size(); i++)
 		{
-			pPolar = (CPolar*)m_poaPolar->at(i);
+			pPolar = (Polar*)m_poaPolar->at(i);
 			if(pPolar->m_FoilName == pFoil1->m_FoilName) size++;
 		}
 		if(size)
 		{
 			for (i=0; i<m_poaPolar->size(); i++)
 			{
-				pPolar = (CPolar*)m_poaPolar->at(i);
+				pPolar = (Polar*)m_poaPolar->at(i);
 				if(pPolar->m_FoilName == pFoil1->m_FoilName)
 				{
 					if(pPolar->m_Reynolds < Re) pPolar1 = pPolar;
@@ -2506,7 +2506,7 @@ double GetZeroLiftAngle(QList<void*>*m_poaPolar, CFoil *pFoil0, CFoil *pFoil1, d
 			}
 			for (i=0; i<m_poaPolar->size(); i++)
 			{
-				pPolar = (CPolar*)m_poaPolar->at(i);
+				pPolar = (Polar*)m_poaPolar->at(i);
 				if(pPolar->m_FoilName == pFoil1->m_FoilName)
 				{
 					if(pPolar->m_Reynolds > Re)
@@ -2530,7 +2530,7 @@ double GetZeroLiftAngle(QList<void*>*m_poaPolar, CFoil *pFoil0, CFoil *pFoil1, d
 }
 
 
-void GetLinearizedPolar(QList<void*>*m_poaPolar, CFoil *pFoil0, CFoil *pFoil1, double Re, double Tau, double &Alpha0, double &Slope)
+void GetLinearizedPolar(QList<void*>*m_poaPolar, Foil *pFoil0, Foil *pFoil1, double Re, double Tau, double &Alpha0, double &Slope)
 {
 	//returns the 0-lift angle of the foil, at Reynolds=Re
 	//if the polar doesn't reach to 0-lift, returns Alpha0 = 0;
@@ -2541,7 +2541,7 @@ void GetLinearizedPolar(QList<void*>*m_poaPolar, CFoil *pFoil0, CFoil *pFoil1, d
 
 //Find the two polars which enclose Reynolds
 	int size = 0;
-	CPolar *pPolar, *pPolar1, *pPolar2;
+	Polar *pPolar, *pPolar1, *pPolar2;
 
 	if(!pFoil0)
 	{
@@ -2554,14 +2554,14 @@ void GetLinearizedPolar(QList<void*>*m_poaPolar, CFoil *pFoil0, CFoil *pFoil1, d
 		pPolar2 = NULL;
 		for (i=0; i<m_poaPolar->size(); i++)
 		{
-			pPolar = (CPolar*)m_poaPolar->at(i);
+			pPolar = (Polar*)m_poaPolar->at(i);
 			if(pPolar->m_FoilName == pFoil0->m_FoilName) size++;
 		}
 		if(size)
 		{
 			for (i=0; i<m_poaPolar->size(); i++)
 			{
-				pPolar = (CPolar*)m_poaPolar->at(i);
+				pPolar = (Polar*)m_poaPolar->at(i);
 				if(pPolar->m_FoilName == pFoil0->m_FoilName)
 				{
 					if(pPolar->m_Reynolds < Re) pPolar1 = pPolar;
@@ -2569,7 +2569,7 @@ void GetLinearizedPolar(QList<void*>*m_poaPolar, CFoil *pFoil0, CFoil *pFoil1, d
 			}
 			for (i=0; i<m_poaPolar->size(); i++)
 			{
-				pPolar = (CPolar*)m_poaPolar->at(i);
+				pPolar = (Polar*)m_poaPolar->at(i);
 				if(pPolar->m_FoilName == pFoil0->m_FoilName)
 				{
 					if(pPolar->m_Reynolds > Re)
@@ -2607,14 +2607,14 @@ void GetLinearizedPolar(QList<void*>*m_poaPolar, CFoil *pFoil0, CFoil *pFoil1, d
 		pPolar2 = NULL;
 		for (i=0; i<m_poaPolar->size(); i++)
 		{
-			pPolar = (CPolar*)m_poaPolar->at(i);
+			pPolar = (Polar*)m_poaPolar->at(i);
 			if(pPolar->m_FoilName == pFoil1->m_FoilName) size++;
 		}
 		if(size)
 		{
 			for (i=0; i<m_poaPolar->size(); i++)
 			{
-				pPolar = (CPolar*)m_poaPolar->at(i);
+				pPolar = (Polar*)m_poaPolar->at(i);
 				if(pPolar->m_FoilName == pFoil1->m_FoilName)
 				{
 					if(pPolar->m_Reynolds < Re) pPolar1 = pPolar;
@@ -2622,7 +2622,7 @@ void GetLinearizedPolar(QList<void*>*m_poaPolar, CFoil *pFoil0, CFoil *pFoil1, d
 			}
 			for (i=0; i<m_poaPolar->size(); i++)
 			{
-				pPolar = (CPolar*)m_poaPolar->at(i);
+				pPolar = (Polar*)m_poaPolar->at(i);
 				if(pPolar->m_FoilName == pFoil1->m_FoilName)
 				{
 					if(pPolar->m_Reynolds > Re)

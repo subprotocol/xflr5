@@ -28,9 +28,9 @@
 
 
 
-void *CPolar::s_pMainFrame;
+void *Polar::s_pMainFrame;
 
-CPolar::CPolar()
+Polar::Polar()
 {
 	m_bIsVisible  = true;
 	m_bShowPoints = false;
@@ -52,7 +52,7 @@ CPolar::CPolar()
 
 
 
-void CPolar::ExportPolar(QTextStream &out, int FileType, bool bDataOnly)
+void Polar::ExportPolar(QTextStream &out, int FileType, bool bDataOnly)
 {
 	QString Header, strong;
 	int j;
@@ -162,7 +162,7 @@ void CPolar::ExportPolar(QTextStream &out, int FileType, bool bDataOnly)
 }
 
 
-void CPolar::ResetPolar()
+void Polar::ResetPolar()
 {
 //	Removes all existing OpPoints results from polar
     m_Alpha.clear();
@@ -181,7 +181,7 @@ void CPolar::ResetPolar()
     m_XCp.clear();
 }
 
-void CPolar::AddData(OpPoint *pOpPoint)
+void Polar::AddData(OpPoint *pOpPoint)
 {
 	//Adds the OpPoint data to the Polar object for further use
 	if(!pOpPoint->m_bVisc) return;
@@ -192,7 +192,7 @@ void CPolar::AddData(OpPoint *pOpPoint)
 }
 
 
-void CPolar::AddData(void* ptrXFoil)
+void Polar::AddData(void* ptrXFoil)
 {
 	XFoil *pXFoil = (XFoil*)ptrXFoil;
 
@@ -205,7 +205,7 @@ void CPolar::AddData(void* ptrXFoil)
 	
 }
 
-void CPolar::AddPoint(double Alpha, double Cd, double Cdp, double Cl, double Cm, double Xtr1,
+void Polar::AddPoint(double Alpha, double Cd, double Cdp, double Cl, double Cm, double Xtr1,
 					  double Xtr2, double HMom, double Cpmn, double Reynolds, double XCp)
 {
 	int i;
@@ -378,7 +378,7 @@ void CPolar::AddPoint(double Alpha, double Cd, double Cdp, double Cl, double Cm,
 }
 
 
-void CPolar::Copy(CPolar *pPolar)
+void Polar::Copy(Polar *pPolar)
 {
 	int i;
 	int size  = (int)m_Alpha.size();
@@ -405,7 +405,7 @@ void CPolar::Copy(CPolar *pPolar)
 	}
 }
 
-bool CPolar::Serialize(QDataStream &ar, bool bIsStoring, bool bTrace)
+bool Polar::Serialize(QDataStream &ar, bool bIsStoring, bool bTrace)
 {
 	int i, j, n, l, k;
 	int ArchiveFormat;// identifies the format of the file
@@ -588,7 +588,7 @@ bool CPolar::Serialize(QDataStream &ar, bool bIsStoring, bool bTrace)
 }
 
 
-void CPolar::Remove(int i)
+void Polar::Remove(int i)
 {
     m_Alpha.removeAt(i);
     m_Cl.removeAt(i);
@@ -607,7 +607,7 @@ void CPolar::Remove(int i)
 }
 
 
-void CPolar::GetAlphaLimits(double &amin, double &amax)
+void Polar::GetAlphaLimits(double &amin, double &amax)
 {
     if(!m_Alpha.size()){
 		amin = 0.0;
@@ -620,7 +620,7 @@ void CPolar::GetAlphaLimits(double &amin, double &amax)
 	}
 }
 
-void CPolar::GetClLimits(double &Clmin, double &Clmax)
+void Polar::GetClLimits(double &Clmin, double &Clmax)
 {
     if(!m_Cl.size())
     {
@@ -641,7 +641,7 @@ void CPolar::GetClLimits(double &Clmin, double &Clmax)
 	}
 }
 
-double CPolar::GetCm0()
+double Polar::GetCm0()
 {
     int i;
 	double Clmin =  1000.0;
@@ -668,7 +668,7 @@ double CPolar::GetCm0()
 
 }
 
-double CPolar::GetZeroLiftAngle()
+double Polar::GetZeroLiftAngle()
 {
 	double Clmin =  1000.0;
 	double Clmax = -1000.0;
@@ -694,7 +694,7 @@ double CPolar::GetZeroLiftAngle()
 
 }
 
-void CPolar::GetLinearizedCl(double &Alpha0, double &slope)
+void Polar::GetLinearizedCl(double &Alpha0, double &slope)
 {
 	// linearize Cl vs. Alpha set of points by least square method
     int n = (int)m_Cl.size();
@@ -733,7 +733,7 @@ void CPolar::GetLinearizedCl(double &Alpha0, double &slope)
 
 }
 
-void CPolar::GetBWStyle(QColor &color, int &style, int &width)
+void Polar::GetBWStyle(QColor &color, int &style, int &width)
 {
 	color = m_Color;
 	style = m_Style;
@@ -742,7 +742,7 @@ void CPolar::GetBWStyle(QColor &color, int &style, int &width)
 }
 
 
-void CPolar::GetPolarProperties(QString &PolarProperties, bool bData)
+void Polar::GetPolarProperties(QString &PolarProperties, bool bData)
 {
 	QString strong;
 	PolarProperties = m_PlrName +"\n\n";
@@ -812,7 +812,7 @@ void CPolar::GetPolarProperties(QString &PolarProperties, bool bData)
 
 
 
-void CPolar::GetPlrVariableName(int iVar, QString &Name)
+void Polar::GetPlrVariableName(int iVar, QString &Name)
 {
 	switch (iVar)
 	{

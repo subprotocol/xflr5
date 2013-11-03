@@ -21,8 +21,8 @@
 *****************************************************************************/
 
 
-#ifndef CSpline_H
-#define CSpline_H
+#ifndef SPLINE_H
+#define SPLINE_H
 #include <QPainter>
 #include <QFile>
 #include <QList>
@@ -30,14 +30,14 @@
 #include "../objects/CVector.h"
 #include "../params.h"
 
-class CSpline
+class Spline
 {
-	friend class CSF;
+	friend class SplineFoil;
 	friend class QXInverse;
 	friend class InverseOptionsDlg;
 public:
 
-	CSpline();
+	Spline();
 
 	void DrawSpline(QPainter & painter, double const &scalex, double const &scaley, QPoint const &Offset);
 	void DrawCtrlPoints(QPainter & painter, double const &scalex, double const &scaley, QPoint const &Offset);
@@ -51,8 +51,8 @@ public:
 	double SplineBlend(int const &i, int const &p, double const &t);
 	double GetY(double const &x);
 
-	void Copy(CSpline *pSpline);
-	void CopySymetric(CSpline *pSpline);
+	void Copy(Spline *pSpline);
+	void CopySymetric(Spline *pSpline);
 	void Export(QTextStream &out, bool bExtrados);
 	void SplineCurve();
 	void SplineKnots();

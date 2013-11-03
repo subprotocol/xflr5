@@ -205,7 +205,7 @@ protected:
 	void DeleteOpPoint(bool bCurrent);
 	void PaintPolarLegend(QPoint place, int bottom,QPainter &painter);
 	void FillComboBoxes(bool bEnable = true);
-	void FillPolarCurve(CCurve *pCurve, CPolar *pPolar, int XVar, int YVar);
+	void FillPolarCurve(CCurve *pCurve, Polar *pPolar, int XVar, int YVar);
 	void FillOppCurve(OpPoint *pOpp, Graph *pGraph, CCurve *pCurve, bool bInviscid=false);
 	void InsertOpPoint(OpPoint *pNewPoint);
 	void LoadSettings(QSettings *pSettings);
@@ -237,18 +237,18 @@ protected:
 //	bool InitXFoil(CFoil *pFoil=NULL);
 //	void InitXFoil2();
 
-	void * GetVariable(CPolar *pPolar, int iVar);
+	void * GetVariable(Polar *pPolar, int iVar);
 	OpPoint* GetOpPoint(double Alpha);
 
 	QGraph* GetGraph(QPoint &pt);
 
-	CFoil* SetFoil(CFoil* pFoil=NULL);
-	CFoil* SetFoil(QString FoilName);
-	CPolar *SetPolar(CPolar *pPolar=NULL);
-	CPolar *SetPolar(QString PlrName);
+	Foil* SetFoil(Foil* pFoil=NULL);
+	Foil* SetFoil(QString FoilName);
+	Polar *SetPolar(Polar *pPolar=NULL);
+	Polar *SetPolar(QString PlrName);
 	OpPoint *SetOpp(double Alpha=-123456789.0);
 
-	OpPoint* AddOpPoint(CPolar *pPolar = NULL, bool bStoreOpp=false);
+	OpPoint* AddOpPoint(Polar *pPolar = NULL, bool bStoreOpp=false);
 
 
 
@@ -367,8 +367,8 @@ private:
 	enumPolarType m_PolarType;
 
 
-	CFoil m_BufferFoil;		// used for screen drawing and temporary geometric mods
-	CPolar* m_pCurPolar;	// pointer to the currently selected foil polar
+	Foil m_BufferFoil;		// used for screen drawing and temporary geometric mods
+	Polar* m_pCurPolar;	// pointer to the currently selected foil polar
 	OpPoint * m_pCurOpp;	// pointer to the currently selected foil operating point
 
 	QList<void*> *m_poaFoil;	// pointer to the foil object array

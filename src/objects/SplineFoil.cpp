@@ -22,11 +22,11 @@
 
 
 #include "math.h"
-#include "Sf.h"
+#include "SplineFoil.h"
 #include "../globals.h"
 
 
-CSF::CSF()
+SplineFoil::SplineFoil()
 {
 	m_FoilStyle = 0;
 	m_FoilWidth = 1;
@@ -42,7 +42,7 @@ CSF::CSF()
 }
 
 
-void CSF::SetCurveParams(int style, int width, QColor color)
+void SplineFoil::SetCurveParams(int style, int width, QColor color)
 {
 	m_FoilStyle = style;
 	m_FoilWidth = width;
@@ -52,7 +52,7 @@ void CSF::SetCurveParams(int style, int width, QColor color)
 }
 
 
-bool CSF::InitSplineFoil()
+bool SplineFoil::InitSplineFoil()
 {
 	m_bModified   = false;
 	m_strFoilName = QObject::tr("Spline Foil");
@@ -88,7 +88,7 @@ bool CSF::InitSplineFoil()
 }
 
 
-bool CSF::CompMidLine()
+bool SplineFoil::CompMidLine()
 {
 	double x, yex, yin;
 	m_fThickness = 0.0;
@@ -126,7 +126,7 @@ bool CSF::CompMidLine()
 
 
 
-void CSF::Copy(CSF* pSF)
+void SplineFoil::Copy(SplineFoil* pSF)
 {
 	m_FoilColor = pSF->m_FoilColor;
 	m_FoilStyle = pSF->m_FoilStyle;
@@ -142,7 +142,7 @@ void CSF::Copy(CSF* pSF)
 }
 
 
-void CSF::CopyFromPicture(Picture *pPic)
+void SplineFoil::CopyFromPicture(Picture *pPic)
 {
 	m_Extrados.m_CtrlPoint.clear();
 
@@ -157,7 +157,7 @@ void CSF::CopyFromPicture(Picture *pPic)
 }
 
 
-void CSF::CopyToPicture(Picture *pPic)
+void SplineFoil::CopyToPicture(Picture *pPic)
 {
 	pPic->m_iExt = m_Extrados.m_CtrlPoint.size();
 
@@ -176,7 +176,7 @@ void CSF::CopyToPicture(Picture *pPic)
 }
 
 
-void CSF::ExportToBuffer(CFoil *pFoil)
+void SplineFoil::ExportToBuffer(Foil *pFoil)
 {
 	int i;
 	int j = m_Extrados.m_iRes;
@@ -199,7 +199,7 @@ void CSF::ExportToBuffer(CFoil *pFoil)
 }
 
 
-void CSF::ExportToFile(QTextStream &out)
+void SplineFoil::ExportToFile(QTextStream &out)
 {
 	m_Extrados.Export(out, true);
 	m_Intrados.Export(out, false);
@@ -207,7 +207,7 @@ void CSF::ExportToFile(QTextStream &out)
 
 
 
-bool CSF::Serialize(QDataStream &ar, bool bIsStoring)
+bool SplineFoil::Serialize(QDataStream &ar, bool bIsStoring)
 {
 	float f,x,y;
 	int ArchiveFormat,k,n;
@@ -313,7 +313,7 @@ bool CSF::Serialize(QDataStream &ar, bool bIsStoring)
 }
 
 
-void CSF::UpdateSplineFoil()
+void SplineFoil::UpdateSplineFoil()
 {
 	CompMidLine();
 	m_OutPoints = m_Extrados.m_iRes + m_Intrados.m_iRes;
@@ -322,7 +322,7 @@ void CSF::UpdateSplineFoil()
 
 
 
-void CSF::UpdateSelected(double x, double y)
+void SplineFoil::UpdateSelected(double x, double y)
 {
 	int i;
 	for (i=0; i<m_Extrados.m_CtrlPoint.size();i++)
@@ -351,28 +351,28 @@ void CSF::UpdateSelected(double x, double y)
 
 
 
-void CSF::DrawCtrlPoints(QPainter &painter, double scalex, double scaley, QPoint Offset)
+void SplineFoil::DrawCtrlPoints(QPainter &painter, double scalex, double scaley, QPoint Offset)
 {
 	m_Extrados.DrawCtrlPoints(painter, scalex, scaley, Offset);
 	m_Intrados.DrawCtrlPoints(painter, scalex, scaley, Offset);
 }
 
 
-void CSF::DrawOutPoints(QPainter & painter, double scalex, double scaley, QPoint Offset)
+void SplineFoil::DrawOutPoints(QPainter & painter, double scalex, double scaley, QPoint Offset)
 {
 	m_Extrados.DrawOutputPoints(painter, scalex, scaley, Offset);
 	m_Intrados.DrawOutputPoints(painter, scalex, scaley, Offset);
 }
 
 
-void CSF::DrawFoil(QPainter &painter, double scalex, double scaley, QPoint Offset)
+void SplineFoil::DrawFoil(QPainter &painter, double scalex, double scaley, QPoint Offset)
 {
 	m_Extrados.DrawSpline(painter, scalex, scaley, Offset);
 	m_Intrados.DrawSpline(painter, scalex, scaley, Offset);
 }
 
 
-void CSF::DrawMidLine(QPainter &painter, double scalex, double scaley, QPoint Offset)
+void SplineFoil::DrawMidLine(QPainter &painter, double scalex, double scaley, QPoint Offset)
 {
 	painter.save();
 	int k;

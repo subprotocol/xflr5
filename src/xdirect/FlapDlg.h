@@ -76,7 +76,7 @@ private:
 
 	double m_LEXHinge, m_LEYHinge, m_LEFlapAngle;
 	double m_TEXHinge, m_TEYHinge, m_TEFlapAngle;
-	CFoil *m_pMemFoil, *m_pBufferFoil;
+	Foil *m_pMemFoil, *m_pBufferFoil;
 
 	void *m_pXFoil;
 	void *m_pXDirect;

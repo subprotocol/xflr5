@@ -53,7 +53,7 @@ public:
 
 	static void *s_pXFoil;
 
-	CFoil* m_pBufferFoil;
+	Foil* m_pBufferFoil;
 	QList<void *> *m_poaFoil;
 
 	QComboBox *m_pctrlFoil1, *m_pctrlFoil2;

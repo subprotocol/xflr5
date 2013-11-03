@@ -65,8 +65,8 @@ private:
 	FloatEdit	*m_pctrlFrom;
 	FloatEdit	*m_pctrlAngTol;
 
-	CFoil* m_pMemFoil;
-	CFoil* m_pBufferFoil;
+	Foil* m_pMemFoil;
+	Foil* m_pBufferFoil;
 	void* m_pXDirect;
 	void* m_pAFoil;
 	double atol;

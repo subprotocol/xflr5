@@ -48,15 +48,15 @@
 #include "../objects/Quaternion.h"
 
 
-CVector CSurface::LA;//save time by preventing allocation & release of memory
-CVector CSurface::LB;
-CVector CSurface::TA;
-CVector CSurface::TB;
-CVector CSurface::VTemp;
-CVector *CSurface::s_pNode;
-CPanel *CSurface::s_pPanel;
+CVector Surface::LA;//save time by preventing allocation & release of memory
+CVector Surface::LB;
+CVector Surface::TA;
+CVector Surface::TB;
+CVector Surface::VTemp;
+CVector *Surface::s_pNode;
+Panel *Surface::s_pPanel;
 
-CSurface::CSurface()
+Surface::Surface()
 {
 	m_bTEFlap = false;
 
@@ -98,7 +98,7 @@ CSurface::CSurface()
 
 
 
-void CSurface::AddFlapPanel(CPanel *pPanel)
+void Surface::AddFlapPanel(Panel *pPanel)
 {
 	bool bFound = false;
 	int i;
@@ -182,7 +182,7 @@ void CSurface::AddFlapPanel(CPanel *pPanel)
 }
 
 
-void CSurface::Copy(CSurface const &Surface)
+void Surface::Copy(Surface const &Surface)
 {
 	m_LA.Copy(Surface.m_LA);
 	m_LB.Copy(Surface.m_LB);
@@ -225,7 +225,7 @@ void CSurface::Copy(CSurface const &Surface)
 }
 
 
-void CSurface::CreateXZSymetric(CSurface const &Surface)
+void Surface::CreateXZSymetric(Surface const &Surface)
 {
 	//reflects the surface about the XZ plane
 	m_LA.x =  Surface.m_LB.x;
@@ -284,7 +284,7 @@ void CSurface::CreateXZSymetric(CSurface const &Surface)
 
 
 
-void CSurface::GetC4(int k, CVector &Pt, double &tau)
+void Surface::GetC4(int k, CVector &Pt, double &tau)
 {
 	GetPanel(k,m_NXPanels-1,MIDSURFACE);
 	double xl = (LA.x+LB.x)/2.0;
@@ -304,7 +304,7 @@ void CSurface::GetC4(int k, CVector &Pt, double &tau)
 }
 
 
-double CSurface::GetChord(int const &k)
+double Surface::GetChord(int const &k)
 {
 	static double y1, y2;
 	GetyDist(k, y1, y2);
@@ -312,7 +312,7 @@ double CSurface::GetChord(int const &k)
 }
 
 
-double CSurface::GetChord(double const &tau)
+double Surface::GetChord(double const &tau)
 {
 	//assumes LA-TB have already been loaded
 	static CVector V1, V2;
@@ -329,7 +329,7 @@ double CSurface::GetChord(double const &tau)
 
 
 
-double CSurface::GetFoilArea(double const &tau)
+double Surface::GetFoilArea(double const &tau)
 {
 	double area, chord;
 	if(m_pFoilA && m_pFoilB)
@@ -343,7 +343,7 @@ double CSurface::GetFoilArea(double const &tau)
 }
 
 
-void CSurface::GetNormal(double yrel, CVector &N)
+void Surface::GetNormal(double yrel, CVector &N)
 {
 	N = NormalA * (1.0-yrel) + NormalB * yrel;
 	N.Normalize();
@@ -352,7 +352,7 @@ void CSurface::GetNormal(double yrel, CVector &N)
 
 
 
-void CSurface::GetLeadingPt(int k, CVector &C)
+void Surface::GetLeadingPt(int k, CVector &C)
 {
 	GetPanel(k,m_NXPanels-1, MIDSURFACE);
 
@@ -362,14 +362,14 @@ void CSurface::GetLeadingPt(int k, CVector &C)
 }
 
 
-double CSurface::GetOffset(double const &tau)
+double Surface::GetOffset(double const &tau)
 {
 	//chord spacing
 	return m_LA.x + (m_LB.x-m_LA.x) * fabs(tau);
 }
 
 
-void CSurface::GetPanel(int const &k, int const &l, enumPanelPosition const &pos)
+void Surface::GetPanel(int const &k, int const &l, enumPanelPosition const &pos)
 {
 	// Assumption : side points have been set for this surface
 	// Loads the corner points of the panel k,l in PTA, PTB, PLA, PLB
@@ -429,14 +429,14 @@ void CSurface::GetPanel(int const &k, int const &l, enumPanelPosition const &pos
 }
 
 
-double CSurface::GetPanelWidth(int const &k)
+double Surface::GetPanelWidth(int const &k)
 {
 	GetPanel(k, 0, MIDSURFACE);
 	return fabs(LA.y-LB.y);
 }
 
 
-void CSurface::GetPoint(double const &xArel, double const &xBrel, double const &yrel, CVector &Point, int const &pos)
+void Surface::GetPoint(double const &xArel, double const &xBrel, double const &yrel, CVector &Point, int const &pos)
 {
 	static CVector APt, BPt;
 	static double TopA, TopB, BotA, BotB;
@@ -477,7 +477,7 @@ void CSurface::GetPoint(double const &xArel, double const &xBrel, double const &
 
 
 
-void CSurface::GetPoint(double const &xArel, double const &xBrel, double const &yrel, CVector &Point, CVector &PtNormal, int const &pos)
+void Surface::GetPoint(double const &xArel, double const &xBrel, double const &yrel, CVector &Point, CVector &PtNormal, int const &pos)
 {
 	static CVector APt, BPt, Nc, u;
 	static double TopA, TopB, BotA, BotB, nxA, nxB, nyA, nyB, theta;
@@ -547,7 +547,7 @@ void CSurface::GetPoint(double const &xArel, double const &xBrel, double const &
 }
 
 
-void CSurface::GetSection(double const &tau, double &Chord, double &Area, CVector &PtC4)
+void Surface::GetSection(double const &tau, double &Chord, double &Area, CVector &PtC4)
 {
 	//explicit double calculations are much faster than vector algebra
 	LA.x = m_LA.x * (1.0-tau) + m_LB.x * tau;
@@ -573,7 +573,7 @@ void CSurface::GetSection(double const &tau, double &Chord, double &Area, CVecto
 }
 
 
-double CSurface::GetStripSpanPos(int const &k)
+double Surface::GetStripSpanPos(int const &k)
 {
 	int  l;
 	double YPos = 0.0;
@@ -598,7 +598,7 @@ double CSurface::GetStripSpanPos(int const &k)
 }
 
 
-void CSurface::GetTrailingPt(int k, CVector &C)
+void Surface::GetTrailingPt(int k, CVector &C)
 {
 	GetPanel(k,0,MIDSURFACE);
 
@@ -609,7 +609,7 @@ void CSurface::GetTrailingPt(int k, CVector &C)
 
 
 
-double CSurface::GetTwist(int const &k)
+double Surface::GetTwist(int const &k)
 {
 	GetPanel(k, 0, MIDSURFACE);
 	double y = (LA.y+LB.y+TA.y+TB.y)/4.0;
@@ -618,7 +618,7 @@ double CSurface::GetTwist(int const &k)
 
 
 
-void CSurface::GetyDist(int const &k, double &y1, double &y2)
+void Surface::GetyDist(int const &k, double &y1, double &y2)
 {
 	//leading edge
 
@@ -653,7 +653,7 @@ void CSurface::GetyDist(int const &k, double &y1, double &y2)
 }
 
 
-void CSurface::Init()
+void Surface::Init()
 {
 	DL.Set(m_LB.x-m_LA.x,m_LB.y-m_LA.y,m_LB.z-m_LA.z);
 	DC.Set(m_TA.x-m_LA.x,m_TA.y-m_LA.y,m_TA.z-m_LA.z);
@@ -676,7 +676,7 @@ void CSurface::Init()
 }
 
 
-bool CSurface::IsFlapPanel(int const &p)
+bool Surface::IsFlapPanel(int const &p)
 {
 	int pp;
 	for(pp=0; pp<m_nFlapPanels; pp++)
@@ -687,7 +687,7 @@ bool CSurface::IsFlapPanel(int const &p)
 }
 
 
-bool CSurface::IsFlapNode(int const &nNode)
+bool Surface::IsFlapNode(int const &nNode)
 {
 	int pp;
 	for(pp=0; pp<m_nFlapPanels; pp++)
@@ -701,7 +701,7 @@ bool CSurface::IsFlapNode(int const &nNode)
 }
 
 
-void CSurface::ResetFlap()
+void Surface::ResetFlap()
 {
 	int i;
 	for(i=0; i<200; i++)
@@ -714,7 +714,7 @@ void CSurface::ResetFlap()
 }
 
 
-bool CSurface::RotateFlap(double const &Angle, bool bBCOnly)
+bool Surface::RotateFlap(double const &Angle, bool bBCOnly)
 {
 	//The average angle between the two tip foil is cancelled
 	//Instead, the Panels are rotated by Angle around the hinge point and hinge vector
@@ -789,7 +789,7 @@ bool CSurface::RotateFlap(double const &Angle, bool bBCOnly)
 }
 
 
-void CSurface::RotateX(CVector const&O, double XTilt)
+void Surface::RotateX(CVector const&O, double XTilt)
 {
 	m_LA.RotateX(O, XTilt);
 	m_LB.RotateX(O, XTilt);
@@ -804,7 +804,7 @@ void CSurface::RotateX(CVector const&O, double XTilt)
 	m_HingeVector.RotateX(Origin, XTilt);
 }
 
-void CSurface::RotateY(CVector const &O, double YTilt)
+void Surface::RotateY(CVector const &O, double YTilt)
 {
 	m_LA.RotateY(O, YTilt);
 	m_LB.RotateY(O, YTilt);
@@ -820,7 +820,7 @@ void CSurface::RotateY(CVector const &O, double YTilt)
 }
 
 
-void CSurface::RotateZ(CVector const &O, double ZTilt)
+void Surface::RotateZ(CVector const &O, double ZTilt)
 {
 	m_LA.RotateZ(O, ZTilt);
 	m_LB.RotateZ(O, ZTilt);
@@ -836,7 +836,7 @@ void CSurface::RotateZ(CVector const &O, double ZTilt)
 }
 
 
-void CSurface::SetFlap()
+void Surface::SetFlap()
 {
 	if(m_pFoilA && m_pFoilA->m_bTEFlap)
 	{
@@ -869,7 +869,7 @@ void CSurface::SetFlap()
 
 
 
-void CSurface::SetNormal()
+void Surface::SetNormal()
 {
 	static CVector LATB, TALB;
 	LATB = m_TB - m_LA;
@@ -880,12 +880,12 @@ void CSurface::SetNormal()
 
 
 
-void CSurface::SetSidePoints(CBody * pBody, double dx, double dz)
+void Surface::SetSidePoints(Body * pBody, double dx, double dz)
 {
 	//creates the left and right tip points between which the panels will be interpolated
 	int l;
 	double cosdA, cosdB;
-	static CBody TBody;
+	static Body TBody;
 	if(pBody)
 	{
 		TBody.Duplicate(pBody);
@@ -1014,7 +1014,7 @@ void CSurface::SetSidePoints(CBody * pBody, double dx, double dz)
 
 
 
-void CSurface::Translate(CVector const &T)
+void Surface::Translate(CVector const &T)
 {
 	m_LA.Translate(T);
 	m_LB.Translate(T);
@@ -1024,7 +1024,7 @@ void CSurface::Translate(CVector const &T)
 }
 
 
-void CSurface::Translate(double tx, double ty, double tz)
+void Surface::Translate(double tx, double ty, double tz)
 {
 	m_LA.Translate(tx, ty, tz);
 	m_LB.Translate(tx, ty, tz);
@@ -1035,7 +1035,7 @@ void CSurface::Translate(double tx, double ty, double tz)
 
 
 
-void CSurface::CreateXPoints()
+void Surface::CreateXPoints()
 {
 	//
 	// Creates the points at the surfaces two end sections
@@ -1108,7 +1108,7 @@ void CSurface::CreateXPoints()
 
 
 
-void CSurface::SetTwist1()
+void Surface::SetTwist1()
 {
 	static CVector A4, B4, L, U, T, O;
 	O.Set(0.0,0.0,0.0);
@@ -1151,7 +1151,7 @@ void CSurface::SetTwist1()
 
 
 
-void CSurface::SetTwist2()
+void Surface::SetTwist2()
 {
 	double xc4,zc4;
 	CVector O(0.0,0.0,0.0);

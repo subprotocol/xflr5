@@ -129,7 +129,7 @@ private:
 
 	bool ExecQDES();
 	bool SetParams();
-	bool InitXFoil(CFoil * pFoil);
+	bool InitXFoil(Foil * pFoil);
 
 
 	double qincom(double qc, double qinf, double tklam);
@@ -166,10 +166,10 @@ private:
 
 	QList<void *> *m_poaFoil;
 
-	CFoil* m_pRefFoil;
-	CFoil* m_pModFoil;
+	Foil* m_pRefFoil;
+	Foil* m_pModFoil;
 
-	CSpline m_Spline;
+	Spline m_Spline;
 
 	bool m_bXPressed, m_bYPressed; //true if the corresponding key is pressed
 	bool m_bLoaded;

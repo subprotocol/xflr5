@@ -55,14 +55,14 @@ private:
 	void Analysis2();
 	void Analysis3();
 	void CleanUp();
-	CPolar* CreatePolar(double Spec, double Mach, double NCrit);
+	Polar* CreatePolar(double Spec, double Mach, double NCrit);
 	bool Iterate();
 	void OutputIter(int iter);
 	void ReadParams();
 	void ReLoop();
 	void ResetCurves();
 	void SetFileHeader();
-	void SetPlrName(CPolar *pPolar);
+	void SetPlrName(Polar *pPolar);
 	void StartAnalysis();
 	void UpdateGraph();
 	void UpdateOutput(QString &str);
@@ -139,8 +139,8 @@ protected:
 
 	QFile *m_pXFile;
 
-	CFoil *m_pFoil;
-	CPolar *m_pCurPolar;
+	Foil *m_pFoil;
+	Polar *m_pCurPolar;
 
 	QFont m_RFont;
 	QFont m_TitleFont;

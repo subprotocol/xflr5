@@ -317,7 +317,7 @@ void BatchThreadDlg::SetupLayout()
 }
 
 
-void BatchThreadDlg::AddOpPoint(CPolar *pPolar)
+void BatchThreadDlg::AddOpPoint(Polar *pPolar)
 {
 	XFoil *pXFoil = (XFoil*)s_pXFoil;
 
@@ -343,13 +343,13 @@ void BatchThreadDlg::CleanUp()
 }
 
 
-CPolar * BatchThreadDlg::CreatePolar(CFoil *pFoil, double Spec, double Mach, double NCrit)
+Polar * BatchThreadDlg::CreatePolar(Foil *pFoil, double Spec, double Mach, double NCrit)
 {
 //	QXDirect *pXDirect = (QXDirect*)s_pXDirect;
 	if(!pFoil) return NULL;
 
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
-	CPolar *pNewPolar = new CPolar;
+	Polar *pNewPolar = new Polar;
 	pNewPolar->m_FoilName   = pFoil->m_FoilName;
 	pNewPolar->m_bIsVisible = true;
 
@@ -389,7 +389,7 @@ CPolar * BatchThreadDlg::CreatePolar(CFoil *pFoil, double Spec, double Mach, dou
 	pNewPolar->m_Color = pMainFrame->GetColor(1);
 
 	SetPlrName(pNewPolar);
-	CPolar *pOldPolar = pMainFrame->GetPolar(pFoil->m_FoilName, pNewPolar->m_PlrName);
+	Polar *pOldPolar = pMainFrame->GetPolar(pFoil->m_FoilName, pNewPolar->m_PlrName);
 
 	if(pOldPolar)
 	{
@@ -715,7 +715,7 @@ void BatchThreadDlg::SetFileHeader()
 
 
 
-void BatchThreadDlg::SetPlrName(CPolar *pNewPolar)
+void BatchThreadDlg::SetPlrName(Polar *pNewPolar)
 {
 	if(m_PolarType!=FIXEDAOAPOLAR)
 	{
@@ -761,8 +761,8 @@ void BatchThreadDlg::StartAnalysis()
 {
 	QXDirect *pXDirect = (QXDirect*)s_pXDirect;
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
-	CFoil *pFoil;
-	CPolar *pPolar;
+	Foil *pFoil;
+	Polar *pPolar;
 	QString strong;
 	int iRe, nRe;
 

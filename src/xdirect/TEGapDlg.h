@@ -57,8 +57,8 @@ public:
 	void *m_pXDirect;
 	void *m_pAFoil;
 
-	CFoil* m_pBufferFoil;
-	CFoil* m_pMemFoil;
+	Foil* m_pBufferFoil;
+	Foil* m_pMemFoil;
 	static void* s_pXFoil;
 };
 

@@ -329,8 +329,8 @@ void StabViewDlg::OnAnimateRestart()
 	double norm1, norm2, theta_sum, psi_sum, ModeState[6];
 
 	QMiarex * pMiarex = (QMiarex*)s_pMiarex;
-	CWOpp *pWOpp = pMiarex->m_pCurWOpp;
-	CWing *pWing = pMiarex->m_pCurWing;
+	WingOpp *pWOpp = pMiarex->m_pCurWOpp;
+	Wing *pWing = pMiarex->m_pCurWing;
 
 	pMiarex->m_ModeTime = 0.0;
 
@@ -505,7 +505,7 @@ void StabViewDlg::SetMode(int iMode)
 	m_pctrlRLMode3->setChecked(m_iCurrentMode%4==2);
 	m_pctrlRLMode4->setChecked(m_iCurrentMode%4==3);
 	FillEigenThings();
-	CWOpp *pWOpp = pMiarex->m_pCurWOpp;
+	WingOpp *pWOpp = pMiarex->m_pCurWOpp;
 
 	if(pWOpp)
 	{

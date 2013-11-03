@@ -25,27 +25,27 @@
 
 #include <QtOpenGL>
 #include "../objects/Plane.h"
-#include "../objects/POpp.h"
+#include "../objects/PlaneOpp.h"
 #include "../objects/WPolar.h"
 
-void GLCreateGeom(void *pQMiarex, CWing *pWing, int List, CBody *pBody=NULL);
-void GLCreateCp(void *pQMiarex, CVector *pNode, CPanel *pPanel, CWOpp *pWOpp, CPOpp *pPOpp);
+void GLCreateGeom(void *pQMiarex, Wing *pWing, int List, Body *pBody=NULL);
+void GLCreateCp(void *pQMiarex, CVector *pNode, Panel *pPanel, WingOpp *pWOpp, PlaneOpp *pPOpp);
 void GLDrawCpLegend(void *pQMiarex);
 void GLCreateCpLegendClr(void *pQMiarex);
-void GLCreateDownwash(void *pQMiarex, CWing *pWing, CWOpp *pWOpp, int List);
-void GLCreateDrag(void *pQMiarex, CWing *pWing, CWPolar* pWPolar, CWOpp *pWOpp, int List);
-void GLCreateMesh(int iList, int size, CPanel *pPanel, CVector *pNode, QColor PanelColor, QColor BackColor, bool bBack=true);
-void GLCreateCtrlPts(void *pQMiarex, CPanel *pPanel);
-void GLCreateLiftStrip(void *pQMiarex, CWing *pWing, CWPolar *pWPolar, CWOpp *pWOpp, int List);
-void GLCreateMoments(void *pQMiarex, CWing *pWing, CWPolar *pWPolar, CWOpp *pWOpp);
-void GLCreateLiftForce(void *pQMiarex, CWPolar *pWPolar, CWOpp *pWOpp);
-void GLCreateStreamLines(void *pQMiarex, CWing *pWing[MAXWINGS], CVector *pNode, CWPolar *pWPolar, CWOpp *pWOpp);
-void GLCreateSurfSpeeds(void *pQMiarex, CPanel *pPanel, CWPolar *pWPolar, CWOpp *pWOpp);
-void GLCreateVortices(void *pQMiarex, CPanel *pPanel, CVector *pNode, CWPolar *pWPolar);
-void GLCreateTrans(void *pQMiarex, CWing *pWing, CWOpp *pWOpp, int List);
-void GLDrawWingLegend(void *pQMiarex, CWing *pWing, CPlane *pPlane, CWPolar *pWPolar);
-void GLDrawWOppLegend(void* pQMiarex, CWing *pWing, CWOpp *pWOpp);
-void GLCreatePanelForce(void *pQMiarex, CWPolar *pWPolar, CWOpp *pWOpp, CPOpp *pPOpp);
-void GLDrawPanelForceLegend(void *pQMiarex, CWPolar *pWPolar);
+void GLCreateDownwash(void *pQMiarex, Wing *pWing, WingOpp *pWOpp, int List);
+void GLCreateDrag(void *pQMiarex, Wing *pWing, WPolar* pWPolar, WingOpp *pWOpp, int List);
+void GLCreateMesh(int iList, int size, Panel *pPanel, CVector *pNode, QColor PanelColor, QColor BackColor, bool bBack=true);
+void GLCreateCtrlPts(void *pQMiarex, Panel *pPanel);
+void GLCreateLiftStrip(void *pQMiarex, Wing *pWing, WPolar *pWPolar, WingOpp *pWOpp, int List);
+void GLCreateMoments(void *pQMiarex, Wing *pWing, WPolar *pWPolar, WingOpp *pWOpp);
+void GLCreateLiftForce(void *pQMiarex, WPolar *pWPolar, WingOpp *pWOpp);
+void GLCreateStreamLines(void *pQMiarex, Wing *PlaneWing[MAXWINGS], CVector *pNode, WPolar *pWPolar, WingOpp *pWOpp);
+void GLCreateSurfSpeeds(void *pQMiarex, Panel *pPanel, WPolar *pWPolar, WingOpp *pWOpp);
+void GLCreateVortices(void *pQMiarex, Panel *pPanel, CVector *pNode, WPolar *pWPolar);
+void GLCreateTrans(void *pQMiarex, Wing *pWing, WingOpp *pWOpp, int List);
+void GLDrawWingLegend(void *pQMiarex, Wing *pWing, Plane *pPlane, WPolar *pWPolar);
+void GLDrawWOppLegend(void* pQMiarex, Wing *pWing, WingOpp *pWOpp);
+void GLCreatePanelForce(void *pQMiarex, WPolar *pWPolar, WingOpp *pWOpp, PlaneOpp *pPOpp);
+void GLDrawPanelForceLegend(void *pQMiarex, WPolar *pWPolar);
 
 #endif // GLCREATELISTS_H

@@ -38,8 +38,8 @@
 
 struct Analysis
 {
-	CFoil *pFoil;
-	CPolar *pPolar;
+	Foil *pFoil;
+	Polar *pPolar;
 };
 
 
@@ -58,14 +58,14 @@ public:
 	void InitDialog();
 
 private:
-	void AddOpPoint(CPolar *pPolar);
+	void AddOpPoint(Polar *pPolar);
 
 	void CleanUp();
-	CPolar * CreatePolar(CFoil *pFoil, double Spec, double Mach, double NCrit);
+	Polar * CreatePolar(Foil *pFoil, double Spec, double Mach, double NCrit);
 	void keyPressEvent(QKeyEvent *event);
 	void ReadParams();
 	void SetFileHeader();
-	void SetPlrName(CPolar *pNewPolar);
+	void SetPlrName(Polar *pNewPolar);
 	void StartAnalysis();
 	void StartThread();
 	void UpdateOutput(QString &str);
@@ -143,7 +143,7 @@ protected:
 
 	QFile *m_pXFile;
 
-	CFoil *m_pCurFoil;
+	Foil *m_pCurFoil;
 
 	QFont m_RFont;
 	QFont m_TitleFont;

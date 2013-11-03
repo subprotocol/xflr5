@@ -100,28 +100,28 @@ PlaneDlg::PlaneDlg(QWidget *parent) :QDialog(parent)
 
 void PlaneDlg::ComputePlane(void)
 {
-	if(m_pPlane->Stab())
+	if(m_pPlane->getStab())
 	{
-		double SLA = m_pPlane->m_WingLE[2].x + m_pPlane->Stab()->Chord(0)/4.0 - m_pPlane->m_WingLE[0].x -m_pPlane->Wing()->Chord(0)/4.0;
-		double area = m_pPlane->Wing()->m_ProjectedArea;
-		if(m_pPlane->Wing2()) area += m_pPlane->Wing2()->m_ProjectedArea;
+		double SLA = m_pPlane->m_WingLE[2].x + m_pPlane->getStab()->Chord(0)/4.0 - m_pPlane->m_WingLE[0].x -m_pPlane->getWing()->Chord(0)/4.0;
+		double area = m_pPlane->getWing()->m_ProjectedArea;
+		if(m_pPlane->getWing2()) area += m_pPlane->getWing2()->m_ProjectedArea;
 
 		double ProjectedArea = 0.0;
-		for (int i=0;i<m_pPlane->Stab()->NWingSection()-1; i++)
+		for (int i=0;i<m_pPlane->getStab()->NWingSection()-1; i++)
 		{
-			ProjectedArea += m_pPlane->Stab()->Length(i+1)*(m_pPlane->Stab()->Chord(i)+m_pPlane->Stab()->Chord(i+1))/2.0
-							*cos(m_pPlane->Stab()->Dihedral(i)*PI/180.0)*cos(m_pPlane->Stab()->Dihedral(i)*PI/180.0);
+			ProjectedArea += m_pPlane->getStab()->Length(i+1)*(m_pPlane->getStab()->Chord(i)+m_pPlane->getStab()->Chord(i+1))/2.0
+							*cos(m_pPlane->getStab()->Dihedral(i)*PI/180.0)*cos(m_pPlane->getStab()->Dihedral(i)*PI/180.0);
 
 		}
 		ProjectedArea *=2.0;
-		m_pPlane->m_TailVolume = ProjectedArea * SLA / area/m_pPlane->Wing()->m_MAChord ;
+		m_pPlane->m_TailVolume = ProjectedArea * SLA / area/m_pPlane->getWing()->m_MAChord ;
 	}
 	else m_pPlane->m_TailVolume = 0.0;
 
-	if(m_pPlane->Fin())
+	if(m_pPlane->getFin())
 	{
-		m_pPlane->Fin()->m_bDoubleFin = m_pPlane->m_bDoubleFin;
-		m_pPlane->Fin()->m_bSymFin    = m_pPlane->m_bSymFin;
+		m_pPlane->getFin()->m_bDoubleFin = m_pPlane->m_bDoubleFin;
+		m_pPlane->getFin()->m_bSymFin    = m_pPlane->m_bSymFin;
 	}
 }
 
@@ -204,7 +204,7 @@ void PlaneDlg::OnBiplane()
 {
 	m_bChanged = true;
 	m_pPlane->m_bBiplane = m_pctrlBiplane->isChecked();
-	if(m_pPlane->Wing2())
+	if(m_pPlane->getWing2())
 	{
 		m_pctrlDefineWing2->setEnabled(true);
 		m_pctrlImportWing2->setEnabled(true);
@@ -281,28 +281,28 @@ void PlaneDlg::OnDescriptionChanged()
 void PlaneDlg::OnDefineWing()
 {
 	QMiarex *pMiarex= (QMiarex*)s_pMiarex;
-	m_SaveWing.Duplicate(m_pPlane->Wing());
+	m_SaveWing.Duplicate(m_pPlane->getWing());
 
     pMiarex->m_pWingDlg->m_bAcceptName = false;
-    pMiarex->m_pWingDlg->InitDialog(m_pPlane->Wing());
+    pMiarex->m_pWingDlg->InitDialog(m_pPlane->getWing());
 
     if(pMiarex->m_pWingDlg->exec() ==QDialog::Accepted)
 	{
 		SetResults();
 		m_bChanged = true;
 	}
-	else   m_pPlane->Wing()->Duplicate(&m_SaveWing);
-	m_pPlane->Wing()->CreateSurfaces(m_pPlane->m_WingLE[0], 0.0, m_pPlane->m_WingTiltAngle[0]);//necessary for eventual inertia calculations
+	else   m_pPlane->getWing()->Duplicate(&m_SaveWing);
+	m_pPlane->getWing()->CreateSurfaces(m_pPlane->m_WingLE[0], 0.0, m_pPlane->m_WingTiltAngle[0]);//necessary for eventual inertia calculations
 }
 
 
 void PlaneDlg::OnDefineFin() 
 {
 	QMiarex *pMiarex= (QMiarex*)s_pMiarex;
-	m_SaveWing.Duplicate(m_pPlane->Fin());
+	m_SaveWing.Duplicate(m_pPlane->getFin());
 
     pMiarex->m_pWingDlg->m_bAcceptName = false;
-    pMiarex->m_pWingDlg->InitDialog(m_pPlane->Fin());
+    pMiarex->m_pWingDlg->InitDialog(m_pPlane->getFin());
 
 
     if(pMiarex->m_pWingDlg->exec() ==QDialog::Accepted)
@@ -310,26 +310,26 @@ void PlaneDlg::OnDefineFin()
 		SetResults();	
 		m_bChanged = true;
 	}
-	else   m_pPlane->Fin()->Duplicate(&m_SaveWing);
-	m_pPlane->Fin()->CreateSurfaces(m_pPlane->m_WingLE[3], -90.0, m_pPlane->m_WingTiltAngle[3]);//necessary for eventual inertia calculations
+	else   m_pPlane->getFin()->Duplicate(&m_SaveWing);
+	m_pPlane->getFin()->CreateSurfaces(m_pPlane->m_WingLE[3], -90.0, m_pPlane->m_WingTiltAngle[3]);//necessary for eventual inertia calculations
 }
 
 
 void PlaneDlg::OnDefineStab() 
 {
 	QMiarex *pMiarex= (QMiarex*)s_pMiarex;
-	m_SaveWing.Duplicate(m_pPlane->Stab());
+	m_SaveWing.Duplicate(m_pPlane->getStab());
 
     pMiarex->m_pWingDlg->m_bAcceptName = false;
-    pMiarex->m_pWingDlg->InitDialog(m_pPlane->Stab());
+    pMiarex->m_pWingDlg->InitDialog(m_pPlane->getStab());
 
     if(pMiarex->m_pWingDlg->exec() == QDialog::Accepted)
 	{
 		SetResults();	
 		m_bChanged = true;
 	}
-	else  m_pPlane->Stab()->Duplicate(&m_SaveWing);
-	m_pPlane->Stab()->CreateSurfaces(m_pPlane->m_WingLE[2], 0.0, m_pPlane->m_WingTiltAngle[2]);//necessary for eventual inertia calculations
+	else  m_pPlane->getStab()->Duplicate(&m_SaveWing);
+	m_pPlane->getStab()->CreateSurfaces(m_pPlane->m_WingLE[2], 0.0, m_pPlane->m_WingTiltAngle[2]);//necessary for eventual inertia calculations
 }
 
 
@@ -337,18 +337,18 @@ void PlaneDlg::OnDefineStab()
 void PlaneDlg::OnDefineWing2()
 {
 	QMiarex *pMiarex= (QMiarex*)s_pMiarex;
-	m_SaveWing.Duplicate(m_pPlane->Wing2());
+	m_SaveWing.Duplicate(m_pPlane->getWing2());
 
     pMiarex->m_pWingDlg->m_bAcceptName = false;
-    pMiarex->m_pWingDlg->InitDialog(m_pPlane->Wing2());
+    pMiarex->m_pWingDlg->InitDialog(m_pPlane->getWing2());
 
     if(pMiarex->m_pWingDlg->exec() ==QDialog::Accepted)
 	{
 		SetResults();
 		m_bChanged = true;
 	}
-	else   m_pPlane->Wing2()->Duplicate(&m_SaveWing);
-	m_pPlane->Wing2()->CreateSurfaces(m_pPlane->m_WingLE[1], 0.0, m_pPlane->m_WingTiltAngle[1]);//necessary for eventual inertia calculations
+	else   m_pPlane->getWing2()->Duplicate(&m_SaveWing);
+	m_pPlane->getWing2()->CreateSurfaces(m_pPlane->m_WingLE[1], 0.0, m_pPlane->m_WingTiltAngle[1]);//necessary for eventual inertia calculations
 }
 
 
@@ -377,7 +377,7 @@ void PlaneDlg::OnEditBody()
 	QMiarex * pMiarex = (QMiarex*)s_pMiarex;
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 
-	CBody memBody;
+	Body memBody;
 	memBody.Duplicate(m_pPlane->m_pBody);
     pMiarex->m_pGL3dBody->m_bEnableName = false;
     pMiarex->m_pGL3dBody->InitDialog(m_pPlane->m_pBody);
@@ -400,8 +400,8 @@ void PlaneDlg::OnExportWing()
 {
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	QMiarex * pMiarex = (QMiarex*)s_pMiarex;
-	CWing *pNewWing = new CWing();
-	pNewWing->Duplicate(m_pPlane->Wing());
+	Wing *pNewWing = new Wing();
+	pNewWing->Duplicate(m_pPlane->getWing());
 	pNewWing->m_WingName = "";
 	pMiarex->AddWing(pNewWing);
 	pMainFrame->UpdateUFOs();
@@ -413,8 +413,8 @@ void PlaneDlg::OnExportWing2()
 {
 	QMiarex *pMiarex = (QMiarex*)s_pMiarex;
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
-	CWing *pNewWing = new CWing();
-	pNewWing->Duplicate(m_pPlane->Wing2());
+	Wing *pNewWing = new Wing();
+	pNewWing->Duplicate(m_pPlane->getWing2());
 	pNewWing->m_WingName = "";
 	pMiarex->AddWing(pNewWing);
 	pMainFrame->UpdateUFOs();
@@ -457,18 +457,18 @@ void PlaneDlg::OnImportWing()
 {
 	QMiarex *pMiarex = (QMiarex*)s_pMiarex;
     ImportWingDlg dlg(this);
-	dlg.m_WingName = m_pPlane->Wing()->m_WingName;
+	dlg.m_WingName = m_pPlane->getWing()->m_WingName;
 	dlg.m_poaWing = s_poaWing;
 	dlg.InitDialog();
 
 	if(dlg.exec() == QDialog::Accepted)
 	{
 		m_bChanged = true;
-		CWing *pWing = pMiarex->GetWing(dlg.m_WingName);
+		Wing *pWing = pMiarex->GetWing(dlg.m_WingName);
 		if(pWing)
 		{
-			m_pPlane->Wing()->Duplicate(pWing);
-			m_pPlane->Wing()->m_WingColor = pWing->m_WingColor;
+			m_pPlane->getWing()->Duplicate(pWing);
+			m_pPlane->getWing()->m_WingColor = pWing->m_WingColor;
 		}
 	}
 }
@@ -478,18 +478,18 @@ void PlaneDlg::OnImportWing2()
 {
 	QMiarex *pMiarex = (QMiarex*)s_pMiarex;
     ImportWingDlg dlg(this);
-	dlg.m_WingName = m_pPlane->Wing()->m_WingName;
+	dlg.m_WingName = m_pPlane->getWing()->m_WingName;
 	dlg.m_poaWing = s_poaWing;
 	dlg.InitDialog();
 
 	if(dlg.exec() == QDialog::Accepted)
 	{
 		m_bChanged = true;
-		CWing *pWing = pMiarex->GetWing(dlg.m_WingName);
+		Wing *pWing = pMiarex->GetWing(dlg.m_WingName);
 		if(pWing)
 		{
-			m_pPlane->Wing2()->Duplicate(pWing);
-			m_pPlane->Wing2()->m_WingColor = pWing->m_WingColor;
+			m_pPlane->getWing2()->Duplicate(pWing);
+			m_pPlane->getWing2()->m_WingColor = pWing->m_WingColor;
 		}
 	}
 }
@@ -546,9 +546,9 @@ void PlaneDlg::OnOK()
 
 	ComputePlane();
 
-	n = m_pPlane->Wing()->VLMGetPanelTotal();
-	if(m_pPlane->Stab()) n+= m_pPlane->Stab()->VLMGetPanelTotal();
-	if(m_pPlane->m_bFin)  n+= m_pPlane->Fin()->VLMGetPanelTotal();
+	n = m_pPlane->getWing()->VLMGetPanelTotal();
+	if(m_pPlane->getStab()) n+= m_pPlane->getStab()->VLMGetPanelTotal();
+	if(m_pPlane->m_bFin)  n+= m_pPlane->getFin()->VLMGetPanelTotal();
 	if(n>VLMMAXMATSIZE)
 	{
 		strong = QString(tr("Total number of VLM panels =%1\n Max Number =%2\nA reduction of the number of VLM panels is required")).arg(n).arg(VLMMAXMATSIZE);
@@ -558,23 +558,23 @@ void PlaneDlg::OnOK()
 
 	//check the number of surfaces
 	int nSurfaces = 0;
-	for (j=0; j<m_pPlane->Wing()->NWingSection()-1; j++)
+	for (j=0; j<m_pPlane->getWing()->NWingSection()-1; j++)
 	{
-		if(fabs(m_pPlane->Wing()->YPosition(j)-m_pPlane->Wing()->YPosition(j+1)) > QMiarex::s_MinPanelSize) nSurfaces+=2;
+		if(fabs(m_pPlane->getWing()->YPosition(j)-m_pPlane->getWing()->YPosition(j+1)) > QMiarex::s_MinPanelSize) nSurfaces+=2;
 	}
-	if(m_pPlane->Stab())
+	if(m_pPlane->getStab())
 	{
-		for (j=0; j<m_pPlane->Stab()->NWingSection()-1; j++)
+		for (j=0; j<m_pPlane->getStab()->NWingSection()-1; j++)
 		{
-			if(fabs(m_pPlane->Stab()->YPosition(j)-m_pPlane->Stab()->YPosition(j+1)) > QMiarex::s_MinPanelSize) nSurfaces+=2;
+			if(fabs(m_pPlane->getStab()->YPosition(j)-m_pPlane->getStab()->YPosition(j+1)) > QMiarex::s_MinPanelSize) nSurfaces+=2;
 		}
 	}
 
-	if(m_pPlane->Fin())
+	if(m_pPlane->getFin())
 	{
-		for (j=0; j<m_pPlane->Fin()->NWingSection()-1; j++)
+		for (j=0; j<m_pPlane->getFin()->NWingSection()-1; j++)
 		{
-			if(fabs(m_pPlane->Fin()->YPosition(j)-m_pPlane->Fin()->YPosition(j+1)) > QMiarex::s_MinPanelSize)
+			if(fabs(m_pPlane->getFin()->YPosition(j)-m_pPlane->getFin()->YPosition(j+1)) > QMiarex::s_MinPanelSize)
 			{
 				if((m_pPlane->m_bSymFin) || (m_pPlane->m_bDoubleFin && m_pPlane->m_bDoubleSymFin))
 					nSurfaces += 2;
@@ -717,16 +717,16 @@ void PlaneDlg::SetParams()
 {
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	int i, pos;
-	CBody *pBody = NULL;
-	if(m_pPlane->Body()) m_pctrlBody->setChecked(true);
+	Body *pBody = NULL;
+	if(m_pPlane->getBody()) m_pctrlBody->setChecked(true);
 	else                 m_pctrlBody->setChecked(false);
 	m_pctrlBodyList->clear();
 	for(i=0; i<s_poaBody->size(); i++)
 	{
-		pBody = (CBody*)s_poaBody->at(i);
+		pBody = (Body*)s_poaBody->at(i);
 		m_pctrlBodyList->addItem(pBody->m_BodyName);
 	}
-	if(m_pPlane->Body() && pBody)
+	if(m_pPlane->getBody() && pBody)
 	{
 		pos = m_pctrlBodyList->findText(m_pPlane->m_pBody->m_BodyName);
 		m_pctrlBodyList->setCurrentIndex(pos);
@@ -768,7 +768,7 @@ void PlaneDlg::SetParams()
 	m_pctrlXBody->SetValue(m_pPlane->m_BodyPos.x * pMainFrame->m_mtoUnit);
 	m_pctrlZBody->SetValue(m_pPlane->m_BodyPos.z * pMainFrame->m_mtoUnit);
 
-	m_pctrlBiplane->setChecked(m_pPlane->Wing2());
+	m_pctrlBiplane->setChecked(m_pPlane->getWing2());
 	OnBiplane();
 
 	m_pctrlXLEFin->SetValue(m_pPlane->m_WingLE[3].x* pMainFrame->m_mtoUnit);
@@ -778,7 +778,7 @@ void PlaneDlg::SetParams()
 	m_pctrlDoubleFin->setChecked(m_pPlane->m_bDoubleFin);
 	m_pctrlSymFin->setChecked(m_pPlane->m_bSymFin);
 	OnFin();
-	m_pctrlStabCheck->setChecked(m_pPlane->Stab());
+	m_pctrlStabCheck->setChecked(m_pPlane->getStab());
 	OnStab();
 }
 
@@ -791,63 +791,63 @@ void PlaneDlg::SetResults()
 //	double area = m_pPlane->Wing()->s_Area;
 //	if(m_pPlane->m_bBiplane) area += m_pPlane->Wing2()->m_Area;
 
-	str = QString("%1").arg(m_pPlane->Wing()->m_PlanformArea*pMainFrame->m_m2toUnit,7,'f',2);
+	str = QString("%1").arg(m_pPlane->getWing()->m_PlanformArea*pMainFrame->m_m2toUnit,7,'f',2);
 	m_pctrlWingSurface->setText(str);
 
-	if(m_pPlane->Stab())   str = QString("%1").arg(m_pPlane->Stab()->m_PlanformArea*pMainFrame->m_m2toUnit,7,'f',2);
+	if(m_pPlane->getStab())   str = QString("%1").arg(m_pPlane->getStab()->m_PlanformArea*pMainFrame->m_m2toUnit,7,'f',2);
 	else str = " ";
 	m_pctrlStabSurface->setText(str);
 
-	if(m_pPlane->Fin())    str = QString("%1").arg(m_pPlane->Fin()->m_PlanformArea*pMainFrame->m_m2toUnit,7,'f',2);
+	if(m_pPlane->getFin())    str = QString("%1").arg(m_pPlane->getFin()->m_PlanformArea*pMainFrame->m_m2toUnit,7,'f',2);
 	else str=" ";
 	m_pctrlFinSurface->setText(str);
 
-	double span = m_pPlane->Wing()->m_PlanformSpan;
-	if(m_pPlane->Wing2()) span = qMax(m_pPlane->Wing()->m_PlanformSpan, m_pPlane->Wing2()->m_PlanformSpan);
+	double span = m_pPlane->getWing()->m_PlanformSpan;
+	if(m_pPlane->getWing2()) span = qMax(m_pPlane->getWing()->m_PlanformSpan, m_pPlane->getWing2()->m_PlanformSpan);
 	str = QString("%1").arg(span*pMainFrame->m_mtoUnit,5,'f',2);
 	m_pctrlWingSpan->setText(str);
 
 	ComputePlane();
-	if(m_pPlane->Stab())
+	if(m_pPlane->getStab())
 	{
-		double SLA = m_pPlane->m_WingLE[2].x + m_pPlane->Stab()->Chord(0)/4.0 - m_pPlane->Wing()->Chord(0)/4.0;
+		double SLA = m_pPlane->m_WingLE[2].x + m_pPlane->getStab()->Chord(0)/4.0 - m_pPlane->getWing()->Chord(0)/4.0;
 		str = QString("%1").arg(SLA*pMainFrame->m_mtoUnit,5,'f',2);
 	}
 	else  str=" ";
 	m_pctrlStabLeverArm->setText(str);
 
-	if(m_pPlane->Stab())
+	if(m_pPlane->getStab())
 	{
 		str = QString("%1").arg(m_pPlane->TailVolume(),5,'f',2);
 	}
 	else str =" ";
 	m_pctrlStabVolume->setText(str);
 
-	int total = m_pPlane->Wing()->VLMGetPanelTotal();
-	total += m_pPlane->Wing()->NXPanels(m_pPlane->Wing()->NWingSection()-2);
-	if(m_pPlane->Wing2())
+	int total = m_pPlane->getWing()->VLMGetPanelTotal();
+	total += m_pPlane->getWing()->NXPanels(m_pPlane->getWing()->NWingSection()-2);
+	if(m_pPlane->getWing2())
 	{
-		total += m_pPlane->Wing2()->VLMGetPanelTotal();
-		total += m_pPlane->Wing2()->NXPanels(m_pPlane->Wing2()->NWingSection()-2);
+		total += m_pPlane->getWing2()->VLMGetPanelTotal();
+		total += m_pPlane->getWing2()->NXPanels(m_pPlane->getWing2()->NWingSection()-2);
 	}
 
-	if(m_pPlane->Stab())
+	if(m_pPlane->getStab())
 	{
-		total += m_pPlane->Stab()->VLMGetPanelTotal();
-		total += m_pPlane->Stab()->NXPanels(m_pPlane->Stab()->NWingSection()-2);
+		total += m_pPlane->getStab()->VLMGetPanelTotal();
+		total += m_pPlane->getStab()->NXPanels(m_pPlane->getStab()->NWingSection()-2);
 	}
 
-	if(m_pPlane->Fin())
+	if(m_pPlane->getFin())
 	{
         //if(m_pPlane->m_bSymFin)  total += 2*m_pPlane->Fin()->VLMGetPanelTotal();
-        if(m_pPlane->m_bDoubleFin ||m_pPlane->m_bSymFin)  total += 2*m_pPlane->Fin()->VLMGetPanelTotal();
-		else                                              total +=   m_pPlane->Fin()->VLMGetPanelTotal();
-		total += m_pPlane->Fin()->NXPanels(m_pPlane->Fin()->NWingSection()-2);
+        if(m_pPlane->m_bDoubleFin ||m_pPlane->m_bSymFin)  total += 2*m_pPlane->getFin()->VLMGetPanelTotal();
+		else                                              total +=   m_pPlane->getFin()->VLMGetPanelTotal();
+		total += m_pPlane->getFin()->NXPanels(m_pPlane->getFin()->NWingSection()-2);
 	}
 
 	total *=2;//in case we have a panel analysis
 
-	if(m_pPlane->Body()) total += m_pPlane->Body()->m_nxPanels * m_pPlane->Body()->m_nhPanels * 2;
+	if(m_pPlane->getBody()) total += m_pPlane->getBody()->m_nxPanels * m_pPlane->getBody()->m_nhPanels * 2;
 
 	str = QString("%1").arg(total);
 	m_pctrlVLMTotalPanels->setText(str);

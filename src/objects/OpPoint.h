@@ -33,7 +33,7 @@ class OpPoint
 {
 
 	friend class MainFrame;
-	friend class CPolar;
+	friend class Polar;
 	friend class QXDirect;
 	friend class ObjectPropsDlg;
 

@@ -59,11 +59,11 @@ class MainFrame : public QMainWindow
 	friend class QAFoil;
 	friend class QXInverse;
 	friend class Miarex;
-	friend class CBody;
-	friend class CWing;
-	friend class CWPolar;
+	friend class Body;
+	friend class Wing;
+	friend class WPolar;
 	friend class CWOpp;
-	friend class CPlane;
+	friend class Plane;
 	friend class BodyGridDlg;
 	friend class XFoilAnalysisDlg;
 	friend class BatchDlg;
@@ -170,7 +170,7 @@ private:
 	void DeleteWing(void *pWingPtr, bool bResultsOnly = false);
 	void GLToClient(CVector const &real, QPoint &point);
 	void RemoveOpPoint(bool bCurrent);
-	void SetCurrentFoil(CFoil* pFoil);
+	void SetCurrentFoil(Foil* pFoil);
 	void SaveSettings();
 	void SelectOpPoint(OpPoint *pOpp);
 	void SelectWOpp(double x);
@@ -188,24 +188,24 @@ private:
 	void UpdateWOpps();
 
 	void UpdateView();
-	void WritePolars(QDataStream &ar, CFoil *pFoil=NULL, int ProjectFormat=6);
+	void WritePolars(QDataStream &ar, Foil *pFoil=NULL, int ProjectFormat=6);
 
 	bool SaveProject(QString PathName="");
 	bool LoadSettings();
 	bool LoadPolarFileV3(QDataStream &ar, bool bIsStoring, int ArchiveFormat=0);
 	bool SerializeProject(QDataStream &ar, bool bIsStoring, int ProjectFormat =6);
 	bool SerializeUFOProject(QDataStream &ar, int ProjectFormat=5);
-	CFoil *DeleteFoil(CFoil *pFoil, bool bAsk=true);
+	Foil *DeleteFoil(Foil *pFoil, bool bAsk=true);
 
-	void AddFoil(CFoil *pFoil);
-	void RenameFoil(CFoil *pFoil);
+	void AddFoil(Foil *pFoil);
+	void RenameFoil(Foil *pFoil);
 
-	CFoil* GetFoil(QString strFoilName);
-	CFoil* ReadFoilFile(QTextStream &ar);
-	CFoil* ReadPolarFile(QDataStream &ar);
-	CFoil* SetModFoil(CFoil* pNewFoil, bool bKeepExistingFoil = false);
-	CPolar *GetPolar(QString m_FoilName, QString PolarName);
-	CPolar* AddPolar(CPolar *pPolar);
+	Foil* GetFoil(QString strFoilName);
+	Foil* ReadFoilFile(QTextStream &ar);
+	Foil* ReadPolarFile(QDataStream &ar);
+	Foil* SetModFoil(Foil* pNewFoil, bool bKeepExistingFoil = false);
+	Polar *GetPolar(QString m_FoilName, QString PolarName);
+	Polar* AddPolar(Polar *pPolar);
 	OpPoint *GetOpp(double Alpha);
 	QColor GetColor(int type);
 

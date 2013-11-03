@@ -21,8 +21,8 @@
 
 
 
-#ifndef CFOIL_H
-#define CFOIL_H
+#ifndef FOIL_H
+#define FOIL_H
 
 #include <QColor>
 #include <QPainter>
@@ -33,20 +33,18 @@
 #include <QTextStream>
 
 
-class CFoil
+class Foil
 {
 	friend class QAFoil;
-	friend class CPF;
-	friend class CSF;
-	friend class CSplinedPoints;
-	friend class CSurface;
+	friend class SplineFoil;
+	friend class Surface;
 	friend class ThreeDWidget;
 	friend class QXDirect;
 	friend class QXInverse;
 	friend class QMiarex;
 	friend class XFoil;
 	friend class FoilPolarDlg;
-	friend class CWing;
+	friend class Wing;
 	friend class MainFrame;
 	friend class NacaFoilDlg;
 	friend class FoilCoordDlg;
@@ -63,13 +61,12 @@ class CFoil
 	friend class XFoilTask;
 	friend class GL3dWingDlg;
 	friend class WingDlg;
-	friend class AFoil;
 	friend class FoilSelectionDlg;
 	friend class ManageFoilsDlg;
 	friend class FoilTableDelegate;
 	
 public:
-	CFoil();
+	Foil();
 	void GetFoilName(QString &FoilName);
 	int IsPoint(CVector const &Real);
 	void DrawFoil(QPainter &painter, double const &alpha, double const &scalex, double const &scaley, QPoint const &Offset);
@@ -99,7 +96,7 @@ public:
 	bool InitFoil();
 	bool SetCamber(double f, double u);
 
-	void CopyFoil(CFoil *pSrcFoil);
+	void CopyFoil(Foil *pSrcFoil);
 	bool Serialize(QDataStream &ar, bool bIsStoring, int ProjectFormat=5);
 	void SetFlap();
 	void SetTEFlap();

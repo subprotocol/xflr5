@@ -24,8 +24,6 @@
  *
  * It dispatches user commands towards object definition, analysis and post-processing
  *
- * \author  Andre Deperrois
- *
  */
 
 
@@ -81,8 +79,7 @@
 #include "../objects/Plane.h"
 #include "../objects/WPolar.h"
 #include "../objects/WOpp.h"
-#include "../objects/POpp.h"
-#include "../objects/Polar.h"
+#include "../objects/PlaneOpp.h"
 #include "../objects/Polar.h"
 #include "../objects/Foil.h"
 #include "../objects/OpPoint.h"
@@ -103,12 +100,12 @@ class QMiarex : public QWidget
 	friend class GL3dBodyDlg;
 	friend class GLLightDlg;
 	friend class WingDlg;
-	friend class CWing;
+	friend class Wing;
 	friend class LLTAnalysisDlg;
 	friend class StabPolarDlg;
 	friend class StabViewDlg;
 	friend class PanelAnalysisDlg;
-	friend class CPlane;
+	friend class Plane;
 	friend class PlaneDlg;
 	friend class ManageBodiesDlg;
 	friend class ManageUFOsDlg;
@@ -116,7 +113,7 @@ class QMiarex : public QWidget
 	friend class DisplaySettingsDlg;
 	friend class UFOTableDelegate;
 	friend class WPolarDlg;
-	friend class CWPolar;
+	friend class WPolar;
 
 	Q_OBJECT
 
@@ -270,12 +267,12 @@ public:
 
 public:
 	//class methods
-	CBody*   AddBody(CBody *pBody);
-	CPlane*  AddPlane(CPlane *pPlane);
-	void     AddPOpp(bool bPointOut, double *Cp, double *Gamma = NULL, double *Sigma=NULL, CPOpp *pPOpp = NULL);
-	CWing*   AddWing(CWing *pWing);
+	Body*   AddBody(Body *pBody);
+	Plane*  AddPlane(Plane *pPlane);
+	void     AddPOpp(bool bPointOut, double *Cp, double *Gamma = NULL, double *Sigma=NULL, PlaneOpp *pPOpp = NULL);
+	Wing*   AddWing(Wing *pWing);
 	void     AddWOpp(double QInf, double Alpha, bool bPointOut, double *Gamma = NULL, double *Sigma = NULL, double *Cp = NULL);
-	CWPolar* AddWPolar(CWPolar* pWPolar);
+	WPolar* AddWPolar(WPolar* pWPolar);
 	double coreSize();
 	int  CreateBodyElements();
 	void CreateCpCurves();
@@ -286,9 +283,9 @@ public:
 	void CreateStabTimeCurves();
 	void CreateStabRungeKuttaCurves();
 	bool CreateWakeElems(int PanelIndex);
-	int  CreateWingElements(CSurface *pSurface);
-	void CreateWOpp(CWOpp *pWOpp, CWing *pWing);
-	void DeleteBody(CBody *pThisBody);
+	int  CreateWingElements(Surface *pSurface);
+	void CreateWOpp(WingOpp *pWOpp, Wing *pWing);
+	void DeleteBody(Body *pThisBody);
 	void DrawCpLegend(QPainter &painter, QPoint place, int bottom);
 	void DrawWOppLegend(QPainter &painter, QPoint place, int bottom);
 	void DrawWPolarLegend(QPainter &painter, QPoint place, int bottom);
@@ -296,16 +293,16 @@ public:
 	void DuplicatePlane();
 	void EditCurPlane();
 	void FillComboBoxes(bool bEnable = true);
-	void FillWPlrCurve(CCurve *pCurve, CWPolar *pWPolar, int XVar, int YVar);
-	void FillWOppCurve(CWOpp *pWOpp, Graph *pGraph, CCurve *pCurve);
-	void FillStabCurve(CCurve *pCurve, CWPolar *pWPolar, int iMode);
-	CBody*   GetBody(QString BodyName);
+	void FillWPlrCurve(CCurve *pCurve, WPolar *pWPolar, int XVar, int YVar);
+	void FillWOppCurve(WingOpp *pWOpp, Graph *pGraph, CCurve *pCurve);
+	void FillStabCurve(CCurve *pCurve, WPolar *pWPolar, int iMode);
+	Body*   GetBody(QString BodyName);
 	QGraph*  GetGraph(QPoint &pt);
-	CPlane*  GetPlane(QString PlaneName);
-	CPOpp*   GetPOpp(double x);
-	CWing*   GetWing(QString WingName);
-	CWOpp*   GetWOpp(double x);
-	CWPolar* GetWPolar(QString WPolarName);
+	Plane*  GetPlane(QString PlaneName);
+	PlaneOpp*   GetPOpp(double x);
+	Wing*   GetWing(QString WingName);
+	WingOpp*   GetWOpp(double x);
+	WPolar* GetWPolar(QString WPolarName);
 	void GLCallViewLists();
 	void GLDraw3D();
 	void GLDrawFoils();
@@ -313,11 +310,11 @@ public:
 	void GLInverseMatrix();
 	void GLRenderView();
 	bool InitializePanels();
-	void InsertWOpp(CWOpp *pNewPoint);
+	void InsertWOpp(WingOpp *pNewPoint);
 	bool Intersect(CVector const &LA, CVector const &LB, CVector const &TA, CVector const &TB, CVector const &Normal, CVector const &A,  CVector const &U,  CVector &I, double &dist);
 	int  IsNode(CVector &Pt);
 	int  IsWakeNode(CVector &Pt);
-	void JoinSurfaces(CSurface *pLeftSurf, CSurface *pRightSurf, int pl, int pr);
+	void JoinSurfaces(Surface *pLeftSurf, Surface *pRightSurf, int pl, int pr);
 	void LLTAnalyze(double V0, double VMax, double VDelta, bool bSequence, bool bInitCalc);	
 	bool LoadSettings(QSettings *pSettings);
 	void PaintXCmRef(QPainter &painter, QPoint ORef, double scale);
@@ -330,7 +327,7 @@ public:
 	void PaintCurWOppLegend(QPainter &painter);
 	void RenameUFO(QString UFOName);
 	void RotateGeomY(double const &Angle, CVector const &P);
-	void RotateGeomZ(CPanel *pPanel, CVector *pNode, CPanel *pWakePanel, CVector *pWakeNode, double const &Beta, CVector const &P);
+	void RotateGeomZ(Panel *pPanel, CVector *pNode, Panel *pWakePanel, CVector *pWakeNode, double const &Beta, CVector const &P);
 	bool SaveSettings(QSettings *pSettings);
 	void Set2DScale();
 	void Set3DRotationCenter();
@@ -338,13 +335,13 @@ public:
 	void Set3DScale();
 	void SetAnalysisParams();
 	void SetControls();
-	void SetControlPositions(CPanel *pPanel, CVector *pNode, double t, int &NCtrls, QString &out, bool bBCOnly=true);
+	void SetControlPositions(Panel *pPanel, CVector *pNode, double t, int &NCtrls, QString &out, bool bBCOnly=true);
 	void SetCoreSize(double CoreSize);
 	void SetCurveParams();
-	bool SetModBody(CBody *pModBody);
-	bool SetModPlane(CPlane *pModPlane);
-	bool SetModWing(CWing *pWing);
-	bool SetModWPolar(CWPolar *pModWPolar);
+	bool SetModBody(Body *pModBody);
+	bool SetModPlane(Plane *pModPlane);
+	bool SetModWing(Wing *pWing);
+	bool SetModWPolar(WPolar *pModWPolar);
 	bool SetPOpp(bool bCurrent, double x = 0.0);
 	void SetScale();
 	void SetStabGraphTitles();
@@ -542,7 +539,7 @@ public:
 	QRect m_r2DCltRect;           /**< the client rectangle, in client coordinates*/
 	QRect m_r3DCltRect;           /**< the drawing rectangle, in client coordinates. @todo check usage*/
 
-	CPOpp * m_pCurPOpp;           /**< a pointer to the active Plane Operating Point, or NULL if none is active*/
+	PlaneOpp * m_pCurPOpp;           /**< a pointer to the active Plane Operating Point, or NULL if none is active*/
 
 
 	QPoint m_LastPoint;           /**< The client position of the previous mousepress event */
@@ -572,18 +569,18 @@ public:
 	CVector m_MemNode[2*VLMMAXMATSIZE];         /**< used if the analysis should be performed on the tilted geometry */
 	CVector m_WakeNode[2*VLMMAXMATSIZE];        /**< the reference current wake node array */
 	CVector m_RefWakeNode[2*VLMMAXMATSIZE];     /**< the reference wake node array if wake needs to be reset */
-	CPanel m_Panel[VLMMAXMATSIZE];		        /**< the panel array for the currently loaded UFO */
-	CPanel m_MemPanel[VLMMAXMATSIZE];           /**< used if the analysis should be performed on the tilted geometry */
-	CPanel m_WakePanel[VLMMAXMATSIZE];          /**< the reference current wake panel array */
-	CPanel m_RefWakePanel[VLMMAXMATSIZE];       /**< the reference wake panel array if wake needs to be reset */
+	Panel m_Panel[VLMMAXMATSIZE];		        /**< the panel array for the currently loaded UFO */
+	Panel m_MemPanel[VLMMAXMATSIZE];           /**< used if the analysis should be performed on the tilted geometry */
+	Panel m_WakePanel[VLMMAXMATSIZE];          /**< the reference current wake panel array */
+	Panel m_RefWakePanel[VLMMAXMATSIZE];       /**< the reference wake panel array if wake needs to be reset */
 
-	CWing *m_pWingList[MAXWINGS];         /**< an array of pointers to the four wings of the currently selected plane */
-	CWOpp *m_pWOpp[MAXWINGS];             /**< an array of pointers to the operating points of the four wings of the currently selected plane */
+	Wing *m_pWingList[MAXWINGS];         /**< an array of pointers to the four wings of the currently selected plane */
+	WingOpp *m_pWOpp[MAXWINGS];             /**< an array of pointers to the operating points of the four wings of the currently selected plane */
 
 	CVector m_L[(MAXBODYFRAMES+1)*(MAXSIDELINES+1)]; /**< Array of temporary points to save calculation times for body NURBS surfaces */
 	CVector m_T[(MAXBODYFRAMES+1)*(MAXSIDELINES+1)]; /**< Array of temporary points to save calculation times for body NURBS surfaces */
 
-	CSurface *m_pSurface[8*MAXSPANSECTIONS];	/**< An array holding the pointers to the wings surfaces */
+	Surface *m_pSurface[8*MAXSPANSECTIONS];	/**< An array holding the pointers to the wings surfaces */
 
 	QList<void *> *m_poaFoil;			/**< a pointer to the array of foil objects */
 	QList<void *> *m_poaPolar;			/**< a pointer to the array of foil polar objects */
@@ -595,11 +592,11 @@ public:
 	QList<void *> *m_poaBody;			/**< a pointer to the array of Body objects */
 
 
-	CBody *m_pCurBody;             /**< the currently active body */
-	CWing *m_pCurWing;             /**< the currently active wing */
-	CWOpp * m_pCurWOpp;			   /**< the currently active Wing Operating Point*/
-	CPlane * m_pCurPlane;          /**< the currently active Plane */
-	CWPolar * m_pCurWPolar;        /**< the currently active WPolar */
+	Body *m_pCurBody;             /**< the currently active body */
+	Wing *m_pCurWing;             /**< the currently active wing */
+	WingOpp * m_pCurWOpp;			   /**< the currently active Wing Operating Point*/
+	Plane * m_pCurPlane;          /**< the currently active Plane */
+	WPolar * m_pCurWPolar;        /**< the currently active WPolar */
 
 
 	int m_StabilityResponseType;   /**< 0 = initial conditions, 1=forced response, 2=modal response */

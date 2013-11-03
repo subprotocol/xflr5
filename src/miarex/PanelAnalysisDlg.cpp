@@ -1365,7 +1365,7 @@ void PanelAnalysisDlg::ComputeOnBodyCp(double V0, double VDelta, int nval)
 }
 
 
-void PanelAnalysisDlg::DoubletNASA4023(CVector const &C, CPanel *pPanel, CVector &V, double &phi, bool bWake)
+void PanelAnalysisDlg::DoubletNASA4023(CVector const &C, Panel *pPanel, CVector &V, double &phi, bool bWake)
 {
 	// VSAERO theory Manual
 	// Influence of panel pp at coll pt of panel p
@@ -1507,7 +1507,7 @@ void PanelAnalysisDlg::DoubletNASA4023(CVector const &C, CPanel *pPanel, CVector
 }
 
 
-void PanelAnalysisDlg::GetDoubletInfluence(CVector const &C, CPanel *pPanel, CVector &V, double &phi, bool bWake, bool bAll)
+void PanelAnalysisDlg::GetDoubletInfluence(CVector const &C, Panel *pPanel, CVector &V, double &phi, bool bWake, bool bAll)
 {
 	// returns the influence of the panel pPanel at point C
 	// if the panel pPanel is located on a thin surface, then its the influence of a vortex
@@ -1538,7 +1538,7 @@ void PanelAnalysisDlg::GetDoubletInfluence(CVector const &C, CPanel *pPanel, CVe
 }
 
 
-void PanelAnalysisDlg::GetSourceInfluence(CVector const &C, CPanel *pPanel, CVector &V, double &phi)
+void PanelAnalysisDlg::GetSourceInfluence(CVector const &C, Panel *pPanel, CVector &V, double &phi)
 {
 	// returns the influence of a uniform source distribution on the panel pPanel at point C
 	// The panel is necessarily located on a thick surface, else the source strength is zero
@@ -1676,7 +1676,7 @@ void PanelAnalysisDlg::InitDialog()
 
 	AddString("\n");
 
-	CWing::s_bVLMSymetric = m_b3DSymetric;
+	Wing::s_bVLMSymetric = m_b3DSymetric;
 
 	m_pctrlProgress->setMinimum(0);
 	m_pctrlProgress->setMaximum(100);
@@ -1876,9 +1876,9 @@ bool PanelAnalysisDlg::ReLoop()
 	if(m_pWPolar->m_bTiltedGeom)
 	{
 		//reset the initial geometry before a new angle is processed
-		memcpy(m_pPanel,     m_pMemPanel,     m_MatSize * sizeof(CPanel));
+		memcpy(m_pPanel,     m_pMemPanel,     m_MatSize * sizeof(Panel));
 		memcpy(m_pNode,      m_pMemNode,      m_nNodes  * sizeof(CVector));
-		memcpy(m_pWakePanel, m_pRefWakePanel, m_WakeSize * sizeof(CPanel));
+		memcpy(m_pWakePanel, m_pRefWakePanel, m_WakeSize * sizeof(Panel));
 		memcpy(m_pWakeNode,  m_pRefWakeNode,  m_nWakeNodes * sizeof(CVector));
 
 		// Rotate the wing panels and translate the wake to the new T.E. position
@@ -1949,7 +1949,7 @@ bool PanelAnalysisDlg::ReLoop()
 
 
 
-void PanelAnalysisDlg::SourceNASA4023(CVector const &C, CPanel *pPanel, CVector &V, double &phi)
+void PanelAnalysisDlg::SourceNASA4023(CVector const &C, Panel *pPanel, CVector &V, double &phi)
 {
 	//VSAERO theory Manual
 	//Influence of panel pp at coll pt of panel p
@@ -2381,9 +2381,9 @@ void PanelAnalysisDlg::StartAnalysis()
 	if(m_pWPolar && (m_pWPolar->m_WPolarType==STABILITYPOLAR || m_pWPolar->m_bTiltedGeom || m_pWPolar->m_bWakeRollUp))
 	{
 		//restore the panels and nodes;
-		memcpy(m_pPanel, m_pMemPanel, m_MatSize * sizeof(CPanel));
+		memcpy(m_pPanel, m_pMemPanel, m_MatSize * sizeof(Panel));
 		memcpy(m_pNode,  m_pMemNode,  m_nNodes  * sizeof(CVector));
-		memcpy(m_pWakePanel, m_pRefWakePanel, m_WakeSize * sizeof(CPanel));
+		memcpy(m_pWakePanel, m_pRefWakePanel, m_WakeSize * sizeof(Panel));
 		memcpy(m_pWakeNode,  m_pRefWakeNode,  m_nWakeNodes * sizeof(CVector));
 	}
 
@@ -2470,9 +2470,9 @@ bool PanelAnalysisDlg::UnitLoop()
 		AddString(str);
 
 		//reset the initial geometry before a new angle is processed
-		memcpy(m_pPanel, m_pMemPanel, m_MatSize * sizeof(CPanel));
+		memcpy(m_pPanel, m_pMemPanel, m_MatSize * sizeof(Panel));
 		memcpy(m_pNode,  m_pMemNode,  m_nNodes  * sizeof(CVector));
-		memcpy(m_pWakePanel, m_pRefWakePanel, m_WakeSize * sizeof(CPanel));
+		memcpy(m_pWakePanel, m_pRefWakePanel, m_WakeSize * sizeof(Panel));
 		memcpy(m_pWakeNode,  m_pRefWakeNode,  m_nWakeNodes * sizeof(CVector));
 
 		// Rotate the wing panels and translate the wake to the new T.E. position
@@ -2564,7 +2564,7 @@ void PanelAnalysisDlg::WriteString(QString strong)
 
 
 
-void PanelAnalysisDlg::VLMGetVortexInfluence(CPanel *pPanel, CVector const &C, CVector &V, bool bAll)
+void PanelAnalysisDlg::VLMGetVortexInfluence(Panel *pPanel, CVector const &C, CVector &V, bool bAll)
 {
 	// calculates the the panel p's vortex influence at point C
 	// V is the resulting velocity
@@ -2755,7 +2755,7 @@ bool PanelAnalysisDlg::ControlLoop()
 	{
 		// create the geometry for the control parameter
 		// so first restore the initial geometry
-		memcpy(m_pPanel, m_pMemPanel, m_MatSize * sizeof(CPanel));
+		memcpy(m_pPanel, m_pMemPanel, m_MatSize * sizeof(Panel));
 		memcpy(m_pNode,  m_pMemNode,  m_nNodes  * sizeof(CVector));
 
 		//define the control position for this iteration

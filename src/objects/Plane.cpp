@@ -24,11 +24,11 @@
 #include "../globals.h"
 #include <math.h>
 
-void*	CPlane::s_pMainFrame;
-void*	CPlane::s_pMiarex ;
+void*	Plane::s_pMainFrame;
+void*	Plane::s_pMiarex ;
 
 //
-CPlane::CPlane()
+Plane::Plane()
 {
 	m_pBody   = NULL;
 
@@ -105,7 +105,7 @@ CPlane::CPlane()
 }
 
 
-void CPlane::ComputeVolumeInertia(double &Mass, CVector & CoG, double &CoGIxx, double &CoGIyy, double &CoGIzz, double &CoGIxz)
+void Plane::ComputeVolumeInertia(double &Mass, CVector & CoG, double &CoGIxx, double &CoGIyy, double &CoGIzz, double &CoGIxz)
 {
 	// the analysis uses each object inertia individually
 	// the export to AVL format is done for each object individually
@@ -116,7 +116,7 @@ void CPlane::ComputeVolumeInertia(double &Mass, CVector & CoG, double &CoGIxx, d
 	CVector Pt;
 	CVector CoGBody;
 	CVector CoGWing[MAXWINGS];
-	CWing *pWing[MAXWINGS];
+	Wing *pWing[MAXWINGS];
 	pWing[0] = pWing[1] = pWing[2] = pWing[3] = NULL;
 
 
@@ -147,7 +147,7 @@ void CPlane::ComputeVolumeInertia(double &Mass, CVector & CoG, double &CoGIxx, d
 		}
 	}
 
-	if(Body())
+	if(getBody())
 	{
 		if(m_pBody->m_VolumeMass>PRECISION)
 		{
@@ -181,7 +181,7 @@ void CPlane::ComputeVolumeInertia(double &Mass, CVector & CoG, double &CoGIxx, d
 		}
 	}
 
-	if(Body())
+	if(getBody())
 	{
 		Pt = CoGBody - CoG;
 		CoGIxx += m_pBody->m_VolumeMass * (Pt.y*Pt.y + Pt.z*Pt.z);
@@ -194,7 +194,7 @@ void CPlane::ComputeVolumeInertia(double &Mass, CVector & CoG, double &CoGIxx, d
 
 
 
-void CPlane::ComputeBodyAxisInertia()
+void Plane::ComputeBodyAxisInertia()
 {
 	//
 	// Initializes the inertia tensor in geometrical (body) axis :
@@ -205,7 +205,7 @@ void CPlane::ComputeBodyAxisInertia()
 
 	int i, iw;
 	CVector VolumeCoG, MassPos;
-	CWing *pWing[MAXWINGS];
+	Wing *pWing[MAXWINGS];
 	double Ixx, Iyy, Izz, Ixz,  VolumeMass;
 	Ixx = Iyy = Izz = Ixz = VolumeMass = 0.0;
 
@@ -238,7 +238,7 @@ void CPlane::ComputeBodyAxisInertia()
 		}
 	}
 
-	if(Body())
+	if(getBody())
 	{
 		for(i=0; i<m_pBody->m_MassValue.size(); i++)
 		{
@@ -282,9 +282,9 @@ void CPlane::ComputeBodyAxisInertia()
 			}
 		}
 	}
-	if(Body())
+	if(getBody())
 	{
-		CBody *pBody = m_pBody;
+		Body *pBody = m_pBody;
 		for(i=0; i<pBody->m_MassValue.size(); i++)
 		{
 			MassPos = m_CoG - (pBody->m_MassPosition[i] + m_BodyPos);
@@ -299,7 +299,7 @@ void CPlane::ComputeBodyAxisInertia()
 
 
 
-void CPlane::ComputePlane(void)
+void Plane::ComputePlane(void)
 {
 	int i;
 	if(m_bStab)
@@ -325,7 +325,7 @@ void CPlane::ComputePlane(void)
 
 
 
-void CPlane::Duplicate(CPlane *pPlane)
+void Plane::Duplicate(Plane *pPlane)
 {
 	m_PlaneName        = pPlane->m_PlaneName;
 	m_PlaneDescription = pPlane->m_PlaneDescription;
@@ -382,14 +382,14 @@ void CPlane::Duplicate(CPlane *pPlane)
 }
 
 
-double CPlane::TailVolume()
+double Plane::TailVolume()
 {
 	if(m_bStab) return m_TailVolume;
 	else        return 0.0;
 }
 
 
-double CPlane::TotalMass()
+double Plane::TotalMass()
 {
 	static double Mass;
 	
@@ -397,7 +397,7 @@ double CPlane::TotalMass()
 	if(m_bBiplane) Mass += m_Wing2.TotalMass();
 	if(m_bStab)    Mass += m_Stab.TotalMass();
 	if(m_bFin)     Mass += m_Fin.TotalMass();
-	if(Body())    Mass += m_pBody->TotalMass();
+	if(getBody())    Mass += m_pBody->TotalMass();
 	
 	for(int i=0; i<m_MassValue.size(); i++)
 		Mass += m_MassValue[i];
@@ -405,7 +405,7 @@ double CPlane::TotalMass()
 }
 
 
-bool CPlane::SerializePlane(QDataStream &ar, bool bIsStoring, int ProjectFormat)
+bool Plane::SerializePlane(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 {
 	QMiarex *pMiarex = (QMiarex*)s_pMiarex;
 
@@ -596,14 +596,14 @@ bool CPlane::SerializePlane(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 
 
 
-void CPlane::SetParents(void *pMainFrame, void*pMiarex)
+void Plane::SetParents(void *pMainFrame, void*pMiarex)
 {
 	s_pMainFrame = pMainFrame;
 	s_pMiarex    = pMiarex;
 }
 
 
-void CPlane::RenameWings()
+void Plane::RenameWings()
 {
 	m_Wing.m_WingName  = m_PlaneName+"_Wing";
 	m_Wing2.m_WingName = m_PlaneName+"_Wing2";
@@ -612,7 +612,7 @@ void CPlane::RenameWings()
 }
 
 
-void CPlane::CreateSurfaces()
+void Plane::CreateSurfaces()
 {
 	m_Wing.CreateSurfaces(m_WingLE[0],  0.0, m_WingTiltAngle[0]);
 	m_Wing2.CreateSurfaces(m_WingLE[1], 0.0, m_WingTiltAngle[1]);
@@ -621,25 +621,25 @@ void CPlane::CreateSurfaces()
 }
 
 
-void CPlane::SetBody(CBody *pBody)
+void Plane::SetBody(Body *pBody)
 {
 	m_pBody = pBody;
 	if(!m_pBody) m_bBody = false;
 }
 
 
-CVector CPlane::WingLE(int iw)
+CVector Plane::WingLE(int iw)
 {
 	return m_WingLE[iw];
 }
 
 
-CVector CPlane::BodyPos()
+CVector Plane::BodyPos()
 {
 	return m_BodyPos;
 }
 
-double CPlane::WingTiltAngle(int iw)
+double Plane::WingTiltAngle(int iw)
 {
 	return m_WingTiltAngle[iw];
 }

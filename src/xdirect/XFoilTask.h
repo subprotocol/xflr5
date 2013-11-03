@@ -39,7 +39,7 @@ public:
 	void run();
 	bool AlphaSequence();
 
-	bool Init(CFoil *pFoil, CPolar *pPolar);
+	bool Init(Foil *pFoil, Polar *pPolar);
 	bool Iterate();
 
 	static bool s_bCancel;
@@ -47,8 +47,8 @@ public:
 	static void *s_pBatchThreadDlg;
 	int m_Id;
 	int m_Iterations;
-	CFoil *m_pFoil;
-	CPolar *m_pPolar;
+	Foil *m_pFoil;
+	Polar *m_pPolar;
 	bool m_bIsFinished;
 	XFoil XFoilInstance;
 };

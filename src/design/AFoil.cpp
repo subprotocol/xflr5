@@ -35,7 +35,7 @@
 #include "AFoilTableDlg.h"
 #include "SplineCtrlsDlg.h"
 
-extern CFoil *g_pCurFoil;
+extern Foil *g_pCurFoil;
 
 void *QAFoil::s_pMainFrame;
 void *QAFoil::s_p2DWidget;
@@ -66,7 +66,7 @@ QAFoil::QAFoil(QWidget *parent)
 	m_poaFoil  = NULL;
 	m_pctrlFoilTable = NULL;
 
-	m_pSF = new CSF();
+	m_pSF = new SplineFoil();
 	m_pSF->m_bModified = false;
 	m_pSF->InitSplineFoil();
 
@@ -124,7 +124,7 @@ QAFoil::QAFoil(QWidget *parent)
 
 	m_ViewportTrans = QPoint(0,0);
 
-	m_pBufferFoil = new CFoil();
+	m_pBufferFoil = new Foil();
 
 	m_CurrentColumn = -1;
 	m_StackPos = 0;
@@ -472,7 +472,7 @@ void QAFoil::FillTableRow(int row)
 {
 	QModelIndex ind;
 	QStandardItem *pItem;
-	CFoil *pFoil = (CFoil*)m_poaFoil->at(row-1);
+	Foil *pFoil = (Foil*)m_poaFoil->at(row-1);
 
 	ind = m_pFoilModel->index(row, 0, QModelIndex());
 	m_pFoilModel->setData(ind,pFoil->m_FoilName);
@@ -1061,13 +1061,13 @@ void QAFoil::OnAFoilDerotateFoil()
 	pMainFrame->statusBar()->showMessage(str);
 
 	//then duplicate the buffer foil and add it
-	CFoil *pNewFoil = new CFoil();
+	Foil *pNewFoil = new Foil();
 	pNewFoil->CopyFoil(m_pBufferFoil);
 	pNewFoil->m_FoilColor  = pMainFrame->GetColor(0);
 	pNewFoil->m_nFoilStyle = 0;
 	pNewFoil->m_nFoilWidth = 1;
 
-	CFoil * pFoil = pMainFrame->SetModFoil(pNewFoil);
+	Foil * pFoil = pMainFrame->SetModFoil(pNewFoil);
 	FillFoilTable();
 	SelectFoil(pFoil);
 
@@ -1117,7 +1117,7 @@ void QAFoil::OnAFoilCadd()
 	if(QDialog::Accepted == m_pCAddDlg->exec())
 	{
 		//then duplicate the buffer foil and add it
-		CFoil *pNewFoil = new CFoil();
+		Foil *pNewFoil = new Foil();
 		pNewFoil->CopyFoil(m_pBufferFoil);
 		pNewFoil->m_FoilColor  = pMainFrame->GetColor(0);
 		pNewFoil->m_nFoilStyle = 0;
@@ -1125,7 +1125,7 @@ void QAFoil::OnAFoilCadd()
 		pNewFoil->m_bPoints = false;
 
 
-		CFoil * pFoil = pMainFrame->SetModFoil(pNewFoil);
+		Foil * pFoil = pMainFrame->SetModFoil(pNewFoil);
 		FillFoilTable();
 		SelectFoil(pFoil);
 	}
@@ -1188,14 +1188,14 @@ void QAFoil::OnAFoilPanels()
 	if(QDialog::Accepted == m_pTwoDPanelDlg->exec())
 	{
 		//then duplicate the buffer foil and add it
-		CFoil *pNewFoil = new CFoil();
+		Foil *pNewFoil = new Foil();
 		pNewFoil->CopyFoil(m_pBufferFoil);
 		pNewFoil->m_FoilColor  = pMainFrame->GetColor(0);
 		pNewFoil->m_nFoilStyle = 0;
 		pNewFoil->m_nFoilWidth = 1;
 		pNewFoil->m_bPoints = false;
 
-		CFoil * pFoil = pMainFrame->SetModFoil(pNewFoil);
+		Foil * pFoil = pMainFrame->SetModFoil(pNewFoil);
 		FillFoilTable();
 		SelectFoil(pFoil);
 	}
@@ -1237,7 +1237,7 @@ void QAFoil::OnAFoilFoilCoordinates()
 	if(QDialog::Accepted == m_pFoilCoordDlg->exec())
 	{
 		//then duplicate the buffer foil and add it
-		CFoil *pNewFoil = new CFoil();
+		Foil *pNewFoil = new Foil();
 		pNewFoil->CopyFoil(m_pBufferFoil);
 		pNewFoil->m_bPoints = false;
 		pNewFoil->m_FoilColor  = pMainFrame->GetColor(0);
@@ -1245,7 +1245,7 @@ void QAFoil::OnAFoilFoilCoordinates()
 		pNewFoil->m_nFoilWidth = 1;
 		pNewFoil->m_iHighLight = -1;
 
-		CFoil * pFoil = pMainFrame->SetModFoil(pNewFoil);
+		Foil * pFoil = pMainFrame->SetModFoil(pNewFoil);
 		FillFoilTable();
 		SelectFoil(pFoil);
 	}
@@ -1285,14 +1285,14 @@ void QAFoil::OnAFoilFoilGeom()
 	if(QDialog::Accepted == m_pFoilGeomDlg->exec())
 	{
 		//then duplicate the buffer foil and add it
-		CFoil *pNewFoil = new CFoil();
+		Foil *pNewFoil = new Foil();
 		pNewFoil->CopyFoil(m_pBufferFoil);
 		pNewFoil->m_FoilColor  = pMainFrame->GetColor(0);
 		pNewFoil->m_nFoilStyle = 0;
 		pNewFoil->m_nFoilWidth = 1;
 		pNewFoil->m_bPoints = false;
 
-		CFoil * pFoil = pMainFrame->SetModFoil(pNewFoil);
+		Foil * pFoil = pMainFrame->SetModFoil(pNewFoil);
 		FillFoilTable();
 		SelectFoil(pFoil);
 	}
@@ -1333,14 +1333,14 @@ void QAFoil::OnAFoilSetTEGap()
 	if(QDialog::Accepted == m_pTEGapDlg->exec())
 	{
 		//then duplicate the buffer foil and add it
-		CFoil *pNewFoil = new CFoil();
+		Foil *pNewFoil = new Foil();
 		pNewFoil->CopyFoil(m_pBufferFoil);
 		pNewFoil->m_FoilColor  = pMainFrame->GetColor(0);
 		pNewFoil->m_nFoilStyle = 0;
 		pNewFoil->m_nFoilWidth = 1;
 		pNewFoil->m_bPoints    = false;
 
-		CFoil * pFoil = pMainFrame->SetModFoil(pNewFoil);
+		Foil * pFoil = pMainFrame->SetModFoil(pNewFoil);
 		FillFoilTable();
 		SelectFoil(pFoil);
 	}
@@ -1384,14 +1384,14 @@ void QAFoil::OnAFoilSetLERadius()
 	if(QDialog::Accepted == m_pLEDlg->exec())
 	{
 		//then duplicate the buffer foil and add it
-		CFoil *pNewFoil = new CFoil();
+		Foil *pNewFoil = new Foil();
 		pNewFoil->CopyFoil(m_pBufferFoil);
 		pNewFoil->m_FoilColor  = pMainFrame->GetColor(0);
 		pNewFoil->m_nFoilStyle = 0;
 		pNewFoil->m_nFoilWidth = 1;
 		pNewFoil->m_bPoints    = false;
 
-		CFoil * pFoil = pMainFrame->SetModFoil(pNewFoil);
+		Foil * pFoil = pMainFrame->SetModFoil(pNewFoil);
 		FillFoilTable();
 		SelectFoil(pFoil);
 	}
@@ -1439,7 +1439,7 @@ void QAFoil::OnAFoilInterpolateFoils()
 	if(QDialog::Accepted == m_pIFDlg->exec())
 	{
 		//then duplicate the buffer foil and add it
-		CFoil *pNewFoil = new CFoil();
+		Foil *pNewFoil = new Foil();
 		pNewFoil->CopyFoil(m_pBufferFoil);
 		pNewFoil->m_FoilColor  = pMainFrame->GetColor(0);
 		pNewFoil->m_nFoilStyle = 0;
@@ -1447,7 +1447,7 @@ void QAFoil::OnAFoilInterpolateFoils()
 		pNewFoil->m_bPoints = false;
 		pNewFoil->m_FoilName = m_pIFDlg->m_NewFoilName;
 
-		CFoil * pFoil = pMainFrame->SetModFoil(pNewFoil);
+		Foil * pFoil = pMainFrame->SetModFoil(pNewFoil);
 		FillFoilTable();
 		SelectFoil(pFoil);
 
@@ -1491,7 +1491,7 @@ void QAFoil::OnAFoilNacaFoils()
 			str = QString("%1").arg(m_pNacaFoilDlg->s_Digits);
 		str = "NACA "+ str;
 
-		CFoil *pNewFoil    = new CFoil();
+		Foil *pNewFoil    = new Foil();
 		pNewFoil->CopyFoil(m_pBufferFoil);
 		pNewFoil->m_FoilColor  = pMainFrame->GetColor(0);
 		pNewFoil->m_nFoilStyle = 0;
@@ -1499,7 +1499,7 @@ void QAFoil::OnAFoilNacaFoils()
 		pNewFoil->m_bPoints    = false;
 		pNewFoil->m_FoilName   = str;
 
-		CFoil * pFoil = pMainFrame->SetModFoil(pNewFoil);
+		Foil * pFoil = pMainFrame->SetModFoil(pNewFoil);
 		FillFoilTable();
 		SelectFoil(pFoil);
 	}
@@ -1541,13 +1541,13 @@ void QAFoil::OnAFoilSetFlap()
 	if(QDialog::Accepted == m_pFlapDlg->exec())
 	{
 		//then duplicate the buffer foil and add it
-		CFoil *pNewFoil = new CFoil();
+		Foil *pNewFoil = new Foil();
 		pNewFoil->CopyFoil(m_pBufferFoil);
 		pNewFoil->m_FoilColor  = pMainFrame->GetColor(0);
 		pNewFoil->m_nFoilStyle = 0;
 		pNewFoil->m_nFoilWidth = 1;
 
-		CFoil * pFoil = pMainFrame->SetModFoil(pNewFoil);
+		Foil * pFoil = pMainFrame->SetModFoil(pNewFoil);
 		FillFoilTable();
 		SelectFoil(pFoil);
 	}
@@ -1568,7 +1568,7 @@ void QAFoil::OnDelete()
 	if(!g_pCurFoil) return;
 
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
-	CFoil *pNextFoil = pMainFrame->DeleteFoil(g_pCurFoil);
+	Foil *pNextFoil = pMainFrame->DeleteFoil(g_pCurFoil);
 	FillFoilTable();
 	SelectFoil(pNextFoil);
 	UpdateView();
@@ -1579,7 +1579,7 @@ void QAFoil::OnDuplicate()
 {
 	MainFrame* pMainFrame = (MainFrame*)s_pMainFrame;
 	if(!g_pCurFoil) return;
-	CFoil *pNewFoil = new CFoil;
+	Foil *pNewFoil = new Foil;
 	pNewFoil->CopyFoil(g_pCurFoil);
 	pNewFoil->InitFoil();
 
@@ -1685,7 +1685,7 @@ void QAFoil::FoilVisibleClicked(const QModelIndex& index)
 
 	if(index.row()>0)
 	{
-		CFoil *pFoil= pMainFrame->GetFoil(pItem->text());
+		Foil *pFoil= pMainFrame->GetFoil(pItem->text());
 		g_pCurFoil = pFoil;
 		if(index.column()==12) 
 		{
@@ -1729,7 +1729,7 @@ void QAFoil::OnFoilClicked(const QModelIndex& index)
 	
 	if(index.row()>0)
 	{
-		CFoil *pFoil= pMainFrame->GetFoil(pItem->text());
+		Foil *pFoil= pMainFrame->GetFoil(pItem->text());
 		g_pCurFoil = pFoil;
 	}
 	else if(index.row()==0)
@@ -1846,10 +1846,10 @@ void QAFoil::OnHideAllFoils()
 {
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	pMainFrame->SetSaveState(false);
-	CFoil*pFoil;
+	Foil*pFoil;
 	for (int k=0; k<m_poaFoil->size(); k++)
 	{
-		pFoil = (CFoil*)m_poaFoil->at(k);
+		pFoil = (Foil*)m_poaFoil->at(k);
 		pFoil->m_bVisible = false;
 	}
 	FillFoilTable();
@@ -1915,10 +1915,10 @@ void QAFoil::OnShowAllFoils()
 {
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	pMainFrame->SetSaveState(false);
-	CFoil*pFoil;
+	Foil*pFoil;
 	for (int k=0; k<m_poaFoil->size(); k++)
 	{
-		pFoil = (CFoil*)m_poaFoil->at(k);
+		pFoil = (Foil*)m_poaFoil->at(k);
 		pFoil->m_bVisible = true;
 	}
 	FillFoilTable();
@@ -1964,7 +1964,7 @@ void QAFoil::OnStoreSplines()
 	}
 
 
-	CFoil *pNewFoil = new CFoil();
+	Foil *pNewFoil = new Foil();
 	m_pSF->ExportToBuffer(pNewFoil);
 
 	pNewFoil->m_FoilColor  = pMainFrame->GetColor(0);
@@ -2018,7 +2018,7 @@ void QAFoil::OnSplineControls()
 	dlg.m_pSF = m_pSF;
 	dlg.InitDialog();
 
-	CSF memSF;
+	SplineFoil memSF;
 	memSF.Copy(m_pSF);
 
 	if(dlg.exec() == QDialog::Accepted)
@@ -2196,7 +2196,7 @@ void QAFoil::PaintLegend(QPainter &painter)
 
 	if(m_bShowLegend)
 	{
-		CFoil* pRefFoil;
+		Foil* pRefFoil;
 		QString strong;
 		QPoint Place(m_rCltRect.right()-250, 10);
 		int LegendSize, ypos, x1, n, k, delta;
@@ -2235,7 +2235,7 @@ void QAFoil::PaintLegend(QPainter &painter)
 		k++;
 		for (n=0; n < m_poaFoil->size(); n++)
 		{
-			pRefFoil = (CFoil*)m_poaFoil->at(n);
+			pRefFoil = (Foil*)m_poaFoil->at(n);
 			if(pRefFoil && pRefFoil->m_bVisible)
 			{
 				strong = pRefFoil->m_FoilName;
@@ -2358,7 +2358,7 @@ void QAFoil::PaintFoils(QPainter &painter)
 {
 	painter.save();
 	int k;
-	CFoil *pFoil;
+	Foil *pFoil;
 	QColor color;
 	int style, width;
 	MainFrame* pMainFrame = (MainFrame*)s_pMainFrame;
@@ -2370,7 +2370,7 @@ void QAFoil::PaintFoils(QPainter &painter)
 
 	for (k=0; k< m_poaFoil->size(); k++)
 	{
-		pFoil = (CFoil*)m_poaFoil->at(k);
+		pFoil = (Foil*)m_poaFoil->at(k);
 		if (pFoil->m_bVisible)
 		{
 			FoilPen.setStyle(GetStyle(pFoil->m_nFoilStyle));
@@ -2642,7 +2642,7 @@ void QAFoil::SetupLayout()
 }
 
 
-void QAFoil::SelectFoil(CFoil* pFoil)
+void QAFoil::SelectFoil(Foil* pFoil)
 {
 	int i;
 
@@ -2680,7 +2680,7 @@ void QAFoil::SetParams()
 }
 
 
-void QAFoil::ShowFoil(CFoil* pFoil, bool bShow)
+void QAFoil::ShowFoil(Foil* pFoil, bool bShow)
 {
 	if(!pFoil) return;
 	MainFrame* pMainFrame = (MainFrame*)s_pMainFrame;

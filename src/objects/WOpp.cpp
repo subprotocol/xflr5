@@ -28,10 +28,10 @@
 #include <QTextStream>
 
 
-void *CWOpp::s_pMainFrame;
-void *CWOpp::s_pMiarex;
+void *WingOpp::s_pMainFrame;
+void *WingOpp::s_pMiarex;
 
-CWOpp::CWOpp()
+WingOpp::WingOpp()
 {
 	m_bOut         = false;
 	m_bVLM1        = true;
@@ -111,7 +111,7 @@ CWOpp::CWOpp()
 }
 
 
-bool CWOpp::Export(QTextStream &out, int FileType, bool bDataOnly)
+bool WingOpp::Export(QTextStream &out, int FileType, bool bDataOnly)
 {
 	QString Header, strong, Format;
 	int k;
@@ -150,7 +150,7 @@ bool CWOpp::Export(QTextStream &out, int FileType, bool bDataOnly)
 
 
 
-double CWOpp::GetMaxLift()
+double WingOpp::GetMaxLift()
 {
 	int i,nStart;
 	if(m_AnalysisMethod==LLTMETHOD) nStart = 1;
@@ -168,7 +168,7 @@ double CWOpp::GetMaxLift()
 }
 
 
-void CWOpp::GetBWStyle(QColor &color, int &style, int &width)
+void WingOpp::GetBWStyle(QColor &color, int &style, int &width)
 {
 	color = m_Color;
 	style = m_Style;
@@ -177,7 +177,7 @@ void CWOpp::GetBWStyle(QColor &color, int &style, int &width)
 
 
 
-bool CWOpp::SerializeWOpp(QDataStream &ar, bool bIsStoring, int ProjectFormat)
+bool WingOpp::SerializeWOpp(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 {
 	int ArchiveFormat;
 	int a,p,k,l,n;
@@ -625,7 +625,7 @@ bool CWOpp::SerializeWOpp(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 
 
 
-void CWOpp::GetWOppProperties(QString &WOppProperties, bool bData)
+void WingOpp::GetWOppProperties(QString &WOppProperties, bool bData)
 {
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	QString strong, strange, lenunit, massunit, speedunit;

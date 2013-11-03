@@ -333,7 +333,7 @@ void NURBSSurface::ClearFrames()
 }
 
 
-void NURBSSurface::InsertFrame(CFrame *pNewFrame)
+void NURBSSurface::InsertFrame(Frame *pNewFrame)
 {
 	for(int ifr=0; ifr<FrameSize(); ifr++)
 	{
@@ -348,8 +348,8 @@ void NURBSSurface::InsertFrame(CFrame *pNewFrame)
 }
 
 
-CFrame * NURBSSurface::AppendFrame()
+Frame * NURBSSurface::AppendFrame()
 {
-	m_pFrame.append(new CFrame);
+	m_pFrame.append(new Frame);
 	return m_pFrame.last();
 }

@@ -68,8 +68,8 @@ private:
 	QStandardItemModel *m_pCoordModel;
 	FloatEditDelegate *m_pFloatDelegate;
 
-	CFoil * m_pMemFoil;
-	CFoil * m_pBufferFoil;
+	Foil * m_pMemFoil;
+	Foil * m_pBufferFoil;
 
 	bool m_bApplied, m_bModified;
 	void *m_pXDirect;

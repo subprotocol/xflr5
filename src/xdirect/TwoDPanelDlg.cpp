@@ -127,7 +127,7 @@ void TwoDPanelDlg::SetupLayout()
 void TwoDPanelDlg::InitDialog()
 {
 	XFoil *pXFoil =(XFoil*)s_pXFoil;
-	CFoil *pMemFoil = (CFoil *)m_pMemFoil;
+	Foil *pMemFoil = (Foil *)m_pMemFoil;
 	//memorize initial values
 //	npan   = pXFoil->n;
 	npan   = pMemFoil->nb;
@@ -201,8 +201,8 @@ void TwoDPanelDlg::OnApply()
 	QXDirect *pXDirect = (QXDirect*)m_pXDirect;
 	QAFoil *pAFoil = (QAFoil*)m_pAFoil;
 
-	CFoil *pMemFoil = (CFoil*)m_pMemFoil;
-	CFoil *pBufferFoil = (CFoil*)m_pBufferFoil;
+	Foil *pMemFoil = (Foil*)m_pMemFoil;
+	Foil *pBufferFoil = (Foil*)m_pBufferFoil;
 
 	for (int i=0; i< pMemFoil->nb; i++)
 	{

@@ -37,7 +37,7 @@
 
 void *StabPolarDlg::s_pMainFrame;
 void *StabPolarDlg::s_pMiarex;
-CWPolar StabPolarDlg::s_StabPolar;
+WPolar StabPolarDlg::s_StabPolar;
 
 StabPolarDlg::StabPolarDlg(QWidget *pParent) : QDialog(pParent)
 {
@@ -262,7 +262,7 @@ void StabPolarDlg::SetViscous()
 }
 
 
-void StabPolarDlg::InitDialog(CPlane *pPlane, CWing *pWing, CWPolar *pWPolar)
+void StabPolarDlg::InitDialog(Plane *pPlane, Wing *pWing, WPolar *pWPolar)
 {
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	QString strLen, strMass, strInertia;
@@ -270,10 +270,10 @@ void StabPolarDlg::InitDialog(CPlane *pPlane, CWing *pWing, CWPolar *pWPolar)
 	m_pPlane = pPlane;
 	if(m_pPlane)
 	{
-		m_pWingList[0] = pPlane->Wing();
-		m_pWingList[1] = pPlane->Wing2();
-		m_pWingList[2] = pPlane->Stab();
-		m_pWingList[3] = pPlane->Fin();
+		m_pWingList[0] = pPlane->getWing();
+		m_pWingList[1] = pPlane->getWing2();
+		m_pWingList[2] = pPlane->getStab();
+		m_pWingList[3] = pPlane->getFin();
 	}
 	else
 	{
@@ -309,20 +309,19 @@ void StabPolarDlg::InitDialog(CPlane *pPlane, CWing *pWing, CWPolar *pWPolar)
 
 	if(pWPolar && pWPolar->m_WPolarType==STABILITYPOLAR)
 	{
-		m_bAutoName = false;
-		m_pctrlAutoName->setChecked(false);
-		m_pctrlWPolarName->setText(pWPolar->m_PlrName);
+//		m_bAutoName = false;
+//		m_pctrlWPolarName->setText(pWPolar->m_PlrName);
 		s_StabPolar.DuplicateSpec(pWPolar);
 	}
 	else
 	{
-		m_bAutoName = true;
-		m_pctrlAutoName->setChecked(true);
 	}
+	m_bAutoName = true;
+	m_pctrlAutoName->setChecked(m_bAutoName);
 
 	if(m_pPlane)
 	{
-		s_StabPolar.m_AnalysisMethod=VLMMETHOD;
+		s_StabPolar.m_AnalysisMethod = PANELMETHOD;
 		s_StabPolar.m_UFOName = m_pPlane->PlaneName();
 		m_pctrlUFOName->setText(m_pPlane->PlaneName());
 		m_pctrlAnalysisControls->setCurrentIndex(1);
@@ -355,6 +354,7 @@ void StabPolarDlg::InitDialog(CPlane *pPlane, CWing *pWing, CWPolar *pWPolar)
 			s_StabPolar.m_nControls += m_pWingList[2]->m_nFlaps;
 		}
 		if(m_pWingList[3]) s_StabPolar.m_nControls+=m_pWingList[3]->m_nFlaps;
+
 	}
 
 	if(m_pPlane) m_pctrlUFOName->setText(m_pPlane->PlaneName());
@@ -383,9 +383,9 @@ void StabPolarDlg::InitDialog(CPlane *pPlane, CWing *pWing, CWPolar *pWPolar)
 
 	m_pctrlPlaneInertia->setChecked(s_StabPolar.m_bAutoInertia);
 	m_pctrlViscous->setChecked(s_StabPolar.m_bViscous);
-	m_pctrlIgnoreBodyPanels->setEnabled(m_pPlane && m_pPlane->Body());
-	m_pctrlIgnoreBodyPanels->setChecked(m_pPlane && m_pPlane->Body() && s_StabPolar.m_bIgnoreBodyPanels);
-	if(!m_pPlane) s_StabPolar.m_bIgnoreBodyPanels=false;
+	m_pctrlIgnoreBodyPanels->setEnabled(m_pPlane && m_pPlane->getBody());
+	m_pctrlIgnoreBodyPanels->setChecked(m_pPlane && m_pPlane->getBody() && s_StabPolar.m_bIgnoreBodyPanels);
+	if(!m_pPlane || !m_pPlane->getBody()) s_StabPolar.m_bIgnoreBodyPanels=false;
 //	m_pctrlAVLControls->setChecked(s_StabPolar.m_bThinSurfaces);
 
 	OnAutoInertia();

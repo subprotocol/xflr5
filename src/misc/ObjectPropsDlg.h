@@ -43,9 +43,9 @@ private:
 	void SetupLayout();
 
 	QTextEdit *m_pctrlDescription;
-	CPolar *m_pPolar;
-	CWPolar *m_pWPolar;
-	CWOpp *m_pWOpp;
+	Polar *m_pPolar;
+	WPolar *m_pWPolar;
+	WingOpp *m_pWOpp;
 	OpPoint *m_pOpp;
 
 	static void *s_pMainFrame;

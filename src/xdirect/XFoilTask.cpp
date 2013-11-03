@@ -66,7 +66,7 @@ void XFoilTask::run()
 }
 
 
-bool XFoilTask::Init(CFoil *pFoil, CPolar *pPolar)
+bool XFoilTask::Init(Foil *pFoil, Polar *pPolar)
 {
 	m_bIsFinished = false;
 	XFoilInstance.lvisc=true;

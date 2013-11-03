@@ -59,7 +59,7 @@ private:
 	QPushButton *m_pctrlDeletePoint, *m_pctrlDeleteAllPoints;
 	QPushButton *OKButton, *CancelButton;
 
-	CPolar *m_pPolar;
+	Polar *m_pPolar;
 
 	QTableView *m_pctrlPointTable;
 	QStandardItemModel *m_pPointModel;

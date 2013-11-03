@@ -34,7 +34,7 @@ class UnitsDlg : public QDialog
 	friend class MainFrame;
 	friend class QMiarex;
 	friend class GL3dBodyDlg;
-	friend class CBody;
+	friend class Body;
 
 public:
     UnitsDlg(QWidget *parent);

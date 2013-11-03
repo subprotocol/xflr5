@@ -32,8 +32,8 @@ public:
 
 	void ClearFrames();
 	void RemoveFrame(int iFrame);
-	void InsertFrame(CFrame *pNewFrame);
-	CFrame *AppendFrame();
+	void InsertFrame(Frame *pNewFrame);
+	Frame *AppendFrame();
 
 	double Weight(const double &d, int const &i, int const &N);
 
@@ -61,7 +61,7 @@ public:
 	double m_Bunch;
 	double m_EdgeWeightu, m_EdgeWeightv; // for a full NURBS. Unused, though, not practical
 
-	QList<CFrame*> m_pFrame;	// the frames at the stations
+	QList<Frame*> m_pFrame;	// the frames at the stations
 
 	//allocate temporary variables to
 	//avoid lengthy memory allocation times on the stack

@@ -28,7 +28,7 @@
 #include <QList>
 
 
-class CPolar
+class Polar
 {
 	friend class MainFrame;
 	friend class QMiarex;
@@ -68,13 +68,13 @@ private:
 	void GetPolarProperties(QString &PolarProperties, bool bData=false);
 	void ResetPolar();
 
-	CPolar();
+	Polar();
 
 	bool Serialize(QDataStream &ar, bool bIsStoring, bool bTrace=false);
 
 	void AddPoint(double Alpha, double Cd, double Cdp, double Cl, double Cm,
 				  double Xtr1, double Xtr2, double HMom, double Cpmn, double Reynolds, double XCp);
-	void Copy(CPolar *pPolar);
+	void Copy(Polar *pPolar);
 
 	static void GetPlrVariableName(int iVar, QString &Name);
 

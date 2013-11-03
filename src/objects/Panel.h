@@ -21,8 +21,8 @@
 
 
 
-#ifndef CPANEL_H
-#define CPANEL_H
+#ifndef PANEL_H
+#define PANEL_H
 
 
 #include "Quaternion.h"
@@ -30,18 +30,18 @@
 
 typedef enum {BOTSURFACE, MIDSURFACE, TOPSURFACE, SIDESURFACE, BODYSURFACE} enumPanelPosition;
 
-class CPanel
+class Panel
 {
-	friend class CSurface;
-	friend class CWing;
+	friend class Surface;
+	friend class Wing;
 	friend class QMiarex;
-	friend class CBody;
+	friend class Body;
 	friend class PanelAnalysisDlg;
 	friend class GL3dBodyDlg;
 	friend class GL3dWingDlg;
 
 public:
-	CPanel();
+	Panel();
 
 	void RotatePanel(CVector const &O, Quaternion & Qt);
 	void RotateBC(CVector const &HA, Quaternion & Qt);

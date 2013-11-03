@@ -36,10 +36,10 @@ ImportWingDlg::ImportWingDlg(QWidget *pParent):QDialog(pParent)
 
 void ImportWingDlg::InitDialog()
 {
-	CWing *pWing;
+	Wing *pWing;
 	for(int i=0;i<m_poaWing->size(); i++)
 	{
-		pWing = (CWing*)m_poaWing->at(i);
+		pWing = (Wing*)m_poaWing->at(i);
 		m_pctrlNameList->addItem(pWing->m_WingName);
 	}
 }

@@ -20,8 +20,8 @@
 *****************************************************************************/
 
 
-#ifndef CWOPP_H
-#define CWOPP_H
+#ifndef WINGOPP_H
+#define WINGOPP_H
 #include "CVector.h"
 #include "../params.h"
 #include <QString>
@@ -31,18 +31,18 @@
 
 using namespace std;
 
-class CWOpp
+class WingOpp
 {
 	friend class QMiarex;
 	friend class MainFrame;
-	friend class CWPolar;
-	friend class CPOpp;
+	friend class WPolar;
+	friend class PlaneOpp;
 	friend class StabViewDlg;
 	friend class PanelAnalysisDlg;
 	friend class ObjectPropsDlg;
 
 public:
-	CWOpp();
+	WingOpp();
 
 private:
 //________________METHODS____________________________________

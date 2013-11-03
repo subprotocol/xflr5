@@ -54,7 +54,7 @@ QWidget *WingDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem 
 		{
 			for(int i=0; i< m_poaFoil->size(); i++)
 			{
-				CFoil *pFoil = (CFoil*)m_poaFoil->at(i);
+				Foil *pFoil = (Foil*)m_poaFoil->at(i);
 				pFoil->GetFoilName(strong);
 				editor->addItem(strong);
 			}

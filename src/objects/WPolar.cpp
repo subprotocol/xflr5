@@ -28,10 +28,13 @@
 #include <QMessageBox>
 
 
-void *CWPolar::s_pMainFrame;
-void *CWPolar::s_pMiarex;
+void *WPolar::s_pMainFrame;
+void *WPolar::s_pMiarex;
 
-CWPolar::CWPolar()
+/**
+ * The public constructor
+ */
+WPolar::WPolar()
 {
 	m_bIsVisible  = true;
 	m_bShowPoints = false;
@@ -82,14 +85,21 @@ CWPolar::CWPolar()
 	m_CoG.Set(0.0,0.0,0.0);
 }
 
-
-void CWPolar::AddPoint(CPOpp *pPOpp)
+/**
+ * Adds the data from the instance of the operating point referenced by pPOpp to the polar object.
+ * The index used to insert the data is the aoa, or the velocity, or the control parameter, depending on the polar type.
+ * If a point with identical index exists, the data is replaced.
+ * If not, the data is inserted for this index.
+ *
+ * @param pPOpp the plane operating point from which the data is to be extracted
+ */
+void WPolar::AddPoint(PlaneOpp *pPOpp)
 {
 	bool bInserted = false;
 	int i,j,l;
 	int size = m_Alpha.size();
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
-	CWOpp *pWOpp = &pPOpp->m_PlaneWOpp[0];
+	WingOpp *pWOpp = &pPOpp->m_PlaneWOpp[0];
 	if(size)
 	{
 		for (i=0; i<size; i++)
@@ -433,8 +443,15 @@ void CWPolar::AddPoint(CPOpp *pPOpp)
 	}
 }
 
-
-void CWPolar::AddPoint(CWOpp *pWOpp)
+/**
+ * Adds the data from the instnace of the operating point referenced by pWOpp to the polar object.
+ * The index used to insert the data is the aoa, or the velocity, or the control parameter, depending on the polar type.
+ * If a point with identical index exists, the data is replaced.
+ * If not, the data is inserted for this index.
+ *
+ * @param pWOpp the wing operating point from which the data is to be extracted
+ */
+void WPolar::AddPoint(WingOpp *pWOpp)
 {
 	bool bInserted = false;
 	int l;
@@ -791,7 +808,26 @@ void CWPolar::AddPoint(CWOpp *pWOpp)
 }
 
 
-void CWPolar::AddPoint(double alpha, double CL, double ICd, double PCd, double CY,   double GCm, double VCm,
+/**
+ * Adds the data passed in the parameters to the polar object.
+ * The index used to insert the data is the aoa, or the velocity, or the control parameter, depending on the polar type.
+ * If a point with identical index exists, the data is replaced.
+ * If not, the data is inserted for this index.
+ *
+ * @param alpha the aoa
+ * @param CL the lift coefficient
+ * @param ICD the induced drag coefficient
+ * @param PCD the viscous drag coefficient
+ * @param CY the side force coefficient
+ * @param GCm the total pitching moment coefficient
+ * @param VCm the viscous part of the pitching moment coefficient
+ * @param ICm the inviscid part of the pitching moment coefficient
+ * @param GRm the rolling moment coefficient
+ * @param GYm the ywing moment coefficient
+ * @param QInf the freestream velocity
+ * @param XCP the x-positionn of the centre of pressure
+ */
+void WPolar::AddPoint(double alpha, double CL, double ICd, double PCd, double CY,   double GCm, double VCm,
 					   double ICm,  double GRm, double GYm, double IYm, double QInf, double XCP)
 {
 	bool bInserted = false;
@@ -945,7 +981,13 @@ void CWPolar::AddPoint(double alpha, double CL, double ICd, double PCd, double C
 	}
 }
 
-void CWPolar::CalculatePoint(int i)
+
+/**
+ * Calculates aerodynamic values for the i-th point in the array : glide ratio, power factor, forces and moments, power
+ * for horizontal flight, efficiency coefficient, mode frequencies and amping factors.
+ * @param i the index of the point for which the values are to be calculated
+ */
+void WPolar::CalculatePoint(int i)
 {
 	//finish calculations
 //	double cl = m_CL[i];
@@ -1039,8 +1081,11 @@ void CWPolar::CalculatePoint(int i)
 	M =  Cm.q.s.c'
 */
 
-
-void CWPolar::DuplicateSpec(CWPolar *pWPolar)
+/**
+ * Copies the polar's analysis parameters from an existing polar
+ * @param pWPolar a pointer to the instance of the reference CWPolar object from which the parameters should be copied
+ */
+void WPolar::DuplicateSpec(WPolar *pWPolar)
 {
 	m_UFOName   = pWPolar->m_UFOName;
 	m_PlrName   = pWPolar->m_PlrName;
@@ -1110,7 +1155,11 @@ void CWPolar::DuplicateSpec(CWPolar *pWPolar)
 
 
 
-void CWPolar::Copy(CWPolar *pWPolar)
+/**
+ * Copies the polar's data from an existing polar
+ * @param pWPolar a pointer to the instance of the reference CWPolar object from which the data should be copied
+ */
+void WPolar::Copy(WPolar *pWPolar)
 {
 	int i;
 
@@ -1185,8 +1234,13 @@ void CWPolar::Copy(CWPolar *pWPolar)
 	}
 }
 
-
-void CWPolar::Export(QTextStream &out, int FileType, bool bDataOnly)
+/**
+ * Exports the data of the polar to a text file
+ * @param out the instance of output QtextStream
+ * @param FileType 1 if the data is separated by spaces, 2 for a comma separator
+ * @param bDataOnly true if the analysis parameters should not be output
+ */
+void WPolar::Export(QTextStream &out, int FileType, bool bDataOnly)
 {
 	MainFrame* pMainFrame = (MainFrame*)s_pMainFrame;
 	int j;
@@ -1295,8 +1349,12 @@ void CWPolar::Export(QTextStream &out, int FileType, bool bDataOnly)
 
 
 
-
-void * CWPolar::GetUFOPlrVariable(int iVar)
+/**
+ * Returns a pointer to the QList array of data for the variable referenced by iVar
+ * @param iVar the index of the variable
+ * @return a void pointer to the array of data
+ */
+void * WPolar::GetUFOPlrVariable(int iVar)
 {
 	// returns a pointer to the variable array defined by its index iVar
 	void * pVar;
@@ -1439,7 +1497,12 @@ void * CWPolar::GetUFOPlrVariable(int iVar)
 }
 
 
-void CWPolar::GetUFOPlrVariableName(int iVar, QString &Name)
+/**
+ * Returns the name of the variable referenced by iVar
+ * @param iVar the index of the variable
+ * @param Name the name of the variable as a QString object
+ */
+void WPolar::GetUFOPlrVariableName(int iVar, QString &Name)
 {
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	QString StrLength;
@@ -1589,8 +1652,11 @@ void CWPolar::GetUFOPlrVariableName(int iVar, QString &Name)
 	}
 }
 
-
-void CWPolar::Remove(double alpha)
+/**
+ * Removes the data for the point with aoa alpha
+ * @param alpha the aoa of the point to be deleted
+ **/
+void WPolar::Remove(double alpha)
 {
 	for(int ia=0;ia<m_Alpha.size(); ia++)
 	{
@@ -1600,11 +1666,14 @@ void CWPolar::Remove(double alpha)
 			break;
 		}
 	}
-
 }
 
 
-void CWPolar::Remove(int i)
+/**
+ * Removes the data at index i of the data arrays
+ * @param i the index at which the data is to be deleted
+ **/
+void WPolar::Remove(int i)
 {
 	int size = m_Alpha.size();
 	m_Alpha.removeAt(i);
@@ -1666,8 +1735,10 @@ void CWPolar::Remove(int i)
 }
 
 
-
-void CWPolar::ResetWPlr()
+/**
+ *Clears the content of the data arrays
+*/
+void WPolar::ResetWPlr()
 {
 	int size = m_Alpha.size();
 	m_Alpha.clear();
@@ -1727,8 +1798,14 @@ void CWPolar::ResetWPlr()
 
 }
 
-
-bool CWPolar::SerializeWPlr(QDataStream &ar, bool bIsStoring, int ProjectFormat)
+/**
+ * Loads or Saves the data of this polar to a binary file
+ * @param ar the QDataStream object from/to which the data should be serialized
+ * @param bIsStoring true if saving the data, false if loading
+ * @param ProjectFormat 5 if data from Xflr5 v5.xx, 6 if from/to xflr5 v6.xx
+ * @return true if the operation was successful, false otherwise
+ */
+bool WPolar::SerializeWPlr(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 {
 	int n;
 	float f,r0,r1,r2,r3,i0,i1,i2,i3;
@@ -2204,8 +2281,12 @@ bool CWPolar::SerializeWPlr(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 }
 
 
-
-void CWPolar::GetPolarProperties(QString &PolarProperties, bool bData)
+/**
+ * Returns a QString object holding the description and value of the polar's parameters
+ * @param &PolarProperties the reference of the QString object to be filled with the description
+ * @param bData true if the analysis data should be appended to the string
+ */
+void WPolar::GetPolarProperties(QString &PolarProperties, bool bData)
 {
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	QMiarex *pMiarex= (QMiarex*)s_pMiarex;
@@ -2216,7 +2297,7 @@ void CWPolar::GetPolarProperties(QString &PolarProperties, bool bData)
 
 	QString inertiaunit = massunit+"."+lenunit+QString::fromUtf8("²");
 
-	CPlane *pPlane = pMiarex->GetPlane(m_UFOName);
+	Plane *pPlane = pMiarex->GetPlane(m_UFOName);
 
 	PolarProperties.clear();
 
@@ -2269,7 +2350,7 @@ void CWPolar::GetPolarProperties(QString &PolarProperties, bool bData)
 				PolarProperties +=strong;
 			}
 			iCtrl=1;
-			if(pPlane->Stab())
+			if(pPlane->getStab())
 			{
 				if(fabs(m_ControlGain[iCtrl]>PRECISION))
 				{
@@ -2280,13 +2361,13 @@ void CWPolar::GetPolarProperties(QString &PolarProperties, bool bData)
 			}
 		}
 
-		CWing *pStab, *pFin, *pWing;
+		Wing *pStab, *pFin, *pWing;
 		pStab = pFin = pWing = NULL;
 		if(pPlane)
 		{
-			pWing = pPlane->Wing();
-			pStab = pPlane->Stab();
-			pFin  = pPlane->Fin();
+			pWing = pPlane->getWing();
+			pStab = pPlane->getStab();
+			pFin  = pPlane->getFin();
 		}
 		else pWing = pMiarex->GetWing(m_UFOName);
 
@@ -2401,7 +2482,7 @@ void CWPolar::GetPolarProperties(QString &PolarProperties, bool bData)
 
 	PolarProperties += QObject::tr("Ref. Area = ");
 	if(m_RefAreaType==1) PolarProperties += QObject::tr("Planform area")+"\n";
-	else                            PolarProperties += QObject::tr("Projected area")+"\n";
+	else                 PolarProperties += QObject::tr("Projected area")+"\n";
 
 	if(m_bTiltedGeom) PolarProperties += QObject::tr("Tilted geometry")+"\n";
 
@@ -2429,14 +2510,18 @@ void CWPolar::GetPolarProperties(QString &PolarProperties, bool bData)
 	PolarProperties += "\n"+strong;
 }
 
-
-void CWPolar::SetInertia(void *ptr, bool bPlane)
+/**
+ * Maps the inertia data from the parameter object to the polar's variales
+ * @param ptr a void pointer to the reference wing or plane instance
+ * @param bPlane true if the reference object is a plane, false if it is a wing
+ */
+void WPolar::RetrieveInertia(void *ptr, bool bPlane)
 {
-	CPlane *pPlane = NULL;
-	CWing *pWing = NULL;
+	Plane *pPlane = NULL;
+	Wing *pWing = NULL;
 	if(bPlane)
 	{
-		pPlane = (CPlane*)ptr;
+		pPlane = (Plane*)ptr;
 		m_Mass = pPlane->TotalMass();
 		m_CoG = pPlane->CoG();
 		m_CoGIxx = pPlane->m_CoGIxx;
@@ -2446,7 +2531,7 @@ void CWPolar::SetInertia(void *ptr, bool bPlane)
 	}
 	else
 	{
-		pWing  = (CWing*)ptr;
+		pWing  = (Wing*)ptr;
 		m_Mass = pWing->TotalMass();
 		m_CoG = pWing->m_CoG;
 		m_CoGIxx = pWing->m_CoGIxx;

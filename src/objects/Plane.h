@@ -19,31 +19,20 @@
 
 *****************************************************************************/
 
-#ifndef CPLANE_H
-#define CPLANE_H
+#ifndef PLANE_H
+#define PLANE_H
 
 #include "Wing.h"
 #include "Body.h"
 
 
-class CPlane
+class Plane
 {
-//	friend class QMiarex;
-//	friend class MainFrame;
-//	friend class CBody;
-//	friend class CWing;
-//	friend class CWPolar;
-//	friend class WPolarDlg;
-//	friend class InertiaDlg;
 	friend class PlaneDlg;
-//	friend class PanelAnalysisDlg;
-//	friend class ManageBodiesDlg;
-//	friend class StabPolarDlg;
-//	friend class ManageUFOsDlg;
 
 
 public:
-	CPlane();
+	Plane();
 	static void SetParents(void *pMainFrame, void*pMiarex);
 
 
@@ -55,19 +44,19 @@ public:
 	QString& rPlaneName() {return m_PlaneName;}
 	const QString& PlaneDescription() const {return m_PlaneDescription;}
 	QString& rPlaneDescription() {return m_PlaneDescription;}
-	CWing *Wing()  {return &m_Wing;}
-	CWing *Wing2() {if(m_bBiplane) return &m_Wing2; else return NULL;}
-	CWing *Stab()  {if(m_bStab)    return &m_Stab;  else return NULL;}
-	CWing *Fin()   {if(m_bFin)     return &m_Fin;   else return NULL;}
-	CBody *Body()  {if(m_bBody)    return m_pBody;  else return NULL;}
+	Wing *getWing()  {return &m_Wing;}
+	Wing *getWing2() {if(m_bBiplane) return &m_Wing2; else return NULL;}
+	Wing *getStab()  {if(m_bStab)    return &m_Stab;  else return NULL;}
+	Wing *getFin()   {if(m_bFin)     return &m_Fin;   else return NULL;}
+	Body *getBody()  {if(m_bBody)    return m_pBody;  else return NULL;}
 	CVector CoG()  {return m_CoG;}
 
-	void Duplicate(CPlane *pPlane);
+	void Duplicate(Plane *pPlane);
 	bool SerializePlane(QDataStream &ar, bool bIsStoring, int ProjectFormat);
 	void ComputePlane(void);
 	void CreateSurfaces();
 	void RenameWings();
-	void SetBody(CBody *pBody);
+	void SetBody(Body *pBody);
 
 	void ComputeVolumeInertia(double &Mass, CVector &CoG, double &Ixx, double &Iyy, double &Izz, double &Ixz);
 	void ComputeBodyAxisInertia();
@@ -79,10 +68,10 @@ public:
 private:
 	static void * s_pMiarex;
 	static void * s_pMainFrame;
-	CWing m_Wing, m_Wing2;
-	CWing m_Stab;
-	CWing m_Fin;
-	CBody *m_pBody;
+	Wing m_Wing, m_Wing2;
+	Wing m_Stab;
+	Wing m_Fin;
+	Body *m_pBody;
 
 	bool m_bBody;
 	bool m_bBiplane;

@@ -35,7 +35,7 @@ class ManageBodiesDlg : public QDialog
 {
 	Q_OBJECT
 
-	friend class CBody;
+	friend class Body;
 	friend class MainFrame;
 	friend class QMiarex;
 
@@ -56,10 +56,10 @@ private slots:
 	void OnDoubleClickTable(const QModelIndex &index);
 
 private:
-	void SetBody(CBody *pBody = NULL);
+	void SetBody(Body *pBody = NULL);
 	void SetupLayout();
 	void UpdateBodyList();
-	bool IsInUse(CBody *pBody);
+	bool IsInUse(Body *pBody);
 
 	static void *s_pMainFrame;
 	static void *s_pMiarex;
@@ -69,7 +69,7 @@ private:
 	QList <void*> *m_poaBody;
 	QList <void*> *m_poaPlane;
 
-	CBody *m_pBody;
+	Body *m_pBody;
 	QPushButton *m_pctrlNew, *m_pctrlEdit, *m_pctrlRename, *m_pctrlDelete, *m_pctrlDuplicate;
 	QPushButton *m_pctrlExportDef, *m_pctrlExportGeom;
 	QListWidget *m_pctrlNameList;

@@ -25,23 +25,23 @@
 #include "Panel.h"
 #include <math.h>
 
-double CPanel::s_VortexPos = 0.25;
-double CPanel::s_CtrlPos   = 0.75;
-double CPanel::mat[9];
-double CPanel::det;
-CVector CPanel::smp, CPanel::smq, CPanel::MidA, CPanel::MidB;
-CVector *CPanel::s_pNode;
-CVector CPanel::ILA, CPanel::ILB, CPanel::ITA, CPanel::ITB, CPanel::T, CPanel::V, CPanel::W;
-CVector CPanel::P;
-CVector CPanel::LATB, CPanel::TALB;
+double Panel::s_VortexPos = 0.25;
+double Panel::s_CtrlPos   = 0.75;
+double Panel::mat[9];
+double Panel::det;
+CVector Panel::smp, Panel::smq, Panel::MidA, Panel::MidB;
+CVector *Panel::s_pNode;
+CVector Panel::ILA, Panel::ILB, Panel::ITA, Panel::ITB, Panel::T, Panel::V, Panel::W;
+CVector Panel::P;
+CVector Panel::LATB, Panel::TALB;
 
 
-CPanel::CPanel()
+Panel::Panel()
 {
 	Reset();
 }
 
-void CPanel::Reset()
+void Panel::Reset()
 {
 	dl     = 0.0;
 	Size   = 0.0;
@@ -75,7 +75,7 @@ void CPanel::Reset()
 
 
 
-void CPanel::SetFrame()
+void Panel::SetFrame()
 {
 	//set the boundary conditions from existing nodes
 	SetFrame(s_pNode[m_iLA], s_pNode[m_iLB], s_pNode[m_iTA], s_pNode[m_iTB]);
@@ -83,7 +83,7 @@ void CPanel::SetFrame()
 
 
 
-void CPanel::SetFrame(CVector const &LA, CVector const &LB, CVector const &TA, CVector const &TB)
+void Panel::SetFrame(CVector const &LA, CVector const &LB, CVector const &TA, CVector const &TB)
 {
 	LATB.x = TB.x - LA.x;
 	LATB.y = TB.y - LA.y;
@@ -210,7 +210,7 @@ void CPanel::SetFrame(CVector const &LA, CVector const &LB, CVector const &TA, C
 
 
 
-bool CPanel::Invert33(double *l)
+bool Panel::Invert33(double *l)
 {
 	memcpy(mat,l,sizeof(mat));
 /*		a0 b1 c2
@@ -242,7 +242,7 @@ a(ei-fh) - b(di-fg) + c(dh-eg)      (dh-eg)   (bg-ah)   (ae-bd)*/
 }
 
 
-CVector CPanel::GlobalToLocal(CVector const &V)
+CVector Panel::GlobalToLocal(CVector const &V)
 {
 	CVector L;
 	L.x = lij[0]*V.x +lij[1]*V.y +lij[2]*V.z;
@@ -252,7 +252,7 @@ CVector CPanel::GlobalToLocal(CVector const &V)
 }
 
 
-CVector CPanel::GlobalToLocal(double const &Vx, double const &Vy, double const &Vz)
+CVector Panel::GlobalToLocal(double const &Vx, double const &Vy, double const &Vz)
 {
 	CVector L;
 	L.x = lij[0]*Vx +lij[1]*Vy +lij[2]*Vz;
@@ -262,7 +262,7 @@ CVector CPanel::GlobalToLocal(double const &Vx, double const &Vy, double const &
 }
 
 
-CVector CPanel::LocalToGlobal(CVector const &V)
+CVector Panel::LocalToGlobal(CVector const &V)
 {
 	CVector L;
 	L.x = V.x * l.x + V.y * m.x + V.z * Normal.x;
@@ -273,7 +273,7 @@ CVector CPanel::LocalToGlobal(CVector const &V)
 
 
 
-bool CPanel::Intersect(CVector const &A, CVector const &U, CVector &I, double &dist)
+bool Panel::Intersect(CVector const &A, CVector const &U, CVector &I, double &dist)
 {
 	bool b1, b2, b3, b4;
 	double r,s;
@@ -351,20 +351,20 @@ bool CPanel::Intersect(CVector const &A, CVector const &U, CVector &I, double &d
 	return false;
 }
 
-double CPanel::GetArea()
+double Panel::GetArea()
 {
 	return Area;
 }
 
 
-double CPanel::Width()
+double Panel::Width()
 {
 	return sqrt( (s_pNode[m_iLB].y - s_pNode[m_iLA].y)*(s_pNode[m_iLB].y - s_pNode[m_iLA].y)
 	            +(s_pNode[m_iLB].z - s_pNode[m_iLA].z)*(s_pNode[m_iLB].z - s_pNode[m_iLA].z));
 }
 
 
-void CPanel::RotateBC(CVector const &HA, Quaternion &Qt)
+void Panel::RotateBC(CVector const &HA, Quaternion &Qt)
 {
 	// HA is the rotation center
 	//rotates the panels properties which are used in control analysis
@@ -416,7 +416,7 @@ void CPanel::RotateBC(CVector const &HA, Quaternion &Qt)
 
 
 
-void CPanel::RotatePanel(CVector const &O, Quaternion &Qt)
+void Panel::RotatePanel(CVector const &O, Quaternion &Qt)
 {
 	// Caution : do not use, the end nodes are rotated multiple times if part of more than one panel
 	// O is the rotation center

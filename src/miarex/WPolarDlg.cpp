@@ -33,7 +33,7 @@
 
 void* WPolarDlg::s_pMainFrame;
 void* WPolarDlg::s_pMiarex;
-CWPolar WPolarDlg::s_WPolar;
+WPolar WPolarDlg::s_WPolar;
 
 WPolarDlg::WPolarDlg(QWidget *pParent) : QDialog(pParent)
 {
@@ -129,7 +129,7 @@ void WPolarDlg::EnableControls()
 
 	m_pctrlViscous->setEnabled(s_WPolar.m_AnalysisMethod==PANELMETHOD);
 	m_pctrlTiltGeom->setEnabled(s_WPolar.m_AnalysisMethod==PANELMETHOD);
-	m_pctrlIgnoreBodyPanels->setEnabled(m_pPlane && m_pPlane->Body());
+	m_pctrlIgnoreBodyPanels->setEnabled(m_pPlane && m_pPlane->getBody());
 	m_pctrlBeta->setEnabled(s_WPolar.m_AnalysisMethod==PANELMETHOD);
 	m_pctrlGroundEffect->setEnabled(s_WPolar.m_AnalysisMethod==PANELMETHOD);
 	m_pctrlHeight->setEnabled(m_pctrlGroundEffect->isChecked() && s_WPolar.m_AnalysisMethod==PANELMETHOD);
@@ -141,7 +141,7 @@ void WPolarDlg::EnableControls()
 
 
 
-void WPolarDlg::InitDialog(CPlane *pPlane, CWing *pWing, CWPolar *pWPolar)
+void WPolarDlg::InitDialog(Plane *pPlane, Wing *pWing, WPolar *pWPolar)
 {
 	MainFrame* pMainFrame = (MainFrame*)s_pMainFrame;
 	QString str, str1;
@@ -241,7 +241,7 @@ void WPolarDlg::InitDialog(CPlane *pPlane, CWing *pWing, CWPolar *pWPolar)
 	m_pctrlViscous->setChecked(s_WPolar.m_bViscous);
 	m_pctrlTiltGeom->setChecked(s_WPolar.m_bTiltedGeom);
 
-	m_pctrlIgnoreBodyPanels->setChecked(m_pPlane && m_pPlane->Body() && s_WPolar.m_bIgnoreBodyPanels);
+	m_pctrlIgnoreBodyPanels->setChecked(m_pPlane && m_pPlane->getBody() && s_WPolar.m_bIgnoreBodyPanels);
 	if(!m_pPlane) s_WPolar.m_bIgnoreBodyPanels=false;
 
 	//	if(s_WPolar.m_bWakeRollUp) 	m_pctrlWakeRollUp->setChecked(true);
@@ -943,7 +943,7 @@ void WPolarDlg::SetWPolarName()
 		WPolarName += "-Inviscid";
 	}
 
-	if(s_WPolar.m_bIgnoreBodyPanels && m_pPlane && m_pPlane->Body())
+	if(s_WPolar.m_bIgnoreBodyPanels && m_pPlane && m_pPlane->getBody())
     {
 		WPolarName += "-NoBodyPanels";
     }

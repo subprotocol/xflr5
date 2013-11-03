@@ -514,12 +514,12 @@ void BatchDlg::CleanUp()
 }
 
 
-CPolar *BatchDlg::CreatePolar(double Spec, double Mach, double NCrit)
+Polar *BatchDlg::CreatePolar(double Spec, double Mach, double NCrit)
 {
 	if(!m_pFoil) return NULL;
 
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
-	CPolar *pPolar = new CPolar;
+	Polar *pPolar = new Polar;
 	pPolar->m_FoilName   = m_pFoil->m_FoilName;
 	pPolar->m_bIsVisible = true;
 
@@ -566,7 +566,7 @@ CPolar *BatchDlg::CreatePolar(double Spec, double Mach, double NCrit)
 	pPolar->m_Color = pMainFrame->GetColor(1);
 
 	SetPlrName(pPolar);
-	CPolar *pOldPolar = pMainFrame->GetPolar(m_pFoil->m_FoilName, pPolar->m_PlrName);
+	Polar *pOldPolar = pMainFrame->GetPolar(m_pFoil->m_FoilName, pPolar->m_PlrName);
 
 	if(pOldPolar)
 	{
@@ -1346,7 +1346,7 @@ void BatchDlg::SetFileHeader()
 
 
 
-void BatchDlg::SetPlrName(CPolar *pPolar)
+void BatchDlg::SetPlrName(Polar *pPolar)
 {
 	if(pPolar->m_PolarType!=FIXEDAOAPOLAR)
 	{
@@ -1373,7 +1373,7 @@ void BatchDlg::StartAnalysis()
 {
 	QXDirect *pXDirect = (QXDirect*)s_pXDirect;
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
-	CFoil *pFoil;
+	Foil *pFoil;
 	QString strong;
 
 	m_pctrlAnalyze->setText(tr("Cancel"));

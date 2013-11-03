@@ -21,29 +21,28 @@
 
 
 
-#ifndef CSURFACE_H
-#define  CSURFACE_H
+#ifndef SURFACE_H
+#define SURFACE_H
 #include "Foil.h"
 #include "Body.h"
 #include "CVector.h"
 
-class CSurface
+class Surface
 {
-	friend class CWing;
+	friend class Wing;
 	friend class QMiarex;
 	friend class MainFrame;
-	friend class CVLMDlg;
 	friend class GL3dWingDlg;
 	friend class PanelAnalysisDlg;
 	friend class InertiaDlg;
-	friend class CWPolar;
+	friend class WPolar;
 
 public:
 
-	CSurface();
+	Surface();
 
-	void AddFlapPanel(CPanel *pPanel);
-	void Copy(CSurface const &Surface);
+	void AddFlapPanel(Panel *pPanel);
+	void Copy(Surface const &Surface);
 	void GetC4(int k, CVector &Pt, double &tau);
 	void GetLeadingPt(int k, CVector &C);
 	void GetNormal(double yrel, CVector &N);
@@ -60,12 +59,12 @@ public:
 	void RotateZ(CVector const &O, double ZTilt);
 	void SetNormal();
 	void SetFlap();
-	void SetSidePoints(CBody *pBody, double dx, double dz);
+	void SetSidePoints(Body *pBody, double dx, double dz);
 	void SetTwist1();
 	void SetTwist2();
 	void Translate(CVector const &T);
 	void Translate(double tx, double ty, double tz);
-	void CreateXZSymetric(CSurface const &Surface);
+	void CreateXZSymetric(Surface const &Surface);
 	void CreateXPoints();
 
 	bool IsCenterSurf() {return m_bIsCenterSurf;}
@@ -96,7 +95,7 @@ private :
 	CVector SideA_B[MAXCHORDPANELS];	 
 	CVector SideB_B[MAXCHORDPANELS];	 
 	static CVector VTemp;
-	static CPanel *s_pPanel;
+	static Panel *s_pPanel;
 	static CVector *s_pNode;
 
 	bool m_bIsInSymPlane;
@@ -130,14 +129,14 @@ private :
 	CVector m_HingePoint;
 	CVector m_HingeVector;
 
-	CSurface *m_pLeftSurface, *m_pRightSurface;
+	Surface *m_pLeftSurface, *m_pRightSurface;
 
 public:
 	bool m_bJoinRight; //true if the surface's right side should be connected to the next right surface's right left side - for panel analysis only
 	static CVector LA, LB, TA, TB;//leading and trailing corners of strip k
 	int m_NYPanels;
 	int m_NXPanels;
-	CFoil *m_pFoilA, *m_pFoilB; //Left and right foils
+	Foil *m_pFoilA, *m_pFoilB; //Left and right foils
 	
 };
 #endif

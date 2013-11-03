@@ -27,7 +27,7 @@
 
 
 
-CSpline::CSpline()
+Spline::Spline()
 {
 	m_Style = 0;
 	m_Width = 1;
@@ -54,7 +54,7 @@ CSpline::CSpline()
 }
 
 
-void CSpline::Copy(CSpline *pSpline)
+void Spline::Copy(Spline *pSpline)
 {
 	m_CtrlPoint.clear();
 	for(int ic=0; ic<pSpline->m_CtrlPoint.size(); ic++)
@@ -72,7 +72,7 @@ void CSpline::Copy(CSpline *pSpline)
 }
 
 
-void CSpline::CopySymetric(CSpline *pSpline)
+void Spline::CopySymetric(Spline *pSpline)
 {
 	m_CtrlPoint.clear();
 	for(int ic=0; ic<pSpline->m_CtrlPoint.size(); ic++)
@@ -100,7 +100,7 @@ void CSpline::CopySymetric(CSpline *pSpline)
 }
 
 
-void CSpline::DrawCtrlPoints(QPainter &painter, double const &scalex, double const &scaley, QPoint const &Offset)
+void Spline::DrawCtrlPoints(QPainter &painter, double const &scalex, double const &scaley, QPoint const &Offset)
 {
 	painter.save();
 
@@ -144,7 +144,7 @@ void CSpline::DrawCtrlPoints(QPainter &painter, double const &scalex, double con
 
 
 
-void CSpline::DrawOutputPoints(QPainter & painter, double const &scalex, double const &scaley, QPoint const &Offset)
+void Spline::DrawOutputPoints(QPainter & painter, double const &scalex, double const &scaley, QPoint const &Offset)
 {
 	painter.save();
 
@@ -171,7 +171,7 @@ void CSpline::DrawOutputPoints(QPainter & painter, double const &scalex, double 
 }
 
 
-void CSpline::DrawSpline(QPainter & painter, double const &scalex, double const &scaley, QPoint const &Offset)
+void Spline::DrawSpline(QPainter & painter, double const &scalex, double const &scaley, QPoint const &Offset)
 {
 	painter.save();
 
@@ -204,7 +204,7 @@ void CSpline::DrawSpline(QPainter & painter, double const &scalex, double const 
 }
 
 
-void CSpline::Export(QTextStream &out, bool bExtrados)
+void Spline::Export(QTextStream &out, bool bExtrados)
 {
 	int k;
 	QString strOut;
@@ -228,7 +228,7 @@ void CSpline::Export(QTextStream &out, bool bExtrados)
 }
 
 
-double CSpline::GetY(double const &x)
+double Spline::GetY(double const &x)
 {
         static int i;
 	static double y;
@@ -250,7 +250,7 @@ double CSpline::GetY(double const &x)
 
 
 
-bool CSpline::InsertPoint(double const &x, double const &y)
+bool Spline::InsertPoint(double const &x, double const &y)
 {
 	static int k;
 	if(m_CtrlPoint.size()>=SPLINECONTROLSIZE) return false;
@@ -296,7 +296,7 @@ bool CSpline::InsertPoint(double const &x, double const &y)
 }
 
 
-int CSpline::IsControlPoint(CVector const &Real)
+int Spline::IsControlPoint(CVector const &Real)
 {
 	static int k;
 	for (k=0; k<m_CtrlPoint.size(); k++)
@@ -307,7 +307,7 @@ int CSpline::IsControlPoint(CVector const &Real)
 }
 
 
-int CSpline::IsControlPoint(CVector const &Real, double const &ZoomFactor)
+int Spline::IsControlPoint(CVector const &Real, double const &ZoomFactor)
 {
 	static int k;
 	for (k=0; k<m_CtrlPoint.size(); k++)
@@ -318,7 +318,7 @@ int CSpline::IsControlPoint(CVector const &Real, double const &ZoomFactor)
 }
 
 
-int CSpline::IsControlPoint(double const &x, double const &y, double const &zx, double const &zy)
+int Spline::IsControlPoint(double const &x, double const &y, double const &zx, double const &zy)
 {
 	static int k;
 	for (k=0; k<m_CtrlPoint.size(); k++)
@@ -329,7 +329,7 @@ int CSpline::IsControlPoint(double const &x, double const &y, double const &zx, 
 }
 
 
-bool CSpline::RemovePoint(int const &k)
+bool Spline::RemovePoint(int const &k)
 {
 	if(m_CtrlPoint.size()<=m_iDegree+1) return false; // no less...
 
@@ -343,28 +343,28 @@ bool CSpline::RemovePoint(int const &k)
 }
 
 
-void CSpline::SetStyle(int style)
+void Spline::SetStyle(int style)
 {
 	m_Style = style;
 }
 
 
 
-void CSpline::SetWidth(int width)
+void Spline::SetWidth(int width)
 {
 	m_Width = width;
 }
 
 
 
-void CSpline::SetColor(QColor color)
+void Spline::SetColor(QColor color)
 {
 	m_Color = color;
 }
 
 
 
-void CSpline::SetSplineParams(int style, int width, QColor color)
+void Spline::SetSplineParams(int style, int width, QColor color)
 {
 	m_Width = width;
 	m_Style = style;
@@ -375,7 +375,7 @@ void CSpline::SetSplineParams(int style, int width, QColor color)
 
 
 
-double CSpline::SplineBlend(int const &i,  int const &p, double const &t)
+double Spline::SplineBlend(int const &i,  int const &p, double const &t)
 {
 /*	Calculate the blending value, this is done recursively.
 	If the numerator and denominator are 0 the expression is 0.
@@ -419,7 +419,7 @@ double CSpline::SplineBlend(int const &i,  int const &p, double const &t)
 
 
 
-void CSpline::SplineCurve()
+void Spline::SplineCurve()
 {
 	static double t, increment, b, w;
 	static int i,j;
@@ -454,7 +454,7 @@ void CSpline::SplineCurve()
 }
 
 
-void CSpline::SplineKnots()
+void Spline::SplineKnots()
 {
 	static double a,b;
 	static int j, iDegree;

@@ -229,7 +229,7 @@ void ManageUFOsDlg::FillWingRow(int row)
 	if(row>=pMainFrame->m_oaWing.size()) return;
 
 	QModelIndex ind;
-	CWing *pWing = (CWing*)pMainFrame->m_oaWing.at(row);
+	Wing *pWing = (Wing*)pMainFrame->m_oaWing.at(row);
 	if(!pWing) return;
 
 	ind = m_pUFOModel->index(row, 0, QModelIndex());
@@ -266,9 +266,9 @@ void ManageUFOsDlg::FillPlaneRow(int row, int n)
 
 	if(row>=pMainFrame->m_oaPlane.size()) return;
 
-	CPlane *pPlane = (CPlane*)pMainFrame->m_oaPlane.at(row);
+	Plane *pPlane = (Plane*)pMainFrame->m_oaPlane.at(row);
 	if(!pPlane) return;
-	CWing *pWing = pPlane->Wing();
+	Wing *pWing = pPlane->getWing();
 
 	ind = m_pUFOModel->index(row+n, 0, QModelIndex());
 	m_pUFOModel->setData(ind,pPlane->PlaneName());

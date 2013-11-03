@@ -26,11 +26,12 @@
 #include "Miarex.h"
 #include "GL3DScales.h"
 #include "StabViewDlg.h"
+#include "../objects/Wing.h"
 #include "../misc/ProgressDlg.h"
 
 #define SIDEPOINTS 51
 
-void GLCreateGeom(void *pQMiarex, CWing *pWing, int List, CBody *pBody)
+void GLCreateGeom(void *pQMiarex, Wing *pWing, int List, Body *pBody)
 {
 	if(!pWing) return;
 	QMiarex * pMiarex = (QMiarex*)pQMiarex;
@@ -40,7 +41,7 @@ void GLCreateGeom(void *pQMiarex, CWing *pWing, int List, CBody *pBody)
 	static double x, xDistrib[SIDEPOINTS];
 	static CVector Pt, PtA, PtB, PtNormal, A, B, C, D, N, BD, AC;
 	static CVector PtILeft[2*SIDEPOINTS],PtIRight[2*SIDEPOINTS];
-	static CFoil * pFoilA, *pFoilB;
+	static Foil * pFoilA, *pFoilB;
 
 	N.Set(0.0, 0.0, 0.0);
 
@@ -434,7 +435,7 @@ void GLCreateGeom(void *pQMiarex, CWing *pWing, int List, CBody *pBody)
 }
 
 
-void GLCreateCp(void *pQMiarex, CVector *pNode, CPanel *pPanel, CWOpp *pWOpp, CPOpp *pPOpp)
+void GLCreateCp(void *pQMiarex, CVector *pNode, Panel *pPanel, WingOpp *pWOpp, PlaneOpp *pPOpp)
 {
 	if(!pWOpp && !pPOpp)
 	{
@@ -708,7 +709,7 @@ void GLCreateCpLegendClr(void *pQMiarex)
 }
 
 
-void GLCreateDownwash(void *pQMiarex, CWing *pWing, CWOpp *pWOpp, int List)
+void GLCreateDownwash(void *pQMiarex, Wing *pWing, WingOpp *pWOpp, int List)
 {
 	// pWing is either the Wing, the stab, or the fin
 	// pWOpp is related to the pWing
@@ -845,7 +846,7 @@ void GLCreateDownwash(void *pQMiarex, CWing *pWing, CWOpp *pWOpp, int List)
 }
 
 
-void GLCreateDrag(void *pQMiarex, CWing *pWing, CWPolar* pWPolar, CWOpp *pWOpp, int List)
+void GLCreateDrag(void *pQMiarex, Wing *pWing, WPolar* pWPolar, WingOpp *pWOpp, int List)
 {
 	if(!pWing || !pWPolar || !pWOpp) return;
 	CVector C;
@@ -863,8 +864,8 @@ void GLCreateDrag(void *pQMiarex, CWing *pWing, CWPolar* pWPolar, CWOpp *pWOpp, 
 	static double cosa, cosb, sina, sinb;
 	cosa =  cos(pWOpp->m_Alpha * PI/180.0);
 	sina = -sin(pWOpp->m_Alpha * PI/180.0);
-	cosb =  cos(pWPolar->m_Beta*PI/180.0);
-	sinb =  sin(pWPolar->m_Beta*PI/180.0);
+	cosb =  cos(pWPolar->sideSlip()*PI/180.0);
+	sinb =  sin(pWPolar->sideSlip()*PI/180.0);
 
 	Icolor = pMiarex->m_IDragColor;
 	Istyle = pMiarex->m_IDragStyle;
@@ -1184,7 +1185,7 @@ void GLCreateDrag(void *pQMiarex, CWing *pWing, CWPolar* pWPolar, CWOpp *pWOpp, 
 }
 
 
-void GLCreateMesh(int iList, int size, CPanel *pPanel, CVector *pNode, QColor PanelColor, QColor BackColor, bool bBack)
+void GLCreateMesh(int iList, int size, Panel *pPanel, CVector *pNode, QColor PanelColor, QColor BackColor, bool bBack)
 {
 //	MainFrame *pMainFrame = (MainFrame*)pMiarex->s_pMainFrame;
 
@@ -1269,7 +1270,7 @@ void GLCreateMesh(int iList, int size, CPanel *pPanel, CVector *pNode, QColor Pa
 }
 
 
-void GLCreateCtrlPts(void *pQMiarex, CPanel *pPanel)
+void GLCreateCtrlPts(void *pQMiarex, Panel *pPanel)
 {
 	QMiarex * pMiarex = (QMiarex*)pQMiarex;
 	glNewList(VLMCTRLPTS,GL_COMPILE);
@@ -1296,7 +1297,7 @@ void GLCreateCtrlPts(void *pQMiarex, CPanel *pPanel)
 }
 
 
-void GLCreateVortices(void *pQMiarex, CPanel *pPanel, CVector *pNode, CWPolar *pWPolar)
+void GLCreateVortices(void *pQMiarex, Panel *pPanel, CVector *pNode, WPolar *pWPolar)
 {
 	int p;
 	CVector A, B, C, D, AC, BD;
@@ -1399,7 +1400,7 @@ void GLCreateVortices(void *pQMiarex, CPanel *pPanel, CVector *pNode, CWPolar *p
 }
 
 
-void GLCreateLiftForce(void *pQMiarex, CWPolar *pWPolar, CWOpp *pWOpp)
+void GLCreateLiftForce(void *pQMiarex, WPolar *pWPolar, WingOpp *pWOpp)
 {
 	if(!pWPolar || !pWOpp) return;
 	int style, width;
@@ -1475,7 +1476,7 @@ void GLCreateLiftForce(void *pQMiarex, CWPolar *pWPolar, CWOpp *pWOpp)
 }
 
 
-void GLCreateMoments(void *pQMiarex, CWing *pWing, CWPolar *pWPolar, CWOpp *pWOpp)
+void GLCreateMoments(void *pQMiarex, Wing *pWing, WPolar *pWPolar, WingOpp *pWOpp)
 {
 //	The most common aeronautical convention defines
 //	- the roll as acting about the longitudinal axis, positive with the starboard wing down.
@@ -1647,7 +1648,7 @@ void GLCreateMoments(void *pQMiarex, CWing *pWing, CWPolar *pWPolar, CWOpp *pWOp
 }
 
 
-void GLCreateLiftStrip(void *pQMiarex, CWing *pWing, CWPolar *pWPolar, CWOpp *pWOpp, int List)
+void GLCreateLiftStrip(void *pQMiarex, Wing *pWing, WPolar *pWPolar, WingOpp *pWOpp, int List)
 {
 	if(!pWing || !pWPolar || !pWOpp) return;
 	int i,j,k;
@@ -1796,11 +1797,11 @@ void GLCreateLiftStrip(void *pQMiarex, CWing *pWing, CWPolar *pWPolar, CWOpp *pW
 }
 
 
-void GLCreateStreamLines(void *pQMiarex, CWing *Wing[MAXWINGS], CVector *pNode, CWPolar *pWPolar, CWOpp *pWOpp)
+void GLCreateStreamLines(void *pQMiarex, Wing *PlaneWing[MAXWINGS], CVector *pNode, WPolar *pWPolar, WingOpp *pWOpp)
 {
 	QMiarex * pMiarex = (QMiarex*)pQMiarex;
 	MainFrame *pMainFrame = (MainFrame*)pMiarex->s_pMainFrame;
-	if(!Wing[0] || !pWOpp || !pWPolar || pWPolar->m_AnalysisMethod==LLTMETHOD)
+	if(!PlaneWing[0] || !pWOpp || !pWPolar || pWPolar->m_AnalysisMethod==LLTMETHOD)
 	{
 		glNewList(VLMSTREAMLINES,GL_COMPILE); glEndList();
 		pMiarex->m_GLList++;
@@ -1810,7 +1811,7 @@ void GLCreateStreamLines(void *pQMiarex, CWing *Wing[MAXWINGS], CVector *pNode, 
 	double memcoresize = pMiarex->coreSize();
 	pMiarex->SetCoreSize(0.0005); //mm, just for the time needed to build the streamlines
 
-	CWing *pWing;
+	Wing *pWing;
 
     ProgressDlg dlg(pMiarex);
 	dlg.setWindowTitle("Streamlines calculation");
@@ -1833,7 +1834,7 @@ void GLCreateStreamLines(void *pQMiarex, CWing *Wing[MAXWINGS], CVector *pNode, 
 
 	D1.Set(987654321.0, 0.0, 0.0);
 
-	CPOpp *pPOpp = pMiarex->m_pCurPOpp;
+	PlaneOpp *pPOpp = pMiarex->m_pCurPOpp;
 
 	if(pMiarex->m_pCurPOpp)
 	{
@@ -1852,7 +1853,7 @@ void GLCreateStreamLines(void *pQMiarex, CWing *Wing[MAXWINGS], CVector *pNode, 
 	}
 
 
-	pMiarex->m_pPanelDlg->m_pWing   = Wing[0];
+	pMiarex->m_pPanelDlg->m_pWing   = PlaneWing[0];
 
 
 //Tilt the geometry w.r.t. aoa
@@ -1886,9 +1887,9 @@ void GLCreateStreamLines(void *pQMiarex, CWing *Wing[MAXWINGS], CVector *pNode, 
 
 		for (iWing=0; iWing<MAXWINGS; iWing++)
 		{
-			if(Wing[iWing])
+			if(PlaneWing[iWing])
 			{
-				pWing = Wing[iWing];
+				pWing = PlaneWing[iWing];
 
 				for (p=0; p<pWing->m_MatSize; p++)
 				{
@@ -2024,7 +2025,7 @@ void GLCreateStreamLines(void *pQMiarex, CWing *Wing[MAXWINGS], CVector *pNode, 
 }
 
 
-void GLCreateSurfSpeeds(void *pQMiarex, CPanel *pPanel, CWPolar *pWPolar, CWOpp *pWOpp)
+void GLCreateSurfSpeeds(void *pQMiarex, Panel *pPanel, WPolar *pWPolar, WingOpp *pWOpp)
 {
 	QMiarex * pMiarex = (QMiarex*)pQMiarex;
 	MainFrame *pMainFrame = (MainFrame*)pMiarex->s_pMainFrame;
@@ -2055,7 +2056,7 @@ void GLCreateSurfSpeeds(void *pQMiarex, CPanel *pPanel, CWPolar *pWPolar, CWOpp 
 
 	factor = pMiarex->m_VelocityScale/100.0;
 
-	CPOpp *pPOpp = pMiarex->m_pCurPOpp;
+	PlaneOpp *pPOpp = pMiarex->m_pCurPOpp;
 	if(pMiarex->m_pCurPOpp)
 	{
 		Mu    = pPOpp->m_G;
@@ -2167,7 +2168,7 @@ void GLCreateSurfSpeeds(void *pQMiarex, CPanel *pPanel, CWPolar *pWPolar, CWOpp 
 }
 
 
-void GLCreateTrans(void *pQMiarex, CWing *pWing, CWOpp *pWOpp, int List)
+void GLCreateTrans(void *pQMiarex, Wing *pWing, WingOpp *pWOpp, int List)
 {
 	if(!pWing || !pWOpp) return;
 	int i,j,k,m, style;
@@ -2338,7 +2339,7 @@ void GLCreateTrans(void *pQMiarex, CWing *pWing, CWOpp *pWOpp, int List)
 }
 
 
-void GLDrawWingLegend(void *pQMiarex, CWing *pWing, CPlane *pPlane, CWPolar *pWPolar)
+void GLDrawWingLegend(void *pQMiarex, Wing *pWing, Plane *pPlane, WPolar *pWPolar)
 {
 	QMiarex *pMiarex = (QMiarex*)pQMiarex;
 	MainFrame *pMainFrame = (MainFrame*)pMiarex->s_pMainFrame;
@@ -2356,7 +2357,7 @@ void GLDrawWingLegend(void *pQMiarex, CWing *pWing, CPlane *pPlane, CWPolar *pWP
 
 	total = 12;
 	if(pWPolar) total +=2;
-	if(pPlane && pPlane->Stab())  total ++;
+	if(pPlane && pPlane->getStab())  total ++;
 	ZPos = pMiarex->m_r3DCltRect.bottom()- total * dD ;
 	LeftPos = pMiarex->m_r3DCltRect.left() +15;
 
@@ -2409,7 +2410,7 @@ void GLDrawWingLegend(void *pQMiarex, CWing *pWing, CPlane *pPlane, CWPolar *pWP
 
 			ZPos +=dD;
 			double Area = pWing->m_PlanformArea;
-			if(pPlane && pPlane->BiPlane()) Area+=pPlane->Wing2()->m_PlanformArea;
+			if(pPlane && pPlane->BiPlane()) Area+=pPlane->getWing2()->m_PlanformArea;
 			str1 = QString(QObject::tr("Wing Area      = %1 ")).arg(Area * pMainFrame->m_m2toUnit, a,'f',b);
 			str1 +=surface;
 			pGLWidget->renderText(LeftPos, ZPos, str1, pMainFrame->m_TextFont);
@@ -2441,7 +2442,7 @@ void GLDrawWingLegend(void *pQMiarex, CWing *pWing, CPlane *pPlane, CWPolar *pWP
 				ZPos +=dD;
 			}
 
-			if(pPlane && pPlane->Stab())
+			if(pPlane && pPlane->getStab())
 			{
 				Result = QString(QObject::tr("Tail Volume    = %1")).arg(pPlane->TailVolume(),c,'f',d);
 				pGLWidget->renderText(LeftPos, ZPos, Result, pMainFrame->m_TextFont);
@@ -2470,7 +2471,7 @@ void GLDrawWingLegend(void *pQMiarex, CWing *pWing, CPlane *pPlane, CWPolar *pWP
 }
 
 
-void GLDrawWOppLegend(void* pQMiarex, CWing *pWing, CWOpp *pWOpp)
+void GLDrawWOppLegend(void* pQMiarex, Wing *pWing, WingOpp *pWOpp)
 {
 	if(!pWing || !pWOpp) return;
 	QMiarex *pMiarex = (QMiarex*)pQMiarex;
@@ -2586,7 +2587,7 @@ void GLDrawWOppLegend(void* pQMiarex, CWing *pWing, CWOpp *pWOpp)
 }
 
 
-void GLCreatePanelForce(void *pQMiarex, CWPolar *pWPolar, CWOpp *pWOpp, CPOpp *pPOpp)
+void GLCreatePanelForce(void *pQMiarex, WPolar *pWPolar, WingOpp *pWOpp, PlaneOpp *pPOpp)
 {
 
 	//
@@ -2637,7 +2638,7 @@ void GLCreatePanelForce(void *pQMiarex, CWPolar *pWPolar, CWOpp *pWOpp, CPOpp *p
 	rmax *= 0.5*pWPolar->m_Density *pWOpp->m_QInf*pWOpp->m_QInf  *pMiarex->m_LiftScale *coef;
 	range = rmax - rmin;
 
-	CPanel *pPanel = pMiarex->m_Panel;
+	Panel *pPanel = pMiarex->m_Panel;
 
 	glNewList(PANELFORCEARROWS, GL_COMPILE);
 	{
@@ -2781,7 +2782,7 @@ void GLCreatePanelForce(void *pQMiarex, CWPolar *pWPolar, CWOpp *pWOpp, CPOpp *p
 }
 
 
-void GLDrawPanelForceLegend(void *pQMiarex, CWPolar *pWPolar)
+void GLDrawPanelForceLegend(void *pQMiarex, WPolar *pWPolar)
 {
 	if(!pWPolar) return;
 	QMiarex * pMiarex = (QMiarex*)pQMiarex;
@@ -2801,8 +2802,8 @@ void GLDrawPanelForceLegend(void *pQMiarex, CWPolar *pWPolar)
 
 	GetForceUnit(strForce, pMainFrame->m_ForceUnit);
 
-	CWing *pWingList[MAXWINGS];
-	CWOpp *pWOppList[MAXWINGS];
+	Wing *pWingList[MAXWINGS];
+	WingOpp *pWOppList[MAXWINGS];
 	for(int ip=0; ip<MAXWINGS; ip++)
 	{
 		pWingList[ip] = pMiarex->m_pWingList[ip];

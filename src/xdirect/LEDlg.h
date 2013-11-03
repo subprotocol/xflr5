@@ -58,8 +58,8 @@ private:
 	void *m_pAFoil;
 	void *m_pXDirect;
 
-	CFoil* m_pBufferFoil;
-	CFoil* m_pMemFoil;
+	Foil* m_pBufferFoil;
+	Foil* m_pMemFoil;
 };
 
 #endif // LEDLG_H

@@ -162,7 +162,7 @@ public:
 
 
 public:
-	void SetFoilFlap(CFoil *pFoil);
+	void SetFoilFlap(Foil *pFoil);
 	void Interpolate(double xf1[], double yf1[], int n1,
 					 double xf2[], double yf2[], int n2, double mixt);
 	void gamlin(int i, int j, double coef);
@@ -193,8 +193,8 @@ public:
 	bool mrcl(double cls, double &m_cls, double &r_cls);
 	bool fcpmin();
 	bool Initialize();
-	bool InitXFoilGeometry(CFoil *pFoil);
-	bool InitXFoilAnalysis(CPolar *pPolar);
+	bool InitXFoilGeometry(Foil *pFoil);
+	bool InitXFoilAnalysis(Polar *pPolar);
 	void pangen();
 	bool Preprocess();
 	bool restoreblData(int icom);

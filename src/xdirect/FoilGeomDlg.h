@@ -75,8 +75,8 @@ private:
 	double m_fThickness;
 	double m_fXCamber;
 	double m_fXThickness;
-	CFoil* m_pBufferFoil;
-	CFoil* m_pMemFoil;
+	Foil* m_pBufferFoil;
+	Foil* m_pMemFoil;
 
 	void *m_pXDirect;
 	void *m_pAFoil;

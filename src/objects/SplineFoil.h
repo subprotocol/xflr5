@@ -20,8 +20,8 @@
 *****************************************************************************/
 
 
-#ifndef CSF_H
-#define CSF_H
+#ifndef SPLINEFOIL_H
+#define SPLINEFOIL_H
 
 
 #include "Foil.h"
@@ -41,7 +41,7 @@ struct Picture
 };
 
 
-class CSF  
+class SplineFoil
 {
 	friend class QAFoil;
 	friend class MainFrame;
@@ -50,7 +50,7 @@ class CSF
 
 
 public:
-	CSF();
+	SplineFoil();
 
 private:
 	bool CompMidLine();
@@ -59,14 +59,14 @@ private:
 
 	bool Serialize(QDataStream &ar, bool bIsStoring);
 
-	void Copy(CSF* pSF);
+	void Copy(SplineFoil* pSF);
 	void CopyFromPicture(Picture *pPic);
 	void CopyToPicture(Picture *pPic);
 	void DrawCtrlPoints(QPainter &painter, double scalex, double scaley, QPoint Offset);
 	void DrawMidLine(QPainter &painter, double scalex, double scaley, QPoint Offset);
 	void DrawFoil(QPainter &painter, double scalex, double scaley, QPoint Offset);
 	void DrawOutPoints(QPainter &painter, double scalex, double scaley, QPoint Offset);
-	void ExportToBuffer(CFoil *pFoil);
+	void ExportToBuffer(Foil *pFoil);
 	void ExportToFile(QTextStream &out);
 	void UpdateSplineFoil();
 	void UpdateSelected(double x, double y);
@@ -85,8 +85,8 @@ private:
 	double m_fxCambMax, m_fxThickMax;
 	QString m_strFoilName;
 	QColor m_FoilColor;
-	CSpline m_Extrados;
-	CSpline m_Intrados;
+	Spline m_Extrados;
+	Spline m_Intrados;
 	CVector m_rpMid[1001];
 };
 #endif

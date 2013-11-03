@@ -69,8 +69,8 @@ private:
 	QStandardItemModel *m_pUFOModel;
 	UFOTableDelegate *m_pUFODelegate;
 
-	CWing *m_pWing;
-	CPlane *m_pPlane;
+	Wing *m_pWing;
+	Plane *m_pPlane;
 	static void *s_pMainFrame, *s_pMiarex;
 };
 

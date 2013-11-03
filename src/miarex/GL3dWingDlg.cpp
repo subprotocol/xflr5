@@ -249,7 +249,7 @@ void GL3dWingDlg::Connect()
 }
 
 
-void GL3dWingDlg::CreateXPoints(int NXPanels, int XDist, CFoil *pFoilA, CFoil *pFoilB, double *xPointA, double *xPointB, int &NXLead, int &NXFlap)
+void GL3dWingDlg::CreateXPoints(int NXPanels, int XDist, Foil *pFoilA, Foil *pFoilB, double *xPointA, double *xPointB, int &NXLead, int &NXFlap)
 {
 	// the chordwise panel distribution is set i.a.w. with the flap hinges;
 
@@ -875,7 +875,7 @@ void GL3dWingDlg::GLDrawFoils()
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 
 	int j;
-	CFoil *pFoil;
+	Foil *pFoil;
 
 	glColor3d(pMainFrame->m_TextColor.redF(), pMainFrame->m_TextColor.greenF(), pMainFrame->m_TextColor.blueF());
 
@@ -1058,7 +1058,7 @@ void GL3dWingDlg::GLRenderView()
 
 
 
-bool GL3dWingDlg::InitDialog(CWing *pWing)
+bool GL3dWingDlg::InitDialog(Wing *pWing)
 {
 	QString str;
 	m_iSection = 0;

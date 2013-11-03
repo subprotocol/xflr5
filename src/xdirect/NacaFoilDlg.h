@@ -50,7 +50,7 @@ public:
 	void *m_pXDirect;
 	void *m_pAFoil;
 
-	CFoil *m_pBufferFoil;
+	Foil *m_pBufferFoil;
 	QPushButton *OKButton, *CancelButton;
 	FloatEdit *m_pctrlNumber;
 	FloatEdit *m_pctrlPanels;

@@ -66,7 +66,7 @@ private:
 	FoilTableDelegate *m_pFoilDelegate;
 
 	int m_iSelection;
-	CFoil *m_pFoil;
+	Foil *m_pFoil;
 	void *m_pMainFrame, *m_pXDirect;
 };
 

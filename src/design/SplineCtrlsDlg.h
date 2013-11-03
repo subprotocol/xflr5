@@ -72,7 +72,7 @@ private:
 	FloatEditDelegate *m_pUpperFloatDelegate, *m_pLowerFloatDelegate;
 
 protected:
-	CSF *m_pSF;
+	SplineFoil *m_pSF;
 
 	static void *s_pAFoil;
 };

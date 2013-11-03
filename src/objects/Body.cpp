@@ -27,11 +27,11 @@
 #include <QMessageBox>
 #include <QFileDialog>
 
-void *CBody::s_pMainFrame;
-double CBody::s_XPanelPos[300];
+void *Body::s_pMainFrame;
+double Body::s_XPanelPos[300];
 
 
-CBody::CBody()
+Body::Body()
 {
 	int i;
 	m_BodyName = QObject::tr("Body Name");
@@ -113,7 +113,7 @@ CBody::CBody()
 //	m_SplineSurface.m_nvLines = SideLines();
 	for(int ifr=0; ifr<7; ifr++)
 	{
-		m_SplineSurface.m_pFrame.append(new CFrame);
+		m_SplineSurface.m_pFrame.append(new Frame);
 		m_SplineSurface.m_pFrame[ifr]->m_CtrlPoint.clear();
 		for(int is=0; is<5; is++)
 		{
@@ -121,55 +121,55 @@ CBody::CBody()
 		}
 	}
 
-	Frame(0)->SetuPosition(-0.10);
-	Frame(1)->SetuPosition(-0.0936);
-	Frame(2)->SetuPosition(-0.0067);
-	Frame(3)->SetuPosition( 0.0943);
-	Frame(4)->SetuPosition( 0.242);
-	Frame(5)->SetuPosition( 0.636);
-	Frame(6)->SetuPosition( 0.660);
+	getFrame(0)->SetuPosition(-0.10);
+	getFrame(1)->SetuPosition(-0.0936);
+	getFrame(2)->SetuPosition(-0.0067);
+	getFrame(3)->SetuPosition( 0.0943);
+	getFrame(4)->SetuPosition( 0.242);
+	getFrame(5)->SetuPosition( 0.636);
+	getFrame(6)->SetuPosition( 0.660);
 
-	Frame(0)->m_CtrlPoint[0].Set(-0.10, 0.0, -0.0124);
-	Frame(0)->m_CtrlPoint[1].Set(-0.10, 0.0, -0.0124);
-	Frame(0)->m_CtrlPoint[2].Set(-0.10, 0.0, -0.0124);
-	Frame(0)->m_CtrlPoint[3].Set(-0.10, 0.0, -0.0124);
-	Frame(0)->m_CtrlPoint[4].Set(-0.10, 0.0, -0.0124);
+	getFrame(0)->m_CtrlPoint[0].Set(-0.10, 0.0, -0.0124);
+	getFrame(0)->m_CtrlPoint[1].Set(-0.10, 0.0, -0.0124);
+	getFrame(0)->m_CtrlPoint[2].Set(-0.10, 0.0, -0.0124);
+	getFrame(0)->m_CtrlPoint[3].Set(-0.10, 0.0, -0.0124);
+	getFrame(0)->m_CtrlPoint[4].Set(-0.10, 0.0, -0.0124);
 
-	Frame(1)->m_CtrlPoint[0].Set(-0.0936, 0.000,  0.0035);
-	Frame(1)->m_CtrlPoint[1].Set(-0.0936, 0.011,  0.0003);
-	Frame(1)->m_CtrlPoint[2].Set(-0.0936, 0.013, -0.0136);
-	Frame(1)->m_CtrlPoint[3].Set(-0.0936, 0.011, -0.0257);
-	Frame(1)->m_CtrlPoint[4].Set(-0.0936, 0.000, -0.0266);
+	getFrame(1)->m_CtrlPoint[0].Set(-0.0936, 0.000,  0.0035);
+	getFrame(1)->m_CtrlPoint[1].Set(-0.0936, 0.011,  0.0003);
+	getFrame(1)->m_CtrlPoint[2].Set(-0.0936, 0.013, -0.0136);
+	getFrame(1)->m_CtrlPoint[3].Set(-0.0936, 0.011, -0.0257);
+	getFrame(1)->m_CtrlPoint[4].Set(-0.0936, 0.000, -0.0266);
 
-	Frame(2)->m_CtrlPoint[0].Set(-0.0067, 0.000,  0.0378);
-	Frame(2)->m_CtrlPoint[1].Set(-0.0067, 0.028,  0.0406);
-	Frame(2)->m_CtrlPoint[2].Set(-0.0067, 0.037,  0.0016);
-	Frame(2)->m_CtrlPoint[3].Set(-0.0067, 0.034, -0.0408);
-	Frame(2)->m_CtrlPoint[4].Set(-0.0067, 0.000, -0.0445);
+	getFrame(2)->m_CtrlPoint[0].Set(-0.0067, 0.000,  0.0378);
+	getFrame(2)->m_CtrlPoint[1].Set(-0.0067, 0.028,  0.0406);
+	getFrame(2)->m_CtrlPoint[2].Set(-0.0067, 0.037,  0.0016);
+	getFrame(2)->m_CtrlPoint[3].Set(-0.0067, 0.034, -0.0408);
+	getFrame(2)->m_CtrlPoint[4].Set(-0.0067, 0.000, -0.0445);
 
-	Frame(3)->m_CtrlPoint[0].Set(0.0943, 0.000,  0.0252);
-	Frame(3)->m_CtrlPoint[1].Set(0.0943, 0.012,  0.0192);
-	Frame(3)->m_CtrlPoint[2].Set(0.0943, 0.018,  0.0012);
-	Frame(3)->m_CtrlPoint[3].Set(0.0943, 0.012, -0.0168);
-	Frame(3)->m_CtrlPoint[4].Set(0.0943, 0.000, -0.0228);
+	getFrame(3)->m_CtrlPoint[0].Set(0.0943, 0.000,  0.0252);
+	getFrame(3)->m_CtrlPoint[1].Set(0.0943, 0.012,  0.0192);
+	getFrame(3)->m_CtrlPoint[2].Set(0.0943, 0.018,  0.0012);
+	getFrame(3)->m_CtrlPoint[3].Set(0.0943, 0.012, -0.0168);
+	getFrame(3)->m_CtrlPoint[4].Set(0.0943, 0.000, -0.0228);
 
-	Frame(4)->m_CtrlPoint[0].Set(0.242, 0.000,  0.0075);
-	Frame(4)->m_CtrlPoint[1].Set(0.242, 0.006,  0.0090);
-	Frame(4)->m_CtrlPoint[2].Set(0.242, 0.009,  0.0011);
-	Frame(4)->m_CtrlPoint[3].Set(0.242, 0.007, -0.0059);
-	Frame(4)->m_CtrlPoint[4].Set(0.242, 0.000, -0.0051);
+	getFrame(4)->m_CtrlPoint[0].Set(0.242, 0.000,  0.0075);
+	getFrame(4)->m_CtrlPoint[1].Set(0.242, 0.006,  0.0090);
+	getFrame(4)->m_CtrlPoint[2].Set(0.242, 0.009,  0.0011);
+	getFrame(4)->m_CtrlPoint[3].Set(0.242, 0.007, -0.0059);
+	getFrame(4)->m_CtrlPoint[4].Set(0.242, 0.000, -0.0051);
 
-	Frame(5)->m_CtrlPoint[0].Set(0.636, 0.000,  0.0138);
-	Frame(5)->m_CtrlPoint[1].Set(0.636, 0.010,  0.0132);
-	Frame(5)->m_CtrlPoint[2].Set(0.636, 0.012, -0.0001);
-	Frame(5)->m_CtrlPoint[3].Set(0.636, 0.010, -0.0098);
-	Frame(5)->m_CtrlPoint[4].Set(0.636, 0.000, -0.0106);
+	getFrame(5)->m_CtrlPoint[0].Set(0.636, 0.000,  0.0138);
+	getFrame(5)->m_CtrlPoint[1].Set(0.636, 0.010,  0.0132);
+	getFrame(5)->m_CtrlPoint[2].Set(0.636, 0.012, -0.0001);
+	getFrame(5)->m_CtrlPoint[3].Set(0.636, 0.010, -0.0098);
+	getFrame(5)->m_CtrlPoint[4].Set(0.636, 0.000, -0.0106);
 
-	Frame(6)->m_CtrlPoint[0].Set(0.660, 0.00,  0.0);
-	Frame(6)->m_CtrlPoint[1].Set(0.660, 0.00,  0.0);
-	Frame(6)->m_CtrlPoint[2].Set(0.660, 0.00,  0.0);
-	Frame(6)->m_CtrlPoint[3].Set(0.660, 0.00, -0.0);
-	Frame(6)->m_CtrlPoint[4].Set(0.660, 0.00, -0.0);
+	getFrame(6)->m_CtrlPoint[0].Set(0.660, 0.00,  0.0);
+	getFrame(6)->m_CtrlPoint[1].Set(0.660, 0.00,  0.0);
+	getFrame(6)->m_CtrlPoint[2].Set(0.660, 0.00,  0.0);
+	getFrame(6)->m_CtrlPoint[3].Set(0.660, 0.00, -0.0);
+	getFrame(6)->m_CtrlPoint[4].Set(0.660, 0.00, -0.0);
 
 #endif
 
@@ -185,14 +185,14 @@ CBody::CBody()
 
 
 
-void CBody::SetKnots()
+void Body::SetKnots()
 {
 	m_SplineSurface.SetKnots();
 }
 
 
 
-void CBody::ComputeAero(double *Cp, double &XCP, double &YCP, double &ZCP,
+void Body::ComputeAero(double *Cp, double &XCP, double &YCP, double &ZCP,
 						double &GCm, double &GRm, double &GYm, double &Alpha, CVector &CoG)
 {
 	int p;
@@ -229,7 +229,7 @@ void CBody::ComputeAero(double *Cp, double &XCP, double &YCP, double &ZCP,
 }
 
 
-void CBody::Duplicate(CBody *pBody)
+void Body::Duplicate(Body *pBody)
 {
 	if(!pBody) return;
 
@@ -243,7 +243,7 @@ void CBody::Duplicate(CBody *pBody)
 	m_SplineSurface.ClearFrames();
 	for(int i=0; i<pBody->FrameSize(); i++)
 	{
-		m_SplineSurface.m_pFrame.append(new CFrame);
+		m_SplineSurface.m_pFrame.append(new Frame);
 		m_SplineSurface.m_pFrame[i]->CopyFrame(pBody->m_SplineSurface.m_pFrame[i]);
 		m_xPanels[i] = pBody->m_xPanels[i];
 	}
@@ -259,7 +259,7 @@ void CBody::Duplicate(CBody *pBody)
 }
 
 
-bool CBody::ExportDefinition()
+bool Body::ExportDefinition()
 {
 	MainFrame* pMainFrame = (MainFrame*)s_pMainFrame;
 	int i, j;
@@ -326,7 +326,7 @@ bool CBody::ExportDefinition()
 }
 
 
-void CBody::ExportGeometry(QTextStream &outStream, int type, double mtoUnit, int nx, int nh)
+void Body::ExportGeometry(QTextStream &outStream, int type, double mtoUnit, int nx, int nh)
 {
 	QString strong, LengthUnit,str;
 	int k,l;
@@ -370,7 +370,7 @@ void CBody::ExportGeometry(QTextStream &outStream, int type, double mtoUnit, int
 }
 
 
-bool CBody::Gauss(double *A, int n, double *B, int m)
+bool Body::Gauss(double *A, int n, double *B, int m)
 {
 	int row, i, j, pivot_row, k;
 	double max, dum, *pa, *pA, *A_pivot_row;
@@ -441,13 +441,13 @@ bool CBody::Gauss(double *A, int n, double *B, int m)
 
 
 
-double CBody::Length()
+double Body::Length()
 {
 	return fabs(m_SplineSurface.m_pFrame.last()->m_Position.x - m_SplineSurface.m_pFrame.first()->m_Position.x);
 }
 
 
-CVector CBody::LeadingPoint()
+CVector Body::LeadingPoint()
 {
 	return CVector(m_SplineSurface.m_pFrame[0]->m_Position.x,
 				   0.0,
@@ -456,7 +456,7 @@ CVector CBody::LeadingPoint()
 
 
 
-double CBody::GetSectionArcLength(double x)
+double Body::GetSectionArcLength(double x)
 {
 	//NURBS only
 	if(m_LineType==BODYPANELTYPE) return 0.0;
@@ -478,7 +478,7 @@ double CBody::GetSectionArcLength(double x)
 }
 
 
-void CBody::GetPoint(double u, double v, bool bRight, CVector &Pt)
+void Body::GetPoint(double u, double v, bool bRight, CVector &Pt)
 {
 	m_SplineSurface.GetPoint(u, v, Pt);
 	if(!bRight)  Pt.y = -Pt.y;
@@ -486,13 +486,13 @@ void CBody::GetPoint(double u, double v, bool bRight, CVector &Pt)
 
 
 
-double CBody::Getu(double x)
+double Body::Getu(double x)
 {
 	return m_SplineSurface.Getu(x,0.0);
 }
 
 
-double CBody::Getv(double u, CVector r, bool bRight)
+double Body::Getv(double u, CVector r, bool bRight)
 {
 	double sine = 10000.0;
 
@@ -533,7 +533,7 @@ double CBody::Getv(double u, CVector r, bool bRight)
 
 
 
-bool CBody::ImportDefinition(QTextStream &inStream, double mtoUnit)
+bool Body::ImportDefinition(QTextStream &inStream, double mtoUnit)
 {
 	int res, i, j, Line, NSideLines;
 	QString strong;
@@ -584,7 +584,7 @@ bool CBody::ImportDefinition(QTextStream &inStream, double mtoUnit)
 		}
 		else if (strong.indexOf("FRAME", 0)  >=0)
 		{
-			CFrame *pNewFrame = new CFrame;
+			Frame *pNewFrame = new Frame;
 			NSideLines = ReadFrame(inStream, Line, pNewFrame, mtoUnit);
 
 			if (NSideLines)
@@ -620,7 +620,7 @@ bool CBody::ImportDefinition(QTextStream &inStream, double mtoUnit)
 }
 
 
-void CBody::InsertSideLine(int SideLine)
+void Body::InsertSideLine(int SideLine)
 {
 	if(SideLine==0) SideLine++;
 	for (int i=0; i<FrameSize(); i++)
@@ -631,7 +631,7 @@ void CBody::InsertSideLine(int SideLine)
 }
 
 
-int CBody::InsertPoint(CVector Real)
+int Body::InsertPoint(CVector Real)
 {
 	//Real is to be inserted in the current frame
 	if(m_iActiveFrame<0)
@@ -659,13 +659,13 @@ int CBody::InsertPoint(CVector Real)
 }
 
 
-int CBody::InsertFrame(CVector Real)
+int Body::InsertFrame(CVector Real)
 {
 	int k, n=0;
 
 	if(Real.x<m_SplineSurface.m_pFrame[0]->m_Position.x)
 	{
-		m_SplineSurface.m_pFrame.prepend(new CFrame(SideLineCount()));
+		m_SplineSurface.m_pFrame.prepend(new Frame(SideLineCount()));
 		for (k=0; k<SideLineCount(); k++)
 		{
 			m_SplineSurface.m_pFrame.first()->m_CtrlPoint[k].Set(0.0,0.0,Real.z);
@@ -674,7 +674,7 @@ int CBody::InsertFrame(CVector Real)
 	}
 	else if(Real.x>m_SplineSurface.m_pFrame.last()->m_Position.x)
 	{
-		m_SplineSurface.m_pFrame.append(new CFrame(SideLineCount()));
+		m_SplineSurface.m_pFrame.append(new Frame(SideLineCount()));
 		
 		for (k=0; k<SideLineCount(); k++)
 		{
@@ -688,7 +688,7 @@ int CBody::InsertFrame(CVector Real)
 		{
 			if(m_SplineSurface.m_pFrame[n]->m_Position.x<=Real.x  &&  Real.x<m_SplineSurface.m_pFrame[n+1]->m_Position.x)
 			{
-				m_SplineSurface.m_pFrame.insert(n+1, new CFrame(SideLineCount()));
+				m_SplineSurface.m_pFrame.insert(n+1, new Frame(SideLineCount()));
 
 				for (k=0; k<SideLineCount(); k++)
 				{
@@ -723,7 +723,7 @@ int CBody::InsertFrame(CVector Real)
 
 
 
-void CBody::InterpolateCurve(CVector *D, CVector *P, double *v, double *knots, int degree, int Size)
+void Body::InterpolateCurve(CVector *D, CVector *P, double *v, double *knots, int degree, int Size)
 {
 	int i,j;
 	double Nij[MAXBODYFRAMES* MAXBODYFRAMES];//MAXBODYFRAMES is greater than MAXSIDELINES
@@ -757,7 +757,7 @@ void CBody::InterpolateCurve(CVector *D, CVector *P, double *v, double *knots, i
 }
 
 
-void CBody::InterpolateSurface()
+void Body::InterpolateSurface()
 {
 /*	int i,k;
 	double u[MAXBODYFRAMES];
@@ -824,7 +824,7 @@ void CBody::InterpolateSurface()
 }
 
 
-bool CBody::Intersect(CVector A, CVector B, CVector &I, bool bRight)
+bool Body::Intersect(CVector A, CVector B, CVector &I, bool bRight)
 {
 	if(m_LineType==BODYPANELTYPE)        return IntersectPanels(A,B,I);
 	else if (m_LineType==BODYSPLINETYPE) return IntersectNURBS(A,B,I, bRight);
@@ -832,7 +832,7 @@ bool CBody::Intersect(CVector A, CVector B, CVector &I, bool bRight)
 }
 
 
-bool CBody::IntersectNURBS(CVector A, CVector B, CVector &I, bool bRight)
+bool Body::IntersectNURBS(CVector A, CVector B, CVector &I, bool bRight)
 {
 	//intersect line AB with right or left body surface
 	//intersection point is I
@@ -892,7 +892,7 @@ bool CBody::IntersectNURBS(CVector A, CVector B, CVector &I, bool bRight)
 }
 
 
-bool CBody::IntersectPanels(CVector A, CVector B, CVector &I)
+bool Body::IntersectPanels(CVector A, CVector B, CVector &I)
 {
 	bool b1, b2, b3, b4, b5;
 	int i,k;
@@ -1035,7 +1035,7 @@ bool CBody::IntersectPanels(CVector A, CVector B, CVector &I)
 
 
 
-int CBody::IsFramePos(CVector Real, double ZoomFactor)
+int Body::IsFramePos(CVector Real, double ZoomFactor)
 {
 	int k;
 	for (k=0; k<FrameSize(); k++)
@@ -1048,7 +1048,7 @@ int CBody::IsFramePos(CVector Real, double ZoomFactor)
 }
 
 
-bool CBody::IsInNURBSBody(CVector Pt)
+bool Body::IsInNURBSBody(CVector Pt)
 {
 	double u, v;
 	bool bRight;
@@ -1069,7 +1069,7 @@ bool CBody::IsInNURBSBody(CVector Pt)
 
 
 
-int CBody::ReadFrame(QTextStream &in, int &Line, CFrame *pFrame, double const &Unit)
+int Body::ReadFrame(QTextStream &in, int &Line, Frame *pFrame, double const &Unit)
 {
 	double x,y,z;
 
@@ -1108,7 +1108,7 @@ int CBody::ReadFrame(QTextStream &in, int &Line, CFrame *pFrame, double const &U
 }
 
 
-int CBody::RemoveFrame(int n)
+int Body::RemoveFrame(int n)
 {
 	m_SplineSurface.m_pFrame.removeAt(n);
 
@@ -1119,7 +1119,7 @@ int CBody::RemoveFrame(int n)
 }
 
 
-void CBody::RemoveActiveFrame()
+void Body::RemoveActiveFrame()
 {
 	m_SplineSurface.RemoveFrame(m_iActiveFrame);
 
@@ -1129,7 +1129,7 @@ void CBody::RemoveActiveFrame()
 }
 
 
-void CBody::RemoveSideLine(int SideLine)
+void Body::RemoveSideLine(int SideLine)
 {
 	for (int i=0; i<m_SplineSurface.m_pFrame.size(); i++)
 	{
@@ -1139,7 +1139,7 @@ void CBody::RemoveSideLine(int SideLine)
 }
 
 
-void CBody::Scale(double XFactor, double YFactor, double ZFactor, bool bFrameOnly, int FrameID)
+void Body::Scale(double XFactor, double YFactor, double ZFactor, bool bFrameOnly, int FrameID)
 {
 	int i,j;
 	for (i=0; i<FrameSize(); i++)
@@ -1159,7 +1159,7 @@ void CBody::Scale(double XFactor, double YFactor, double ZFactor, bool bFrameOnl
 //	ComputeCenterLine();
 }
 
-bool CBody::SerializeBody(QDataStream &ar, bool bIsStoring, int ProjectFormat)
+bool Body::SerializeBody(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 {
 	int ArchiveFormat;
 	int i,k,n, nStations;
@@ -1252,7 +1252,7 @@ bool CBody::SerializeBody(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 		m_SplineSurface.ClearFrames();
 		for(k=0; k<nStations; k++)
 		{
-			m_SplineSurface.m_pFrame.append(new CFrame);
+			m_SplineSurface.m_pFrame.append(new Frame);
 			m_SplineSurface.m_pFrame[k]->SerializeFrame(ar, bIsStoring);
 		}
 		//Serialize Bodyline
@@ -1305,7 +1305,7 @@ bool CBody::SerializeBody(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 
 
 
-void CBody::SetPanelPos()
+void Body::SetPanelPos()
 {
 	int i;
 /*	for(i=0; i<=m_nxPanels; i++)
@@ -1330,7 +1330,7 @@ void CBody::SetPanelPos()
 
 
 
-void CBody::Translate(double XTrans, double YTrans, double ZTrans, bool bFrameOnly, int FrameID)
+void Body::Translate(double XTrans, double YTrans, double ZTrans, bool bFrameOnly, int FrameID)
 {
 	int i,j;
 	for (i=0; i<FrameSize(); i++)
@@ -1352,14 +1352,14 @@ void CBody::Translate(double XTrans, double YTrans, double ZTrans, bool bFrameOn
 }
 
 
-void CBody::Translate(CVector T, bool bFrameOnly, int FrameID)
+void Body::Translate(CVector T, bool bFrameOnly, int FrameID)
 {
 	Translate(T.x, T.y, T.z, bFrameOnly, FrameID);
 }
 
 
 
-CFrame *CBody::Frame(int k)
+Frame *Body::getFrame(int k)
 {
 	if(k>=0 && k<FrameSize()) return m_SplineSurface.m_pFrame[k];
 	return NULL;
@@ -1367,21 +1367,21 @@ CFrame *CBody::Frame(int k)
 
 
 
-double CBody::FramePosition(int iFrame)
+double Body::FramePosition(int iFrame)
 {
 	return m_SplineSurface.m_pFrame[iFrame]->m_Position.x;
 }
 
 
 
-CFrame *CBody::ActiveFrame()
+Frame *Body::activeFrame()
 {
 	if(m_iActiveFrame>=0 && m_iActiveFrame<FrameSize()) return m_SplineSurface.m_pFrame[m_iActiveFrame];
 	return NULL;
 }
 
 
-void CBody::SetActiveFrame(CFrame *pFrame)
+void Body::SetActiveFrame(Frame *pFrame)
 {
 	for(int ifr=0; ifr<m_SplineSurface.m_pFrame.size(); ifr++)
 	{
@@ -1396,7 +1396,7 @@ void CBody::SetActiveFrame(CFrame *pFrame)
 
 
 
-void CBody::ComputeBodyAxisInertia()
+void Body::ComputeBodyAxisInertia()
 {
 	// Calculates the inertia tensor in geometrical (body) axis :
 	//  - adds the volume inertia AND the point masses of all components
@@ -1445,7 +1445,7 @@ void CBody::ComputeBodyAxisInertia()
 
 
 
-void CBody::ComputeVolumeInertia(CVector &CoG, double &CoGIxx, double &CoGIyy, double &CoGIzz, double &CoGIxz)
+void Body::ComputeVolumeInertia(CVector &CoG, double &CoGIxx, double &CoGIyy, double &CoGIzz, double &CoGIxz)
 {
 	// Assume that the mass is distributed homogeneously in the body's skin
 	// Homogeneity is questionable, but is a rather handy assumption
@@ -1474,20 +1474,20 @@ void CBody::ComputeVolumeInertia(CVector &CoG, double &CoGIxx, double &CoGIyy, d
 			{
 				//build the four corner points of the strips
 				PLA.x =  FramePosition(i);
-				PLA.y =  Frame(i)->m_CtrlPoint[k].y  ;
-				PLA.z =  Frame(i)->m_CtrlPoint[k].z  ;
+				PLA.y =  getFrame(i)->m_CtrlPoint[k].y  ;
+				PLA.z =  getFrame(i)->m_CtrlPoint[k].z  ;
 
 				PLB.x = FramePosition(i);
-				PLB.y = Frame(i)->m_CtrlPoint[k+1].y ;
-				PLB.z = Frame(i)->m_CtrlPoint[k+1].z ;
+				PLB.y = getFrame(i)->m_CtrlPoint[k+1].y ;
+				PLB.z = getFrame(i)->m_CtrlPoint[k+1].z ;
 
 				PTA.x = FramePosition(i+1);
-				PTA.y = Frame(i+1)->m_CtrlPoint[k].y ;
-				PTA.z = Frame(i+1)->m_CtrlPoint[k].z ;
+				PTA.y = getFrame(i+1)->m_CtrlPoint[k].y ;
+				PTA.z = getFrame(i+1)->m_CtrlPoint[k].z ;
 
 				PTB.x = FramePosition(i+1);
-				PTB.y = Frame(i+1)->m_CtrlPoint[k+1].y;
-				PTB.z = Frame(i+1)->m_CtrlPoint[k+1].z;
+				PTB.y = getFrame(i+1)->m_CtrlPoint[k+1].y;
+				PTB.z = getFrame(i+1)->m_CtrlPoint[k+1].z;
 
 				LATB = PTB - PLA;
 				TALB = PLB - PTA;
@@ -1513,17 +1513,17 @@ void CBody::ComputeVolumeInertia(CVector &CoG, double &CoGIxx, double &CoGIyy, d
 				for (k=0; k<SideLineCount()-1; k++)
 				{
 					//build the four corner points of the strips
-					PLB.y = (1.0- dj) * Frame(i)->m_CtrlPoint[k].y   +  dj * Frame(i+1)->m_CtrlPoint[k].y;
-					PLB.z = (1.0- dj) * Frame(i)->m_CtrlPoint[k].z   +  dj * Frame(i+1)->m_CtrlPoint[k].z;
+					PLB.y = (1.0- dj) * getFrame(i)->m_CtrlPoint[k].y   +  dj * getFrame(i+1)->m_CtrlPoint[k].y;
+					PLB.z = (1.0- dj) * getFrame(i)->m_CtrlPoint[k].z   +  dj * getFrame(i+1)->m_CtrlPoint[k].z;
 
-					PTB.y = (1.0-dj1) * Frame(i)->m_CtrlPoint[k].y   + dj1 * Frame(i+1)->m_CtrlPoint[k].y;
-					PTB.z = (1.0-dj1) * Frame(i)->m_CtrlPoint[k].z   + dj1 * Frame(i+1)->m_CtrlPoint[k].z;
+					PTB.y = (1.0-dj1) * getFrame(i)->m_CtrlPoint[k].y   + dj1 * getFrame(i+1)->m_CtrlPoint[k].y;
+					PTB.z = (1.0-dj1) * getFrame(i)->m_CtrlPoint[k].z   + dj1 * getFrame(i+1)->m_CtrlPoint[k].z;
 
-					PLA.y = (1.0- dj) * Frame(i)->m_CtrlPoint[k+1].y +  dj * Frame(i+1)->m_CtrlPoint[k+1].y;
-					PLA.z = (1.0- dj) * Frame(i)->m_CtrlPoint[k+1].z +  dj * Frame(i+1)->m_CtrlPoint[k+1].z;
+					PLA.y = (1.0- dj) * getFrame(i)->m_CtrlPoint[k+1].y +  dj * getFrame(i+1)->m_CtrlPoint[k+1].y;
+					PLA.z = (1.0- dj) * getFrame(i)->m_CtrlPoint[k+1].z +  dj * getFrame(i+1)->m_CtrlPoint[k+1].z;
 
-					PTA.y = (1.0-dj1) * Frame(i)->m_CtrlPoint[k+1].y + dj1 * Frame(i+1)->m_CtrlPoint[k+1].y;
-					PTA.z = (1.0-dj1) * Frame(i)->m_CtrlPoint[k+1].z + dj1 * Frame(i+1)->m_CtrlPoint[k+1].z;
+					PTA.y = (1.0-dj1) * getFrame(i)->m_CtrlPoint[k+1].y + dj1 * getFrame(i+1)->m_CtrlPoint[k+1].y;
+					PTA.z = (1.0-dj1) * getFrame(i)->m_CtrlPoint[k+1].z + dj1 * getFrame(i+1)->m_CtrlPoint[k+1].z;
 
 					LATB = PTB - PLA;
 					TALB = PLB - PTA;
@@ -1562,17 +1562,17 @@ void CBody::ComputeVolumeInertia(CVector &CoG, double &CoGIxx, double &CoGIyy, d
 				for (k=0; k<SideLineCount()-1; k++)
 				{
 					//build the four corner points of the strips
-					PLB.y = (1.0- dj) * Frame(i)->m_CtrlPoint[k].y   +  dj * Frame(i+1)->m_CtrlPoint[k].y;
-					PLB.z = (1.0- dj) * Frame(i)->m_CtrlPoint[k].z   +  dj * Frame(i+1)->m_CtrlPoint[k].z;
+					PLB.y = (1.0- dj) * getFrame(i)->m_CtrlPoint[k].y   +  dj * getFrame(i+1)->m_CtrlPoint[k].y;
+					PLB.z = (1.0- dj) * getFrame(i)->m_CtrlPoint[k].z   +  dj * getFrame(i+1)->m_CtrlPoint[k].z;
 
-					PTB.y = (1.0-dj1) * Frame(i)->m_CtrlPoint[k].y   + dj1 * Frame(i+1)->m_CtrlPoint[k].y;
-					PTB.z = (1.0-dj1) * Frame(i)->m_CtrlPoint[k].z   + dj1 * Frame(i+1)->m_CtrlPoint[k].z;
+					PTB.y = (1.0-dj1) * getFrame(i)->m_CtrlPoint[k].y   + dj1 * getFrame(i+1)->m_CtrlPoint[k].y;
+					PTB.z = (1.0-dj1) * getFrame(i)->m_CtrlPoint[k].z   + dj1 * getFrame(i+1)->m_CtrlPoint[k].z;
 
-					PLA.y = (1.0- dj) * Frame(i)->m_CtrlPoint[k+1].y +  dj * Frame(i+1)->m_CtrlPoint[k+1].y;
-					PLA.z = (1.0- dj) * Frame(i)->m_CtrlPoint[k+1].z +  dj * Frame(i+1)->m_CtrlPoint[k+1].z;
+					PLA.y = (1.0- dj) * getFrame(i)->m_CtrlPoint[k+1].y +  dj * getFrame(i+1)->m_CtrlPoint[k+1].y;
+					PLA.z = (1.0- dj) * getFrame(i)->m_CtrlPoint[k+1].z +  dj * getFrame(i+1)->m_CtrlPoint[k+1].z;
 
-					PTA.y = (1.0-dj1) * Frame(i)->m_CtrlPoint[k+1].y + dj1 * Frame(i+1)->m_CtrlPoint[k+1].y;
-					PTA.z = (1.0-dj1) * Frame(i)->m_CtrlPoint[k+1].z + dj1 * Frame(i+1)->m_CtrlPoint[k+1].z;
+					PTA.y = (1.0-dj1) * getFrame(i)->m_CtrlPoint[k+1].y + dj1 * getFrame(i+1)->m_CtrlPoint[k+1].y;
+					PTA.z = (1.0-dj1) * getFrame(i)->m_CtrlPoint[k+1].z + dj1 * getFrame(i+1)->m_CtrlPoint[k+1].z;
 
 					LATB = PTB - PLA;
 					TALB = PLB - PTA;
@@ -1651,7 +1651,7 @@ void CBody::ComputeVolumeInertia(CVector &CoG, double &CoGIxx, double &CoGIyy, d
 }
 
 
-double CBody::TotalMass()
+double Body::TotalMass()
 {
 	double TotalMass = m_VolumeMass;
 	for(int im=0; im<m_MassValue.size(); im++)
@@ -1661,7 +1661,7 @@ double CBody::TotalMass()
 
 
 
-void CBody::SetEdgeWeight(double uw, double vw)
+void Body::SetEdgeWeight(double uw, double vw)
 {
 	m_SplineSurface.m_EdgeWeightu = uw;
 	m_SplineSurface.m_EdgeWeightv = vw;

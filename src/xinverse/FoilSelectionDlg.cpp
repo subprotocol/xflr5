@@ -109,11 +109,11 @@ void FoilSelectionDlg::OnDoubleClickList(QListWidgetItem *pItem)
 void FoilSelectionDlg::InitDialog()
 {
 	if(!m_poaFoil) return;
-	CFoil *pFoil;
+	Foil *pFoil;
 
 	for (int i=0; i<m_poaFoil->size(); i++)
 	{
-		pFoil = (CFoil*)m_poaFoil->at(i);
+		pFoil = (Foil*)m_poaFoil->at(i);
 		m_pctrlNameList->addItem(pFoil->m_FoilName);
 		m_pctrlNameList->setItemSelected(m_pctrlNameList->item(i), false);
 		for(int j=0; j<m_FoilList.size();j++)

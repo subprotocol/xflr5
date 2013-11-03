@@ -28,18 +28,18 @@
 #include "WOpp.h"
 #include <QDataStream>
 
-class CPOpp
+class PlaneOpp
 {
 	friend class QMiarex;
 	friend class MainFrame;
-	friend class CWPolar;
+	friend class WPolar;
 
 public:
-	CPOpp();
+	PlaneOpp();
 	bool SerializePOpp(QDataStream &ar, bool bIsStoring, int ProjectFormat);
 
 private:
-	CWOpp m_PlaneWOpp[MAXWINGS];
+	WingOpp m_PlaneWOpp[MAXWINGS];
 
 	QString m_PlaneName;		// the plane's name to which the POpp belongs
 	QString m_PlrName;		// the polar's name to which the POpp belongs

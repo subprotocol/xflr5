@@ -20,6 +20,7 @@ SOURCES += \
 	src/miarex/LLTAnalysis.cpp \
 	src/miarex/ImportWingDlg.cpp \
 	src/miarex/InertiaDlg.cpp \
+	src/miarex/NURBSDomDoc.cpp \
 	src/miarex/Miarex.cpp \
 	src/miarex/ManageBodiesDlg.cpp \
 	src/miarex/ManageUFOsDlg.cpp \
@@ -39,6 +40,7 @@ SOURCES += \
 	src/xdirect/FoilCoordDlg.cpp \
 	src/xdirect/FoilGeomDlg.cpp \
 	src/xdirect/FoilPolarDlg.cpp \
+	src/xdirect/EditPlrDlg.cpp \
 	src/xdirect/FlapDlg.cpp \
 	src/xdirect/InterpolateFoilsDlg.cpp \
 	src/xdirect/LEDlg.cpp \
@@ -61,9 +63,10 @@ SOURCES += \
 	src/objects/Panel.cpp \
 	src/objects/Plane.cpp \
 	src/objects/Polar.cpp \
-	src/objects/POpp.cpp \
 	src/objects/Quaternion.cpp \
-	src/objects/Sf.cpp \
+	src/objects/WingSection.cpp \
+	src/objects/PlaneOpp.cpp \
+	src/objects/NURBSSurface.cpp \
 	src/objects/Spline.cpp \
 	src/objects/Surface.cpp \
 	src/objects/WPolar.cpp \
@@ -84,6 +87,7 @@ SOURCES += \
 	src/misc/DisplaySettingsDlg.cpp \
 	src/misc/ColorButton.cpp \
 	src/misc/FloatEdit.cpp \
+	src/misc/GLLightDlg.cpp \
 	src/misc/AboutQ5.cpp \
 	src/misc/NewNameDlg.cpp \
 	src/misc/ObjectPropsDlg.cpp \
@@ -106,13 +110,9 @@ SOURCES += \
     src/globals.cpp \
     src/main.cpp \
     src/mainframe.cpp \
-    src/objects/NURBSSurface.cpp \
-    src/misc/GLLightDlg.cpp \
     src/threedwidget.cpp \
-    src/twodwidget.cpp \
-    src/miarex/NURBSDomDoc.cpp \
-	src/xdirect/EditPlrDlg.cpp \
-    src/objects/WingSection.cpp
+	src/twodwidget.cpp \
+    src/objects/SplineFoil.cpp
 
 HEADERS += \
 	src/XFLR5Application.h \
@@ -139,6 +139,7 @@ HEADERS += \
 	src/miarex/BodyScaleDlg.h \
 	src/miarex/WAdvancedDlg.h \
 	src/miarex/GL3dWingDlg.h \
+	src/miarex/NURBSDomDoc.h \
 	src/miarex/BodyTransDlg.h \
 	src/miarex/GL3DScales.h \
 	src/miarex/GL3dBodyDlg.h \
@@ -155,6 +156,7 @@ HEADERS += \
 	src/xdirect/XDirectStyleDlg.h \
 	src/xdirect/ManageFoilsDlg.h \
 	src/xdirect/NacaFoilDlg.h \
+	src/xdirect/EditPlrDlg.h \
 	src/xdirect/LEDlg.h \
 	src/xdirect/FoilPolarDlg.h \
 	src/xdirect/FlapDlg.h \
@@ -171,14 +173,15 @@ HEADERS += \
 	src/objects/Wing.h \
 	src/objects/Surface.h \
 	src/objects/Spline.h \
-	src/objects/Sf.h \
+	src/objects/WingSection.h \
 	src/objects/OpPoint.h \
 	src/objects/Quaternion.h \
-	src/objects/POpp.h \
+	src/objects/PlaneOpp.h \
 	src/objects/Polar.h \
 	src/objects/CVector.h \
 	src/objects/Plane.h \
 	src/objects/CRectangle.h \
+	src/objects/NURBSSurface.h \
 	src/objects/Panel.h \
 	src/objects/Frame.h \
 	src/objects/Foil.h \
@@ -200,6 +203,7 @@ HEADERS += \
 	src/misc/LineButton.h \
 	src/misc/AboutQ5.h \
 	src/misc/FloatEdit.h \
+	src/misc/GLLightDlg.h \
 	src/misc/ProgressDlg.h \
 	src/misc/NewNameDlg.h \
 	src/misc/ObjectPropsDlg.h \
@@ -217,13 +221,10 @@ HEADERS += \
     src/params.h \
     src/globals.h \
     src/mainframe.h \
-    src/objects/NURBSSurface.h \
-    src/misc/GLLightDlg.h \
     src/twodwidget.h \
-    src/threedwidget.h \
-    src/miarex/NURBSDomDoc.h \
-	src/xdirect/EditPlrDlg.h \
-    src/objects/WingSection.h
+	src/threedwidget.h \
+    src/objects/SplineFoil.h
+
 
 TRANSLATIONS = translations/xflr5v6.ts \
     translations/xflr5v6_de.ts \

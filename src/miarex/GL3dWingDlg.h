@@ -51,7 +51,7 @@ class GL3dWingDlg: public QDialog
 	friend class MainFrame;
 	friend class QMiarex;
 	friend class ThreeDWidget;
-	friend class CWing;
+	friend class Wing;
 	friend class GLLightDlg;
 	friend class PlaneDlg;
 	friend class WingDelegate;
@@ -111,7 +111,7 @@ private:
 	void resizeEvent(QResizeEvent *event);
 
 	bool CheckWing();
-	void CreateXPoints(int NXPanels, int XDist, CFoil *pFoilA, CFoil *pFoilB, double *xPointA, double *xPointB, int &NXLead, int &NXFlap);
+	void CreateXPoints(int NXPanels, int XDist, Foil *pFoilA, Foil *pFoilB, double *xPointA, double *xPointB, int &NXLead, int &NXFlap);
 	void ComputeGeometry();
 
 	void SetWingData();
@@ -124,7 +124,7 @@ private:
 	int VLMGetPanelTotal();
 	bool VLMSetAutoMesh(int total=0);
 
-	bool InitDialog(CWing *pWing);
+	bool InitDialog(Wing *pWing);
 	void Connect();
 	void SetupLayout();
 	void GLCreateMesh();
@@ -196,7 +196,7 @@ private:
 
 	QWidget *m_pctrlControlsWidget;
 
-	CWing *m_pWing;
+	Wing *m_pWing;
 
 	bool m_bAcceptName;
 	bool m_bRightSide;
@@ -239,7 +239,7 @@ private:
 	CVector m_L[(MAXBODYFRAMES+1)*(MAXSIDELINES+1)]; //temporary points to save calculation times for body NURBS surfaces
 	CVector m_T[(MAXBODYFRAMES+1)*(MAXSIDELINES+1)];
 
-	CPanel *m_pPanel;
+	Panel *m_pPanel;
 	CVector *m_pNode;
 
 	ArcBall m_ArcBall;

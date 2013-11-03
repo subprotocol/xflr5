@@ -43,7 +43,7 @@ class PanelAnalysisDlg : public QDialog
 
 	friend class QMiarex;
 	friend class MainFrame;
-	friend class CWing;
+	friend class Wing;
 
 public:
     PanelAnalysisDlg(QWidget *pParent);
@@ -87,20 +87,20 @@ private:
 	void CreateUnitRHS();
 	void CreateWakeContribution();
 	void CreateWakeContribution(double *pWakeContrib, CVector WindDirection);
-	void DoubletNASA4023(CVector const &C, CPanel *pPanel, CVector &V, double &phi, bool bWake=false);
-	void GetDoubletInfluence(CVector const &C, CPanel *pPanel, CVector &V, double &phi, bool bWake=false, bool bAll=true);
-	void GetSourceInfluence(CVector const &C, CPanel *pPanel, CVector &V, double &phi);
+	void DoubletNASA4023(CVector const &C, Panel *pPanel, CVector &V, double &phi, bool bWake=false);
+	void GetDoubletInfluence(CVector const &C, Panel *pPanel, CVector &V, double &phi, bool bWake=false, bool bAll=true);
+	void GetSourceInfluence(CVector const &C, Panel *pPanel, CVector &V, double &phi);
 	void RelaxWake();
 	void ScaleResultstoSpeed(int nval);
 	void SetAlpha(double AlphaMin, double AlphaMax, double AlphaDelta);
 	void SetFileHeader();
-	void SourceNASA4023(CVector const &C, CPanel *pPanel, CVector &V, double &phi);
+	void SourceNASA4023(CVector const &C, Panel *pPanel, CVector &V, double &phi);
 	void SetupLayout();
 	void StartAnalysis();
 	void SumPanelForces(double *Cp, double Alpha, double &Lift, double &Drag);
 	void UpdateView();
 	void WriteString(QString strong);
-	void VLMGetVortexInfluence(CPanel *pPanel, CVector const &C, CVector &V, bool bAll);
+	void VLMGetVortexInfluence(Panel *pPanel, CVector const &C, CVector &V, bool bAll);
 	void VLMQmn(CVector const &LA, CVector const &LB, CVector const &TA, CVector const &TB, CVector const &C, CVector &V);
 	void VLMCmn(CVector const &A, CVector const &B, CVector const &C, CVector &V, bool const &bAll=true);
 
@@ -196,10 +196,10 @@ private:
 	QString m_VersionName;
 	
 //	CPanel **m_ppPanel;//the sorted array of panel pointers
-	CPanel *m_pPanel; //the original array of panels
-	CPanel *m_pWakePanel;// the current working wake panel array
-	CPanel *m_pRefWakePanel;// a copy of the reference wake node array if wake needs to be reset
-	CPanel *m_pMemPanel;// a copy of the reference panel array for tilted calc
+	Panel *m_pPanel; //the original array of panels
+	Panel *m_pWakePanel;// the current working wake panel array
+	Panel *m_pRefWakePanel;// a copy of the reference wake node array if wake needs to be reset
+	Panel *m_pMemPanel;// a copy of the reference panel array for tilted calc
 
 	CVector *m_pNode;	// the working array of Nodes 
 	CVector *m_pMemNode;	// a copy of the reference node array for tilted calc
@@ -208,14 +208,14 @@ private:
 	CVector *m_pTempWakeNode;// the temporary wake node array during relaxation calc
 
 	
-	CWPolar *m_pWPolar;
-	CBody *m_pBody;
-	CPlane *m_pPlane;
+	WPolar *m_pWPolar;
+	Body *m_pBody;
+	Plane *m_pPlane;
 
 	//temp data
 	CVector VG, CG;
 	double phiG;
-	CPanel m_SymPanel;
+	Panel m_SymPanel;
 	CVector R[5];
 	CVector r0, r1, r2, Psi, t, Far;
 	double r1v,r2v,ftmp, Omega;
@@ -230,8 +230,8 @@ public:
 	CVector m_Vd[ MAXWINGS*VLMMAXRHS * MAXSPANSTATIONS];
 	CVector m_WingForce[MAXWINGS*VLMMAXRHS];
 	double m_WingIDrag[MAXWINGS*VLMMAXRHS];
-	CWing *m_pWing; //pointer to the geometry class of the wing
-	CWing * m_pWingList[MAXWINGS]; //pointer to the plane's four wings
+	Wing *m_pWing; //pointer to the geometry class of the wing
+	Wing * m_pWingList[MAXWINGS]; //pointer to the plane's four wings
 	void GetSpeedVector(CVector const &C, double *Mu, double *Sigma, CVector &VT, bool bAll=true);
 	void GetSpeedVector(CVector const &C, float *Mu,  float *Sigma,  CVector &VT, bool bAll=true);
 
@@ -270,7 +270,7 @@ public://stability analysis method and variables
 	double m_AlphaEq, m_Ctrl;
 	double m_ControlMin, m_ControlMax, m_ControlDelta;
 
-	CSurface **m_ppSurface;
+	Surface **m_ppSurface;
 	double m_radius, m_W, m_p, m_q, m_r; //trimmed flight data
 
 	bool m_bTrace;

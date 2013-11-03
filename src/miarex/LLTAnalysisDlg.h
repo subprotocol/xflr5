@@ -40,7 +40,7 @@ class LLTAnalysisDlg : public QDialog
 
 	friend class MainFrame;
 	friend class QMiarex;
-	friend class CWing;
+	friend class Wing;
 
 public:
     LLTAnalysisDlg(QWidget *pParent);
@@ -92,8 +92,8 @@ private:
 
 	QGraph m_IterGraph;
 
-	CWing   *m_pWing;
-	CWPolar *m_pWPolar;
+	Wing   *m_pWing;
+	WPolar *m_pWPolar;
 
 	LLTAnalysis m_LLT;
 

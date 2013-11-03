@@ -173,7 +173,7 @@ void FoilTableDelegate::paint(QPainter *painter, const QStyleOptionViewItem &opt
 		}
 		else
 		{
-			CFoil *pFoil = (CFoil*)pAFoil->m_poaFoil->at(index.row()-1);
+			Foil *pFoil = (Foil*)pAFoil->m_poaFoil->at(index.row()-1);
 			color = pFoil->m_FoilColor;
 			style = pFoil->m_nFoilStyle;
 			width = pFoil->m_nFoilWidth;			

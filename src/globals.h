@@ -107,18 +107,18 @@ bool Crout_LU_Decomposition_with_Pivoting(double *A, int pivot[], int n, bool *p
 bool Crout_LU_with_Pivoting_Solve(double *LU, double B[], int pivot[], double x[], int n, bool *pbCancel);
 
 
-void *GetPlrVariable(CPolar *pPolar, int iVar);
-double GetVar(QList<void*>*m_poaPolar, int nVar, CFoil *pFoil0, CFoil *pFoil1, double Re, double Cl, double Tau, bool &bOutRe, bool &bError);
-double GetZeroLiftAngle(QList<void*>*m_poaPolar, CFoil *pFoil0, CFoil *pFoil1, double Re, double Tau);
-double GetCl(QList<void*>*m_poaPolar, CFoil  *pFoil0, CFoil *pFoil1, double Re, double Alpha, double Tau, bool &bOutRe, bool &bError);
-double GetCm(QList<void*>*m_poaPolar, CFoil  *pFoil0, CFoil *pFoil1, double Re, double Alpha, double Tau, bool &bOutRe, bool &bError);
-double GetCm0(QList<void*>*m_poaPolar, CFoil *pFoil0, CFoil *pFoil1, double Re, double Tau, bool &bOutRe, bool &bError);
-double GetCd(QList<void*>*m_poaPolar, CFoil *pFoil0, CFoil *pFoil1, double Re, double Alpha, double Tau, double AR, bool &bOutRe, bool &bError);
-double GetXCp(QList<void*>*m_poaPolar, CFoil *pFoil0, CFoil *pFoil1, double Re, double Alpha, double Tau,  bool &bOutRe, bool &bError);
-double GetXTr(QList<void*>*m_poaPolar, CFoil *pFoil0, CFoil *pFoil1, double Re, double Alpha, double Tau, bool bTop, bool &bOutRe, bool &bError);
-double GetPlrPointFromCl(QList<void*>*m_poaPolar, CFoil *pFoil, double Re, double Cl, int PlrVar, bool &bOutRe, bool &bError);
-double GetPlrPointFromAlpha(QList<void*>*m_poaPolar, CFoil *pFoil, double Re, double Alpha, int PlrVar, bool &bOutRe, bool &bError);
-void GetLinearizedPolar(QList<void*>*m_poaPolar, CFoil *pFoil0, CFoil *pFoil1, double Re, double Tau, double &Alpha0, double &Slope);
+void *GetPlrVariable(Polar *pPolar, int iVar);
+double GetVar(QList<void*>*m_poaPolar, int nVar, Foil *pFoil0, Foil *pFoil1, double Re, double Cl, double Tau, bool &bOutRe, bool &bError);
+double GetZeroLiftAngle(QList<void*>*m_poaPolar, Foil *pFoil0, Foil *pFoil1, double Re, double Tau);
+double GetCl(QList<void*>*m_poaPolar, Foil  *pFoil0, Foil *pFoil1, double Re, double Alpha, double Tau, bool &bOutRe, bool &bError);
+double GetCm(QList<void*>*m_poaPolar, Foil  *pFoil0, Foil *pFoil1, double Re, double Alpha, double Tau, bool &bOutRe, bool &bError);
+double GetCm0(QList<void*>*m_poaPolar, Foil *pFoil0, Foil *pFoil1, double Re, double Tau, bool &bOutRe, bool &bError);
+double GetCd(QList<void*>*m_poaPolar, Foil *pFoil0, Foil *pFoil1, double Re, double Alpha, double Tau, double AR, bool &bOutRe, bool &bError);
+double GetXCp(QList<void*>*m_poaPolar, Foil *pFoil0, Foil *pFoil1, double Re, double Alpha, double Tau,  bool &bOutRe, bool &bError);
+double GetXTr(QList<void*>*m_poaPolar, Foil *pFoil0, Foil *pFoil1, double Re, double Alpha, double Tau, bool bTop, bool &bOutRe, bool &bError);
+double GetPlrPointFromCl(QList<void*>*m_poaPolar, Foil *pFoil, double Re, double Cl, int PlrVar, bool &bOutRe, bool &bError);
+double GetPlrPointFromAlpha(QList<void*>*m_poaPolar, Foil *pFoil, double Re, double Alpha, int PlrVar, bool &bOutRe, bool &bError);
+void GetLinearizedPolar(QList<void*>*m_poaPolar, Foil *pFoil0, Foil *pFoil1, double Re, double Tau, double &Alpha0, double &Slope);
 
 bool SplineInterpolation(int n, double *x, double *y,  double *a, double *b, double *c, double *d);
 double SplineBlend(int const &index, int const &p, double const &t, double *knots);

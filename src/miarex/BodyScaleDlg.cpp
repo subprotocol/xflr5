@@ -214,7 +214,7 @@ void BodyScaleDlg::OnEditingFinished()
 	GL3dBodyDlg *pBodyDlg = (GL3dBodyDlg*)m_pBodyDlg;
 	m_FrameID = m_pctrlFrameID->Value()-1;
 	pBodyDlg->m_pBody->m_iActiveFrame = m_FrameID;
-	pBodyDlg->m_pFrame = pBodyDlg->m_pBody->ActiveFrame();
+	pBodyDlg->m_pFrame = pBodyDlg->m_pBody->activeFrame();
 	pBodyDlg->m_bResetglBody2D = true;
 	pBodyDlg->UpdateView();
 }

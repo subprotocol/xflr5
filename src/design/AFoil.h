@@ -136,9 +136,9 @@ private:
 	void DrawYMinGrid(QPainter &painter, double scalex, double scaley, QPoint Offset, QRect dRect);
 	void FillFoilTable();
 	void FillTableRow(int row);
-	void ShowFoil(CFoil* pFoil, bool bShow=true);
+	void ShowFoil(Foil* pFoil, bool bShow=true);
 	void SetParams();
-	void SelectFoil(CFoil* pFoil = NULL);
+	void SelectFoil(Foil* pFoil = NULL);
 	void PaintGrids(QPainter &painter);
 	void PaintSplines(QPainter &painter);
 	void PaintFoils(QPainter &painter);
@@ -227,7 +227,7 @@ private:
 
 
 //	CFoil *m_pCurFoil;
-	CSF *m_pSF;
+	SplineFoil *m_pSF;
 
 	QPoint m_ptOffset;//the foil's leading edge position in screen coordinates
 	QPoint m_ViewportTrans; // the translation of the viewport
@@ -237,7 +237,7 @@ private:
 	QRect m_rCltRect;
 	QRect m_ZoomRect;
 	CVector m_MousePos;
-	CFoil *m_pBufferFoil;
+	Foil *m_pBufferFoil;
 
 
 	QCursor m_hcMove;

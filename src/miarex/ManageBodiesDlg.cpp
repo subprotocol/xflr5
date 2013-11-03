@@ -53,14 +53,14 @@ void ManageBodiesDlg::InitDialog()
 }
 
 
-bool ManageBodiesDlg::IsInUse(CBody *pBody)
+bool ManageBodiesDlg::IsInUse(Body *pBody)
 {
 	int i;
-	CPlane *pOldPlane;
+	Plane *pOldPlane;
 	for (i=0; i<m_poaPlane->count();i++)
 	{
-		pOldPlane = (CPlane*)m_poaPlane->at(i);
-		if(pOldPlane->Body() && pOldPlane->Body()==m_pBody)
+		pOldPlane = (Plane*)m_poaPlane->at(i);
+		if(pOldPlane->getBody() && pOldPlane->getBody()==m_pBody)
 		{
 			return true;
 		}
@@ -78,7 +78,7 @@ void ManageBodiesDlg::OnDelete()
 
 	QString strong;
 	int i;
-	CPlane *pOldPlane;
+	Plane *pOldPlane;
 
 	if(IsInUse(m_pBody))
 	{
@@ -86,8 +86,8 @@ void ManageBodiesDlg::OnDelete()
 		if (QMessageBox::Yes != QMessageBox::question(window(), tr("Question"), strong, QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel)) return;
 		for (i=0; i<m_poaPlane->count();i++)
 		{
-			pOldPlane = (CPlane*)m_poaPlane->at(i);
-			if(pOldPlane->Body() == m_pBody)
+			pOldPlane = (Plane*)m_poaPlane->at(i);
+			if(pOldPlane->getBody() == m_pBody)
 			{
 				pOldPlane->SetBody(NULL);
 				pMainFrame->DeletePlane(pOldPlane, true);
@@ -117,7 +117,7 @@ void ManageBodiesDlg::OnDoubleClickTable(const QModelIndex &index)
 	{
 		QListWidgetItem* pItem =  m_pctrlNameList->item(index.row());
 
-		CBody *pBody = pMiarex->GetBody(pItem->text());
+		Body *pBody = pMiarex->GetBody(pItem->text());
 		if(pBody)
 		{
 			SetBody(pBody);
@@ -142,7 +142,7 @@ void ManageBodiesDlg::OnDuplicate()
 
 	QMiarex * pMiarex = (QMiarex*)s_pMiarex;
 
-	CBody *pBody = new CBody;
+	Body *pBody = new Body;
 	pBody->Duplicate(m_pBody);
 	pBody->m_BodyName = m_pBody->m_BodyName;
 	pMiarex->SetModBody(pBody);
@@ -159,17 +159,17 @@ void ManageBodiesDlg::OnEdit()
 
 	bool bUsed = false;
 	int i;
-	CPlane *pPlane;
-	CWPolar *pWPolar;
+	Plane *pPlane;
+	WPolar *pWPolar;
 	for (i=0; i< pMiarex->m_poaPlane->size(); i++)
 	{
-		pPlane = (CPlane*)m_poaPlane->at(i);
-		if(pPlane->Body() && pPlane->Body()==m_pBody)
+		pPlane = (Plane*)m_poaPlane->at(i);
+		if(pPlane->getBody() && pPlane->getBody()==m_pBody)
 		{
 			// Does this plane have results
 			for(int j=0; j<pMiarex->m_poaWPolar->size(); j++)
 			{
-				pWPolar = (CWPolar*)pMiarex->m_poaWPolar->at(j);
+				pWPolar = (WPolar*)pMiarex->m_poaWPolar->at(j);
 				if(pWPolar->m_UFOName==pPlane->PlaneName() && pWPolar->m_Alpha.size())
 				{
 					bUsed = true;
@@ -180,7 +180,7 @@ void ManageBodiesDlg::OnEdit()
 		}
 	}
 
-	CBody memBody;
+	Body memBody;
 	memBody.Duplicate(m_pBody);
 	pGL3dBodyDlg->m_bEnableName = false;
 	pGL3dBodyDlg->InitDialog(m_pBody);
@@ -201,7 +201,7 @@ void ManageBodiesDlg::OnEdit()
 			}
 			else if(Ans==20)
 			{
-				CBody* pNewBody= new CBody();
+				Body* pNewBody= new Body();
 				pNewBody->Duplicate(m_pBody);
 				m_pBody->Duplicate(&memBody);
 				if(!pMiarex->SetModBody(pNewBody))
@@ -216,8 +216,8 @@ void ManageBodiesDlg::OnEdit()
 				//delete all results associated to planes using this body
 				for (i=0; i<pMiarex->m_poaPlane->count();i++)
 				{
-					pPlane = (CPlane*)pMiarex->m_poaPlane->at(i);
-					if(pPlane->Body() == m_pBody)
+					pPlane = (Plane*)pMiarex->m_poaPlane->at(i);
+					if(pPlane->getBody() == m_pBody)
 					{
 						pMainFrame->DeletePlane(pPlane, true);
 					}
@@ -297,7 +297,7 @@ void ManageBodiesDlg::OnNameList(QListWidgetItem *pItem)
 	QMiarex * pMiarex = (QMiarex*)s_pMiarex;
 	QListWidgetItem *pOldItem ;
 
-	CBody *pBody = pMiarex->GetBody(pItem->text());
+	Body *pBody = pMiarex->GetBody(pItem->text());
 	if(pBody)
 	{
 		for(int i=0; i<m_pctrlNameList->count(); i++)
@@ -318,7 +318,7 @@ void ManageBodiesDlg::OnNew()
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	QMiarex * pMiarex = (QMiarex*)s_pMiarex;
 	GL3dBodyDlg *pGL3dBodyDlg = (GL3dBodyDlg*)m_pGL3dBodyDlg;
-	CBody *pBody = new CBody;
+	Body *pBody = new Body;
 	pGL3dBodyDlg->SetBody(pBody);
 	if(pGL3dBodyDlg->exec() == QDialog::Accepted)
 	{
@@ -343,7 +343,7 @@ void ManageBodiesDlg::OnRename()
 
 
 
-void ManageBodiesDlg::SetBody(CBody *pBody)
+void ManageBodiesDlg::SetBody(Body *pBody)
 {
 	int i;
 	QListWidgetItem *pItem ;
@@ -428,12 +428,12 @@ void ManageBodiesDlg::SetupLayout()
 
 void ManageBodiesDlg::UpdateBodyList()
 {
-	CBody * pBody;
+	Body * pBody;
 	m_pctrlNameList->clear();
 
 	for (int i=0; i<m_poaBody->size(); i++)
 	{
-		pBody = (CBody*)m_poaBody->at(i);
+		pBody = (Body*)m_poaBody->at(i);
 		m_pctrlNameList->addItem(pBody->m_BodyName);
 	}
 }

@@ -50,7 +50,7 @@ private:
 	void SetReynolds();
 	void SetWingLoad();
 	void ReadValues();
-	void InitDialog(CPlane *pPlane, CWing *pWing, CWPolar *pWPolar=NULL);
+	void InitDialog(Plane *pPlane, Wing *pWing, WPolar *pWPolar=NULL);
 	void SetDensity();
 	void EnableControls();
 
@@ -75,13 +75,13 @@ private:
 	static void *s_pMiarex;
 
 //	QList <void *> *m_poaWPolar;
-	CPlane *m_pPlane;
-	CWing *m_pWing;
+	Plane *m_pPlane;
+	Wing *m_pWing;
 
 //	QString m_WPolarName;
 //	QString m_UFOName;
 
-	static CWPolar s_WPolar;
+	static WPolar s_WPolar;
 	bool m_bAutoName;
 	int m_UnitType;//1= International, 2= English
 	double m_WingLoad;

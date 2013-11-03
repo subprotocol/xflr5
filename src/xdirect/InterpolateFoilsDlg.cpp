@@ -137,12 +137,12 @@ void InterpolateFoilsDlg::SetupLayout()
 void InterpolateFoilsDlg::InitDialog()
 {
 	int i;
-	CFoil* pFoil;
+	Foil* pFoil;
 	m_pctrlFoil1->clear();
 	m_pctrlFoil2->clear();
 	for (i=0; i<m_poaFoil->size(); i++)
 	{
-		pFoil = (CFoil*)m_poaFoil->at(i);
+		pFoil = (Foil*)m_poaFoil->at(i);
 		if(pFoil)
 		{
 			m_pctrlFoil1->addItem(pFoil->m_FoilName);
@@ -197,7 +197,7 @@ void InterpolateFoilsDlg::OnSelChangeFoil1(int i)
 	QString strong  = m_pctrlFoil1->currentText();
 
 	i=0;
-	CFoil* pFoil = pMainFrame->GetFoil(strong);
+	Foil* pFoil = pMainFrame->GetFoil(strong);
 
 	if(pFoil)
 	{
@@ -228,7 +228,7 @@ void InterpolateFoilsDlg::OnSelChangeFoil2(int i)
 	MainFrame * pMainFrame = (MainFrame*)m_pMainFrame;
 	QString strong  = m_pctrlFoil2->currentText();
 
-	CFoil* pFoil = pMainFrame->GetFoil(strong);
+	Foil* pFoil = pMainFrame->GetFoil(strong);
 
 	if(pFoil)
 	{
@@ -260,10 +260,10 @@ void InterpolateFoilsDlg::Update()
 	QString strong;
 
 	strong = m_pctrlFoil1->currentText();
-	CFoil* pFoil1 = pMainFrame->GetFoil(strong);
+	Foil* pFoil1 = pMainFrame->GetFoil(strong);
 
 	strong = m_pctrlFoil2->currentText();
-	CFoil* pFoil2 = pMainFrame->GetFoil(strong);
+	Foil* pFoil2 = pMainFrame->GetFoil(strong);
 
 	if(!pFoil1 || !pFoil2) return;
 

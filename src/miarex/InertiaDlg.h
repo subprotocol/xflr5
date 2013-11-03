@@ -74,9 +74,9 @@ private:
 	void SetupLayout();
 	void ReadData();
 
-	CBody *m_pBody;
-	CWing *m_pWing;
-	CPlane *m_pPlane;
+	Body *m_pBody;
+	Wing *m_pWing;
+	Plane *m_pPlane;
 	static void *s_pMainFrame;
 
 	QStackedWidget *m_pctrlTopStack;

@@ -20,16 +20,25 @@
 *****************************************************************************/
 
 
+/*! \file
+ *
+ * This class defines the polar object for the 3D analysis of wings and planes
+ *
+ *
+ */
+
+
+
 #ifndef WPOLAR_H
 #define WPOLAR_H
 
 #include "WOpp.h"
-#include "POpp.h"
+#include "PlaneOpp.h"
 
 
-class CWPolar
+class WPolar
 {
-	friend class CWing;
+	friend class Wing;
 	friend class QMiarex;
 	friend class MainFrame;
 	friend class WPolarDlg;
@@ -42,131 +51,148 @@ class CWPolar
 	friend class ManageBodiesDlg;
 
 public:
-	CWPolar();
-	void AddPoint(CWOpp* pWOpp);
-	void AddPoint(CPOpp* pPOpp);
+	WPolar();
+	void AddPoint(WingOpp* pWOpp);
+	void AddPoint(PlaneOpp* pPOpp);
 	void AddPoint(double alpha, double CL, double ICd, double PCd, double CY, double GCm, double VCm, double ICm, double GRm, double GYm, double IYm, double QInf, double XCP);
+
+	/** returns the analysis method of the polar as an index in the enumeration */
+	enumAnalysisMethod analysisMethod() {return m_AnalysisMethod;};
+
 	void CalculatePoint(int i);
+	void Copy(WPolar *pWPolar);
+
+	double density()                    {return m_Density;}     /**< returns the fluid's density, in IS units */
+
+	void DuplicateSpec(WPolar *pWPolar);
 	void Export(QTextStream &out, int FileType, bool bDataOnly=false);
 	void GetPolarProperties(QString &Properties, bool bData=false);
+	void *GetUFOPlrVariable(int iVar);
+
+	bool pointsVisible()                {return m_bShowPoints;} /**< returns true if the polar curve's points should be displayed in the graphs */
+
+	QString polarName()                 {return m_PlrName;}     /**< returns the polar's name as a QString object */
+
+	enumPolarType polarType()           {return m_WPolarType;}  /** returns the type of the polar as an index in the enumeration */
+
 	void Remove(int i);
 	void Remove(double alpha);
-	void SetInertia(void *ptr, bool bPlane);
-	void *GetUFOPlrVariable(int iVar);
 	void ResetWPlr();
-	void Copy(CWPolar *pWPolar);
-	void DuplicateSpec(CWPolar *pWPolar);
+	void RetrieveInertia(void *ptr, bool bPlane);
 	bool SerializeWPlr(QDataStream &ar, bool bIsStoring, int ProjectFormat);
+
+	double sideSlip()                   {return m_Beta;}       /**< returns the sideslip angle */
+
+	QString UFOName()                   {return m_UFOName;}    /**< returns the name of the polar's parent object as a QString object */
+
+	double viscosity()                  {return m_Viscosity;}  /**< returns the fluid's kinematic viscosity, in IS units */
+
+
+	bool visible()                      {return m_bIsVisible;} /**< returns true if the polar curve should be displayed the graphs */
 
 	static void GetUFOPlrVariableName(int iVar, QString &Name);
 
-	static void* s_pMainFrame;
-	static void* s_pMiarex;
 
 private:
-	int m_PolarFormat;
-	int m_RefAreaType;
-	double m_QInf;
-	double m_ASpec;
-	double m_AMem;
+	static void* s_pMainFrame;   /**< a pointer to the unique instance of the application's mainframe */
+	static void* s_pMiarex;      /**< a pointer to the unique instance of the application's QMiarex class */
 
-	int m_Style;
-	int m_Width;
-	QColor m_Color;
+	double   m_AMem;               /**< A variable which stores the last aoa displayed for this polar. Used to display the same aoa when the user switches to another polar */
+	double   m_ASpec;              /**< the angle of attack for type 4 polars */
+	double   m_BankAngle;          /**< The bank angle */
+	bool     m_bAutoInertia;         /**< true if the inertia to be taken into account is the one of the parent plane */
+	bool     m_bDirichlet;           /**< true if Dirichlet boundary conditions should be applied, false if Neumann */
+	double   m_Beta;               /**< The sideslip angle*/
+	bool     m_bGround;              /**< true if ground effect should be taken into account in the analysis */
+	bool     m_bIgnoreBodyPanels;    /**< true if the body panels should be ignored in the analysis */
+	bool     m_bIsVisible;           /**< true if the polar curve is visible in the graphs */
+	bool     m_bShowPoints;          /**< true if the polar points are visible in the graphs */
+	bool     m_bThinSurfaces;        /**< true if VLM, false if 3D-panels */
+	bool     m_bTiltedGeom;          /**< true if the analysis should be performed on the tilted geometry */
+	bool     m_bViscous;             /**< true if the analysis is viscous */
+	bool     m_bWakeRollUp;          /**< true if wake roll-up  should be taken into account in the analysis */
+	QColor   m_Color;              /**< the curve's color for the graphs */
+	double   m_ControlGain[4*MAXCONTROLS];      /**< the scaling factor for each of the control surfaces */
+	double   m_Height;             /**< The plane flight altitude, used if ground effect is to be taken into account*/
+	double   m_CoGIxx;             /**< The Ixx component of the inertia tensor, w.r.t. the CoG origin */
+	double   m_CoGIxz;             /**< The Ixz component of the inertia tensor, w.r.t. the CoG origin */
+	double   m_CoGIyy;             /**< The Iyy component of the inertia tensor, w.r.t. the CoG origin */
+	double   m_CoGIzz;             /**< The Izz component of the inertia tensor, w.r.t. the CoG origin */
+	int      m_nControls;                          /**< the number of control surfaces for this wing or plane */
+	int      m_NXWakePanels;          /**< the number of wake panels */
+	double   m_QInf;               /**< the freestream velocity for type 1 polars */
+	QString  m_PlrName;           /**< the polar's name */
+	int      m_PolarFormat;           /**< the identification number which references the format used to serialize the data */
+	int      m_RefAreaType;           /**< Describes the origin of the refernce area : 1 if planform area, else projected area */
+	int      m_Style;                 /**< the index of the curve's style for the graphs */
+	double   m_TotalWakeLength;    /**< the wake's length */
+	QString  m_UFOName;           /**< the name of the parent wing or plane */
+	double   m_Viscosity;          /**< The fluid's kinematic viscosity */
+	double   m_WakePanelFactor;    /**< the ratio between the length of two wake panels in the x direction */
+	int      m_Width;                 /**< the curve's width in pixels for the graphs */
 
-	QString m_UFOName;
-	QString m_PlrName;
 
-	// general aerodynamic data - specific to a polar
-	double m_Viscosity;
-	double m_Height;//for ground effect
-	double m_BankAngle;
 
-	bool m_bIsVisible;
-	bool m_bShowPoints;
-	bool m_bGround;
-	bool m_bWakeRollUp;
-	bool m_bDirichlet;
-	bool m_bTiltedGeom;
-	bool m_bViscous;
-	bool m_bIgnoreBodyPanels;
+	QList <double>  m_1Cl;        /**< 1/Cl, special for Matthieu */
+	QList <double>  m_Alpha;      /**< angle of attack */
+	QList <double>  m_Cl32Cd;     /**< the power factor */
+	QList <double>  m_ClCd;       /**< the glide ratio */
+	QList <double>  m_CL;         /**< lift coef. */
+	QList <double>  m_Ctrl;                    /**< Ctrl variable */
+	QList <double>  m_CY;         /**< Side Force */
+	QList <double>  m_DutchRollDamping;        /**< the damping of the Dutch roll mode, as a result of stability analysis only */
+	QList <double>  m_DutchRollFrequency;      /**< the frequency of the Dutch roll mode, as a result of stability analysis only */
+	complex<double> m_EigenValue[8][MAXPOLARPOINTS]; /**< until we have a QList<complex<double>> ? */
+	QList <double>  m_FX;         /**< the total drag */
+	QList <double>  m_FY;         /**< the total side force */
+	QList <double>  m_FZ;         /**< the total wing lift */
+	QList <double>  m_Gamma;      /**< glide angle = Atan(Cx/Cz), in degrees */
+	QList <double>  m_GCm;        /**< Total Pitching Moment coefficient */
+	QList <double>  m_GRm;        /**< Total rolling moment */
+	QList <double>  m_GYm;        /**< Total yawing moment coefficient */
+	QList <double>  m_ICd;        /**< induced drag coef. */
+	QList <double>  m_ICm;        /**< Induced Pitching Moment coefficient */
+	QList <double>  m_IYm;        /**< induced yawing moment coefficient */
+	QList <double>  m_MaxBending;              /**< the max bending moment at the root chord */
+	QList <double>  m_Oswald;                  /**< Oswald's efficiency factor */
+	QList <double>  m_PCd;        /**< profile drag coef. */
+	QList <double>  m_Pm;         /**< the total pitching moment */
+	QList <double>  m_PhugoidFrequency;        /**< the phugoid's frequency, as a result of stability analysis only */
+	QList <double>  m_PhugoidDamping;          /**< the phugoid's damping factor, as a result of stability analysis only */
+	QList <double>  m_QInfinite;  /**< the free stream speed - type2 Wpolars */
+	QList <double>  m_RollDamping;             /**< the damping of the roll-damping mode, as a result of stability analysis only */
+	QList <double>  m_Rm;         /**< the total rolling moment */
+	QList <double>  m_ShortPeriodDamping;      /**< the damping of the short period mode, as a result of stability analysis only */
+	QList <double>  m_ShortPeriodFrequency;    /**< the frequency of the short period mode, as a result of stability analysis only */
+	QList <double>  m_SM;                      /**< pseudo Static Margin = (XCP-XCmRef)/m.a.c; */
+	QList <double>  m_SpiralDamping;           /**< the damping of the spiral mode, as a result of stability analysis only */
+	QList <double>  m_TCd;        /**< total drag coef. */
+	QList <double>  m_VCm;        /**< Viscous Pitching Moment coefficient */
+	QList <double>  m_VertPower;               /**< the power for steady horizontal flight = m.g.Vz */
+	QList <double>  m_Vx;         /**< the horizontal component of the velocity */
+	QList <double>  m_VYm;        /**< Profile yawing Moment coefficient */
+	QList <double>  m_Vz;         /**< the sink speed = sqrt(2mg/rho/S)/powerfactor */
+	QList <double>  m_XCP;        /**<  centre of pressure X-position relative to the wing's root LE */
+	QList <double>  m_XNP;                     /**< the position of the neutral point, as a result of stability analysis only */
+	QList <double>  m_YCP;        /**<  centre of pressure Y-position relative to the wing's root LE */
+	QList <double>  m_Ym;         /**< the total yawing moment */
+	QList <double>  m_ZCP;        /**<  centre of pressure Z-position relative to the wing's root LE */
 
-	int m_NXWakePanels;
-	double m_TotalWakeLength;
-	double m_WakePanelFactor;
 
-	
-	// the rest is litterature
-	QList <double> m_Alpha; //angle of attack
-	QList <double> m_CL;    //lift coef.
-	QList <double> m_CY;    //Side Force
-	QList <double> m_ICd;   //induced drag coef.
-	QList <double> m_PCd;   //profile drag coef.
-	QList <double> m_TCd;   //total drag coef.
-	QList <double> m_GCm;   //Total Pitching Moment coefficient
-	QList <double> m_VCm;   //Viscous Pitching Moment coefficient
-	QList <double> m_ICm;   //Induced Pitching Moment coefficient
-	QList <double> m_GRm;   //Total rolling moment
-	QList <double> m_GYm;   //Total yawing moment coefficient
-	QList <double> m_VYm;   //Profile yawing Moment coefficient
-	QList <double> m_IYm;   //induced yawing moment coefficient
-	QList <double> m_ClCd;  //glide ratio
-	QList <double> m_Cl32Cd;  //powerfactor
-	QList <double> m_QInfinite;  //free stream speed - type2 Wpolars
-	QList <double> m_FX;//Wing Drag
-	QList <double> m_FY;//Wing Side force
-	QList <double> m_FZ;//Wing Lift
-	QList <double> m_1Cl;//1/Cl, special for Matthieu
-	QList <double> m_Vx;//horizontal speed
-	QList <double> m_Vz;//Sink speed = sqrt(2mg/rho/S)/powerfactor
-	QList <double> m_Gamma;//glide angle = Atan(Cx/Cz), in degrees
-	QList <double> m_Rm;
-	QList <double> m_Ym;
-	QList <double> m_Pm;
-	QList <double> m_XCP;// centre of pressure X-position relative to the wing's root LE
-	QList <double> m_YCP;// centre of pressure Y-position relative to the wing's root LE
-    QList <double> m_ZCP;// centre of pressure Z-position relative to the wing's root LE
-	QList <double> m_MaxBending;
-	QList <double> m_VertPower;
-	QList <double> m_Oswald;
-	QList <double> m_SM;//pseudo Static Margin = (XCP-XCmRef)/m.a.c;
-	QList <double> m_Ctrl;//Ctrl variable
-	QList <double> m_XNP;
-	QList <double> m_PhugoidFrequency;
-	QList <double> m_PhugoidDamping;
-	QList <double> m_ShortPeriodFrequency;
-	QList <double> m_ShortPeriodDamping;
-	QList <double> m_DutchRollFrequency;
-	QList <double> m_DutchRollDamping;
-	QList <double> m_RollDamping;
-	QList <double> m_SpiralDamping;
-
-	complex<double> m_EigenValue[8][MAXPOLARPOINTS]; //until we have a QList<complex<double>> ?
-
-	//control data - Type 5-6-7 polars
-	int m_nControls;
-	double m_ControlGain[4*MAXCONTROLS];
 
 public:
-	enumAnalysisMethod m_AnalysisMethod;
-	enumPolarType m_WPolarType;
+	enumAnalysisMethod m_AnalysisMethod; /**< The method used for the analysis. May be one of the following types : LLTMETHOD, VLMMETHOD, PANELMETHOD */
+	bool          m_bVLM1;                /**< true if the analysis is performed with horseshoe vortices, flase if quad rings */
+	CVector       m_CoG;               /**< the position of the CoG */
+	double        m_Density;            /**< The fluid's density */
+	double        m_Mass;               /**< The mass for type 2 and type 7 polars */
+	double        m_WArea;              /**< The reference area for the calculation of aero coefficients */
+	double        m_WMAChord;           /**< The reference length = the mean aero chord, for the calculation of aero coefficients */
+	enumPolarType m_WPolarType;          /**< The type of analysis. May be one of the following types :FIXEDSPEEDPOLAR, FIXEDLIFTPOLAR, FIXEDAOAPOLAR, STABILITYPOLAR */
+	double        m_WSpan;              /**< The reference span for the calculation of aero coefficients */
 
-	double m_Beta;
-	double m_Density  ;
-	double m_WArea;//for lift and drag calculations
-	double m_WMAChord;// for moment calculations
-	double m_WSpan;//for moment calculations
 
-	//Inertia properties
-	double m_Mass;
-	bool m_bAutoInertia;
-	bool m_bThinSurfaces;
-	double m_CoGIxx, m_CoGIyy, m_CoGIzz, m_CoGIxz;
-	CVector m_CoG;
 
-	bool m_bVLM1;
-//	bool m_bAVLControls; // true if the control is defined only by its "gain" AVL-like
-//						 // false if the control is defined by Active/Min/Max params
 };
 
 #endif

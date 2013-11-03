@@ -32,7 +32,7 @@
 #include "../objects/Foil.h"
 
 
-extern CFoil* g_pCurFoil;
+extern Foil* g_pCurFoil;
 
 void *QXInverse::s_pMainFrame;
 void *QXInverse::s_p2DWidget;
@@ -72,8 +72,8 @@ QXInverse::QXInverse(QWidget *parent)
 	m_bSmooth  = false;
 	m_bXPressed = m_bYPressed = false;
 
-	m_pRefFoil = new CFoil();
-	m_pModFoil = new CFoil();
+	m_pRefFoil = new Foil();
+	m_pModFoil = new Foil();
 	m_pRefFoil->m_FoilColor  = QColor(255,0,0);
 	m_pRefFoil->m_nFoilStyle = 0;
 	m_pRefFoil->m_nFoilWidth = 0;
@@ -442,7 +442,7 @@ bool QXInverse::ExecQDES()
 }
 
 
-bool QXInverse::InitXFoil(CFoil * pFoil)
+bool QXInverse::InitXFoil(Foil * pFoil)
 {
 	//loads pFoil in XFoil, calculates normal vectors, and sets results in current foil
 	if(!pFoil) return  false;
@@ -1285,7 +1285,7 @@ void QXInverse::OnExtractFoil()
 		m_bMarked = false;
 		m_bSpline = false;
 		m_bSplined  = true;
-		CFoil *pFoil;
+		Foil *pFoil;
 		pFoil = pMainFrame->GetFoil(dlg.m_FoilName);
 		pMainFrame->SetCurrentFoil(pFoil);
 		m_pRefFoil->CopyFoil(pFoil);
@@ -1625,7 +1625,7 @@ void QXInverse::OnStoreFoil()
 	if(!m_bLoaded) return;
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 
-	CFoil* pFoil = new CFoil();
+	Foil* pFoil = new Foil();
 	pFoil->CopyFoil(m_pModFoil);
 	pFoil->m_nFoilStyle = 0;
 	pFoil->m_nFoilWidth = 1;
@@ -2054,7 +2054,7 @@ bool QXInverse::SetParams()
 {
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	XFoil *pXFoil = (XFoil*)m_pXFoil;
-	CFoil*pFoil;
+	Foil*pFoil;
 
 	if(m_bFullInverse)
 	{
@@ -2117,7 +2117,7 @@ bool QXInverse::SetParams()
 		//is there anything in the database ?
 		if(m_poaFoil->size())
 		{
-			pFoil = (CFoil*)m_poaFoil->at(0);
+			pFoil = (Foil*)m_poaFoil->at(0);
 			m_pRefFoil->CopyFoil(pFoil);
 			m_pRefFoil->m_FoilColor = m_pQCurve->color();
 			pXFoil->m_FoilName      = m_pRefFoil->m_FoilName ;

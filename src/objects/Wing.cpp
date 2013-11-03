@@ -42,17 +42,17 @@
 
 
 
-CVector *CWing::m_pWakeNode;			//pointer to the VLM wake node array
-CPanel  *CWing::m_pWakePanel;			//pointer to the VLM Wake Panel array
+CVector *Wing::m_pWakeNode;			//pointer to the VLM wake node array
+Panel  *Wing::m_pWakePanel;			//pointer to the VLM Wake Panel array
 
-void* CWing::s_pMainFrame;		//pointer to the Frame window
-void* CWing::s_pMiarex;	//pointer to the Miarex Application window
-void* CWing::s_p3DPanelDlg;//pointer to the 3DPanel analysis dialog class
-bool CWing::s_bVLMSymetric;
+void* Wing::s_pMainFrame;		//pointer to the Frame window
+void* Wing::s_pMiarex;	//pointer to the Miarex Application window
+void* Wing::s_p3DPanelDlg;//pointer to the 3DPanel analysis dialog class
+bool Wing::s_bVLMSymetric;
 
 
 
-CWing::CWing()
+Wing::Wing()
 {
 	memset(m_Ai, 0, sizeof(m_Ai));
 	memset(m_Twist, 0, sizeof(m_Twist));
@@ -146,7 +146,7 @@ CWing::CWing()
 	}
 }
 
-void CWing::ImportDefinition(QString path_to_file)
+void Wing::ImportDefinition(QString path_to_file)
 {
 	//Import the wing geometry from a text file
 	
@@ -216,7 +216,7 @@ void CWing::ImportDefinition(QString path_to_file)
 	}
 }
 
-void CWing::ExportDefinition(QString path_to_file)
+void Wing::ExportDefinition(QString path_to_file)
 {
 	//Import the wing geometry from a text file
 	
@@ -262,7 +262,7 @@ void CWing::ExportDefinition(QString path_to_file)
 }
 
 
-void CWing::ComputeDihedrals()
+void Wing::ComputeDihedrals()
 {
 	for (int is=0; is<NWingSection()-1; is++)
 	{
@@ -271,13 +271,13 @@ void CWing::ComputeDihedrals()
 }
 
 
-void CWing::ComputeGeometry()
+void Wing::ComputeGeometry()
 {
 	// Computes the wing's characteristics from the panel data
 	//
 	MainFrame *pMainFrame  = (MainFrame*)s_pMainFrame;
 //	QMiarex    *pMiarex = (QMiarex*)   s_pMiarex;
-	CFoil *pFoilA, *pFoilB;
+	Foil *pFoilA, *pFoilB;
 	double MinPanelSize;
 	int is;
 
@@ -358,7 +358,7 @@ void CWing::ComputeGeometry()
 #define NXSTATIONS 20
 #define NYSTATIONS 40
 
-void CWing::ComputeVolumeInertia(CVector &CoG, double &CoGIxx, double &CoGIyy, double &CoGIzz, double &CoGIxz)
+void Wing::ComputeVolumeInertia(CVector &CoG, double &CoGIxx, double &CoGIyy, double &CoGIzz, double &CoGIxz)
 {
 	//
 	// Returns the inertia properties of the structure based on the object's mass and on the existing geometry
@@ -503,7 +503,7 @@ void CWing::ComputeVolumeInertia(CVector &CoG, double &CoGIxx, double &CoGIyy, d
 }
 
 
-void CWing::ComputeBodyAxisInertia()
+void Wing::ComputeBodyAxisInertia()
 {
 	//
 	// Calculates the inertia tensor in geometrical (body) axis :
@@ -556,7 +556,7 @@ void CWing::ComputeBodyAxisInertia()
 
 
 
-void CWing::CreateSurfaces(CVector const &T, double XTilt, double YTilt)
+void Wing::CreateSurfaces(CVector const &T, double XTilt, double YTilt)
 {
 	//
 	// Constructs the surface objects based on the input data
@@ -825,7 +825,7 @@ void CWing::CreateSurfaces(CVector const &T, double XTilt, double YTilt)
 
 
 
-void CWing::ComputeChords(int NStation)
+void Wing::ComputeChords(int NStation)
 {
 	//
 	// Calculates the chord lengths at each position of the NStation in LLT calculations
@@ -906,7 +906,7 @@ void CWing::ComputeChords(int NStation)
 
 
 
-void CWing::ComputeChords(int NStation, double *chord, double *offset, double *twist)
+void Wing::ComputeChords(int NStation, double *chord, double *offset, double *twist)
 {
 	//
 	// Calculates the chord lengths at each position of the NStation in LLT calculations
@@ -987,7 +987,7 @@ void CWing::ComputeChords(int NStation, double *chord, double *offset, double *t
 
 
 
-void CWing::Duplicate(CWing *pWing)
+void Wing::Duplicate(Wing *pWing)
 {
 	//
 	// Copies the wing data from an existing wing
@@ -1061,7 +1061,7 @@ void CWing::Duplicate(CWing *pWing)
 
 
 
-bool CWing::ExportAVLWing(QTextStream &out, int index, double x, double y, double z, double Thetax, double Thetay)
+bool Wing::ExportAVLWing(QTextStream &out, int index, double x, double y, double z, double Thetax, double Thetay)
 {
 	// Exports the current wing to AVL format
 
@@ -1114,7 +1114,7 @@ bool CWing::ExportAVLWing(QTextStream &out, int index, double x, double y, doubl
 	out << ("\n\n");
 
 	//write only right wing surfaces since we have provided YDUPLICATE
-	CSurface ASurface;
+	Surface ASurface;
 	int iFlap = 1;
 //	int iSurface = 0;
 
@@ -1226,7 +1226,7 @@ bool CWing::ExportAVLWing(QTextStream &out, int index, double x, double y, doubl
 }
 
 
-double CWing::AverageSweep()
+double Wing::AverageSweep()
 {
 	//returns the wing's average sweep from root to tip
 	//measured at the quarter chord
@@ -1237,7 +1237,7 @@ double CWing::AverageSweep()
 }
 
 
-double CWing::C4(double yob, double xRef)
+double Wing::C4(double yob, double xRef)
 {
 	//returns the quarter-chord point xposition relative to XCmRef
 	double chord, offset, tau;
@@ -1258,7 +1258,7 @@ double CWing::C4(double yob, double xRef)
 }
 
 
-double CWing::Chord(double yob)
+double Wing::Chord(double yob)
 {
 	double chord = 0.0;
 	double tau;
@@ -1278,7 +1278,7 @@ double CWing::Chord(double yob)
 }
 
 
-double CWing::Dihedral(double yob)
+double Wing::Dihedral(double yob)
 {
 	double y= fabs(yob*m_PlanformSpan/2.0);//geometry is symetric
 	for(int is=0; is<NWingSection()-1; is++)
@@ -1293,7 +1293,7 @@ double CWing::Dihedral(double yob)
 }
 
 
-void CWing::GetFoils(CFoil **pFoil0, CFoil **pFoil1, double y, double &t)
+void Wing::GetFoils(Foil **pFoil0, Foil **pFoil1, double y, double &t)
 {
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 
@@ -1336,7 +1336,7 @@ void CWing::GetFoils(CFoil **pFoil0, CFoil **pFoil1, double y, double &t)
 
 
 
-double CWing::TotalMass()
+double Wing::TotalMass()
 {
 	double TotalMass = m_VolumeMass;
 	for(int im=0; im<m_MassValue.size(); im++)
@@ -1347,7 +1347,7 @@ double CWing::TotalMass()
 
 
 
-double CWing::Offset(double yob)
+double Wing::Offset(double yob)
 {
 	double tau, y;
 	double offset = 0.0;
@@ -1368,7 +1368,7 @@ double CWing::Offset(double yob)
 
 
 
-double CWing::Twist(double y)
+double Wing::Twist(double y)
 {
 	double tau;
 	// calculate twist at each station
@@ -1402,7 +1402,7 @@ double CWing::Twist(double y)
 }
 
 
-void CWing::GetViewYZPos(double xrel, double y, double &yv, double &zv, int pos)
+void Wing::GetViewYZPos(double xrel, double y, double &yv, double &zv, int pos)
 {
 	//returns the wing's absolute positions yv and zv from the relative value xrel and the planform span y
 	double tau;
@@ -1436,8 +1436,8 @@ void CWing::GetViewYZPos(double xrel, double y, double &yv, double &zv, int pos)
 			chord = Chord(fy*2./m_PlanformSpan);
 			zv -= (xrel-0.25)*chord*sin(twist);
 
-			CFoil *pFoil0 = NULL;
-			CFoil *pFoil1 = NULL;
+			Foil *pFoil0 = NULL;
+			Foil *pFoil1 = NULL;
 			GetFoils(&pFoil0, &pFoil1, y,  tau);
 
 			if(!pFoil0 || !pFoil1) return;
@@ -1463,7 +1463,7 @@ void CWing::GetViewYZPos(double xrel, double y, double &yv, double &zv, int pos)
 }
 
 
-double CWing::yrel(double SpanPos)
+double Wing::yrel(double SpanPos)
 {
 	double y = fabs(SpanPos);
 	for(int is=0; is<NWingSection()-1; is++)
@@ -1478,7 +1478,7 @@ double CWing::yrel(double SpanPos)
 }
 
 
-double CWing::ZPosition(double y)
+double Wing::ZPosition(double y)
 {
 	double tau;
 	double ZPos =0.0;
@@ -1504,8 +1504,8 @@ double CWing::ZPosition(double y)
 
 
 
-void CWing::PanelTrefftz(double QInf, double Alpha, double *Mu, double *Sigma, int pos, CVector &Force, double &WingIDrag,
-						 CWPolar *pWPolar, CPanel *pWakePanel, CVector *pWakeNode)
+void Wing::PanelTrefftz(double QInf, double Alpha, double *Mu, double *Sigma, int pos, CVector &Force, double &WingIDrag,
+						 WPolar *pWPolar, Panel *pWakePanel, CVector *pWakeNode)
 {
 	// calculates the induced lift and drag from the vortices or wake panels strength
 	// using a farfield method
@@ -1692,7 +1692,7 @@ void CWing::PanelTrefftz(double QInf, double Alpha, double *Mu, double *Sigma, i
 
 
 
-void CWing::PanelSetBending(bool bThinSurface)
+void Wing::PanelSetBending(bool bThinSurface)
 {
 	double ypos[MAXSPANSTATIONS+1], zpos[MAXSPANSTATIONS+1];
 	int j,k,jj,coef,p;
@@ -1761,7 +1761,7 @@ void CWing::PanelSetBending(bool bThinSurface)
 }
 
 
-void CWing::ScaleChord(double NewChord)
+void Wing::ScaleChord(double NewChord)
 {
 	// Scales the wing chord-wise so that the root chord is set to the NewChord value
 
@@ -1775,7 +1775,7 @@ void CWing::ScaleChord(double NewChord)
 }
 
 
-void CWing::ScaleSpan(double NewSpan)
+void Wing::ScaleSpan(double NewSpan)
 {
 	// Scales the wing span-wise to the NewSpan value
 
@@ -1788,7 +1788,7 @@ void CWing::ScaleSpan(double NewSpan)
 }
 
 
-bool CWing::SerializeWing(QDataStream &ar, bool bIsStoring, int ProjectFormat)
+bool Wing::SerializeWing(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 {
 	//saves or loads the wing data to the archive ar
 
@@ -2071,7 +2071,7 @@ bool CWing::SerializeWing(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 
 
 
-void CWing::ScaleSweep(double sweep)
+void Wing::ScaleSweep(double sweep)
 {
 	//
 	// Sets the average sweep measured at the quarter-chord to the new value Sweep
@@ -2101,7 +2101,7 @@ void CWing::ScaleSweep(double sweep)
 }
 
 
-void CWing::ScaleTwist(double twist)
+void Wing::ScaleTwist(double twist)
 {
 	//
 	// Scales the twist to the new value
@@ -2130,7 +2130,7 @@ void CWing::ScaleTwist(double twist)
 
 
 
-int CWing::VLMGetPanelTotal()
+int Wing::VLMGetPanelTotal()
 {
 //	QMiarex *pMiarex = (QMiarex*) s_pMiarex;
 	double MinPanelSize;
@@ -2149,9 +2149,9 @@ int CWing::VLMGetPanelTotal()
 }
 
 
-void CWing::PanelComputeOnBody(double QInf, double Alpha, double *Cp, double *Gamma, double &XCP, double &YCP, double &ZCP,
+void Wing::PanelComputeOnBody(double QInf, double Alpha, double *Cp, double *Gamma, double &XCP, double &YCP, double &ZCP,
 						 double &GCm, double &VCm, double &ICm, double &GRm, double &GYm, double &VYm,double &IYm,
-						 CWPolar *pWPolar, CVector CoG)
+						 WPolar *pWPolar, CVector CoG)
 
 {
 	//  Calculates the wing aero coefficients
@@ -2330,7 +2330,7 @@ void CWing::PanelComputeOnBody(double QInf, double Alpha, double *Cp, double *Ga
 }
 
 
-void CWing::PanelComputeViscous(double QInf, double Alpha, CWPolar *pWPolar, double &WingVDrag, bool bViscous, QString &OutString)
+void Wing::PanelComputeViscous(double QInf, double Alpha, WPolar *pWPolar, double &WingVDrag, bool bViscous, QString &OutString)
 {
 	// In input, takes the speed QInf and the distribution of lift coefficients m_Cl[] along the span
 	// In output, returns for each span station
@@ -2424,7 +2424,7 @@ void CWing::PanelComputeViscous(double QInf, double Alpha, CWPolar *pWPolar, dou
 }
 
 
-bool CWing::IsWingPanel(int nPanel)
+bool Wing::IsWingPanel(int nPanel)
 {
 	for(int p=0; p<m_MatSize; p++)
 	{
@@ -2434,7 +2434,7 @@ bool CWing::IsWingPanel(int nPanel)
 }
 
 
-bool CWing::IsWingNode(int nNode)
+bool Wing::IsWingNode(int nNode)
 {
 	for(int p=0; p<m_MatSize; p++)
 	{
@@ -2448,34 +2448,34 @@ bool CWing::IsWingNode(int nNode)
 
 
 
-double & CWing::Offset(const int &iSection)    {return m_WingSection[iSection]->m_Offset;}
-double & CWing::Dihedral(const int &iSection)  {return m_WingSection[iSection]->m_Dihedral;}
-double & CWing::Chord(const int &iSection)     {return m_WingSection[iSection]->m_Chord;}
-double & CWing::Twist(const int &iSection)     {return m_WingSection[iSection]->m_Twist;}
-double & CWing::YPosition(const int &iSection) {return m_WingSection[iSection]->m_YPosition;}
-double & CWing::Length(const int &iSection)    {return m_WingSection[iSection]->m_Length;}
-double & CWing::YProj(const int &iSection)     {return m_WingSection[iSection]->m_YProj;}
-double & CWing::ZPosition(const int &iSection) {return m_WingSection[iSection]->m_ZPos;}
+double & Wing::Offset(const int &iSection)    {return m_WingSection[iSection]->m_Offset;}
+double & Wing::Dihedral(const int &iSection)  {return m_WingSection[iSection]->m_Dihedral;}
+double & Wing::Chord(const int &iSection)     {return m_WingSection[iSection]->m_Chord;}
+double & Wing::Twist(const int &iSection)     {return m_WingSection[iSection]->m_Twist;}
+double & Wing::YPosition(const int &iSection) {return m_WingSection[iSection]->m_YPosition;}
+double & Wing::Length(const int &iSection)    {return m_WingSection[iSection]->m_Length;}
+double & Wing::YProj(const int &iSection)     {return m_WingSection[iSection]->m_YProj;}
+double & Wing::ZPosition(const int &iSection) {return m_WingSection[iSection]->m_ZPos;}
 
 
-int & CWing::NXPanels(const int &iSection)   {return m_WingSection[iSection]->m_NXPanels;}
-int & CWing::NYPanels(const int &iSection)   {return m_WingSection[iSection]->m_NYPanels;}
-int & CWing::XPanelDist(const int &iSection) {return m_WingSection[iSection]->m_XPanelDist;}
-int & CWing::YPanelDist(const int &iSection) {return m_WingSection[iSection]->m_YPanelDist;}
+int & Wing::NXPanels(const int &iSection)   {return m_WingSection[iSection]->m_NXPanels;}
+int & Wing::NYPanels(const int &iSection)   {return m_WingSection[iSection]->m_NYPanels;}
+int & Wing::XPanelDist(const int &iSection) {return m_WingSection[iSection]->m_XPanelDist;}
+int & Wing::YPanelDist(const int &iSection) {return m_WingSection[iSection]->m_YPanelDist;}
 
-QString & CWing::RightFoil(const int &iSection) {return m_WingSection[iSection]->m_RightFoilName;}
-QString & CWing::LeftFoil(const int &iSection)  {return m_WingSection[iSection]->m_LeftFoilName;}
+QString & Wing::RightFoil(const int &iSection) {return m_WingSection[iSection]->m_RightFoilName;}
+QString & Wing::LeftFoil(const int &iSection)  {return m_WingSection[iSection]->m_LeftFoilName;}
 
 
 
-void CWing::RemoveWingSection(int const iSection)
+void Wing::RemoveWingSection(int const iSection)
 {
 	if(iSection<0 || iSection>=m_WingSection.size()) return;
 	m_WingSection.removeAt(iSection);
 }
 
 
-void CWing::InsertSection(int iSection)
+void Wing::InsertSection(int iSection)
 {
 	if(iSection==0)                          m_WingSection.prepend(new WingSection);
 	else if(iSection>=m_WingSection.size())  m_WingSection.append(new WingSection);
@@ -2483,7 +2483,7 @@ void CWing::InsertSection(int iSection)
 }
 
 
-bool CWing::AppendWingSection()
+bool Wing::AppendWingSection()
 {
 	if(m_WingSection.size()>MAXSPANSECTIONS) return false;
 	m_WingSection.append(new WingSection());
@@ -2491,7 +2491,7 @@ bool CWing::AppendWingSection()
 }
 
 
-bool CWing::AppendWingSection(double Chord, double Twist, double Pos, double Dihedral, double Offset,
+bool Wing::AppendWingSection(double Chord, double Twist, double Pos, double Dihedral, double Offset,
 					   int NXPanels, int NYPanels, int XPanelDist, int YPanelDist,
 						QString RightFoilName, QString LeftFoilName)
 {

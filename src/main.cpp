@@ -25,7 +25,7 @@
 #include <QSplashScreen>
 #include <QMessageBox>
 
-CFoil *g_pCurFoil;	//make it common to all applications
+Foil *g_pCurFoil;	//make it common to all applications
 
 int main(int argc, char *argv[])
 {

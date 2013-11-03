@@ -31,7 +31,7 @@
 
 
 
-CFoil::CFoil()
+Foil::Foil()
 {
 	m_nFoilStyle = 0;
 	m_nFoilWidth = 1;
@@ -92,7 +92,7 @@ CFoil::CFoil()
 
 
 
-bool CFoil::CompMidLine(bool bParams)
+bool Foil::CompMidLine(bool bParams)
 {
 	//  Calculates the foil's thickness and camber for the base foil
 
@@ -140,7 +140,7 @@ bool CFoil::CompMidLine(bool bParams)
 }
 
 
-void CFoil::CopyFoil(CFoil *pSrcFoil)
+void Foil::CopyFoil(Foil *pSrcFoil)
 {
 	// Copies the foil from a source foil
 
@@ -191,7 +191,7 @@ void CFoil::CopyFoil(CFoil *pSrcFoil)
 
 
 
-double CFoil::DeRotate()
+double Foil::DeRotate()
 {
 	//De-rotates the foil, i.e. aligns the mid-line with the x-axis
 
@@ -244,7 +244,7 @@ double CFoil::DeRotate()
 }
 
 
-void CFoil::DrawFoil(QPainter &painter, double const &alpha, double const &scalex, double const &scaley, QPoint const &Offset)
+void Foil::DrawFoil(QPainter &painter, double const &alpha, double const &scalex, double const &scaley, QPoint const &Offset)
 {
 	static double xa, ya, sina, cosa;
 	static QPoint From, To;
@@ -313,7 +313,7 @@ void CFoil::DrawFoil(QPainter &painter, double const &alpha, double const &scale
 }
 
 
-void CFoil::DrawMidLine(QPainter &painter, double const &scalex, double const &scaley, QPoint const &Offset)
+void Foil::DrawMidLine(QPainter &painter, double const &scalex, double const &scaley, QPoint const &Offset)
 {
 	static QPoint From, To;
 	static int k;
@@ -341,7 +341,7 @@ void CFoil::DrawMidLine(QPainter &painter, double const &scalex, double const &s
 
 
 
-void CFoil::DrawPoints(QPainter &painter, double const &scalex, double const &scaley, QPoint const &Offset)
+void Foil::DrawPoints(QPainter &painter, double const &scalex, double const &scaley, QPoint const &Offset)
 {
 	static int width;
 	static QPoint pt1;
@@ -377,7 +377,7 @@ void CFoil::DrawPoints(QPainter &painter, double const &scalex, double const &sc
 
 
 
-bool CFoil::ExportFoil(QTextStream &out)
+bool Foil::ExportFoil(QTextStream &out)
 {
     int i;
 
@@ -395,7 +395,7 @@ bool CFoil::ExportFoil(QTextStream &out)
 }
 
 
-double CFoil::GetArea()
+double Foil::GetArea()
 {
 	int i;
 	double area = 0.0;
@@ -407,7 +407,7 @@ double CFoil::GetArea()
 }
 
 
-double CFoil::GetBaseLowerY(double const &x)
+double Foil::GetBaseLowerY(double const &x)
 {
 	static int i;
 	static double y;
@@ -426,7 +426,7 @@ double CFoil::GetBaseLowerY(double const &x)
 	return 0.0;
 }
 
-double CFoil::GetBaseUpperY(double const &x)
+double Foil::GetBaseUpperY(double const &x)
 {
 	static double y;
 	static int i;
@@ -446,7 +446,7 @@ double CFoil::GetBaseUpperY(double const &x)
 }
 
 
-double CFoil::GetBotSlope(double const &x)
+double Foil::GetBotSlope(double const &x)
 {
 	//returns the bottom slope at position x
 	static int i;
@@ -464,7 +464,7 @@ double CFoil::GetBotSlope(double const &x)
 }
 
 
-double CFoil::GetCamber(double const &x)
+double Foil::GetCamber(double const &x)
 {
 	//returns the camber value at position x
 	for (int i=0; i<=1000; i++)
@@ -477,7 +477,7 @@ double CFoil::GetCamber(double const &x)
 	return 0.0;
 }
 
-double CFoil::GetCamberAngle(double const &x)
+double Foil::GetCamberAngle(double const &x)
 {
 	//returns the camber angle at position x
 	static int i;
@@ -495,7 +495,7 @@ double CFoil::GetCamberAngle(double const &x)
 }
 
 
-double CFoil::GetCamberSlope(double const &x)
+double Foil::GetCamberSlope(double const &x)
 {
 	//returns the camber slope at position x
 	static int i;
@@ -516,12 +516,12 @@ double CFoil::GetCamberSlope(double const &x)
 }
 
 
-void CFoil::GetFoilName(QString &FoilName)
+void Foil::GetFoilName(QString &FoilName)
 {
 	FoilName =  m_FoilName;
 }
 
-double CFoil::GetLength()
+double Foil::GetLength()
 {
 	//Returns the foil's length
 
@@ -529,7 +529,7 @@ double CFoil::GetLength()
 }
 
 
-double CFoil::GetLowerY(double x)
+double Foil::GetLowerY(double x)
 {
 	// Returns the y-coordinate on the current foil's lower surface at the x position
 	x = m_rpIntrados[0].x + x*(m_rpIntrados[m_iInt].x-m_rpIntrados[0].x);//in case there is a flap which reduces the length
@@ -548,7 +548,7 @@ double CFoil::GetLowerY(double x)
 }
 
 
-void CFoil::GetLowerY(double x, double &y, double &normx, double &normy)
+void Foil::GetLowerY(double x, double &y, double &normx, double &normy)
 {
 	// Returns the y-coordinate on the current foil's lower surface at the x position
 
@@ -571,14 +571,14 @@ void CFoil::GetLowerY(double x, double &y, double &normx, double &normy)
 }
 
 
-double CFoil::GetMidY(double const &x)
+double Foil::GetMidY(double const &x)
 {
 	//Returns the current foil's mid position at the x position
 	return (GetUpperY(x)+GetLowerY(x))/2.0;
 }
 
 
-double CFoil::GetTopSlope(double const &x)
+double Foil::GetTopSlope(double const &x)
 {
 	//returns the upper slope at position x
 	static int i;
@@ -596,7 +596,7 @@ double CFoil::GetTopSlope(double const &x)
 
 
 
-double CFoil::GetUpperY(double x)
+double Foil::GetUpperY(double x)
 {
 	// Returns the y-coordinate on the current foil's upper surface at the x position
 	x = m_rpExtrados[0].x + x*(m_rpExtrados[m_iExt].x-m_rpExtrados[0].x);//in case there is a flap which reduces the length
@@ -614,7 +614,7 @@ double CFoil::GetUpperY(double x)
 }
 
 
-void CFoil::GetUpperY(double x, double &y, double &normx, double &normy)
+void Foil::GetUpperY(double x, double &y, double &normx, double &normy)
 {
 	static double nabs;
 	static int i;
@@ -638,7 +638,7 @@ void CFoil::GetUpperY(double x, double &y, double &normx, double &normy)
 
 
  
-bool CFoil::InitFoil()
+bool Foil::InitFoil()
 {
 	//Initializes the foil geometry,
 	// constructs the upper and lower points
@@ -747,7 +747,7 @@ bool CFoil::InitFoil()
 
 
 
-bool CFoil::Intersect(CVector const &A, CVector const &B, CVector const &C, CVector const &D, CVector *M)
+bool Foil::Intersect(CVector const &A, CVector const &B, CVector const &C, CVector const &D, CVector *M)
 {
 	//ABCD are assumed to lie in the xy plane
 	//returns true and intersection point M if AB and CD intersect inside
@@ -785,7 +785,7 @@ bool CFoil::Intersect(CVector const &A, CVector const &B, CVector const &C, CVec
 
 
 
-bool CFoil::IsBetween(int f, int f1, int f2)
+bool Foil::IsBetween(int f, int f1, int f2)
 {
 	if (f2 < f1)
 	{
@@ -799,7 +799,7 @@ bool CFoil::IsBetween(int f, int f1, int f2)
 }
 
 
-bool CFoil::IsBetween(int f, double f1, double f2)
+bool Foil::IsBetween(int f, double f1, double f2)
 {
 	static double ff;
 	ff = f;
@@ -815,7 +815,7 @@ bool CFoil::IsBetween(int f, double f1, double f2)
 }
 
 
-int CFoil::IsPoint(CVector const &Real)
+int Foil::IsPoint(CVector const &Real)
 {
 	// Returns the index of foil's point which coincides with the input point, if any
 	// Otherwise returns -10
@@ -828,7 +828,7 @@ int CFoil::IsPoint(CVector const &Real)
 }
 
 
-double CFoil::NormalizeGeometry()
+double Foil::NormalizeGeometry()
 {
 	// Normalizes the base foil's lengh to unity
 	// The current foil's length is modified by the same ratio
@@ -874,7 +874,7 @@ double CFoil::NormalizeGeometry()
 }
 
 
-bool CFoil::Serialize(QDataStream &ar, bool bIsStoring, int ProjectFormat)
+bool Foil::Serialize(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 {
 	// saves or loads the foil to the archive ar
 
@@ -995,7 +995,7 @@ bool CFoil::Serialize(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 }
 
 
-void CFoil::SetNaca009()
+void Foil::SetNaca009()
 {	
 	// Reset the foil to Naca 009
 	x[0]  = 1.00000    ; y[0]  = 0.00000;
@@ -1046,7 +1046,7 @@ void CFoil::SetNaca009()
 
 
 
-void  CFoil::SetTEFlapData(bool bFlap, double xhinge, double yhinge, double angle)
+void  Foil::SetTEFlapData(bool bFlap, double xhinge, double yhinge, double angle)
 {
 	// Sets a trailing edge flap properties
 	// x and y hinge are in relative % coordinates
@@ -1059,7 +1059,7 @@ void  CFoil::SetTEFlapData(bool bFlap, double xhinge, double yhinge, double angl
 }
 
 
-void  CFoil::SetLEFlapData(bool bFlap, double xhinge, double yhinge, double angle)
+void  Foil::SetLEFlapData(bool bFlap, double xhinge, double yhinge, double angle)
 {
 	// Sets a leading edge flap properties
 	// x and y hinge are in relative % coordinates
@@ -1071,7 +1071,7 @@ void  CFoil::SetLEFlapData(bool bFlap, double xhinge, double yhinge, double angl
 }
 
 
-void CFoil::SetLEFlap()
+void Foil::SetLEFlap()
 {
 	int i, j, k, l, p, i1, i2;
 	i=j=k=l=p=i1=i2=0;
@@ -1192,7 +1192,7 @@ void CFoil::SetLEFlap()
 		m_rpIntrados[i].y = yh + sina * dx + cosa * dy;
 	}
 
-	CSpline LinkSpline;
+	Spline LinkSpline;
 	LinkSpline.m_iRes = 4;
 	LinkSpline.m_iDegree = 2;
 	LinkSpline.m_CtrlPoint.clear();
@@ -1321,7 +1321,7 @@ void CFoil::SetLEFlap()
 }
 
 
-void CFoil::SetTEFlap()
+void Foil::SetTEFlap()
 {
 	int i, j, k, l, p, i1, i2;
 	double xh, yh, dx, dy;
@@ -1432,7 +1432,7 @@ void CFoil::SetTEFlap()
 		m_rpIntrados[i].y = yh - sina * dx + cosa * dy;
 	}
 
-	CSpline LinkSpline;
+	Spline LinkSpline;
 	LinkSpline.m_iRes = 4;
 	LinkSpline.m_iDegree = 2;
 	LinkSpline.m_CtrlPoint.clear();
@@ -1564,7 +1564,7 @@ void CFoil::SetTEFlap()
 }
 
 
-void CFoil::SetFlap()
+void Foil::SetFlap()
 {
 	int i;
 	// modifies the current airfoil's geometry 
@@ -1599,7 +1599,7 @@ void CFoil::SetFlap()
 }
 
 
-bool CFoil::SetCamber(double f, double u)
+bool Foil::SetCamber(double f, double u)
 {
 	// keeps the same thickness distribution
 	//c is the new camber, as a % of the chord
