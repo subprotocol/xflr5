@@ -1,7 +1,7 @@
 /****************************************************************************
 
 	PanelAnalysisDlg Class
-	Copyright (C) 2009-2012 Andre Deperrois adeperrois@xflr5.com
+	Copyright (C) 2009-2013 Andre Deperrois adeperrois@xflr5.com
 
 	This program is free software; you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -20,6 +20,13 @@
 *****************************************************************************/
  
 
+/**
+ *@file
+ *
+ * This file contains the PanelAnalysisDlg class, which is used to perform VLM and 3D-Panel analysis
+ *
+ */
+
 #ifndef PANELANALYSISDLG_H
 #define PANELANALYSISDLG_H
 
@@ -36,7 +43,15 @@
 #include "../objects/CVector.h"
 
 
-
+/**
+ *@class PanelAnalysisDlg
+ *@brief The class is used to perform VLM and 3D-ponel analysis
+ 
+ For convenience, the class is derived from the QDialog class. 
+ The dialog interface allows the user to visualize the progress of the analysis, and to interrupt it as necessary.
+ Ideally for oop good practices, the MMI should be implemented in a class separate
+ from the class which performs the analysis.
+ */
 class PanelAnalysisDlg : public QDialog
 {
 	Q_OBJECT

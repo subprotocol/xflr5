@@ -20,9 +20,36 @@
 *****************************************************************************/
 
 
+/*! \file
+ *
+ * This class defines the surface object on which the panels are constructed for the VLM and 3d-panel calculations.
+ *
+ */
+
+
+
 
 #ifndef SURFACE_H
 #define SURFACE_H
+
+
+/**
+*@class Surface
+*@brief
+ * The class which defines the surface object on which the panels are constructed for the VLM and 3d-panel calculations.
+ *
+ A surface extends from one span section to the next  in the spanwise directions.
+
+ Surfaces are constructed and indexed from left tip to right tip.
+
+ For a half-wing, there will be one surface less than the number of span sections defined by the user.
+
+ The data is stored in International Standard Units, i.e. meters, seconds, kg, and Newtons.
+ Angular data is stored in degrees.
+*/
+
+
+
 #include "Foil.h"
 #include "Body.h"
 #include "CVector.h"
@@ -98,11 +125,11 @@ private :
 	static Panel *s_pPanel;
 	static CVector *s_pNode;
 
-	bool m_bIsInSymPlane;
-	bool m_bTEFlap;
+	bool m_bIsInSymPlane; /**< true if the surface is positioned in the symetry xz plane defined by y=0. Case of a single fin. */
+	bool m_bTEFlap;       /**< true if the surface has a flap on the trailing edge */
 	bool m_bIsLeftSurf, m_bIsRightSurf;
 	bool m_bIsTipLeft, m_bIsTipRight;
-	bool m_bIsCenterSurf;//true if is either left or right center surface... need to connect to body
+	bool m_bIsCenterSurf; /**< true if is either left or right center surface... need to connect to body */
 
 	CVector m_LA, m_LB, m_TA, m_TB;
 	CVector Normal, NormalA, NormalB;
@@ -110,16 +137,16 @@ private :
 	CVector NA, NB;
 
 	double m_TwistA, m_TwistB;
-	double m_Length;// along span-y direction...
+	double m_Length; /**< along span-y direction... */
 	double y1, y2, xLA, xTA, xLB, xTB;
 	double chordA, chordB, zA, zB, Chord, Length;
-	double m_posATE, m_posBTE;//flap break positions at sides A and B
+	double m_posATE, m_posBTE;    /**< flap break positions at sides A and B */
 	double m_xPointA[MAXCHORDPANELS], m_xPointB[MAXCHORDPANELS];	//chorwise position of VLM panels
 
 
 	int m_XDistType;
 	int m_YDistType;
-	int m_NXLead, m_NXFlap;//number of panels before and after the break
+	int m_NXLead, m_NXFlap;     /**< number of panels before and after the break */
 	int m_NElements;
 
 	int m_nFlapNodes, m_nFlapPanels;
@@ -132,10 +159,10 @@ private :
 	Surface *m_pLeftSurface, *m_pRightSurface;
 
 public:
-	bool m_bJoinRight; //true if the surface's right side should be connected to the next right surface's right left side - for panel analysis only
-	static CVector LA, LB, TA, TB;//leading and trailing corners of strip k
-	int m_NYPanels;
-	int m_NXPanels;
+	bool m_bJoinRight; /**< true if the surface's right side should be connected to the next right surface's right left side - for panel analysis only */
+	static CVector LA, LB, TA, TB; /**< leading and trailing corners of strip k */
+	int m_NYPanels;    /**< the number of spanwise panels of this surface */
+	int m_NXPanels;    /**< the number of chordwise panels of this surface */
 	Foil *m_pFoilA, *m_pFoilB; //Left and right foils
 	
 };

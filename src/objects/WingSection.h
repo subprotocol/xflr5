@@ -20,31 +20,63 @@
 *****************************************************************************/
 
 
+
+/**
+ *@file This class defines the wing section object used to define wing geometries.
+ */
+
+
 #ifndef WINGSECTION_H
 #define WINGSECTION_H
+
+
+/**
+*@class WingSection
+*@brief  The class which defines the wing section object used to construct wing geometries.
+
+*/
 
 #include <QString>
 
 class WingSection
 {
 public:
-	WingSection();
+	WingSection()
+	{
+		m_NXPanels   = 0;
+		m_NYPanels   = 0;
+		m_XPanelDist = 0;
+		m_YPanelDist = 0;
 
-	int m_NXPanels; 		// VLM Panels along chord, for each Wing Panel
-	int m_NYPanels; 		// VLM Panels along span, for each Wing Panel
-	int m_XPanelDist;		// VLM Panel distribution type, for each Wing Panel
-	int m_YPanelDist;		// VLM Panel distribution type, for each Wing Panel
+		m_Chord    = 0.0;
+		m_Length   = 0.0;
+		m_YPosition      = 0.0;
+		m_YProj    = 0.0;
+		m_Offset   = 0.0;
+		m_Dihedral = 0.0;
+		m_ZPos     = 0.0;
+		m_Twist    = 0.0;
 
-	double m_Chord;		// Chord length at each panel side
-	double m_Length;		// the length of each panel
-	double m_YPosition;		// b-position of each panel end on developed surface
-	double m_YProj;		// b-position of each panel end projected on horizontal surface
-	double m_Offset;		// b-position of each panel end
-	double m_Dihedral;	// b-position of each panel end
-	double m_ZPos;		// vertical offset - calculation result only
-	double m_Twist;		//Twist value of each foil (measured to the wing root)
+		m_RightFoilName.clear();
+		m_LeftFoilName.clear();
+	}
 
-	QString m_RightFoilName, m_LeftFoilName;
+	int m_NXPanels;         /**< VLM Panels along chord, for each Wing Panel */
+	int m_NYPanels;         /**< VLM Panels along span, for each Wing Panel */
+	int m_XPanelDist;       /**< VLM Panel distribution type, for each Wing Panel */
+	int m_YPanelDist;       /**< VLM Panel distribution type, for each Wing Panel */
+
+	double m_Chord;         /**< Chord length at each panel side */
+	double m_Length;        /**< the length of each panel */
+	double m_YPosition;     /**< b-position of each panel end on developed surface */
+	double m_YProj;         /**< b-position of each panel end projected on tbe xy plane */
+	double m_Offset;        /**< b-position of each panel end */
+	double m_Dihedral;      /**< b-position of each panel end */
+	double m_ZPos;          /**< vertical offset - calculation result only */
+	double m_Twist;         /**< Twist value of each foil (measured to the wing root) */
+
+	QString m_LeftFoilName;  /**< The name of the foil on the leftt side of the section */
+	QString m_RightFoilName; /**< The name of the foil on the right side of the section */
 };
 
 #endif // WINGSECTION_H

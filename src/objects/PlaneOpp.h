@@ -21,13 +21,30 @@
 
 
 
-#ifndef POPP_H
-#define POPP_H
+/*! \file
+ *
+ * This class defines the operating point object for the 3D analysis of planes
+ *
+ */
 
 
-#include "WOpp.h"
+#ifndef PLANEOPP_H
+#define PLANEOPP_H
+
+
+#include "WingOpp.h"
 #include <QDataStream>
 
+/**
+*@brief
+*	This class defines the operating point object which stores the data of plane analysis
+*
+	Each instance of this class is uniquely associated to an instance of a WPolar, which is itself uniquely
+	associated to a Wing or a Plane object.
+	The results associated to each of the plane's wing is stored in WingOpp objects, declared as member variables.
+	The data is stored in International Standard Units, i.e. meters, seconds, kg, and Newtons.
+	Angular data is stored in degrees.
+*/
 class PlaneOpp
 {
 	friend class QMiarex;

@@ -18,7 +18,9 @@
 	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 *****************************************************************************/
-
+/**
+* This file contains the declaration of methods used throughout the program and not specific to one application.
+*/
 
 #ifndef GLOBALS_H
 #define GLOBALS_H
@@ -86,9 +88,6 @@ void SetUnits(int LUnit, int AUnit, int SUnit, int WUnit, int FUnit, int MUnit,
 Qt::PenStyle GetStyle(int s);
 
 
-double Bernstein(int const &i, int const &n, double const &u);
-double BezierBlend(int const &k, int const &n, double const&u);
-
 double Det44(double *aij);
 double Det33(double *aij);
 complex<double> Det33(complex<double> *aij);
@@ -123,7 +122,6 @@ void GetLinearizedPolar(QList<void*>*m_poaPolar, Foil *pFoil0, Foil *pFoil1, dou
 bool SplineInterpolation(int n, double *x, double *y,  double *a, double *b, double *c, double *d);
 double SplineBlend(int const &index, int const &p, double const &t, double *knots);
 
-double GetInterpolation(double t, double *y, int m, double *a, double *b, double *c, double *d);
 
 int Compare(complex<double> a, complex<double>b);
 void ComplexSort(complex<double>*array, int ub);

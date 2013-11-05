@@ -21,8 +21,18 @@
 *****************************************************************************/
 
 
+
+/**
+ *@file This class defines the spline object used in foil design.
+ */
+
+
 #ifndef SPLINE_H
 #define SPLINE_H
+
+
+
+
 #include <QPainter>
 #include <QFile>
 #include <QList>
@@ -30,6 +40,15 @@
 #include "../objects/CVector.h"
 #include "../params.h"
 
+
+/**
+*@class Spline
+*@brief  The class which defines the spline object.
+
+The spline is used in direct foil design to represent upper and lower surfaces, and in XInverse foil design to define the specification curve.
+
+Based on the code provided by Paul Bourke.
+*/
 class Spline
 {
 	friend class SplineFoil;
@@ -68,8 +87,8 @@ public:
 
 	double m_PtWeight;
 
-	QList<double> m_knot;
-	QList<CVector> m_CtrlPoint;
+	QList<double> m_knot;            /**< the array of the values of the spline's knot */
+	QList<CVector> m_CtrlPoint;      /**< the array of the positions of the spline's control points */
 	CVector m_Output[IQX2];
 
 

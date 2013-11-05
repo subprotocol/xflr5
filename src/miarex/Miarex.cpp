@@ -8160,7 +8160,6 @@ void QMiarex::OnDefineStabPolar()
  */
 void QMiarex::OnDefineWPolar()
 {
-
 	if(!m_pCurWing) return;
 
 	StopAnimate();
@@ -9040,11 +9039,11 @@ void QMiarex::OnExportCurWOpp()
 	if(!m_pCurWOpp)return ;// is there anything to export ?
 
 	int iStrip,j,k,l,p, coef;
-	int exporttype;
+	enumTextFileType exporttype;
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	QString filter;
-	if(pMainFrame->m_ExportFileType==1) filter = "Text File (*.txt)";
-	else                                filter = "Comma Separated Values (*.csv)";
+	if(pMainFrame->m_ExportFileType==TXT) filter = "Text File (*.txt)";
+	else                                  filter = "Comma Separated Values (*.csv)";
 
 	QString FileName, sep, str, strong, Format;
 
@@ -9063,8 +9062,8 @@ void QMiarex::OnExportCurWOpp()
 	int pos = FileName.lastIndexOf("/");
 	if(pos>0) pMainFrame->m_LastDirName = FileName.left(pos);
 	pos = FileName.lastIndexOf(".csv");
-	if (pos>0) pMainFrame->m_ExportFileType = 2;
-	else       pMainFrame->m_ExportFileType = 1;
+	if (pos>0) pMainFrame->m_ExportFileType = CSV;
+	else       pMainFrame->m_ExportFileType = TXT;
 	exporttype = pMainFrame->m_ExportFileType;
 
 
@@ -9074,7 +9073,7 @@ void QMiarex::OnExportCurWOpp()
 
 	QTextStream out(&XFile);
 
-	if(exporttype==1) sep = ""; else sep=",";
+	if(exporttype==TXT) sep = ""; else sep=",";
 
 
 	out << pMainFrame->m_VersionName;
@@ -9110,7 +9109,7 @@ void QMiarex::OnExportCurWOpp()
 	strong = QString("Cy    = "+sep+"%1\n").arg(m_pCurWOpp->m_CY,11, 'f', 6);
 	out << strong;
 
-	if(exporttype==1) strong = QString(tr("Cd    = %1     ICd   = %2     PCd   = %3\n"))
+	if(exporttype==TXT) strong = QString(tr("Cd    = %1     ICd   = %2     PCd   = %3\n"))
 		.arg(m_pCurWOpp->m_ICD+m_pCurWOpp->m_VCD,11, 'f', 6)
 		.arg(m_pCurWOpp->m_ICD,11, 'f', 6)
 		.arg(m_pCurWOpp->m_VCD,11, 'f', 6);
@@ -9125,16 +9124,16 @@ void QMiarex::OnExportCurWOpp()
 	strong = QString(tr("Cm   =")+sep+" %1\n").arg(m_pCurWOpp->m_GCm, 11,'g',6);
 	out << strong;
 
-	if(exporttype==1) strong = QString(tr("ICn   = %1     PCn   = %2 \n")).arg(m_pCurWOpp->m_IYm, 11, 'f', 6).arg(m_pCurWOpp->m_GYm, 11, 'f', 6);
-	else        strong = QString(tr("ICn=, %1,PCn=, %2\n")).arg(m_pCurWOpp->m_IYm, 11, 'f', 6).arg(m_pCurWOpp->m_GYm, 11, 'f', 6);
+	if(exporttype==TXT) strong = QString(tr("ICn   = %1     PCn   = %2 \n")).arg(m_pCurWOpp->m_IYm, 11, 'f', 6).arg(m_pCurWOpp->m_GYm, 11, 'f', 6);
+	else                strong = QString(tr("ICn=, %1,PCn=, %2\n")).arg(m_pCurWOpp->m_IYm, 11, 'f', 6).arg(m_pCurWOpp->m_GYm, 11, 'f', 6);
 	out << strong;
 
-	if(exporttype==1) strong = QString("XCP   = %1     YCP   = %2     ZCP   = %3  \n").arg(m_pCurWOpp->m_XCP, 11, 'f', 6).arg(m_pCurWOpp->m_YCP, 11, 'f', 6).arg(m_pCurWOpp->m_ZCP, 11, 'f', 6);
-	else        strong = QString("XCP=, %1, YCP=, %2, ZCP=, %3 \n").arg(m_pCurWOpp->m_XCP, 11, 'f', 6).arg(m_pCurWOpp->m_YCP, 11, 'f', 6).arg(m_pCurWOpp->m_ZCP, 11, 'f', 6);
+	if(exporttype==TXT) strong = QString("XCP   = %1     YCP   = %2     ZCP   = %3  \n").arg(m_pCurWOpp->m_XCP, 11, 'f', 6).arg(m_pCurWOpp->m_YCP, 11, 'f', 6).arg(m_pCurWOpp->m_ZCP, 11, 'f', 6);
+	else                strong = QString("XCP=, %1, YCP=, %2, ZCP=, %3 \n").arg(m_pCurWOpp->m_XCP, 11, 'f', 6).arg(m_pCurWOpp->m_YCP, 11, 'f', 6).arg(m_pCurWOpp->m_ZCP, 11, 'f', 6);
 	out << strong;
 
-	if(exporttype==1) strong = QString("XNP   = %1\n").arg(m_pCurWOpp->m_XNP, 11, 'f', 6);
-	else        strong = QString("XNP=, %1\n").arg(m_pCurWOpp->m_XNP, 11, 'f', 6);
+	if(exporttype==TXT) strong = QString("XNP   = %1\n").arg(m_pCurWOpp->m_XNP, 11, 'f', 6);
+	else                strong = QString("XNP=, %1\n").arg(m_pCurWOpp->m_XNP, 11, 'f', 6);
 	out << strong;
 
 
@@ -9144,7 +9143,7 @@ void QMiarex::OnExportCurWOpp()
 	if(m_pCurWPolar->m_WPolarType==STABILITYPOLAR)
 	{
 		//export non dimensional stability derivatives
-		if(exporttype==1)
+		if(exporttype==TXT)
 		{
 //			complex<double> c, angle;
 			double u0 = m_pCurWOpp->m_QInf;
@@ -9373,8 +9372,8 @@ void QMiarex::OnExportCurWPolar()
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	QString FileName, filter;
 
-	if(pMainFrame->m_ExportFileType==1) filter = "Text File (*.txt)";
-	else                                filter = "Comma Separated Values (*.csv)";
+	if(pMainFrame->m_ExportFileType==TXT) filter = "Text File (*.txt)";
+	else                                  filter = "Comma Separated Values (*.csv)";
 
 	FileName = m_pCurWPolar->m_PlrName;
 	FileName.replace("/", " ");
@@ -9387,8 +9386,8 @@ void QMiarex::OnExportCurWPolar()
 	int pos = FileName.lastIndexOf("/");
 	if(pos>0) pMainFrame->m_LastDirName = FileName.left(pos);
 	pos = FileName.lastIndexOf(".csv");
-	if (pos>0) pMainFrame->m_ExportFileType = 2;
-	else       pMainFrame->m_ExportFileType = 1;
+	if (pos>0) pMainFrame->m_ExportFileType = CSV;
+	else       pMainFrame->m_ExportFileType = TXT;
 
 	QFile XFile(FileName);
 
@@ -15644,7 +15643,7 @@ void QMiarex::OnWOppProps()
  * @param pPanel a pointer to the array of surface panels to be rotated
  * @param pNode  a pointer to the array of mesh nodes to be rotated
  * @param t the value of the control parameter which defines the amount of rotation
- * @param &NCtrls - unused @todo check and remove
+ * @param &NCtrls counts tha active controls
  * @param &out the output message for the log file
  * @param bBCOnly, if true, then only the control points and normal vector and rotates; if not,the whole geometry is rotated
  */

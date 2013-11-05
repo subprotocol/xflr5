@@ -19,8 +19,27 @@
 
 *****************************************************************************/
 
+/*! \file
+ *
+ * This class :
+ *	- defines the plane object
+ *	- provides the methods for the calculation of the plane's geometric properties
+ * The data is stored in International Standard Units, i.e. meters, kg, and seconds
+ * Angular data is stored in degrees
+ */
+
+
+
 #ifndef PLANE_H
 #define PLANE_H
+
+
+/**
+*@class Plane
+*@brief
+*	The class which defines the Plane object used in 3D calculations.
+
+*/
 
 #include "Wing.h"
 #include "Body.h"

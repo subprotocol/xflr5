@@ -20,6 +20,11 @@
 *****************************************************************************/
 
 
+/**
+*@file This file contains the declaration of the class ThreeDWidget, 
+*used for 3d openGL-based drawing in the central area of the application's MainFrame.
+*/
+
 #ifndef THREEDWIDGET_H
 #define THREEDWIDGET_H
 
@@ -29,9 +34,18 @@
 #include "objects/ArcBall.h"
 #include "misc/GLLightDlg.h"
 
-
+/** @enum This enumeration lists the different 3D views used in the program, i.e. the view in Miarex, in Body edition and in Wing edition.*/
 typedef enum {GLMIAREXVIEW,GLBODYVIEW, GLWINGVIEW} enumGLView;
 
+
+/**
+*@class ThreeDWidget 
+* @brief This class is used for 3d OpenGl-based drawing in the central area of the application's MainFrame.
+
+* There is a unique instance of this class, attached to the QStackedWidget of the MainFrame.
+* Depending on the active application, this class calls the drawings methods in QMiarex, in the GLBodyDlg or in GLWingDlg.
+* All Qt events received by this widget are sent to the child windows for handling.
+*/
 class ThreeDWidget : public QGLWidget
 {
     Q_OBJECT
@@ -45,40 +59,35 @@ class ThreeDWidget : public QGLWidget
 public:
 	ThreeDWidget(QWidget *parent = 0);
 	void CreateArcballList(ArcBall &ArcBall, double GLScale);
-	void NormalVector(GLdouble p1[3], GLdouble p2[3],  GLdouble p3[3], GLdouble n[3]);
-	void GLRenderSphere(QColor cr, double radius, int NumLongitudes, int NumLatitudes);
-	void GLDrawAxes(double length, QColor AxisColor, int AxisStyle, int AxisWidth);
-	void GLSetupLight(GLLightDlg *pglLightParams, double Offset_y, double LightFactor);
 	void ClientToGL(QPoint const &point, CVector &real);
+	void GLDrawAxes(double length, QColor AxisColor, int AxisStyle, int AxisWidth);
+	void GLRenderSphere(QColor cr, double radius, int NumLongitudes, int NumLatitudes);
+	void GLSetupLight(GLLightDlg *pglLightParams, double Offset_y, double LightFactor);
 	void GLToClient(CVector const &real, QPoint &point);
+	void NormalVector(GLdouble p1[3], GLdouble p2[3],  GLdouble p3[3], GLdouble n[3]);
 
 private:
-
+	void contextMenuEvent (QContextMenuEvent * event);
 	void initializeGL();
 	void keyPressEvent(QKeyEvent *event);
 	void keyReleaseEvent(QKeyEvent *event);
-	void resizeGL(int width, int height);
-	void paintGL();//virtual override
-	void contextMenuEvent (QContextMenuEvent * event);
 	void mousePressEvent(QMouseEvent *event);
 	void mouseMoveEvent(QMouseEvent *event);
 	void mouseReleaseEvent(QMouseEvent *event);
 	void mouseDoubleClickEvent (QMouseEvent *event);
+	void paintGL();//virtual override
+	void resizeGL(int width, int height);
 	void wheelEvent (QWheelEvent *event );
 
-private slots:
-
 private:
+	static void *s_pMiarex;     /**< A void pointer to the instance of the QMiarex widget.*/
+	static void *s_pMainFrame;  /**< A void pointer to the instance of the MainFrame widget.*/
+	void *m_pParent;            /**< A void pointer to the parent widget. */
 
-	void *m_pParent;
-	static void *s_pMiarex;
-	static void *s_pMainFrame;
+	QRect m_rCltRect;           /**< The client window rectangle @todo check usage */
+	CRectangle m_GLViewRect;    /**< The OpenGl viewport.*/
 
-	QColor m_wndTextColor;
-	QRect m_rCltRect;        // The client window rectangle
-	CRectangle m_GLViewRect; // The OpenGl Viewport
-
-	enumGLView m_iView;
+	enumGLView m_iView;         /**<The identification of the type of the calling parent widget*/
 };
 
 #endif

@@ -19,8 +19,29 @@
 
 *****************************************************************************/
 
+/*! \file
+ *
+ * This class :
+ *	- defines the wing object
+ *	- provides the methods for the calculation of the wing geometric properties
+ *	- provides methods for LLT, VLM and Panel methods
+ * The data is stored in International Standard Units, i.e. meters, kg, and seconds
+ * Angular data is stored in degrees
+ */
+
+
 #ifndef WING_H
 #define WING_H
+
+
+/**
+*@brief  This class defines the wing object, provides the methods for the calculation of the wing geometric properties, and
+		 provides methods for LLT, VLM and Panel methods
+
+ * The data is stored in International Standard Units, i.e. meters, kg, and seconds.
+ * Angular data is stored in degrees
+*/
+
 
 #include "WPolar.h"
 #include "Surface.h"
@@ -89,7 +110,7 @@ public:
 
 
 	void PanelComputeViscous(double QInf, double Alpha, WPolar *pWPolar, double &WingVDrag, bool bViscous, QString &OutString);
-	void PanelSetBending(bool bThinSurface);
+	void PanelComputeBending(bool bThinSurface);
 
 	bool IsWingPanel(int nPanel);
 	bool IsWingNode(int nNode);
@@ -98,14 +119,13 @@ public:
 	void Duplicate(Wing *pWing);
 	void ComputeChords(int NStation=0);
 	void ComputeChords(int NStation, double *chord, double *offset, double *twist);
-	void ComputeDihedrals();
 	void ComputeGeometry();
 	void ComputeVolumeInertia(CVector &CoG, double &CoGIxx, double &CoGIyy, double &CoGIzz, double &CoGIxz);
 	void ComputeBodyAxisInertia();
 
 //	void InsertSection(double TPos, double TChord, double TOffset, double TZPos, double Twist, QString Foil,int NChord, int NSpan, int SSpan);
-	void ScaleSweep(double sweep);
-	void ScaleTwist(double twist);
+	void ScaleSweep(double NewSweep);
+	void ScaleTwist(double NewTwist);
 	void ScaleSpan(double NewSpan);
 	void ScaleChord(double NewChord);
 	bool SerializeWing(QDataStream &ar, bool bIsStoring, int ProjectFormat);
@@ -117,14 +137,11 @@ public:
 	bool IsSymFin()       {return m_bSymFin;}
 	bool IsDoubleSymFin() {return m_bDoubleSymFin;}
 
-//	bool SplineInterpolation(int n, double *x, double *y,  double *a, double *b, double *c, double *d);
-//	double GetInterpolation(double t, double *y, int m, double *a, double *b, double *c, double *d);
-
 	void InsertSection(int iSection);
 	bool AppendWingSection();
 	bool AppendWingSection(double Chord, double Twist, double Pos, double Dihedral, double Offset, int NXPanels, int NYPanels, int XPanelDist, int YPanelDist, QString RightFoilName, QString LeftFoilName);
 	void RemoveWingSection(int const iSection);
-	int NWingSection() {return m_WingSection.count();};
+	int NWingSection() {return m_WingSection.count();}
 
 	double &Chord(const int &iSection);
 	double &Twist(const int &iSection);
@@ -143,11 +160,11 @@ public:
 	QString &RightFoil(const int &iSection);
 	QString &LeftFoil(const int &iSection);
 
-	double RootChord()  {return m_WingSection.first()->m_Chord;};
-	double TipChord()   {return m_WingSection.last()->m_Chord;};
-	double TipTwist()   {return m_WingSection.last()->m_Twist;};
-	double TipOffset()  {return m_WingSection.last()->m_Offset;};
-	double TipPos()     {return m_WingSection.last()->m_YPosition;};
+	double RootChord()  {return m_WingSection.first()->m_Chord;}
+	double TipChord()   {return m_WingSection.last()->m_Chord;}
+	double TipTwist()   {return m_WingSection.last()->m_Twist;}
+	double TipOffset()  {return m_WingSection.last()->m_Offset;}
+	double TipPos()     {return m_WingSection.last()->m_YPosition;}
 
 //__________________________Variables_______________________
 private:

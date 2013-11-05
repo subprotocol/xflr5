@@ -1,7 +1,7 @@
 /****************************************************************************
 
 	WPolarDlg Class
-	Copyright (C) 2009 Andre Deperrois adeperrois@xflr5.com
+	Copyright (C) 2009-2013 Andre Deperrois adeperrois@xflr5.com
 
 	This program is free software; you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -18,7 +18,9 @@
 	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 *****************************************************************************/
-
+ /**
+ *@file This file contains the definition of the class WPolarDlg which is used to define the data for a WPolar object.
+ */
 
 #ifndef WPOLARDLG_H
 #define WPOLARDLG_H
@@ -32,6 +34,15 @@
 #include "../misc/FloatEdit.h"
 #include "../objects/Plane.h"
 
+/**
+*@class WPolarDlg
+*@brief This class provides the interface dialog box which is used to define or to edit the paramaters of a type 1, 2 or 4 polar.
+
+* The class uses a static instance of WPolar as the default data. 
+* This is so that the next call to the class uses the existing data, and only modifications are required.
+* The creation and storage of the new polar object is managed from the calling class QMiarex.
+* The rest of the methods and variables is self explanatory and not documented further.
+*/
 class WPolarDlg : public QDialog
 {
 	Q_OBJECT
@@ -44,15 +55,15 @@ public:
 private:
 	void keyPressEvent(QKeyEvent *event);
 
-	void SetupLayout();
 	void Connect();
-	void SetWPolarName();
-	void SetReynolds();
-	void SetWingLoad();
-	void ReadValues();
-	void InitDialog(Plane *pPlane, Wing *pWing, WPolar *pWPolar=NULL);
-	void SetDensity();
 	void EnableControls();
+	void InitDialog(Plane *pPlane, Wing *pWing, WPolar *pWPolar=NULL);
+	void ReadValues();
+	void SetDensity();
+	void SetReynolds();
+	void SetupLayout();
+	void SetWingLoad();
+	void SetWPolarName();
 
 
 private slots:
@@ -74,18 +85,13 @@ private:
 	static void *s_pMainFrame;
 	static void *s_pMiarex;
 
-//	QList <void *> *m_poaWPolar;
 	Plane *m_pPlane;
 	Wing *m_pWing;
-
-//	QString m_WPolarName;
-//	QString m_UFOName;
 
 	static WPolar s_WPolar;
 	bool m_bAutoName;
 	int m_UnitType;//1= International, 2= English
 	double m_WingLoad;
-//	enumPolarType m_WPolarType; // fixed speed, fixed lift, fixed aoa
 
 	QStackedWidget *m_pctrlAnalysisControls;
 

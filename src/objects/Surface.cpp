@@ -743,12 +743,6 @@ bool Surface::RotateFlap(double const &Angle, bool bBCOnly)
 
 		Quat.Set(Angle-alpha0, m_HingeVector);
 
-/*		for(l=0; l<m_nFlapPanels; l++)
-		{
-			k = m_FlapPanel[l];
-			if(bBCOnly) s_pPanel[k].RotateBC(m_HingePoint, Quat);
-			else        s_pPanel[k].RotatePanel(m_HingePoint, Quat);
-		}*/
 
 		for (k=0; k<m_nFlapNodes; k++)
 		{

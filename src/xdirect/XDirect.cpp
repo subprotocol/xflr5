@@ -2924,8 +2924,8 @@ void QXDirect::OnExportAllPolars()
 	{
 		pPolar = (Polar*)m_poaPolar->at(l);
 		FileName = DirName + "/" + pPolar->m_FoilName + "_" + pPolar->m_PlrName;
-		if(pMainFrame->m_ExportFileType==1) FileName += ".txt";
-		else                                FileName += ".csv";
+		if(pMainFrame->m_ExportFileType==TXT) FileName += ".txt";
+		else                                  FileName += ".csv";
 
 		XFile.setFileName(FileName);
 		if (XFile.open(QIODevice::WriteOnly | QIODevice::Text))
@@ -2975,8 +2975,8 @@ void QXDirect::OnExportCurOpp()
 	QString FileName;
 
 	QString filter;
-	if(pMainFrame->m_ExportFileType==1) filter = "Text File (*.txt)";
-	else                                filter = "Comma Separated Values (*.csv)";
+	if(pMainFrame->m_ExportFileType==TXT) filter = "Text File (*.txt)";
+	else                                  filter = "Comma Separated Values (*.csv)";
 
 	FileName = QFileDialog::getSaveFileName(this, tr("Export OpPoint"),
 											pMainFrame->m_LastDirName ,
@@ -2987,8 +2987,8 @@ void QXDirect::OnExportCurOpp()
 	int pos = FileName.lastIndexOf("/");
 	if(pos>0) pMainFrame->m_LastDirName = FileName.left(pos);
 	pos = FileName.lastIndexOf(".csv");
-	if (pos>0) pMainFrame->m_ExportFileType = 2;
-	else       pMainFrame->m_ExportFileType = 1;
+	if (pos>0) pMainFrame->m_ExportFileType = CSV;
+	else       pMainFrame->m_ExportFileType = TXT;
 
 	QFile XFile(FileName);
 
@@ -3014,8 +3014,8 @@ void QXDirect::OnExportPolarOpps()
 	QString FileName;
 
 	QString filter;
-	if(pMainFrame->m_ExportFileType==1) filter = "Text File (*.txt)";
-	else                                filter = "Comma Separated Values (*.csv)";
+	if(pMainFrame->m_ExportFileType==TXT) filter = "Text File (*.txt)";
+	else                                  filter = "Comma Separated Values (*.csv)";
 
 	FileName = QFileDialog::getSaveFileName(this, tr("Export OpPoint"),
 											pMainFrame->m_LastDirName ,
@@ -3028,8 +3028,8 @@ void QXDirect::OnExportPolarOpps()
 	int pos = FileName.lastIndexOf("/");
 	if(pos>0) pMainFrame->m_LastDirName = FileName.left(pos);
 	pos = FileName.lastIndexOf(".csv");
-	if (pos>0) pMainFrame->m_ExportFileType = 2;
-	else       pMainFrame->m_ExportFileType = 1;
+	if (pos>0) pMainFrame->m_ExportFileType = CSV;
+	else       pMainFrame->m_ExportFileType = TXT;
 
 	QFile XFile(FileName);
 
@@ -3051,7 +3051,7 @@ void QXDirect::OnExportPolarOpps()
 		pOpPoint = (OpPoint*)m_poaOpp->at(i);
 		if(pOpPoint->m_strFoilName == m_pCurPolar->m_FoilName && pOpPoint->m_strPlrName == m_pCurPolar->m_PlrName )
 		{
-			if(pMainFrame->m_ExportFileType==1)
+			if(pMainFrame->m_ExportFileType==TXT)
 				strong = QString("Reynolds = %1   Mach = %2  NCrit = %3\n")
 									.arg(pOpPoint->Reynolds, 7, 'f', 0)
 									.arg(pOpPoint->Mach, 4,'f',0)
@@ -3067,7 +3067,7 @@ void QXDirect::OnExportPolarOpps()
 			else        Header = QString("Alpha,Cd,Cl,Cm,XTr1,XTr2,TEHMom,Cpmn\n");
 			out<<Header;
 
-			if(pMainFrame->m_ExportFileType==1)
+			if(pMainFrame->m_ExportFileType==TXT)
 				strong = QString("%1   %2   %3   %4   %5   %6   %7  %8\n")
 					.arg(pOpPoint->Alpha,7,'f',3)
 					.arg(pOpPoint->Cd,9,'f',3)
@@ -3089,15 +3089,15 @@ void QXDirect::OnExportPolarOpps()
 				.arg(pOpPoint->Cpmn,7,'f',4);
 
 			out<<strong;
-			if(pMainFrame->m_ExportFileType==1) out<< " Cpi          Cpv\n-----------------\n";
-			else                                out << "Cpi,Cpv\n";
+			if(pMainFrame->m_ExportFileType==TXT) out<< " Cpi          Cpv\n-----------------\n";
+			else                                  out << "Cpi,Cpv\n";
 
 			for (j=0; j<pOpPoint->n; j++)
 			{
 				if(pOpPoint->m_bVisc)
 				{
-					if(pMainFrame->m_ExportFileType==1) strong = QString("%1   %2\n").arg(pOpPoint->Cpi[j], 7,'f',4).arg(pOpPoint->Cpv[j], 7, 'f',4);
-					else                                strong = QString("%1,%2\n").arg(pOpPoint->Cpi[j], 7,'f',4).arg(pOpPoint->Cpv[j], 7, 'f',4);
+					if(pMainFrame->m_ExportFileType==TXT) strong = QString("%1   %2\n").arg(pOpPoint->Cpi[j], 7,'f',4).arg(pOpPoint->Cpv[j], 7, 'f',4);
+					else                                  strong = QString("%1,%2\n").arg(pOpPoint->Cpi[j], 7,'f',4).arg(pOpPoint->Cpv[j], 7, 'f',4);
 				}
 				else
 				{
@@ -3122,8 +3122,8 @@ void QXDirect::OnExportCurPolar()
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	QString FileName, filter;
 
-	if(pMainFrame->m_ExportFileType==1) filter = "Text File (*.txt)";
-	else                                filter = "Comma Separated Values (*.csv)";
+	if(pMainFrame->m_ExportFileType==TXT) filter = "Text File (*.txt)";
+	else                                  filter = "Comma Separated Values (*.csv)";
 
 	FileName = m_pCurPolar->m_PlrName;
 	FileName.replace("/", " ");
@@ -3136,8 +3136,8 @@ void QXDirect::OnExportCurPolar()
 	int pos = FileName.lastIndexOf("/");
 	if(pos>0) pMainFrame->m_LastDirName = FileName.left(pos);
 	pos = FileName.lastIndexOf(".csv");
-	if (pos>0) pMainFrame->m_ExportFileType = 2;
-	else       pMainFrame->m_ExportFileType = 1;
+	if (pos>0) pMainFrame->m_ExportFileType = CSV;
+	else       pMainFrame->m_ExportFileType = TXT;
 
 	QFile XFile(FileName);
 

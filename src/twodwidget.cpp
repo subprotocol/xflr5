@@ -32,7 +32,9 @@
 #include "twodwidget.h"
 
 
-
+/**
+*The public constructor
+*/
 TwoDWidget::TwoDWidget(QWidget *parent)
 	: QWidget(parent)
 {
@@ -46,7 +48,10 @@ TwoDWidget::TwoDWidget(QWidget *parent)
 }
 
 
-
+/**
+*Overrides the keyPressEvent method of the base class.
+*Dispatches the handling to the active child application.
+*/
 void TwoDWidget::keyPressEvent(QKeyEvent *event)
 {
 	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
@@ -72,6 +77,11 @@ void TwoDWidget::keyPressEvent(QKeyEvent *event)
 	}
 }
 
+
+/**
+*Overrides the keyReleaseEvent method of the base class.
+*Dispatches the handling to the active child application.
+*/
 void TwoDWidget::keyReleaseEvent(QKeyEvent *event)
 {
 
@@ -100,6 +110,10 @@ void TwoDWidget::keyReleaseEvent(QKeyEvent *event)
 
 
 
+/**
+*Overrides the mousePressEvent method of the base class.
+*Dispatches the handling to the active child application.
+*/
 void TwoDWidget::mousePressEvent(QMouseEvent *event)
 {
 	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
@@ -126,6 +140,10 @@ void TwoDWidget::mousePressEvent(QMouseEvent *event)
 }
 
 
+/**
+*Overrides the mouseReleaseEvent method of the base class.
+*Dispatches the handling to the active child application.
+*/
 void TwoDWidget::mouseReleaseEvent(QMouseEvent *event)
 {
 	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
@@ -152,6 +170,10 @@ void TwoDWidget::mouseReleaseEvent(QMouseEvent *event)
 }
 
 
+/**
+*Overrides the mouseMoveEvent method of the base class.
+*Dispatches the handling to the active child application.
+*/
 void TwoDWidget::mouseMoveEvent(QMouseEvent *event)
 {
 	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
@@ -177,6 +199,12 @@ void TwoDWidget::mouseMoveEvent(QMouseEvent *event)
 	}
 }
 
+
+
+/**
+*Overrides the mouseDoubleClickEvent function of the base class.
+*Dispatches the handling to the active child application.
+*/
 void TwoDWidget::mouseDoubleClickEvent ( QMouseEvent * event )
 {
 	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
@@ -209,6 +237,10 @@ void TwoDWidget::mouseDoubleClickEvent ( QMouseEvent * event )
 }
 
 
+/**
+*Overrides the resizeEvent function of the base class.
+*Dispatches the handling to the active child application.
+*/
 void TwoDWidget::resizeEvent(QResizeEvent *event)
 {
 //	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
@@ -242,6 +274,10 @@ void TwoDWidget::resizeEvent(QResizeEvent *event)
 }
 
 
+/**
+*Overrides the wheelEvent function of the base class.
+*Dispatches the handling to the active child application.
+*/
 void TwoDWidget::wheelEvent(QWheelEvent *event)
 {
 	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
@@ -268,6 +304,10 @@ void TwoDWidget::wheelEvent(QWheelEvent *event)
 }
 
 
+/**
+*Overrides the paintEvent function of the base class.
+*Dispatches the handling to the active child application.
+*/
 void TwoDWidget::paintEvent(QPaintEvent *event)
 {
 	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
@@ -303,6 +343,10 @@ void TwoDWidget::paintEvent(QPaintEvent *event)
 }
 
 
+/**
+*Overrides the contextMenuEvent function of the base class.
+*Dispatches the handling to the active child application.
+*/
 void TwoDWidget::contextMenuEvent (QContextMenuEvent * event)
 {
 	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;

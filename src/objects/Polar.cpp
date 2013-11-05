@@ -29,7 +29,9 @@
 
 
 void *Polar::s_pMainFrame;
-
+/**
+*The public constructor.
+*/
 Polar::Polar()
 {
 	m_bIsVisible  = true;
@@ -51,8 +53,13 @@ Polar::Polar()
 
 
 
-
-void Polar::ExportPolar(QTextStream &out, int FileType, bool bDataOnly)
+/**
+ * Exports the data of the polar to a text file
+ * @param out the instance of output QtextStream
+ * @param FileType TXT if the data is separated by spaces, CSV for a comma separator
+ * @param bDataOnly true if the analysis parameters should not be output
+ */
+void Polar::ExportPolar(QTextStream &out, enumTextFileType FileType, bool bDataOnly)
 {
 	QString Header, strong;
 	int j;
@@ -85,23 +92,23 @@ void Polar::ExportPolar(QTextStream &out, int FileType, bool bDataOnly)
 
 	if(m_PolarType!=FIXEDAOAPOLAR)
 	{
-		if(FileType==1) Header = ("  alpha     CL        CD       CDp       Cm    Top Xtr Bot Xtr   Cpmin    Chinge    XCp    \n");
-		else            Header = ("alpha,CL,CD,CDp,Cm,Top Xtr,Bot Xtr,Cpmin,Chinge,XCp\n");
+		if(FileType==TXT) Header = ("  alpha     CL        CD       CDp       Cm    Top Xtr Bot Xtr   Cpmin    Chinge    XCp    \n");
+		else              Header = ("alpha,CL,CD,CDp,Cm,Top Xtr,Bot Xtr,Cpmin,Chinge,XCp\n");
 		out << Header;
-		if(FileType==1)
+		if(FileType==TXT)
 		{
 			Header=QString(" ------- -------- --------- --------- -------- ------- ------- -------- --------- ---------\n");
 			out << Header;
 		}
 		for (j=0; j<m_Alpha.size(); j++)
 		{
-			if(FileType==1) strong = QString(" %1  %2  %3  %4  %5")
+			if(FileType==TXT) strong = QString(" %1  %2  %3  %4  %5")
 											.arg(m_Alpha[j],7,'f',3)
 											.arg(m_Cl[j],7,'f',4)
 											.arg(m_Cd[j],8,'f',5)
 											.arg(m_Cdp[j],8,'f',5)
 											.arg(m_Cm[j],7,'f',4);
-			else            strong = QString("%1,%2,%3,%4,%5")
+			else              strong = QString("%1,%2,%3,%4,%5")
 											.arg(m_Alpha[j],7,'f',3)
 											.arg(m_Cl[j],7,'f',4)
 											.arg(m_Cd[j],8,'f',5)
@@ -111,35 +118,35 @@ void Polar::ExportPolar(QTextStream &out, int FileType, bool bDataOnly)
 			out << strong;
 			if(m_XTr1[j]<990.0)
 			{
-				if(FileType==1) strong=QString("  %1  %2").arg(m_XTr1[j],6,'f',4).arg( m_XTr2[j],6,'f',4);
-				else            strong=QString(",%1,%2").arg(m_XTr1[j],6,'f',4).arg( m_XTr2[j],6,'f',4);
+				if(FileType==TXT) strong=QString("  %1  %2").arg(m_XTr1[j],6,'f',4).arg( m_XTr2[j],6,'f',4);
+				else              strong=QString(",%1,%2").arg(m_XTr1[j],6,'f',4).arg( m_XTr2[j],6,'f',4);
 				out << strong;
 			}
-			if(FileType==1) strong=QString("  %1  %2  %3\n").arg(m_Cpmn[j],7,'f',4).arg(m_HMom[j],7,'f',4).arg(m_XCp[j],7,'f',4);
-			else            strong=QString(",%1,%2,%3\n").arg(m_Cpmn[j],7,'f',4).arg(m_HMom[j],7,'f',4).arg(m_XCp[j],7,'f',4);
+			if(FileType==TXT) strong=QString("  %1  %2  %3\n").arg(m_Cpmn[j],7,'f',4).arg(m_HMom[j],7,'f',4).arg(m_XCp[j],7,'f',4);
+			else              strong=QString(",%1,%2,%3\n").arg(m_Cpmn[j],7,'f',4).arg(m_HMom[j],7,'f',4).arg(m_XCp[j],7,'f',4);
 			out << strong;
 			}
 	}
 	else 
 	{
-		if(FileType==1) Header=QString(("  alpha     Re      CL        CD       CDp       Cm    Top Xtr Bot Xtr   Cpmin    Chinge     XCp    \n"));
-		else            Header=QString(("alpha,Re,CL,CD,CDp,Cm,Top Xtr,Bot Xtr,Cpmin,Chinge,XCp\n"));
+		if(FileType==TXT) Header=QString(("  alpha     Re      CL        CD       CDp       Cm    Top Xtr Bot Xtr   Cpmin    Chinge     XCp    \n"));
+		else              Header=QString(("alpha,Re,CL,CD,CDp,Cm,Top Xtr,Bot Xtr,Cpmin,Chinge,XCp\n"));
 		out << Header;
-		if(FileType==1)
+		if(FileType==TXT)
 		{
 			Header=QString(" ------- -------- -------- --------- --------- -------- ------- ------- -------- --------- ---------\n");
 			out << Header;
 		}
 		for (j=0; j<m_Alpha.size(); j++)
 		{
-			if(FileType==1) strong=QString(" %1 %2  %3  %4  %5  %6")
+			if(FileType==TXT) strong=QString(" %1 %2  %3  %4  %5  %6")
 											.arg(m_Alpha[j],7,'f',3)
 											.arg( m_Re[j],8,'f',0)
 											.arg( m_Cl[j],7,'f',4)
 											.arg( m_Cd[j],8,'f',5)
 											.arg(m_Cdp[j],8,'f',5)
 											.arg(m_Cm[j],7,'f',4);
-			else            strong=QString(" %1,%2,%3,%4,%5,%6")
+			else              strong=QString(" %1,%2,%3,%4,%5,%6")
 											.arg(m_Alpha[j],7,'f',3)
 											.arg( m_Re[j],8,'f',0)
 											.arg( m_Cl[j],7,'f',4)
@@ -149,12 +156,12 @@ void Polar::ExportPolar(QTextStream &out, int FileType, bool bDataOnly)
 			out << strong;
 			if(m_XTr1[j]<990.0)
 			{
-				if(FileType==1) strong=QString("  %1  %2").arg(m_XTr1[j],6,'f',4).arg(m_XTr2[j],6,'f',4);
-				else            strong=QString(",%1,%2").arg(m_XTr1[j],6,'f',4).arg(m_XTr2[j],6,'f',4);
+				if(FileType==TXT) strong=QString("  %1  %2").arg(m_XTr1[j],6,'f',4).arg(m_XTr2[j],6,'f',4);
+				else              strong=QString(",%1,%2").arg(m_XTr1[j],6,'f',4).arg(m_XTr2[j],6,'f',4);
 				out << strong;
 			}
-			if(FileType==1) strong=QString("  %1  %2  %3\n").arg(m_Cpmn[j],7,'f',4).arg(m_HMom[j],7,'f',4).arg(m_XCp[j],7,'f',4);
-			else            strong=QString(",%1,%2,%3\n").arg(m_Cpmn[j],7,'f',4).arg(m_HMom[j],7,'f',4).arg(m_XCp[j],7,'f',4);
+			if(FileType==TXT) strong=QString("  %1  %2  %3\n").arg(m_Cpmn[j],7,'f',4).arg(m_HMom[j],7,'f',4).arg(m_XCp[j],7,'f',4);
+			else              strong=QString(",%1,%2,%3\n").arg(m_Cpmn[j],7,'f',4).arg(m_HMom[j],7,'f',4).arg(m_XCp[j],7,'f',4);
 			out << strong;
         }
 	}
@@ -162,9 +169,11 @@ void Polar::ExportPolar(QTextStream &out, int FileType, bool bDataOnly)
 }
 
 
+/**
+ * Remove all data from the polar object
+ */
 void Polar::ResetPolar()
 {
-//	Removes all existing OpPoints results from polar
     m_Alpha.clear();
     m_Cl.clear();
     m_Cd.clear();
@@ -181,9 +190,17 @@ void Polar::ResetPolar()
     m_XCp.clear();
 }
 
-void Polar::AddData(OpPoint *pOpPoint)
+
+/**
+ * Adds the data from the instance of the operating point referenced by pOpPoint to the polar object.
+ * The index used to insert the data is the aoa for type 1, 2 and 3 polars, and the freestream velocity for type 4 polars.
+ * If a point with identical index exists, the data is replaced.
+ * If not, the data is inserted for this index.
+ *
+ * @param *pPOpPoint a pointer to the foil's operating point from which the data is to be extracted
+ */
+ void Polar::AddData(OpPoint *pOpPoint)
 {
-	//Adds the OpPoint data to the Polar object for further use
 	if(!pOpPoint->m_bVisc) return;
 	m_ACrit = pOpPoint->ACrit;
 	AddPoint(pOpPoint->Alpha, pOpPoint->Cd, pOpPoint->Cdp, pOpPoint->Cl, pOpPoint->Cm,
@@ -192,6 +209,14 @@ void Polar::AddData(OpPoint *pOpPoint)
 }
 
 
+/**
+ * Adds the data from the instance of the XFoil object to the data arrays
+ * The index used to insert the data is the aoa for type 1, 2 and 3 polars, and the freestream velocity for type 4 polars.
+ * If a point with identical index exists, the data is replaced.
+ * If not, the data is inserted for this index.
+ *
+ * @param *ptrXFoil a pointer to the instance of the XFoil class where the calculation has been performed.
+ */
 void Polar::AddData(void* ptrXFoil)
 {
 	XFoil *pXFoil = (XFoil*)ptrXFoil;
@@ -205,8 +230,15 @@ void Polar::AddData(void* ptrXFoil)
 	
 }
 
+/**
+ * Adds the parameter data to the data arrays
+ * The index used to insert the data is the aoa for type 1, 2 and 3 polars, and the freestream velocity for type 4 polars.
+ * If a point with identical index exists, the data is replaced.
+ * If not, the data is inserted for this index.
+ *
+ */
 void Polar::AddPoint(double Alpha, double Cd, double Cdp, double Cl, double Cm, double Xtr1,
-					  double Xtr2, double HMom, double Cpmn, double Reynolds, double XCp)
+					 double Xtr2, double HMom, double Cpmn, double Reynolds, double XCp)
 {
 	int i;
 	bool bInserted = false;
@@ -378,6 +410,10 @@ void Polar::AddPoint(double Alpha, double Cd, double Cdp, double Cl, double Cm, 
 }
 
 
+/**
+ * Copies the polar's data from an existing polar
+ * @param pPolar a pointer to the instance of the reference Polar object from which the data should be copied
+ */
 void Polar::Copy(Polar *pPolar)
 {
 	int i;
@@ -405,14 +441,20 @@ void Polar::Copy(Polar *pPolar)
 	}
 }
 
-bool Polar::Serialize(QDataStream &ar, bool bIsStoring, bool bTrace)
+
+/**
+ * Loads or saves the data of this polar to a binary file
+ * @param ar the QDataStream object from/to which the data should be serialized
+ * @param bIsStoring true if saving the data, false if loading
+ * @return true if the operation was successful, false otherwise
+ */
+bool Polar::Serialize(QDataStream &ar, bool bIsStoring)
 {
 	int i, j, n, l, k;
 	int ArchiveFormat;// identifies the format of the file
 	float f;
 //	qint32 colorref;
 //	int r,g,b;
-
 
 	if(bIsStoring)
     {
@@ -588,6 +630,10 @@ bool Polar::Serialize(QDataStream &ar, bool bIsStoring, bool bTrace)
 }
 
 
+/**
+ * Removes the data for the point at a given index of the data arrays
+ * @param i the index of the point to be removed
+ **/
 void Polar::Remove(int i)
 {
     m_Alpha.removeAt(i);
@@ -606,7 +652,12 @@ void Polar::Remove(int i)
     m_XCp.removeAt(i);
 }
 
-
+/**
+* Returns the minimum and maximum angles of attack stored in the polar.
+* Since the data is sorted by crescending aoa, this is a matter of returning the first and last values of the array.
+*@param &amin the miminum aoa
+*@param &amax the maximum aoa
+*/
 void Polar::GetAlphaLimits(double &amin, double &amax)
 {
     if(!m_Alpha.size()){
@@ -620,6 +671,11 @@ void Polar::GetAlphaLimits(double &amin, double &amax)
 	}
 }
 
+/**
+* Returns the minimum and maximum lift coefficients stored in the polar.
+*@param &Clmin the miminum lift coefficient
+*@param &Clmax the maximum lift coefficient
+*/
 void Polar::GetClLimits(double &Clmin, double &Clmax)
 {
     if(!m_Cl.size())
@@ -641,6 +697,12 @@ void Polar::GetClLimits(double &Clmin, double &Clmax)
 	}
 }
 
+/**
+* Returns the moment coefficient at zero-lift.
+* Cm0 is interpolated between the two points in the array such that Cl[i]<0 and Cl[i+1]>0.
+* If no such pair is found, the method returns 0.
+*@return Cm0
+*/
 double Polar::GetCm0()
 {
     int i;
@@ -668,6 +730,13 @@ double Polar::GetCm0()
 
 }
 
+
+/**
+* Returns the value of the aoa such that Cl=0.
+* The zero lift angle is interpolated between the two points in the array such that Cl[i]<0 and Cl[i+1]>0.
+* If no such pair is found, the method returns 0.
+*@return Cm0
+*/
 double Polar::GetZeroLiftAngle()
 {
 	double Clmin =  1000.0;
@@ -694,9 +763,14 @@ double Polar::GetZeroLiftAngle()
 
 }
 
+
+/**
+* Linearizes Cl vs. Alpha set of points by least square method
+* @param Alpha0 the aoa such that Cl = 0, in degrees
+* @param slope the slope of the curve Cl=f(aoa), in units 1/°
+*/
 void Polar::GetLinearizedCl(double &Alpha0, double &slope)
 {
-	// linearize Cl vs. Alpha set of points by least square method
     int n = (int)m_Cl.size();
 
     if(n<=1)
@@ -719,7 +793,9 @@ void Polar::GetLinearizedCl(double &Alpha0, double &slope)
 		sum3 += m_Cl[k];
 		sum4 += m_Alpha[k] * m_Alpha[k];
 	}
-	if(fn*sum4 == sum2*sum2 || fn*sum1 == sum2 * sum3) {//very improbable...
+	if(fn*sum4 == sum2*sum2 || fn*sum1 == sum2 * sum3) 
+	{
+		//very improbable...
 		Alpha0 = 0.0;
 		slope = 2.0*PI*PI/180.0;
 		return;
@@ -728,11 +804,17 @@ void Polar::GetLinearizedCl(double &Alpha0, double &slope)
 	b1 = (fn*sum1 - sum2 * sum3)/(fn*sum4 - sum2*sum2);
 	b2 = (sum3 - b1 * sum2)/fn;
 
-	slope  = b1; //in cl/�
+	slope  = b1; //in cl/°
 	Alpha0 = -b2/b1;
 
 }
 
+
+/**
+*@deprecated
+*Returns an equivalent grey tone for the style of this polar.
+*Used for B&W printing
+*/
 void Polar::GetBWStyle(QColor &color, int &style, int &width)
 {
 	color = m_Color;
@@ -741,7 +823,11 @@ void Polar::GetBWStyle(QColor &color, int &style, int &width)
 //	GetBWColor(color, style, width);
 }
 
-
+/**
+ * Returns a QString object holding the description and value of the polar's parameters
+ * @param &PolarProperties the reference of the QString object to be filled with the description
+ * @param bData true if the analysis data should be appended to the string
+ */
 void Polar::GetPolarProperties(QString &PolarProperties, bool bData)
 {
 	QString strong;
@@ -811,7 +897,11 @@ void Polar::GetPolarProperties(QString &PolarProperties, bool bData)
 
 
 
-
+/**
+* Returns the name of the variable for a given index
+*@param iVar the index of the variable
+*@param &Name the reference of the QString object to be filled with the variable's name.
+*/
 void Polar::GetPlrVariableName(int iVar, QString &Name)
 {
 	switch (iVar)

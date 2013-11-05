@@ -1157,7 +1157,7 @@ void WPolar::DuplicateSpec(WPolar *pWPolar)
 
 /**
  * Copies the polar's data from an existing polar
- * @param pWPolar a pointer to the instance of the reference CWPolar object from which the data should be copied
+ * @param pWPolar a pointer to the instance of the reference WPolar object from which the data should be copied
  */
 void WPolar::Copy(WPolar *pWPolar)
 {
@@ -1237,16 +1237,16 @@ void WPolar::Copy(WPolar *pWPolar)
 /**
  * Exports the data of the polar to a text file
  * @param out the instance of output QtextStream
- * @param FileType 1 if the data is separated by spaces, 2 for a comma separator
+ * @param FileType TXT if the data is separated by spaces, CSV for a comma separator
  * @param bDataOnly true if the analysis parameters should not be output
  */
-void WPolar::Export(QTextStream &out, int FileType, bool bDataOnly)
+void WPolar::Export(QTextStream &out, enumTextFileType FileType, bool bDataOnly)
 {
 	MainFrame* pMainFrame = (MainFrame*)s_pMainFrame;
 	int j;
 	QString Header, strong, str;
 
-	if (FileType==1)
+	if (FileType==TXT)
 	{
 		if(!bDataOnly)
 		{
@@ -1299,7 +1299,7 @@ void WPolar::Export(QTextStream &out, int FileType, bool bDataOnly)
 			out << strong;
 		}
 	}
-	else if (FileType==2)
+	else if (FileType==CSV)
 	{
 		if(!bDataOnly)
 		{
@@ -1799,10 +1799,10 @@ void WPolar::ResetWPlr()
 }
 
 /**
- * Loads or Saves the data of this polar to a binary file
+ * Loads or saves the data of this polar to a binary file
  * @param ar the QDataStream object from/to which the data should be serialized
  * @param bIsStoring true if saving the data, false if loading
- * @param ProjectFormat 5 if data from Xflr5 v5.xx, 6 if from/to xflr5 v6.xx
+ * @param ProjectFormat 5 if data from Xflr5 v5.xx, 6 if from/to xflr5 v6.xx @todo remove, Format 5 is obsolete and should not be used
  * @return true if the operation was successful, false otherwise
  */
 bool WPolar::SerializeWPlr(QDataStream &ar, bool bIsStoring, int ProjectFormat)

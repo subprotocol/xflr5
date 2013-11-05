@@ -19,14 +19,24 @@
 
 *****************************************************************************/
 
-
-#ifndef TwoDWidget_H
-#define TwoDWidget_H
+/**
+*@file This file contains the declaration of the class TwoDWidget, 
+*used for 2d drawing in the central area of the application's MainFrame.
+*/
+#ifndef TWODWIDGET_H
+#define TWODWIDGET_H
 
 #include <QWidget>
 #include "params.h"
 
+/**
+*@class TwoDWidget 
+* @brief This class is used for 2d drawing in the central area of the application's MainFrame.
 
+* There is a unique instance of this class, attached to the QStackedWidget of the MainFrame.
+* Depending on the active application, this class calls the drawings methods in QAFoil, QXDirect, QXInverse or QMiarex.
+* All Qt events received by this widget are sent to the child applications for handling.
+*/
 class TwoDWidget : public QWidget
 {
     Q_OBJECT
@@ -37,25 +47,25 @@ class TwoDWidget : public QWidget
 
 public:
 	TwoDWidget(QWidget *parent = 0);
-//	void UpdateView();
-
 
 protected:
+	void contextMenuEvent (QContextMenuEvent *event);
 	void keyPressEvent(QKeyEvent *event);
 	void keyReleaseEvent(QKeyEvent *event);
-	void mousePressEvent(QMouseEvent *event);
+	void mouseDoubleClickEvent (QMouseEvent *event);
 	void mouseMoveEvent(QMouseEvent *event);
+	void mousePressEvent(QMouseEvent *event);
 	void mouseReleaseEvent(QMouseEvent *event);
-	void wheelEvent (QWheelEvent *event );
-	void resizeEvent ( QResizeEvent * event );
 	void paintEvent(QPaintEvent *event);
-	void mouseDoubleClickEvent ( QMouseEvent * event );
-	void contextMenuEvent (QContextMenuEvent * event);
- 
+	void resizeEvent (QResizeEvent *event);
+ 	void wheelEvent (QWheelEvent *event);
+
 private:
-//	QRect m_rCltRect;          // The client window rectangle
-	void * m_pXDirect, *m_pMiarex, *m_pAFoil, *m_pXInverse;
-	void *m_pMainFrame;
+	void *m_pAFoil;       /**< A void pointer to the instance of the QAFoil object. */
+	void *m_pMainFrame;   /**< A void pointer to the instance of the MainFrame object. */
+	void *m_pMiarex;      /**< A void pointer to the instance of the QMiarex object. */
+	void *m_pXDirect;     /**< A void pointer to the instance of the QXDirect object. */
+	void *m_pXInverse;    /**< A void pointer to the instance of the QXInverse object. */
 
 };
 

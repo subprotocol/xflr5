@@ -188,7 +188,7 @@ bool OpPoint::Serialize(QDataStream &ar, bool bIsStoring, int ArchiveFormat)
 }
 
 
-bool OpPoint::ExportOpp(QTextStream &out, QString Version, int FileType, bool bDataOnly)
+bool OpPoint::ExportOpp(QTextStream &out, QString Version, enumTextFileType FileType, bool bDataOnly)
 {
 	int k;
 	QString strong;
@@ -201,21 +201,21 @@ bool OpPoint::ExportOpp(QTextStream &out, QString Version, int FileType, bool bD
 		out<< strong;
 		strong = m_strPlrName + "\n";
 		out<< strong;
-		if(FileType==1) strong=QString("Alpha = %1,  Re = %2,  Ma = %3,  ACrit =%4 \n\n")
+		if(FileType==TXT) strong=QString("Alpha = %1,  Re = %2,  Ma = %3,  ACrit =%4 \n\n")
 									   .arg(Alpha,5,'f',1).arg(Reynolds,8,'f',0).arg(Mach,6,'f',4).arg(ACrit,4,'f',1);
-		else            strong=QString("Alpha =, %1,  Re =, %2,  Ma =, %3,  ACrit =, %4 \n\n")
+		else              strong=QString("Alpha =, %1,  Re =, %2,  Ma =, %3,  ACrit =, %4 \n\n")
 									   .arg(Alpha,5,'f',1).arg(Reynolds,8,'f',0).arg(Mach,6,'f',4).arg(ACrit,4,'f',1);
 		out<< strong;
 	}
 
-	if(FileType==1) out << "   x        Cpi      Cpv        Qi        Qv\n";
+	if(FileType==TXT) out << "   x        Cpi      Cpv        Qi        Qv\n";
 	else            out << "x,Cpi,Cpv,Qi,Qv\n";
 
 	for (k=0; k<n; k++)
 	{
-		if(FileType==1) strong=QString("%1  %2   %3   %4   %5\n")
+		if(FileType==CSV) strong=QString("%1  %2   %3   %4   %5\n")
 									   .arg(x[k],7,'f',4).arg(Cpi[k],7,'f',3).arg(Cpv[k],7,'f',3).arg(Qi[k],7,'f',3).arg(Qv[k],7,'f',3);
-		else            strong=QString("%1,%2,%3,%4,%5\n")
+		else              strong=QString("%1,%2,%3,%4,%5\n")
 									   .arg(x[k],7,'f',4).arg(Cpi[k],7,'f',3).arg(Cpv[k],7,'f',3).arg(Qi[k],7,'f',3).arg(Qv[k],7,'f',3);
 		out<< strong;
 	}

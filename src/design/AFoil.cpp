@@ -180,7 +180,7 @@ void QAFoil::CheckButtons()
 
 
 
-void QAFoil::DrawScale(QPainter &painter, double scalex, double scaley, QPoint Offset, QRect dRect)
+void QAFoil::DrawScale(QPainter &painter, double scalex)
 {
 	int i;
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
@@ -2180,7 +2180,7 @@ void QAFoil::PaintGrids(QPainter &painter)
 	if(m_bXMinGrid) DrawXMinGrid(painter, m_fScale, m_fScale*m_fScaleY, m_ptOffset, m_rCltRect);
 	if(m_bYMinGrid) DrawYMinGrid(painter, m_fScale, m_fScale*m_fScaleY, m_ptOffset, m_rCltRect);
 
-	if(m_bScale) DrawScale(painter, m_fScale, m_fScale*m_fScaleY, m_ptOffset, m_rCltRect);
+	if(m_bScale) DrawScale(painter, m_fScale);
 
 	painter.restore();
 }

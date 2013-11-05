@@ -129,7 +129,7 @@ private slots:
 private:
 
 	void CheckButtons();
-	void DrawScale(QPainter &painter, double scalex, double scaley, QPoint Offset, QRect dRect);
+	void DrawScale(QPainter &painter, double scalex);
 	void DrawXGrid(QPainter &painter, double scalex, double scaley, QPoint Offset, QRect dRect);
 	void DrawYGrid(QPainter &painter, double scalex, double scaley, QPoint Offset, QRect dRect);
 	void DrawXMinGrid(QPainter &painter, double scalex, double scaley, QPoint Offset, QRect dRect);

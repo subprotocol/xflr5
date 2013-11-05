@@ -19,8 +19,27 @@
 
 *****************************************************************************/
 
-#ifndef ARCBALL_H
-#define ARCBALL_H
+
+
+/** @file
+ *
+ * This class defines the Quaternion used for the calculation of rotations in 3D display
+ *
+ */
+
+
+#ifndef QUATERNION_H
+#define QUATERNION_H
+
+
+/**
+*@class Quaternion
+*@brief
+ * The class which defines the quaternion object used for the calculation of rotations in 3D display.
+
+Home made class. Since it was written, Qt has developed and provided a QQuaternion class.
+*/
+
 
 #include "CVector.h"
 #include "../params.h"

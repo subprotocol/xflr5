@@ -1,7 +1,7 @@
 /****************************************************************************
 
-    CPanel Class
-	Copyright (C) 2006-2008 Andre Deperrois adeperrois@xflr5.com
+    Panel Class
+	Copyright (C) 2006-2013 Andre Deperrois adeperrois@xflr5.com
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -35,12 +35,18 @@ CVector Panel::ILA, Panel::ILB, Panel::ITA, Panel::ITB, Panel::T, Panel::V, Pane
 CVector Panel::P;
 CVector Panel::LATB, Panel::TALB;
 
-
+/**
+* The public constructor
+*/
 Panel::Panel()
 {
 	Reset();
 }
 
+
+/**
+* Resets the panel geometry to default initialization values
+*/
 void Panel::Reset()
 {
 	dl     = 0.0;
@@ -74,7 +80,9 @@ void Panel::Reset()
 }
 
 
-
+/**
+* Defines the vortex and panel geometrical properties necessary for the VLM and panel calculations.
+*/
 void Panel::SetFrame()
 {
 	//set the boundary conditions from existing nodes
@@ -82,7 +90,15 @@ void Panel::SetFrame()
 }
 
 
-
+/**
+* Constructs the vortex and panel properties necessary for the VLM and panel calculations, 
+  based on the absolute position of the four corner nodes.
+*
+* @param LA the position of the leading edge left node.
+* @param LB the position of the leading edge right node.
+* @param TA the position of the trailing edge left node.
+* @param TB the position of the trailing edge rightt node.
+*/
 void Panel::SetFrame(CVector const &LA, CVector const &LB, CVector const &TA, CVector const &TB)
 {
 	LATB.x = TB.x - LA.x;
@@ -209,7 +225,9 @@ void Panel::SetFrame(CVector const &LA, CVector const &LB, CVector const &TA, CV
 }
 
 
-
+/**
+* Inverts in place a 3x3 matrix
+*/
 bool Panel::Invert33(double *l)
 {
 	memcpy(mat,l,sizeof(mat));
@@ -241,7 +259,12 @@ a(ei-fh) - b(di-fg) + c(dh-eg)      (dh-eg)   (bg-ah)   (ae-bd)*/
 	return true;
 }
 
-
+/**
+* Converts the global coordinates of the input vector in local panel coordinates.
+*@param  V the global coordinates
+*@return The CVector holding the local coordinates
+*@todo check if a reference of the vector can be returned instead of a new instance, in order to speed up calculations.
+*/
 CVector Panel::GlobalToLocal(CVector const &V)
 {
 	CVector L;
@@ -251,7 +274,14 @@ CVector Panel::GlobalToLocal(CVector const &V)
 	return L;
 }
 
-
+/**
+* Converts the global coordinates of the input vector in local panel coordinates.
+*@param  Vx the global x-coordinate
+*@param  Vy the global y-coordinate
+*@param  Vz the global z-coordinate
+*@return The CVector holding the local coordinates
+*@todo check if a reference of the vector can be returned instead of a new instance, in order to speed up calculations.
+*/
 CVector Panel::GlobalToLocal(double const &Vx, double const &Vy, double const &Vz)
 {
 	CVector L;
@@ -262,6 +292,12 @@ CVector Panel::GlobalToLocal(double const &Vx, double const &Vy, double const &V
 }
 
 
+/**
+* Converts the local coordinates of the input vector in the global referential
+*@param  V the locaal coordinates
+*@return The CVector holding the global coordinates
+*@todo check if a reference of the vector can be returned instead of a new instance, in order to speed up calculations.
+*/
 CVector Panel::LocalToGlobal(CVector const &V)
 {
 	CVector L;
@@ -272,7 +308,14 @@ CVector Panel::LocalToGlobal(CVector const &V)
 }
 
 
-
+/**
+* Finds the intersection point of a ray with the panel. 
+* The ray is defined by a point and a direction vector.
+*@param A the ray's origin
+*@param U the ray's direction
+*@param I the intersection point
+*@param dist the distance of A to the panel in the direction of the panel's normal
+*/
 bool Panel::Intersect(CVector const &A, CVector const &U, CVector &I, double &dist)
 {
 	bool b1, b2, b3, b4;
@@ -351,23 +394,31 @@ bool Panel::Intersect(CVector const &A, CVector const &U, CVector &I, double &di
 	return false;
 }
 
+/**
+*Returns the panel's area
+*@return the panel's area
+*/
 double Panel::GetArea()
 {
 	return Area;
 }
 
-
+/**
+*Returns the panel's width, measured at the leading edge 
+*/
 double Panel::Width()
 {
 	return sqrt( (s_pNode[m_iLB].y - s_pNode[m_iLA].y)*(s_pNode[m_iLB].y - s_pNode[m_iLA].y)
 	            +(s_pNode[m_iLB].z - s_pNode[m_iLA].z)*(s_pNode[m_iLB].z - s_pNode[m_iLA].z));
 }
 
-
+/**
+*Rotates the boundary condition properties which are used in stability analysis with variable control positions.
+*@param HA is the center of rotation
+*@param Qt the quaternion which defines the 3D rotation
+*/
 void Panel::RotateBC(CVector const &HA, Quaternion &Qt)
 {
-	// HA is the rotation center
-	//rotates the panels properties which are used in control analysis
 //	Qt.Conjugate(Vortex);
 
 	W.x = VortexPos.x - HA.x;
@@ -412,49 +463,6 @@ void Panel::RotateBC(CVector const &HA, Quaternion &Qt)
 
 	Qt.Conjugate(Vortex);
 	Qt.Conjugate(Normal);
-}
-
-
-
-void Panel::RotatePanel(CVector const &O, Quaternion &Qt)
-{
-	// Caution : do not use, the end nodes are rotated multiple times if part of more than one panel
-	// O is the rotation center
-	// Rotates the panel's corner points and resets the local fram
-	W.x = s_pNode[m_iLA].x - O.x;
-	W.y = s_pNode[m_iLA].y - O.y;
-	W.z = s_pNode[m_iLA].z - O.z;
-	Qt.Conjugate(W);
-	s_pNode[m_iLA].x = W.x + O.x;
-	s_pNode[m_iLA].y = W.y + O.y;
-	s_pNode[m_iLA].z = W.z + O.z;
-
-	W.x = s_pNode[m_iLB].x - O.x;
-	W.y = s_pNode[m_iLB].y - O.y;
-	W.z = s_pNode[m_iLB].z - O.z;
-	Qt.Conjugate(W);
-	s_pNode[m_iLB].x = W.x + O.x;
-	s_pNode[m_iLB].y = W.y + O.y;
-	s_pNode[m_iLB].z = W.z + O.z;
-
-	W.x = s_pNode[m_iTA].x - O.x;
-	W.y = s_pNode[m_iTA].y - O.y;
-	W.z = s_pNode[m_iTA].z - O.z;
-	Qt.Conjugate(W);
-	s_pNode[m_iTA].x = W.x + O.x;
-	s_pNode[m_iTA].y = W.y + O.y;
-	s_pNode[m_iTA].z = W.z + O.z;
-
-	W.x = s_pNode[m_iTB].x - O.x;
-	W.y = s_pNode[m_iTB].y - O.y;
-	W.z = s_pNode[m_iTB].z - O.z;
-	Qt.Conjugate(W);
-	s_pNode[m_iTB].x = W.x + O.x;
-	s_pNode[m_iTB].y = W.y + O.y;
-	s_pNode[m_iTB].z = W.z + O.z;
-
-	if(m_Pos==BOTSURFACE) SetFrame(s_pNode[m_iLB], s_pNode[m_iLA], s_pNode[m_iTB], s_pNode[m_iTA]);
-	else                  SetFrame(s_pNode[m_iLA], s_pNode[m_iLB], s_pNode[m_iTA], s_pNode[m_iTB]);
 }
 
 

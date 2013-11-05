@@ -20,8 +20,25 @@
 *****************************************************************************/
 
 
+/*! \file
+ *
+ * This class defines the polar object for the 2D analysis of foils
+ *
+ */
+
+
+
 #ifndef POLAR_H
 #define POLAR_H
+
+
+/**
+*@brief
+ * This class defines the polar object for the 2D analysis of foils
+ *
+	The class stores both the analysis parameters and the analysis results.
+	Each instance of this class is uniquely associated to an instance of a Foil object.
+*/
 
 
 #include "OpPoint.h"
@@ -64,13 +81,13 @@ private:
 
 	void AddData(OpPoint* pOpPoint);
 	void AddData(void* ptrXFoil);
-	void ExportPolar(QTextStream &out, int FileType, bool bDataOnly=false);
+	void ExportPolar(QTextStream &out, enumTextFileType FileType, bool bDataOnly=false);
 	void GetPolarProperties(QString &PolarProperties, bool bData=false);
 	void ResetPolar();
 
 	Polar();
 
-	bool Serialize(QDataStream &ar, bool bIsStoring, bool bTrace=false);
+	bool Serialize(QDataStream &ar, bool bIsStoring);
 
 	void AddPoint(double Alpha, double Cd, double Cdp, double Cl, double Cm,
 				  double Xtr1, double Xtr2, double HMom, double Cpmn, double Reynolds, double XCp);

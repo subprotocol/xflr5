@@ -1035,7 +1035,7 @@ void PanelAnalysisDlg::ComputePlane(double Alpha, double QInf, int qrhs)
 													m_pWPolar, m_pWPolar->m_CoG);
 
 
-				m_pWingList[iw]->PanelSetBending(m_pWPolar->m_bThinSurfaces);
+				m_pWingList[iw]->PanelComputeBending(m_pWPolar->m_bThinSurfaces);
 
 				pos += m_pWingList[iw]->m_MatSize;
 			}
@@ -4054,7 +4054,6 @@ void PanelAnalysisDlg::ComputeControlDerivatives()
 					if(m_ppSurface[j]->IsFlapPanel(p))
 					{
 						m_pPanel[p].RotateBC(m_ppSurface[j]->m_HingePoint, Quat);
-//						m_pPanel[p].RotatePanel(m_ppSurface[j]->m_HingePoint, Quat);
 					}
 				}
 			}

@@ -64,13 +64,11 @@ SOURCES += \
 	src/objects/Plane.cpp \
 	src/objects/Polar.cpp \
 	src/objects/Quaternion.cpp \
-	src/objects/WingSection.cpp \
 	src/objects/PlaneOpp.cpp \
 	src/objects/NURBSSurface.cpp \
 	src/objects/Spline.cpp \
 	src/objects/Surface.cpp \
 	src/objects/WPolar.cpp \
-	src/objects/WOpp.cpp \
 	src/objects/Wing.cpp \
 	src/misc/SaveOptionsDlg.cpp \
 	src/misc/ProgressDlg.cpp \
@@ -112,7 +110,8 @@ SOURCES += \
     src/mainframe.cpp \
     src/threedwidget.cpp \
 	src/twodwidget.cpp \
-    src/objects/SplineFoil.cpp
+    src/objects/SplineFoil.cpp \
+    src/objects/WingOpp.cpp
 
 HEADERS += \
 	src/XFLR5Application.h \
@@ -169,7 +168,6 @@ HEADERS += \
 	src/xinverse/FoilSelectionDlg.h \
 	src/xinverse/PertDlg.h \
 	src/objects/WPolar.h \
-	src/objects/WOpp.h \
 	src/objects/Wing.h \
 	src/objects/Surface.h \
 	src/objects/Spline.h \
@@ -223,7 +221,8 @@ HEADERS += \
     src/mainframe.h \
     src/twodwidget.h \
 	src/threedwidget.h \
-    src/objects/SplineFoil.h
+    src/objects/SplineFoil.h \
+    src/objects/WingOpp.h
 
 
 TRANSLATIONS = translations/xflr5v6.ts \

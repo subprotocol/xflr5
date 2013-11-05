@@ -18,19 +18,18 @@
 
 *****************************************************************************/
 
-/*! \file
+/**
+ *@file
  *
  * The class associated to the MMI of 3D analysis
- *
- * It dispatches user commands towards object definition, analysis and post-processing
  *
  */
 
 
-
-
 #ifndef QMIAREX_H
 #define QMIAREX_H
+
+
 
 #include "../params.h"
 #include <QWidget>
@@ -78,19 +77,37 @@
 #include "../objects/Wing.h"
 #include "../objects/Plane.h"
 #include "../objects/WPolar.h"
-#include "../objects/WOpp.h"
+#include "../objects/WingOpp.h"
 #include "../objects/PlaneOpp.h"
 #include "../objects/Polar.h"
 #include "../objects/Foil.h"
 #include "../objects/OpPoint.h"
 #include "../graph/QGraph.h"
 
+/** This enumeration defines the options for the active view.
+ *May be the operaring point view, the polar view, the 3D view, the Cp view, or the stability view*/
 typedef enum {WOPPVIEW, WPOLARVIEW, W3DVIEW, WCPVIEW, WSTABVIEW} enumMiarexViews;
 
+/** In the case of a stability view, this enumeration defines the display options.
+ *May be the a time graph view, a root locus view, or a 3D view, */
 typedef enum {STABTIMEVIEW, STABPOLARVIEW, STAB3DVIEW} enumStabilityViews;
 
 
 
+
+/**
+ *@class QMiarex
+ *@brief This is the class associated to the 3D calculations
+
+  It is the handling class for the Miarex toolbar and it dispatches user commands towards
+  object definition, analysis and post-processing.
+  The main methods of this class are:
+	- Management of wings, planes, polars, and operating points
+	- Construction of the panels for 3D calculations
+	- Management of the display
+	- Management of the LLT and Panel Analysis,
+	- Mapping of the analyis results to the operating point and polar objects
+*/
 class QMiarex : public QWidget
 {
 	friend class MainFrame;
@@ -536,8 +553,8 @@ public:
 	double m_DragScale;                /**< scaling factor for the drag display in 3D view */
 	double m_glScaled;                 /**< scaling factor for the object in the 3D view */
 
-	QRect m_r2DCltRect;           /**< the client rectangle, in client coordinates*/
-	QRect m_r3DCltRect;           /**< the drawing rectangle, in client coordinates. @todo check usage*/
+	QRect m_r2DCltRect;                /**< the client rectangle, in client coordinates. */
+	QRect m_r3DCltRect;                /**< the drawing rectangle, in client coordinates .*/
 
 	PlaneOpp * m_pCurPOpp;           /**< a pointer to the active Plane Operating Point, or NULL if none is active*/
 

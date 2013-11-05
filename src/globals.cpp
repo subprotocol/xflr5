@@ -21,6 +21,7 @@
 
 //Global functions
 
+/**@file This file contains the definitions of methods used throughout the program and not specific to one application. */
 
 #include "globals.h"
 #include <QVector3D>
@@ -33,7 +34,11 @@
 #include <QByteArray>
 #include <math.h>
 
-
+/** 
+* Returns a double number as its root and its base 10 exponent
+* @param f the double number to reformat; is returned as f = f/pow(10.0,exp);
+* @param exp the base 10 exponent of f.
+*/
 void ExpFormat(double &f, int &exp)
 {
 	if (f==0.0)
@@ -54,7 +59,15 @@ void ExpFormat(double &f, int &exp)
 }
 
 
-
+/**
+* Solves a linear system using Gauss partial pivot method
+*@param A a pointer to the single dimensionnal array of double values. Size is n².
+*@param n the size of the square matrix
+*@param B a pointer to the array of m RHS 
+*@param m the number of RHS arrays to solve
+*@param pbCancel a pointer to the boolean variable which holds true if the operation shold be interrupted.
+*@return true if the problem was successfully solved.
+*/
 bool Gauss(double *A, int n, double *B, int m, bool *pbCancel)
 {
 	static int row, i, j, pivot_row, k;
@@ -139,7 +152,11 @@ bool Gauss(double *A, int n, double *B, int m, bool *pbCancel)
 }
 
 
-
+/**
+ * Returns the name of the user-selected area unit, based on its index in the array. 
+ *@param str the reference of the QString to be filled with the name of the area unit
+ *@param unit the index of the area unit
+ */
 void GetAreaUnit(QString &str, int unit)
 {
 	switch(unit)
@@ -184,6 +201,11 @@ void GetAreaUnit(QString &str, int unit)
 
 
 
+/**
+ * Returns the name of the user-selected length unit, based on its index in the array. 
+ *@param str the reference of the QString to be filled with the name of the length unit
+ *@param unit the index of the length unit
+ */
 void GetLengthUnit(QString &str, int unit)
 {
 	switch(unit)
@@ -226,6 +248,12 @@ void GetLengthUnit(QString &str, int unit)
 	}
 }
 
+
+/**
+ * Returns the name of the user-selected force unit, based on its index in the array. 
+ *@param str the reference of the QString to be filled with the name of the force unit
+ *@param unit the index of the force unit
+ */
 void GetForceUnit(QString &str, int unit)
 {
 	switch(unit)
@@ -246,6 +274,12 @@ void GetForceUnit(QString &str, int unit)
 	}
 }
 
+
+/**
+ * Returns the name of the user-selected moment unit, based on its index in the array. 
+ *@param str the reference of the QString to be filled with the name of the moment unit
+ *@param unit the index of the moment unit
+ */
 void GetMomentUnit(QString &str, int unit)
 {
 	switch(unit)
@@ -274,6 +308,12 @@ void GetMomentUnit(QString &str, int unit)
 }
 
 
+
+/**
+ * Returns the name of the user-selected speed unit, based on its index in the array. 
+ *@param str the reference of the QString to be filled with the name of the speed unit
+ *@param unit the index of the speed unit
+ */
 void GetSpeedUnit(QString &str, int unit)
 {
 	switch(unit){
@@ -305,6 +345,11 @@ void GetSpeedUnit(QString &str, int unit)
 }
 
 
+/**
+ * Returns the name of the user-selected mass unit, based on its index in the array. 
+ *@param str the reference of the QString to be filled with the name of the mass unit
+ *@param unit the index of the mass unit
+ */
 void GetWeightUnit(QString &str, int unit)
 {
 	switch(unit){
@@ -331,6 +376,13 @@ void GetWeightUnit(QString &str, int unit)
 	}
 }
 
+/**
+* Tests if a given integer is between two other integers
+*@param f the integer to test
+*@param f1 the first bound
+*@param f2 the second bound
+*@return true if f1<f<f2 or f2<f<f1
+*/
 bool IsBetween(int f, int f1, int f2)
 {
 	if (f2 < f1)
@@ -345,12 +397,13 @@ bool IsBetween(int f, int f1, int f2)
 }
 
 
-bool IsEven(int n)
-{
-	if(n%2==0) return true;
-	else return false;
-}
-
+/**
+* Tests if a given integer is between two double values
+*@param f the integer to test
+*@param f1 the first bound
+*@param f2 the second bound
+*@return true if f1<f<f2 or f2<f<f1
+*/
 bool IsBetween(int f, double f1, double f2)
 {
 	double ff = f;
@@ -366,6 +419,23 @@ bool IsBetween(int f, double f1, double f2)
 }
 
 
+/**
+* Tests if a given integer is an even number
+*@param n the integer to test
+*@return true if n is an even number
+*/
+bool IsEven(int n)
+{
+	if(n%2==0) return true;
+	else return false;
+}
+
+/**
+* Returns the index of a Qt-style based on the index of the style in the array 
+*@param s the index of the style
+*@return The index of the Qt-style 
+*@todo Use directly the Qt style list ?
+*/
 Qt::PenStyle GetStyle(int s)
 {
 	if(s==0)      return Qt::SolidLine;
@@ -377,7 +447,10 @@ Qt::PenStyle GetStyle(int s)
 }
 
 
-
+/**
+*Reads one line from an AVL-format text file
+*@deprecated the option to map AVL data was too comlplex and has been disabled.
+*/
 bool ReadAVLString(QTextStream &in, int &Line, QString &strong)
 {
 	bool bComment = true;
@@ -408,7 +481,11 @@ bool ReadAVLString(QTextStream &in, int &Line, QString &strong)
 	return true;
 }
 
-
+/**
+* Reads the RGB int values of a color from binary datastream and returns a QColor. Inherited from the MFC versions of XFLR5.
+*@param ar the binary datastream
+*@param color the QColor read from the stream
+*/
 void ReadCOLORREF(QDataStream &ar, QColor &color)
 {
 	qint32 colorref;
@@ -420,9 +497,30 @@ void ReadCOLORREF(QDataStream &ar, QColor &color)
 	g = (int)(colorref/256);
 	r = colorref - g*256;
 	color = QColor(r,g,b,255);
-
 }
 
+/**
+* Writes the RGB int values of a color to a binary datastream. Inherited from the MFC versions of XFLR5.
+*@param ar the binary datastream
+*@param color the QColor to write to the stream
+*/
+void WriteCOLORREF(QDataStream &ar, QColor const &color)
+{
+	qint32 colorref;
+	int r,g,b;
+
+	color.getRgb(&r,&g,&b);
+
+	colorref = b*256*256+g*256+r;
+	ar << colorref;
+}
+
+
+/**
+* Reads a sequence of characters from a binary stream and returns a QString. Inherited from the MFC versions of XFLR5.
+*@param ar the binary datastream
+*@param strong the QString read from the stream
+*/
 void ReadCString(QDataStream &ar, QString &strong)
 {
 	qint8 qi, ch;
@@ -439,7 +537,32 @@ void ReadCString(QDataStream &ar, QString &strong)
 	}
 }
 
+/**
+* Writes a sequence of characters from a QStrinf to a binary stream. Inherited from the MFC versions of XFLR5.
+*@param ar the binary datastream
+*@param strong the QString to output to the stream
+*/
+void WriteCString(QDataStream &ar, QString const &strong)
+{
+	qint8 qi = strong.length();
 
+	QByteArray textline;
+	char *text;
+	textline = strong.toAscii();
+	text = textline.data();
+	ar << qi;
+	ar.writeRawData(text, qi);
+}
+
+
+
+
+/**
+*Rewinds one line from a QTextStream opened for reading
+*@param in the stream opened for reading
+*@param Line the index of the next Line to read
+*@param strong the line to =ewind
+*/
 bool Rewind1Line(QTextStream &in, int &Line, QString &strong)
 {
 	int length = strong.length() * 1+2;//1 char takes one byte in the file ?
@@ -451,7 +574,11 @@ bool Rewind1Line(QTextStream &in, int &Line, QString &strong)
 }
 
 
-
+/**
+* Takes a double number holding the value of a Reynolds number and returns a string.
+*@param str the return string  with the formatted number
+*@param f the Reynolds number to be formatted
+*/
 void ReynoldsFormat(QString &str, double f)
 {
 	int i, q, r, exp;
@@ -478,7 +605,9 @@ void ReynoldsFormat(QString &str, double f)
 	str = strong;
 }
 
-
+/**
+* Initializes the conversion factors for all user-defined units
+*/
 void SetUnits(int LUnit, int AUnit, int SUnit, int WUnit, int FUnit, int MUnit,
 			  double &mtoUnit, double &m2toUnit, double &mstoUnit,  double &kgtoUnit, double &NtoUnit, double &NmtoUnit)
 {
@@ -630,7 +759,13 @@ void SetUnits(int LUnit, int AUnit, int SUnit, int WUnit, int FUnit, int MUnit,
 	}
 }
 
-
+/**
+* Outputs in a debug file the current time and the value of the integer passed as an input parameter.
+* The file is in the user's default temporary directory with the name Trace.log
+* The file is in the user's default temporary directory with the name Trace.log. 
+* Used for debugging.
+*@param n the integer to output
+*/
 void Trace(int n)
 {
 	QString FileName = QDir::tempPath() + "/Trace.log";
@@ -651,6 +786,12 @@ void Trace(int n)
 }
 
 
+/**
+* Outputs in a debug file the current time and a string message passed as an input parameter.
+* The file is in the user's default temporary directory with the name Trace.log. 
+* Used for debugging.
+*@param msg the message to output
+*/
 void Trace(QString msg)
 {
 //	if(!((CXFLR5App*)AfxGetApp())->bTrace) return;
@@ -676,6 +817,13 @@ void Trace(QString msg)
 }
 
 
+/**
+* Outputs in a debug file the current time, a string message and the value of the integer passed as an input parameter.
+* The file is in the user's default temporary directory with the name Trace.log. 
+* Used for debugging.
+*@param msg the message to output
+*@param n the integer to output
+*/
 void Trace(QString msg, int n)
 {
 //	if(!((CXFLR5App*)AfxGetApp())->bTrace) return;
@@ -686,8 +834,6 @@ void Trace(QString msg, int n)
 	QString strong;
 	QTextStream ts(tf);
 	while(!ts.atEnd()) ts>>strong;
-
-
 
 	strong = QString("  %1").arg(n);
 	strong = msg + strong;
@@ -701,6 +847,13 @@ void Trace(QString msg, int n)
 }
 
 
+/**
+* Outputs in a debug file the current time, a string message and the value of the floating number passed as an input parameter.
+* The file is in the user's default temporary directory with the name Trace.log. 
+* Used for debugging.
+*@param msg the message to output
+*@param f the float number to output
+*/
 void Trace(QString msg, double f)
 {
 //	if(!((CXFLR5App*)AfxGetApp())->bTrace) return;
@@ -729,34 +882,12 @@ void Trace(QString msg, double f)
 }
 
 
-
-void WriteCOLORREF(QDataStream &ar, QColor const &color)
-{
-	qint32 colorref;
-	int r,g,b;
-
-	color.getRgb(&r,&g,&b);
-
-	colorref = b*256*256+g*256+r;
-	ar << colorref;
-}
-
-
-
-void WriteCString(QDataStream &ar, QString const &strong)
-{
-	qint8 qi = strong.length();
-
-	QByteArray textline;
-	char *text;
-	textline = strong.toAscii();
-	text = textline.data();
-	ar << qi;
-	ar.writeRawData(text, qi);
-}
-
-
-
+/**
+* Returns the red component of a color scale depending on an input parameter with value between 0 and 1.
+* Used to draw a color scale between 0=blue and 1=red
+*@param tau the input parameter between 0 and 1.
+*@return the red component of the color
+*/
 double GLGetRed(double tau)
 {
 	if(tau>2.0/3.0)      return 1.0;
@@ -765,6 +896,12 @@ double GLGetRed(double tau)
 }
 
 
+/**
+* Returns the green component of a color scale depending on an input parameter with value between 0 and 1.
+* Used to draw a color scale between 0=blue and 1=red
+*@param tau the input parameter between 0 and 1.
+*@return the green component of the color
+*/
 double GLGetGreen(double tau)
 {
 	if(tau<0.f || tau>1.0) 	return 0.0;
@@ -774,6 +911,12 @@ double GLGetGreen(double tau)
 }
 
 
+/**
+* Returns the blue component of a color scale depending on an input parameter with value between 0 and 1.
+* Used to draw a color scale between 0=blue and 1=red
+*@param tau the input parameter between 0 and 1.
+*@return the blue component of the color
+*/
 double GLGetBlue(double tau)
 {
 	if(tau>2.0/3.0)      return 0.0;
@@ -782,10 +925,11 @@ double GLGetBlue(double tau)
 }
 
 
+/**
+ Auxiliary integral used in LLT calculations
+*/
 double IntegralC2(double y1, double y2, double c1, double c2)
 {
-	// Auxiliary integral used in LLT calculations
-
 	double res = 0.0;
 
 	if (fabs(y2-y1)<1.e-5) return 0.0;
@@ -799,10 +943,11 @@ double IntegralC2(double y1, double y2, double c1, double c2)
 }
 
 
+/**
+ Auxiliary integral used in LLT calculations
+*/
 double IntegralCy(double y1, double y2, double c1, double c2)
 {
-	// Auxiliary integral used in LLT calculations
-
 	double res = 0.0;
 	if (fabs(y2-y1)<1.e-5) return (y1+y2)/2.0 * (c1+c2)/2.0;
 
@@ -811,7 +956,9 @@ double IntegralCy(double y1, double y2, double c1, double c2)
 	return res;
 }
 
-
+/**
+* Extracts three double values from a QString, and returns the number of extracted values.
+*/
 void ReadValues(QString line, int &res, double &x, double &y, double &z)
 {
 /*	char *sx = new char[30];
@@ -872,53 +1019,51 @@ void ReadValues(QString line, int &res, double &x, double &y, double &z)
 
 
 
-////////////////////////////////////////////////////////////////////////////////
-//  int Crout_LU_Decomposition_with_Pivoting(double *A, int pivot[], int n)   //
-//                                                                            //
-//  Unknown author http://mymathlib.webtrellis.net/index.html                 //
-//                                                                            //
-//  Description:                                                              //
-//     This routine uses Crout's method to decompose a row interchanged       //
-//     version of the n x n matrix A into a lower triangular matrix L and a   //
-//     unit upper triangular matrix U such that A = LU.                       //
-//     The matrices L and U replace the matrix A so that the original matrix  //
-//     A is destroyed.                                                        //
-//     Note!  In Crout's method the diagonal elements of U are 1 and are      //
-//            not stored.                                                     //
-//     Note!  The determinant of A is the product of the diagonal elements    //
-//            of L.  (det A = det L * det U = det L).                         //
-//     The LU decomposition is convenient when one needs to solve the linear  //
-//     equation Ax = B for the vector x while the matrix A is fixed and the   //
-//     vector B is varied.  The routine for solving the linear system Ax = B  //
-//     after performing the LU decomposition for A is                         //
-//                      Crout_LU_with_Pivoting_Solve.                         //
-//     (see below).                                                           //
-//                                                                            //
-//     The Crout method with partial pivoting is: Determine the pivot row and //
-//     interchange the current row with the pivot row, then assuming that     //
-//     row k is the current row, k = 0, ..., n - 1 evaluate in order the      //
-//     the following pair of expressions                                      //
-//       L[i][k] = (A[i][k] - (L[i][0]*U[0][k] + . + L[i][k-1]*U[k-1][k]))    //
-//                                 for i = k, ... , n-1,                      //
-//       U[k][j] = A[k][j] - (L[k][0]*U[0][j] + ... + L[k][k-1]*U[k-1][j])    //
-//                                                                  / L[k][k] //
-//                                      for j = k+1, ... , n-1.               //
-//       The matrix U forms the upper triangular matrix, and the matrix L     //
-//       forms the lower triangular matrix.                                   //
-//                                                                            //
-//  Arguments:                                                                //
-//     double *A       Pointer to the first element of the matrix A[n][n].    //
-//     int    pivot[]  The i-th element is the pivot row interchanged with    //
-//                     row i.                                                 //
-//     int     n       The number of rows or columns of the matrix A.         //
-//                                                                            //
-//  Return Values:                                                            //
-//     0  Success                                                             //
-//    -1  Failure - The matrix A is singular.                                 //
-//                                                                            //
-////////////////////////////////////////////////////////////////////////////////
-//                                                                            //
-
+/**
+  int Crout_LU_Decomposition_with_Pivoting(double *A, int pivot[], int n)   
+                                                                            
+  Unknown author http:mymathlib.webtrellis.net/index.html                 
+                                                                            
+  Description:                                                              
+     This routine uses Crout's method to decompose a row interchanged       
+     version of the n x n matrix A into a lower triangular matrix L and a   
+     unit upper triangular matrix U such that A = LU.                       
+     The matrices L and U replace the matrix A so that the original matrix  
+     A is destroyed.                                                        
+     Note!  In Crout's method the diagonal elements of U are 1 and are      
+            not stored.                                                     
+     Note!  The determinant of A is the product of the diagonal elements    
+            of L.  (det A = det L * det U = det L).                         
+     The LU decomposition is convenient when one needs to solve the linear  
+     equation Ax = B for the vector x while the matrix A is fixed and the   
+     vector B is varied.  The routine for solving the linear system Ax = B  
+     after performing the LU decomposition for A is                         
+                      Crout_LU_with_Pivoting_Solve.                         
+     (see below).                                                           
+                                                                            
+     The Crout method with partial pivoting is: Determine the pivot row and 
+     interchange the current row with the pivot row, then assuming that     
+     row k is the current row, k = 0, ..., n - 1 evaluate in order the      
+     the following pair of expressions                                      
+       L[i][k] = (A[i][k] - (L[i][0]*U[0][k] + . + L[i][k-1]*U[k-1][k]))    
+                                 for i = k, ... , n-1,                      
+       U[k][j] = A[k][j] - (L[k][0]*U[0][j] + ... + L[k][k-1]*U[k-1][j])    
+                                                                  / L[k][k] 
+                                      for j = k+1, ... , n-1.               
+       The matrix U forms the upper triangular matrix, and the matrix L     
+       forms the lower triangular matrix.                                   
+                                                                            
+  Arguments:                                                                
+     double *A       Pointer to the first element of the matrix A[n][n].    
+     int    pivot[]  The i-th element is the pivot row interchanged with    
+                     row i.                                                 
+     int     n       The number of rows or columns of the matrix A.         
+                                                                            
+  Return Values:                                                            
+     0  Success                                                             
+    -1  Failure - The matrix A is singular.                                 
+                                                                            
+*/
 bool Crout_LU_Decomposition_with_Pivoting(double *A, int pivot[], int n, bool *pbCancel, double TaskSize, double &Progress)
 {
 	int i, j, k;
@@ -975,39 +1120,38 @@ bool Crout_LU_Decomposition_with_Pivoting(double *A, int pivot[], int n, bool *p
 }
 
 
-////////////////////////////////////////////////////////////////////////////////
-//  int Crout_LU_with_Pivoting_Solve(double *LU, double B[], int pivot[],     //
-//                                                        double x[], int n)  //
-//                                                                            //
-// Unknown author http://mymathlib.webtrellis.net/index.html                  //
-//                                                                            //
-//  Description:                                                              //
-//     This routine uses Crout's method to solve the linear equation Ax = B.  //
-//     This routine is called after the matrix A has been decomposed into a   //
-//     product of a lower triangular matrix L and a unit upper triangular     //
-//     matrix U without pivoting.  The argument LU is a pointer to the matrix //
-//     the superdiagonal part of which is U and the subdiagonal together with //
-//     the diagonal part is L. (The diagonal part of U is 1 and is not        //
-//     stored.)   The matrix A = LU.                                          //
-//     The solution proceeds by solving the linear equation Ly = B for y and  //
-//     subsequently solving the linear equation Ux = y for x.                 //
-//                                                                            //
-//  Arguments:                                                                //
-//     double *LU      Pointer to the first element of the matrix whose       //
-//                     elements form the lower and upper triangular matrix    //
-//                     factors of A.                                          //
-//     double *B       Pointer to the column vector, (n x 1) matrix, B.       //
-//     int    pivot[]  The i-th element is the pivot row interchanged with    //
-//                     row i.                                                 //
-//     double *x       Solution to the equation Ax = B.                       //
-//     int     n       The number of rows or columns of the matrix LU.        //
-//                                                                            //
-//  Return Values:                                                            //
-//     true  : Success                                                        //
-//     false : Failure - The matrix A is singular.                            //
-//                                                                            //
-////////////////////////////////////////////////////////////////////////////////
-//                                                                            //
+/**
+  int Crout_LU_with_Pivoting_Solve(double *LU, double B[], int pivot[],     
+                                                        double x[], int n)  
+                                                                            
+ Unknown author http:mymathlib.webtrellis.net/index.html                  
+                                                                            
+  Description:                                                              
+     This routine uses Crout's method to solve the linear equation Ax = B.  
+     This routine is called after the matrix A has been decomposed into a   
+     product of a lower triangular matrix L and a unit upper triangular     
+     matrix U without pivoting.  The argument LU is a pointer to the matrix 
+     the superdiagonal part of which is U and the subdiagonal together with 
+     the diagonal part is L. (The diagonal part of U is 1 and is not        
+     stored.)   The matrix A = LU.                                          
+     The solution proceeds by solving the linear equation Ly = B for y and  
+     subsequently solving the linear equation Ux = y for x.                 
+                                                                            
+  Arguments:                                                                
+     double *LU      Pointer to the first element of the matrix whose       
+                     elements form the lower and upper triangular matrix    
+                     factors of A.                                          
+     double *B       Pointer to the column vector, (n x 1) matrix, B.       
+     int    pivot[]  The i-th element is the pivot row interchanged with    
+                     row i.                                                 
+     double *x       Solution to the equation Ax = B.                       
+     int     n       The number of rows or columns of the matrix LU.        
+                                                                            
+  Return Values:                                                            
+     true  : Success                                                        
+     false : Failure - The matrix A is singular.                            
+                                                                            
+*/
 bool Crout_LU_with_Pivoting_Solve(double *LU, double B[], int pivot[], double x[], int Size, bool *pbCancel)
 {
 	int i, k;
@@ -1055,6 +1199,11 @@ bool Crout_LU_with_Pivoting_Solve(double *LU, double B[], int pivot[], double x[
 }
 
 
+/** 
+*Returns the determinant of a 4x4 matrix
+*@param aij a pointer to a one-dimensional array holding the 16 double values of the matrix
+*@return the matrix's determinant
+*/
 double Det44(double *aij)
 {
 //	returns the determinant of a 4x4 matrix
@@ -1086,6 +1235,12 @@ double Det44(double *aij)
 }
 
 
+
+/** 
+*Returns the determinant of a 3x3 matrix
+*@param aij a pointer to a one-dimensional array holding the 9 double values of the matrix
+*@return the matrix's determinant
+*/
 double Det33(double *aij)
 {
 	//returns the determinant of a 3x3 matrix
@@ -1106,6 +1261,11 @@ double Det33(double *aij)
 
 
 
+/** 
+*Returns the determinant of a complex 3x3 matrix
+*@param aij a pointer to a one-dimensional array holding the 9 complex values of the matrix
+*@return the matrix's determinant
+*/
 complex<double> Det33(complex<double> *aij)
 {
 	//returns the determinant of a 3x3 matrix
@@ -1124,6 +1284,13 @@ complex<double> Det33(complex<double> *aij)
 }
 
 
+/** 
+*Returns the cofactor of an element in a 4x4 matrix of complex values.
+*@param aij a pointer to a one-dimensional array holding the 16 complex values of the matrix.
+*@param i the number of the element's line, starting at 0.
+*@param j the number of the element's column, starting at 0.
+*@return the cofactor of element (i,j).
+*/
 complex<double> Cofactor44(complex<double> *aij, int &i, int &j)
 {
 	//returns the complex cofactor	of element i,j, in the 4x4 matrix aij
@@ -1150,7 +1317,11 @@ complex<double> Cofactor44(complex<double> *aij, int &i, int &j)
 	return Det33(a33);
 }
 
-
+/** 
+*Returns the determinant of a complex 4x4 matrix
+*@param aij a pointer to a one-dimensional array holding the 16 complex double values of the matrix
+*@return the matrix's determinant
+*/
 complex<double> Det44(complex<double> *aij)
 {
 //	returns the determinant of a 4x4 matrix
@@ -1187,7 +1358,12 @@ complex<double> Det44(complex<double> *aij)
 	return det;
 }
 
-
+/** 
+*Inverts a complex 4x4 matrix
+*@param ain in input, a pointer to a one-dimensional array holding the 16 complex values of the input matrix
+*@param aout in output, a pointer to a one-dimensional array holding the 16 complex values of the inverted matrix
+*@return if the inversion was successful
+*/
 bool Invert44(complex<double> *ain, complex<double> *aout)
 {
 	//small size, use the direct method
@@ -1213,16 +1389,14 @@ bool Invert44(complex<double> *ain, complex<double> *aout)
 
 
 
-
-
+/**
+* Returns the coefficients of the characteristic polynomial of a 4x4 matrix of double values. Thanks Mapple.
+* The polynom can then be solved for complex roots using Bairstow's algorithm
+*@param m the 4x4 matrix
+*@param p the array holding the 5 coefficients of the matrix characteristic polynomial
+*/
 void CharacteristicPol(double m[][4], double p[5])
 {
-	// input : 4x4 matrix m[][]
-	// output : coefficients p[] of the matrix characteristic polynomial
-	// thanks Mapple !
-	// polynom can then be solved for complex roots using Bairstow's algorithm
-
-
 	// lambda^4
 	p[4] =  1;
 
@@ -1302,7 +1476,7 @@ void CharacteristicPol(double m[][4], double p[5])
 
 #define POLYNOMORDER    6
 
-
+/** Text function, for debugging purposes only*/
 void TestEigen()
 {
 	double A[4][4];
@@ -1340,23 +1514,25 @@ void TestEigen()
 }
 
 
+/**________________________________________________________________________
+* Finds the eigenvector associated to an eigenvalue.
+* Solves the system A.V = lambda.V where A is a 4x4 complex matrix
+* in input :
+*    - matrix A
+*    - the array of complex eigenvalues
+* in output
+*    - the array of complex eigenvectors
+*
+* The eigenvector is calculated by direct matrix inversion.
+* One of the vector's component is set to 1, to avoid the trivial solution V=0;
+*
+* (c) Andre Deperrois October 2009
+*@param a the complex two-dimensional 4x4 input matrix to diagonalize
+*@param lambda the output array of four complex eigenvalues
+*@param V the eigenvector as a one-dimensional array of complex values
+*________________________________________________________________________ */
 bool Eigenvector(double a[][4], complex<double> lambda, complex<double> *V)
 {
-	//________________________________________________________________________
-	//Solves the system A.V = lambda.V for a 4x4 complex matrix
-	// in input :
-	//    - matrix A
-	//    - the array of complex eigenvalues
-	// in output
-	//    - the array of complex eigenvectors
-	//
-	// eigen vector is solved by direct matrix solution
-	// one of the vector's component is set to 1, to avoid the trivial solution V=0;
-	//
-	// Andre Deperrois October 2009
-	//
-	//________________________________________________________________________
-
 	static complex<double> detm, detr;
 	static complex<double> r[9], m[9];
 	int ii, jj, i, j, kp;
@@ -1426,18 +1602,19 @@ bool Eigenvector(double a[][4], complex<double> lambda, complex<double> *V)
 #define TOLERANCE   1.e-8
 #define MAXBAIRSTOWITER 30
 
+/**
+* Finds the complex roots of a polynom P(x) using Lin-Bairstow's method
+* P(x) = Sum p_i x^i	    i = 0..n;
+* The polynoms coefficient are in array p
+*
+* Andre Deperrois October 2009
+*@param p the array of the polynoms double's coefficients
+*@param root the array of the polynom's complex roots
+*@param n the polynom's order
+*@return true if the extraction was successful
+*/
 bool LinBairstow(double *p, complex<double> *root, int n)
 {
-	//________________________________________________________________________
-	//
-	// Finds the complex roots of a polynom P(x) using Lin-Bairstow's method
-	// P(x) = Sum p_i x^i	    i = 0..n;
-	// The polynoms coefficient are in array p
-	//
-	// Andre Deperrois October 2009
-	//
-	//________________________________________________________________________
-
 	double b[POLYNOMORDER], c[POLYNOMORDER];
 	int i, k, nn, iter;
 	double r,s,d0,d1,d2;
@@ -1550,7 +1727,20 @@ bool LinBairstow(double *p, complex<double> *root, int n)
 }
 
 
-
+/**
+*Interpolates a variable on the polar mesh, based on the geometrical position of a point between two sections on a wing.
+*@param m_poaPolar the pointer to the array of polars.
+*@param nVar the index of the variable to interpolate.
+*@param pFoil0 the pointer to the left foil  of the wing's section.
+*@param pFoil1 the pointer to the left foil  of the wing's section.
+*@param Re the Reynolds number at the point's position.
+*@param Cl the lift coefficient at the point's position.
+*@param Tau the relative position of the point between the two foils.
+*@param bOutRe true if Cl is outside the min or max Cl of the polar mesh.
+*@param bError if Re is outside the min or max Reynolds number of the polar mesh.
+*@return the interpolated value.
+*@todo check the description of the variables
+*/
 double GetVar(QList<void*>*m_poaPolar, int nVar, Foil *pFoil0, Foil *pFoil1, double Re, double Cl, double Tau, bool &bOutRe, bool &bError)
 {
 	bool IsOutRe = false;
@@ -1583,11 +1773,14 @@ double GetVar(QList<void*>*m_poaPolar, int nVar, Foil *pFoil0, Foil *pFoil1, dou
 	return ((1-Tau) * Var0 + Tau * Var1);
 }
 
-
+/**
+* Returns a pointer to a variable array of a polar object, based on the variable's index
+* @param pPolar the pointer to the polar object
+* @param iVar the index of the variable
+* @return the pointer to the array holding the values of the variable
+*/
 void * GetPlrVariable(Polar *pPolar, int iVar)
 {
-	// returns a pointer to the variable array defined by its index iVar
-
 	void * pVar;
 	switch (iVar)
 	{
@@ -1635,6 +1828,20 @@ void * GetPlrVariable(Polar *pPolar, int iVar)
 }
 
 
+/**
+* Returns the value of an aero coefficient, interpolated on a polar mesh, and based on the value of the Reynolds Number and of the aoa.
+* Proceeds by identifiying the two polars surronding Re, then interpolating both with the value of Alpha, 
+* last by interpolating the requested variable between the values measured on the two polars.
+*@param m_poaPolar the pointer to the array of polars.
+*@param pFoil the pointer to the foil
+*@param Re the Reynolds number .
+*@param Alpha the angle of attack.
+*@param PlrVar the index of the variable to interpolate.
+*@param bOutRe true if Cl is outside the min or max Cl of the polar mesh.
+*@param bError if Re is outside the min or max Reynolds number of the polar mesh.
+*@return the interpolated value.
+*@todo check the description of the variables
+*/
 double GetPlrPointFromAlpha(QList<void*>*m_poaPolar, Foil *pFoil, double Re, double Alpha, int PlrVar, bool &bOutRe, bool &bError)
 {
 /*	Var
@@ -1886,6 +2093,20 @@ double GetPlrPointFromAlpha(QList<void*>*m_poaPolar, Foil *pFoil, double Re, dou
 }
 
 
+/**
+* Returns the value of an aero coefficient, interpolated on a polar mesh, and based on the value of the Reynolds Number and of the lift coefficient.
+* Proceeds by identifiying the two polars surronding Re, then interpolating both with the value of Alpha, 
+* last by interpolating the requested variable between the values measured on the two polars.
+*@param m_poaPolar the pointer to the array of polars.
+*@param pFoil the pointer to the foil
+*@param Re the Reynolds number .
+*@param Cl the lift coefficient.
+*@param PlrVar the index of the variable to interpolate.
+*@param bOutRe true if Cl is outside the min or max Cl of the polar mesh.
+*@param bError if Re is outside the min or max Reynolds number of the polar mesh.
+*@return the interpolated value.
+*@todo check the description of the variables
+*/
 double GetPlrPointFromCl(QList<void*>*m_poaPolar, Foil *pFoil, double Re, double Cl, int PlrVar, bool &bOutRe, bool &bError)
 {
 /*	Var
@@ -2223,7 +2444,20 @@ double GetPlrPointFromCl(QList<void*>*m_poaPolar, Foil *pFoil, double Re, double
 	}
 }
 
-
+/**
+*Interpolates the lift coefficient on the polar mesh, based on the geometrical position of a point between two sections on a wing.
+*@param m_poaPolar the pointer to the array of polars.
+*@param nVar the index of the variable to interpolate.
+*@param pFoil0 the pointer to the left foil  of the wing's section.
+*@param pFoil1 the pointer to the left foil  of the wing's section.
+*@param Re the Reynolds number at the point's position.
+*@param Alpha the apparent (? @todo check) aoa at the point's position.
+*@param Tau the relative position of the point between the two foils.
+*@param bOutRe true if Cl is outside the min or max Cl of the polar mesh.
+*@param bError if Re is outside the min or max Reynolds number of the polar mesh.
+*@return the interpolated value.
+*@todo check the description of the variables
+*/
 double GetCl(QList<void*>*m_poaPolar, Foil *pFoil0, Foil *pFoil1, double Re, double Alpha, double Tau, bool &bOutRe, bool &bError)
 {
 	double Cl0, Cl1;
@@ -2251,7 +2485,18 @@ double GetCl(QList<void*>*m_poaPolar, Foil *pFoil0, Foil *pFoil1, double Re, dou
 	return ((1-Tau) * Cl0 + Tau * Cl1);
 }
 
-
+/**
+*Returns the zero-lift moment coefficient interpolated on the polar mesh, based on the geometrical position of a point between two sections on a wing.
+*@param m_poaPolar the pointer to the array of polars.
+*@param pFoil0 the pointer to the left foil  of the wing's section.
+*@param pFoil1 the pointer to the left foil  of the wing's section.
+*@param Re the Reynolds number at the point's position.
+*@param Tau the relative position of the point between the two foils.
+*@param bOutRe true if Cl is outside the min or max Cl of the polar mesh.
+*@param bError if Re is outside the min or max Reynolds number of the polar mesh.
+*@return the interpolated value for the zero-moment lift coefficient.
+*@todo check the description of the variables
+*/
 double GetCm0(QList<void*>*m_poaPolar, Foil *pFoil0, Foil *pFoil1, double Re, double Tau, bool &bOutRe, bool &bError)
 {
 	//Find 0-lift angle for local foil
@@ -2296,7 +2541,20 @@ double GetCm0(QList<void*>*m_poaPolar, Foil *pFoil0, Foil *pFoil1, double Re, do
 	return Res;
 }
 
-
+/**
+*Interpolates the moment coefficient on the polar mesh, based on the geometrical position of a point between two sections on a wing.
+*@param m_poaPolar the pointer to the array of polars.
+*@param nVar the index of the variable to interpolate.
+*@param pFoil0 the pointer to the left foil  of the wing's section.
+*@param pFoil1 the pointer to the left foil  of the wing's section.
+*@param Re the Reynolds number at the point's position.
+*@param Alpha the apparent (? @todo check) aoa  at the point's position.
+*@param Tau the relative position of the point between the two foils.
+*@param bOutRe true if Cl is outside the min or max Cl of the polar mesh.
+*@param bError if Re is outside the min or max Reynolds number of the polar mesh.
+*@return the interpolated value.
+*@todo check the description of the variables
+*/
 double GetCm(QList<void*>*m_poaPolar, Foil *pFoil0, Foil *pFoil1, double Re, double Alpha, double Tau, bool &bOutRe, bool &bError)
 {
 	double Cm0, Cm1;
@@ -2325,6 +2583,20 @@ double GetCm(QList<void*>*m_poaPolar, Foil *pFoil0, Foil *pFoil1, double Re, dou
 }
 
 
+/**
+*Interpolates the drag coefficient on the polar mesh, based on the geometrical position of a point between two sections on a wing.
+*@param m_poaPolar the pointer to the array of polars.
+*@param nVar the index of the variable to interpolate.
+*@param pFoil0 the pointer to the left foil  of the wing's section.
+*@param pFoil1 the pointer to the left foil  of the wing's section.
+*@param Re the Reynolds number at the point's position.
+*@param Alpha the apparent (? @todo check) aoa  at the point's position.
+*@param Tau the relative position of the point between the two foils.
+*@param bOutRe true if Cl is outside the min or max Cl of the polar mesh.
+*@param bError if Re is outside the min or max Reynolds number of the polar mesh.
+*@return the interpolated value.
+*@todo check the description of the variables
+*/
 double GetCd(QList<void*>*m_poaPolar, Foil *pFoil0, Foil *pFoil1, double Re, double Alpha, double Tau, double AR, bool &bOutRe, bool &bError)
 {
 	//For LLT calculations
@@ -2359,6 +2631,19 @@ double GetCd(QList<void*>*m_poaPolar, Foil *pFoil0, Foil *pFoil1, double Re, dou
 }
 
 
+/**
+*Interpolates the center of pressure's x-position coefficient on the polar mesh, based on the geometrical position of a point between two sections on a wing.
+*@param m_poaPolar the pointer to the array of polars.
+*@param pFoil0 the pointer to the left foil  of the wing's section.
+*@param pFoil1 the pointer to the left foil  of the wing's section.
+*@param Re the Reynolds number at the point's position.
+*@param Alpha the apparent (? @todo check) aoa  at the point's position.
+*@param Tau the relative position of the point between the two foils.
+*@param bOutRe true if Cl is outside the min or max Cl of the polar mesh.
+*@param bError if Re is outside the min or max Reynolds number of the polar mesh.
+*@return the interpolated value.
+*@todo check the description of the variables
+*/
 double GetXCp(QList<void*>*m_poaPolar, Foil *pFoil0, Foil *pFoil1, double Re, double Alpha, double Tau, bool &bOutRe, bool &bError)
 {
 	//For LLT calculations
@@ -2389,6 +2674,20 @@ double GetXCp(QList<void*>*m_poaPolar, Foil *pFoil0, Foil *pFoil1, double Re, do
 }
 
 
+/**
+*Interpolates transition locations on the polar mesh, based on the geometrical position of a point between two sections on a wing.
+*@param m_poaPolar the pointer to the array of polars.
+*@param pFoil0 the pointer to the left foil  of the wing's section.
+*@param pFoil1 the pointer to the left foil  of the wing's section.
+*@param Re the Reynolds number at the point's position.
+*@param Alpha the apparent (? @todo check) aoa  at the point's position.
+*@param Tau the relative position of the point between the two foils.
+*@param bTop true if the upper transition is requested, false otherwise
+*@param bOutRe true if Cl is outside the min or max Cl of the polar mesh.
+*@param bError if Re is outside the min or max Reynolds number of the polar mesh.
+*@return the interpolated value.
+*@todo check the description of the variables
+*/
 double GetXTr(QList<void*>*m_poaPolar, Foil *pFoil0, Foil *pFoil1, double Re, double Alpha, double Tau, bool bTop, bool &bOutRe, bool &bError)
 {
 	//For LLT calculations
@@ -2431,6 +2730,16 @@ double GetXTr(QList<void*>*m_poaPolar, Foil *pFoil0, Foil *pFoil1, double Re, do
 }
 
 
+/**
+*Interpolates the zero-lift angle on the polar mesh, based on the geometrical position of a point between two sections on a wing.
+*@param m_poaPolar the pointer to the array of polars.
+*@param pFoil0 the pointer to the left foil  of the wing's section.
+*@param pFoil1 the pointer to the left foil  of the wing's section.
+*@param Re the Reynolds number at the point's position.
+*@param Tau the relative position of the point between the two foils.
+*@return the interpolated value.
+*@todo check the description of the variables
+*/
 double GetZeroLiftAngle(QList<void*>*m_poaPolar, Foil *pFoil0, Foil *pFoil1, double Re, double Tau)
 {
 	//returns the 0-lift angle of the foil, at Reynolds=Re
@@ -2530,6 +2839,17 @@ double GetZeroLiftAngle(QList<void*>*m_poaPolar, Foil *pFoil0, Foil *pFoil1, dou
 }
 
 
+/**
+*Returns the coefficient of an approximate linearized Cl=f(aoa) curve, based on the geometrical position of a point between two sections on a wing.
+*@param m_poaPolar the pointer to the array of polars.
+*@param pFoil0 the pointer to the left foil  of the wing's section.
+*@param pFoil1 the pointer to the left foil  of the wing's section.
+*@param Re the Reynolds number at the point's position.
+*@param Tau the relative position of the point between the two foils.
+*@param Alpha0 the zero-lift angle
+*@param Slope the slope of the lift curve
+*@todo check the description of the variables
+*/
 void GetLinearizedPolar(QList<void*>*m_poaPolar, Foil *pFoil0, Foil *pFoil1, double Re, double Tau, double &Alpha0, double &Slope)
 {
 	//returns the 0-lift angle of the foil, at Reynolds=Re
@@ -2655,10 +2975,7 @@ void GetLinearizedPolar(QList<void*>*m_poaPolar, Foil *pFoil0, Foil *pFoil1, dou
 
 
 
-
-bool SplineInterpolation(int n, double *x, double *y, double *a, double *b, double *c, double *d)
-{
-//
+/**
 // Given an array of n+1 pairs (x[i], y[i]), with i ranging from 0 to n,
 // this function calculates the 3rd order cubic spline which interpolate the pairs.
 //
@@ -2688,8 +3005,9 @@ bool SplineInterpolation(int n, double *x, double *y, double *a, double *b, doub
 //	  a[1]
 //    ...
 //	  d[n-1]
-//
-
+*/
+bool SplineInterpolation(int n, double *x, double *y, double *a, double *b, double *c, double *d)
+{
 	if(n>50) return false;
 	int i,size;
 
@@ -2768,22 +3086,12 @@ bool SplineInterpolation(int n, double *x, double *y, double *a, double *b, doub
 }
 
 
-double GetInterpolation(double t, double *y, int m, double *a, double *b, double *c, double *d)
-{
-	if(t<=y[0])
-		return a[0] * t*t*t + b[0] *t*t + c[0] * t +d[0];
-
-	for (int k=1; k<m; k++)
-	{
-		if(t<=y[k])
-			return a[k-1] * t*t*t + b[k-1] *t*t + c[k-1] * t +d[k-1];
-
-	}
-	return a[m-1] * t*t*t + b[m-1] *t*t + c[m-1] * t +d[m-1];
-}
-
-
-
+/**
+* Method for the comparison of two complex number
+*@param a first complex number
+*@param b second complex number
+*@return 1 if Real(a) > Real(b), -1 if Real(a)<Real(b); if Real(a)=Real(b), returns 1 if Imag(a)>Image(b), -1 otherwise.
+*/
 int Compare(complex<double> a, complex<double>b)
 {
 	if(a.real()>b.real())       return  1;
@@ -2797,12 +3105,13 @@ int Compare(complex<double> a, complex<double>b)
 	return 0;
 }
 
-
+/**
+* Bubble sort algorithm for complex numbers
+*@param array the array of complex numbers to sort
+*@param ub @todo check usage
+*/
 void ComplexSort(complex<double>*array, int ub)
 {
-	// bubble sort
-	// derived from http://www.concentric.net/~ttwang/sort/sort.htm
-	//
 	int indx, indx2;
 	complex<double> temp, temp2;
 	int flipped;
@@ -2829,74 +3138,20 @@ void ComplexSort(complex<double>*array, int ub)
 
 
 
-double Bernstein(int const &i, int const &n, double const &u)
-{
-	static int k, fi, fni;
-	static double pui, pu1i1;
-
-	fi  = 1;
-	fni = 1;
-
-	for(k=2;     k<=i; k++) fi  *=k;
-	for(k=n-i+1; k<=n; k++) fni *=k;
-
-	pui   = 1.0;
-	for(k=0; k<i;   k++) pui*=u;
-
-	pu1i1 = 1.0;
-	for(k=0; k<n-i; k++) pu1i1*=1.0-u;
-
-	return pui * pu1i1 * (double)fni/(double)fi;
-}
-
-
-double BezierBlend(int const &k, int const &n, double const&u)
-{
-	static int nn,kn,nkn;
-	double blend=1.0;
-
-	nn = n;
-	kn = k;
-	nkn = n - k;
-
-	while (nn >= 1)
-	{
-		blend *= nn;
-		nn--;
-		if (kn > 1)
-		{
-			blend /= (double)kn;
-			kn--;
-		}
-		if (nkn > 1)
-		{
-			blend /= (double)nkn;
-			nkn--;
-		}
-	}
-
-	if (k > 0)   for(kn=0; kn<k;   kn++) blend *= u;
-	if (n-k > 0) for(kn=0; kn<n-k; kn++) blend *= 1.0-u;
-
-	return(blend);
-}
-
-
-
+/**
+* Returns the intersection of a ray with the object's panels
+* The ray is defined by a mouse click and is perpendicular to the viewport
+*	A is the ray's origin,
+*	U is the ray's direction
+*	LA, LB, TA, TB define a quadrangle in 3D space.
+*	N is the normal to the quadrangle
+*	I is the resulting intersection point of the ray and the quadrangle, if inside the quadrangle
+*	dist = |AI|
+*	The return value is true if the intersection inside the quadrangle, false otherwise
+**/
 bool Intersect(CVector const &LA, CVector const &LB, CVector const &TA, CVector const &TB, CVector const &Normal,
 			   CVector const &A,  CVector const &U,  CVector &I, double &dist)
 {
-	//
-	// Returns the intersection of a ray with the object's panels
-	// The ray is defined by a mouse click and is perpendicular to the viewport
-	//	A is the ray's origin,
-	//	U is the ray's direction
-	//	LA, LB, TA, TB define a quadrangle in 3D space.
-	//	N is the normal to the quadrangle
-	//	I is the resulting intersection point of the ray and the quadrangle, if inside the quadrangle
-	//	dist = |AI|
-	//	The return value is true if intersection inside the quadrangle, false otherwise
-	//
 	static CVector P, W, V, T;
 	bool b1, b2, b3, b4;
 	double r,s;
@@ -2969,18 +3224,17 @@ bool Intersect(CVector const &LA, CVector const &LB, CVector const &TA, CVector 
 	return false;
 }
 
-
-
+/**
+*	Calculates the blending value of a point on a BSpline. This is done recursively.
+*	If the numerator and denominator are 0 the expression is 0.
+*	If the denominator is 0 the expression is 0
+*
+*	   index   is the control point's index
+*	   p       is the spline's degree
+*	   t       is the spline parameter
+*/
 double SplineBlend(int const &index, int const &p, double const &t, double *knots)
 {
-//	Calculate the blending value, this is done recursively.
-//	If the numerator and denominator are 0 the expression is 0.
-//	If the denominator is 0 the expression is 0
-//
-//	   index   is the control point's index
-//	   p       is the spline's degree
-//	   t       is the spline parameter
-//
 	static double eps = 1.e-6;
 	double value;
 

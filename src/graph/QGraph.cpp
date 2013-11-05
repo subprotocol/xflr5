@@ -613,7 +613,7 @@ void QGraph::ExpFormat(double &f, int &exp)
 }
 
 
-void QGraph::ExportToFile(QFile &XFile, int FileType)
+void QGraph::ExportToFile(QFile &XFile, enumTextFileType FileType)
 {
 	int i,j, maxpoints;
 	CCurve *pCurve;
@@ -629,8 +629,8 @@ void QGraph::ExportToFile(QFile &XFile, int FileType)
 			maxpoints = qMax(maxpoints,pCurve->n); 
 
 			pCurve->title(strong);
-			if(FileType==1)	out << "     "<<m_XTitle<<"       "<< strong <<"    ";
-			else            out << m_XTitle<<","<< strong << ", , ";
+			if(FileType==TXT) out << "     "<<m_XTitle<<"       "<< strong <<"    ";
+			else              out << m_XTitle<<","<< strong << ", , ";
 
 		}
 	}
@@ -643,15 +643,15 @@ void QGraph::ExportToFile(QFile &XFile, int FileType)
 			pCurve = GetCurve(i);
 			if(pCurve && j<pCurve->n)
 			{
-				if(FileType==1)	strong= QString("%1     %2  ")
+				if(FileType==TXT) strong= QString("%1     %2  ")
 												.arg(pCurve->x[j],13,'g',7).arg(pCurve->y[j],13,'g',7);
-				else            strong= QString("%1, %2, , ")
+				else              strong= QString("%1, %2, , ")
 												.arg(pCurve->x[j],13,'g',7).arg(pCurve->y[j],13,'g',7);
 			}
 			else
 			{
-				if(FileType==1)	strong= "                                 ";
-				else            strong= ", , , ";
+				if(FileType==TXT) strong= "                                 ";
+				else              strong= ", , , ";
 			}
 			out << strong;
 		}

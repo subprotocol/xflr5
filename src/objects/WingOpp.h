@@ -20,8 +20,30 @@
 *****************************************************************************/
 
 
+
+/*! \file
+ *
+ * This class defines the operating point object for the 3D analysis of wings.
+ *
+ */
+
+
 #ifndef WINGOPP_H
 #define WINGOPP_H
+
+
+/**
+*@brief
+*	This class defines the operating point object which stores the data of plane analysis
+*
+	In the case of an analysis of an independant wing, the instance of this class is uniquely associated to an instance of a WPolar, 
+	which is itself uniquely associated to the Wing object.
+	Alternatively, the WingOpp may be a member variable of a PlaneOpp object.
+	The data is stored in International Standard Units, i.e. meters, seconds, kg, and Newtons.
+	Angular data is stored in degrees.
+*/
+
+
 #include "CVector.h"
 #include "../params.h"
 #include <QString>
@@ -47,7 +69,7 @@ public:
 private:
 //________________METHODS____________________________________
 	bool SerializeWOpp(QDataStream &ar, bool bIsStoring, int ProjectFormat);
-	bool Export(QTextStream &out, int FileType, bool bDataOnly=false);
+	bool Export(QTextStream &out, enumTextFileType FileType);
 	void GetBWStyle(QColor &color, int &style, int &width);
 	void GetWOppProperties(QString &WOppProperties, bool bData=false);
 	double GetMaxLift();

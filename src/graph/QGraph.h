@@ -48,7 +48,7 @@ public:
 	void DrawXTicks(QPainter &painter);
 	void DrawYTicks(QPainter &painter);
 	void ExpFormat(double &f, int &exp);
-	void ExportToFile(QFile &XFile, int FileType);
+	void ExportToFile(QFile &XFile, enumTextFileType FileType);
 	void Highlight(QPainter &painter, CCurve *pCurve, int ref);
 
 	void LoadSettings(QSettings *pSettings);

@@ -1,58 +1,64 @@
+/**
+*@file This files defines the values of the main constant parameters used throughout the program
+* A modification of this file triggers the compilation of the whole project.
+* 
+* @todo Set the a dynamic memory allocation at runtime for the panel mesh and for the influence matrix and rhs. 
+This will allow the user to define larger meshes, at the expense increased size of memory usage.
+*/
 #ifndef PARAMS_H
 #define PARAMS_H
 
 //General
 #define XFLR5
-#define PI             3.14159265358979
-#define MAXRECENTFILES         8
-#define SETTINGSFORMAT    100623
-#define PRECISION  0.00000000001 //values are assumed 0 if less than this value
-#define MAXCOLORS   30
+#define PI             3.14159265358979  
+#define MAXRECENTFILES         8  /**< Defines the maximum number of file names in the recent file list */
+#define SETTINGSFORMAT    100623  /**< A random number which defines the format of the settings file */
+#define PRECISION  0.00000000001  /**< Values are assumed 0 if less than this value. This is to avoid comparing the equality of two floating point numbers */
+#define MAXCOLORS   30            /**< The number of the different colors used, mainly for the graph curves */
 
 
-//Polar reference area and span
-#define PLANFORMAREA        1
-#define PROJECTEDAREA       2
+#define PLANFORMAREA        1     /** The reference area and span for aero coefficients is the planform area. @todo replace by an enumeration */
+#define PROJECTEDAREA       2     /** The reference area and span for aero coefficients is the area projected on the xy plane. */
 
 
 //3D analysis parameters
-#define MAXWINGS            4 //wing, wing2, elevator, fin, in that order
-#define MAXBODIES           3
-#define MAXSPANSECTIONS    30 // max number of sections on a half wing
-#define MAXSPANSTATIONS   250 // max number of stations for LLT or VLM analysis
-#define MAXCHORDPANELS	   50 // max number of panels in the chordwise direction
-#define VLMMAXMATSIZE    5000 // max number of VLM panels over the whole plane
-#define VLMHALF          2500
-#define VLMMAXRHS         100 // max number of points which may be calculated in a single sequence
-#define MAXCONTROLS        40 // max controls per wing section
-#define MAXBODYFRAMES      60
-#define MAXSIDELINES       40
-//#define MAXMASSES          30
-#define MAXPOLARPOINTS   1000
-#define MAXMODEFRAMES     200
+#define MAXWINGS            4     /**< Wing, wing2, elevator, fin, in that order.*/
+#define MAXBODIES           3     /**< One only in XFLR5 */
+#define MAXSPANSECTIONS    30     /**< The max number of sections on a half wing */
+#define MAXSPANSTATIONS   250     /**< The max number of stations for LLT. For a VLM analysis, this is the max number of panels in the spanwise direction. */
+#define MAXCHORDPANELS	   50     /**< The max number of panels in the chordwise direction for a VLM analysis. */
+#define VLMMAXMATSIZE    5000     /**< The max number of VLM panels for the whole plane. Sets the size of the influence matrix and its RHS.*/
+#define VLMHALF          2500     /**< Half the value of VLMMAXMATSIZE. */
+#define VLMMAXRHS         100     /**< The max number of points which may be calculated in a single sequence. Has an impact on the memory reserved at program launch the size of the */
+#define MAXCONTROLS        40     /**< The max number of controls */
+#define MAXBODYFRAMES      60     /**< The max number of frames that can be used to define a body. */
+#define MAXSIDELINES       40     /**< The max number of sidelines that can be used to define a body? */
 
-#define BODYPANELTYPE       1
-#define BODYSPLINETYPE      2
+#define MAXPOLARPOINTS   1000     /**< The max number of points on a polar. @todo check usage now that the storage has been transferred to QList type arrays. Needs to be consistent with the max number of points on a graph curve. */
+#define MAXMODEFRAMES     200     /**< @todo Check usage. */
+
+#define BODYPANELTYPE       1     /**< Label for a flat panel type body. @todo replace by an enumeration */
+#define BODYSPLINETYPE      2     /**< Label for a spline type body. @todo replace by an enumeration */
 
 //Direct Design
-#define MAXSTACKPOS        50 // max number of undo pictures on the stack in direct design
-#define SPLINECONTROLSIZE  50 // maximum number of control points
+#define MAXSTACKPOS        50     /**< The max number of undo pictures on the stack in direct design. */
+#define SPLINECONTROLSIZE  50     /**< The maximum number of control points for a spline in direct design. */
 
 
-//XFoil Direct Parameters
-#define IQX  302	//300 = number of surface panel nodes + 6
-#define IQX2 151	//IQX/2 added arcds
-#define IWX   50	// number of wake panel nodes
-#define IPX    6	//6 number of qspec[s] distributions
-#define ISX    3	//number of airfoil sides
-#define IBX  604	//600 number of buffer airfoil nodes = 2*IQX
-#define IZX  350	//350 = number of panel nodes [airfoil + wake]
-#define IVX  302	//300 = number of nodes along bl on one side of airfoil and wake
+//XFoil Direct Parameters - refer to XFoil documentation
+#define IQX  302	/**< 300 = number of surface panel nodes + 6 */
+#define IQX2 151	/**< IQX/2 */
+#define IWX   50	/**< number of wake panel nodes */
+#define IPX    6	/**< 6 number of qspec[s] distributions */
+#define ISX    3	/**< number of airfoil sides */
+#define IBX  604	/**< 600 number of buffer airfoil nodes = 2*IQX */
+#define IZX  350	/**< 350 = number of panel nodes [airfoil + wake] */
+#define IVX  302	/**< 300 = number of nodes along bl on one side of airfoil and wake. */
 
-//XFoil INVERSE parameters
-#define ICX 257 // number of circle-plane points for complex mapping   ( 2^n  + 1 )
-#define IMX 64  // number of complex mapping coefficients  Cn
-#define IMX4 16 // = IMX/4 added arcds
+//XFoil INVERSE parameters  - refer to XFoil documentation
+#define ICX 257     /**< number of circle-plane points for complex mapping   ( 2^n  + 1 ) */
+#define IMX 64      /**< number of complex mapping coefficients  Cn */
+#define IMX4 16     /**< = IMX/4 */
 
 
 
@@ -118,13 +124,10 @@
 #define PANELFORCEARROWS        1391
 #define PANELFORCELEGENDTXT     1392
 
-//#define GLBODYMESHPANELS      1402
-//#define GLBODYMESHBACK        1403
+#define ARCBALL                 1414
+#define ARCPOINT                1415
 
-#define ARCBALL             1414
-#define ARCPOINT            1415
-
-#define MODELEGEND          1416
+#define MODELEGEND              1416
 
 #define BODYGEOMBASE            4321
 #define BODYMESHBASE            5322
@@ -132,13 +135,25 @@
 #define BODYFORCELISTBASE       6245
 
 
-#define MAXGRAPHS 4
+#define MAXGRAPHS 4  /**< The max number of graphs available for display in QXDirect and in QMiarex. */
 
+/** @enum The different types of analysis methods for 3D calculations of wings and planes. */
 typedef enum{LLTMETHOD, VLMMETHOD, PANELMETHOD} enumAnalysisMethod;
+
+/** @enum The different types of polar available for 2D and 3D calculations. */
 typedef enum{FIXEDSPEEDPOLAR, FIXEDLIFTPOLAR, RUBBERCHORDPOLAR, FIXEDAOAPOLAR, STABILITYPOLAR} enumPolarType;
 
+/** @enum The different applications available to the user */
+typedef enum {NOAPP, XFOILANALYSIS, DIRECTDESIGN, INVERSEDESIGN, MIAREX}	enumApp;
 
-#define QUESTION (BB || !BB) //Shakespeare
+/** @enum The different image formats usable to export screen captures*/
+typedef enum {PNG, JPEG, BMP}	enumImageFormat;
+
+/** @enum The different formats usable to export data to text format files*/
+typedef enum {TXT, CSV}	enumTextFileType;
+
+
+#define QUESTION (BB || !BB) /**< Shakespeare */
 
 #endif // PARAMS_H
  

@@ -21,7 +21,7 @@
 
 #include "../mainframe.h"
 #include "../miarex/Miarex.h"
-#include "WOpp.h"
+#include "WingOpp.h"
 #include "Plane.h"
 #include "../globals.h"
 #include <math.h>
@@ -111,21 +111,21 @@ WingOpp::WingOpp()
 }
 
 
-bool WingOpp::Export(QTextStream &out, int FileType, bool bDataOnly)
+bool WingOpp::Export(QTextStream &out, enumTextFileType FileType)
 {
 	QString Header, strong, Format;
 	int k;
 
-	if(FileType==1) Header = "  y-span        Chord      Ai         Cl        PCd          ICd        CmGeom      CmAirf      XTrtop    XTrBot      XCP       BM\n";
-	else            Header = "  y-span,Chord,Ai,Cl,PCd,ICd,CmGeom,CmAirf,XTrtop,XTrBot,XCP,BM\n";
+	if(FileType==TXT) Header = "  y-span        Chord      Ai         Cl        PCd          ICd        CmGeom      CmAirf      XTrtop    XTrBot      XCP       BM\n";
+	else              Header = "  y-span,Chord,Ai,Cl,PCd,ICd,CmGeom,CmAirf,XTrtop,XTrBot,XCP,BM\n";
 	out << Header;
 
 	int nStart;
 	if(m_AnalysisMethod==LLTMETHOD) nStart = 1;
 	else                            nStart = 0;
 
-	if(FileType==1) Format = "%1  %2   %3   %4   %5   %6   %7   %8    %9   %10   %11   %12\n";
-	else            Format = "%1,%2,%3,%4,%5,%6,%7,%8,%9,%10,%11,%12\n";
+	if(FileType==TXT) Format = "%1  %2   %3   %4   %5   %6   %7   %8    %9   %10   %11   %12\n";
+	else              Format = "%1,%2,%3,%4,%5,%6,%7,%8,%9,%10,%11,%12\n";
 	for (k=nStart; k<m_NStation; k++)
 	{
 		strong = QString(Format)

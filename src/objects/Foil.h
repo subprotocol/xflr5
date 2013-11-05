@@ -19,6 +19,13 @@
 
 *****************************************************************************/
 
+/**
+ *@file
+ *
+ * This class defines the foil object used in 2d and 3d calculations
+ *
+ */
+
 
 
 #ifndef FOIL_H
@@ -33,6 +40,19 @@
 #include <QTextStream>
 
 
+
+/**
+*@class Foil
+*@brief
+*	The class which defines the Foil object used in 2D and 3D calculations.
+
+The class stores two geometries:
+	- the base foil, which unless advised otherwise is unchanged from the moment it has been first loaded or created
+	- the current foil, on which the geometrical modifications are applied
+	   such as flap deflection, camber and thickness scaling
+@todo One of the very early classes in this project. Would need a general revision.
+Also it mixes the construction methods and the MMI; would be better to move the MMI to a derived child class for polymorphism.
+*/
 class Foil
 {
 	friend class QAFoil;
@@ -67,7 +87,7 @@ class Foil
 	
 public:
 	Foil();
-	void GetFoilName(QString &FoilName);
+	void foilName(QString &FoilName);
 	int IsPoint(CVector const &Real);
 	void DrawFoil(QPainter &painter, double const &alpha, double const &scalex, double const &scaley, QPoint const &Offset);
 	void DrawPoints(QPainter &painter, double const &scalex, double const &scaley, QPoint const &Offset);
@@ -83,18 +103,16 @@ public:
 	double GetLowerY(double x);
 	double GetUpperY(double x);
 	double GetCamber(double const &x);
-	double GetCamberAngle(double const &x);
 	double GetCamberSlope(double const &x);
-	double GetLength();
+	double length();
 	double GetArea();
 	double GetTopSlope(double const &x);
 	double GetBotSlope(double const &x);
 	double NormalizeGeometry();
-	bool CompMidLine(bool bParams);
+	void CompMidLine(bool bParams);
 
 	bool ExportFoil(QTextStream &out);
 	bool InitFoil();
-	bool SetCamber(double f, double u);
 
 	void CopyFoil(Foil *pSrcFoil);
 	bool Serialize(QDataStream &ar, bool bIsStoring, int ProjectFormat=5);
@@ -106,8 +124,8 @@ public:
 	void SetTEFlapData(bool bFlap, double xhinge, double yhinge, double angle);
 
 	bool Intersect(CVector const &A, CVector const &B, CVector const &C, CVector const &D, CVector *M);
-	bool IsBetween(int f, int f1, int f2);
-	bool IsBetween(int f, double f1, double f2);
+//	bool IsBetween(int f, int f1, int f2);
+//	bool IsBetween(int f, double f1, double f2);
 
 private:
 	QString m_FoilDescription;	// a description

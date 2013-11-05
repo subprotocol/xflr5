@@ -19,13 +19,6 @@
 
 *****************************************************************************/
 
-//
-// This class :
-//	- defines the wing object
-//	- provides the methods for the calculation of the wing geometric properties
-//	- provides methods for LLT, VLM and Panel methods
-//
-
 
 #include <math.h>
 #include <QtDebug>
@@ -51,7 +44,9 @@ void* Wing::s_p3DPanelDlg;//pointer to the 3DPanel analysis dialog class
 bool Wing::s_bVLMSymetric;
 
 
-
+/**
+ * The public constructor
+ */
 Wing::Wing()
 {
 	memset(m_Ai, 0, sizeof(m_Ai));
@@ -146,10 +141,13 @@ Wing::Wing()
 	}
 }
 
+
+/**
+ * Import the wing geometry from a text file
+ * @param path_to_file the path to the filename as a QString
+ */
 void Wing::ImportDefinition(QString path_to_file)
 {
-	//Import the wing geometry from a text file
-	
 	QFile fp(path_to_file);
 	double ypos;
 	double chord;
@@ -216,18 +214,12 @@ void Wing::ImportDefinition(QString path_to_file)
 	}
 }
 
+/**
+ * Export the wing geometry to a text file
+ * @param path_to_file the path to the filename as a QString
+ */
 void Wing::ExportDefinition(QString path_to_file)
 {
-	//Import the wing geometry from a text file
-	
-	double ypos;
-	double chord;
-	double offset;
-	double dihedral;
-	double twist;
-	int nx;
-	int ny;
-
 	try{
 	QFile fp(path_to_file);
 		if (!fp.open(QIODevice::WriteOnly)) {
@@ -262,15 +254,11 @@ void Wing::ExportDefinition(QString path_to_file)
 }
 
 
-void Wing::ComputeDihedrals()
-{
-	for (int is=0; is<NWingSection()-1; is++)
-	{
-		Dihedral(is) = 180.0/PI* atan2(ZPosition(is+1)-ZPosition(is), YPosition(is+1)-YPosition(is));
-	}
-}
-
-
+/**
+ * Calculates the properties of the wing based on the input in the data table
+ * Stores the results in the member variables
+ * Enables the user to see the properties of the wing in real time as he modifies the geometry
+ */
 void Wing::ComputeGeometry()
 {
 	// Computes the wing's characteristics from the panel data
@@ -358,16 +346,18 @@ void Wing::ComputeGeometry()
 #define NXSTATIONS 20
 #define NYSTATIONS 40
 
+/**
+* Returns the inertia properties of the structure based on the object's mass and on the existing geometry
+* The mass is assumed to have been set previously.
+* Mass = mass of the structure, excluding point masses
+* @param  &CoG a reference to the CoG point, as a result of the calculation
+* @param  &CoGIxx xx axis component of the inertia tensor, calculated at the CoG
+* @param  &CoGIyy yy axis component of the inertia tensor, calculated at the CoG
+* @param  &CoGIzz zz axis component of the inertia tensor, calculated at the CoG
+* @param  &CoGIxz xz axis component of the inertia tensor, calculated at the CoG
+*/
 void Wing::ComputeVolumeInertia(CVector &CoG, double &CoGIxx, double &CoGIyy, double &CoGIzz, double &CoGIxz)
 {
-	//
-	// Returns the inertia properties of the structure based on the object's mass and on the existing geometry
-	//   in input:
-	//     Mass = mass of the wing, excluding point masses
-	//   in output:
-	//     CoG  = center of gravity position
-	//     CoGIxx, CoGIyy, CoGIzz, CoGIxz = inertia of properties calculated at the CoG
-	//
 	static double ElemVolume[NXSTATIONS*NYSTATIONS*MAXSPANSECTIONS*2];
 	static CVector PtVolume[NXSTATIONS*NYSTATIONS*MAXSPANSECTIONS*2];
 	int j,k,l;
@@ -503,15 +493,14 @@ void Wing::ComputeVolumeInertia(CVector &CoG, double &CoGIxx, double &CoGIyy, do
 }
 
 
+/**
+* Calculates the inertia tensor in geometrical (body) axis :
+*  - adds the volume inertia AND the inertia of point masses of all components
+*  - the body axis is the frame in which the geometry has been defined
+*  - the origin is the plane's CoG, taking into account all masses
+*/
 void Wing::ComputeBodyAxisInertia()
 {
-	//
-	// Calculates the inertia tensor in geometrical (body) axis :
-	//  - adds the volume inertia AND the inertia of point masses of all components
-	//  - the body axis is the frame in which the geometry has been defined
-	//  - the origin is the plane's CoG, taking into account all masses
-	//
-
 	CVector LA, VolumeCoG;
 	double Ixx, Iyy, Izz, Ixz, VolumeMass;
 	Ixx = Iyy = Izz = Ixz = VolumeMass = 0.0;
@@ -553,9 +542,13 @@ void Wing::ComputeBodyAxisInertia()
 }
 
 
-
-
-
+/**
+ * Constructs the surface objects based on the wing's geometry, on its position, and on its orientation
+ * The position and orientation are defined in the plane object
+ * @param T the translation to be appied to the wing geometry
+ * @param XTilt  the rotation in degrees around the x-axis; used in the case of fins
+ * @param YTilt  the rotation in degrees arouns the y-axi; used for wing or elevator tilt
+ */
 void Wing::CreateSurfaces(CVector const &T, double XTilt, double YTilt)
 {
 	//
@@ -825,11 +818,12 @@ void Wing::CreateSurfaces(CVector const &T, double XTilt, double YTilt)
 
 
 
+/**
+* Calculates the chord lengths at each position of the NStation in LLT calculations
+*@param NStation the number of stations required by the user in LLT calculations
+*/
 void Wing::ComputeChords(int NStation)
 {
-	//
-	// Calculates the chord lengths at each position of the NStation in LLT calculations
-	//
 	int j,k,m;
 	double y, yob, tau;
 	double x0,y0,y1,y2;
@@ -906,11 +900,16 @@ void Wing::ComputeChords(int NStation)
 
 
 
+/**
+* Calculates the chord lengths at each position of the NStation in LLT calculations
+* Overloaded function
+*@param NStation the number of stations required by the user in LLT calculations
+*@param *chord pointer to the array of chords lengths at the span stations
+*@param *offset pointer to the array of offset positions at the span stations
+*@param *twist pointer to the array of twist values at the span stations
+*/
 void Wing::ComputeChords(int NStation, double *chord, double *offset, double *twist)
 {
-	//
-	// Calculates the chord lengths at each position of the NStation in LLT calculations
-	//
 	int m;
 	double y, yob, tau;
 	double x0,y0,y1,y2;
@@ -986,13 +985,12 @@ void Wing::ComputeChords(int NStation, double *chord, double *offset, double *tw
 }
 
 
-
+/**
+* Copies the gemetrical data from an existing wing
+*@param pWing a pointer to the instance of the reference wing object
+*/
 void Wing::Duplicate(Wing *pWing)
 {
-	//
-	// Copies the wing data from an existing wing
-	//
-
 	s_pMainFrame    = pWing->s_pMainFrame;
 	s_pMiarex       = pWing->s_pMiarex;
 	m_NStation      = pWing->m_NStation;
@@ -1060,11 +1058,19 @@ void Wing::Duplicate(Wing *pWing)
 
 
 
-
+/**
+ * Export the wing geometry to a text file readable by AVL
+ * @param out the instance of the QTextStream to which the output will be directed
+ * @param index a reference number used by AVL to idnitfy the wing
+ * @param x the x value of the translation to be applied to the wing's geometry -unused
+ * @param y the y value of the translation to be applied to the wing's geometry
+ * @param z the z value of the translation to be applied to the wing's geometry -unused
+ * @param Thetax the rotation about the x-axis to be applied to the geometry -unused
+ * @param Thetay the rotation about the y-axis to be applied to the geometry
+ * @return true if successful, false otherwise
+ */
 bool Wing::ExportAVLWing(QTextStream &out, int index, double x, double y, double z, double Thetax, double Thetay)
 {
-	// Exports the current wing to AVL format
-
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 
 	int j;
@@ -1225,11 +1231,13 @@ bool Wing::ExportAVLWing(QTextStream &out, int index, double x, double y, double
 	return true;
 }
 
-
+/**
+* Returns the wing's average sweep from root to tip measured at the quarter chord
+* The sweep is calulated as the arctangent of the root and tip quarter-chord points
+*@return the value of the average sweep, in degrees
+*/
 double Wing::AverageSweep()
 {
-	//returns the wing's average sweep from root to tip
-	//measured at the quarter chord
 	double xroot = Chord(0)/4.0;
 	double xtip  = TipOffset() + TipChord()/4.0;
 //	double sweep = (atan2(xtip-xroot, m_PlanformSpan/2.0)) * 180.0/PI;
@@ -1237,9 +1245,14 @@ double Wing::AverageSweep()
 }
 
 
+/**
+ * Returns the x-position of the quarter-chord point at a given span position, relative to a reference x-value
+ *@param yob the span position where the quarter-chord point will be calculated
+ *@param xRef the reference position
+ *@return the quarter-chord position
+ */
 double Wing::C4(double yob, double xRef)
 {
-	//returns the quarter-chord point xposition relative to XCmRef
 	double chord, offset, tau;
 	double C4 = 0.0;
 	double y = fabs(yob*m_PlanformSpan/2.0);
@@ -1257,7 +1270,11 @@ double Wing::C4(double yob, double xRef)
 	return C4;
 }
 
-
+/**
+ * Calculates and returns the chord length at a given span position
+ * @param yob the position where the chord length will be calculated
+ * @return the chord length
+ */
 double Wing::Chord(double yob)
 {
 	double chord = 0.0;
@@ -1278,6 +1295,77 @@ double Wing::Chord(double yob)
 }
 
 
+/**
+ * Calculates and returns the offste value at a given span position
+ * @param yob the position where the offset will be calculated
+ * @return the offset value
+ */
+double Wing::Offset(double yob)
+{
+	double tau, y;
+	double offset = 0.0;
+
+	y= fabs(yob*m_PlanformSpan/2.0);
+	for(int is=0; is<NWingSection()-1; is++)
+	{
+		if(YPosition(is)<= y && y <=YPosition(is+1))
+		{
+			tau = (y - YPosition(is))/(YPosition(is+1)-YPosition(is));
+			offset = Offset(is) + tau * (Offset(is+1) - Offset(is));
+			return offset;
+		}
+	}
+
+	return -1.0;
+}
+
+
+
+/**
+ * Calculates and returns the twist angle at a given span position
+ * @param yob the position where the twist angle will be calculated
+ * @return the twist angle in degrees
+ */
+double Wing::Twist(double y)
+{
+	double tau;
+	// calculate twist at each station
+	if (y>=0.0)
+	{
+		//right wing
+		for (int is=0; is<NWingSection(); is++)
+		{
+			if(YPosition(is) <= y && y <=YPosition(is+1))
+			{
+				tau = (y-YPosition(is))/(YPosition(is+1)-YPosition(is));
+				return Twist(is)+(Twist(is+1)-Twist(is)) * tau;
+			}
+		}
+	}
+	else
+	{
+		//left wing
+		y=fabs(y);
+		for (int is=0; is<NWingSection()-1; is++)
+		{
+			if(YPosition(is) <= y && y <=YPosition(is+1))
+			{
+				tau = (y-YPosition(is))/(YPosition(is+1)-YPosition(is));
+				return Twist(is)+(Twist(is+1)-Twist(is)) * tau;
+			}
+		}
+	}
+
+	return -1.0;
+}
+
+
+
+/**
+ * Calculates and returns the dihedral angle at a given span position
+ * @param yob the position where the dihedral angle will be calculated
+ * @return the dihedral angle in degrees
+ */
 double Wing::Dihedral(double yob)
 {
 	double y= fabs(yob*m_PlanformSpan/2.0);//geometry is symetric
@@ -1292,7 +1380,13 @@ double Wing::Dihedral(double yob)
 	return 0.0;
 }
 
-
+/**
+ * Returns pointers to the left and right foils of a given span position, and the relative position of the span position between these two foils
+ * @param pFoil0 the pointer to the pointer of the left foil
+ * @param pFoil1 the pointer to the pointer of the right foil
+ * @param y the reference span position
+ * @param t the ratio between the position of the two foils
+ */
 void Wing::GetFoils(Foil **pFoil0, Foil **pFoil1, double y, double &t)
 {
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
@@ -1335,7 +1429,10 @@ void Wing::GetFoils(Foil **pFoil0, Foil **pFoil1, double y, double &t)
 
 
 
-
+/**
+ * Returns the total mass of the wing, as the sum of volume and point masses
+ * @return the total mass
+ */
 double Wing::TotalMass()
 {
 	double TotalMass = m_VolumeMass;
@@ -1347,64 +1444,16 @@ double Wing::TotalMass()
 
 
 
-double Wing::Offset(double yob)
-{
-	double tau, y;
-	double offset = 0.0;
-
-	y= fabs(yob*m_PlanformSpan/2.0);
-	for(int is=0; is<NWingSection()-1; is++)
-	{
-		if(YPosition(is)<= y && y <=YPosition(is+1))
-		{
-			tau = (y - YPosition(is))/(YPosition(is+1)-YPosition(is));
-			offset = Offset(is) + tau * (Offset(is+1) - Offset(is));
-			return offset;
-		}
-	}
-
-	return -1.0;
-}
-
-
-
-double Wing::Twist(double y)
-{
-	double tau;
-	// calculate twist at each station
-	if (y>=0.0)
-	{
-		//right wing
-		for (int is=0; is<NWingSection(); is++)
-		{
-			if(YPosition(is) <= y && y <=YPosition(is+1))
-			{
-				tau = (y-YPosition(is))/(YPosition(is+1)-YPosition(is));
-				return Twist(is)+(Twist(is+1)-Twist(is)) * tau;
-			}
-		}
-	}
-	else
-	{
-		//left wing
-		y=fabs(y);
-		for (int is=0; is<NWingSection()-1; is++)
-		{
-			if(YPosition(is) <= y && y <=YPosition(is+1))
-			{
-				tau = (y-YPosition(is))/(YPosition(is+1)-YPosition(is));
-				return Twist(is)+(Twist(is+1)-Twist(is)) * tau;
-			}
-		}
-	}
-
-	return -1.0;
-}
-
-
+/**
+*Returns the wing's absolute positions yv and zv from the relative value xrel and the planform span y
+*Used for display purposes only
+*@param xrel the relative position along the chord, in %
+*@param y the planform (2D) span position where the y and z positions will be calculated
+*@param &yv the 3D y-position of the point
+*@param &zv the 3D z-position of the point
+*/
 void Wing::GetViewYZPos(double xrel, double y, double &yv, double &zv, int pos)
 {
-	//returns the wing's absolute positions yv and zv from the relative value xrel and the planform span y
 	double tau;
 	double twist, chord;
 	double z0, z1, nx, ny;
@@ -1462,7 +1511,11 @@ void Wing::GetViewYZPos(double xrel, double y, double &yv, double &zv, int pos)
 	}
 }
 
-
+/**
+ * Returns the relative position in % of a given absolute span position
+ * @param SpanPos the absolute span position
+ * @return the relative position, in %
+ */
 double Wing::yrel(double SpanPos)
 {
 	double y = fabs(SpanPos);
@@ -1477,7 +1530,12 @@ double Wing::yrel(double SpanPos)
 	return 1.0;
 }
 
-
+/**
+ * The z-position of a specified absolute span position.
+ * Used for moment evaluations in LLT, where the wing is defined as a 2D planform
+ * @param y the abolute span position
+ * @return the absolute z-position
+ */
 double Wing::ZPosition(double y)
 {
 	double tau;
@@ -1503,14 +1561,13 @@ double Wing::ZPosition(double y)
 
 
 
-
+/**
+* Calculates the induced lift and drag from the vortices or wake panels strength using a farfield method
+* Downwash is evaluated at a distance 100 times the span downstream (i.e. infinite)
+*/
 void Wing::PanelTrefftz(double QInf, double Alpha, double *Mu, double *Sigma, int pos, CVector &Force, double &WingIDrag,
 						 WPolar *pWPolar, Panel *pWakePanel, CVector *pWakeNode)
 {
-	// calculates the induced lift and drag from the vortices or wake panels strength
-	// using a farfield method
-	// Downwash is evaluated at a distance 100 times the span downstream (i.e. infinite)
-
 	PanelAnalysisDlg *pPanelDlg = (PanelAnalysisDlg*)s_p3DPanelDlg;
 
 	int nw, iTA, iTB;
@@ -1691,8 +1748,12 @@ void Wing::PanelTrefftz(double QInf, double Alpha, double *Mu, double *Sigma, in
 }
 
 
-
-void Wing::PanelSetBending(bool bThinSurface)
+/**
+ * Computes the bending moment at each span position based on the results of the panel analysis
+ * Assumes the array of force vectors has been calculated previously
+ * @param bThinSurface true if the calculation has been performed on thin VLM surfaces, false in the case of a 3D-panelanalysis
+ */
+void Wing::PanelComputeBending(bool bThinSurface)
 {
 	double ypos[MAXSPANSTATIONS+1], zpos[MAXSPANSTATIONS+1];
 	int j,k,jj,coef,p;
@@ -1760,11 +1821,12 @@ void Wing::PanelSetBending(bool bThinSurface)
 	}
 }
 
-
+/**
+* Scales the wing chord-wise so that the root chord is set to the NewChord value
+*@param NewChord the new value of the root chord
+*/
 void Wing::ScaleChord(double NewChord)
 {
-	// Scales the wing chord-wise so that the root chord is set to the NewChord value
-
 	double ratio = NewChord/Chord(0);
 	for (int is=0; is<m_WingSection.size(); is++)
 	{
@@ -1775,10 +1837,12 @@ void Wing::ScaleChord(double NewChord)
 }
 
 
+/**
+* Scales the wing span-wise so that the span is set to the NewSpan value
+*@param NewSpan the new value of the span
+*/
 void Wing::ScaleSpan(double NewSpan)
 {
-	// Scales the wing span-wise to the NewSpan value
-
 	for (int is=0; is<m_WingSection.size(); is++)
 	{
 		YPosition(is)      *= NewSpan/m_PlanformSpan;
@@ -1787,11 +1851,76 @@ void Wing::ScaleSpan(double NewSpan)
 	ComputeGeometry();
 }
 
+/**
+* Scales the wing's sweep so that the sweep is set to the NewSweep value
+*@param NewSweep the new value of the average quarter-chord sweep, in degrees
+*/
+void Wing::ScaleSweep(double NewSweep)
+{
+	double OldTipOffset = TipOffset();
+	double NewTipOffset = Chord(0)/4.0
+						 + tan(NewSweep*PI/180.0)*m_PlanformSpan/2.0
+						 - TipChord()/4.0;
+	if(fabs(OldTipOffset)>0.00001)
+	{
+		//scale each panel's offset
+		double ratio = NewTipOffset/OldTipOffset;
+		for(int is=1; is<NWingSection(); is++)
+		{
+			Offset(is) *= ratio;
+		}
+	}
+	else
+	{
+		//set each panel's offset
+		for(int is=1; is<NWingSection(); is++)
+		{
+			Offset(is) = NewTipOffset*YPosition(is)/(m_PlanformSpan/2.0);
+		}
+	}
+	ComputeGeometry();
+}
 
+
+/**
+* Scales the wing's twist angles so that the tip twist is set to the NewTwist value
+*@param NewTwist the new value of the average quarter-chord twist, in degrees
+*/
+void Wing::ScaleTwist(double NewTwist)
+{
+	if(fabs(TipTwist())>0.0001)
+	{
+		//scale each panel's twist
+		double ratio = NewTwist/TipTwist();
+
+		for(int is=1; is<NWingSection(); is++)
+		{
+			Twist(is) *= ratio;
+		}
+	}
+	else
+	{
+		//Set each panel's twist in the ratio of the span position
+		for(int is=1; is<NWingSection(); is++)
+		{
+			Twist(is) = NewTwist*YPosition(is)/(m_PlanformSpan/2.0);
+		}
+	}
+	ComputeGeometry();
+}
+
+
+
+
+/**
+ * Loads or Saves the data of this wing to a binary file
+ * @param ar the QDataStream object from/to which the data should be serialized
+ * @param bIsStoring true if saving the data, false if loading
+ * @param ProjectFormat 5 if data from Xflr5 v5.xx, 6 if from/to xflr5 v6.xx
+ * @return true if the operation was successful, false otherwise
+ */
 bool Wing::SerializeWing(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 {
-	//saves or loads the wing data to the archive ar
-
 	int i;
 //	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	int ArchiveFormat;// identifies the format of the file
@@ -2071,65 +2200,10 @@ bool Wing::SerializeWing(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 
 
 
-void Wing::ScaleSweep(double sweep)
-{
-	//
-	// Sets the average sweep measured at the quarter-chord to the new value Sweep
-	//
-	double OldTipOffset = TipOffset();
-	double NewTipOffset = Chord(0)/4.0
-						 + tan(sweep*PI/180.0)*m_PlanformSpan/2.0
-						 - TipChord()/4.0;
-	if(fabs(OldTipOffset)>0.00001)
-	{
-		//scale each panel's offset
-		double ratio = NewTipOffset/OldTipOffset;
-		for(int is=1; is<NWingSection(); is++)
-		{
-			Offset(is) *= ratio;
-		}
-	}
-	else
-	{
-		//set each panel's offset
-		for(int is=1; is<NWingSection(); is++)
-		{
-			Offset(is) = NewTipOffset*YPosition(is)/(m_PlanformSpan/2.0);
-		}
-	}
-	ComputeGeometry();
-}
-
-
-void Wing::ScaleTwist(double twist)
-{
-	//
-	// Scales the twist to the new value
-	//
-	if(fabs(TipTwist())>0.0001)
-	{
-		//scale each panel's twist
-		double ratio = twist/TipTwist();
-
-		for(int is=1; is<NWingSection(); is++)
-		{
-			Twist(is) *= ratio;
-		}
-	}
-	else
-	{
-		//Set each panel's twist in the ratio of the span position
-		for(int is=1; is<NWingSection(); is++)
-		{
-			Twist(is) = twist*YPosition(is)/(m_PlanformSpan/2.0);
-		}
-	}
-	ComputeGeometry();
-}
-
-
-
-
+/**
+ * Returns the total number of panels on this wing. the number is given for a double-side mesh of the wing
+ * @return the total number of panels
+ */
 int Wing::VLMGetPanelTotal()
 {
 //	QMiarex *pMiarex = (QMiarex*) s_pMiarex;
@@ -2149,31 +2223,30 @@ int Wing::VLMGetPanelTotal()
 }
 
 
+/**
+*  Calculates the wing aero coefficients
+*  Uses Cp distribution in input for thick surfaces
+*  Uses Gamma distribution in input for VLM method
+*
+*  Input data:
+*    Freestream speed Qinf
+*    Angle of attack Alpha
+*    Cp dstribution for thick wings
+*    Mu or Gamma distribution, depending on the analysis type
+*    Type of surface :
+*        - Thin Surface, i.e. VLM type surfaces, with vortex distribution
+*        - Thick Surfaces;, i.e. 3D Panels with source+doublet distribution on panels
+*    Type of analysis : viscous or inviscid
+*
+*  Output
+*    centre of pressure position (XCP, YCP)
+*    moment coefficients GCm, VCm, ICm, GRm, GYm, VYm, IYm
+*/
 void Wing::PanelComputeOnBody(double QInf, double Alpha, double *Cp, double *Gamma, double &XCP, double &YCP, double &ZCP,
 						 double &GCm, double &VCm, double &ICm, double &GRm, double &GYm, double &VYm,double &IYm,
 						 WPolar *pWPolar, CVector CoG)
 
 {
-	//  Calculates the wing aero coefficients
-	//  Uses Cp distribution in input for thick surfaces
-	//  Uses Gamma distribution in input for VLM method
-	//
-	//  Input data:
-	//    Freestream speed Qinf
-	//    Angle of attack Alpha
-	//    Cp dstribution for thick wings
-	//    Mu or Gamma distribution, depending on the analysis type
-	//    Type of surface :
-	//        - Thin Surface, i.e. VLM type surfaces, with vortex distribution
-	//        - Thick Surfaces;, i.e. 3D Panels with source+doublet distribution on panels
-	//    Type of analysis : viscous or inviscid
-	//
-	//  Output
-	//    centre of pressure position (XCP, YCP)
-	//    moment coefficients GCm, VCm, ICm, GRm, GYm, VYm, IYm
-	//
-
-
 	int  j, k, l, p, m, nFlap, coef;
 	double CPStrip, tau, NForce, cosa, sina;
 	CVector HingeLeverArm,  PtC4Strip, PtLEStrip, ForcePt, SurfaceNormal, LeverArmC4CoG, LeverArmPanelC4, LeverArmPanelCoG;
@@ -2329,15 +2402,15 @@ void Wing::PanelComputeOnBody(double QInf, double Alpha, double *Cp, double *Gam
 	IYm -= m_IYm;
 }
 
-
+/**
+* In input, takes the speed QInf and the distribution of lift coefficients m_Cl[] along the span
+* In output, returns for each span station
+* 	- The Reynolds number m_Re[]
+*	- The viscous drag coefficient m_PCd[]
+*      - The top and bottom transition points m_XTrtop[] and m_XTrBot[]
+*/
 void Wing::PanelComputeViscous(double QInf, double Alpha, WPolar *pWPolar, double &WingVDrag, bool bViscous, QString &OutString)
 {
-	// In input, takes the speed QInf and the distribution of lift coefficients m_Cl[] along the span
-	// In output, returns for each span station
-	// 	- The Reynolds number m_Re[]
-	//	- The viscous drag coefficient m_PCd[]
-	//      - The top and bottom transition points m_XTrtop[] and m_XTrBot[]
-	//
 	QString string, strong, strLength;
 	int m;
 	bool bPointOutRe, bPointOutCl, bOutRe, bError;
@@ -2424,6 +2497,11 @@ void Wing::PanelComputeViscous(double QInf, double Alpha, WPolar *pWPolar, doubl
 }
 
 
+/**
+ * Identifies if a given index of a panel belongs to this wing or not
+ * @param nPanel the index of the panel
+ * @return true if the panel belongs to the wing, false otherwise
+ */
 bool Wing::IsWingPanel(int nPanel)
 {
 	for(int p=0; p<m_MatSize; p++)
@@ -2434,6 +2512,11 @@ bool Wing::IsWingPanel(int nPanel)
 }
 
 
+/**
+ * Identifies if a given index of a node belongs to this wing or not
+ * @param nNode the index of a node
+ * @return true if the node belongs to the wing, false otherwise
+ */
 bool Wing::IsWingNode(int nNode)
 {
 	for(int p=0; p<m_MatSize; p++)
@@ -2447,27 +2530,98 @@ bool Wing::IsWingNode(int nNode)
 }
 
 
-
+/** Returns the offset at a span section identified by its index
+*@param iSection the index of the section
+*@return the value of the offset
+*/
 double & Wing::Offset(const int &iSection)    {return m_WingSection[iSection]->m_Offset;}
+
+/** Returns the dihedral angle at a span section identified by its index
+*@param iSection the index of the section
+*@return the value of the dihedral angle, in degrees
+*/
 double & Wing::Dihedral(const int &iSection)  {return m_WingSection[iSection]->m_Dihedral;}
+
+/** Returns the chord length at a span section identified by its index
+*@param iSection the index of the section
+*@return the value of the chord length
+*/
 double & Wing::Chord(const int &iSection)     {return m_WingSection[iSection]->m_Chord;}
+
+/** Returns the twost angle at a span section identified by its index
+*@param iSection the index of the section
+*@return the value of the twist angle, in degrees
+*/
 double & Wing::Twist(const int &iSection)     {return m_WingSection[iSection]->m_Twist;}
+
+/** Returns the span position at a span section identified by its index
+*@param iSection the index of the section
+*@return the value of the span position
+*/
 double & Wing::YPosition(const int &iSection) {return m_WingSection[iSection]->m_YPosition;}
+
+/** Returns the length betwee a span section identified by its index and the next spanwise section
+*@param iSection the index of the section
+*@return the value of the length of the panel
+*/
 double & Wing::Length(const int &iSection)    {return m_WingSection[iSection]->m_Length;}
+
+/** Returns the span position of a span section identified by its index, projecteed on the x-y plane
+*@param iSection the index of the section
+*@return the value of the projected span position
+*/
 double & Wing::YProj(const int &iSection)     {return m_WingSection[iSection]->m_YProj;}
+
+/** Returns the z-position at a span section identified by its index
+*@param iSection the index of the section
+*@return the value of the z-position
+*/
 double & Wing::ZPosition(const int &iSection) {return m_WingSection[iSection]->m_ZPos;}
 
 
+/** Returns the number of chordwise panels at a span section identified by its index
+*@param iSection the index of the section
+*@return the number of chordwise panels
+*/
 int & Wing::NXPanels(const int &iSection)   {return m_WingSection[iSection]->m_NXPanels;}
+
+/** Returns the number of spanwise panels at a span section identified by its index
+*@param iSection the index of the section
+*@return the number of spanwise panels
+*/
 int & Wing::NYPanels(const int &iSection)   {return m_WingSection[iSection]->m_NYPanels;}
+
+/** Returns the type of distribution of chordwise panels at a span section identified by its index - always cosine type
+*@param iSection the index of the section
+*@return the type of distribution of chordwise panels - always cosine type
+*/
 int & Wing::XPanelDist(const int &iSection) {return m_WingSection[iSection]->m_XPanelDist;}
+
+/** Returns the type of distribution of spanwise panels at a span section identified by its index
+*@param iSection the index of the section
+*@return the type of distribution of spanwise panels
+*/
 int & Wing::YPanelDist(const int &iSection) {return m_WingSection[iSection]->m_YPanelDist;}
 
+/**
+ * Returns the name of the foil on the right side of a span section
+ * @param iSection the index of the section
+ * @return the name of the foil on the right side of the section
+ */
 QString & Wing::RightFoil(const int &iSection) {return m_WingSection[iSection]->m_RightFoilName;}
+
+/**
+ * Returns the name of the foil on the left side of a span section
+ * @param iSection the index of the section
+ * @return the name of the foil on the left side of the section
+ */
 QString & Wing::LeftFoil(const int &iSection)  {return m_WingSection[iSection]->m_LeftFoilName;}
 
 
-
+/**
+ * Removes the section in the geometry of the wing identified by its index
+ * @param iSection the index of the section
+ */
 void Wing::RemoveWingSection(int const iSection)
 {
 	if(iSection<0 || iSection>=m_WingSection.size()) return;
@@ -2475,6 +2629,10 @@ void Wing::RemoveWingSection(int const iSection)
 }
 
 
+/**
+ * Inserts a section in the geometry of the wing at a postion identified by its index
+ * @param iSection the index of the section
+ */
 void Wing::InsertSection(int iSection)
 {
 	if(iSection==0)                          m_WingSection.prepend(new WingSection);
@@ -2483,6 +2641,9 @@ void Wing::InsertSection(int iSection)
 }
 
 
+/**
+ * Appends a new section at the tip of the wing, with default values
+ */
 bool Wing::AppendWingSection()
 {
 	if(m_WingSection.size()>MAXSPANSECTIONS) return false;
@@ -2491,6 +2652,9 @@ bool Wing::AppendWingSection()
 }
 
 
+/**
+ * Appends a new section at the tip of the wing, with values specified as input parameters
+ */
 bool Wing::AppendWingSection(double Chord, double Twist, double Pos, double Dihedral, double Offset,
 					   int NXPanels, int NYPanels, int XPanelDist, int YPanelDist,
 						QString RightFoilName, QString LeftFoilName)

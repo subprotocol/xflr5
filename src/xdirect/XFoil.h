@@ -19,14 +19,25 @@
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 *****************************************************************************/
-//
-// XFoil.h: interface for the XFoil class.
-//
-//////////////////////////////////////////////////////////////////////
+
+
+/**
+ *@file This class defines the Xfoil object.
+ */
 
 
 #ifndef XFOIL_H
 #define XFOIL_H
+
+
+/**
+*@class XFoil
+*@brief  The class which defines the XFoil object.
+
+This is a translation to C++ of the original Fortran code of Mark Drela and Harold Youngren.
+See http://raphael.mit.edu/xfoil for more information.
+*/
+
 
 #include <QString>
 #include <QFile>

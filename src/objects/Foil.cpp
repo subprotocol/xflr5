@@ -30,7 +30,9 @@
 #include <QMessageBox>
 
 
-
+/**
+ * The public constructor
+ */
 Foil::Foil()
 {
 	m_nFoilStyle = 0;
@@ -77,8 +79,6 @@ Foil::Foil()
 	memset(m_BaseExtrados, 0, sizeof(m_BaseExtrados));
 	memset(m_BaseIntrados, 0, sizeof(m_BaseIntrados));
 
-//	m_rViewRect.SetRectEmpty();
-
 	m_bTEFlap     = false;
 	m_TEFlapAngle = 0.0;
 	m_TEXHinge    = 80.0;
@@ -91,11 +91,13 @@ Foil::Foil()
 }
 
 
-
-bool Foil::CompMidLine(bool bParams)
+/**
+* Constructs the postion of the foil's mid camber line
+* Calculates the foil's thickness and camber, if requested
+*@param bParams true if the max thickness and camber properties shold be calculated
+*/
+void Foil::CompMidLine(bool bParams)
 {
-	//  Calculates the foil's thickness and camber for the base foil
-
 	static int l;
 	static double xt, yex, yin, step;
 
@@ -122,28 +124,29 @@ bool Foil::CompMidLine(bool bParams)
 		
 		m_rpMid[l].x = xt;
 		m_rpMid[l].y = (yex+yin)/2.0;
-                if(bParams)
-                {
-                        if(fabs(yex-yin)>m_fThickness)
-                        {
-                                m_fThickness  = fabs(yex-yin);
+		if(bParams)
+		{
+			if(fabs(yex-yin)>m_fThickness)
+			{
+				m_fThickness  = fabs(yex-yin);
 				m_fXThickness = xt;
 			}
-                        if(fabs(m_rpMid[l].y)>fabs(m_fCamber))
-                        {
+			if(fabs(m_rpMid[l].y)>fabs(m_fCamber))
+			{
 				m_fCamber  = m_rpMid[l].y;
 				m_fXCamber = xt;
 			}
 		}
 	}
-	return true;
 }
 
 
+/**
+* Copies the data from an existing foil and maps it to this foil's variables
+*@param pSrcFoil a pointer to the reference foil from which the data wil be copied
+*/
 void Foil::CopyFoil(Foil *pSrcFoil)
 {
-	// Copies the foil from a source foil
-
 	memcpy(x, pSrcFoil->x,  sizeof(pSrcFoil->x));
 	memcpy(y, pSrcFoil->y,  sizeof(pSrcFoil->y));
 	memcpy(xb,pSrcFoil->xb, sizeof(pSrcFoil->xb));
@@ -191,9 +194,14 @@ void Foil::CopyFoil(Foil *pSrcFoil)
 
 
 
+
+/**
+* Derotates the fol's geometry i.e. aligns the mid-line with the x-axis
+*@return the angle, in degrees, by which the foil has been de-rotated
+*/
 double Foil::DeRotate()
 {
-	//De-rotates the foil, i.e. aligns the mid-line with the x-axis
+	//De-rotates the foil,
 
 	double xle, xte, yle, yte;
 	double angle, cosa, sina;
@@ -243,7 +251,15 @@ double Foil::DeRotate()
 	return angle*180.0/PI;
 }
 
-
+/**
+ * Draws the foil in the client area
+ * @todo dissociate foil object and MMI
+ * @param painter a refernce to the QPainter object on which the foil will be drawn
+ * @param alpha the rotation angle in degrees of the foil
+ * @param scalex the scaling factor in the x-direction
+ * @param scaley the scaling factor in the y-direction
+ * @param Offset the foil offset in the client area
+ */
 void Foil::DrawFoil(QPainter &painter, double const &alpha, double const &scalex, double const &scaley, QPoint const &Offset)
 {
 	static double xa, ya, sina, cosa;
@@ -313,6 +329,15 @@ void Foil::DrawFoil(QPainter &painter, double const &alpha, double const &scalex
 }
 
 
+/**
+ * Draws the foil's mid line in the client area
+ * @todo dissociate foil object and MMI
+ * @param painter a refernce to the QPainter object on which the foil will be drawn
+ * @param alpha the rotation angle in degrees of the foil
+ * @param scalex the scaling factor in the x-direction
+ * @param scaley the scaling factor in the y-direction
+ * @param Offset the foil offset in the client area
+ */
 void Foil::DrawMidLine(QPainter &painter, double const &scalex, double const &scaley, QPoint const &Offset)
 {
 	static QPoint From, To;
@@ -341,6 +366,15 @@ void Foil::DrawMidLine(QPainter &painter, double const &scalex, double const &sc
 
 
 
+/**
+ * Draws the foil's points in the client area
+ * @todo dissociate foil object and MMI
+ * @param painter a refernce to the QPainter object on which the foil will be drawn
+ * @param alpha the rotation angle in degrees of the foil
+ * @param scalex the scaling factor in the x-direction
+ * @param scaley the scaling factor in the y-direction
+ * @param Offset the foil offset in the client area
+ */
 void Foil::DrawPoints(QPainter &painter, double const &scalex, double const &scaley, QPoint const &Offset)
 {
 	static int width;
@@ -376,7 +410,11 @@ void Foil::DrawPoints(QPainter &painter, double const &scalex, double const &sca
 }
 
 
-
+/**
+ * Exports the foil geometry to a text .dat file
+ * @param out the QtextStream to which the output will be directed
+ * @return true if the operation has been successful, false otherwise
+ */
 bool Foil::ExportFoil(QTextStream &out)
 {
     int i;
@@ -395,6 +433,10 @@ bool Foil::ExportFoil(QTextStream &out)
 }
 
 
+/**
+ * Returns the area defined by the foil's contour, in normalized units
+ * @return the foil's internal area
+ */
 double Foil::GetArea()
 {
 	int i;
@@ -407,12 +449,16 @@ double Foil::GetArea()
 }
 
 
+/**
+ * Returns the y-position on the lower surface, at a specified chord position
+ * @param &x the chordwise position
+ * @return the y-position
+ */
 double Foil::GetBaseLowerY(double const &x)
 {
 	static int i;
 	static double y;
 
-	// Returns the y-coordinate on the base foil's lower surface at the x position
 //	x = x*(m_BaseIntrados[m_iInt].x-m_BaseIntrados[0].x);//in case there is a flap which reduces the length
 	for (i=0; i<m_iBaseInt; i++)
 	{
@@ -426,12 +472,16 @@ double Foil::GetBaseLowerY(double const &x)
 	return 0.0;
 }
 
+/**
+ * Returns the y-position on the upper surface, at a specified chord position
+ * @param &x the chordwise position
+ * @return the y-position
+ */
 double Foil::GetBaseUpperY(double const &x)
 {
 	static double y;
 	static int i;
 
-	// Returns the y-coordinate on the base foil's upper surface at the x position
 //	x = x*(m_BaseExtrados[m_iExt].x-m_BaseExtrados[0].x);//in case there is a flap which reduces the length
 	for (i=0; i<m_iBaseExt; i++)
 	{
@@ -446,6 +496,11 @@ double Foil::GetBaseUpperY(double const &x)
 }
 
 
+/**
+ * Returns the slope in radians on the lower surface, at a specified chord position
+ * @param &x the chordwise position
+ * @return the slope in radians
+ */
 double Foil::GetBotSlope(double const &x)
 {
 	//returns the bottom slope at position x
@@ -464,120 +519,11 @@ double Foil::GetBotSlope(double const &x)
 }
 
 
-double Foil::GetCamber(double const &x)
-{
-	//returns the camber value at position x
-	for (int i=0; i<=1000; i++)
-	{
-		if ((m_rpMid[i].x <= x) && (x < m_rpMid[i+1].x))
-		{
-			return (m_rpMid[i+1].y+m_rpMid[i].y)/2.0;
-		}
-	}
-	return 0.0;
-}
-
-double Foil::GetCamberAngle(double const &x)
-{
-	//returns the camber angle at position x
-	static int i;
-	for (i=0; i<=1000; i++)
-	{
-		if ((m_rpMid[i].x <= x) && (x < m_rpMid[i+1].x))
-		{
-			double dx = m_rpMid[i+1].x-m_rpMid[i].x;
-			double dy = m_rpMid[i+1].y-m_rpMid[i].y;
-			double alpha = atan(dy/dx)*180.0/PI;
-			return alpha;
-		}
-	}
-	return 0.0;
-}
-
-
-double Foil::GetCamberSlope(double const &x)
-{
-	//returns the camber slope at position x
-	static int i;
-	for (i=0; i<1000; i++){
-		if ((m_rpMid[i].x <= x) && (x < m_rpMid[i+1].x)){
-			double dx = m_rpMid[i+1].x-m_rpMid[i].x;
-			double dy = m_rpMid[i+1].y-m_rpMid[i].y;
-			return atan2(dy,dx);
-		}
-	}
-	if(x>=1.0)
-	{
-			double dx = m_rpMid[1000].x-m_rpMid[999].x;
-			double dy = m_rpMid[1000].y-m_rpMid[999].y;
-			return atan2(dy,dx);
-	}
-	return 0.0;
-}
-
-
-void Foil::GetFoilName(QString &FoilName)
-{
-	FoilName =  m_FoilName;
-}
-
-double Foil::GetLength()
-{
-	//Returns the foil's length
-
-		return qMax(m_rpExtrados[m_iExt].x, m_rpExtrados[m_iInt].x);
-}
-
-
-double Foil::GetLowerY(double x)
-{
-	// Returns the y-coordinate on the current foil's lower surface at the x position
-	x = m_rpIntrados[0].x + x*(m_rpIntrados[m_iInt].x-m_rpIntrados[0].x);//in case there is a flap which reduces the length
-	static double y;
-	for (int i=0; i<m_iInt; i++)
-	{
-		if (m_rpIntrados[i].x <m_rpIntrados[i+1].x  &&
-			m_rpIntrados[i].x <= x && x<=m_rpIntrados[i+1].x )
-		{
-			y = (m_rpIntrados[i].y 	+ (m_rpIntrados[i+1].y-m_rpIntrados[i].y)
-									 /(m_rpIntrados[i+1].x-m_rpIntrados[i].x)*(x-m_rpIntrados[i].x));
-			return y;
-		}
-	}
-	return 0.0;
-}
-
-
-void Foil::GetLowerY(double x, double &y, double &normx, double &normy)
-{
-	// Returns the y-coordinate on the current foil's lower surface at the x position
-
-	static double nabs;
-	static int i;
-
-	x = m_rpIntrados[0].x + x*(m_rpIntrados[m_iInt].x-m_rpIntrados[0].x);//in case there is a flap which reduces the length
-	for (i=0; i<m_iInt; i++)
-	{
-		if (m_rpIntrados[i].x <m_rpIntrados[i+1].x  &&  m_rpIntrados[i].x <= x && x<=m_rpIntrados[i+1].x )
-		{
-			y = (m_rpIntrados[i].y 	+ (m_rpIntrados[i+1].y-m_rpIntrados[i].y) /(m_rpIntrados[i+1].x-m_rpIntrados[i].x)*(x-m_rpIntrados[i].x));
-			nabs = sqrt(  (m_rpIntrados[i+1].x-m_rpIntrados[i].x) * (m_rpIntrados[i+1].x-m_rpIntrados[i].x) 
-                                    + (m_rpIntrados[i+1].y-m_rpIntrados[i].y) * (m_rpIntrados[i+1].y-m_rpIntrados[i].y));
-			normx = ( m_rpIntrados[i+1].y - m_rpIntrados[i].y)/nabs;
-			normy = (-m_rpIntrados[i+1].x + m_rpIntrados[i].x)/nabs;
-			return;
-		}
-	}
-}
-
-
-double Foil::GetMidY(double const &x)
-{
-	//Returns the current foil's mid position at the x position
-	return (GetUpperY(x)+GetLowerY(x))/2.0;
-}
-
-
+/**
+ * Returns the slope in radians on the upperer surface, at a specified chord position
+ * @param &x the chordwise position
+ * @return the slope in radians
+ */
 double Foil::GetTopSlope(double const &x)
 {
 	//returns the upper slope at position x
@@ -596,6 +542,139 @@ double Foil::GetTopSlope(double const &x)
 
 
 
+/**
+ * Returns the camber value at a specified chord position, in normalized units
+ * @param &x the chordwise position
+ * @return the camber value
+ */
+double Foil::GetCamber(double const &x)
+{
+	//returns the camber value at position x
+	for (int i=0; i<=1000; i++)
+	{
+		if ((m_rpMid[i].x <= x) && (x < m_rpMid[i+1].x))
+		{
+			return (m_rpMid[i+1].y+m_rpMid[i].y)/2.0;
+		}
+	}
+	return 0.0;
+}
+
+
+/**
+ * Returns the camber angle in degrees at a specified chord position
+ * @param &x the chordwise position
+ * @return the camber angle, in degrees
+ */
+double Foil::GetCamberSlope(double const &x)
+{
+	//returns the camber slope at position x
+	static int i;
+	for (i=0; i<1000; i++)
+	{
+		if ((m_rpMid[i].x <= x) && (x < m_rpMid[i+1].x)){
+			double dx = m_rpMid[i+1].x-m_rpMid[i].x;
+			double dy = m_rpMid[i+1].y-m_rpMid[i].y;
+			return atan2(dy,dx);
+		}
+	}
+	if(x>=1.0)
+	{
+			double dx = m_rpMid[1000].x-m_rpMid[999].x;
+			double dy = m_rpMid[1000].y-m_rpMid[999].y;
+			return atan2(dy,dx);
+	}
+	return 0.0;
+}
+
+/**
+ * Returns the foil's name
+ * @param FoilName the foil's name as a QString
+ */
+void Foil::foilName(QString &FoilName)
+{
+	FoilName =  m_FoilName;
+}
+
+/**
+ *Returns the foil's length
+ *@return the foil's length, in relative units
+*/
+double Foil::length()
+{
+	return qMax(m_rpExtrados[m_iExt].x, m_rpExtrados[m_iInt].x);
+}
+
+/**
+* Returns the y-coordinate on the current foil's lower surface at the x position
+*@param x the chordwise position
+*@return the position on the lower surface
+*/
+double Foil::GetLowerY(double x)
+{
+	x = m_rpIntrados[0].x + x*(m_rpIntrados[m_iInt].x-m_rpIntrados[0].x);//in case there is a flap which reduces the length
+	static double y;
+	for (int i=0; i<m_iInt; i++)
+	{
+		if (m_rpIntrados[i].x <m_rpIntrados[i+1].x  &&
+			m_rpIntrados[i].x <= x && x<=m_rpIntrados[i+1].x )
+		{
+			y = (m_rpIntrados[i].y 	+ (m_rpIntrados[i+1].y-m_rpIntrados[i].y)
+									 /(m_rpIntrados[i+1].x-m_rpIntrados[i].x)*(x-m_rpIntrados[i].x));
+			return y;
+		}
+	}
+	return 0.0;
+}
+
+
+/**
+* Returns the y-coordinate and the normal to the surface on the foil's lower surface at the x position
+*@param x the chordwise position
+*@param &y a reference to variable holding the position on the lower surface
+*@param &normx a reference to variable holding the x-component of the normal to the surface
+*@param &normy a reference to variable holding the y-component of the normal to the surface
+*/
+void Foil::GetLowerY(double x, double &y, double &normx, double &normy)
+{
+	static double nabs;
+	static int i;
+
+	x = m_rpIntrados[0].x + x*(m_rpIntrados[m_iInt].x-m_rpIntrados[0].x);//in case there is a flap which reduces the length
+	for (i=0; i<m_iInt; i++)
+	{
+		if (m_rpIntrados[i].x <m_rpIntrados[i+1].x  &&  m_rpIntrados[i].x <= x && x<=m_rpIntrados[i+1].x )
+		{
+			y = (m_rpIntrados[i].y 	+ (m_rpIntrados[i+1].y-m_rpIntrados[i].y) /(m_rpIntrados[i+1].x-m_rpIntrados[i].x)*(x-m_rpIntrados[i].x));
+			nabs = sqrt(  (m_rpIntrados[i+1].x-m_rpIntrados[i].x) * (m_rpIntrados[i+1].x-m_rpIntrados[i].x)
+									+ (m_rpIntrados[i+1].y-m_rpIntrados[i].y) * (m_rpIntrados[i+1].y-m_rpIntrados[i].y));
+			normx = ( m_rpIntrados[i+1].y - m_rpIntrados[i].y)/nabs;
+			normy = (-m_rpIntrados[i+1].x + m_rpIntrados[i].x)/nabs;
+			return;
+		}
+	}
+}
+
+
+/**
+* Returns the y-coordinate on the current foil's mid line at the x position
+*@param x the chordwise position
+*@return the position on the mid line
+*/
+double Foil::GetMidY(double const &x)
+{
+	//Returns the current foil's mid position at the x position
+	return (GetUpperY(x)+GetLowerY(x))/2.0;
+}
+
+
+
+
+/**
+* Returns the y-coordinate on the current foil's upper surface at the x position
+*@param x the chordwise position
+*@return the position on the upper surface
+*/
 double Foil::GetUpperY(double x)
 {
 	// Returns the y-coordinate on the current foil's upper surface at the x position
@@ -614,6 +693,14 @@ double Foil::GetUpperY(double x)
 }
 
 
+
+/**
+* Returns the y-coordinate and the normal to the surface on the foil's upper surface at the x position
+*@param x the chordwise position
+*@param &y a reference to variable holding the position on the surface
+*@param &normx a reference to variable holding the x-component of the normal to the surface
+*@param &normy a reference to variable holding the y-component of the normal to the surface
+*/
 void Foil::GetUpperY(double x, double &y, double &normx, double &normy)
 {
 	static double nabs;
@@ -637,13 +724,14 @@ void Foil::GetUpperY(double x, double &y, double &normx, double &normy)
 }
 
 
- 
+/**
+* Initializes the foil geometry,
+* constructs the upper and lower points
+* aplies the flap deflection if requested
+*/
+
 bool Foil::InitFoil()
 {
-	//Initializes the foil geometry,
-	// constructs the upper and lower points
-	// aplies to the flap deflection to the current foil if relevant
-
 	// at this point, coordinates have been loaded
 	// so has been the number of points defining the foil
 	bool bNotFound = true;
@@ -745,14 +833,12 @@ bool Foil::InitFoil()
 	return true;
 }
 
-
-
+/**
+*ABCD are assumed to lie in the xy plane
+*@return true and intersection point M if AB and CD intersect inside, false and intersection point M if AB and CD intersect outside
+*/
 bool Foil::Intersect(CVector const &A, CVector const &B, CVector const &C, CVector const &D, CVector *M)
 {
-	//ABCD are assumed to lie in the xy plane
-	//returns true and intersection point M if AB and CD intersect inside
-	//returns false and intersection point M if AB and CD intersect outside
-
 	static double Det, Det1, Det2, t, u;
 	static CVector AB, CD;
 
@@ -784,7 +870,7 @@ bool Foil::Intersect(CVector const &A, CVector const &B, CVector const &C, CVect
 }
 
 
-
+/*
 bool Foil::IsBetween(int f, int f1, int f2)
 {
 	if (f2 < f1)
@@ -812,13 +898,15 @@ bool Foil::IsBetween(int f, double f1, double f2)
 	if(ff<f1) return false;
 	else if(ff>f2) return false;
 	return true;
-}
+}*/
 
-
+/**
+*Returns the index of foil's point which coincides with the input point, if any
+* Otherwise returns -10
+*@param &Real the Cvector which defines the input point
+*/
 int Foil::IsPoint(CVector const &Real)
 {
-	// Returns the index of foil's point which coincides with the input point, if any
-	// Otherwise returns -10
 	static int k;
 	for (k=0; k<n; k++)
 	{
@@ -827,11 +915,13 @@ int Foil::IsPoint(CVector const &Real)
 	return -10;
 }
 
-
+/**
+* Normalizes the base foil's lengh to unity
+* The current foil's length is modified by the same ratio
+* @return the foil's former length
+*/
 double Foil::NormalizeGeometry()
 {
-	// Normalizes the base foil's lengh to unity
-	// The current foil's length is modified by the same ratio
 	int i;
 	double xmin = 1.0;
 	double xmax = 0.0;
@@ -874,6 +964,13 @@ double Foil::NormalizeGeometry()
 }
 
 
+/**
+ * Loads or Saves the data of this foil to a binary file
+ * @param ar the QDataStream object from/to which the data should be serialized
+ * @param bIsStoring true if saving the data, false if loading
+ * @param ProjectFormat 5 if data from Xflr5 v5.xx, 6 if from/to xflr5 v6.xx
+ * @return true if the operation was successful, false otherwise
+ */
 bool Foil::Serialize(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 {
 	// saves or loads the foil to the archive ar
@@ -994,10 +1091,11 @@ bool Foil::Serialize(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 	}
 }
 
-
+/**
+ * 	Reset the foil to a default Naca 009 geometry
+ */
 void Foil::SetNaca009()
 {	
-	// Reset the foil to Naca 009
 	x[0]  = 1.00000    ; y[0]  = 0.00000;
 	x[1]  = 0.99572    ; y[1]  = 0.00057;
 	x[2]  = 0.98296    ; y[2]  = 0.00218;
@@ -1044,14 +1142,15 @@ void Foil::SetNaca009()
 }
 
 
-
-
+/**
+* Sets the properties for the trailing edge flap
+* @param bFlap true if a flap is applied to the trailing edge
+* @param xhinge the relative x-position of the flap's hinge
+* @param yhinge the relative y-position of the flap's hinge
+* @param angle the flap angle in degrees
+*/
 void  Foil::SetTEFlapData(bool bFlap, double xhinge, double yhinge, double angle)
 {
-	// Sets a trailing edge flap properties
-	// x and y hinge are in relative % coordinates
-	// angle is in degree
-
 	m_bTEFlap     = bFlap;
 	m_TEXHinge    = xhinge;
 	m_TEYHinge    = yhinge;
@@ -1059,18 +1158,25 @@ void  Foil::SetTEFlapData(bool bFlap, double xhinge, double yhinge, double angle
 }
 
 
+/**
+* Sets the properties for the leading edge flap
+* @param bFlap true if a flap is applied to the leading edge
+* @param xhinge the relative x-position of the flap's hinge
+* @param yhinge the relative y-position of the flap's hinge
+* @param angle the flap angle in degrees
+*/
 void  Foil::SetLEFlapData(bool bFlap, double xhinge, double yhinge, double angle)
 {
-	// Sets a leading edge flap properties
-	// x and y hinge are in relative % coordinates
-	// angle is in degree
 	m_bLEFlap     = bFlap;
 	m_LEXHinge    = xhinge;
 	m_LEYHinge    = yhinge;
 	m_LEFlapAngle = angle;
 }
 
-
+/**
+ * Modifies the geometry of the current foil by setting the leading edge flap.
+ * The specification for the flap is assumed to have been set previously
+ */
 void Foil::SetLEFlap()
 {
 	int i, j, k, l, p, i1, i2;
@@ -1321,6 +1427,10 @@ void Foil::SetLEFlap()
 }
 
 
+/**
+ * Modifies the geometry of the current foil by setting the trailing edge flap.
+ * The specification for the flap is assumed to have been set previously
+ */
 void Foil::SetTEFlap()
 {
 	int i, j, k, l, p, i1, i2;
@@ -1509,8 +1619,7 @@ void Foil::SetTEFlap()
 	{
 		for (k=i1;k>0; k--)
 		{
-			if(Intersect(m_rpExtrados[j], m_rpExtrados[j+1],
-						m_rpExtrados[k], m_rpExtrados[k-1], &M))
+			if(Intersect(m_rpExtrados[j], m_rpExtrados[j+1], m_rpExtrados[k], m_rpExtrados[k-1], &M))
 			{
 					bIntersect = true;
 					break;
@@ -1540,8 +1649,7 @@ void Foil::SetTEFlap()
 	{
 		for (k=i1;k>0; k--)
 		{
-			if(Intersect(m_rpIntrados[j], m_rpIntrados[j+1],
-						m_rpIntrados[k], m_rpIntrados[k-1], &M))
+			if(Intersect(m_rpIntrados[j], m_rpIntrados[j+1], m_rpIntrados[k], m_rpIntrados[k-1], &M))
 			{
 					bIntersect = true;
 					break;
@@ -1563,7 +1671,9 @@ void Foil::SetTEFlap()
 	}
 }
 
-
+/**
+ * Creates the leading and trailing edge flaps on the current geometry
+ */
 void Foil::SetFlap()
 {
 	int i;
@@ -1596,36 +1706,6 @@ void Foil::SetFlap()
 	n = m_iExt + m_iInt + 1;
 
 //	InitFoil();//normals are set in InitXFoil() at calculation time
-}
-
-
-bool Foil::SetCamber(double f, double u)
-{
-	// keeps the same thickness distribution
-	//c is the new camber, as a % of the chord
-	//x is the point of max camber
-	//first lets find parameters of y(x) = ax3+bx2+cx+d
-	//d=0
-	double newy;
-	double u3    = u*u*u;
-	double u2    = u*u;
-	double du1   = 2.0*u-1.0;
-	double inter =  u3 - u -(u2-u)*(3.0*u2-1.0)/du1;
-	double a     = f/inter;
-	double b     = a*(1-3*u2)/du1;
-	double c     = -a*(2.0*u-3.0*u2)/du1;
-
-	//for each extrados point
-	for (int j=0; j<=m_iExt; j++)
-	{
-		//find the opposite point
-		newy =    a * m_rpMid[j].x*m_rpMid[j].x*m_rpMid[j].x
-				+ b * m_rpMid[j].x*m_rpMid[j].x
-				+ c * m_rpMid[j].x;
-		m_rpExtrados[j].y = newy + m_rpExtrados[j].y - m_rpMid[j].y;
-		m_rpMid[j].y      = newy;
-	}
-	return true;
 }
 
 

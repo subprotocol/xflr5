@@ -20,8 +20,18 @@
 *****************************************************************************/
 
 
+
+
+
+/**
+ *@file This class defines the splined foil object used in foil design.
+ */
+
+
 #ifndef SPLINEFOIL_H
 #define SPLINEFOIL_H
+
+
 
 
 #include "Foil.h"
@@ -41,6 +51,13 @@ struct Picture
 };
 
 
+/**
+*@class SplineFoil
+*@brief  The class which defines the splined foil object.
+
+The foil is contructed based on one spline for the upper surface and one spline for the lower surface.
+@todo This class mixes the construction methods and the MMI; would be better to move the MMI to a derived child class for polymorphism.
+*/
 class SplineFoil
 {
 	friend class QAFoil;

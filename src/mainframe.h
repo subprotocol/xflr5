@@ -19,7 +19,10 @@
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 *****************************************************************************/
-
+/**
+ *@file This file contains the description of the MainFrame class associated to the application's main window
+ *
+*/
 #ifndef MAINFRAME_H
 #define MAINFRAME_H
 
@@ -48,8 +51,18 @@
 #include "misc/UnitsDlg.h"
 
 
-typedef enum {NOAPP, XFOILANALYSIS, DIRECTDESIGN, INVERSEDESIGN, MIAREX}	enumApp;
+/**
+*@class MainFrame
+*@brief The class associated to the application's main window.
 
+  The class fills many functions:
+  - it creates the child windows and toolbars of the application
+  - it manages the loading and saving of settings
+  - it stores and manages the arrays of data as member variables
+  - it manages the load & save operations of project files 
+  
+  This class will remain only partially documented.
+*/
 class MainFrame : public QMainWindow
 {
 	friend class TwoDWidget;
@@ -141,11 +154,12 @@ private slots:
 
 /*___________________________________________Methods_______________________________*/
 private:
+	void AddFoil(Foil *pFoil);
+	Polar* AddPolar(Polar *pPolar);
+	void AddRecentFile(const QString &PathNAme);
+	void ClientToGL(QPoint const &point, CVector &real);
 	void closeEvent (QCloseEvent * event);
 	void contextMenuEvent (QContextMenuEvent * event) ;
-	void keyPressEvent(QKeyEvent *event);
-	void keyReleaseEvent(QKeyEvent *event);
-
 	void CreateDockWindows();
 	void CreateToolbars();
 	void CreateStatusBar();
@@ -163,56 +177,47 @@ private:
 	void CreateAFoilActions();
 	void CreateAFoilMenus();
 	void CreateAFoilToolbar();
-
-	void ClientToGL(QPoint const &point, CVector &real);
+	Foil *DeleteFoil(Foil *pFoil, bool bAsk=true);
 	void DeleteProject();
 	void DeletePlane(void *pPlanePtr, bool bResultsOnly = false);
 	void DeleteWing(void *pWingPtr, bool bResultsOnly = false);
+	QColor GetColor(int type);
+	Foil* GetFoil(QString strFoilName);
+	OpPoint *GetOpp(double Alpha);
+	Polar *GetPolar(QString m_FoilName, QString PolarName);
 	void GLToClient(CVector const &real, QPoint &point);
+	void keyPressEvent(QKeyEvent *event);
+	void keyReleaseEvent(QKeyEvent *event);
+	bool LoadSettings();
+	bool LoadPolarFileV3(QDataStream &ar, bool bIsStoring, int ArchiveFormat=0);
+	Foil* ReadFoilFile(QTextStream &ar);
+	Foil* ReadPolarFile(QDataStream &ar);
 	void RemoveOpPoint(bool bCurrent);
-	void SetCurrentFoil(Foil* pFoil);
+	void RenameFoil(Foil *pFoil);
+	bool SaveProject(QString PathName="");
 	void SaveSettings();
 	void SelectOpPoint(OpPoint *pOpp);
 	void SelectWOpp(double x);
+	bool SerializeProject(QDataStream &ar, bool bIsStoring, int ProjectFormat =6);
+	bool SerializeUFOProject(QDataStream &ar, int ProjectFormat=5);
 	void SetCentralWidget();
+	void SetCurrentFoil(Foil* pFoil);
 	void SetDlgPos(QDialog &Dlg);
 	void SetGraphSettings(Graph *pGraph);
 	void SetProjectName(QString PathName);
 	void SetMenus();
+	Foil* SetModFoil(Foil* pNewFoil, bool bKeepExistingFoil = false);
 	void SetSaveState(bool bSave);
+	QString ShortenFileName(QString &PathName);
 	void UpdateFoils();
 	void UpdatePolars();
 	void UpdateOpps();
+	void updateRecentFileActions();
 	void UpdateUFOs();
+	void UpdateView();
 	void UpdateWPolars();
 	void UpdateWOpps();
-
-	void UpdateView();
 	void WritePolars(QDataStream &ar, Foil *pFoil=NULL, int ProjectFormat=6);
-
-	bool SaveProject(QString PathName="");
-	bool LoadSettings();
-	bool LoadPolarFileV3(QDataStream &ar, bool bIsStoring, int ArchiveFormat=0);
-	bool SerializeProject(QDataStream &ar, bool bIsStoring, int ProjectFormat =6);
-	bool SerializeUFOProject(QDataStream &ar, int ProjectFormat=5);
-	Foil *DeleteFoil(Foil *pFoil, bool bAsk=true);
-
-	void AddFoil(Foil *pFoil);
-	void RenameFoil(Foil *pFoil);
-
-	Foil* GetFoil(QString strFoilName);
-	Foil* ReadFoilFile(QTextStream &ar);
-	Foil* ReadPolarFile(QDataStream &ar);
-	Foil* SetModFoil(Foil* pNewFoil, bool bKeepExistingFoil = false);
-	Polar *GetPolar(QString m_FoilName, QString PolarName);
-	Polar* AddPolar(Polar *pPolar);
-	OpPoint *GetOpp(double Alpha);
-	QColor GetColor(int type);
-
-	//recent file
-	QString ShortenFileName(QString &PathName);
-	void AddRecentFile(const QString &PathNAme);
-	void updateRecentFileActions();
 
 /*___________________________________________Variables_______________________________*/
 public:
@@ -229,22 +234,23 @@ private:
     RenameDlg *m_pRenameDlg;
     UnitsDlg *m_pUnitsDlg;
 
+	void *m_pAFoil;     /**< A void pointer to the instance of the QAFoil application. The pointer will be cast to the QAFoil type at runtime. This is necessary to prevent loop includes of header files. */
+	void *m_pMiarex;    /**< A void pointer to the instance of the QMiarex application. The pointer will be cast to the QMiarex type at runtime. This is necessary to prevent loop includes of header files. */
+	void *m_pXInverse;  /**< A void pointer to the instance of the QXInverse application. The pointer will be cast to the QXInverse type at runtime. This is necessary to prevent loop includes of header files. */
+	void *m_pXDirect;   /**< A void pointer to the instance of the QXDirect application. The pointer will be cast to the QXDirect type at runtime. This is necessary to prevent loop includes of header files. */
+	void *m_pStabView;  /** < A void pointer to the instance of the StabViewDlg window. */
+	
+	static QPointer<MainFrame> _self;  /**< @todo need to discuss this one with Francesco */
 
-	void *m_pXInverse;
-	void *m_pXDirect;
-	void *m_pMiarex;
-	void *m_pAFoil;
-	void *m_pStabView;
-	static QPointer<MainFrame> _self;
-
-	TwoDWidget *m_p2DWidget;
-	QStackedWidget *m_pctrlCentralWidget;
-	ThreeDWidget   *m_pGLWidget;
+	QStackedWidget *m_pctrlCentralWidget;  /** The stacked widget which is loaded at the center of the display area. The stack holds one TwoDWidget and one ThreeDWidget and sxwitches between the two depending on the user's request. */
+	TwoDWidget *m_p2DWidget;        /** A pointer to the instance of the TwoDWidget which is used to perform 2d drawings */
+	ThreeDWidget   *m_pGLWidget;  /** A pointer to the instance of the ThreeDWidget which is used to perform all 3D drawings */
 
 	QDockWidget *m_pctrlXDirectWidget, *m_pctrlMiarexWidget, *m_pctrlAFoilWidget, *m_pctrlXInverseWidget;
 	QDockWidget *m_pctrl3DScalesWidget, *m_pctrlStabViewWidget;
 
-	QToolBar *m_pctrlXDirectToolBar, *m_pctrlXInverseToolBar;
+	QToolBar *m_pctrlXDirectToolBar;   /**< The tool bar container which holds the instance of the QXDirect application  */
+	QToolBar *m_pctrlXInverseToolBar;
 	QToolBar *m_pctrlMiarexToolBar;
 	QToolBar *m_pctrlAFoilToolBar;
 
@@ -378,29 +384,32 @@ private:
 	QStringList m_RecentFiles;
 
 
-	QList <void *> m_oaFoil;
-	QList <void *> m_oaPolar;
-	QList <void *> m_oaOpp;
-	QList <void *> m_oaPlane;
-	QList <void *> m_oaWing;
-	QList <void *> m_oaWPolar;
-	QList <void *> m_oaWOpp;
-	QList <void *> m_oaPOpp;
-	QList <void *> m_oaBody;
+	QList <void *> m_oaFoil;    /**< The array of void pointers to the Foil objects. */
+	QList <void *> m_oaPolar;   /**< The array of void pointers to the foil Polar objects. */
+	QList <void *> m_oaOpp;     /**< The array of void pointers to the foil operating point objects. */
+	QList <void *> m_oaPlane;   /**< The array of void pointers to the Plane objects. */
+	QList <void *> m_oaWing;    /**< The array of void pointers to the Wing objects. */
+	QList <void *> m_oaWPolar;  /**< The array of void pointers to the WPolar objects. */
+	QList <void *> m_oaWOpp;    /**< The array of void pointers to the WingOpp objects. */
+	QList <void *> m_oaPOpp;    /**< The array of void pointers to the PlaneOpp objects. */
+	QList <void *> m_oaBody;    /**< The array of void pointers to the Body objects. */
 
 
-	int m_iApp;
+	enumApp m_iApp;                 /**< The identification number of the active app. */
 
-	bool m_bStyleSheets;
-	bool m_bSaved;
-	bool m_bSaveOpps;
-	bool m_bSaveWOpps;
-	bool m_bSaveSettings;
-	bool m_bReverseZoom;                    // true if the rolling forward zooms in
-	bool m_bHighlightOpp, m_bHighlightWOpp;
+	bool m_bStyleSheets;        /**< true if the window's widgets should be displayed using custom stylesheets. */
+	bool m_bSaved;              /**< true if the project has not been modified since the last save operation. */
+	bool m_bSaveOpps;           /**< true if foil operating points should be serialized in the project file */
+	bool m_bSaveWOpps;          /**< true if wing operating points should be serialized in the project file */
+	bool m_bSaveSettings;       /**< true if user-defined settings should be saved on exit. */
+	bool m_bReverseZoom;        /**< true if the rolling forward zooms in rather than out. */
+	bool m_bHighlightOpp;       /**< true if the active OpPoint should be highlighted on the polar curve. */
+	bool m_bHighlightWOpp;      /**< true if the active WingOpp should be highlighted on the polar curve. */
 
 
-	QString m_ProjectName, m_FileName, m_LanguageFilePath;
+	QString m_ProjectName;      /**< The Project's name. */
+	QString m_FileName;         /**< The absolute path to the file of the current project. */
+	QString m_LanguageFilePath;
 	QString m_LastDirName, m_ExportLastDirName, m_ImageDirName;
 	QString m_UFOType;
 	QList <QColor> m_ColorList;
@@ -408,28 +417,30 @@ private:
 	QGraph m_RefGraph;//Reference setttings
 	QColor m_BorderClr;
 
-	int m_ImageFormat;
+	enumImageFormat m_ImageFormat;   /**< The index of the type of image file which should be used. */
 
 public:
  	QFont m_TextFont;
 	QColor m_TextColor;
 	QColor m_BackgroundColor;
-	QPoint m_DlgPos;//preferred position for dialog boxes
+	QPoint m_DlgPos;      /**< Preferred position for the top-right corner of dialog boxes. @deprecated center all dialog boxes in the MainFrame window. */
 	void *m_pGL3DScales;
-	double m_mtoUnit;
-	double m_mstoUnit;
-	double m_m2toUnit;
-	double m_kgtoUnit;
-	double m_NtoUnit;
-	double m_NmtoUnit;
-	int m_LengthUnit;
-	int m_AreaUnit;
-	int m_WeightUnit;
-	int m_SpeedUnit;
-	int m_ForceUnit;
-	int m_MomentUnit;
-	int m_ExportFileType;
-	bool m_bAlphaChannel;
+	
+	double m_mtoUnit;    /**< Conversion factor from meters to the user selected length unit. */
+	double m_mstoUnit;   /**< Conversion factor from m/s to the user selected speed unit. */
+	double m_m2toUnit;   /**< Conversion factor from square meters to the user selected area unit. */
+	double m_kgtoUnit;   /**< Conversion factor from kg to the user selected mass unit. */
+	double m_NtoUnit;    /**< Conversion factor from Newtons to the user selected force unit. */
+	double m_NmtoUnit;   /**< Conversion factor from N.m to the user selected unit for moments. */
+	int m_LengthUnit;    /**< The index of the user selected unit in the array of length units. @todo use an enumeration instead. */
+	int m_AreaUnit;      /**< The index of the user selected unit in the array of area units. */
+	int m_WeightUnit;    /**< The index of the user selected unit in the array of mass units. */
+	int m_SpeedUnit;     /**< The index of the user selected unit in the array of speed units. */
+	int m_ForceUnit;     /**< The index of the user selected unit in the array of force units. */
+	int m_MomentUnit;    /**< The index of the user selected unit in the array of moment units. */
+	
+	enumTextFileType m_ExportFileType;  /**< Defines if the list separator for the output text files should be a space or a comma. */
+	bool m_bAlphaChannel;  /**< true if transparency is enabled for 3D displays. */
 
 };
 

@@ -24,7 +24,9 @@
 #include "../globals.h"
 
 
-
+/**
+*The public constructor
+*/
 PlaneOpp::PlaneOpp()
 {
 	m_PlaneName   = "";
@@ -57,7 +59,15 @@ PlaneOpp::PlaneOpp()
 }
 
 
-
+/**
+ * Loads or saves the data of this operating point to a binary file. 
+ * This method serializes the data associated to the plane, then calls the serialization methods
+ * of the wings.
+ * @param ar the QDataStream object from/to which the data should be serialized
+ * @param bIsStoring true if saving the data, false if loading
+ * @param ProjectFormat 5 if data from Xflr5 v5.xx, 6 if from/to xflr5 v6.xx @todo remove, Format 5 is obsolete and should not be used
+ * @return true if the operation was successful, false otherwise
+ */
 bool PlaneOpp::SerializePOpp(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 {
 	int ArchiveFormat;

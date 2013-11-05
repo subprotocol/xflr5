@@ -36,12 +36,13 @@
 void *ThreeDWidget::s_pMiarex;
 void *ThreeDWidget::s_pMainFrame;
 
-
+/**
+*The public constructor
+*/
 ThreeDWidget::ThreeDWidget(QWidget *parent)
 	: QGLWidget(parent)
 {
 	m_pParent = parent;
-	m_wndTextColor = QColor(200,200,200);
 	m_iView = GLMIAREXVIEW;
 
 	setAutoFillBackground(false);
@@ -50,7 +51,10 @@ ThreeDWidget::ThreeDWidget(QWidget *parent)
 	setCursor(Qt::CrossCursor);
 }
 
-
+/**
+*Overrides the contextMenuEvent method of the base class.
+*Dispatches the handling to the active child application.
+*/
 void ThreeDWidget::contextMenuEvent (QContextMenuEvent * event)
 {
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
@@ -76,6 +80,10 @@ void ThreeDWidget::contextMenuEvent (QContextMenuEvent * event)
 	}
 }
 
+/**
+*Overrides the mousePressEvent method of the base class.
+*Dispatches the handling to the active child application.
+*/
 void ThreeDWidget::mousePressEvent(QMouseEvent *event)
 {
 	if(m_iView == GLMIAREXVIEW)
@@ -95,6 +103,10 @@ void ThreeDWidget::mousePressEvent(QMouseEvent *event)
 	}
 }
 
+/**
+*Overrides the mouseReleaseEvent method of the base class.
+*Dispatches the handling to the active child application.
+*/
 void ThreeDWidget::mouseReleaseEvent(QMouseEvent *event)
 {
 	if(m_iView == GLMIAREXVIEW)
@@ -115,7 +127,10 @@ void ThreeDWidget::mouseReleaseEvent(QMouseEvent *event)
 }
 
 
-
+/**
+*Overrides the mouseMoveEvent method of the base class.
+*Dispatches the handling to the active child application.
+*/
 void ThreeDWidget::mouseMoveEvent(QMouseEvent *event)
 {
 	if(m_iView == GLMIAREXVIEW)
@@ -136,7 +151,10 @@ void ThreeDWidget::mouseMoveEvent(QMouseEvent *event)
 }
 
 
-
+/**
+*Overrides the mouseDoubleClickEvent method of the base class.
+*Dispatches the handling to the active child application.
+*/
 void ThreeDWidget::mouseDoubleClickEvent ( QMouseEvent * event )
 {
 	if(m_iView == GLMIAREXVIEW)
@@ -156,6 +174,11 @@ void ThreeDWidget::mouseDoubleClickEvent ( QMouseEvent * event )
 	}
 }
 
+
+/**
+*Overrides the wheelEvent method of the base class.
+*Dispatches the handling to the active child application.
+*/
 void ThreeDWidget::wheelEvent(QWheelEvent *event)
 {
 	if(m_iView == GLMIAREXVIEW)
@@ -176,12 +199,19 @@ void ThreeDWidget::wheelEvent(QWheelEvent *event)
 }
 
 
+/**
+*Sets the background color for the OpenGl viewport.
+* @todo check usage.
+*/
 void ThreeDWidget::initializeGL()
 {
 	glClearColor(.1, 0.0784, 0.1569, 1.0);
 }
 
-
+/**
+*Overrides the keyPressEvent method of the base class.
+*Dispatches the handling to the active child application.
+*/
 void ThreeDWidget::keyPressEvent(QKeyEvent *event)
 {
 	if(m_iView == GLMIAREXVIEW)
@@ -201,6 +231,11 @@ void ThreeDWidget::keyPressEvent(QKeyEvent *event)
 	}
 }
 
+
+/**
+*Overrides the keyReleaseEvent method of the base class.
+*Dispatches the handling to the active child application.
+*/
 void ThreeDWidget::keyReleaseEvent(QKeyEvent *event)
 {
 	if(m_iView ==GLMIAREXVIEW)
@@ -220,7 +255,10 @@ void ThreeDWidget::keyReleaseEvent(QKeyEvent *event)
 	}
 }
 
-
+/**
+*Overrides the paintGL method of the base class.
+*Dispatches the handling to the active child application.
+*/
 void ThreeDWidget::paintGL()
 {
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
@@ -252,7 +290,13 @@ void ThreeDWidget::paintGL()
 	}
 }
 
-
+/**
+*Overrides the resizeGL method of the base class.
+* Sets the GL viewport to fit in the client area.
+* Sets the scaling factors for the objects to be drawn in the viewport.
+*@param width the width in pixels of the client area
+*@param height the height in pixels of the client area
+*/
 void ThreeDWidget::resizeGL(int width, int height)
 {
 	double w, h;
@@ -268,7 +312,6 @@ void ThreeDWidget::resizeGL(int width, int height)
 #endif
 //	d = qMax(w,h);
 //	glViewport(0,0, d, d);
-
 
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
@@ -311,7 +354,11 @@ void ThreeDWidget::resizeGL(int width, int height)
 
 
 
-
+/**
+*Creates the OpenGL List for the ArcBall.
+*@param ArcBall the ArcBall object associated to the view 
+*@param GLScale the overall scaling factor for the view @deprecated and unused
+*/
 void ThreeDWidget::CreateArcballList(ArcBall &ArcBall, double GLScale)
 {
 	int row, col, NumAngles, NumCircles;
@@ -426,13 +473,15 @@ void ThreeDWidget::CreateArcballList(ArcBall &ArcBall, double GLScale)
 
 
 
-
+/**
+* Draws the axis in the OpenGL view
+*@param length the length of the axis, in IS units  @todo check
+*@param color the color to use to draw the axis
+*@param style the index of the style to use to draw the axis
+*@param width the width to use to draw the axis
+*/
 void ThreeDWidget::GLDrawAxes(double length, QColor AxisColor, int AxisStyle, int AxisWidth)
 {
-	//
-	// Draws the axis in the OpenGL view
-	//
-
 	MainFrame * pMainFrame =(MainFrame*)s_pMainFrame;
 	double l = .6*length;
 
@@ -517,12 +566,15 @@ void ThreeDWidget::GLDrawAxes(double length, QColor AxisColor, int AxisStyle, in
 
 
 
-
+/**
+*Renders a sphere in the viewport. Used to draw the point masses and the light.
+*@param cr the sphere's color
+*@param radius the sphere's radius, in IS units
+*@param NumLongitudes the number of longitude arcs to be used to draw the sphere
+*@param NumLatitudes the number of latitude arcs to be used to draw the sphere
+*/
 void ThreeDWidget::GLRenderSphere(QColor cr, double radius, int NumLongitudes, int NumLatitudes)
 {
-	//
-	// Render the sphere representing the light or point masses
-	//
 	static double start_lat, start_lon,lat_incr, lon_incr, R;
 	static double phi1, phi2, theta1, theta2;
 	static GLdouble u[3], v[3], w[3], n[3];
@@ -584,12 +636,11 @@ void ThreeDWidget::GLRenderSphere(QColor cr, double radius, int NumLongitudes, i
 }
 
 
-
+/**
+* Calculates two vectors, using the middle point as the common origin
+*/
 void ThreeDWidget::NormalVector(GLdouble p1[3], GLdouble p2[3],  GLdouble p3[3], GLdouble n[3])
 {
-	//
-	// calculate two vectors, using the middle point as the common origin
-	//
 
 	GLdouble v1[3], v2[3], d;
 	v1[0] = p3[0] - p1[0];
@@ -621,13 +672,14 @@ void ThreeDWidget::NormalVector(GLdouble p1[3], GLdouble p2[3],  GLdouble p3[3],
 	n[2] *= d;
 }
 
-
+/**
+*Initializes the light parameters of the GL Viewport
+*@param pglLightParams a pointer to the instance of the GLLightDlg which holds the user-defined settings for the light.
+*@param Offset_y
+*@param LightFactor a global factor for all light intensities.
+*/
 void ThreeDWidget::GLSetupLight(GLLightDlg *pglLightParams, double Offset_y, double LightFactor)
 {
-	//
-	// Sets the light parameters for the OpenGl display
-	//
-
 	glEnable(GL_LIGHTING);
 	glEnable(GL_LIGHT0);    // the ambient light
 	glDisable(GL_LIGHT1);
@@ -667,7 +719,6 @@ void ThreeDWidget::GLSetupLight(GLLightDlg *pglLightParams, double Offset_y, dou
 	fLightPosition0[1] = (GLfloat)((pglLightParams->s_YLight + Offset_y));
 	fLightPosition0[2] = (GLfloat)((pglLightParams->s_ZLight));
 	fLightPosition0[3] = 1.0; // W (positional light)
-
 
 
 	// Enable the basic light
@@ -714,6 +765,11 @@ void ThreeDWidget::GLSetupLight(GLLightDlg *pglLightParams, double Offset_y, dou
 }
 
 
+/**
+*Converts Client coordinates to OpenGL Viewport coordinates.
+*@param point the client coordinates.
+*@param real the viewport coordinates.
+*/
 void ThreeDWidget::ClientToGL(QPoint const &point, CVector &real)
 {
 	//
@@ -738,6 +794,11 @@ void ThreeDWidget::ClientToGL(QPoint const &point, CVector &real)
 
 
 
+/**
+*Converts OpenGL Viewport coordinates to client coordinates
+*@param real the viewport coordinates.
+*@param point the client coordinates.
+*/
 void ThreeDWidget::GLToClient(CVector const &real, QPoint &point)
 {
 	//

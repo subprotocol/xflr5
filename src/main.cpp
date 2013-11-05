@@ -2,7 +2,7 @@
 
 	QFLR5 Application
 
-	Copyright (C) 2008-2010 Andre Deperrois adeperrois@xflr5.com
+	Copyright (C) 2008-2013 Andre Deperrois adeperrois@xflr5.com
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -25,8 +25,14 @@
 #include <QSplashScreen>
 #include <QMessageBox>
 
-Foil *g_pCurFoil;	//make it common to all applications
 
+Foil *g_pCurFoil;	/**< A global pointer to a foil object. 
+                         This allows to keep the same foil active in the different applications Direct design, inverse design, and foil analysis.
+						 @todo Bad oop practice though, see if could be replaced by a static pointer to the pointer in mainframe class.*/
+
+/** 
+*The app's point of entry !
+*/
 int main(int argc, char *argv[])
 {
 #if QT_VERSION >= 0x040600

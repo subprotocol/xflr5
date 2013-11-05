@@ -35,6 +35,10 @@
 void *LLTAnalysisDlg::s_pMainFrame;
 void *LLTAnalysisDlg::s_pMiarex;
 
+
+/**
+*The public constructor
+*/
 LLTAnalysisDlg::LLTAnalysisDlg(QWidget *pParent) : QDialog(pParent)
 {
 	setWindowTitle(tr("LLT Analysis"));
@@ -67,7 +71,6 @@ LLTAnalysisDlg::LLTAnalysisDlg(QWidget *pParent) : QDialog(pParent)
 	m_bFinished   = false;
 	m_bInitCalc   = true;
 	m_bSequence   = false;
-	m_bAlpha      = true;
 
 	m_Iterations =  0;
 	m_IterLim    = 20;
@@ -84,7 +87,11 @@ LLTAnalysisDlg::LLTAnalysisDlg(QWidget *pParent) : QDialog(pParent)
 }
 
 
-
+/**
+* Launches a type 1 or 2 analysis.
+* Loops over the range of specified aoa. 
+* For each successful aoa, stores the data in the WPolar and Operating Point objects.
+*/
 bool LLTAnalysisDlg::AlphaLoop()
 {
 	QString str;
@@ -186,241 +193,14 @@ bool LLTAnalysisDlg::AlphaLoop()
 
 }
 
-
-
-void LLTAnalysisDlg::InitDialog()
-{
-	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
-	QString FileName = QDir::tempPath() + "/XFLR5.log";
-	m_pXFile = new QFile(FileName);
-	if (!m_pXFile->open(QIODevice::WriteOnly | QIODevice::Text)) m_pXFile = NULL;
-
-	SetFileHeader();
-
-	m_Iterations = 0;
-
-	QString str;
-	m_IterGraph.AddCurve();
-	m_IterGraph.AddCurve();
-	str = "|Da|";
-	m_IterGraph.GetCurve(0)->SetTitle(str);
-
-	m_IterGraph.SetAutoX(true);
-	m_IterGraph.SetXMin(0.0);
-	m_IterGraph.SetXMax((double)m_IterLim);
-	m_IterGraph.SetX0(0.0);
-	m_IterGraph.SetXUnit((int)(m_IterLim/10.0));
-
-	m_IterGraph.SetAutoY(true);
-	m_IterGraph.SetY0(0.0);
-	m_IterGraph.SetYMin(0.0);
-	m_IterGraph.SetYMax(1.0);
-
-	m_IterGraph.SetMargin(40);
-	if(pMainFrame) m_IterGraph.CopySettings(&pMainFrame->m_RefGraph,false);
-
-	m_LLT.m_IterLim = m_IterLim;
-}
-
-
-
-
-void LLTAnalysisDlg::keyPressEvent(QKeyEvent *event)
-{
-	switch (event->key())
-	{
-		case Qt::Key_Escape:
-		{
-			OnCancelAnalysis();
-			event->accept();
-			return;
-		}
-		default:
-			event->ignore();
-	}
-}
-
-
-void LLTAnalysisDlg::OnCancelAnalysis()
-{
-	if(m_pXFile->isOpen()) m_pXFile->close();
-	m_bSkip = true;
-	m_bExit = true;
-	m_bCancel = true;
-	if(m_bFinished) done(1);
-}
-
-
-void LLTAnalysisDlg::OnSkipPoint()
-{
-	m_bSkip = true;
-}
-
-
-
-void LLTAnalysisDlg::ResetCurves()
-{
-	CCurve*pCurve;
-	pCurve = m_IterGraph.GetCurve(0);
-	if(pCurve) pCurve->ResetCurve();
-	pCurve = m_IterGraph.GetCurve(1);
-	if(pCurve) pCurve->ResetCurve();
-
-}
-
-
-void LLTAnalysisDlg::SetAlpha(double AlphaMin, double AlphaMax, double DeltaAlpha)
-{
-	m_AlphaMin = AlphaMin;
-	m_AlphaMax = AlphaMax;
-	m_AlphaDelta = DeltaAlpha;
-}
-
-
-
-void LLTAnalysisDlg::SetFileHeader()
-{
-	QMiarex *pMiarex = (QMiarex*)s_pMiarex;
-	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
-
-	QTextStream out(m_pXFile);
-	out << "\n";
-	out << pMainFrame->m_VersionName;
-	out << "\n";
-	out << m_pWing->m_WingName;
-	out << "\n";
-	if(pMiarex && pMiarex->m_pCurWPolar)
-	{
-//		out << pMiarex->m_pCurWPolar->m_WPlrName;
-//		out << "\n";
-	}
-
-	QDateTime dt = QDateTime::currentDateTime();
-	QString str = dt.toString("dd.MM.yyyy  hh:mm:ss");
-
-	out << str;
-	out << "\n___________________________________\n\n";
-}
-
-
-void LLTAnalysisDlg::SetupLayout()
-{
-	QDesktopWidget desktop;
-	QRect r = desktop.geometry();
-	setMinimumHeight(r.height()*2/3);
-	setMinimumWidth(r.width()/2);
-
-	m_pctrlTextOutput = new QTextEdit;
-	m_pctrlTextOutput->setFontFamily("Courier");
-	m_pctrlTextOutput->setReadOnly(true);
-	m_pctrlTextOutput->setLineWrapMode(QTextEdit::NoWrap);
-	m_pctrlTextOutput->setWordWrapMode(QTextOption::NoWrap);
-
-	m_pGraphWidget = new GraphWidget;
-//	m_pGraphWidget->setMinimumHeight(r.height()/4);
-//	m_pGraphWidget->setMinimumWidth(r.width()/4);
-	m_pGraphWidget->m_pGraph = &m_IterGraph;
-
-//	QHBoxLayout *GraphLayout = new QHBoxLayout;
-//	GraphLayout->addWidget(m_pGraphWidget,1);
-
-	m_pctrlSkip   = new QPushButton(tr("Skip"));
-	m_pctrlCancel = new QPushButton(tr("Cancel"));
-
-	connect(m_pctrlSkip,   SIGNAL(clicked()), this, SLOT(OnSkipPoint()));
-	connect(m_pctrlCancel, SIGNAL(clicked()), this, SLOT(OnCancelAnalysis()));
-
-	QHBoxLayout *buttonsLayout = new QHBoxLayout;
-	buttonsLayout->addStretch(1);
-	buttonsLayout->addWidget(m_pctrlSkip);
-	buttonsLayout->addStretch(1);
-	buttonsLayout->addWidget(m_pctrlCancel);
-	buttonsLayout->addStretch(1);
-
-	QVBoxLayout *mainLayout = new QVBoxLayout;
-	mainLayout->addWidget(m_pctrlTextOutput);
-	mainLayout->addWidget(m_pGraphWidget,2);
-	mainLayout->addLayout(buttonsLayout);
-	setLayout(mainLayout);
-}
-
-
-
-void LLTAnalysisDlg::StartAnalysis()
-{
-	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
-	//all set to launch the analysis
-	if(!m_pWPolar || !m_pWing) return;
-
-	m_pctrlCancel->setText(tr("Cancel"));
-	m_bSkip       = false;
-	m_bExit       = false;
-	m_bCancel     = false;
-	m_bWarning    = false;
-	m_bError      = false;
-	m_bFinished   = false;
-
-	m_pctrlTextOutput->clear();
-
-	m_LLT.m_poaPolar = &pMainFrame->m_oaPolar;
-	m_LLT.m_pWing = m_pWing;
-	m_LLT.m_pWPolar = m_pWPolar;
-	m_LLT.LLTInitialize(m_pWPolar->m_QInf);
-
-
-	if (m_pWPolar->m_WPolarType!=FIXEDAOAPOLAR)
-	{
-		AlphaLoop() ;
-	}
-	else
-	{
-		ReLoop();
-	}
-
-	m_bFinished = true;
-	QString strange = "\n_________\n"+tr("Analysis completed");
-	if(m_bWarning)      strange += tr(" ...some points are outside the flight envelope");
-	else if(m_bError)	strange += tr(" ...some points are unconverged");
-
-	strange+= "\n";
-
-	UpdateOutput(strange);
-	m_pctrlCancel->setText(tr("Close"));
-	m_pctrlSkip->setEnabled(false);
-
-	m_bSkip   = false;
-	m_bExit   = false;
-}
-
-
-void LLTAnalysisDlg::UpdateView()
-{
-	m_pGraphWidget->update();
-	repaint();
-}
-
-
-void LLTAnalysisDlg::UpdateOutput(QString &strong)
-{
-	m_pctrlTextOutput->insertPlainText(strong);
-	m_pctrlTextOutput->ensureCursorVisible();
-	WriteString(strong);
-}
-
-
-void LLTAnalysisDlg::WriteString(QString &strong)
-{
-	if(!m_pXFile) return;
-	if(!m_pXFile->isOpen()) return;
-	QTextStream ds(m_pXFile);
-	ds << strong;
-}
-
-
-bool LLTAnalysisDlg::ReLoop()
+/**
+* Launches a type 4 analysis.
+* Loops over the range of specified velocities. 
+* For each successful aoa, stores the data in the WPolar and Operating Point objects.
+*/
+bool LLTAnalysisDlg::QInfLoop()
 {
 	//Alpha stands for QInf...
-
 	int i,iter;
 	QString str;
 
@@ -528,6 +308,269 @@ bool LLTAnalysisDlg::ReLoop()
 }
 
 
+
+/**
+*Initializes the dialog and its associated data.
+*/
+void LLTAnalysisDlg::InitDialog()
+{
+	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
+	QString FileName = QDir::tempPath() + "/XFLR5.log";
+	m_pXFile = new QFile(FileName);
+	if (!m_pXFile->open(QIODevice::WriteOnly | QIODevice::Text)) m_pXFile = NULL;
+
+	SetFileHeader();
+
+	m_Iterations = 0;
+
+	QString str;
+	m_IterGraph.AddCurve();
+	m_IterGraph.AddCurve();
+	str = "|Da|";
+	m_IterGraph.GetCurve(0)->SetTitle(str);
+
+	m_IterGraph.SetAutoX(true);
+	m_IterGraph.SetXMin(0.0);
+	m_IterGraph.SetXMax((double)m_IterLim);
+	m_IterGraph.SetX0(0.0);
+	m_IterGraph.SetXUnit((int)(m_IterLim/10.0));
+
+	m_IterGraph.SetAutoY(true);
+	m_IterGraph.SetY0(0.0);
+	m_IterGraph.SetYMin(0.0);
+	m_IterGraph.SetYMax(1.0);
+
+	m_IterGraph.SetMargin(40);
+	if(pMainFrame) m_IterGraph.CopySettings(&pMainFrame->m_RefGraph,false);
+
+	m_LLT.m_IterLim = m_IterLim;
+}
+
+
+
+/** Overrides and handles the keyPressEvent sent by Qt */
+void LLTAnalysisDlg::keyPressEvent(QKeyEvent *event)
+{
+	switch (event->key())
+	{
+		case Qt::Key_Escape:
+		{
+			OnCancelAnalysis();
+			event->accept();
+			return;
+		}
+		default:
+			event->ignore();
+	}
+}
+
+/** The user has requested the cancellation of the analysis*/
+void LLTAnalysisDlg::OnCancelAnalysis()
+{
+	if(m_pXFile->isOpen()) m_pXFile->close();
+	m_bSkip = true;
+	m_bExit = true;
+	m_bCancel = true;
+	if(m_bFinished) done(1);
+}
+
+/** The user has requested that the calculation for the current aoa be skipped. 
+*The analysis will continue for the next aoa if anay.
+*/
+void LLTAnalysisDlg::OnSkipPoint()
+{
+	m_bSkip = true;
+}
+
+
+/**
+*Clears the content of the graph's curve prior to the start of the calculation of the next operating point.
+*/
+void LLTAnalysisDlg::ResetCurves()
+{
+	CCurve*pCurve;
+	pCurve = m_IterGraph.GetCurve(0);
+	if(pCurve) pCurve->ResetCurve();
+	pCurve = m_IterGraph.GetCurve(1);
+	if(pCurve) pCurve->ResetCurve();
+
+}
+
+/**
+* Copies the value of the input parameters to the member variables
+*/
+void LLTAnalysisDlg::SetAlpha(double AlphaMin, double AlphaMax, double DeltaAlpha)
+{
+	m_AlphaMin = AlphaMin;
+	m_AlphaMax = AlphaMax;
+	m_AlphaDelta = DeltaAlpha;
+}
+
+
+/**
+* Initializes the header of the log file
+*/
+void LLTAnalysisDlg::SetFileHeader()
+{
+	QMiarex *pMiarex = (QMiarex*)s_pMiarex;
+	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
+
+	QTextStream out(m_pXFile);
+	out << "\n";
+	out << pMainFrame->m_VersionName;
+	out << "\n";
+	out << m_pWing->m_WingName;
+	out << "\n";
+	if(pMiarex && pMiarex->m_pCurWPolar)
+	{
+//		out << pMiarex->m_pCurWPolar->m_WPlrName;
+//		out << "\n";
+	}
+
+	QDateTime dt = QDateTime::currentDateTime();
+	QString str = dt.toString("dd.MM.yyyy  hh:mm:ss");
+
+	out << str;
+	out << "\n___________________________________\n\n";
+}
+
+/**
+* Initializes the interface of the dialog box
+*/
+void LLTAnalysisDlg::SetupLayout()
+{
+	QDesktopWidget desktop;
+	QRect r = desktop.geometry();
+	setMinimumHeight(r.height()*2/3);
+	setMinimumWidth(r.width()/2);
+
+	m_pctrlTextOutput = new QTextEdit;
+	m_pctrlTextOutput->setFontFamily("Courier");
+	m_pctrlTextOutput->setReadOnly(true);
+	m_pctrlTextOutput->setLineWrapMode(QTextEdit::NoWrap);
+	m_pctrlTextOutput->setWordWrapMode(QTextOption::NoWrap);
+
+	m_pGraphWidget = new GraphWidget;
+//	m_pGraphWidget->setMinimumHeight(r.height()/4);
+//	m_pGraphWidget->setMinimumWidth(r.width()/4);
+	m_pGraphWidget->m_pGraph = &m_IterGraph;
+
+//	QHBoxLayout *GraphLayout = new QHBoxLayout;
+//	GraphLayout->addWidget(m_pGraphWidget,1);
+
+	m_pctrlSkip   = new QPushButton(tr("Skip"));
+	m_pctrlCancel = new QPushButton(tr("Cancel"));
+
+	connect(m_pctrlSkip,   SIGNAL(clicked()), this, SLOT(OnSkipPoint()));
+	connect(m_pctrlCancel, SIGNAL(clicked()), this, SLOT(OnCancelAnalysis()));
+
+	QHBoxLayout *buttonsLayout = new QHBoxLayout;
+	buttonsLayout->addStretch(1);
+	buttonsLayout->addWidget(m_pctrlSkip);
+	buttonsLayout->addStretch(1);
+	buttonsLayout->addWidget(m_pctrlCancel);
+	buttonsLayout->addStretch(1);
+
+	QVBoxLayout *mainLayout = new QVBoxLayout;
+	mainLayout->addWidget(m_pctrlTextOutput);
+	mainLayout->addWidget(m_pGraphWidget,2);
+	mainLayout->addLayout(buttonsLayout);
+	setLayout(mainLayout);
+}
+
+
+/**
+* Launches the analysis.
+* At this stage, the dialogbox has been setup and initialized.
+* The LLTAnalysis object has been created and the input data has been loaded.
+* Depending on the type of polar, the method launches either a loop over aoa or velocity values.
+*/
+void LLTAnalysisDlg::StartAnalysis()
+{
+	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
+	//all set to launch the analysis
+	if(!m_pWPolar || !m_pWing) return;
+
+	m_pctrlCancel->setText(tr("Cancel"));
+	m_bSkip       = false;
+	m_bExit       = false;
+	m_bCancel     = false;
+	m_bWarning    = false;
+	m_bError      = false;
+	m_bFinished   = false;
+
+	m_pctrlTextOutput->clear();
+
+	m_LLT.m_poaPolar = &pMainFrame->m_oaPolar;
+	m_LLT.m_pWing = m_pWing;
+	m_LLT.m_pWPolar = m_pWPolar;
+	m_LLT.LLTInitialize(m_pWPolar->m_QInf);
+
+
+	if (m_pWPolar->m_WPolarType!=FIXEDAOAPOLAR)
+	{
+		AlphaLoop() ;
+	}
+	else
+	{
+		QInfLoop();
+	}
+
+	m_bFinished = true;
+	QString strange = "\n_________\n"+tr("Analysis completed");
+	if(m_bWarning)      strange += tr(" ...some points are outside the flight envelope");
+	else if(m_bError)	strange += tr(" ...some points are unconverged");
+
+	strange+= "\n";
+
+	UpdateOutput(strange);
+	m_pctrlCancel->setText(tr("Close"));
+	m_pctrlSkip->setEnabled(false);
+
+	m_bSkip   = false;
+	m_bExit   = false;
+}
+
+/**
+* Updates the graph widget. Called after each iteration of the LLTAnalysis. 
+* Time consuming, but it's necessary to provide the user with visual feedback on the progress of the analysis
+*/
+void LLTAnalysisDlg::UpdateView()
+{
+	m_pGraphWidget->update();
+	repaint();
+}
+
+/**
+* Updates the text output in the dialog box and the log file.
+*@param strong the text message to append to the output widget and to the log file.
+*/
+void LLTAnalysisDlg::UpdateOutput(QString &strong)
+{
+	m_pctrlTextOutput->insertPlainText(strong);
+	m_pctrlTextOutput->ensureCursorVisible();
+	WriteString(strong);
+}
+
+
+/**
+* Appends a string to the log file
+*@param strong the text message to append to the log file.
+*/
+void LLTAnalysisDlg::WriteString(QString &strong)
+{
+	if(!m_pXFile) return;
+	if(!m_pXFile->isOpen()) return;
+	QTextStream ds(m_pXFile);
+	ds << strong;
+}
+
+
+/** 
+* Appends a point to the curve in the graph widget 
+* @param x the x-value of the point to be appended
+* @param x the y-value of the point to be appended
+*/
 void LLTAnalysisDlg::UpdateGraph(int x, double y)
 {
 	CCurve *pCurve = m_IterGraph.GetCurve(0);

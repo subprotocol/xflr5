@@ -18,6 +18,15 @@
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 *****************************************************************************/
+
+
+/**
+ *@file
+ *
+ * This file contains the LLTAnalysisDlg class, which is used to perform LLT analysis
+ *
+ */
+ 
 //
 //Class used to perform LLT analysis
 //GUI-independant
@@ -31,7 +40,13 @@
 #include "../objects/Wing.h"
 #include <QList>
 
+/**
+ *@class LLTAnalysis
+ *@brief The class is used to perform the LLT analysis of one operating point
 
+	The analysis is managed from the instance of the LLTAnalysisDlg class.
+	All the data is in International Standard units kg, m, s.
+ */
 class LLTAnalysis
 {
 	friend class MainFrame;
@@ -41,71 +56,66 @@ public:
     LLTAnalysis(void *pParent=NULL);
 
 private:
-
-    void LLTInitialize(double QInf);
-    void LLTSetBending(double QInf);
-    void LLTComputeWing(double QInf, double Alpha, QString &ErrorMessage);
-    bool LLTSetLinearSolution(double Alpha);
-    void LLTInitCl(double &QInf, double const Alpha);
-    int LLTIterate(double &QInf, double const Alpha);
-
-    double Sigma(int m);
-    double Eta(int m);
-    double Beta(int m, int k);
     double AlphaInduced(int k);
+    double Beta(int m, int k);
+    double Eta(int m);
+    void LLTComputeWing(double QInf, double Alpha, QString &ErrorMessage);
+    void LLTInitCl(double &QInf, double const Alpha);
+    void LLTInitialize(double QInf);
+    int LLTIterate(double &QInf, double const Alpha);
+    void LLTSetBending(double QInf);
+    bool LLTSetLinearSolution(double Alpha);
+    double Sigma(int m);
 
-    void *m_pParent;
-    Wing * m_pWing;
-    WPolar *m_pWPolar;
+    void *m_pParent;                            /**< A void pointer to the instance of the LLTAnalysisDlg class */
+    Wing * m_pWing;                             /**< A pointer to the Wing object for which the calculation shall be performed */
+    WPolar *m_pWPolar;                          /**< A pointer to the WPolar object for which the calculation shall be performed */
 
-    QList<void *> *m_poaPolar;			// a pointer to the foil polar array
+    bool m_bCancel;                             /**< true if the user has cancelled the analysis */
+    bool m_bConverged;                          /**< true if the analysis has converged  */
+    bool m_bSkip;                               /**< true if the user has requested to skip this operating point */
+    bool m_bWingOut;                            /**< true if the interpolation of viscous properties falls outside the polar mesh */
+	double m_Ai[MAXSPANSTATIONS+1];		        /**< Induced Angle coefficient at the span stations */
+	double m_BendingMoment[MAXSPANSTATIONS+1];	/**< bending moment at the span stations */
+	double m_Cl[MAXSPANSTATIONS+1];		        /**< Local lift coefficient at the span stations */
+	double m_Chord[MAXSPANSTATIONS+1];          /**< chord at the span stations */
+    double m_CL;                                /**< The wing's lift coefficient */
+	double m_Cm[MAXSPANSTATIONS+1];			    /**< Total pitching moment coefficient at the span stations */
+	double m_CmAirf[MAXSPANSTATIONS+1];		    /**< Airfoil part of the pitching moment coefficient at the span stations */
+    double m_GCm;                               /**< The wing's total pitching moment */
+    double m_GRm;                               /**< The wing's total rolling moment */
+    double m_GYm;                               /**< The wing's total yawing moment */
+	double m_ICd[MAXSPANSTATIONS+1];		    /**< Induced Drag coefficient at the span stations */
+    double m_ICm;                               /**< The wing's induced pitching moment */
+    double m_InducedDrag;                       /**< The wing's induced drag coefficient */
+    int m_IterLim;                              /**< Maximum number of iterations in the calculation */
+    double m_IYm;                               /**< The wing's induced yawing moment */
+    QString m_LengthUnit;                       /**< Name of the user-defined length unit */
+    double m_Maxa;                              /**< The max value of the difference of induced angle at any span station between two iterations */
+    double m_mtoUnit;                           /**< Conversion factor for the display of results in the user-defined length unit*/
+	double m_Offset[MAXSPANSTATIONS+1];         /**< offset at  the span stations */
+	double m_PCd[MAXSPANSTATIONS+1];		    /**< Viscous Drag coefficient at the span stations */
+    QList<void *> *m_poaPolar;			        /**< A pointer to the foil polar array */
+    double m_QInf0;                             /**< The freestream velocity */
+	double m_Re[MAXSPANSTATIONS+1];		        /**< Reynolds number at the span stations */
+	double m_SpanPos[MAXSPANSTATIONS+1];		/**< Span position of the span stations */
+	double m_StripArea[MAXSPANSTATIONS+1];		/** <Local strip area at the span stations */
+	double m_Twist[MAXSPANSTATIONS+1];          /**< twist at the span stations */
+    double m_VCm;                               /**< The wing's viscous pitching moment */
+    double m_ViscousDrag;                       /**< The wing's viscous drag coefficient */
+    double m_VYm;                               /**< The wing's viscous yawing moment */
+    double m_XCP;                               /**< The x-position of the center of pressure */
+	double m_XCPSpanAbs[MAXSPANSTATIONS+1];	    /**< Center of Pressure pos at the span stations */
+	double m_XCPSpanRel[MAXSPANSTATIONS+1];	    /**< Center of Pressure pos at the span stations */
+	double m_XTrTop[MAXSPANSTATIONS+1];		    /**< Upper transition location at the span stations */
+	double m_XTrBot[MAXSPANSTATIONS+1];		    /**< Lower transition location at the span stations */
+    double m_YCP;                               /**< The y-position of the center of pressure */
+    double m_ZCP;                               /**< The z-position of the center of pressure */
+	
+	static int s_NLLTStations;                  /**< The number of LLT stations in the spanwise direction */
+    static double s_RelaxMax;                   /**< The relaxation factor for the iterations */
+    static double s_CvPrec;                     /**< Precision criterion to stop the iterations. The difference in induced angle at any span point between two iterations should be less than the criterion */
 
-    static int s_NLLTStations;
-    static double s_RelaxMax;
-    static double s_CvPrec;
-
-    bool m_bSkip;
-    bool m_bCancel;
-    bool m_bConverged;
-    bool m_bWingOut;
-
-    int m_IterLim;
-
-	double m_Chord[MAXSPANSTATIONS+1];		//chord at stations
-	double m_Offset[MAXSPANSTATIONS+1];		//offset at LLT stations
-	double m_Twist[MAXSPANSTATIONS+1];		//twist at LLT stations
-	double m_SpanPos[MAXSPANSTATIONS+1];		//Span position of  LLT stations
-	double m_StripArea[MAXSPANSTATIONS+1];		//Local strip area at  LLT stations
-
-
-	double m_Re[MAXSPANSTATIONS+1];
-	double m_Cl[MAXSPANSTATIONS+1];
-	double m_Ai[MAXSPANSTATIONS+1];
-	double m_ICd[MAXSPANSTATIONS+1];		//Induced Drag coefficient at stations
-	double m_PCd[MAXSPANSTATIONS+1];		//Viscous Drag coefficient at stations
-	double m_Cm[MAXSPANSTATIONS+1];			//Total pitching moment coefficient at stations
-	double m_CmAirf[MAXSPANSTATIONS+1];		//Aill part of Pitching moment coefficient at stations
-	double m_XCPSpanRel[MAXSPANSTATIONS+1];	//Center of Pressure pos at stations
-	double m_XCPSpanAbs[MAXSPANSTATIONS+1];	//Center of Pressure pos at stations
-	double m_BendingMoment[MAXSPANSTATIONS+1];	//bending moment at stations
-	double m_XTrTop[MAXSPANSTATIONS+1];		//Upper transition location at stations
-	double m_XTrBot[MAXSPANSTATIONS+1];		//Lower transition location at stations
-
-    double m_mtoUnit;
-    QString m_LengthUnit;
-
-    double m_QInf0;
-    double m_Maxa;
-
-    double m_CL;
-    double m_InducedDrag;
-    double m_ViscousDrag;
-
-    double m_VYm, m_IYm, m_GYm;
-    double m_VCm, m_ICm, m_GCm;
-    double m_GRm;
-
-    double m_XCP, m_YCP, m_ZCP;
 };
 
 #endif // LLTANALYSIS_H

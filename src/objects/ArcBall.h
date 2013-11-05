@@ -57,13 +57,33 @@
  */
 
 
+
+/**
+ *@file
+ * This file contains the description of the Arcball class used for the calculation of rotations in 3D display.
+ * Based on the code provided by Bradley Smith http://rainwarrior.ca/dragon/arcball.html
+ *
+ */
+
+
 #ifndef ARCALL_H
 #define ARCALL_H
+
+
 
 #include "../objects/CVector.h"
 #include "../objects/Quaternion.h"
 #include <QRect>
 
+
+
+/**
+*@class Arcball
+*@brief
+ * This class defines the Arcball object used for the calculation of rotations in 3D display.
+ *
+   Based on the code provided by Bradley Smith http://rainwarrior.ca/dragon/arcball.html
+*/
 class ArcBall
 {
 public:

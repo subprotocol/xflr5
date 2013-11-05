@@ -1,7 +1,7 @@
 /****************************************************************************
 
     WPolar Class
-	Copyright (C) 2005-2010 Andre Deperrois adeperrois@xflr5.com
+	Copyright (C) 2005-2013 Andre Deperrois adeperrois@xflr5.com
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -24,7 +24,6 @@
  *
  * This class defines the polar object for the 3D analysis of wings and planes
  *
- *
  */
 
 
@@ -32,7 +31,22 @@
 #ifndef WPOLAR_H
 #define WPOLAR_H
 
-#include "WOpp.h"
+
+/**
+*@brief
+*	This class defines the polar object used in 2D and 3D calculations
+*
+	The class stores both the analysis parameters and the analysis results.
+
+	Each instance of this class is uniquely associated to an instance of a Wing or a Plane object.
+	The data is stored in International Standard Units, i.e. meters, seconds, kg, and Newtons.
+	Angular data is stored in degrees
+*/
+
+
+
+
+#include "WingOpp.h"
 #include "PlaneOpp.h"
 
 
@@ -57,7 +71,7 @@ public:
 	void AddPoint(double alpha, double CL, double ICd, double PCd, double CY, double GCm, double VCm, double ICm, double GRm, double GYm, double IYm, double QInf, double XCP);
 
 	/** returns the analysis method of the polar as an index in the enumeration */
-	enumAnalysisMethod analysisMethod() {return m_AnalysisMethod;};
+	enumAnalysisMethod analysisMethod() {return m_AnalysisMethod;}
 
 	void CalculatePoint(int i);
 	void Copy(WPolar *pWPolar);
@@ -65,7 +79,7 @@ public:
 	double density()                    {return m_Density;}     /**< returns the fluid's density, in IS units */
 
 	void DuplicateSpec(WPolar *pWPolar);
-	void Export(QTextStream &out, int FileType, bool bDataOnly=false);
+	void Export(QTextStream &out, enumTextFileType FileType, bool bDataOnly=false);
 	void GetPolarProperties(QString &Properties, bool bData=false);
 	void *GetUFOPlrVariable(int iVar);
 
@@ -190,8 +204,6 @@ public:
 	double        m_WMAChord;           /**< The reference length = the mean aero chord, for the calculation of aero coefficients */
 	enumPolarType m_WPolarType;          /**< The type of analysis. May be one of the following types :FIXEDSPEEDPOLAR, FIXEDLIFTPOLAR, FIXEDAOAPOLAR, STABILITYPOLAR */
 	double        m_WSpan;              /**< The reference span for the calculation of aero coefficients */
-
-
 
 };
 

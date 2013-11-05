@@ -138,8 +138,8 @@ MainFrame::MainFrame(QWidget *parent, Qt::WFlags flags)
 
 	m_RefGraph.SetGraphName("Reference Graph");
 
-	m_ImageFormat = 2;
-	m_ExportFileType = 1;
+	m_ImageFormat = PNG;
+	m_ExportFileType = TXT;
 	m_bStyleSheets  = true;
 	m_bReverseZoom  = false;
 	m_bAlphaChannel = true;
@@ -242,7 +242,7 @@ MainFrame::MainFrame(QWidget *parent, Qt::WFlags flags)
 	m_bSaved     = true;
 	m_bHighlightOpp = m_bHighlightWOpp = false;
 
-	m_iApp = 0;
+	m_iApp = NOAPP;
 	m_pctrlAFoilToolBar->hide();
 	m_pctrlXDirectToolBar->hide();
 	m_pctrlXInverseToolBar->hide();
@@ -3431,7 +3431,22 @@ bool MainFrame::LoadSettings()
 		m_TextFont.setPointSize(settings.value("TextFontPointSize", 10).toInt());
 		m_TextFont.setStyleStrategy(QFont::OpenGLCompatible);
 
-		m_ImageFormat = settings.value("ImageFormat").toInt();
+		switch(settings.value("ImageFormat").toInt())
+		{
+			case 0:
+				m_ImageFormat = PNG;
+				break;
+			case 1:
+				m_ImageFormat = JPEG;
+				break;
+			case 2:
+				m_ImageFormat = BMP;
+				break;
+			default:
+				m_ImageFormat = PNG;
+				break;
+		}
+
 		m_bSaveOpps   = settings.value("SaveOpps").toBool();
 		m_bSaveWOpps  = settings.value("SaveWOpps").toBool();
 		m_DlgPos.rx() = settings.value("DlgPos_x").toInt();
@@ -3681,7 +3696,8 @@ void MainFrame::OnExportCurGraph()
 											&m_GraphExportFilter);
 	if(!FileName.length()) return;
 
-	int pos, type;
+	int pos;
+	enumTextFileType type;
 	pos = FileName.lastIndexOf("/");
 	if(pos>0) m_ExportLastDirName = FileName.left(pos);
 
@@ -3689,7 +3705,7 @@ void MainFrame::OnExportCurGraph()
 
 	if (!XFile.open(QIODevice::WriteOnly | QIODevice::Text)) return ;
 	pos = FileName.indexOf(".csv");
-	if(pos>0) type=2; else type=1;
+	if(pos>0) type=CSV; else type=TXT;
 
 	pGraph->ExportToFile(XFile, type);
 }
@@ -3817,7 +3833,7 @@ void MainFrame::OnLoadFile()
 {
 	QStringList PathNames;
 	QString PathName;
-	int App  = NOAPP;
+	enumApp App  = NOAPP;
 	bool warn_non_airfoil_multiload = false;
 	QXDirect *pXDirect = (QXDirect*)m_pXDirect;
 	QMiarex *pMiarex = (QMiarex*)m_pMiarex;
@@ -4208,17 +4224,17 @@ void MainFrame::OnSaveViewToImageFile()
 
 	switch(m_ImageFormat)
 	{
-		case 0 :
+		case PNG :
 		{
 			Filter = "Portable Network Graphics (*.png)";
 			break;
 		}
-		case 1 :
+		case JPEG :
 		{
 			Filter = "JPEG (*.jpg)";
 			break;
 		}
-		case 2 :
+		case BMP :
 		{
 			Filter = "Windows Bitmap (*.bmp)";
 			break;
@@ -4238,17 +4254,17 @@ void MainFrame::OnSaveViewToImageFile()
 	if(Filter == "Portable Network Graphics (*.png)")
 	{
 		if(FileName.right(4)!=".png") FileName+= ".png";
-		m_ImageFormat = 0;
+		m_ImageFormat = PNG;
 	}
 	else if(Filter == "JPEG (*.jpg)")
 	{
 		if(FileName.right(4)!=".jpg") FileName+= ".jpg";
-		m_ImageFormat = 1;
+		m_ImageFormat = JPEG;
 	}
 	else if(Filter == "Windows Bitmap (*.bmp)")
 	{
 		if(FileName.right(4)!=".bmp") FileName+= ".bmp";
-		m_ImageFormat = 2;
+		m_ImageFormat = BMP;
 	}
 
 	switch(m_iApp)
