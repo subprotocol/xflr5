@@ -38,7 +38,7 @@
 *@class WPolarDlg
 *@brief This class provides the interface dialog box which is used to define or to edit the paramaters of a type 1, 2 or 4 polar.
 
-* The class uses a static instance of WPolar as the default data. 
+* The class uses a static instance of the WPolar class as the default data. 
 * This is so that the next call to the class uses the existing data, and only modifications are required.
 * The creation and storage of the new polar object is managed from the calling class QMiarex.
 * The rest of the methods and variables is self explanatory and not documented further.
@@ -53,11 +53,11 @@ public:
 	WPolarDlg(QWidget *pParent=NULL);
 
 private:
-	void keyPressEvent(QKeyEvent *event);
 
 	void Connect();
 	void EnableControls();
 	void InitDialog(Plane *pPlane, Wing *pWing, WPolar *pWPolar=NULL);
+	void keyPressEvent(QKeyEvent *event);
 	void ReadValues();
 	void SetDensity();
 	void SetReynolds();

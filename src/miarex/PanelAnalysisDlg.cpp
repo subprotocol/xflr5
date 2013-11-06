@@ -39,7 +39,9 @@ void *PanelAnalysisDlg::s_pMainFrame;
 
 bool g_bTrace = false;
 
-
+/**<
+* The public constructor
+*/
 PanelAnalysisDlg::PanelAnalysisDlg(QWidget *pParent) : QDialog(pParent)
 {
 	setWindowTitle(tr("3D Panel Analysis"));
@@ -61,9 +63,9 @@ PanelAnalysisDlg::PanelAnalysisDlg(QWidget *pParent) : QDialog(pParent)
 	m_b3DSymetric    = false;
 	m_bSequence      = false;
 	m_bWarning       = false;
-	m_bType4         = false;
-	m_bXFile         = false;
-	m_bConverged     = false;
+//	m_bType4         = false;
+//	m_bXFile         = false;
+	m_bInverted     = false;
 	m_bCancel        = false;
 	m_bTrefftz       = false;
 
@@ -148,7 +150,10 @@ PanelAnalysisDlg::PanelAnalysisDlg(QWidget *pParent) : QDialog(pParent)
 }
 
 
-
+/**
+*Adds a string to the output widget and to the log file
+*@param strong the string to output
+*/
 void PanelAnalysisDlg::AddString(QString strong)
 {
 	m_pctrlTextOutput->insertPlainText(strong);
@@ -156,7 +161,14 @@ void PanelAnalysisDlg::AddString(QString strong)
 	WriteString(strong);
 }
 
-
+/**
+* Launches a calculation over the input sequence of aoa.
+* Used for type 1 & 2 analysis, without tilted geometry.
+*
+* The calculation is performed for two unit RHS, and all the Operating POints are calculated by linear combination. 
+* The two unit RHS are for a unit velocity along the x-axis, and for a unit velocity along the z-axis.
+*@return true if all the aoa were computed successfully, false otherwise. Interpolation issues are not counted as unsuccessful.
+*/
 bool PanelAnalysisDlg::AlphaLoop()
 {
 	QString str;
@@ -261,7 +273,9 @@ bool PanelAnalysisDlg::AlphaLoop()
 	return true;
 }
 
-
+/**
+* Builds the influence matrix, both for VLM or Panel calculations.
+*/
 void PanelAnalysisDlg::BuildInfluenceMatrix()
 {
 	CVector C, CC, V, VS;
@@ -325,18 +339,20 @@ void PanelAnalysisDlg::BuildInfluenceMatrix()
 	}
 }
 
-
+/**
+ * Creates the source strengths for all requested RHS in a Panel analysis, using the specified boundary conditions (BC).
+ * BC may be of the Neumann or Dirichlet type depending on the analysis type and on the geometry
+ *
+ * Uses NASA 4023 equation (20) & (22)
+ * 
+ * The computation is performed for a unit speed. The results are scaled to speed later depending on the polar type.
+ *
+ *@param Alpha0 the first aoa in the sequence
+ *@param AlphaDeltathe aoa increment
+ *@param the total number of aoa and of source arrays to build
+*/
 void PanelAnalysisDlg::CreateSourceStrength(double Alpha0, double AlphaDelta, int nval)
 {
-	// Creates the RHS of the linear problem, using boundary conditions
-	// BC may be of the Neumann or Dirichlet type depending on the analysis type and on the geometry
-	//
-	// if 3d-panel, use NASA 4023 equation (20) & (22)
-	// 
-	// Compute with a unit speed
-	// The results are scaled to speed later depending on the polar type
-	//
-	
 	int p, pp, q;
 	double alpha;
 	CVector WindDirection;
@@ -360,12 +376,16 @@ void PanelAnalysisDlg::CreateSourceStrength(double Alpha0, double AlphaDelta, in
 }
 
 
-
-void PanelAnalysisDlg::CreateRHS(double *RHS, CVector VInf, double *VField, bool bTrace)
+/**
+* Creates a RHS vector array for a given field of velocity vectors.
+* If the input pointer VField is NULL, a uniform field of freestream velocities is considered.
+* If the pointer is not NULL, it points to an array of velocity vectors on the panels. Used for evaluating the stability derivatives for the rotation dof.
+* @param RHS A pointer to the RHS to build
+* @param VField a pointer to the array of the freesteam velocity vectors on the panels.
+* @param VInf the freestream velocity vector
+*/
+void PanelAnalysisDlg::CreateRHS(double *RHS, CVector VInf, double *VField)
 {
-	//Creates the RHS vector for
-	//  free stream velocity VInf,
-	//	rotation Angle around vector Omega
 	int m, p, pp;
 	double  phi, sigmapp;
 	CVector V, C, VPanel;
@@ -429,7 +449,9 @@ void PanelAnalysisDlg::CreateRHS(double *RHS, CVector VInf, double *VField, bool
 }
 
 
-
+/**
+*Builds the two unit RHS for freestream velocities directed along x and z
+*/
 void PanelAnalysisDlg::CreateUnitRHS()
 {
 	//Creates the two RHS for unit speeds along x and z
@@ -442,16 +464,16 @@ void PanelAnalysisDlg::CreateUnitRHS()
 }
 
 
-
+/**
+* In the case of a panel analysis, adds the contribution of the wake columns to the coefficients of the influence matrix
+* Method :
+* 	- follow the method described in NASA 4023 eq. (44)
+*	- add the wake's doublet contribution to the matrix
+*	- add the difference in potential at the trailing edge panels to the RHS
+* Only a flat wake is considered. Wake roll-up has been tested but did not prove robust enough for implementation.
+*/
 void PanelAnalysisDlg::CreateWakeContribution()
 {
-	//______________________________________________________________________________________
-	// Method :
-	// 	- follow the method described in NASA 4023 eq. (44)
-	//	- add the wake's doublet contribution to the matrix
-	//	- add the difference in potential at the trailing edge panels to the RHS
-	//______________________________________________________________________________________
-	//
 	int kw, lw, pw, p, pp, Size;
 
 	CVector V, VS, C, CC, TrPt;
@@ -586,16 +608,17 @@ void PanelAnalysisDlg::CreateWakeContribution()
 }
 
 
+/**
+* In the case of a panel analysis, adds the contribution of the wake columns to the coefficients of the influence matrix
+* Method :
+* 	- follow the method described in NASA 4023 eq. (44)
+*	- add the wake's doublet contribution to the matrix
+*	- add the potential difference at the trailing edge panels to the RHS ; the potential's origin
+*     is set arbitrarily to the geometrical orgin so that phi = V.dot(WindDirectio) x point_position
+* Only a flat wake is considered. Wake roll-up has been tested but did not prove robust enough for implementation.
+*/
 void PanelAnalysisDlg::CreateWakeContribution(double *pWakeContrib, CVector WindDirection)
 {
-	//______________________________________________________________________________________
-	// Method :
-	// 	- follow the method described in NASA 4023 eq. (44)
-	//	- add the wake's doublet contribution to the matrix
-	//	- add the potential difference at the trailing edge panels to the RHS ; the potential's origin
-	//    is set arbitrarily to the geometrical orgin so that phi = V.dot(WindDirectio) x point_position
-	//______________________________________________________________________________________
-	//
 	int kw, lw, pw, p, pp;
 
 	static CVector V, VS, C, CC, TrPt;
@@ -661,7 +684,7 @@ void PanelAnalysisDlg::CreateWakeContribution(double *pWakeContrib, CVector Wind
 					// Is the panel pp shedding a wake ?
 					if(m_pPanel[pp].m_bIsTrailing)
 					{
-						// Get trailing point where the jup in potential is evaluated
+						// Get trailing point where the jump in potential is evaluated
 						TrPt = (m_pNode[m_pPanel[pp].m_iTA] + m_pNode[m_pPanel[pp].m_iTB])/2.0;
 						// If so, we need to add the contributions of the wake column
 						// shedded by this panel to the RHS and to the Matrix
@@ -717,24 +740,23 @@ void PanelAnalysisDlg::CreateWakeContribution(double *pWakeContrib, CVector Wind
 }
 
 
+/**
+* This method performs the computation in the far-field (Trefftz) plane.
+* For each of the wings, calculates, the resulting Force vector and induced drag, and the coefficients for each chordwise strip.
+* The calculations are made based on the source and doublet strengths or on the vortex circulations which have been previously computed.
+* The results are used a first time to calculate the balance velocities, and a second time for the calculation of aero coefficients
+* @param QInf the freestream velocity
+* @param Alpha0 the first aoa in the sequence
+* @param AlphaDelta the aoa increment
+* @param nval the number of aoa in the sequence
+*/
 void PanelAnalysisDlg::ComputeFarField(double QInf, double Alpha0, double AlphaDelta, int nval)
 {
-	//______________________________________________________________________________________
-	// Method : 
-	// 	First calculate the Cp coefficients
-	// 	Deduce the lift for unit speed
-	// 	Calculate the speeds i.a.w. the polar's type
-	// 	Scale the doublet and source strength i.a.w. the speeds
-	//______________________________________________________________________________________
-
 	QString strong;
 	int q, pos;
 	double alpha, IDrag, *Mu, *Sigma;
 	double ThinSize = 0.0;
 	CVector WindNormal, WingForce;
-
-	//______________________________________________________________________________________
-	// Scale the speeds i.a.w. the polar's type
 
 	AddString(tr("      Calculating aerodynamic coefficients in the far field plane")+"\n");
 
@@ -742,7 +764,6 @@ void PanelAnalysisDlg::ComputeFarField(double QInf, double Alpha0, double AlphaD
 	{
 		if(m_pWingList[iw]) ThinSize += (double)m_pWingList[iw]->m_MatSize;
 	}
-
 
 	for (q=0; q<nval;q++)
 	{
@@ -764,7 +785,6 @@ void PanelAnalysisDlg::ComputeFarField(double QInf, double Alpha0, double AlphaD
 			{
 				WingForce.Set(0.0, 0.0, 0.0);
 				m_pWingList[iw]->PanelTrefftz(QInf, alpha, Mu, Sigma, pos, WingForce, IDrag, m_pWPolar, m_pWakePanel, m_pWakeNode);
-
 
 				//save the results... will save another FF calculation when computing operating point
 				m_WingForce[q*MAXWINGS+iw] = WingForce;
@@ -789,7 +809,12 @@ void PanelAnalysisDlg::ComputeFarField(double QInf, double Alpha0, double AlphaD
 }
 
 
-
+/**
+* In the case of Type 2 or Type 7 polars, computes the velocity for which the lift force balances the plane's weight.
+* Assumes the lift force on each lifting wing has been calculated for a unit velocity.
+* @param Alpha the angle of attack to calculate
+* @param q the index of the aoa in the sequence
+*/
 void PanelAnalysisDlg::ComputeBalanceSpeeds(double Alpha, int q)
 {
 	QString strong, strange;
@@ -830,7 +855,12 @@ void PanelAnalysisDlg::ComputeBalanceSpeeds(double Alpha, int q)
 	}
 }
 
-
+/**
+* Scales the unit results using the specified freestream velocity. 
+* The velocity may have been specified directly in the case of a type 1 polar, or may have been calculated to balance the plane's weight.
+* The velocity for each aoa are provided in the member variable array m_3DQInf
+* @param nval the number of aoa in the sequence
+*/
 void PanelAnalysisDlg::ScaleResultstoSpeed(int nval)
 {
 	int p, q, pp;
@@ -911,10 +941,14 @@ void PanelAnalysisDlg::ScaleResultstoSpeed(int nval)
 	}
 }
 
-
+/**
+* Computes the  viscous and inviscid aerodynamic coefficients.
+* @param V0 the initial aoa or velocity, depending on the polar type
+* @param VDelta the aoa or velocity increment, depending on the polar type
+* @param nrhs the number of points in the sequence
+*/
 void PanelAnalysisDlg::ComputeAeroCoefs(double V0, double VDelta, int nrhs)
 {
-	// Calculates the viscous and inviscid wing coefficients 
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	int q;
 	QString str, strong;
@@ -952,10 +986,16 @@ void PanelAnalysisDlg::ComputeAeroCoefs(double V0, double VDelta, int nrhs)
 	}
 }
 
-
+/**
+ *  This method calculates the all the viscous and inviscid aerodynamic coefficients for one aoa. 
+ * The method calls the method in the QMiarex class which creates the operating points, updates the polar data, and updates the graphs.
+ * The method uses in input the result data stored in the member variables.
+ * @param Alpha the aoa of this calculation
+ * @param QInf the freesteam velocity of this calculation
+ * @param qrhs the index of the current right hand side calculation
+*/
 void PanelAnalysisDlg::ComputePlane(double Alpha, double QInf, int qrhs)
 {
-	// calculates the viscous and inviscid wing coefficients 
 	QMiarex *pMiarex = (QMiarex*)s_pMiarex;
 	int pos;
 	double *Mu, *Sigma;
@@ -1003,7 +1043,6 @@ void PanelAnalysisDlg::ComputePlane(double Alpha, double QInf, int qrhs)
 				//restore the saved FF results
 				if(m_pWPolar->m_WPolarType!=FIXEDAOAPOLAR)
 				{
-
 					memcpy(m_pWingList[iw]->m_Cl,  m_Cl  + qrhs*MAXWINGS*MAXSPANSTATIONS + iw*MAXSPANSTATIONS, m_pWingList[iw]->m_NStation*sizeof(double));
 					memcpy(m_pWingList[iw]->m_ICd, m_ICd + qrhs*MAXWINGS*MAXSPANSTATIONS + iw*MAXSPANSTATIONS, m_pWingList[iw]->m_NStation*sizeof(double));
 					memcpy(m_pWingList[iw]->m_Ai,  m_Ai  + qrhs*MAXWINGS*MAXSPANSTATIONS + iw*MAXSPANSTATIONS, m_pWingList[iw]->m_NStation*sizeof(double));
@@ -1109,6 +1148,13 @@ void PanelAnalysisDlg::ComputePlane(double Alpha, double QInf, int qrhs)
 }
 
 
+/**
+* Returns the estimation of the panel's lift coeficient based on the vortex circulation.
+* @param p the index of the panel
+* @param Gamma the pointer to the array of vortex circulations
+* @param Cp a pointer to the array of resulting panel lift coefficients
+* @param VInf the freestream velocity vector
+*/
 void PanelAnalysisDlg::GetVortexCp(const int &p, double *Gamma, double *Cp, CVector &VInf)
 {
 	static CVector PanelForce, Force;
@@ -1119,14 +1165,25 @@ void PanelAnalysisDlg::GetVortexCp(const int &p, double *Gamma, double *Cp, CVec
 	if(!m_pWPolar->m_bVLM1 && !m_pPanel[p].m_bIsLeading)
 	{
 		Force       = VInf* m_pPanel[p].Vortex;
-		Force      *= Gamma[p+1] * m_pWPolar->m_Density;       //Newtons
+		Force      *= Gamma[p+1] * m_pWPolar->m_Density;           //Newtons
 		PanelForce -= Force;
 	}
 
 	Cp[p]  = -2.0 * PanelForce.dot(m_pPanel[p].Normal) /m_pPanel[p].Area/m_pWPolar->m_Density;
 }
 
-
+/**
+* This method calculates the Cp coefficient on a panel based on the distribution of doublet strengths.
+*The Cp coefficient is the derivative of the doublet strength on the surface
+*This calculation follows the method provided in document NASA 4023.
+* @param p the index of the panel for which the calculation is performed
+* @param Mu the array of doublet strength values 
+* @param Cp a reference to the Cp variable to evaluate
+* @param VLocal a reference to the CVector holding the local velocity on the panel
+* @param QInf the freestream velocity
+* @param Vx the x-component of the freestream velocity vector
+* @param Vz the z-component of the freestream velocity vector
+*/
 void PanelAnalysisDlg::GetDoubletDerivative(const int &p, double *Mu, double &Cp, CVector &VLocal, double const &QInf, double Vx, double Vy, double Vz)
 {
 	static int PL,PR, PU, PD;
@@ -1283,7 +1340,12 @@ void PanelAnalysisDlg::GetDoubletDerivative(const int &p, double *Mu, double &Cp
 }
 
 
-
+/**
+* Calculates the Cp coefficient on each panel, using hte vortex circulations or the doublet strengths, depending on the analysis method.
+* @param V0 the first value in the sequence, either aoa for type 1 & 2 polars or velocity for type 4
+* @param VDelta the increment value of the input parameter, either aoa for type 1 & 2 polars or velocity for type 4
+* @param nval the number of values in the sequence
+*/
 void PanelAnalysisDlg::ComputeOnBodyCp(double V0, double VDelta, int nval)
 {
 	//following VSAERO theory manual
@@ -1364,13 +1426,21 @@ void PanelAnalysisDlg::ComputeOnBodyCp(double V0, double VDelta, int nval)
 	AddString("\n");
 }
 
-
+/**
+* Evaluates the influence of a doublet at a point outside the panel.
+*
+* Follows the method provided in the VSAERO theory Manual NASA 4023.
+*
+* Vectorial operations are written inline to save computing times -->longer code, but 4x more efficient.
+*
+*@param C the point where the influence is to be evaluated
+*@param pPanel a pointer to the Panel with the doublet strength
+*@param V the perturbation velocity at point C
+*@param phi the potential at point C
+*@param bWake true if the panel is located on the wake
+*/
 void PanelAnalysisDlg::DoubletNASA4023(CVector const &C, Panel *pPanel, CVector &V, double &phi, bool bWake)
 {
-	// VSAERO theory Manual
-	// Influence of panel pp at coll pt of panel p
-	// vectorial operations are written inline to save computing times
-	// -->longer code, but 4x more efficient....
 	int i;
 	double CoreSize = 0.00000;
 	if(fabs(*m_pCoreSize)>1.e-10) CoreSize = *m_pCoreSize;
@@ -1507,12 +1577,20 @@ void PanelAnalysisDlg::DoubletNASA4023(CVector const &C, Panel *pPanel, CVector 
 }
 
 
+/**
+* Returns the influence at point C of the panel pPanel.
+* If the panel pPanel is located on a thin surface, then its the influence of a vortex.
+* If it is on a thick surface, then its a doublet.
+*
+*@param C the point where the influence is to be evaluated
+*@param pPanel a pointer to the Panel with the doublet strength
+*@param V the perturbation velocity at point C
+*@param phi the potential at point C
+*@param bWake true if the panel is located on the wake
+*@param bAll true if the influence of the bound vortex should be evaluated, in the case of a VLM analysis. 
+*/
 void PanelAnalysisDlg::GetDoubletInfluence(CVector const &C, Panel *pPanel, CVector &V, double &phi, bool bWake, bool bAll)
 {
-	// returns the influence of the panel pPanel at point C
-	// if the panel pPanel is located on a thin surface, then its the influence of a vortex
-	// if it is on a thick surface, then its a doublet
-
 	if(pPanel->m_Pos!=MIDSURFACE || pPanel->m_bIsWakePanel)	DoubletNASA4023(C, pPanel, V, phi, bWake);
 	else
 	{
@@ -1537,11 +1615,16 @@ void PanelAnalysisDlg::GetDoubletInfluence(CVector const &C, Panel *pPanel, CVec
 	}
 }
 
-
+/**
+* Returns the influence at point C of a uniform source distribution on the panel pPanel 
+* The panel is necessarily located on a thick surface, else the source strength is zero
+*@param C the point where the influence is to be evaluated
+*@param pPanel a pointer to the Panel with the doublet strength
+*@param V the perturbation velocity at point C
+*@param phi the potential at point C
+*/
 void PanelAnalysisDlg::GetSourceInfluence(CVector const &C, Panel *pPanel, CVector &V, double &phi)
 {
-	// returns the influence of a uniform source distribution on the panel pPanel at point C
-	// The panel is necessarily located on a thick surface, else the source strength is zero
 
 	SourceNASA4023(C, pPanel, V, phi);
 
@@ -1556,7 +1639,14 @@ void PanelAnalysisDlg::GetSourceInfluence(CVector const &C, Panel *pPanel, CVect
 	}
 }
 
-
+/**
+* Returns the perturbation velocity vector at a given point, due to the distribution of source and doublet/circulation strengths.
+* @param C the point where the influence is to be evaluated
+* @param Mu a pointer to the array of doublet strength or vortex circulations
+* @param sigma a pointer to the array of source strengths
+* @param VT the resulting perturbation velocity
+* @param bAll true if the influence of the bound vortex should be included, in the case of a VLM analysis
+*/
 void PanelAnalysisDlg::GetSpeedVector(CVector const &C, double *Mu, double *Sigma, CVector &VT, bool bAll)
 {
 	CVector V;
@@ -1593,7 +1683,15 @@ void PanelAnalysisDlg::GetSpeedVector(CVector const &C, double *Mu, double *Sigm
 	}
 }
 
-
+/**
+* Returns the perturbation velocity vector at a given point, due to the distribution of source and doublet/circulation strengths.
+* Overloaded function in the case where the source and doublet/vortex strengths are float values loaded from a file and not doublet values.
+* @param C the point where the influence is to be evaluated
+* @param Mu a pointer to the array of doublet strength or vortex circulations
+* @param sigma a pointer to the array of source strengths
+* @param VT the resulting perturbation velocity
+* @param bAll true if the influence of the bound vortex should be included, in the case of a VLM analysis
+*/
 void PanelAnalysisDlg::GetSpeedVector(CVector const &C, float *Mu, float *Sigma, CVector &VT, bool bAll)
 {
 	CVector V;
@@ -1629,6 +1727,11 @@ void PanelAnalysisDlg::GetSpeedVector(CVector const &C, float *Mu, float *Sigma,
 		}
 	}
 }
+
+
+/**
+*Initializes the dialog and the analysis
+*/
 void PanelAnalysisDlg::InitDialog()
 {
 	m_Progress = 0.0;
@@ -1682,7 +1785,7 @@ void PanelAnalysisDlg::InitDialog()
 	m_pctrlProgress->setMaximum(100);
 }
 
-
+/**Overrides the keyPressEvent sent by Qt */
 void PanelAnalysisDlg::keyPressEvent(QKeyEvent *event)
 {
 	switch (event->key())
@@ -1698,7 +1801,7 @@ void PanelAnalysisDlg::keyPressEvent(QKeyEvent *event)
 	}
 }
 
-
+/** The user has requested to cancel the on-going analysis*/
 void PanelAnalysisDlg::OnCancelAnalysis()
 {
 	if(m_pXFile->isOpen()) m_pXFile->close();
@@ -1710,7 +1813,10 @@ void PanelAnalysisDlg::OnCancelAnalysis()
 }
 
 
-
+/**
+* Relaxes the wake based on the perturbation velocities.
+* Has been disabled due to lack of robustness
+*/
 void PanelAnalysisDlg::RelaxWake()
 {
 	QMiarex *pMiarex = (QMiarex*)s_pMiarex;
@@ -1823,6 +1929,14 @@ void PanelAnalysisDlg::RelaxWake()
 
 
 
+/**
+* Launches a calculation over the input sequence of velocity.
+* Used for type 4 analysis, without tilted geometry.
+*
+* The calculation is performed for two unit RHS, and all the Operating POints are calculated by linear combination. 
+* The two unit RHS are for a unit velocity along the x-axis, and for a unit velocity along the z-axis.
+*@return true if all the aoa were computed successfully, false otherwise. Interpolation issues are not counted as unsuccessful.
+*/
 bool PanelAnalysisDlg::ReLoop()
 {
 	QString str;
@@ -1948,13 +2062,20 @@ bool PanelAnalysisDlg::ReLoop()
 }
 
 
-
+/**
+* Evaluates the influence of a uniform source at a point outside the panel.
+*
+* Follows the method provided in the VSAERO theory Manual NASA 4023.
+*
+* Vectorial operations are written inline to save computing times -->longer code, but 4x more efficient.
+*
+*@param C the point where the influence is to be evaluated
+*@param pPanel a pointer to the Panel with the doublet strength
+*@param V the perturbation velocity at point C
+*@param phi the potential at point C
+*/
 void PanelAnalysisDlg::SourceNASA4023(CVector const &C, Panel *pPanel, CVector &V, double &phi)
 {
-	//VSAERO theory Manual
-	//Influence of panel pp at coll pt of panel p
-	//vectorial operations are written inline to save computing times
-	//-->longer code, but 4x more efficient....
 	int i;
 	double CoreSize = 0.00000;
 	if(fabs(*m_pCoreSize)>1.e-10) CoreSize = *m_pCoreSize;
@@ -2088,7 +2209,9 @@ void PanelAnalysisDlg::SourceNASA4023(CVector const &C, Panel *pPanel, CVector &
 	}
 }
 
-
+/**
+*Initializes the header of the log file
+*/
 void PanelAnalysisDlg::SetFileHeader()
 {
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
@@ -2110,13 +2233,13 @@ void PanelAnalysisDlg::SetFileHeader()
 	out << "\n___________________________________\n";
 }
 
-
+/**Updates the progress of the analysis in the slider widget */
 void PanelAnalysisDlg::OnProgress()
 {
 	m_pctrlProgress->setValue((int)m_Progress);
 }
 
-
+/**  Sets up the MMI */
 void PanelAnalysisDlg::SetupLayout()
 {
 	QDesktopWidget desktop;
@@ -2152,17 +2275,19 @@ void PanelAnalysisDlg::SetupLayout()
 }
 
 
-
+/**
+* Solves the linear system for the unit RHS, using LU decomposition.
+*   Method :
+* 	  - If the polar is of type 1 or 2, solve the linear system
+*	  - for cosine and sine parts, for a unit speed
+*	  - If the polar is of type 4, solve only for unit speed and for the specified Alpha
+*	  - Reconstruct right side results if calculation was symetric
+*	  - Sort results i.a.w. panel numbering
+* 
+* Calculates the local velocities on each panel
+*/
 bool PanelAnalysisDlg::SolveUnitRHS()
 {
-	//______________________________________________________________________________________
-	// Method :
-	// 	- If the polar is of type 1 or 2, solve the linear system
-	//	- for cosine and sine parts, for a unit speed
-	//	- If the polar is of type 4, solve only for unit speed and for the specified Alpha
-	//	- Reconstruct right side results if calculation was symetric
-	//	- Sort results i.a.w. panel numbering
-	//______________________________________________________________________________________
 
 	int Size = m_MatSize;
 	if(m_b3DSymetric) Size = m_SymSize;
@@ -2175,10 +2300,10 @@ bool PanelAnalysisDlg::SolveUnitRHS()
 	if(!Crout_LU_Decomposition_with_Pivoting(m_aij, m_Index, Size, &m_bCancel, 30.0*(double)m_MatSize/400.0, m_Progress))
 	{
 		AddString(tr("      Singular Matrix.... Aborting calculation...\n"));
-		m_bConverged = false;
+		m_bInverted = false;
 		return false;
 	}
-	else m_bConverged = true;
+	else m_bInverted = true;
 
 
 	AddString("      Solving LU system...\n");
@@ -2229,14 +2354,19 @@ bool PanelAnalysisDlg::SolveUnitRHS()
 	return true;
 }
 
-
+/**
+*
+* Creates the doublet strength for all the operating points from the unit sine and cosine unit results.
+* The doublet and source strengths are for a unit speed.
+* The scaling to speed is performed at the next step, depending on the polar type.
+*
+* @param Alpha0 the first aoa in the sequence
+* @param AlphaDelta the aoa increment
+* @param nval the number of aoa to calculate
+*/
 void PanelAnalysisDlg::CreateDoubletStrength(double Alpha0, double AlphaDelta, int nval)
 {
-	//
-	// Creates the doublet strength for all the operating points from the unit sine and cosine results
-	// The doublet and source strengths are for a unit speed
-	// The scaling to speed is performed at the next step, depending on the polar type
-	//
+
 	int  q, p;
 	double alpha, cosa, sina;
 
@@ -2262,31 +2392,32 @@ void PanelAnalysisDlg::CreateDoubletStrength(double Alpha0, double AlphaDelta, i
 }
 
 
+/**
+* Starts the panel or VLM analysis
+*
+* Method applied from v6.00 onwards:
+* 
+* First case :
+*    If the analysis is for a wing and not a plane, the full 3D panel method is applied
+*    and the wing is modelled as a thick surface
+*    The method is strictly the one described in NASA TN 4023
+*    The boundary condition is of the Dirichlet type, which has proved more convincing than the Neumann BC for full 3D panel methods
+*
+* Second case :
+*    If the analysis is for a plane, the full 3D method is not applicable since the 
+*    junctions between wing and body, or between fin and elevator, cannot be adequately 
+*    represented as closed surfaces. This would require a 3D CAD programe. 
+*    Therefore, in this case, the wings are modelled as thin surfaces.
+*    Trial tests using the method of NASA TN 4023 have not been conclusive. With a uniform doublet
+*    distribution and a boundary condition applied at the panel's centroid, the results 
+*    are less convincing than with VLM.
+*    Therefore in this case, the VLM1 method is applied to the thin surfaces, and the 3D-panel method 
+*    is applied to the body.
+*    Last consideration : since the potential of a straight vortex line requires a lot of computations, 
+*    the Neumann type BC is applied to the body panels, rather than the Dirichlet type BC
+*/
 void PanelAnalysisDlg::StartAnalysis()
 {
-	//
-	// Method applied from v6.00 onwards
-	// 
-	// First case :
-	// If the analysis is for a wing and not a plane, the full 3D panel method is applied
-	// and the wing is modelled as a thick surface
-	// The method is strictly the one described in NASA TN 4023
-	// The boundary condition is of the Dirichlet type, which has proved more convincing 
-	// than the Neumann BC for full 3D panel methods
-	//
-	// Second case :
-	// If the analysis is for a plane, the full 3D method is not applicable since the 
-	// junctions between wing and body, or between fin and elevator, cannot be adequately 
-	// represented as closed surfaces. This would require a 3D CAD programe. 
-	// Therefore, in this case, the wings are modelled as thin surfaces.
-	// Trial tests using the method of NASA TN 4023 have not been conclusive. With a uniform doublet
-	// distribution and a boundary condition applied at the panel's centroid, the results 
-	// are less convincing than with VLM.
-	// Therefore in this case, the VLM1 method is applied to the thin surfaces, and the 3D-panel method 
-	// is applied to the body.
-	// Last consideration : since the potential of a straight vortex line requires a lot of computations, 
-	// the Neumann type BC is applied to the body panels, rather than the Dirichlet type BC
-	//
 	qApp->processEvents();
 
 	if(!m_pWPolar) return;
@@ -2392,7 +2523,13 @@ void PanelAnalysisDlg::StartAnalysis()
 	m_pctrlCancel->setText(tr("Close"));
 }
 
-
+/**
+* Performs the summation of on-body forces to calculate the total lift and drag forces
+* @param Cp a pointer to the array of previously calculated Cp coefficients
+* @param Alpha the aoa for which this calculation is performed
+* @param Lift the resulting lift force
+* @param Drag the resulting drag force
+*/
 void PanelAnalysisDlg::SumPanelForces(double *Cp, double Alpha, double &Lift, double &Drag)
 {
 	int p;
@@ -2409,6 +2546,12 @@ void PanelAnalysisDlg::SumPanelForces(double *Cp, double Alpha, double &Lift, do
 
 
 
+/**
+* Launches the calculation of operating points, when linear combination is not an option.
+* This is the case for analysis of tilted geometries, or with wake roll-up
+*
+*@return true if the aoa was computed successfully, false otherwise.
+*/
 bool PanelAnalysisDlg::UnitLoop()
 {
 	QString str;
@@ -2551,7 +2694,10 @@ bool PanelAnalysisDlg::UnitLoop()
 
 
 
-
+/**
+* Writes a string message to the log file
+* @param strong the string message.
+*/
 void PanelAnalysisDlg::WriteString(QString strong)
 {
 	if(!m_pXFile) return;
@@ -2563,7 +2709,13 @@ void PanelAnalysisDlg::WriteString(QString strong)
 
 
 
-
+/**
+* Returns the perturbation velocity created at a point C by a horseshoe or quad vortex with unit circulation located on a panel pPanel
+* @param pPanel a pointer to the Panel where the vortex is located
+* @param C the point where the perrturbation is evaluated
+* @param V a reference to the perturbation velocity vector 
+* @param bAll true if the influence of the bound vector should be included 
+*/
 void PanelAnalysisDlg::VLMGetVortexInfluence(Panel *pPanel, CVector const &C, CVector &V, bool bAll)
 {
 	// calculates the the panel p's vortex influence at point C
@@ -2658,7 +2810,10 @@ void PanelAnalysisDlg::VLMGetVortexInfluence(Panel *pPanel, CVector const &C, CV
 
 
 
-
+/**
+* Performs a stability analysis for each requested position of the control surfaces.
+*
+*/
 bool PanelAnalysisDlg::ControlLoop()
 {
 	//
@@ -2851,7 +3006,11 @@ bool PanelAnalysisDlg::ControlLoop()
 
 
 
-
+/**
+* Extracts the eigenvalues and eigenvectors from the state matrices. 
+* Stores the results in the memeber variables if successful.
+* @return true if the extraction was successful.
+*/
 bool PanelAnalysisDlg::SolveEigenvalues()
 {
 	// Finds the eigenvalues and eigenvectors of the state matrices ALong and ALat
@@ -2965,7 +3124,10 @@ bool PanelAnalysisDlg::SolveEigenvalues()
 	return true;
 }
 
-
+/**
+* Computes the non-dimensional stability derivatives.
+* Outputs the results to the log file
+*/
 void PanelAnalysisDlg::ComputeNDStabDerivatives()
 {
 	QString str;
@@ -3092,13 +3254,19 @@ void PanelAnalysisDlg::ComputeNDStabDerivatives()
 }
 
 
-
-void PanelAnalysisDlg::Forces(double *Mu, double *Sigma, double alpha, double *VInf, CVector &Force, CVector &Moment, bool bTilted, bool bTrace)
+/**
+* Calculates the forces using a farfield method.
+* Calculates the moments by a near field method, i.e. direct summation on the panels.
+* Downwash is evaluated at a distance 100 times the span downstream (i.e. infinite)
+* @param Mu a pointer to the array of doublet strengths or vortex circulations
+* @param Sigma a pointer to the array of source strengths
+* @param *VInf a pointer to the array of velocity vector on the panels @todo check local or freestream or total
+* @param Force the resulting force vector
+* @param Moment the resulting moment vector
+* @param bTilted  true if the calculation is performed on a tilted geometry
+*/
+void PanelAnalysisDlg::Forces(double *Mu, double *Sigma, double alpha, double *VInf, CVector &Force, CVector &Moment, bool bTilted)
 {
-	// Calculates the forces using a farfield method
-	// Calculates the moments by a near field method, i.e. direct summation on the panels
-	// Downwash is evaluated at a distance 100 times the span downstream (i.e. infinite)
-	//
 	if(!m_pPanel||!m_pWPolar) return;
 
 	static bool bOutRe, bError, bOut, bOutCl;
@@ -3272,9 +3440,12 @@ void PanelAnalysisDlg::Forces(double *Mu, double *Sigma, double alpha, double *V
 
 
 #define CM_ITER_MAX 50
+/**
+* Finds the zero-pitching-moment aoa such that Cm=0.
+* @return true if an equlibrium angle was found false otherwise.
+*/
 bool PanelAnalysisDlg::GetZeroMomentAngle()
 {
-	//start loop to find zero-pitching-moment alpha
 	static int iter;
 	static double a, a0, a1, Cm, Cm0, Cm1, tmp;
 	static double eps = 1.e-7;
@@ -3336,20 +3507,21 @@ bool PanelAnalysisDlg::GetZeroMomentAngle()
 	if(iter>=CM_ITER_MAX || m_bCancel) return false;
 
 	m_AlphaEq = a*180.0/PI;
-	Cm = ComputeCm(m_AlphaEq, true);// for information only, should be zero
+	Cm = ComputeCm(m_AlphaEq);// for information only, should be zero
 
 	return true;
 }
 
 
+/**
+ * Creates the longitudinal and lateral state matrices
+ * from the derivatives and inertias calculated previously
 
+ * Creates the control state matrix from the control derivatives
+*/
 void PanelAnalysisDlg::BuildStateMatrices()
 {
-	// Creates the longitudinal and lateral state matrices
-	// from the derivatives and inertias calculated previously
-	//
-	// Creates the control state matrix from the control derivatives
-	//
+
 	static int i;
 	static double Ipxx, Ipzz, Ipzx;
 	static double Ixx,Iyy,Izz, Izx;
@@ -3475,15 +3647,15 @@ void PanelAnalysisDlg::BuildStateMatrices()
 	AddString(strange);
 }
 
-
+/**
+ *  This methods builds the rotation matrix from geometrical axis to stability axis,
+ *  i.e. if V is a vector defined in the body axis, its coordinates in stability axis are v = R.V
+ *  In XFLR5, the x-body-axis is pointing backward, and the convention
+ *  for stability axes is with the x-axis pointing forward.
+ *  The rotation matrix is set in accordance.
+*/
 void PanelAnalysisDlg::BuildRotationMatrix()
 {
-	// This is the rotation matrix from geometrical axis to stability axis,
-	// i.e. if V is a vector defined in the body axis, its coordinates
-	// in stability axis are      v = R.V
-	// In XFLR5, the x-body-axis is pointing backward, and the convention
-	// for stability axes is with the x-axis pointing forward.
-	// The rotation matrix is set in accordance
 
 	m_R[0][0] = -cos(m_AlphaEq*PI/180.0);
 	m_R[1][0] =  0.0;
@@ -3496,17 +3668,16 @@ void PanelAnalysisDlg::BuildRotationMatrix()
 	m_R[2][2] = -cos(m_AlphaEq*PI/180.0);
 }
 
-
+/**
+ * Computes the trimmed condition for a stability analysis
+ * Method :
+ *   - For level flight, find a.o.a. such that Cm=0, by iterations
+ *   - Reconstruct right side circulations if calculation was symmetric
+ *   - Sort results i.a.w. panel numbering
+ *   - Set trimmed parameters for level flight or other
+*/
 bool PanelAnalysisDlg::ComputeTrimmedConditions()
 {
-	//______________________________________________________________________________________
-	// Method :
-	//	- For level flight, find a.o.a. such that Cm=0, by iterations
-	//	- Reconstruct right side circulations if calculation was symmetric
-	//	- Sort results i.a.w. panel numbering
-	//	- Set trimmed parameters for level flight or other
-	//______________________________________________________________________________________
-
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	QString strong, strange;
 	int p;
@@ -3518,7 +3689,6 @@ bool PanelAnalysisDlg::ComputeTrimmedConditions()
 	//Build the unit RHS vectors along x and z in Body Axis
 	CreateUnitRHS();
 	if (m_bCancel) return false;
-
 
 	// build the influence matrix in Body Axis
 	BuildInfluenceMatrix();
@@ -3674,11 +3844,14 @@ bool PanelAnalysisDlg::ComputeTrimmedConditions()
 }
 
 
+/**
+* Calculates the stability derivatives.
+* @todo implement automatic differentiation. Considerable task.
+ The stability derivatives are estimated by forward difference at U=(U0,0,0).
+ The reference condition has been saved during the calculation of the trimmed condition.
+*/
 void PanelAnalysisDlg::ComputeStabilityDerivatives()
 {
-	// The stability derivatives are estimated by forward difference at U=(U0,0,0).
-	// The reference condition has been saved during the calculation of the trimmed condition
-
 	static CVector V0, Force, Moment, CGM, is, js, ks, Vi, Vj, Vk, Ris, Rjs, Rks, WindDirection, WindNormal;
 	static int p;
 	static double alpha, sina, cosa, deltaspeed, deltarotation;
@@ -3785,7 +3958,7 @@ void PanelAnalysisDlg::ComputeStabilityDerivatives()
 	}
 
 
-	// The LU matrix is unchanged, so baksubstitute for unit vortex circulations
+	// The LU matrix is unchanged, so back-substitute for unit vortex circulations
 	Crout_LU_with_Pivoting_Solve(m_aij, m_uRHS, m_Index, m_RHS,             Size, &m_bCancel);
 	Crout_LU_with_Pivoting_Solve(m_aij, m_vRHS, m_Index, m_RHS+  m_MatSize, Size, &m_bCancel);
 	Crout_LU_with_Pivoting_Solve(m_aij, m_wRHS, m_Index, m_RHS+2*m_MatSize, Size, &m_bCancel);
@@ -3875,21 +4048,20 @@ void PanelAnalysisDlg::ComputeStabilityDerivatives()
 	All this is for a conventional configuration. Not sure what the impact is on the pitch damping of flying wings. */
 }
 
+/**
+ * Returns the inertia tensor in stability axis
 
+ * R  is the rotation matrix from Body Frame to stability frame
+ * Ib is the inertia tensor in the body frame, with origin at the CoG
+
+ * The body frame is the one in which the geometry has been defined,
+ * i.e. the x axis points backwards, y is starboard and z is upwards
+
+ * Is is the inertia tensor in stability axes with origin at the CoG
+ *                               Is = tR.Ib.R
+*/
 void PanelAnalysisDlg::ComputeStabilityInertia()
 {
-	//
-	// Returns the inertia tensor in stability axis
-	//
-	// R  is the rotation matrix from Body Frame to stability frame
-	// Ib is the inertia tensor in the body frame, with origin at the CoG
-	//
-	// The body frame is the one in which the geometry has been defined,
-	// i.e. the x axis points backwards, y is starboard and z is upwards
-	//
-	// Is is the inertia tensor in stability axes with origin at the CoG
-	//                               Is = tR.Ib.R
-	//
 
 	static int i,j;
 	static double tR[3][3], tmp[3][3];
@@ -3925,28 +4097,27 @@ void PanelAnalysisDlg::ComputeStabilityInertia()
 	}
 }
 
+
+/**
+ * Calculates the control derivatives for small control deflections, using forward derivatives
+
+ * The geometry has been previously modified to set the control in the position defined for this iteration of the analysis
+
+ * The problem is not linear, since we take into account viscous forces
+ * Therefore to get the derivative, we need to make the difference between two states
+ * We use forward differences between the reference state corresponding to the trimmed conditions
+ * and the same state + application of a delta angle to all the controls
+
+ * AVL ignores the modification of the matrix terms and therefore requires only a single LU decomposition throughout the problem. 
+
+ * The same method is applied here
+ *  - Save the reference geometry
+ *  - Change the control point positions and the normals of the flaps
+ *  - re-generate the RHS vector
+ *  - the geometry is reset at the next iteration loop
+*/
 void PanelAnalysisDlg::ComputeControlDerivatives()
 {
-	//
-	// Calculates the control derivatives for small control deflections, using forward derivatives
-	//
-	// The geometry has been previously modified to set the control in the position
-	// defined for this iteration of the analysis
-	//
-	// The problem is not linear, since we take into account viscous forces
-	// Therefore to get the derivative, we need to make the difference between two states
-	// We use forward differences between the reference state corresponding to the trimmed conditions
-	// and the same state + application of a delta angle to all the controls
-	//
-	// AVL ignores the modification of the matrix terms and therefore requires only a
-	// single LU decomposition throughout the problem. 
-	//
-	// The same method is applied here
-	//   - Save the reference geometry
-	//   - Change the control point positions and the normals of the flaps
-	//   - re-generate the RHS vector
-	//   - the geometry is reset at the next iteration loop
-	//
 	CVector WindDirection, H, Force, Moment, V0, is, js, ks;
 	static int j, p, pos, NCtrls;
 	static double DeltaAngle, SignedDeltaAngle, q, S, b, mac, cosa, sina;
@@ -4097,11 +4268,13 @@ void PanelAnalysisDlg::ComputeControlDerivatives()
 }
 
 
-double PanelAnalysisDlg::ComputeCm(double Alpha, bool bTrace)
+/**
+* Returns the geometric pitching moment coefficient for the specified angle of attack
+* The effect of the viscous drag is not included.
+*@param Alpha the aoa for which Cm is calculated
+*/
+double PanelAnalysisDlg::ComputeCm(double Alpha)
 {
-	// Returns the geometric pithing moment coefficient for the specified angle of attack
-	// The effect of the viscous drag is not included
-
 	static int p;
 	static double Cm, cosa, sina, Gamma, Gammap1;
 	static CVector VInf, Force, PanelLeverArm, ForcePt, PanelForce, WindDirection, VLocal;
@@ -4156,23 +4329,38 @@ double PanelAnalysisDlg::ComputeCm(double Alpha, bool bTrace)
 }
 
 
-
+/** 
+* QUAD VORTEX FORMULATION
+*
+* LA, LB, TA, TB are the vortex's four corners
+* LA and LB are at the 3/4 point of panel nx
+* TA and TB are at the 3/4 point of panel nx+1
+*
+*    LA__________LB               |
+*    |           |                |
+*    |           |                | freestream speed
+*    |           |                |
+*    |           |                \/
+*    |           |
+*    TA__________TB
+*
+*
+* Returns the velocity greated by a ring vortex with unit circulation at a distant point
+*
+* Notes : 
+*  - The geometry has been rotated by the sideslip angle, hence, there is no need to align the trailing vortices with sideslip
+*  - Vectorial operations are written inline to save computing times -->longer code, but 4x more efficient....
+*
+* @param LA the leading left point of the quad vortex
+* @param LB the leading right point of the quad vortex
+* @param TA the trailing left point of the quad vortex
+* @param TB the trailing right point of the quad vortex
+* @param C the point where the velocity is calculated
+* @param V the resulting velocity vector at point C
+*/
 void PanelAnalysisDlg::VLMQmn(CVector const &LA, CVector const &LB, CVector const &TA, CVector const &TB, CVector const &C, CVector &V)
 {
-	//Quadrilateral VLM FORMULATION
-	// LA, LB, TA, TB are the vortex's four corners
-	// LA and LB are at the 3/4 point of panel nx
-	// TA and TB are at the 3/4 point of panel nx+1
-	//
-	//    LA__________LB               |
-	//    |           |                |
-	//    |           |                | freestream speed
-	//    |           |                |
-	//    |           |                \/
-	//    |           |
-	//    TA__________TB
-	//
-	//
+
 	//
 	// C is the point where the induced speed is calculated
 	// V is the resulting speed
@@ -4244,26 +4432,32 @@ void PanelAnalysisDlg::VLMQmn(CVector const &LA, CVector const &LB, CVector cons
 }
 
 
-
+/** 
+* HORSESHOE VORTEX FORMULATION/
+*
+*    LA__________LB               |
+*    |           |                |
+*    |           |                | freestream speed
+*    |           |                |
+*    |           |                \/
+*    |           |
+*    \/          \/
+*
+* 
+* Returns the velocity greated by a horseshoe vortex with unit circulation at a distant point
+*
+* Notes : 
+*  - The geometry has been rotated by the sideslip angle, hence, there is no need to align the trailing vortices with sideslip
+*  - Vectorial operations are written inline to save computing times -->longer code, but 4x more efficient....
+*
+* @param A the left point of the bound vortex
+* @param B the right point of the bound vortex
+* @param C the point where the velocity is calculated
+* @param V the resulting velocity vector at point C
+* @param bAll true if the influence of the bound vortex should be evaluated; false for a distant point in the far field.
+*/
 void PanelAnalysisDlg::VLMCmn(CVector const &A, CVector const &B, CVector const &C, CVector &V, bool const &bAll)
 {
-	// CLASSIC VLM FORMULATION/
-	//
-	//    LA__________LB               |
-	//    |           |                |
-	//    |           |                | freestream speed
-	//    |           |                |
-	//    |           |                \/
-	//    |           |
-	//    \/          \/
-	//
-	// Note : the geometry has been rotated by sideslip, hence, there is no need to align the trailing vortices with sideslip
-	//
-	// V is the resulting speed at point C
-	//
-	// Vectorial operations are written inline to save computing times
-	// -->longer code, but 4x more efficient....
-
 	double CoreSize = 0.0001;
 	if(fabs(*m_pCoreSize)>1.e-10) CoreSize = *m_pCoreSize;
 

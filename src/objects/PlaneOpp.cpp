@@ -65,10 +65,9 @@ PlaneOpp::PlaneOpp()
  * of the wings.
  * @param ar the QDataStream object from/to which the data should be serialized
  * @param bIsStoring true if saving the data, false if loading
- * @param ProjectFormat 5 if data from Xflr5 v5.xx, 6 if from/to xflr5 v6.xx @todo remove, Format 5 is obsolete and should not be used
  * @return true if the operation was successful, false otherwise
  */
-bool PlaneOpp::SerializePOpp(QDataStream &ar, bool bIsStoring, int ProjectFormat)
+bool PlaneOpp::SerializePOpp(QDataStream &ar, bool bIsStoring)
 {
 	int ArchiveFormat;
 	int a, k;
@@ -77,8 +76,7 @@ bool PlaneOpp::SerializePOpp(QDataStream &ar, bool bIsStoring, int ProjectFormat
 
 	if(bIsStoring)
 	{
-		if(ProjectFormat>=6) ar << 1009;
-		else                 ar << 1007;
+		ar << 1009;
 		//1009 : restored the serialization of Cp, Gamma, Sigma arrays...
 		//1008 : removed the serialization of Cp, Gamma, Sigma arrays
 		//1007 : added Sideslip Beta
@@ -117,21 +115,12 @@ bool PlaneOpp::SerializePOpp(QDataStream &ar, bool bIsStoring, int ProjectFormat
 		ar << (float)m_Beta;
 
 		ar << m_NPanels;
-		if(ProjectFormat<6)
-		{
-			for (k=0; k<=m_NPanels; k++) ar <<  (float)m_Cp[k];
-			for (k=0; k<=m_NPanels; k++) ar <<  (float)m_G[k];
-			for (k=0; k<=m_NPanels; k++) ar <<  (float)m_Sigma[k];
-		}
-		else
-		{
-			for (k=0; k<m_NPanels; k++) ar<<(float)m_Cp[k]<<(float)m_Sigma[k]<<(float)m_G[k];
-		}
+		for (k=0; k<m_NPanels; k++) ar<<(float)m_Cp[k]<<(float)m_Sigma[k]<<(float)m_G[k];
 		ar << m_VLMType;
 
 		for(int iw=0; iw<MAXWINGS; iw++)
 		{
-			if(m_bWing[iw])	m_PlaneWOpp[iw].SerializeWOpp(ar, bIsStoring, ProjectFormat);
+			if(m_bWing[iw])	m_PlaneWOpp[iw].SerializeWOpp(ar, bIsStoring);
 		}
 	}
 	else
@@ -275,7 +264,7 @@ bool PlaneOpp::SerializePOpp(QDataStream &ar, bool bIsStoring, int ProjectFormat
 
 		ar >> m_VLMType;
 
-		if (!m_PlaneWOpp[0].SerializeWOpp(ar, bIsStoring, ProjectFormat))
+		if (!m_PlaneWOpp[0].SerializeWOpp(ar, bIsStoring))
 		{
 			return false;
 		}
@@ -286,7 +275,7 @@ bool PlaneOpp::SerializePOpp(QDataStream &ar, bool bIsStoring, int ProjectFormat
 		{
 			if(m_bWing[1])
 			{
-				if (!m_PlaneWOpp[1].SerializeWOpp(ar, bIsStoring, ProjectFormat))
+				if (!m_PlaneWOpp[1].SerializeWOpp(ar, bIsStoring))
 				{
 					return false;
 				}
@@ -294,7 +283,7 @@ bool PlaneOpp::SerializePOpp(QDataStream &ar, bool bIsStoring, int ProjectFormat
 		}
 		if(m_bWing[2])
 		{
-			if (!m_PlaneWOpp[2].SerializeWOpp(ar, bIsStoring, ProjectFormat))
+			if (!m_PlaneWOpp[2].SerializeWOpp(ar, bIsStoring))
 			{
 				return false;
 			}
@@ -302,7 +291,7 @@ bool PlaneOpp::SerializePOpp(QDataStream &ar, bool bIsStoring, int ProjectFormat
 		}
 		if(m_bWing[3])
 		{
-			if (!m_PlaneWOpp[3].SerializeWOpp(ar, bIsStoring, ProjectFormat))
+			if (!m_PlaneWOpp[3].SerializeWOpp(ar, bIsStoring))
 			{
 				return false;
 			}

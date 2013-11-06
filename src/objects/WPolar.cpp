@@ -1802,10 +1802,9 @@ void WPolar::ResetWPlr()
  * Loads or saves the data of this polar to a binary file
  * @param ar the QDataStream object from/to which the data should be serialized
  * @param bIsStoring true if saving the data, false if loading
- * @param ProjectFormat 5 if data from Xflr5 v5.xx, 6 if from/to xflr5 v6.xx @todo remove, Format 5 is obsolete and should not be used
  * @return true if the operation was successful, false otherwise
  */
-bool WPolar::SerializeWPlr(QDataStream &ar, bool bIsStoring, int ProjectFormat)
+bool WPolar::SerializeWPlr(QDataStream &ar, bool bIsStoring)
 {
 	int n;
 	float f,r0,r1,r2,r3,i0,i1,i2,i3;
@@ -1840,8 +1839,8 @@ bool WPolar::SerializeWPlr(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 	if(bIsStoring)
 	{
 		//write variables
-		if(ProjectFormat>5) ar << m_PolarFormat; // identifies the format of the file
-		else                ar << 1018;
+		ar << m_PolarFormat; // identifies the format of the file
+
 		WriteCString(ar,m_UFOName);
 		WriteCString(ar,m_PlrName);
 		ar << (float)m_WArea << (float)m_WMAChord << (float)m_WSpan ;
@@ -1877,8 +1876,7 @@ bool WPolar::SerializeWPlr(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 		ar << (float)m_Mass;
 		ar << (float)m_ASpec ;
 		ar << (float)m_Beta ;
-		if(ProjectFormat<5) ar << (float)m_CoG.x;
-		else                ar << (float)m_CoG.x << (float)m_CoG.y << (float)m_CoG.z;
+		ar << (float)m_CoG.x << (float)m_CoG.y << (float)m_CoG.z;
 		ar <<( float)m_Density << (float)m_Viscosity;
 
 		ar << m_RefAreaType;
@@ -1897,13 +1895,12 @@ bool WPolar::SerializeWPlr(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 
 			ar << (float)m_QInfinite[i];
 
-			ar << (float)m_XCP[i] << (float)m_YCP[i];
-			if(ProjectFormat>5) ar << (float)m_ZCP[i];
+			ar << (float)m_XCP[i] << (float)m_YCP[i] << (float)m_ZCP[i];
 
 			ar << (float)m_MaxBending[i];
 
 			ar << (float)m_Ctrl[i];
-			if(ProjectFormat>5) ar<<(float)m_XNP[i];
+			ar<<(float)m_XNP[i];
 		}
 
 		ar << m_nControls;
@@ -1917,31 +1914,25 @@ bool WPolar::SerializeWPlr(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 //			if(m_bActiveControl[i])	ar<<1 ; else ar <<0;
 			ar <<1;
 		}
-		if(ProjectFormat>5)
-		{
-			for(i=0; i<m_Alpha.size(); i++)
-			{
-				ar <<(float)m_EigenValue[0][i].real() <<(float)m_EigenValue[1][i].real() <<(float)m_EigenValue[2][i].real() <<(float)m_EigenValue[3][i].real();
-				ar <<(float)m_EigenValue[0][i].imag() <<(float)m_EigenValue[1][i].imag() <<(float)m_EigenValue[2][i].imag() <<(float)m_EigenValue[3][i].imag();
-				ar <<(float)m_EigenValue[4][i].real() <<(float)m_EigenValue[5][i].real() <<(float)m_EigenValue[6][i].real() <<(float)m_EigenValue[7][i].real();
-				ar <<(float)m_EigenValue[4][i].imag() <<(float)m_EigenValue[5][i].imag() <<(float)m_EigenValue[6][i].imag() <<(float)m_EigenValue[7][i].imag();
-			}
 
-			if(m_bAutoInertia) ar<<1; else ar<<0;
-			ar<<(float)m_CoGIxx<<(float)m_CoGIyy<<(float)m_CoGIzz<<(float)m_CoGIxz;
+		for(i=0; i<m_Alpha.size(); i++)
+		{
+			ar <<(float)m_EigenValue[0][i].real() <<(float)m_EigenValue[1][i].real() <<(float)m_EigenValue[2][i].real() <<(float)m_EigenValue[3][i].real();
+			ar <<(float)m_EigenValue[0][i].imag() <<(float)m_EigenValue[1][i].imag() <<(float)m_EigenValue[2][i].imag() <<(float)m_EigenValue[3][i].imag();
+			ar <<(float)m_EigenValue[4][i].real() <<(float)m_EigenValue[5][i].real() <<(float)m_EigenValue[6][i].real() <<(float)m_EigenValue[7][i].real();
+			ar <<(float)m_EigenValue[4][i].imag() <<(float)m_EigenValue[5][i].imag() <<(float)m_EigenValue[6][i].imag() <<(float)m_EigenValue[7][i].imag();
 		}
 
-		if(ProjectFormat>5)
-		{
-			//float provision
-			for(int i=0; i<20; i++) ar<<(float)i;
+		if(m_bAutoInertia) ar<<1; else ar<<0;
+		ar<<(float)m_CoGIxx<<(float)m_CoGIyy<<(float)m_CoGIzz<<(float)m_CoGIxz;
+		//float provision
+		for(int i=0; i<20; i++) ar<<(float)i;
 
-			//int provision
+		//int provision
 //			if(m_bAVLControls) ar<<1; else ar<<0;
 
-			if (m_bIgnoreBodyPanels) ar << 1; else ar << 0;
-			for(int i=1; i<20; i++) ar<<i;
-		}
+		if (m_bIgnoreBodyPanels) ar << 1; else ar << 0;
+		for(int i=1; i<20; i++) ar<<i;
 
 		return true;
 	}

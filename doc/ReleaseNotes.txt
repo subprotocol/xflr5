@@ -16,6 +16,7 @@
 
 
 xflr5 v6.09.06, November xxx, 2013
+	- removed the option to save as a file for xflr5 v5 or v4 - no point and source of bugs
 	- corrected the automatic polar name of foils in multithreaded analysis
 	- added import/export of the wing geometry via plain-text files
 	- fixed the bug which caused the pitching moment to be zero

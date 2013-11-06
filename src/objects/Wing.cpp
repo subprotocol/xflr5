@@ -1916,10 +1916,9 @@ void Wing::ScaleTwist(double NewTwist)
  * Loads or Saves the data of this wing to a binary file
  * @param ar the QDataStream object from/to which the data should be serialized
  * @param bIsStoring true if saving the data, false if loading
- * @param ProjectFormat 5 if data from Xflr5 v5.xx, 6 if from/to xflr5 v6.xx
  * @return true if the operation was successful, false otherwise
  */
-bool Wing::SerializeWing(QDataStream &ar, bool bIsStoring, int ProjectFormat)
+bool Wing::SerializeWing(QDataStream &ar, bool bIsStoring)
 {
 	int i;
 //	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
@@ -1927,8 +1926,7 @@ bool Wing::SerializeWing(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 
 	if(bIsStoring)
 	{	// storing code
-		if(ProjectFormat>5)       ar << 1010;
-		else if(ProjectFormat==5) ar << 1009;
+		ar << 1010;
 			//1010 : added storage of alpha channel + added a provision for ints and floats
 			//1009 : QFLR5 v0.03 : added mass properties for inertia calculations
 			//1008 : QFLR5 v0.02 : Added wing description field
@@ -1940,7 +1938,7 @@ bool Wing::SerializeWing(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 			//1002 : save VLM Mesh (v1.99-12)
 			//1001 : initial format
 		WriteCString(ar, m_WingName);
-		if(ProjectFormat>=5) WriteCString(ar, m_WingDescription);
+		WriteCString(ar, m_WingDescription);
 
 		ar << 0; //non elliptic...
 
@@ -1968,20 +1966,15 @@ bool Wing::SerializeWing(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 
 		WriteCOLORREF(ar,m_WingColor);
 
-		if(ProjectFormat>=5)
-		{
-			ar << (float)m_VolumeMass;
-			ar << m_MassValue.size();
-			for(int im=0; im<m_MassValue.size(); im++) ar << (float)m_MassValue[im];
-			for(int im=0; im<m_MassValue.size(); im++) ar << (float)m_MassPosition[im].x << (float)m_MassPosition[im].y << (float)m_MassPosition[im].z;
-			for(int im=0; im<m_MassValue.size(); im++)  WriteCString(ar, m_MassTag[im]);
-		}
-		if(ProjectFormat>5)
-		{
-			ar << m_WingColor.alpha();
-			for(int i=0; i<20; i++) ar<<(float)0.0f;
-			for(int i=0; i<20; i++) ar<<0;
-		}
+		ar << (float)m_VolumeMass;
+		ar << m_MassValue.size();
+		for(int im=0; im<m_MassValue.size(); im++) ar << (float)m_MassValue[im];
+		for(int im=0; im<m_MassValue.size(); im++) ar << (float)m_MassPosition[im].x << (float)m_MassPosition[im].y << (float)m_MassPosition[im].z;
+		for(int im=0; im<m_MassValue.size(); im++)  WriteCString(ar, m_MassTag[im]);
+		ar << m_WingColor.alpha();
+		for(int i=0; i<20; i++) ar<<(float)0.0f;
+		for(int i=0; i<20; i++) ar<<0;
+
 		return true;
 	}
 	else

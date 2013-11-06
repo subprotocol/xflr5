@@ -128,7 +128,7 @@ public:
 	void ScaleTwist(double NewTwist);
 	void ScaleSpan(double NewSpan);
 	void ScaleChord(double NewChord);
-	bool SerializeWing(QDataStream &ar, bool bIsStoring, int ProjectFormat);
+	bool SerializeWing(QDataStream &ar, bool bIsStoring);
 	bool ExportAVLWing(QTextStream &out, int index, double x, double y, double z, double Thetax, double Thetay);
 
 	bool IsWingOut()      {return m_bWingOut;}

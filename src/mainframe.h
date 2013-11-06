@@ -198,8 +198,8 @@ private:
 	void SaveSettings();
 	void SelectOpPoint(OpPoint *pOpp);
 	void SelectWOpp(double x);
-	bool SerializeProject(QDataStream &ar, bool bIsStoring, int ProjectFormat =6);
-	bool SerializeUFOProject(QDataStream &ar, int ProjectFormat=5);
+	bool SerializeProject(QDataStream &ar, bool bIsStoring);
+	bool SerializeUFOProject(QDataStream &ar);
 	void SetCentralWidget();
 	void SetCurrentFoil(Foil* pFoil);
 	void SetDlgPos(QDialog &Dlg);
@@ -217,7 +217,7 @@ private:
 	void UpdateView();
 	void UpdateWPolars();
 	void UpdateWOpps();
-	void WritePolars(QDataStream &ar, Foil *pFoil=NULL, int ProjectFormat=6);
+	void WritePolars(QDataStream &ar, Foil *pFoil=NULL);
 
 /*___________________________________________Variables_______________________________*/
 public:

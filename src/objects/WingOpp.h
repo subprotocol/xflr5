@@ -68,7 +68,7 @@ public:
 
 private:
 //________________METHODS____________________________________
-	bool SerializeWOpp(QDataStream &ar, bool bIsStoring, int ProjectFormat);
+	bool SerializeWOpp(QDataStream &ar, bool bIsStoring);
 	bool Export(QTextStream &out, enumTextFileType FileType);
 	void GetBWStyle(QColor &color, int &style, int &width);
 	void GetWOppProperties(QString &WOppProperties, bool bData=false);

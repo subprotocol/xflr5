@@ -3580,7 +3580,7 @@ enumApp MainFrame::LoadXFLR5File(QString PathName)
 				ar.setVersion(QDataStream::Qt_4_5);
 #endif
 				ar.setByteOrder(QDataStream::LittleEndian);
-				if(SerializeProject(ar, false, 1))
+				if(SerializeProject(ar, false))
 				{
 					g_pCurFoil = pXDirect->SetFoil();
 					UpdateFoils();
@@ -3684,6 +3684,8 @@ void MainFrame::OnExportCurGraph()
 			pGraph = pXDirect->m_pCurGraph;
 			break;
 		}
+		default:
+			pGraph = NULL;
 	}
 	if(!pGraph) return;
 
@@ -3772,7 +3774,7 @@ void MainFrame::OnInsertProject()
 #endif
 	ar.setByteOrder(QDataStream::LittleEndian);
 
-	SerializeProject(ar, false, 1);
+	SerializeProject(ar, false);
 
 	SetSaveState(false);
 
@@ -4011,6 +4013,8 @@ void MainFrame::OnResetCurGraphScales()
 			pXInverse->ReleaseZoom();
 			break;
 		}
+		default:
+		pGraph = NULL;
 	}
 
 	if(!pGraph) return;
@@ -4206,7 +4210,7 @@ void MainFrame::OnSaveUFOAsProject()
 	ar.setVersion(QDataStream::Qt_4_5);
 #endif
 	ar.setByteOrder(QDataStream::LittleEndian);
-	SerializeUFOProject(ar, 6);
+	SerializeUFOProject(ar);
 	m_FileName = PathName;
 	fp.close();
 
@@ -4301,6 +4305,8 @@ void MainFrame::OnSaveViewToImageFile()
 			else pMiarex->PaintView(painter);
 			break;
 		}
+		default:
+			break;
 	}
 	img.save(FileName);
 }
@@ -5078,7 +5084,6 @@ bool MainFrame::SaveProject(QString PathName)
 {
 	QString Filter = "XFLR5 v6 Project File (*.wpa)";
 	QString FileName = m_ProjectName;
-	int Format = 6;
 
 	if(!PathName.length())
 	{
@@ -5099,8 +5104,6 @@ bool MainFrame::SaveProject(QString PathName)
 	}
 //	int x = QString::compare(Filter, "XFLR5 v5 Project File (*.wpa)", Qt::CaseInsensitive);
 //	x = QString::compare(Filter, "XFLR5 v6 Project File (*.wpa)", Qt::CaseInsensitive);
-	if(Filter=="XFLR5 v5 Project File (*.*)")       Format = 5;
-	else if(Filter=="XFLR5 v6 Project File (*.wpa") Format = 6;
 
 	QFile fp(PathName);
 
@@ -5118,7 +5121,7 @@ bool MainFrame::SaveProject(QString PathName)
 #endif
 	ar.setByteOrder(QDataStream::LittleEndian);
 
-	SerializeProject(ar,true, Format);
+	SerializeProject(ar,true);
 	m_FileName = PathName;
 	fp.close();
 
@@ -5326,7 +5329,7 @@ void MainFrame::SelectWOpp(double x)
 
 
 
-bool MainFrame::SerializeUFOProject(QDataStream &ar, int ProjectFormat)
+bool MainFrame::SerializeUFOProject(QDataStream &ar)
 {
 	QMiarex * pMiarex = (QMiarex*)m_pMiarex;
 	if(!pMiarex->m_pCurWing)
@@ -5405,7 +5408,7 @@ bool MainFrame::SerializeUFOProject(QDataStream &ar, int ProjectFormat)
 	if(!pPlane)
 	{
 		ar << 1;//just one wing
-		pWing->SerializeWing(ar,true, ProjectFormat);
+		pWing->SerializeWing(ar, true);
 	}
 	else ar <<0;
 
@@ -5422,7 +5425,7 @@ bool MainFrame::SerializeUFOProject(QDataStream &ar, int ProjectFormat)
 	for (i=0; i<m_oaWPolar.size();i++)
 	{
 		pWPolar = (WPolar*)m_oaWPolar.at(i);
-		if(pWPolar->m_UFOName == UFOName) pWPolar->SerializeWPlr(ar, true, ProjectFormat);
+		if(pWPolar->m_UFOName == UFOName) pWPolar->SerializeWPlr(ar, true);
 	}
 
 	ar << 0;//no WOpps
@@ -5539,7 +5542,7 @@ bool MainFrame::SerializeUFOProject(QDataStream &ar, int ProjectFormat)
 	for (i=0; i<FoilList.size(); i++)
 	{
 		pFoil = GetFoil(FoilList[i]);
-		pFoil->Serialize(ar, true, ProjectFormat);
+		pFoil->Serialize(ar, true);
 	}
 	int n = 0;
 	for (i=0; i<FoilList.size(); i++)
@@ -5575,7 +5578,7 @@ bool MainFrame::SerializeUFOProject(QDataStream &ar, int ProjectFormat)
 	if(pPlane && pPlane->getBody())
 	{
 		ar << 1;
-		pPlane->getBody()->SerializeBody(ar, true, ProjectFormat);
+		pPlane->getBody()->SerializeBody(ar, true);
 	}
 	else ar <<0; //no plane
 
@@ -5584,7 +5587,7 @@ bool MainFrame::SerializeUFOProject(QDataStream &ar, int ProjectFormat)
 	if(pPlane)
 	{
 		ar <<1;
-		pPlane->SerializePlane(ar, true, ProjectFormat);
+		pPlane->SerializePlane(ar, true);
 	}
 	else ar <<0;
 
@@ -5598,7 +5601,7 @@ bool MainFrame::SerializeUFOProject(QDataStream &ar, int ProjectFormat)
 }
 
 
-bool MainFrame::SerializeProject(QDataStream &ar, bool bIsStoring, int ProjectFormat)
+bool MainFrame::SerializeProject(QDataStream &ar, bool bIsStoring)
 {
 	QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
 	QMiarex *pMiarex = (QMiarex*)m_pMiarex;
@@ -5675,14 +5678,14 @@ bool MainFrame::SerializeProject(QDataStream &ar, bool bIsStoring, int ProjectFo
 		for (i=0; i<m_oaWing.size();i++)
 		{
 			pWing = (Wing*)m_oaWing.at(i);
-			pWing->SerializeWing(ar, true, ProjectFormat);
+			pWing->SerializeWing(ar, true);
 		}
 		// now store all the WPolars
 		ar << m_oaWPolar.size();
 		for (i=0; i<m_oaWPolar.size();i++)
 		{
 			pWPolar = (WPolar*)m_oaWPolar.at(i);
-			pWPolar->SerializeWPlr(ar, bIsStoring, ProjectFormat);
+			pWPolar->SerializeWPlr(ar, bIsStoring);
 		}
 		// next store all the WOpps
 		if(m_bSaveWOpps)
@@ -5691,20 +5694,20 @@ bool MainFrame::SerializeProject(QDataStream &ar, bool bIsStoring, int ProjectFo
 			for (i=0; i<m_oaWOpp.size();i++)
 			{
 				pWOpp = (WingOpp*)m_oaWOpp.at(i);
-				pWOpp->SerializeWOpp(ar, bIsStoring, ProjectFormat);
+				pWOpp->SerializeWOpp(ar, bIsStoring);
 			}
 		}
 		else ar << 0;
 
 		// then the foils,  polars and Opps
-		WritePolars(ar, NULL, ProjectFormat);
+		WritePolars(ar, NULL);
 
 		// next the bodies
 		ar << m_oaBody.size();
 		for (i=0; i<m_oaBody.size();i++)
 		{
 			pBody = (Body*)m_oaBody.at(i);
-			pBody->SerializeBody(ar, bIsStoring, ProjectFormat);
+			pBody->SerializeBody(ar, bIsStoring);
 		}
 
 		// last write the planes...
@@ -5712,7 +5715,7 @@ bool MainFrame::SerializeProject(QDataStream &ar, bool bIsStoring, int ProjectFo
 		for (i=0; i<m_oaPlane.size();i++)
 		{
 			pPlane = (Plane*)m_oaPlane.at(i);
-			pPlane->SerializePlane(ar, bIsStoring, ProjectFormat);
+			pPlane->SerializePlane(ar, bIsStoring);
 		}
 
 		if(m_bSaveWOpps)
@@ -5722,7 +5725,7 @@ bool MainFrame::SerializeProject(QDataStream &ar, bool bIsStoring, int ProjectFo
 			for (i=0; i<m_oaPOpp.size();i++)
 			{
 				pPOpp = (PlaneOpp*)m_oaPOpp.at(i);
-				pPOpp->SerializePOpp(ar, bIsStoring, ProjectFormat);
+				pPOpp->SerializePOpp(ar, bIsStoring);
 			}
 		}
 		else ar << 0;
@@ -5829,7 +5832,7 @@ bool MainFrame::SerializeProject(QDataStream &ar, bool bIsStoring, int ProjectFo
 		{
 			pWing = new Wing;
 
-			if (!pWing->SerializeWing(ar, bIsStoring, ProjectFormat))
+			if (!pWing->SerializeWing(ar, bIsStoring))
 			{
 					if(pWing) delete pWing;
 					QApplication::restoreOverrideCursor();
@@ -5853,7 +5856,7 @@ bool MainFrame::SerializeProject(QDataStream &ar, bool bIsStoring, int ProjectFo
 		for (i=0;i<n; i++)
 		{
 			pWPolar = new WPolar;
-			bWPolarOK = pWPolar->SerializeWPlr(ar, bIsStoring, ProjectFormat);
+			bWPolarOK = pWPolar->SerializeWPlr(ar, bIsStoring);
 			//force compatibilty
 			if(pWPolar->m_AnalysisMethod==PANELMETHOD && pWPolar->m_WPolarType==STABILITYPOLAR) pWPolar->m_bThinSurfaces = true;
 
@@ -5883,7 +5886,7 @@ bool MainFrame::SerializeProject(QDataStream &ar, bool bIsStoring, int ProjectFo
 			}
 			else
 			{
-				bWOppOK = pWOpp->SerializeWOpp(ar, bIsStoring, ProjectFormat);
+				bWOppOK = pWOpp->SerializeWOpp(ar, bIsStoring);
 				if(pWOpp && bWOppOK)
 				{
 					pWing = pMiarex->GetWing(pWOpp->m_WingName);
@@ -5959,7 +5962,7 @@ bool MainFrame::SerializeProject(QDataStream &ar, bool bIsStoring, int ProjectFo
 			{
 				pBody = new Body();
 
-				if (pBody->SerializeBody(ar, bIsStoring, ProjectFormat))
+				if (pBody->SerializeBody(ar, bIsStoring))
 				{
 					pMiarex->AddBody(pBody);
 				}
@@ -5980,7 +5983,7 @@ bool MainFrame::SerializeProject(QDataStream &ar, bool bIsStoring, int ProjectFo
 				pPlane = new Plane();
 				if(pPlane)
 				{
-					if(pPlane->SerializePlane(ar, bIsStoring, ProjectFormat))
+					if(pPlane->SerializePlane(ar, bIsStoring))
 					{
 						pMiarex->AddPlane(pPlane);
 					}
@@ -6000,7 +6003,7 @@ bool MainFrame::SerializeProject(QDataStream &ar, bool bIsStoring, int ProjectFo
 				{
 					pWPolar = new WPolar();
 
-					if (!pWPolar->SerializeWPlr(ar, bIsStoring, ProjectFormat))
+					if (!pWPolar->SerializeWPlr(ar, bIsStoring))
 					{
 						if(pWPolar) delete pWPolar;
 						QApplication::restoreOverrideCursor();
@@ -6017,7 +6020,7 @@ bool MainFrame::SerializeProject(QDataStream &ar, bool bIsStoring, int ProjectFo
 			{
 				pPOpp = new PlaneOpp();
 
-				if (!pPOpp->SerializePOpp(ar, bIsStoring, ProjectFormat))
+				if (!pPOpp->SerializePOpp(ar, bIsStoring))
 				{
 					if(pPOpp) delete pPOpp;
 					QApplication::restoreOverrideCursor();
@@ -6931,11 +6934,13 @@ void MainFrame::UpdateView()
 			pXInverse->UpdateView();
 			break;
 		}
+		default:
+			break;
 	}
 }
 
 
-void MainFrame::WritePolars(QDataStream &ar, Foil *pFoil, int ProjectFormat)
+void MainFrame::WritePolars(QDataStream &ar, Foil *pFoil)
 {
 	int i;
 	if(!pFoil)
@@ -6950,7 +6955,7 @@ void MainFrame::WritePolars(QDataStream &ar, Foil *pFoil, int ProjectFormat)
 		for (i=0; i<m_oaFoil.size(); i++)
 		{
 			pFoil = (Foil*)m_oaFoil.at(i);
-			pFoil->Serialize(ar, true, ProjectFormat);
+			pFoil->Serialize(ar, true);
 		}
 
 		//then write polars
@@ -6981,7 +6986,7 @@ void MainFrame::WritePolars(QDataStream &ar, Foil *pFoil, int ProjectFormat)
 		//100001 : transferred NCrit, XTopTr, XBotTr to polar file
 		//first write foil
 		ar << 1;//only one this time
-		pFoil->Serialize(ar,true, ProjectFormat);
+		pFoil->Serialize(ar,true);
 		//count polars associated to the foil
 		Polar * pPolar ;
 		int n=0;

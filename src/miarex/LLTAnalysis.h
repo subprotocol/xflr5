@@ -87,7 +87,7 @@ private:
     double m_GYm;                               /**< The wing's total yawing moment */
 	double m_ICd[MAXSPANSTATIONS+1];		    /**< Induced Drag coefficient at the span stations */
     double m_ICm;                               /**< The wing's induced pitching moment */
-    double m_InducedDrag;                       /**< The wing's induced drag coefficient */
+    double m_InducedDrag;                       /**< The wing's induced drag coefficient @todo check*/
     int m_IterLim;                              /**< Maximum number of iterations in the calculation */
     double m_IYm;                               /**< The wing's induced yawing moment */
     QString m_LengthUnit;                       /**< Name of the user-defined length unit */
@@ -102,7 +102,7 @@ private:
 	double m_StripArea[MAXSPANSTATIONS+1];		/** <Local strip area at the span stations */
 	double m_Twist[MAXSPANSTATIONS+1];          /**< twist at the span stations */
     double m_VCm;                               /**< The wing's viscous pitching moment */
-    double m_ViscousDrag;                       /**< The wing's viscous drag coefficient */
+    double m_ViscousDrag;                       /**< The wing's viscous drag coefficient @todo check*/
     double m_VYm;                               /**< The wing's viscous yawing moment */
     double m_XCP;                               /**< The x-position of the center of pressure */
 	double m_XCPSpanAbs[MAXSPANSTATIONS+1];	    /**< Center of Pressure pos at the span stations */

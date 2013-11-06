@@ -405,7 +405,7 @@ double Plane::TotalMass()
 }
 
 
-bool Plane::SerializePlane(QDataStream &ar, bool bIsStoring, int ProjectFormat)
+bool Plane::SerializePlane(QDataStream &ar, bool bIsStoring)
 {
 	QMiarex *pMiarex = (QMiarex*)s_pMiarex;
 
@@ -417,8 +417,7 @@ bool Plane::SerializePlane(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 	if (bIsStoring)
 	{
 		// storing code
-		if(ProjectFormat>=5)      ar << 1012;
-		else if(ProjectFormat==4) ar << 1010;
+		ar << 1012;
 		//1012 : QFLR5 v0.03 : added mass properties for inertia calculations
 		//1011 : QFLR5 v0.02 : added Plane description field
 		//1010 : added body LE x and z position
@@ -431,12 +430,12 @@ bool Plane::SerializePlane(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 		//1003 : Added fin tilt;
 		//1002 : Added doublefin;
 		WriteCString(ar, m_PlaneName);
-		if(ProjectFormat>=5)      WriteCString(ar, m_PlaneDescription);
+		WriteCString(ar, m_PlaneDescription);
 
-		m_Wing.SerializeWing(ar, true, ProjectFormat);
-		m_Wing2.SerializeWing(ar, true, ProjectFormat);
-		m_Stab.SerializeWing(ar, true, ProjectFormat);
-		m_Fin.SerializeWing(ar, true, ProjectFormat);
+		m_Wing.SerializeWing(ar, true);
+		m_Wing2.SerializeWing(ar, true);
+		m_Stab.SerializeWing(ar, true);
+		m_Fin.SerializeWing(ar, true);
 		if(m_bStab)          ar <<1; else ar <<0;
 		if(m_bFin)           ar <<1; else ar <<0;
 		if(m_bDoubleFin)     ar <<1; else ar <<0;
@@ -464,13 +463,13 @@ bool Plane::SerializePlane(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 			ar << 0;
 			WriteCString(ar, strong);
 		}
-		if(ProjectFormat>=5)
-		{
-			ar << m_MassValue.size();
-			for(i=0; i<m_MassValue.size(); i++) ar << (float)m_MassValue[i];
-			for(i=0; i<m_MassValue.size(); i++) ar << (float)m_MassPosition[i].x << (float)m_MassPosition[i].y << (float)m_MassPosition[i].z;
-			for(i=0; i<m_MassValue.size(); i++)  WriteCString(ar, m_MassTag[i]);
-		}
+
+
+		ar << m_MassValue.size();
+		for(i=0; i<m_MassValue.size(); i++) ar << (float)m_MassValue[i];
+		for(i=0; i<m_MassValue.size(); i++) ar << (float)m_MassPosition[i].x << (float)m_MassPosition[i].y << (float)m_MassPosition[i].z;
+		for(i=0; i<m_MassValue.size(); i++)  WriteCString(ar, m_MassTag[i]);
+
 		return true;
 	}
 	else
@@ -488,10 +487,10 @@ bool Plane::SerializePlane(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 
 		if(ArchiveFormat>=1011) ReadCString(ar, m_PlaneDescription);
 
-		m_Wing.SerializeWing(ar, false, ProjectFormat);
-		if(ArchiveFormat>=1007) m_Wing2.SerializeWing(ar, false, ProjectFormat);
-		m_Stab.SerializeWing(ar, false, ProjectFormat);
-		m_Fin.SerializeWing(ar, false, ProjectFormat);
+		m_Wing.SerializeWing(ar, false);
+		if(ArchiveFormat>=1007) m_Wing2.SerializeWing(ar, false);
+		m_Stab.SerializeWing(ar, false);
+		m_Fin.SerializeWing(ar, false);
 
 		ar >>k;
 		if(k) m_bStab = true; else m_bStab = false;

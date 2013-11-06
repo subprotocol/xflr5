@@ -53,7 +53,7 @@ class PlaneOpp
 
 public:
 	PlaneOpp();
-	bool SerializePOpp(QDataStream &ar, bool bIsStoring, int ProjectFormat);
+	bool SerializePOpp(QDataStream &ar, bool bIsStoring);
 
 private:
 	WingOpp m_PlaneWOpp[MAXWINGS];

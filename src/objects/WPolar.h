@@ -93,7 +93,7 @@ public:
 	void Remove(double alpha);
 	void ResetWPlr();
 	void RetrieveInertia(void *ptr, bool bPlane);
-	bool SerializeWPlr(QDataStream &ar, bool bIsStoring, int ProjectFormat);
+	bool SerializeWPlr(QDataStream &ar, bool bIsStoring);
 
 	double sideSlip()                   {return m_Beta;}       /**< returns the sideslip angle */
 

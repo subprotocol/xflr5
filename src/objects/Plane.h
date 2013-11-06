@@ -71,7 +71,7 @@ public:
 	CVector CoG()  {return m_CoG;}
 
 	void Duplicate(Plane *pPlane);
-	bool SerializePlane(QDataStream &ar, bool bIsStoring, int ProjectFormat);
+	bool SerializePlane(QDataStream &ar, bool bIsStoring);
 	void ComputePlane(void);
 	void CreateSurfaces();
 	void RenameWings();
