@@ -45,7 +45,7 @@ bool Wing::s_bVLMSymetric;
 
 
 /**
- * The public constructor
+ * The public constructor.
  */
 Wing::Wing()
 {
@@ -98,8 +98,8 @@ Wing::Wing()
 	m_pWakePanel = NULL;
 
 	m_CL                = 0.0;
-	m_ViscousDrag       = 0.0;
-	m_InducedDrag       = 0.0;
+	m_CDv               = 0.0;
+	m_CDi               = 0.0;
 //	m_RollingMoment     = 0.0;
 //	m_PitchingMoment    = 0.0;
 	m_GYm               = 0.0;
@@ -108,9 +108,8 @@ Wing::Wing()
 	m_GRm               = 0.0;
 	m_VCm               = 0.0;
 	m_VYm               = 0.0;
-	m_XCP               = 0.0;
-	m_YCP               = 0.0;
-    m_ZCP               = 0.0;
+
+	m_CP.Set(0.0, 0.0, 0.0);
 
 	m_AVLIndex = -(int)(qrand()/10000);//improbable value...
 
@@ -143,7 +142,7 @@ Wing::Wing()
 
 
 /**
- * Import the wing geometry from a text file
+ * Imports the wing geometry from a text file.
  * @param path_to_file the path to the filename as a QString
  */
 void Wing::ImportDefinition(QString path_to_file)
@@ -215,7 +214,7 @@ void Wing::ImportDefinition(QString path_to_file)
 }
 
 /**
- * Export the wing geometry to a text file
+ * Exports the wing geometry to a text file.
  * @param path_to_file the path to the filename as a QString
  */
 void Wing::ExportDefinition(QString path_to_file)
@@ -255,16 +254,13 @@ void Wing::ExportDefinition(QString path_to_file)
 
 
 /**
- * Calculates the properties of the wing based on the input in the data table
- * Stores the results in the member variables
- * Enables the user to see the properties of the wing in real time as he modifies the geometry
+ * Calculates the properties of the wing based on the input data.
+ * Stores the results in the member variables.
+ * Enables the user to see the properties of the wing in real time as the geometry is modified.
  */
 void Wing::ComputeGeometry()
 {
-	// Computes the wing's characteristics from the panel data
-	//
 	MainFrame *pMainFrame  = (MainFrame*)s_pMainFrame;
-//	QMiarex    *pMiarex = (QMiarex*)   s_pMiarex;
 	Foil *pFoilA, *pFoilB;
 	double MinPanelSize;
 	int is;
@@ -279,7 +275,7 @@ void Wing::ComputeGeometry()
 	{
 		YProj(is) = YProj(is-1) + Length(is) * cos(Dihedral(is-1)*PI/180.0);
 	}
-//qDebug()<<"TipPos"<<TipPos();
+
 	m_PlanformSpan  = 2.0 * TipPos();
 	m_ProjectedSpan = 0.0;
 	m_MAChord = 0.0;
@@ -543,21 +539,17 @@ void Wing::ComputeBodyAxisInertia()
 
 
 /**
- * Constructs the surface objects based on the wing's geometry, on its position, and on its orientation
+ * Constructs the surface objects based on the WingSection data.
  * The position and orientation are defined in the plane object
+ * The surfaces are constructed from root to tip, and re-ordered from let tip to right tip
+ * One surface object for each of the wing's panels
+ * A is the surface's left side, B is the right side
  * @param T the translation to be appied to the wing geometry
  * @param XTilt  the rotation in degrees around the x-axis; used in the case of fins
  * @param YTilt  the rotation in degrees arouns the y-axi; used for wing or elevator tilt
  */
 void Wing::CreateSurfaces(CVector const &T, double XTilt, double YTilt)
 {
-	//
-	// Constructs the surface objects based on the input data
-	// The surfaces are constructed from root to tip, and re-ordered from let tip to right tip
-	// One surface object for each of the wing's panels
-	//A is the surface's left side, B is the right side
-	//
-
 	int j, nSurf;
 	CVector PLA, PTA, PLB, PTB, offset, T1;
 	CVector Trans(T.x, 0.0, T.z);
@@ -819,8 +811,8 @@ void Wing::CreateSurfaces(CVector const &T, double XTilt, double YTilt)
 
 
 /**
-* Calculates the chord lengths at each position of the NStation in LLT calculations
-*@param NStation the number of stations required by the user in LLT calculations
+* Calculates the chord lengths at each position of the NStation defined by the LLT or the Panel analysis
+*@param NStation the number of stations required by the analysis
 */
 void Wing::ComputeChords(int NStation)
 {
@@ -901,9 +893,9 @@ void Wing::ComputeChords(int NStation)
 
 
 /**
-* Calculates the chord lengths at each position of the NStation in LLT calculations
+* Calculates the chord lengths at each position of the NStation defined by the LLT or the Panel analysis
 * Overloaded function
-*@param NStation the number of stations required by the user in LLT calculations
+*@param NStation the number of stations required by the analysis
 *@param *chord pointer to the array of chords lengths at the span stations
 *@param *offset pointer to the array of offset positions at the span stations
 *@param *twist pointer to the array of twist values at the span stations
@@ -991,8 +983,8 @@ void Wing::ComputeChords(int NStation, double *chord, double *offset, double *tw
 */
 void Wing::Duplicate(Wing *pWing)
 {
-	s_pMainFrame    = pWing->s_pMainFrame;
-	s_pMiarex       = pWing->s_pMiarex;
+//	s_pMainFrame    = pWing->s_pMainFrame;
+//	s_pMiarex       = pWing->s_pMiarex;
 	m_NStation      = pWing->m_NStation;
 	m_PlanformSpan  = pWing->m_PlanformSpan;
 	m_ProjectedSpan = pWing->m_ProjectedSpan;
@@ -1059,7 +1051,7 @@ void Wing::Duplicate(Wing *pWing)
 
 
 /**
- * Export the wing geometry to a text file readable by AVL
+ * Export the wing geometry to a text file readable by AVL.
  * @param out the instance of the QTextStream to which the output will be directed
  * @param index a reference number used by AVL to idnitfy the wing
  * @param x the x value of the translation to be applied to the wing's geometry -unused
@@ -1271,8 +1263,8 @@ double Wing::C4(double yob, double xRef)
 }
 
 /**
- * Calculates and returns the chord length at a given span position
- * @param yob the position where the chord length will be calculated
+ * Calculates and returns the chord length at a given relative span position
+ * @param yob the relative span position in %, where the chord length will be calculated
  * @return the chord length
  */
 double Wing::Chord(double yob)
@@ -1296,8 +1288,8 @@ double Wing::Chord(double yob)
 
 
 /**
- * Calculates and returns the offste value at a given span position
- * @param yob the position where the offset will be calculated
+ * Calculates and returns the offste value at a given relative span position
+ * @param yob the relative span position in %, where the offset will be calculated
  * @return the offset value
  */
 double Wing::Offset(double yob)
@@ -1322,8 +1314,8 @@ double Wing::Offset(double yob)
 
 
 /**
- * Calculates and returns the twist angle at a given span position
- * @param yob the position where the twist angle will be calculated
+ * Calculates and returns the twist angle at a given relative span position
+ * @param yob the relative position where the twist angle will be calculated
  * @return the twist angle in degrees
  */
 double Wing::Twist(double y)
@@ -1362,8 +1354,8 @@ double Wing::Twist(double y)
 
 
 /**
- * Calculates and returns the dihedral angle at a given span position
- * @param yob the position where the dihedral angle will be calculated
+ * Calculates and returns the dihedral angle at a given relative span position
+ * @param yob the relative position where the dihedral angle will be calculated
  * @return the dihedral angle in degrees
  */
 double Wing::Dihedral(double yob)
@@ -1744,7 +1736,7 @@ void Wing::PanelTrefftz(double QInf, double Alpha, double *Mu, double *Sigma, in
 		if(m_Surface[j].m_bIsTipRight && !pWPolar->m_bThinSurfaces) p+=m_Surface[j].m_NXPanels;//tip patch panels
 	}
 
-	m_InducedDrag = WingIDrag; // save this wing's induced drag (unused though...)
+	m_CDi = WingIDrag; // save this wing's induced drag (unused though...)
 }
 
 
@@ -2636,6 +2628,7 @@ void Wing::InsertSection(int iSection)
 
 /**
  * Appends a new section at the tip of the wing, with default values
+ *@
  */
 bool Wing::AppendWingSection()
 {

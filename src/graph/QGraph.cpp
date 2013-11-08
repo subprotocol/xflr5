@@ -105,7 +105,7 @@ void QGraph::DrawCurve(int nIndex, QPainter &painter)
 	static QRect rViewRect;
 
 	ptside = 2;
-	CCurve* pCurve = GetCurve(nIndex);
+	Curve* pCurve = GetCurve(nIndex);
 
 	scaley = m_scaley;
 
@@ -556,7 +556,7 @@ void QGraph::DrawLegend(QPainter &painter, QPoint &Place, QFont &LegendFont, QCo
 
 	painter.setFont(LegendFont);
 
-	CCurve* pCurve;
+	Curve* pCurve;
 
 	QPen TextPen(LegendColor);
 	QPen LegendPen(Qt::gray);
@@ -564,7 +564,7 @@ void QGraph::DrawLegend(QPainter &painter, QPoint &Place, QFont &LegendFont, QCo
 	int npos = 0;
 	for (int nc=0; nc< m_oaCurves.size(); nc++)
 	{
-		pCurve = (CCurve*) m_oaCurves[nc];
+		pCurve = (Curve*) m_oaCurves[nc];
 		if(pCurve->IsVisible())
 		{
 			pCurve->title(strong);
@@ -616,7 +616,7 @@ void QGraph::ExpFormat(double &f, int &exp)
 void QGraph::ExportToFile(QFile &XFile, enumTextFileType FileType)
 {
 	int i,j, maxpoints;
-	CCurve *pCurve;
+	Curve *pCurve;
 	QString strong;
 	QTextStream out(&XFile);
 
@@ -669,7 +669,7 @@ QPoint QGraph::GetOffset()
 }
 
 
-void QGraph::Highlight(QPainter &painter, CCurve *pCurve, int ref)
+void QGraph::Highlight(QPainter &painter, Curve *pCurve, int ref)
 {
 	painter.save();
 	int x = int(pCurve->x[ref]/m_scalex)  +m_ptoffset.x();

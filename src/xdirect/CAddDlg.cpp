@@ -144,7 +144,7 @@ void CAddDlg::OnApply()
 		m_iSplineType = 2;
 
 	int added = pXFoil->cadd(m_iSplineType, m_pctrlAngTol->Value(),
-						m_pctrlFrom->Value(), m_pctrlTo->Value());
+	                         m_pctrlFrom->Value(), m_pctrlTo->Value());
 	pXFoil->abcopy();
 
 	QString strong;

@@ -19,6 +19,8 @@
 
 *****************************************************************************/
 
+/** @file This file implements the QXDirect class used to manage direct Foil analysis. */
+
 #ifndef QXDIRECT_H
 #define QXDIRECT_H
 
@@ -60,7 +62,13 @@
 #include "CAddDlg.h"
 #include "XDirectStyleDlg.h"
 
-
+/**
+* @class QXDirect This class is used to manage direct Foil Analysis.
+*
+* This is the handling class for the QXDirect right toolbar.
+* It provides the methods to modify the foil geometry, define the Polar analysis, perform the analysis, and post-process the results.
+* One of the very first class of this project.
+*/
 class QXDirect : public QWidget
 {
 	friend class MainFrame;
@@ -205,8 +213,8 @@ protected:
 	void DeleteOpPoint(bool bCurrent);
 	void PaintPolarLegend(QPoint place, int bottom,QPainter &painter);
 	void FillComboBoxes(bool bEnable = true);
-	void FillPolarCurve(CCurve *pCurve, Polar *pPolar, int XVar, int YVar);
-	void FillOppCurve(OpPoint *pOpp, Graph *pGraph, CCurve *pCurve, bool bInviscid=false);
+	void FillPolarCurve(Curve *pCurve, Polar *pPolar, int XVar, int YVar);
+	void FillOppCurve(OpPoint *pOpp, Graph *pGraph, Curve *pCurve, bool bInviscid=false);
 	void InsertOpPoint(OpPoint *pNewPoint);
 	void LoadSettings(QSettings *pSettings);
 
@@ -232,10 +240,6 @@ protected:
 	void SetupLayout();	
 	void StopAnimate();
 	void UpdateCurve();
-
-
-//	bool InitXFoil(CFoil *pFoil=NULL);
-//	void InitXFoil2();
 
 	void * GetVariable(Polar *pPolar, int iVar);
 	OpPoint* GetOpPoint(double Alpha);
@@ -313,95 +317,109 @@ private:
 
 	LineDelegate *m_pStyleDelegate, *m_pWidthDelegate;
 
-	int m_IconWidth, m_IconHeight; //in the comboboxes for curve style & color
+	bool m_bAlpha;             /**< true if performing an analysis based on aoa, false if based on Cl */
+	bool m_bStoreOpp;          /**< true if operating points should be stored after an analysis */
+	bool m_bViscous;           /**< true if performing a viscous calculation, false if inviscid */
+	bool m_bInitBL;            /**< true if the boundary layer should be initialized for the next xfoil calculation */
+	bool m_bBL;                /**< true if the Boundary layer shoud be displayed */
+	bool m_bPressure;          /**< true if the pressure distirbution should be displayed */
+	bool m_bPolar;             /**< true if the polar view is selected, false if the operating point view is selected */
+	bool m_bShowUserGraph;     /**< true if the 5th polar graph should be displayed */
+	bool m_bAnimate;           /**< true if a result animation is underway */
+	bool m_bAnimatePlus;       /**< true if the animation is going from lower to higher alpha, false if decreasing */
+	bool m_bShowPanels;        /**< true if the panels should be displayed on the foil surface */
+	bool m_bType1;             /**< true if the type 1 polars are to be displayed in the graphs */
+	bool m_bType2;             /**< true if the type 2 polars are to be displayed in the graphs */
+	bool m_bType3;             /**< true if the type 3 polars are to be displayed in the graphs */
+	bool m_bType4;             /**< true if the type 4 polars are to be displayed in the graphs */
+	bool m_bAutoInitBL;        /**< true if the BL initialization is left to the code's decision */
+	bool m_bTrans;             /**< true if the user is dragging a view */
+	bool m_bTransGraph;        /**< true if the user is dragging a graph */
+	bool m_bFromList;          /**< true if the batch analysis is based on a list of Re values */
+	bool m_bFromZero;          /**< true if the batch analysis should start from Alpha=0 */
+	bool m_bShowTextOutput;    /**< true if the batch analysis should display text result output */
+	bool m_bNeutralLine;       /**< true if the neutral line should be displayed */
+	bool m_bCurOppOnly;        /**< true if only the current operating point should be displayed */
+	bool m_bShowInviscid;      /**< true if the inviscid results should be displayed */
+	bool m_bCpGraph;           /**< true if the Cp graph should be displayed */
+	bool m_bSequence;          /**< true if a sequential analysis is to be performed */
+	bool m_bXPressed;          /**< true if the 'X' key is pressed */
+	bool m_bYPressed;          /**< true if the 'Y' key is pressed */
+	bool m_bHighlightOpp;      /**< true if the active operating point should be highlighted on the curves of the polar graphs */
 
-	int m_CurveStyle, m_CurveWidth;
-	QColor m_CurveColor;
+	int m_posAnimate;          /**< the current aoa in the animation */
+	int m_XFoilVar;            /**< defines the variable for current XFoil results */
+	int m_IterLim;             /**< max iteratio limit for XFoil */
 
-	bool m_bAlpha;			//true if performing an analysis based on aoa, false if based on Cl
-	bool m_bStoreOpp;		// true if operating points should be stored after an analysis
-	bool m_bViscous;		// true if performing a viscous calculation, false if inviscid
-	bool m_bInitBL;			// true if the boundary layer should be initialized for the next xfoil calculation
-	bool m_bBL;				// true if the Boundary layer shoud be displayed
-	bool m_bPressure;		// true if the pressure distirbution should be displayed
-	bool m_bPolar;			// true if the polar view is selected, false if the operating point view is selected
-	bool m_bShowUserGraph;	// true if the 5th polar graph should be displayed
-	bool m_bAnimate;		// true if a result animation is underway
-	bool m_bAnimatePlus;	// true if the animation is going from lower to higher alpha, false if decreasing
-	bool m_bShowPanels;		// true if the panels should be displayed on the foil surface
-	bool m_bType1, m_bType2, m_bType3, m_bType4; // filter for polar diplay
-	bool m_bAutoInitBL;		// true if the BL initialization is left to the code's decision
-	bool m_bTrans;			// true if the user is dragging a view
-	bool m_bTransGraph;		// true if the user is dragging a graph
-	bool m_bFromList;		// true if the batch analysis is based on a list of Re values
-	bool m_bFromZero;		// true if the batch analysis should start from Alpha=0
-	bool m_bShowTextOutput;	// true if the batch analysis should display text result output
-	bool m_bNeutralLine;	// true if the neutral line should be displayed
-	bool m_bCurOppOnly;		// true if only the current operating point should be displayed
-	bool m_bShowInviscid;	// true if the inviscid results should be displayed
-	bool m_bCpGraph;		// true if the Cp graph should be displayed
-	bool m_bSequence;		// true if a sequential analysis is to be performed
-	bool m_bXPressed, m_bYPressed; //true if the corresponding key is pressed
-	bool m_bHighlightOpp;
+	int m_iPlrGraph;           /**< defines whch polar graph is selected if m_iPlrView=1 */
+	int m_iPlrView;	           /**< 0 is all graphs, 1 is a single graph, 2 is two ! */
+	int m_FoilYPos;            /**< y position for the foil display, in pixels from the bottom of the screen */
 
-	int m_posAnimate;		// the current aoa in the animation
-	int m_XFoilVar;			// defines the variable for current XFoil results
-	int m_IterLim;			// max iteratio limit for XFoil
+	double m_fFoilScale;        /**< the scale for foil display*/
+	double m_ReList[30];        /**< the user-defined list of Re numbers, used for batch analysis */
+	double m_MachList[30];      /**< the user-defined list of Mach numbers, used for batch analysis */
+	double m_NCritList[30];     /**< the user-defined list of NCrit numbers, used for batch analysis */
+	int m_NRe;                  /**< the number of Re values in the ReList */
 
-	int m_iPlrGraph;		// defines whch polar graph is selected if m_iPlrView=1
-	int m_iPlrView;			// 0 is all, 1 is single, 2 is two !
-	int m_FoilYPos;		// y position for the foil display, in pixels from the bottom of the screen
+	double m_Alpha;             /**< the min value of the aoa for a sequential analysis of Type 1, 2, or 3*/
+	double m_AlphaMax;          /**< the max value of the aoa for a sequential analysis of Type 1, 2, or 3*/
+	double m_AlphaDelta;        /**< the increment value of the aoa for a sequential analysis of Type 1, 2, or 3*/
+	double m_Cl;                /**< the min value of the lift coefficient for a sequential analysis of Type 1, 2, or 3*/
+	double m_ClMax;             /**< the max value of the aoa for a sequential analysis of Type 1, 2, or 3*/
+	double m_ClDelta;           /**< the increment value of the aoa for a sequential analysis of Type 1, 2, or 3*/
+	double m_Reynolds;          /**< the min value of the Reynolds number for a sequential analysis of Type 4*/
+	double m_ReynoldsMax;       /**< the max value of the Reynolds number for a sequential analysis of Type 4*/
+	double m_ReynoldsDelta;     /**< the increment value of the Reynolds number for a sequential analysis of Type 4*/
+	double m_Mach;              /**< Stores the Mach number defined in the last Polar creation */
+	double m_ASpec;             /**< Stores the aoa defined in the last Type 4 Polar creation */
+	double m_NCrit;             /**< Stores the NCrit number defined in the last Polar creation */
+	double m_XTopTr;            /**< Stores the position of the top transition point defined in the last Polar creation */
+	double m_XBotTr;            /**< Stores the position of the bottom transition point defined in the last Polar creation */
+	enumPolarType m_PolarType;  /**< Stores the type of the last polar which has been created. */
 
-	double m_fFoilScale;	// foil display scale
-	double m_ReList[30];	// for batch analysis
-	double m_MachList[30];	// for batch analysis
-	double m_NCritList[30];	// for batch analysis
-	int m_NRe;				// number of Re values in the ReList
+	Foil m_BufferFoil;          /**< used for screen drawing and temporary geometric mods */
+	Polar* m_pCurPolar;         /**< pointer to the currently selected foil polar */
+	OpPoint * m_pCurOpp;        /**< pointer to the currently selected foil operating point */
 
-	double m_Alpha, m_AlphaMax, m_AlphaDelta;
-	double m_Cl, m_ClMax, m_ClDelta;
-	double m_Reynolds, m_ReynoldsMax, m_ReynoldsDelta;
-	double m_Mach;
-	double m_ASpec;
-	double m_NCrit, m_XTopTr, m_XBotTr;
-	enumPolarType m_PolarType;
+	QList<void*> *m_poaFoil;	/**< pointer to the foil object array */
+	QList<void*> *m_poaPolar;	/**< pointer to the polar object array */
+	QList<void*> *m_poaOpp;		/**< pointer to the OpPoint object array */
 
+	QGraph* m_pCpGraph;         /**< a pointer to the Cp graphs */
+	QGraph* m_pPolarGraph;      /**< a pointer to the first polar graph @todo replace with an array of 5 graphs*/
+	QGraph* m_pCmGraph;         /**< a pointer to the second polar graph */
+	QGraph* m_pCzGraph;         /**< a pointer to the third polar graph */
+	QGraph* m_pTrGraph;         /**< a pointer to the fourth polar graph */
+	QGraph* m_pUserGraph;       /**< a pointer to the fift polar graph */
+	QGraph* m_pCurGraph;        /**< a pointer to the graph over which the mouse is hovering */
 
-	Foil m_BufferFoil;		// used for screen drawing and temporary geometric mods
-	Polar* m_pCurPolar;	// pointer to the currently selected foil polar
-	OpPoint * m_pCurOpp;	// pointer to the currently selected foil operating point
+	QFile m_XFile;		        /**< The instance of the log file to which the text output of the analysis is directed */
 
-	QList<void*> *m_poaFoil;	// pointer to the foil object array
-	QList<void*> *m_poaPolar;	// pointer to the polar object array
-	QList<void*> *m_poaOpp;		// pointer to the OpPoint object array
-
-	QGraph* m_pCpGraph;		//pointers to the various graphs
-	QGraph* m_pPolarGraph;
-	QGraph* m_pCmGraph;
-	QGraph* m_pCzGraph;
-	QGraph* m_pTrGraph;
-	QGraph* m_pUserGraph;
-	QGraph* m_pCurGraph;
-
-	QFile m_XFile;		//output file for the analysis
+	static void *s_pMainFrame;  /**< a pointer to the instance of the application's MainFrame object */
+	static void *s_p2DWidget;   /**< a pointer to the instance of the application's central widget used for 2D drawings */
 
 
-	static void *s_pMainFrame;
-	static void *s_p2DWidget;
+	QColor m_crBLColor;         /**< the color used to draw the boundary layer */
+	QColor m_crPressureColor;   /**< the color used to draw the pressure arrows */
+	QColor m_crNeutralColor;    /**< the color used to draw the neutral line */
+	QColor m_CurveColor;        /**< the color displayed in the comboboxes for the selection of curve styles */
 
+	int m_iBLStyle;             /**< the index of the style used to draw the boundary layer */
+	int m_iBLWidth;             /**< the width of the line used to draw the boundary layer */
+	int m_iPressureStyle;       /**< the index of the style used to draw the pressure arrows*/
+	int m_iPressureWidth;       /**< the width of the line used to draw the pressure arrows */
+	int m_iNeutralStyle;        /**< the index of the style used to draw the neutral line */
+	int m_iNeutralWidth;        /**< the width of the line used to draw the neutral line */
 
-	QColor m_crFoilColor, m_crBLColor, m_crPressureColor, m_crNeutralColor; //foil display parameters
-	int m_iFoilStyle, m_iFoilWidth;
-	int m_iBLStyle, m_iBLWidth;
-	int m_iPressureStyle, m_iPressureWidth;
-	int m_iNeutralStyle, m_iNeutralWidth;
+	int m_CurveStyle;           /**< the index of the style of the lines displayed in the comboboxes for the selection of curve styles*/
+	int m_CurveWidth;           /**< the width of the lines displayed in the comboboxes for the selection of curve styles*/
+	
+	QRect m_rCltRect;		    /**< the client rectangle of the central TwoDWidget */
+	QPoint m_PointDown;		    /**< the client coordinated of the last mouse left-click */
+	QPoint m_FoilOffset;		/**< the offset position for the foil display in the client area */
+	QPoint m_PolarLegendOffset; /**< the offset position for the legend display in the client area */
 
-	QRect m_rCltRect;		// the client area
-	QPoint m_PointDown;		// the client point for the last mouse left-click
-	QPoint m_FoilOffset;		// the screen offset position for the foil display
-	QPoint m_PolarLegendOffset;
-
-	XFoil *m_pXFoil;		// a pointer to the XFoil object
+	XFoil *m_pXFoil;		    /**< a pointer to the unique instance of the XFoil object */
 };
 
 

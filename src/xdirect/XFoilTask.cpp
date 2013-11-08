@@ -1,3 +1,4 @@
+
 /****************************************************************************
 
 	XFoilTask Class
@@ -33,6 +34,9 @@ bool XFoilTask::s_bAutoInitBL = false;
 bool XFoilTask::s_bCancel = true;
 void *XFoilTask::s_pBatchThreadDlg;
 
+/**
+* The public constructor
+*/
 XFoilTask::XFoilTask()
 {
 	m_Id = -1;
@@ -42,10 +46,13 @@ XFoilTask::XFoilTask()
 	setAutoDelete(false);
 }
 
-
+/**
+* Implements the run method of the QRunnable @todo check if (pure) virtual
+*
+* Asssumes that XFoil has been initialized with foil and polar
+*/
 void XFoilTask::run()
 {
-	//asssumes that XFoil has been initialized with foil and polar
 	QObject *pBatch = (QObject*)s_pBatchThreadDlg;
 	if(s_bCancel || !m_pPolar || !m_pFoil)
 	{
@@ -65,7 +72,12 @@ void XFoilTask::run()
 	//will be truly finished whent this message has been received by the batch analysis engine
 }
 
-
+/**
+* Initializes the XFoil calculation
+* @param pFoil a pointer to the instance of the Foil object for which the calculation is run
+* @param pPolar a pointer to the instance of the Polar object for which the calculation is run
+* @return true if the initialization of the Foil in XFoil has been sucessful, false otherwise
+*/
 bool XFoilTask::Init(Foil *pFoil, Polar *pPolar)
 {
 	m_bIsFinished = false;
@@ -80,7 +92,10 @@ bool XFoilTask::Init(Foil *pFoil, Polar *pPolar)
 	return true;
 }
 
-
+/** 
+* Performs a sequence of Xfoil calculations for a range of aoa.
+* @return true if the calculation was successful
+*/
 bool XFoilTask::AlphaSequence()
 {
 	BatchThreadDlg *pBatch = (BatchThreadDlg*)s_pBatchThreadDlg;
@@ -199,7 +214,10 @@ bool XFoilTask::AlphaSequence()
 	return true;
 }
 
-
+/**
+* Manages the viscous iterations of the XFoil calculation.
+* @return true if the analysis has been successful.
+*/
 bool XFoilTask::Iterate()
 {
 	BatchThreadDlg *pBatch = (BatchThreadDlg*)s_pBatchThreadDlg;
@@ -207,7 +225,7 @@ bool XFoilTask::Iterate()
 
 	if(!XFoilInstance.viscal())
 	{
-		XFoilInstance.lvconv = false;//point is unconverged
+		XFoilInstance.lvconv = false;
 //		str =QObject::tr("CpCalc: local speed too large\n Compressibility corrections invalid");
 		return false;
 	}

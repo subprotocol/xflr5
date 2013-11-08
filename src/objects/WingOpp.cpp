@@ -67,8 +67,7 @@ WingOpp::WingOpp()
 	m_VCD                 = 0.0;
 	m_ICD                 = 0.0;
 	m_GCm = m_VCm = m_ICm = m_GRm = m_GYm = m_VYm = m_IYm = 0.0;
-	m_XCP                 = 0.0;
-	m_YCP                 = 0.0;
+	m_CP.Set(0.0,0.0,0.0);
 	m_XNP	              = 0.0;
 
 	CXu = CZu = Cmu = 0.0;
@@ -244,7 +243,7 @@ bool WingOpp::SerializeWOpp(QDataStream &ar, bool bIsStoring)
 		ar << 0.0f << (float)m_VYm;
 		ar << (float)m_IYm;
 
-        ar << (float)m_XCP << (float)m_YCP;
+		ar << (float)m_CP.x << (float)m_CP.z;
 
 		for (k=0; k<m_NStation; k++)
 		{
@@ -309,7 +308,7 @@ bool WingOpp::SerializeWOpp(QDataStream &ar, bool bIsStoring)
 		//provision
 		for(int i=1; i<20; i++) ar<<(float)0.0f;
 		for(int i=0; i<20; i++) ar<<0;
-		ar<<(float)m_ZCP;
+		ar<<(float)m_CP.z;
 	}
 	else
 	{
@@ -396,8 +395,8 @@ bool WingOpp::SerializeWOpp(QDataStream &ar, bool bIsStoring)
 			m_GCm = m_GRm = m_GYm = m_VYm = m_IYm = 0.0;
 		}
 
-        ar >> f; m_XCP =f;
-		ar >> f; m_YCP =f;
+		ar >> f; m_CP.x =f;
+		ar >> f; m_CP.y =f;
 
 		for (k=0; k<m_NStation; k++)
 		{
@@ -515,8 +514,8 @@ bool WingOpp::SerializeWOpp(QDataStream &ar, bool bIsStoring)
 			}
 			m_MAChord /=1000.0;
 			m_Span    /=1000.0;
-			m_XCP     /=1000.0;
-			m_YCP     /=1000.0;
+			m_CP.x    /=1000.0;
+			m_CP.y    /=1000.0;
 		}
 		if(ArchiveFormat>=1016)
 		{
@@ -612,7 +611,7 @@ bool WingOpp::SerializeWOpp(QDataStream &ar, bool bIsStoring)
 		}
         if(ArchiveFormat>=1021)
         {
-            ar >> f; m_ZCP=f;
+			ar >> f; m_CP.z=f;
         }
 	}
 	return true;
@@ -672,11 +671,11 @@ void WingOpp::GetWOppProperties(QString &WOppProperties, bool bData)
 		strong  = QString(QObject::tr("XNP")+" = %1 ").arg(m_XNP*pMainFrame->m_mtoUnit,7,'f',3);
 		WOppProperties += "\n"+strong +lenunit+"\n";
 	}
-	strong  = QString(QObject::tr("XCP")+" = %1 ").arg(m_XCP*pMainFrame->m_mtoUnit,7,'f',3);
+	strong  = QString(QObject::tr("XCP")+" = %1 ").arg(m_CP.x*pMainFrame->m_mtoUnit,7,'f',3);
 	WOppProperties += strong +lenunit+"\n";
-	strong  = QString(QObject::tr("YCP")+" = %1 ").arg(m_YCP*pMainFrame->m_mtoUnit,7,'f',3);
+	strong  = QString(QObject::tr("YCP")+" = %1 ").arg(m_CP.y*pMainFrame->m_mtoUnit,7,'f',3);
     WOppProperties += strong +lenunit+"\n";
-    strong  = QString(QObject::tr("ZCP")+" = %1 ").arg(m_ZCP*pMainFrame->m_mtoUnit,7,'f',3);
+	strong  = QString(QObject::tr("ZCP")+" = %1 ").arg(m_CP.z*pMainFrame->m_mtoUnit,7,'f',3);
     WOppProperties += strong +lenunit+"\n\n";
 
 

@@ -49,7 +49,7 @@ public:
 	void DrawYTicks(QPainter &painter);
 	void ExpFormat(double &f, int &exp);
 	void ExportToFile(QFile &XFile, enumTextFileType FileType);
-	void Highlight(QPainter &painter, CCurve *pCurve, int ref);
+	void Highlight(QPainter &painter, Curve *pCurve, int ref);
 
 	void LoadSettings(QSettings *pSettings);
 	void SaveSettings(QSettings *pSettings);

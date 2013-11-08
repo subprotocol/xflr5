@@ -26,9 +26,9 @@
 #include <QMessageBox>
 
 
-Foil *g_pCurFoil;	/**< A global pointer to a foil object. 
-                         This allows to keep the same foil active in the different applications Direct design, inverse design, and foil analysis.
-						 @todo Bad oop practice though, see if could be replaced by a static pointer to the pointer in mainframe class.*/
+//Foil *MainFrame::g_ppCurFoil;	/**< A global pointer to a foil object.
+//                         This allows to keep the same foil active in the different applications Direct design, inverse design, and foil analysis.
+//						 @todo Bad oop practice though, see if could be replaced by a static pointer to the pointer in mainframe class.*/
 
 /** 
 *The app's point of entry !

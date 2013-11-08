@@ -2,7 +2,7 @@
 
     Spline  Class
 	Copyright (C) 1996 Paul Bourke	http://astronomy.swin.edu.au/~pbourke/curves/spline/
-	Copyright (C) 2003 Andre Deperrois adeperrois@xflr5.com
+	Copyright (C) 2003-2013 Andre Deperrois adeperrois@xflr5.com
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -23,10 +23,11 @@
 #include "../globals.h"
 #include "Spline.h"
 #include "math.h"
-#include <QtDebug>
 
 
-
+/**
+*The public constructor
+*/
 Spline::Spline()
 {
 	m_Style = 0;
@@ -53,9 +54,14 @@ Spline::Spline()
 	memset(m_Output, 0, sizeof(m_Output));
 }
 
-
+/**
+* Copies the data from an existing Spline.
+* @param pSpline a pointer to an existing Spline object.
+*/
 void Spline::Copy(Spline *pSpline)
 {
+	if(!pSpline) return;
+	
 	m_CtrlPoint.clear();
 	for(int ic=0; ic<pSpline->m_CtrlPoint.size(); ic++)
 	{
@@ -72,8 +78,14 @@ void Spline::Copy(Spline *pSpline)
 }
 
 
+/**
+* Creates a symetric spline w.r.t. the axis y=0, from an existing Spline.
+* @param pSpline a pointer to an existing Spline object.
+*/
 void Spline::CopySymetric(Spline *pSpline)
 {
+	if(!pSpline) return;
+	
 	m_CtrlPoint.clear();
 	for(int ic=0; ic<pSpline->m_CtrlPoint.size(); ic++)
 	{
@@ -99,7 +111,9 @@ void Spline::CopySymetric(Spline *pSpline)
 	}
 }
 
-
+/**
+*Draws the control points on a QPainter. @todo separate MMI and object for polymorphism.
+*/
 void Spline::DrawCtrlPoints(QPainter &painter, double const &scalex, double const &scaley, QPoint const &Offset)
 {
 	painter.save();
@@ -144,6 +158,9 @@ void Spline::DrawCtrlPoints(QPainter &painter, double const &scalex, double cons
 
 
 
+/**
+*Draws the output points on a QPainter. @todo separate MMI and object for polymorphism.
+*/
 void Spline::DrawOutputPoints(QPainter & painter, double const &scalex, double const &scaley, QPoint const &Offset)
 {
 	painter.save();
@@ -171,6 +188,9 @@ void Spline::DrawOutputPoints(QPainter & painter, double const &scalex, double c
 }
 
 
+/**
+*Draws the spline curve on a QPainter. @todo separate MMI and object for polymorphism.
+*/
 void Spline::DrawSpline(QPainter & painter, double const &scalex, double const &scaley, QPoint const &Offset)
 {
 	painter.save();
@@ -203,7 +223,11 @@ void Spline::DrawSpline(QPainter & painter, double const &scalex, double const &
 	painter.restore();
 }
 
-
+/**
+* Exports the spline output points to a text file
+* @param out the stream to which the data is directed
+* @param bExtrados true if the data should be written from end to beginning, false if written from beginning to end. This is the order required by foil files.
+*/
 void Spline::Export(QTextStream &out, bool bExtrados)
 {
 	int k;
@@ -245,15 +269,20 @@ double Spline::GetY(double const &x)
 			return y;
 		}
 	}
-	return 0.0; //we'll have to do better...
+	return 0.0; /** @todo improve*/
 }
 
 
-
+/**
+* Inserts a new point in the array of control points, using crescending x values as the key for insertion
+* @param x the x-coordinate of the point to insert
+* @param y the y-coordinate of the point to insert
+* @return true unless the max number of points has been reached @todo check if SPLINECONTROLSIZE still has a use
+*/
 bool Spline::InsertPoint(double const &x, double const &y)
 {
 	static int k;
-	if(m_CtrlPoint.size()>=SPLINECONTROLSIZE) return false;
+	if(m_CtrlPoint.size()>=SPLINECONTROLSIZE) return false; 
 	if (x>=0.0 && x<=1.0)
 	{ 
 		//No points yet
@@ -295,7 +324,11 @@ bool Spline::InsertPoint(double const &x, double const &y)
 	return true;
 }
 
-
+/**
+* Checks if an input point matches with a control point
+*@param Real the input point to compare with the control points
+*@return the index of the first control point which matches, or -10 if none matches.
+*/
 int Spline::IsControlPoint(CVector const &Real)
 {
 	static int k;
@@ -307,6 +340,12 @@ int Spline::IsControlPoint(CVector const &Real)
 }
 
 
+/**
+* Checks if an input point matches with a control point
+*@param Real the input point to compare with the control points
+*@param ZoomFactor the scaling factor to withdraw from the input point @todo withdrawal to be performed from within the calling function.
+*@return the index of the first control point which matches, or -10 if none matches.
+*/
 int Spline::IsControlPoint(CVector const &Real, double const &ZoomFactor)
 {
 	static int k;
@@ -318,6 +357,14 @@ int Spline::IsControlPoint(CVector const &Real, double const &ZoomFactor)
 }
 
 
+
+/**
+* Checks if an input point matches with a control point
+*@param Real the input point to compare with the control points
+*@param zx the scaling factor of the x-scale, to withdraw from the input point @todo withdrawal to be performed from within the calling function.
+*@param zy the scaling factor of the y-scale, to withdraw from the input point @todo withdrawal to be performed from within the calling function.
+*@return the index of the first control point which matches, or -10 if none matches.
+*/
 int Spline::IsControlPoint(double const &x, double const &y, double const &zx, double const &zy)
 {
 	static int k;
@@ -328,7 +375,11 @@ int Spline::IsControlPoint(double const &x, double const &y, double const &zx, d
 	return -10;
 }
 
-
+/**
+* Removes a point from the array of control points, only if the remaining number of points is strictly greater than the spline's degree
+*@param k the index of the control point to remove in the array
+*@return false if the remaining number of points is equal or less than the spline's degree, true otherwise.
+*/
 bool Spline::RemovePoint(int const &k)
 {
 	if(m_CtrlPoint.size()<=m_iDegree+1) return false; // no less...
@@ -343,27 +394,40 @@ bool Spline::RemovePoint(int const &k)
 }
 
 
+/** Sets the spline's drawing style 
+*@param style the index of the spline's style
+*/
 void Spline::SetStyle(int style)
 {
 	m_Style = style;
 }
 
 
-
+/** Sets the spline's drawing width 
+*@param width the width of the spline
+*/
 void Spline::SetWidth(int width)
 {
 	m_Width = width;
 }
 
 
-
+/**
+*Sets the spline drawing color
+*@param color the spline's color
+*/
 void Spline::SetColor(QColor color)
 {
 	m_Color = color;
 }
 
 
-
+/**
+*Sets the spline's style, width and color
+*@param style the spline's drawing style
+*@param width the width of the spline
+*@param color the spline's color
+*/
 void Spline::SetSplineParams(int style, int width, QColor color)
 {
 	m_Width = width;
@@ -372,25 +436,24 @@ void Spline::SetSplineParams(int style, int width, QColor color)
 }
 
 
-
-
-
+/**	
+ * Calculates the blending value. This is done recursively.
+   If the numerator and denominator are 0 the expression is 0.
+   If the denominator is 0 the expression is 0 
+ *
+ * @param  i   the control point's index
+ * @param  p   the spline's degree 	
+ * @param  t   the spline parameter
+ * @return the blending value for this control point and the pair of degree and parameter values.
+*/
 double Spline::SplineBlend(int const &i,  int const &p, double const &t)
 {
-/*	Calculate the blending value, this is done recursively.
-	If the numerator and denominator are 0 the expression is 0.
-	If the denominator is 0 the expression is 0 */
-//
-//	   i   is the control point's index
-//	   p   is the spline's degree 	
-//	   t   is the spline parameter
-//
 
 	static double pres = 1.e-6; //same for all the recursive calls...
 
 	if(i+p+1>=m_knot.size())
 	{
-		qDebug()<<"Error here";
+//		qDebug()<<"Error here";
 		return 0.0;
 	}
 
@@ -418,7 +481,9 @@ double Spline::SplineBlend(int const &i,  int const &p, double const &t)
 }
 
 
-
+/**
+* Calculates the spline's output points 
+*/
 void Spline::SplineCurve()
 {
 	static double t, increment, b, w;
@@ -453,7 +518,9 @@ void Spline::SplineCurve()
 	}
 }
 
-
+/**
+*Generates an array of standard knot values for this spline.
+*/
 void Spline::SplineKnots()
 {
 	static double a,b;

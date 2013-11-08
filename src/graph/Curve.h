@@ -23,7 +23,6 @@
  *
  * The class which define a CCurve object for the graphs
  *
- * \author Andre Deperrois
  *
  */
 
@@ -36,12 +35,12 @@
 #include "../objects/CVector.h"
 #include <QColor>
 
-class CCurve
+class Curve
 {
 	friend class Graph;
 
 public:
-	CCurve();
+	Curve();
 
 	int     AppendPoint(double xn, double yn);
 	void    BWStyle(QColor &color, int &style, int &width);
@@ -50,7 +49,7 @@ public:
 	void    closestPoint(double xs, double ys, double &dist, int &n);
 	void    closestPoint(double const &xs, double const &ys, double &xSel, double &ySel, double &dist, int &nSel);
 	QColor  color();
-	void    Copy(CCurve *pCurve);
+	void    Copy(Curve *pCurve);
 	int     count();
 	int     GetSelected();
 	bool    IsVisible();

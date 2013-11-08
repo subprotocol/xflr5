@@ -76,14 +76,14 @@ LLTAnalysis::LLTAnalysis(void *pParent)
 	m_Maxa  = 0.0;
 
 	m_CL = 0.0;
-	m_InducedDrag = 0.0;
-	m_ViscousDrag = 0.0;
+	m_CDi = 0.0;
+	m_CDv = 0.0;
 
 	m_VYm = m_IYm = m_GYm = 0.0;
 	m_VCm = m_ICm = m_GCm = 0.0;
 	m_GRm = 0.0;
 
-	m_XCP = m_YCP = 0.0;
+	m_CP.Set(0.0,0.0,0.0);
 }
 
 
@@ -258,8 +258,8 @@ void LLTAnalysis::LLTComputeWing(double QInf, double Alpha, QString &ErrorMessag
 	}
 
 	m_CL            =  Integral0   * m_pWing->m_AR /m_pWing->m_PlanformSpan;
-	m_InducedDrag   =  InducedDrag * m_pWing->m_AR /m_pWing->m_PlanformSpan  * PI / 180.0;
-	m_ViscousDrag   =  ViscousDrag / m_pWing->m_GChord;
+	m_CDi   =  InducedDrag * m_pWing->m_AR /m_pWing->m_PlanformSpan  * PI / 180.0;
+	m_CDv   =  ViscousDrag / m_pWing->m_GChord;
 
 	m_VYm = ViscousYawingMoment /m_pWing->m_GChord;
 	m_IYm = InducedYawingMoment /m_pWing->m_PlanformSpan * PI * m_pWing->m_AR /180.0;
@@ -273,18 +273,17 @@ void LLTAnalysis::LLTComputeWing(double QInf, double Alpha, QString &ErrorMessag
 
 	if(m_CL !=0.0)
 	{
-        m_XCP = Integral2 * m_pWing->m_AR /m_pWing->m_PlanformSpan/m_CL;
+		m_CP.x = Integral2 * m_pWing->m_AR /m_pWing->m_PlanformSpan/m_CL;
 //        m_ZCP = Integral3 * m_pWing->m_AR /m_pWing->m_PlanformSpan/m_CL;
-		m_ZCP=0.0;//the ZCP position may make physical sense in 3D panel analysis, but not in LLT
+		m_CP.z=0.0;//the ZCP position may make physical sense in 3D panel analysis, but not in LLT
 
 	}
 	else
 	{
-        m_XCP = 0.0;
-        m_ZCP = 0.0;
+		m_CP.Set(0.0,0.0,0.0);
     }
-	if(m_pWing->m_bSymetric) m_YCP = 0.0;
-	else                     m_YCP = m_pWing->m_AR/m_CL * Integral1;
+	if(m_pWing->m_bSymetric) m_CP.y = 0.0;
+	else                     m_CP.y = m_pWing->m_AR/m_CL * Integral1;
 
 	LLTSetBending(QInf);
 }

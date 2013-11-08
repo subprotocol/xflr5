@@ -73,7 +73,7 @@ PanelAnalysisDlg::PanelAnalysisDlg(QWidget *pParent) : QDialog(pParent)
 	m_CL  = m_CX  = m_CY  = 0.0;
 	m_GCm = m_GRm = m_GYm = m_VCm = m_VYm = m_IYm = 0.0;
 	m_ControlMin  = m_ControlMax = m_ControlDelta  = 0.0;
-	m_XCP = m_YCP = 0.0;
+	m_CP.Set(0.0,0.0,0.0);
 	m_ViscousDrag = m_InducedDrag = 0.0;
 
 	m_MatSize        = 0;
@@ -1102,15 +1102,13 @@ void PanelAnalysisDlg::ComputePlane(double Alpha, double QInf, int qrhs)
 
 		if(fabs(Force.dot(WindNormal))>0.0)
 		{
-			m_XCP         = XCP/Force.dot(WindNormal);
-			m_YCP         = YCP/Force.dot(WindNormal);
-            m_ZCP         = ZCP/Force.dot(WindNormal);
+			m_CP.x         = XCP/Force.dot(WindNormal);
+			m_CP.y         = YCP/Force.dot(WindNormal);
+			m_CP.z         = ZCP/Force.dot(WindNormal);
 		}
 		else
 		{
-			m_XCP         = 0.0;
-			m_YCP         = 0.0;
-            m_ZCP         = 0.0;
+			m_CP.Set(0.0,0.0,0.0);
 		}
 
 		m_GCm *= 1.0 / m_pWPolar->m_WArea /m_pWing->m_MAChord;
@@ -1937,7 +1935,7 @@ void PanelAnalysisDlg::RelaxWake()
 * The two unit RHS are for a unit velocity along the x-axis, and for a unit velocity along the z-axis.
 *@return true if all the aoa were computed successfully, false otherwise. Interpolation issues are not counted as unsuccessful.
 */
-bool PanelAnalysisDlg::ReLoop()
+bool PanelAnalysisDlg::QInfLoop()
 {
 	QString str;
 	int nrhs;
@@ -2408,10 +2406,10 @@ void PanelAnalysisDlg::CreateDoubletStrength(double Alpha0, double AlphaDelta, i
 *    junctions between wing and body, or between fin and elevator, cannot be adequately 
 *    represented as closed surfaces. This would require a 3D CAD programe. 
 *    Therefore, in this case, the wings are modelled as thin surfaces.
-*    Trial tests using the method of NASA TN 4023 have not been conclusive. With a uniform doublet
+*    Trial tests using the method of NASA TN4023 have not been conclusive. With a uniform doublet
 *    distribution and a boundary condition applied at the panel's centroid, the results 
 *    are less convincing than with VLM.
-*    Therefore in this case, the VLM1 method is applied to the thin surfaces, and the 3D-panel method 
+*    Therefore in this case, the VLM1 ( @todo check VLM type) method is applied to the thin surfaces, and the 3D-panel method 
 *    is applied to the body.
 *    Last consideration : since the potential of a straight vortex line requires a lot of computations, 
 *    the Neumann type BC is applied to the body panels, rather than the Dirichlet type BC
@@ -2491,7 +2489,7 @@ void PanelAnalysisDlg::StartAnalysis()
 	}
 	else if(m_pWPolar->m_WPolarType==FIXEDAOAPOLAR)
 	{
-		ReLoop();
+		QInfLoop();
 	}
 	else if(m_pWPolar->m_WPolarType==STABILITYPOLAR)
 	{
@@ -3260,7 +3258,7 @@ void PanelAnalysisDlg::ComputeNDStabDerivatives()
 * Downwash is evaluated at a distance 100 times the span downstream (i.e. infinite)
 * @param Mu a pointer to the array of doublet strengths or vortex circulations
 * @param Sigma a pointer to the array of source strengths
-* @param *VInf a pointer to the array of velocity vector on the panels @todo check local or freestream or total
+* @param *VInf a pointer to the array of the velocity vectors on the panels 
 * @param Force the resulting force vector
 * @param Moment the resulting moment vector
 * @param bTilted  true if the calculation is performed on a tilted geometry
@@ -3442,6 +3440,7 @@ void PanelAnalysisDlg::Forces(double *Mu, double *Sigma, double alpha, double *V
 #define CM_ITER_MAX 50
 /**
 * Finds the zero-pitching-moment aoa such that Cm=0.
+* Proceeds by iteration between -PI/4 and PI/4
 * @return true if an equlibrium angle was found false otherwise.
 */
 bool PanelAnalysisDlg::GetZeroMomentAngle()
@@ -3521,7 +3520,6 @@ bool PanelAnalysisDlg::GetZeroMomentAngle()
 */
 void PanelAnalysisDlg::BuildStateMatrices()
 {
-
 	static int i;
 	static double Ipxx, Ipzz, Ipzx;
 	static double Ixx,Iyy,Izz, Izx;
@@ -3647,6 +3645,7 @@ void PanelAnalysisDlg::BuildStateMatrices()
 	AddString(strange);
 }
 
+
 /**
  *  This methods builds the rotation matrix from geometrical axis to stability axis,
  *  i.e. if V is a vector defined in the body axis, its coordinates in stability axis are v = R.V
@@ -3668,11 +3667,12 @@ void PanelAnalysisDlg::BuildRotationMatrix()
 	m_R[2][2] = -cos(m_AlphaEq*PI/180.0);
 }
 
+
 /**
  * Computes the trimmed condition for a stability analysis
  * Method :
- *   - For level flight, find a.o.a. such that Cm=0, by iterations
- *   - Reconstruct right side circulations if calculation was symmetric
+ *   - For level flight, find the a.o.a. such that Cm=0
+ *   - Reconstruct the right side circulations if the calculation was symmetric
  *   - Sort results i.a.w. panel numbering
  *   - Set trimmed parameters for level flight or other
 */
@@ -3748,9 +3748,6 @@ bool PanelAnalysisDlg::ComputeTrimmedConditions()
 	// find the speeds which will create a lift equal to the weight
 
 	AddString("      Calculating speed to balance the weight...");
-
-//	CWing::s_Viscosity = m_pWPolar->m_Viscosity;
-//	CWing::s_Density   = m_pWPolar->m_Density;
 
 	WindNormal.Set(-sin(m_AlphaEq*PI/180.0), 0.0, cos(m_AlphaEq*PI/180.0));
 	VInf.Set(       cos(m_AlphaEq*PI/180.0), 0.0, sin(m_AlphaEq*PI/180.0));

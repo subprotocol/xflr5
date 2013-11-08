@@ -566,9 +566,9 @@ QMiarex::QMiarex(QWidget *parent)
 
 
 /**
- * Miarex::~QMiarex public class destructor
+ * The public destructor.
  *
- * Not really necessary. Qt does the cleanup pretty well by itself
+ * Not really necessary. Qt does the clean-up pretty well by itself
  * Old C++ practice
  */
 QMiarex::~QMiarex()
@@ -840,9 +840,7 @@ void QMiarex::AddPOpp(bool bPointOut, double *Cp, double *Gamma, double *Sigma, 
 			pWOpp->m_VYm                 = m_pPanelDlg->m_VYm;
 			pWOpp->m_IYm                 = m_pPanelDlg->m_IYm;
 
-            pWOpp->m_XCP                 = m_pPanelDlg->m_XCP;
-            pWOpp->m_YCP                 = m_pPanelDlg->m_YCP;
-            pWOpp->m_ZCP                 = m_pPanelDlg->m_ZCP;
+			pWOpp->m_CP                  = m_pPanelDlg->m_CP;
 
 			pPOpp->m_Beta                = m_pCurWPolar->m_Beta;
 			pWOpp->m_Beta                = m_pCurWPolar->m_Beta;
@@ -1241,7 +1239,7 @@ void QMiarex::AddWOpp(double QInf, double Alpha, bool bPointOut, double *Gamma, 
 			pNewPoint->m_CL                  = m_pLLTDlg->m_LLT.m_CL;
 //			pNewPoint->m_CY                  = m_pCurWing->m_CY;
 //			pNewPoint->m_CX                  = m_pCurWing->m_CX;
-			pNewPoint->m_ICD                 = m_pLLTDlg->m_LLT.m_InducedDrag;
+			pNewPoint->m_ICD                 = m_pLLTDlg->m_LLT.m_CDi;
 
 			pNewPoint->m_GCm                 = m_pLLTDlg->m_LLT.m_GCm;
 			pNewPoint->m_VCm                 = m_pLLTDlg->m_LLT.m_VCm;
@@ -1251,10 +1249,8 @@ void QMiarex::AddWOpp(double QInf, double Alpha, bool bPointOut, double *Gamma, 
 			pNewPoint->m_VYm                 = m_pLLTDlg->m_LLT.m_VYm;
 			pNewPoint->m_IYm                 = m_pLLTDlg->m_LLT.m_IYm;
 
-			pNewPoint->m_XCP                 = m_pLLTDlg->m_LLT.m_XCP;
-			pNewPoint->m_YCP                 = m_pLLTDlg->m_LLT.m_YCP;
-            pNewPoint->m_ZCP                 = m_pLLTDlg->m_LLT.m_ZCP;
-			pNewPoint->m_VCD                 = m_pLLTDlg->m_LLT.m_ViscousDrag;
+			pNewPoint->m_CP                  = m_pLLTDlg->m_LLT.m_CP;
+			pNewPoint->m_VCD                 = m_pLLTDlg->m_LLT.m_CDv;
 
 			for (l=1; l<m_pCurWing->m_NStation; l++)
 			{
@@ -1305,9 +1301,7 @@ void QMiarex::AddWOpp(double QInf, double Alpha, bool bPointOut, double *Gamma, 
 			pNewPoint->m_VYm                 = m_pPanelDlg->m_VYm;
 			pNewPoint->m_IYm                 = m_pPanelDlg->m_IYm;
 
-			pNewPoint->m_XCP                 = m_pPanelDlg->m_XCP;
-			pNewPoint->m_YCP                 = m_pPanelDlg->m_YCP;
-            pNewPoint->m_ZCP                 = m_pPanelDlg->m_ZCP;
+			pNewPoint->m_CP                  = m_pPanelDlg->m_CP;
 
 			pNewPoint->m_Beta                = m_pCurWPolar->m_Beta;
 
@@ -1816,7 +1810,7 @@ void QMiarex::CreateCpCurves()
 	double SpanPos, SpanInc;
 
 	CVector N;
-	CCurve *pCurve = NULL;
+	Curve *pCurve = NULL;
 	QString str1, str2, str3;
 
 	for (i=0; i<4; i++)
@@ -2836,8 +2830,8 @@ void QMiarex::CreateWOpp(WingOpp *pWOpp, Wing *pWing)
 	pWOpp->m_Span                = m_pCurWPolar->m_WSpan;
 	pWOpp->m_MAChord             = pWing->m_MAChord;
 	pWOpp->m_CL                  = pWing->m_CL;
-	pWOpp->m_ICD                 = pWing->m_InducedDrag;
-	pWOpp->m_VCD                 = pWing->m_ViscousDrag;
+	pWOpp->m_ICD                 = pWing->m_CDi;
+	pWOpp->m_VCD                 = pWing->m_CDv;
 
 	pWOpp->m_GCm                 = pWing->m_GCm;
 	pWOpp->m_VCm                 = pWing->m_VCm;
@@ -2847,9 +2841,9 @@ void QMiarex::CreateWOpp(WingOpp *pWOpp, Wing *pWing)
 	pWOpp->m_VYm                 = pWing->m_VYm;
 	pWOpp->m_IYm                 = pWing->m_IYm;
 
-	pWOpp->m_XCP                 = pWing->m_XCP;
-	pWOpp->m_YCP                 = pWing->m_YCP;
-    pWOpp->m_ZCP                 = pWing->m_ZCP;
+
+	/**< @todo check if m_CP !=0 */
+	pWOpp->m_CP                  = pWing->m_CP;
 
 	double Cb =0.0;
 
@@ -2889,7 +2883,7 @@ void QMiarex::CreateWOppCurves()
 	
 	WingOpp *pWOpp = NULL;;
 	PlaneOpp *pPOpp = NULL;
-	CCurve *pWingCurve[MAXWINGS][MAXGRAPHS];
+	Curve *pWingCurve[MAXWINGS][MAXGRAPHS];
 	QString str;
 	int i,k;
 
@@ -2954,7 +2948,7 @@ void QMiarex::CreateWOppCurves()
 		{
 			if(m_WingGraph[ig].GetYVariable()==3)
 			{
-				CCurve *pCurve = m_WingGraph[ig].AddCurve();
+				Curve *pCurve = m_WingGraph[ig].AddCurve();
 				pCurve->SetStyle(1);
 				pCurve->SetColor(QColor(150, 150, 150));
 				for (i=nStart; i<m_pCurWOpp->m_NStation; i++)
@@ -2975,7 +2969,7 @@ void QMiarex::CreateWOppCurves()
 void QMiarex::CreateWPolarCurves()
 {
 	WPolar *pWPolar;
-	CCurve *pCurve[4];
+	Curve *pCurve[4];
 
 	for(int ig=0; ig<4; ig++) m_WPlrGraph[ig].DeleteCurves();
 
@@ -3033,7 +3027,7 @@ void QMiarex::CreateStabTimeCurves()
 	int i,j,k;
 	double t, dt, TotalPoints; // the input load
 	complex<double> in[4];
-	CCurve *pCurve0, *pCurve1, *pCurve2, *pCurve3;
+	Curve *pCurve0, *pCurve1, *pCurve2, *pCurve3;
 	QString strong, CurveTitle;
 
 
@@ -3143,7 +3137,7 @@ void QMiarex::CreateStabRungeKuttaCurves()
 	static int i, j, TotalPoints, PlotInterval;
 
 	static double t, dt, ctrl_t;
-	static CCurve *pCurve0, *pCurve1, *pCurve2, *pCurve3;
+	static Curve *pCurve0, *pCurve1, *pCurve2, *pCurve3;
 	static double A[4][4], B[MAXCONTROLS][4];
 	static double m[5][4];
 	static double y[4], yp[4];
@@ -3319,8 +3313,8 @@ void QMiarex::CreateStabRLCurves()
 
 	// we have eight modes, 4 longitudinal and 4 lateral
 	// declare a curve for each
-	static CCurve *pLongCurve1,*pLongCurve2,*pLongCurve3,*pLongCurve4;
-	static CCurve *pLatCurve1,*pLatCurve2,*pLatCurve3,*pLatCurve4;//do it later
+	static Curve *pLongCurve1,*pLongCurve2,*pLongCurve3,*pLongCurve4;
+	static Curve *pLatCurve1,*pLatCurve2,*pLatCurve3,*pLatCurve4;//do it later
 	
 	m_LongRLGraph.DeleteCurves();
 	m_LatRLGraph.DeleteCurves();
@@ -3452,7 +3446,7 @@ void QMiarex::DrawCpLegend(QPainter &painter, QPoint place, int bottom)
 	painter.save();
 	MainFrame* pMainFrame = (MainFrame*)s_pMainFrame;
 	int LegendSize, LegendWidth, dny, x1, i, ny;
-	CCurve *pCurve=NULL;
+	Curve *pCurve=NULL;
 	QColor color;
 	QString strong;
 
@@ -3515,7 +3509,7 @@ void QMiarex::DrawStabTimeLegend(QPainter &painter, QPoint place, int bottom)
 	painter.save();
 	MainFrame* pMainFrame = (MainFrame*)s_pMainFrame;
 	int LegendSize, LegendWidth, dny, x1, i, ny;
-	CCurve *pCurve=NULL;
+	Curve *pCurve=NULL;
 	QString strong;
 
 	LegendSize = 30;
@@ -4202,7 +4196,7 @@ void QMiarex::FillComboBoxes(bool bEnable)
 *@param pGraph a pointer to the instance of the Graph object to which the curve belongs
 *@param pCurve a pointer to the instance of the CCurve object to be filled with the data from the CWOpp object
 */
-void QMiarex::FillWOppCurve(WingOpp *pWOpp, Graph *pGraph, CCurve *pCurve)
+void QMiarex::FillWOppCurve(WingOpp *pWOpp, Graph *pGraph, Curve *pCurve)
 {
 	if(!pCurve) return;
 	int Var = pGraph->GetYVariable();
@@ -4370,7 +4364,7 @@ void QMiarex::FillWOppCurve(WingOpp *pWOpp, Graph *pGraph, CCurve *pCurve)
 *@param pWPolar a pointer to the instance of the CWPolar object from which the data is to be extracted
 *@param iMode the index of the mode for which the curve is to be created
 */
-void QMiarex::FillStabCurve(CCurve *pCurve, WPolar *pWPolar, int iMode)
+void QMiarex::FillStabCurve(Curve *pCurve, WPolar *pWPolar, int iMode)
 {
 	static int i;
 	static double x,y;
@@ -4414,7 +4408,7 @@ void QMiarex::FillStabCurve(CCurve *pCurve, WPolar *pWPolar, int iMode)
 *@param XVar the index of the variable to appear on the x-axis
 *@param YVar the index of the variable to appear on the y-axis
 */
-void QMiarex::FillWPlrCurve(CCurve *pCurve, WPolar *pWPolar, int XVar, int YVar)
+void QMiarex::FillWPlrCurve(Curve *pCurve, WPolar *pWPolar, int XVar, int YVar)
 {
 	bool bAdd;
 	int i;
@@ -6671,7 +6665,7 @@ void QMiarex::mouseDoubleClickEvent (QMouseEvent * event)
 	}
 	else if(m_pCurGraph) 
 	{
-		CCurve *pCloseCurve = NULL;
+		Curve *pCloseCurve = NULL;
 		int n=-1;
 
 		pCloseCurve = m_pCurGraph->GetCurvePoint(event->pos().x(),event->pos().y(), n);
@@ -9128,8 +9122,8 @@ void QMiarex::OnExportCurWOpp()
 	else                strong = QString(tr("ICn=, %1,PCn=, %2\n")).arg(m_pCurWOpp->m_IYm, 11, 'f', 6).arg(m_pCurWOpp->m_GYm, 11, 'f', 6);
 	out << strong;
 
-	if(exporttype==TXT) strong = QString("XCP   = %1     YCP   = %2     ZCP   = %3  \n").arg(m_pCurWOpp->m_XCP, 11, 'f', 6).arg(m_pCurWOpp->m_YCP, 11, 'f', 6).arg(m_pCurWOpp->m_ZCP, 11, 'f', 6);
-	else                strong = QString("XCP=, %1, YCP=, %2, ZCP=, %3 \n").arg(m_pCurWOpp->m_XCP, 11, 'f', 6).arg(m_pCurWOpp->m_YCP, 11, 'f', 6).arg(m_pCurWOpp->m_ZCP, 11, 'f', 6);
+	if(exporttype==TXT) strong = QString("XCP   = %1     YCP   = %2     ZCP   = %3  \n").arg(m_pCurWOpp->m_CP.x, 11, 'f', 6).arg(m_pCurWOpp->m_CP.y, 11, 'f', 6).arg(m_pCurWOpp->m_CP.z, 11, 'f', 6);
+	else                strong = QString("XCP=, %1, YCP=, %2, ZCP=, %3 \n").arg(m_pCurWOpp->m_CP.x, 11, 'f', 6).arg(m_pCurWOpp->m_CP.y, 11, 'f', 6).arg(m_pCurWOpp->m_CP.z, 11, 'f', 6);
 	out << strong;
 
 	if(exporttype==TXT) strong = QString("XNP   = %1\n").arg(m_pCurWOpp->m_XNP, 11, 'f', 6);
@@ -10071,7 +10065,7 @@ void QMiarex::OnInitLLTCalc()
  */
 void QMiarex::OnKeepCpSection()
 {
-	CCurve *pCurve, *pNewCurve;
+	Curve *pCurve, *pNewCurve;
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 
 	pCurve = m_CpGraph.GetCurve(0);
@@ -12222,7 +12216,7 @@ void QMiarex::PaintCurWOppLegend(QPainter &painter)
 			painter.drawText(RightPos, ZPos+D, dwidth, dheight, Qt::AlignRight | Qt::AlignTop, Result);
 		}
 
-		Result = QString(QObject::tr("X_CP = %1 ")).arg(m_pCurWOpp->m_XCP*pMainFrame->m_mtoUnit, c, 'f', d);
+		Result = QString(QObject::tr("X_CP = %1 ")).arg(m_pCurWOpp->m_CP.x*pMainFrame->m_mtoUnit, c, 'f', d);
 		Result += str;
 		D+=dheight;
 		painter.drawText(RightPos, ZPos+D, dwidth, dheight, Qt::AlignRight | Qt::AlignTop, Result);
@@ -12373,8 +12367,8 @@ void QMiarex::PaintXCP(QPainter & painter, QPoint ORef, double scale)
 	XCPPen.setStyle(GetStyle(m_XCPStyle));
 	painter.setPen(XCPPen);
 
-	int XCp = O.x() + (int)(m_pCurWOpp->m_YCP*scalex);
-	int YCp = O.y() + (int)(m_pCurWOpp->m_XCP*scaley);
+	int XCp = O.x() + (int)(m_pCurWOpp->m_CP.y*scalex);
+	int YCp = O.y() + (int)(m_pCurWOpp->m_CP.x*scaley);
 //    int ZCp = O.z() + (int)(m_pCurWOpp->m_ZCP*scalez);
 	int size = 3;
 	QRect CP(XCp-size, YCp-size, 2*size, 2*size);

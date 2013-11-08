@@ -201,10 +201,10 @@ private:
 
 	QGraph m_QGraph;
 	QGraph *m_pCurGraph;//to check if the mouse is hovering over the graph
-	CCurve* m_pQCurve;
-	CCurve* m_pQVCurve;
-	CCurve* m_pMCurve;
-	CCurve* m_pReflectedCurve;
+	Curve* m_pQCurve;
+	Curve* m_pQVCurve;
+	Curve* m_pMCurve;
+	Curve* m_pReflectedCurve;
 
 
 	QRect m_rCltRect, m_rGraphRect;

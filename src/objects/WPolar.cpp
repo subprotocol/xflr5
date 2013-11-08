@@ -125,9 +125,9 @@ void WPolar::AddPoint(PlaneOpp *pPOpp)
 					m_VYm[i]        =  pWOpp->m_VYm;
 					m_IYm[i]        =  pWOpp->m_IYm;
 
-					m_XCP[i]        =  pWOpp->m_XCP;
-					m_YCP[i]        =  pWOpp->m_YCP;
-					m_ZCP[i]        =  pWOpp->m_ZCP;
+					m_XCP[i]        =  pWOpp->m_CP.x;
+					m_YCP[i]        =  pWOpp->m_CP.x;
+					m_ZCP[i]        =  pWOpp->m_CP.z;
 					m_MaxBending[i] =  pWOpp->m_MaxBending;
 					m_Ctrl[i]       =  pWOpp->m_Ctrl;
 					m_XNP[i]        =  pWOpp->m_XNP;
@@ -153,9 +153,9 @@ void WPolar::AddPoint(PlaneOpp *pPOpp)
 					m_VYm.insert(i,  pWOpp->m_VYm);
 					m_IYm.insert(i,  pWOpp->m_IYm);
 
-					m_XCP.insert(i,  pWOpp->m_XCP);
-					m_YCP.insert(i,  pWOpp->m_YCP);
-					m_ZCP.insert(i,  pWOpp->m_ZCP);
+					m_XCP.insert(i,  pWOpp->m_CP.x);
+					m_YCP.insert(i,  pWOpp->m_CP.y);
+					m_ZCP.insert(i,  pWOpp->m_CP.z);
 					m_MaxBending.insert(i, pWOpp->m_MaxBending);
 					m_Ctrl.insert(i, pWOpp->m_Ctrl);
 					m_XNP.insert(i, pWOpp->m_XNP);
@@ -211,9 +211,9 @@ void WPolar::AddPoint(PlaneOpp *pPOpp)
 					m_IYm[i]        = pWOpp->m_IYm;
 
 					m_QInfinite[i]  = pWOpp->m_QInf;
-					m_XCP[i]        = pWOpp->m_XCP;
-					m_YCP[i]        = pWOpp->m_YCP;
-					m_ZCP[i]        = pWOpp->m_ZCP;
+					m_XCP[i]        = pWOpp->m_CP.x;
+					m_YCP[i]        = pWOpp->m_CP.y;
+					m_ZCP[i]        = pWOpp->m_CP.z;
 					m_MaxBending[i] = pWOpp->m_MaxBending;
 					m_Ctrl[i]       = pWOpp->m_Ctrl;
 					m_XNP[i]        = pWOpp->m_XNP;
@@ -239,9 +239,9 @@ void WPolar::AddPoint(PlaneOpp *pPOpp)
 					m_IYm.insert(i,       pWOpp->m_IYm);
 
 					m_QInfinite.insert(i, pWOpp->m_QInf);
-					m_XCP.insert(i,       pWOpp->m_XCP);
-					m_YCP.insert(i,       pWOpp->m_YCP);
-					m_ZCP.insert(i,       pWOpp->m_ZCP);
+					m_XCP.insert(i,       pWOpp->m_CP.x);
+					m_YCP.insert(i,       pWOpp->m_CP.y);
+					m_ZCP.insert(i,       pWOpp->m_CP.z);
 					m_MaxBending.insert(i, pWOpp->m_MaxBending);
 					m_Ctrl.insert(i,       pWOpp->m_Ctrl);
 					m_XNP.insert(i,       pWOpp->m_XNP);
@@ -296,9 +296,9 @@ void WPolar::AddPoint(PlaneOpp *pPOpp)
 					m_IYm[i]        = pWOpp->m_IYm;
 
 					m_QInfinite[i]  = pWOpp->m_QInf;
-					m_XCP[i]        = pWOpp->m_XCP;
-					m_YCP[i]        = pWOpp->m_YCP;
-					m_ZCP[i]        = pWOpp->m_ZCP;
+					m_XCP[i]        = pWOpp->m_CP.x;
+					m_YCP[i]        = pWOpp->m_CP.y;
+					m_ZCP[i]        = pWOpp->m_CP.z;
 					m_MaxBending[i] = pWOpp->m_MaxBending;
 					m_Ctrl[i]       = pWOpp->m_Ctrl;
 					m_XNP[i]        = pWOpp->m_XNP;
@@ -327,9 +327,9 @@ void WPolar::AddPoint(PlaneOpp *pPOpp)
 					m_IYm.insert(i,       pWOpp->m_IYm);
 
 					m_QInfinite.insert(i, pWOpp->m_QInf);
-					m_XCP.insert(i,       pWOpp->m_XCP);
-					m_YCP.insert(i,       pWOpp->m_YCP);
-					m_ZCP.insert(i,       pWOpp->m_ZCP);
+					m_XCP.insert(i,       pWOpp->m_CP.x);
+					m_YCP.insert(i,       pWOpp->m_CP.y);
+					m_ZCP.insert(i,       pWOpp->m_CP.z);
 					m_MaxBending.insert(i, pWOpp->m_MaxBending);
 					m_Ctrl.insert(i,       pWOpp->m_Ctrl);
 					m_XNP.insert(i,       pWOpp->m_XNP);
@@ -402,9 +402,9 @@ void WPolar::AddPoint(PlaneOpp *pPOpp)
 		m_IYm.append(pWOpp->m_IYm);
 
 		m_QInfinite.append(pWOpp->m_QInf);
-		m_XCP.append(pWOpp->m_XCP);
-		m_YCP.append(pWOpp->m_YCP);
-		m_ZCP.append(pWOpp->m_ZCP);
+		m_XCP.append(pWOpp->m_CP.x);
+		m_YCP.append(pWOpp->m_CP.y);
+		m_ZCP.append(pWOpp->m_CP.z);
 		m_MaxBending.append(pWOpp->m_MaxBending);
 		m_Ctrl.append(pWOpp->m_Ctrl);
 		m_XNP.append(pWOpp->m_XNP);
@@ -482,9 +482,9 @@ void WPolar::AddPoint(WingOpp *pWOpp)
 					m_IYm[i]        =  pWOpp->m_IYm;
 
 					m_QInfinite[i]  =  pWOpp->m_QInf;
-					m_XCP[i]        =  pWOpp->m_XCP;
-					m_YCP[i]        =  pWOpp->m_YCP;
-					m_ZCP[i]        =  pWOpp->m_ZCP;
+					m_XCP[i]        =  pWOpp->m_CP.x;
+					m_YCP[i]        =  pWOpp->m_CP.y;
+					m_ZCP[i]        =  pWOpp->m_CP.z;
 					m_MaxBending[i] =  pWOpp->m_MaxBending;
 					m_Ctrl[i]       =  pWOpp->m_Ctrl;
 					m_XNP[i]        =  pWOpp->m_XNP;
@@ -510,9 +510,9 @@ void WPolar::AddPoint(WingOpp *pWOpp)
 					m_IYm.insert(i, pWOpp->m_IYm);
 
 					m_QInfinite.insert(i, pWOpp->m_QInf);
-					m_XCP.insert(i,  pWOpp->m_XCP);
-					m_YCP.insert(i,  pWOpp->m_YCP);
-					m_ZCP.insert(i,  pWOpp->m_ZCP);
+					m_XCP.insert(i,  pWOpp->m_CP.x);
+					m_YCP.insert(i,  pWOpp->m_CP.y);
+					m_ZCP.insert(i,  pWOpp->m_CP.z);
 					m_MaxBending.insert(i, pWOpp->m_MaxBending);
 					m_Ctrl.insert(i, pWOpp->m_Ctrl);
 					m_XNP.insert(i,  pWOpp->m_XNP);
@@ -569,9 +569,9 @@ void WPolar::AddPoint(WingOpp *pWOpp)
 					m_IYm[i]        =  pWOpp->m_IYm;
 
 					m_QInfinite[i]  = pWOpp->m_QInf;
-					m_XCP[i]        = pWOpp->m_XCP;
-					m_YCP[i]        = pWOpp->m_YCP;
-					m_ZCP[i]        = pWOpp->m_ZCP;
+					m_XCP[i]        = pWOpp->m_CP.x;
+					m_YCP[i]        = pWOpp->m_CP.y;
+					m_ZCP[i]        = pWOpp->m_CP.z;
 					m_MaxBending[i] = pWOpp->m_MaxBending;
 					m_Ctrl[i]       = pWOpp->m_Ctrl;
 					m_XNP[i]        = pWOpp->m_XNP;
@@ -598,9 +598,9 @@ void WPolar::AddPoint(WingOpp *pWOpp)
 					m_IYm.insert(i, pWOpp->m_IYm);
 
 					m_QInfinite.insert(i, pWOpp->m_QInf);
-					m_XCP.insert(i,  pWOpp->m_XCP);
-					m_YCP.insert(i,  pWOpp->m_YCP);
-					m_ZCP.insert(i,  pWOpp->m_ZCP);
+					m_XCP.insert(i,  pWOpp->m_CP.x);
+					m_YCP.insert(i,  pWOpp->m_CP.y);
+					m_ZCP.insert(i,  pWOpp->m_CP.z);
 					m_MaxBending.insert(i, pWOpp->m_MaxBending);
 					m_Ctrl.insert(i, pWOpp->m_Ctrl);
 					m_XNP.insert(i,  pWOpp->m_XNP);
@@ -656,9 +656,9 @@ void WPolar::AddPoint(WingOpp *pWOpp)
 					m_IYm[i]        =  pWOpp->m_IYm;
 
 					m_QInfinite[i]  = pWOpp->m_QInf;
-					m_XCP[i]        = pWOpp->m_XCP;
-					m_YCP[i]        = pWOpp->m_YCP;
-					m_ZCP[i]        = pWOpp->m_ZCP;
+					m_XCP[i]        = pWOpp->m_CP.x;
+					m_YCP[i]        = pWOpp->m_CP.y;
+					m_ZCP[i]        = pWOpp->m_CP.z;
 					m_MaxBending[i] = pWOpp->m_MaxBending;
 					m_Ctrl[i]       = pWOpp->m_Ctrl;
 					m_XNP[i]        = pWOpp->m_XNP;
@@ -691,9 +691,9 @@ void WPolar::AddPoint(WingOpp *pWOpp)
 					m_IYm.insert(i, pWOpp->m_IYm);
 
 					m_QInfinite.insert(i, pWOpp->m_QInf);
-					m_XCP.insert(i,  pWOpp->m_XCP);
-					m_YCP.insert(i,  pWOpp->m_YCP);
-					m_ZCP.insert(i,  pWOpp->m_ZCP);
+					m_XCP.insert(i,  pWOpp->m_CP.x);
+					m_YCP.insert(i,  pWOpp->m_CP.y);
+					m_ZCP.insert(i,  pWOpp->m_CP.z);
 					m_MaxBending.insert(i, pWOpp->m_MaxBending);
 					m_Ctrl.insert(i, pWOpp->m_Ctrl);
 					m_XNP.insert(i, pWOpp->m_XNP);
@@ -760,9 +760,9 @@ void WPolar::AddPoint(WingOpp *pWOpp)
 		m_IYm.append(pWOpp->m_IYm);
 
 		m_QInfinite.append(pWOpp->m_QInf);
-		m_XCP.append(pWOpp->m_XCP);
-		m_YCP.append(pWOpp->m_YCP);
-		m_ZCP.append(pWOpp->m_ZCP);
+		m_XCP.append(pWOpp->m_CP.x);
+		m_YCP.append(pWOpp->m_CP.y);
+		m_ZCP.append(pWOpp->m_CP.z);
 		m_MaxBending.append(pWOpp->m_MaxBending);
 		m_Ctrl.append(pWOpp->m_Ctrl);
 		m_XNP.append(pWOpp->m_XNP);

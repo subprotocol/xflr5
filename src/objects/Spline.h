@@ -23,14 +23,12 @@
 
 
 /**
- *@file This class defines the spline object used in foil design.
+ *@file This file implements the spline class used in foil direct and inverse design.
  */
 
 
 #ifndef SPLINE_H
 #define SPLINE_H
-
-
 
 
 #include <QPainter>
@@ -43,7 +41,7 @@
 
 /**
 *@class Spline
-*@brief  The class which defines the spline object.
+*@brief  The class which defines the 2D spline object.
 
 The spline is used in direct foil design to represent upper and lower surfaces, and in XInverse foil design to define the specification curve.
 
@@ -51,11 +49,11 @@ Based on the code provided by Paul Bourke.
 */
 class Spline
 {
-	friend class SplineFoil;
-	friend class QXInverse;
-	friend class InverseOptionsDlg;
-public:
+//	friend class SplineFoil;
+//	friend class QXInverse;
+//	friend class InverseOptionsDlg;
 
+public:
 	Spline();
 
 	void DrawSpline(QPainter & painter, double const &scalex, double const &scaley, QPoint const &Offset);
@@ -80,21 +78,25 @@ public:
 	void SetWidth(int width);
 	void SetColor(QColor color);
 	void SetSplineParams(int style, int width, QColor color);
+	QColor color() {return m_Color;}
+	int style() {return m_Style;}
+	int width() {return m_Width;}
 
-	int m_iHighlight, m_iSelect;
-	int m_iRes;
-	int m_iDegree;
+	int m_iHighlight;                /**< the index of the currently highlighted control point, i.e. the point over which the mouse hovers, or -1 of none. */
+	int m_iSelect;                   /**< the index of the currently selected control point, i.e. the point on which the user has last click, or -1 if none. */
+	int m_iRes;                      /**< the number of output points to draw the spline */
+	int m_iDegree;                   /**< the spline's degree */
 
-	double m_PtWeight;
+	double m_PtWeight;               /**< the common weight of all control points. Default is 1. The higher the value, the more the curve will be pulled towards the control points. */
 
 	QList<double> m_knot;            /**< the array of the values of the spline's knot */
 	QList<CVector> m_CtrlPoint;      /**< the array of the positions of the spline's control points */
-	CVector m_Output[IQX2];
-
+	CVector m_Output[IQX2];          /**< the array of output points, size of which is m_iRes @todo use a QVarLengthArray or a QList*/
 
 private:
-	QColor m_Color;
-	int m_Style, m_Width;
+	QColor m_Color;                  /**< the spline's color */
+	int m_Style;                     /**< the index of the spline's style */
+	int m_Width;                     /**< the width of the spline */
 };
 
 

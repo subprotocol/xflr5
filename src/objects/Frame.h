@@ -19,6 +19,8 @@
 
 *****************************************************************************/
  
+/** @file This file implements the Frame class used in the definition of Body objects */
+ 
 #ifndef FRAME_H
 #define FRAME_H
 
@@ -26,15 +28,21 @@
 #include <QDataStream>
 #include <QList>
 
+/**
+*@class Frame This class defines a frame in the yz plane, on which the body surface is built. 
+ * This is similar to the way a real life body is designed and built.
+ * The Frame's points may be used indiferently by a spline-type or a flat-panel-type body.
+ * The Frmae's points are defined from bottom to top, i.e. for crescending z values, and for the body's left (port) side. 
+  * The x-value of the control points is unused, the frame's position is defined by the variable m_Position.
+*/
 class Frame
 {
 public:
 	Frame(int nCtrlPts=0);
-	~Frame();
 
 	void   AppendPoint(CVector const& Pt);
 	void   CopyFrame(Frame *pFrame);
-	void   CopyPoints(QList<CVector> *m_pPointList);
+	void   CopyPoints(QList<CVector> *pPointList);
 	double Height();
 	int    IsPoint(CVector const &Point, double const &ZoomFactor);
 	void   InsertPoint(int n);
@@ -50,10 +58,11 @@ public:
 	void   SetwPosition(double w);
 	double zPos();
 
-
-	QList <CVector> m_CtrlPoint;	// the point's positions
-	int m_iHighlight, m_iSelect;
-	CVector m_Position;
+	/** @todo declare private and access by public methods, i.a.w. good oop practices */
+	QList <CVector> m_CtrlPoint;	/**< the array of points which define the frame.  */
+	int m_iHighlight;               /**< the point over which the mouse hovers, or -1 if none @todo check use*/
+	int m_iSelect;                  /**< the selected pointed, i.e. the last point on which the user has clicked, or -1 if none @todo check use*/
+	CVector m_Position;             /**< the translation vector for the Frame's origin */
 };
 
 

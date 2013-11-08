@@ -136,7 +136,7 @@ bool LLTAnalysisDlg::AlphaLoop()
 		}
 		m_IterGraph.SetYMin(0.0);
 		m_IterGraph.SetYMax(0.5);
-		CCurve *pCurve = m_IterGraph.GetCurve(0);
+		Curve *pCurve = m_IterGraph.GetCurve(0);
 		pCurve->ResetCurve();
 
 		m_LLT.LLTInitCl(m_pWPolar->m_QInf, Alpha);
@@ -205,7 +205,7 @@ bool LLTAnalysisDlg::QInfLoop()
 	QString str;
 
 	QMiarex* pMiarex = (QMiarex*)s_pMiarex;
-	CCurve *pCurve = m_IterGraph.GetCurve(0);
+	Curve *pCurve = m_IterGraph.GetCurve(0);
 
 	//Alpha has been set in CMiarex::SetWPlr
 
@@ -388,7 +388,7 @@ void LLTAnalysisDlg::OnSkipPoint()
 */
 void LLTAnalysisDlg::ResetCurves()
 {
-	CCurve*pCurve;
+	Curve*pCurve;
 	pCurve = m_IterGraph.GetCurve(0);
 	if(pCurve) pCurve->ResetCurve();
 	pCurve = m_IterGraph.GetCurve(1);
@@ -573,7 +573,7 @@ void LLTAnalysisDlg::WriteString(QString &strong)
 */
 void LLTAnalysisDlg::UpdateGraph(int x, double y)
 {
-	CCurve *pCurve = m_IterGraph.GetCurve(0);
+	Curve *pCurve = m_IterGraph.GetCurve(0);
 	pCurve->AppendPoint((double)x,y);
 	UpdateView();
 }

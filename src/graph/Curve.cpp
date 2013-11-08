@@ -28,7 +28,7 @@
 /**
  * The public constructor
  */
-CCurve::CCurve()
+Curve::Curve()
 {
     CurveColor = QColor(255,0,0,127);
 	memset(x,0,sizeof(x));
@@ -48,7 +48,7 @@ CCurve::CCurve()
  * @param yn: y-coordinate
  * @return the new number of points in the curve
  */
-int CCurve::AppendPoint(double xn, double yn)
+int Curve::AppendPoint(double xn, double yn)
 {
 	x[n] = xn;
 	y[n] = yn;
@@ -60,7 +60,7 @@ int CCurve::AppendPoint(double xn, double yn)
  * Copies the data and settings from an existing curve
  * @param pCurve: a pointer to the input curve
  */
-void CCurve::Copy(CCurve *pCurve)
+void Curve::Copy(Curve *pCurve)
 {
 	if(!pCurve) return;
 	int i;
@@ -83,7 +83,7 @@ void CCurve::Copy(CCurve *pCurve)
  * returns the color of the curve
  * @return the curve's color
  */
-QColor CCurve::color()
+QColor Curve::color()
 {
 	return CurveColor;
 }
@@ -96,7 +96,7 @@ QColor CCurve::color()
  * @param &style
  * @param &width
  */
-void CCurve::BWStyle(QColor &color, int &style, int &width)
+void Curve::BWStyle(QColor &color, int &style, int &width)
 {
 	color = CurveColor;
 	style = CurveStyle;
@@ -104,12 +104,13 @@ void CCurve::BWStyle(QColor &color, int &style, int &width)
 //	GetBWColor(color, style, width);
 }
 
+
 /**
  * Returns the point referenced by the input parameter as a CVector object
  * @param ref the reference of the requested pointed
  * @return a CVector instance of the point, or (0, 0, 0) if the reference is out of bounds
  */
-CVector CCurve::point(int ref)
+CVector Curve::point(int ref)
 {
 	CVector r;
 	if(ref<0 || ref>=n){
@@ -131,7 +132,7 @@ CVector CCurve::point(int ref)
  * @param &dist distance to the return point
  * @return the index of the closest point
  */
-int CCurve::closestPoint(double xs, double ys, double &dist )
+int Curve::closestPoint(double xs, double ys, double &dist )
 {
 	Graph *pGraph = (Graph*)m_pParentGraph;
 	static int ref;
@@ -162,7 +163,7 @@ int CCurve::closestPoint(double xs, double ys, double &dist )
  * @param &dist distance to the return point
  * @param &n the index of the closest point
  */
-void CCurve::closestPoint(double xs, double ys, double &dist, int &n)
+void Curve::closestPoint(double xs, double ys, double &dist, int &n)
 {
 	Graph *pGraph = (Graph*)m_pParentGraph;
 	static double d2;
@@ -190,7 +191,7 @@ void CCurve::closestPoint(double xs, double ys, double &dist, int &n)
  * @param &dist distance to the return point
  * @param &nSel the index of the closest point
  */
-void CCurve::closestPoint(double const &xs, double const &ys, double &xSel, double &ySel, double &dist, int &nSel)
+void Curve::closestPoint(double const &xs, double const &ys, double &xSel, double &ySel, double &dist, int &nSel)
 {
 	static double d2;
 	dist = 1.e40;
@@ -213,7 +214,7 @@ void CCurve::closestPoint(double const &xs, double const &ys, double &xSel, doub
  * Returns the number of point in this curve
  * @return the number of point in this curve
  */
-int CCurve::count()
+int Curve::count()
 {
 	return n;
 }
@@ -222,7 +223,7 @@ int CCurve::count()
  * Returns the curve style
  * @return the index of the curve's style
  */
-int CCurve::style()
+int Curve::style()
 {
 	return CurveStyle;
 }
@@ -232,7 +233,7 @@ int CCurve::style()
  * Returns the curve's title
  * @param &string a reference to the string to be filled with the curve's title
  */
-void CCurve::title(QString &string)
+void Curve::title(QString &string)
 {
 	string =  m_CurveName;
 }
@@ -243,7 +244,7 @@ void CCurve::title(QString &string)
  * @return a QString instance of curve's title
  *@overload
  */
-QString CCurve::title()
+QString Curve::title()
 {
 	return m_CurveName;
 }
@@ -253,7 +254,7 @@ QString CCurve::title()
  * Returns the curve's width in pixels
  * @return the curve's width as an int value
  */
-int CCurve::width()
+int Curve::width()
 {
 	return CurveWidth;
 }
@@ -263,7 +264,7 @@ int CCurve::width()
  * Returns the minimum x value of this curve
  *@return the x min value, or +99999999.0 if the curve has no points
  */
-double CCurve::xMin()
+double Curve::xMin()
 {
 	double xMin = 99999999.0;
 //	if(n==0) xmin = .0; 
@@ -278,7 +279,7 @@ double CCurve::xMin()
  * Returns the maximum x value of this curve
  *@return the x max value, or -99999999.0 if the curve has no points
  */
-double CCurve::xMax()
+double Curve::xMax()
 {
 	double xMax = -99999999.0;
 //	if(n==0) xmax = 1.0; 
@@ -293,7 +294,7 @@ double CCurve::xMax()
  * Returns the minimum y value of this curve
  *@return the y min value, or +99999999.0 if the curve has no points
  */
-double CCurve::yMin()
+double Curve::yMin()
 {
 	double yMin = 99999999.0;
 //	if(n==0) ymin = .0; 
@@ -308,7 +309,7 @@ double CCurve::yMin()
  * Returns the maximum y value of this curve
  *@return the y max value, or -99999999.0 if the curve has no points
  */
-double CCurve::yMax()
+double Curve::yMax()
 {
 	double yMax = -99999999.0;
 //	if(n==0) ymax = 1.0; 
@@ -323,7 +324,7 @@ double CCurve::yMax()
  * Return the visibility of the curve as a boolean.
  * @return true if the curve should be displayed, false otherwise
  */
-bool CCurve::IsVisible()
+bool Curve::IsVisible()
 {
 	return m_bIsVisible;
 }
@@ -333,7 +334,7 @@ bool CCurve::IsVisible()
  * Return the visibility of the points as a boolean.
  * @return true if the points should be displayed, false otherwise
  */
-bool CCurve::PointsVisible()
+bool Curve::PointsVisible()
 {
 	return m_bShowPoints;
 }
@@ -342,7 +343,7 @@ bool CCurve::PointsVisible()
 /**
  * Resets the content of the curve by setting the count to 0
  */
-void CCurve::ResetCurve()
+void Curve::ResetCurve()
 {
 	n = 0;
 }
@@ -352,7 +353,7 @@ void CCurve::ResetCurve()
  * Sets the curve title
  *@param Title the new curve's title
  */
-void CCurve::SetTitle(QString Title)
+void Curve::SetTitle(QString Title)
 {
 	m_CurveName = Title;
 }
@@ -362,7 +363,7 @@ void CCurve::SetTitle(QString Title)
  * Sets the curve's color
  * @param clr the new QColor value for the curve
  */
-void CCurve::SetColor(QColor clr)
+void Curve::SetColor(QColor clr)
 {
 	CurveColor = clr;
 }
@@ -372,7 +373,7 @@ void CCurve::SetColor(QColor clr)
  * Sets the index of the currently selected point of this curve
  * @param n the point to select
  */
-void CCurve::SetSelected(int n)
+void Curve::SetSelected(int n)
 {
 	m_iSelected = n;
 }
@@ -382,7 +383,7 @@ void CCurve::SetSelected(int n)
  * Sets the curve's style
  * @param nStyle the index of the new curve's style
  */
-void CCurve::SetStyle(int nStyle)
+void Curve::SetStyle(int nStyle)
 {
 	CurveStyle = nStyle;
 }
@@ -391,7 +392,7 @@ void CCurve::SetStyle(int nStyle)
  *Sets the curve's width
  *@param nWidth the new curve's width in pixels
  **/
-void CCurve::SetWidth(int nWidth)
+void Curve::SetWidth(int nWidth)
 {
 	CurveWidth = nWidth;
 }
@@ -400,7 +401,7 @@ void CCurve::SetWidth(int nWidth)
  * Sets the visibility of the curve in the graphs
  *@param bVisible true if the curve is to be displayed, false otherwise
  */
-void CCurve::SetVisible(bool bVisible)
+void Curve::SetVisible(bool bVisible)
 {
 	m_bIsVisible = bVisible;
 }
@@ -410,7 +411,7 @@ void CCurve::SetVisible(bool bVisible)
  * Sets the visibility of the points in the graphs
  *@param bShow true if the points are to be displayed, false otherwise
  */
-void CCurve::ShowPoints(bool bShow)
+void Curve::ShowPoints(bool bShow)
 {
 	m_bShowPoints = bShow;
 }
@@ -419,7 +420,7 @@ void CCurve::ShowPoints(bool bShow)
  * Return the index of the currently selected point
  *@param the index of the currently selected point
 */
-int CCurve::GetSelected()
+int Curve::GetSelected()
 {
 	return m_iSelected;
 }

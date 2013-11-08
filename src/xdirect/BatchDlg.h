@@ -150,7 +150,7 @@ protected:
 
 	QGraph m_RmsGraph;
 	QRect m_IterRect;
-	CCurve* m_pIterCurve;
+	Curve* m_pIterCurve;
 
 
 };

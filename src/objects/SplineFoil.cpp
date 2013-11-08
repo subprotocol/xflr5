@@ -57,9 +57,7 @@ bool SplineFoil::InitSplineFoil()
 	m_bModified   = false;
 	m_strFoilName = QObject::tr("Spline Foil");
 	
-	m_Extrados.m_Color = m_FoilColor;
-	m_Extrados.m_Style = m_FoilStyle;
-	m_Extrados.m_Width = m_FoilWidth;
+	m_Extrados.SetSplineParams(m_FoilStyle, m_FoilWidth, m_FoilColor);
 	m_Extrados.m_CtrlPoint.clear();
 	m_Extrados.InsertPoint(0.0 , 0.0);
 	m_Extrados.InsertPoint(0.0 , 0.00774066);
@@ -69,9 +67,7 @@ bool SplineFoil::InitSplineFoil()
 	m_Extrados.InsertPoint(0.736139 , 0.0269428);
 	m_Extrados.InsertPoint(1. , 0.);
 
-	m_Intrados.m_Color = m_FoilColor;
-	m_Intrados.m_Style = m_FoilStyle;
-	m_Intrados.m_Width = m_FoilWidth;
+	m_Intrados.SetSplineParams(m_FoilStyle, m_FoilWidth, m_FoilColor);
 	m_Intrados.m_CtrlPoint.clear();
 	m_Intrados.InsertPoint(0. , 0.);
 	m_Intrados.InsertPoint(0. , -0.00774066);

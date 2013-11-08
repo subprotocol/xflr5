@@ -302,8 +302,8 @@ void XFoilAnalysisDlg::InitDialog()
 bool XFoilAnalysisDlg::Iterate()
 {
 	QString str, strange;
-	CCurve *pCurve0 = m_RmsGraph.GetCurve(0);
-	CCurve *pCurve1 = m_RmsGraph.GetCurve(1);
+	Curve *pCurve0 = m_RmsGraph.GetCurve(0);
+	Curve *pCurve1 = m_RmsGraph.GetCurve(1);
 
 	str= tr("   Initializing viscous analysis ...\n");
 	WriteString(str);
@@ -478,7 +478,7 @@ bool XFoilAnalysisDlg::ReLoop()
 
 void XFoilAnalysisDlg::ResetCurves()
 {
-	CCurve*pCurve;
+	Curve*pCurve;
 	pCurve = m_RmsGraph.GetCurve(0);
 	if(pCurve) pCurve->ResetCurve();
 	pCurve = m_RmsGraph.GetCurve(1);

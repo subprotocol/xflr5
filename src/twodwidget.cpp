@@ -393,5 +393,7 @@ void TwoDWidget::contextMenuEvent (QContextMenuEvent * event)
 			pMainFrame->InverseContextMenu->exec(ScreenPt);
 			break;
 		}
+		default:
+			break;
 	}
 }

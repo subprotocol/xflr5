@@ -1447,9 +1447,9 @@ void GLCreateLiftForce(void *pQMiarex, WPolar *pWPolar, WingOpp *pWOpp)
 		glLineStipple (1, 0xFFFF);// Solid
 		glLineWidth(3.0);
 
-		glx = (GLfloat)pWOpp->m_XCP;
-		gly = (GLfloat)pWOpp->m_YCP;
-        glz = (GLfloat)pWOpp->m_ZCP;
+		glx = (GLfloat)pWOpp->m_CP.x;
+		gly = (GLfloat)pWOpp->m_CP.y;
+		glz = (GLfloat)pWOpp->m_CP.z;
 
 		glBegin(GL_LINES);
             glVertex3d(glx,gly,glz);
@@ -2577,7 +2577,7 @@ void GLDrawWOppLegend(void* pQMiarex, Wing *pWing, WingOpp *pWOpp)
 				pGLWidget->renderText(XPos-fm.width(Result), YPos, Result, pMainFrame->m_TextFont);
 			}
 
-			Result = QString(QObject::tr("X_CP = %1 ")).arg(pWOpp->m_XCP*pMainFrame->m_mtoUnit, c, 'f', d);
+			Result = QString(QObject::tr("X_CP = %1 ")).arg(pWOpp->m_CP.x*pMainFrame->m_mtoUnit, c, 'f', d);
 			Result += str;
 			YPos += dD;
 			pGLWidget->renderText(XPos-fm.width(Result), YPos, Result, pMainFrame->m_TextFont);

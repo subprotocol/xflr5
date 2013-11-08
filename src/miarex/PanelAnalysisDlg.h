@@ -54,6 +54,7 @@
  All calculations are performed, and all results are stored, in International Standard Units, i.e. m, kg, s, Newtons
  
  * Note: this class has grown quite complex with time, and would need to be revisited and simplified.
+ * Improvement : remove the option for symetry, benefit is not worth the increased complexity of the implementation
  */
 class PanelAnalysisDlg : public QDialog
 {
@@ -85,7 +86,7 @@ private:
 	bool SolveUnitRHS();
 
 	bool AlphaLoop();
-	bool ReLoop();
+	bool QInfLoop();
 	bool UnitLoop();
 	bool ControlLoop();
 
@@ -199,9 +200,7 @@ private:
 	double m_QInfMax;           /**< The max value of the velocity for the analysis of type 4 polars */
 	double m_QInfDelta;         /**< The increment value of the velocity for the analysis of type 4 polars */
 
-    double m_XCP;               /**< The x-position of the center of pressure */
-    double m_YCP;               /**< The y-position of the center of pressure */
-    double m_ZCP; 	            /**< The z-position of the center of pressure */
+	CVector m_CP;               /**< The position of the center of pressure */
 
 	double eps;
 	double phiw, rz;
@@ -282,7 +281,7 @@ public: //stability analysis method and variables
 
 	// longitudinal stability derivatives
 	double Xu, Xw, Zu, Zw, Xq, Zq, Mu, Mw, Mq;//first order
-	double Zwp, Mwp;                  //second order
+	double Zwp, Mwp;                          //second order derivatives, cannot be calculated by a panel method, set to zero.
 
 	// latal stability derivatives
 	double Yv, Yp, Yr, Lv, Lp, Lr, Nv, Np, Nr;//first order

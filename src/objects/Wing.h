@@ -19,14 +19,7 @@
 
 *****************************************************************************/
 
-/*! \file
- *
- * This class :
- *	- defines the wing object
- *	- provides the methods for the calculation of the wing geometric properties
- *	- provides methods for LLT, VLM and Panel methods
- * The data is stored in International Standard Units, i.e. meters, kg, and seconds
- * Angular data is stored in degrees
+/*! \file This file implements the Wing class.
  */
 
 
@@ -34,13 +27,6 @@
 #define WING_H
 
 
-/**
-*@brief  This class defines the wing object, provides the methods for the calculation of the wing geometric properties, and
-		 provides methods for LLT, VLM and Panel methods
-
- * The data is stored in International Standard Units, i.e. meters, kg, and seconds.
- * Angular data is stored in degrees
-*/
 
 
 #include "WPolar.h"
@@ -48,6 +34,25 @@
 #include "Panel.h"
 #include "WingSection.h"
 
+/**
+*@brief  This class defines the wing object, provides the methods for the calculation of the wing geometric properties, and
+		 provides methods for LLT, VLM and Panel methods.
+ *
+ * A wing is identified and reference by its name, which is used  by the parent Plane objects and by child Polar and WingOPpp objects.
+ *
+ * The wing is defined by geometric data at a finite number of span-stations : chord, chord position, foil, dihedral and washout.
+ *
+ * The panel between two span-stations is a WingSection object. The term "panel" is reserved for the mesh panels used to perform a VLM or Panel analysis. 
+ * @todo check variable names for consistency with this rule.
+ *
+ * The term stations is reserved for the spanwise points used by the LLT, or by the spanwise position of the panels in a VLM or panel analysis.
+ * During an LLT or a Panel analysis, the value of the aerodynamic parameters of interest are stored in the member variables of this Wing object.
+ * The data is retrieved and stored in an operating point at the end of the analysis.
+ * The choice to include the wing-specific methods used in the analysis in this wing class is arbitrary. It simplifies somewhat the implementation
+ * of the LLTAnalysis and PanelAnalysisDlg classes, but makes this Wing class more complex.
+ *
+ * The data is stored in International Standard Units, i.e. meters, kg, and seconds. Angular data is stored in degrees.
+*/
 class Wing
 {
 	friend class QMiarex;
@@ -69,33 +74,14 @@ class Wing
 	friend class InertiaDlg;
 	friend class StabViewDlg;
 
-	// Construction
 public:
 
-	Wing();   // standard constructor
+	Wing(); 
 
 	void ImportDefinition(QString path_to_file);
 	void ExportDefinition(QString path_to_file);
 
 	void GetViewYZPos(double xrel, double y, double &yv, double &zv, int pos);
-
-	double yrel(double SpanPos);
-	double Chord(double yob);
-	double Offset(double yob);
-	double Dihedral(double yob);
-	double Twist(double y);
-	double AverageSweep();
-	double TotalMass();
-	double C4(double yob, double xRef);
-	double ZPosition(double y);
-	double Beta(int m, int k);
-
-	CVector CoG() {return m_CoG;}
-	const QString& WingName() const {return m_WingName;}
-	QString& rWingName() {return m_WingName;}
-	const QString& WingDescription() const {return m_WingDescription;}
-	QString& rWingDescription() {return m_WingDescription;}
-
 
 	void CreateSurfaces(CVector const &T, double XTilt, double YTilt);//generic surface, LLT, VLM or Panel
 
@@ -123,7 +109,6 @@ public:
 	void ComputeVolumeInertia(CVector &CoG, double &CoGIxx, double &CoGIyy, double &CoGIzz, double &CoGIxz);
 	void ComputeBodyAxisInertia();
 
-//	void InsertSection(double TPos, double TChord, double TOffset, double TZPos, double Twist, QString Foil,int NChord, int NSpan, int SSpan);
 	void ScaleSweep(double NewSweep);
 	void ScaleTwist(double NewTwist);
 	void ScaleSpan(double NewSpan);
@@ -141,7 +126,20 @@ public:
 	bool AppendWingSection();
 	bool AppendWingSection(double Chord, double Twist, double Pos, double Dihedral, double Offset, int NXPanels, int NYPanels, int XPanelDist, int YPanelDist, QString RightFoilName, QString LeftFoilName);
 	void RemoveWingSection(int const iSection);
+	
+
+	//access methods
 	int NWingSection() {return m_WingSection.count();}
+	int &NXPanels(const int &iSection);
+	int &NYPanels(const int &iSection);
+	int &XPanelDist(const int &iSection);
+	int &YPanelDist(const int &iSection);
+
+	double RootChord()  {return m_WingSection.first()->m_Chord;}
+	double TipChord()   {return m_WingSection.last()->m_Chord;}
+	double TipTwist()   {return m_WingSection.last()->m_Twist;}
+	double TipOffset()  {return m_WingSection.last()->m_Offset;}
+	double TipPos()     {return m_WingSection.last()->m_YPosition;}
 
 	double &Chord(const int &iSection);
 	double &Twist(const int &iSection);
@@ -152,115 +150,127 @@ public:
 	double &YProj(const int &iSection);
 	double &ZPosition(const int &iSection);
 
-	int &NXPanels(const int &iSection);
-	int &NYPanels(const int &iSection);
-	int &XPanelDist(const int &iSection);
-	int &YPanelDist(const int &iSection);
+	double yrel(double SpanPos);
+	double Chord(double yob);
+	double Offset(double yob);
+	double Dihedral(double yob);
+	double Twist(double y);
+	double AverageSweep();
+	double TotalMass();
+	double C4(double yob, double xRef);
+	double ZPosition(double y);
+	double Beta(int m, int k);
 
+	CVector CoG() {return m_CoG;}
+	const QString& WingName() const {return m_WingName;}
+	QString& rWingName() {return m_WingName;}
+	const QString& WingDescription() const {return m_WingDescription;}
 	QString &RightFoil(const int &iSection);
 	QString &LeftFoil(const int &iSection);
+	QString& rWingDescription() {return m_WingDescription;}
 
-	double RootChord()  {return m_WingSection.first()->m_Chord;}
-	double TipChord()   {return m_WingSection.last()->m_Chord;}
-	double TipTwist()   {return m_WingSection.last()->m_Twist;}
-	double TipOffset()  {return m_WingSection.last()->m_Offset;}
-	double TipPos()     {return m_WingSection.last()->m_YPosition;}
 
 //__________________________Variables_______________________
 private:
-	static void* s_pMainFrame;		//pointer to the Frame window
-	static void* s_pMiarex;	//pointer to the Miarex Application window
-	static void* s_p3DPanelDlg;//pointer to the 3DPanel analysis dialog class
-	static CVector *m_pWakeNode;			//pointer to the VLM wake node array
-	static Panel *m_pWakePanel;			//pointer to the VLM Wake Panel array
+	static void* s_pMainFrame;       /**< a static pointer to the MainFrame window */
+	static void* s_pMiarex;          /**< a static pointer to the Miarex Application window */
+	static void* s_p3DPanelDlg;      /**< a static pointer to the instance of the PanelAnalysisDlg class if a calculation is on-going*/
+	static CVector *m_pWakeNode;     /**< a static pointer to the array of wake nodes */
+	static Panel *m_pWakePanel;      /**< a static pointer to the array of wake panels */
+
+	static bool s_bVLMSymetric;	     /**< true if the vlm calculation is symmetric */
+
+	bool m_bWingOut;	             /**< true if the wing OpPoint is outside the flight envelope of the available Type 1 polar mesh */
+	bool m_bSymetric;	             /**< true if the wing's geometry is symetric */
+	bool m_bIsFin;                   /**< true if this wing describes a fin */
+	bool m_bDoubleFin;               /**< true if the wing describes a double fin symetric about the y=0 plane */
+	double m_bSymFin;                /**< true if the wing describes a double fin symetric about the z=0 plane */
+	double m_bDoubleSymFin;          /**< true if the fin is both double and symetric */
+
+	int m_NStation;                  /**< the number of stations for wing calculation; either the number of points of LLT, @todo check: or the number of spanwise panels  */
+	int m_nNodes;                    /**< the number of nodes of the panel mesh */
+	int m_AVLIndex;                  /**< a random identification number needed to export to AVL */
+
+	int m_nFlaps;                    /**< the number of T.E. flaps, numbered from left wing to right wing; for a main wing this number is even*/
+	double m_FlapMoment[2*MAXSPANSECTIONS];  /**< the flap moments resulting from the panel of VLM analysis */
+
+	double m_QInf0;                  /**< the freestream velocity */
+
+	double m_VolumeMass;             /**< the mass of the wing's structure, excluding point masses */
+	double m_TotalMass;              /**< the wing's total mass, i.e. the sum of the volume mass and of the point masses */
+
+	/**< @todo replace with a structure implementing the three variables */
+	QList<double> m_MassValue;       /**< the value of the point mass, in kg */
+	QList<CVector> m_MassPosition;   /**< the absolute position of the point mass */
+	QStringList m_MassTag;           /**< the description of the point mass */
+
+	double m_GChord;                 /**< the mean geometric chord */
+	double m_yMac;                   /**< the mean aerodynamic chord span position  -  @todo meaning and calculation are unclear*/
+	double m_CDi;                    /**< the wing's induced drag coefficient for the current calculation */
+	double m_CDv;                    /**< the wing's viscous drag coefficient for the current calculation */
+	double m_CL;                     /**< the lift coefficient */
+	double m_Maxa;                   /**< the convergence crtierion on the difference of induced angle at any span bewteen two LLT iterations*/
+	double m_ICm;                    /**< the induced par of the pitching moment coefficient */
+	double m_GCm;                    /**< the total pitching moment coefficient */
+	double m_VCm;                    /**< the viscous part of the pitching moment coefficient - @todo check calculated by interpolation of the viscous Cm on the polar mesh*/
+	double m_GYm;                    /**< the total yawing moment coefficient */
+	double m_IYm;                    /**< the induced part of the yawing moment coefficient */
+	double m_VYm;                    /**< the viscous part of the yawing moment coefficient */
+	double m_GRm;                    /**< the geometric rolling moment coefficient */
+
+	CVector m_CP;                    /**< the centre of pressure's position */
 
 
-	static bool s_bVLMSymetric;	// true if the vlm calculation is symmetric
+	/**<  Span Coefficients  resulting from VLM or LLT calculation @todo replace with QVarLenArray<double>*/
+	double m_Ai[MAXSPANSTATIONS+1];            /**< the induced angles, in degrees */
+	double m_Cl[MAXSPANSTATIONS+1];            /**< the lift coefficient at stations */
+	double m_ICd[MAXSPANSTATIONS+1];           /**< the induced drag coefficient at stations */
+	double m_PCd[MAXSPANSTATIONS+1];           /**< the viscous drag coefficient at stations */
+	double m_Re[MAXSPANSTATIONS+1];            /**< the Reynolds number at stations */
+	double m_XTrTop[MAXSPANSTATIONS+1];        /**< the upper transition location at stations */
+	double m_XTrBot[MAXSPANSTATIONS+1];        /**< the lower transition location at stations */
+	double m_Cm[MAXSPANSTATIONS+1];            /**< the total pitching moment coefficient at stations */
+	double m_CmAirf[MAXSPANSTATIONS+1];        /**< the viscous part of the pitching moment coefficient at stations @todo check and rename*/
+	double m_XCPSpanRel[MAXSPANSTATIONS+1];    /**< the relative position of the strip's center of pressure at stations as a % of the local chord length*/
+	double m_XCPSpanAbs[MAXSPANSTATIONS+1];    /**< the absolute position of the strip's center of pressure pos at stations */
+	double m_Chord[MAXSPANSTATIONS+1];         /**< the chord at stations */
+	double m_Offset[MAXSPANSTATIONS+1];        /**< the offset at LLT stations */
+	double m_Twist[MAXSPANSTATIONS+1];         /**< the twist at LLT stations */
+	double m_StripArea[MAXSPANSTATIONS+1];     /**< the area of each chordwise strip @todo check how this is calculated, and check that sum = wing area */
+	double m_BendingMoment[MAXSPANSTATIONS+1]; /**< the bending moment at stations */
+	double m_SpanPos[MAXSPANSTATIONS+1];       /**< the span positions of LLT stations */
+	double m_xHinge[MAXCHORDPANELS];           /**< the chorwise position of flap hinges */
+	double m_xPanel[MAXCHORDPANELS];           /**< the chorwise distribution of VLM panels */
 
-	bool m_bWingOut;	// true if the wing OpPoint is outside the flight envelope of the available Type1 polars
-	bool m_bSymetric;	// true if the wing's geometry is symmetric
-	bool m_bIsFin, m_bDoubleFin, m_bSymFin, m_bDoubleSymFin; //fin flags
-
-	int m_NStation;		// number of stations for wing calculation
-	int m_nNodes;		// the number of VLM panel nodes
-	int m_AVLIndex;		// need to export to AVL
-
-	int m_nFlaps;		// the number of T.E. flaps, numbered from left wing to right wing
-	double m_FlapMoment[2*MAXSPANSECTIONS];
-
-	double m_QInf0;
-
-	double m_VolumeMass, m_TotalMass;    //for inertia calculations
-//	int m_NMass; //number of point mass values
-	QList<double> m_MassValue;
-	QList<CVector> m_MassPosition;
-	QStringList m_MassTag;
-
-	double m_GChord;	// mean geometric chord
-	double m_yMac;		// mean aerodynamic chord span position
-	double m_CL;		//Lift
-	double m_InducedDrag, m_ViscousDrag;
-    double m_XCP, m_YCP, m_ZCP;	// Centre of pressure's position
-	double m_Maxa; 		// Used in LLT
-	double m_GCm, m_VCm, m_ICm; // Pitching Moment
-	double m_GYm, m_VYm, m_IYm;		// Induced Yawing Moment
-	double m_GRm;		// Geometric Rolling Moment
-
-
-	// Span Coefficients  resulting from VLM or LLT calculation
-	double m_Ai[MAXSPANSTATIONS+1];		//Induced angles, in degrees
-	double m_Cl[MAXSPANSTATIONS+1];		//Lift coefficient at stations
-	double m_ICd[MAXSPANSTATIONS+1];		//Induced Drag coefficient at stations
-	double m_PCd[MAXSPANSTATIONS+1];		//Viscous Drag coefficient at stations
-	double m_Re[MAXSPANSTATIONS+1];		//Reynolds number at stations
-	double m_XTrTop[MAXSPANSTATIONS+1];		//Upper transition location at stations
-	double m_XTrBot[MAXSPANSTATIONS+1];		//Lower transition location at stations
-	double m_Cm[MAXSPANSTATIONS+1];			//Total pitching moment coefficient at stations
-	double m_CmAirf[MAXSPANSTATIONS+1];		//Aill part of Pitching moment coefficient at stations
-	double m_XCPSpanRel[MAXSPANSTATIONS+1];	//Center of Pressure pos at stations
-	double m_XCPSpanAbs[MAXSPANSTATIONS+1];	//Center of Pressure pos at stations
-	double m_Chord[MAXSPANSTATIONS+1];		//chord at stations
-	double m_Offset[MAXSPANSTATIONS+1];		//offset at LLT stations
-	double m_Twist[MAXSPANSTATIONS+1];		//twist at LLT stations
-	double m_StripArea[MAXSPANSTATIONS+1];
-	double m_BendingMoment[MAXSPANSTATIONS+1];	//bending moment at stations
-	double m_SpanPos[MAXSPANSTATIONS+1];	//span positions of LLT stations
-	double m_xHinge[MAXCHORDPANELS];		//chorwise position of flap hinges
-	double m_xPanel[MAXCHORDPANELS];	//chorwise position of VLM panels
-
-	QString m_WingDescription;
-
-//	QStringList m_RightFoil;			// name of the right foils
-//	QStringList m_LeftFoil;			// name of the left foils
-
-	CVector m_Vd[MAXSPANSTATIONS];		// downwash vector at span stations
-	CVector m_F[MAXSPANSTATIONS];		// lift vector at span stations
+	CVector m_Vd[MAXSPANSTATIONS];             /**< the downwash vector at span stations */
+	CVector m_F[MAXSPANSTATIONS];              /**< the lift vector at span stations */
 
 public:	
-	QString m_WingName;	//the wing's name
+	QString m_WingName;	                       /**< the wing's name; this name is used to identify the wing and as a reference for child Polar and WingOpp objects. */
+	QString m_WingDescription;                 /**< a text field for the description of the wing */
 
-	QColor m_WingColor;
+	QColor m_WingColor;                        /**< the wing's color */
+
+	QList<WingSection*> m_WingSection;         /**< the array of wing sections used. A WingSection extends between a foil and the next. */
+
+	int m_NSurfaces; 	                       /**< the number of Surface objects built on the wing geometry (=2 x number of WingSection) @todo replace with a QList<Surface>*/
+	Surface m_Surface[2*MAXSPANSECTIONS];      /**< the array of Surface objects associated to the wing @todo replace with a QList<Surface>*/
 	
-	int m_NSurfaces; 	// The number of VLM Surfaces (=2 x Wing Panels)
-//	int m_NPanel;		// number of span panels in wing definition
+	double m_MAChord;                          /**< the wing's mean aerodynamic chord */
+	double m_PlanformSpan;                     /**< the planform span, i.e. if the dihedral was 0 at each junction */
+	double m_ProjectedSpan;                    /**< the span projected on the xy plane defined by z=0 */
+	double m_PlanformArea;                     /**< the planform wing area, i.e. if the dihedral was 0 at each junction */
+	double m_ProjectedArea;                    /**< the wing area projected on the xy plane defined by z=0; */
+	double m_AR;                               /**< the wing's aspect ratio */
+	double m_TR;                               /**< the wing's taper ratio */
+	double m_CoGIxx;                           /**< the Ixx component of the inertia tensor, calculated at the CoG */
+	double m_CoGIyy;                           /**< the Ixx component of the inertia tensor, calculated at the CoG */
+	double m_CoGIzz;                           /**< the Ixx component of the inertia tensor, calculated at the CoG */
+	double m_CoGIxz;                           /**< the Ixx component of the inertia tensor, calculated at the CoG */
+	CVector m_CoG;                             /**< the position of the CoG */
 
-	Surface m_Surface[2*MAXSPANSECTIONS];
-
-	QList<WingSection*> m_WingSection;
-	
-	double m_MAChord;	// mean aerodynamic chord
-	double m_PlanformSpan;
-	double m_ProjectedSpan;
-	double m_PlanformArea;		// wing surface projected on xy plane;
-	double m_ProjectedArea;		// wing surface projected on xy plane;
-	double m_AR;		// Aspect ratio
-	double m_TR;		// Taper ratio
-	double m_CoGIxx,m_CoGIyy,m_CoGIzz,m_CoGIxz;
-	CVector m_CoG;
-
-	int m_MatSize;	// Max Size for the VLMMatrix
-	Panel *m_pPanel;			//pointer to the VLM Panel array
-
+	int m_MatSize;                             /**< the size of the influence matrix */
+	Panel *m_pPanel;                           /**< a pointer to the array of panels */
 };
 
 #endif

@@ -62,8 +62,8 @@ public:
 
 	void CopySettings(Graph* pGraph, bool bScales=true);
 	void DeselectPoint();
-	CCurve * GetCurvePoint(const int &xClt, const int &yClt, int &nSel);
-	CCurve * GetClosestPoint(double const &x, double const &y, double &xSel, double &ySel, int &nSel);
+	Curve * GetCurvePoint(const int &xClt, const int &yClt, int &nSel);
+	Curve * GetClosestPoint(double const &x, double const &y, double &xSel, double &ySel, int &nSel);
 	void ResetLimits();
 	void ResetCurves();
 	void Scale(double zoom);
@@ -172,11 +172,11 @@ public:
 
 	QString GetGraphName();
 	
-	CCurve* GetCurve(int nIndex);
-	CCurve* GetCurve(QString CurveTitle);
-	CCurve* AddCurve();
+	Curve* GetCurve(int nIndex);
+	Curve* GetCurve(QString CurveTitle);
+	Curve* AddCurve();
 	void DeleteCurve(int index);
-	void DeleteCurve(CCurve *pCurve);
+	void DeleteCurve(Curve *pCurve);
 	void DeleteCurve(QString CurveTitle);
 	void DeleteCurves();
 	void ResetXLimits();

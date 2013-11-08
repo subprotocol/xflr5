@@ -19,6 +19,7 @@
 
 *****************************************************************************/
 
+/** @file This file implements the management task of an XFoil calculation. Used in multithreaded analysis. */
 
 #ifndef XFOILTASK_H
 #define XFOILTASK_H
@@ -30,6 +31,10 @@
 
 // this class runs an XFoil analysis in a thread separate from the main thread
 
+/**
+*@class XFoilTask
+* This file implements the management task of an XFoil calculation. Used in multithreaded analysis. 
+*/
 class XFoilTask : public QRunnable
 {
 public:
@@ -42,15 +47,17 @@ public:
 	bool Init(Foil *pFoil, Polar *pPolar);
 	bool Iterate();
 
-	static bool s_bCancel;
-	static bool s_bAutoInitBL;
-	static void *s_pBatchThreadDlg;
-	int m_Id;
-	int m_Iterations;
-	Foil *m_pFoil;
-	Polar *m_pPolar;
-	bool m_bIsFinished;
-	XFoil XFoilInstance;
+	static bool s_bCancel;          /**< true if the user has asked to cancel the analysis */
+	static bool s_bAutoInitBL;      /**< true if the BL initialization is left to the code's decision */
+	static void *s_pBatchThreadDlg; /**< A static pointer to the instance of the calling BathThreadDlg class */
+	
+	
+	int m_Id;                /**< @todo check usage */
+	int m_Iterations;        /**< The number of iterations already performed */
+	Foil *m_pFoil;           /**< A pointer to the instance of the Foil object for which the calculation is performed */
+	Polar *m_pPolar;         /**< A pointer to the instance of the Polar object for which the calculation is performed */
+	bool m_bIsFinished;      /**< true if the calculation is over */
+	XFoil XFoilInstance;     /**< An instance of the XFoil class specific for this object @todo check the behaviour of static variables in XFoil methods */
 };
 
 #endif // XFOILTASK_H

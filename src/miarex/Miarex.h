@@ -310,9 +310,9 @@ public:
 	void DuplicatePlane();
 	void EditCurPlane();
 	void FillComboBoxes(bool bEnable = true);
-	void FillWPlrCurve(CCurve *pCurve, WPolar *pWPolar, int XVar, int YVar);
-	void FillWOppCurve(WingOpp *pWOpp, Graph *pGraph, CCurve *pCurve);
-	void FillStabCurve(CCurve *pCurve, WPolar *pWPolar, int iMode);
+	void FillWPlrCurve(Curve *pCurve, WPolar *pWPolar, int XVar, int YVar);
+	void FillWOppCurve(WingOpp *pWOpp, Graph *pGraph, Curve *pCurve);
+	void FillStabCurve(Curve *pCurve, WPolar *pWPolar, int iMode);
 	Body*   GetBody(QString BodyName);
 	QGraph*  GetGraph(QPoint &pt);
 	Plane*  GetPlane(QString PlaneName);

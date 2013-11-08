@@ -32,8 +32,6 @@
 #include "../objects/Foil.h"
 
 
-extern Foil* g_pCurFoil;
-
 void *QXInverse::s_pMainFrame;
 void *QXInverse::s_p2DWidget;
 
@@ -614,9 +612,9 @@ void QXInverse::LoadSettings(QSettings *pSettings)
 	{
 		m_bFullInverse = pSettings->value("FullInverse").toBool();
 
-		m_Spline.m_Color = pSettings->value("SplineColor").value<QColor>();
-		m_Spline.m_Style = pSettings->value("SplineStyle").toInt();
-		m_Spline.m_Width = pSettings->value("SplineWdth").toInt();
+		m_Spline.SetColor(pSettings->value("SplineColor").value<QColor>());
+		m_Spline.SetStyle(pSettings->value("SplineStyle").toInt());
+		m_Spline.SetWidth(pSettings->value("SplineWdth").toInt());
 		m_pRefFoil->m_FoilColor  = pSettings->value("BaseFoilColor").value<QColor>();
 		m_pRefFoil->m_nFoilStyle = pSettings->value("BaseFoilStyle").toInt();
 		m_pRefFoil->m_nFoilWidth = pSettings->value("BaseFoilWidth").toInt();
@@ -1962,9 +1960,9 @@ void QXInverse::SaveSettings(QSettings *pSettings)
 	pSettings->beginGroup("XInverse");
 	{
 		pSettings->setValue("FullInverse", m_bFullInverse);
-		pSettings->setValue("SplineColor", m_Spline.m_Color);
-		pSettings->setValue("SplineStyle", m_Spline.m_Style);
-		pSettings->setValue("SplineWdth", m_Spline.m_Width);
+		pSettings->setValue("SplineColor", m_Spline.color());
+		pSettings->setValue("SplineStyle", m_Spline.style());
+		pSettings->setValue("SplineWdth", m_Spline.width());
 		pSettings->setValue("BaseFoilColor", m_pRefFoil->m_FoilColor);
 		pSettings->setValue("BaseFoilStyle", m_pRefFoil->m_nFoilStyle);
 		pSettings->setValue("BaseFoilWidth", m_pRefFoil->m_nFoilWidth);
@@ -2103,9 +2101,9 @@ bool QXInverse::SetParams()
 
 	OnSpecal();
 	//is a foil set as current in the mainframe ?
-	if (g_pCurFoil && pXFoil->m_FoilName==g_pCurFoil->m_FoilName && pXFoil->lqspec)
+	if (MainFrame::s_pCurFoil && pXFoil->m_FoilName==MainFrame::s_pCurFoil->m_FoilName && pXFoil->lqspec)
 	{
-		m_pRefFoil->CopyFoil(g_pCurFoil);
+		m_pRefFoil->CopyFoil(MainFrame::s_pCurFoil);
 		m_pRefFoil->m_FoilColor = m_pQCurve->color();
 //		m_pXFoil->m_FoilName    = m_pRefFoil->m_FoilName ;
 //		InitXFoil(m_pRefFoil);

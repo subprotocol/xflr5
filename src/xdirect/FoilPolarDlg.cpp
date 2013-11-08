@@ -26,7 +26,6 @@
 #include "../globals.h"
 #include "../mainframe.h"
 
-extern Foil *g_pCurFoil;
 
 void *FoilPolarDlg::s_pXDirect;
 void *FoilPolarDlg::s_pMainFrame;
@@ -273,8 +272,8 @@ void FoilPolarDlg::InitDialog()
 {
 	QXDirect* pXDirect = (QXDirect*)s_pXDirect;
 	MainFrame *pMainFrame =(MainFrame*)s_pMainFrame;
-	if(pXDirect && g_pCurFoil) m_FoilName = g_pCurFoil->m_FoilName;
-	else                       m_FoilName = "";
+	if(pXDirect && MainFrame::s_pCurFoil) m_FoilName = MainFrame::s_pCurFoil->m_FoilName;
+	else                                   m_FoilName = "";
 
 	QString str = tr("Analysis parameters for ");
 	setWindowTitle(str+ m_FoilName);

@@ -62,14 +62,14 @@
 	#include <CoreFoundation/CoreFoundation.h>
 #endif
 
-extern Foil* g_pCurFoil;
+Foil * MainFrame::s_pCurFoil=NULL;
 
 QPointer<MainFrame> MainFrame::_self = 0L;
 
 MainFrame::MainFrame(QWidget *parent, Qt::WFlags flags)
 	: QMainWindow(parent, flags)
 {
-
+	s_pCurFoil = NULL;
 	m_VersionName = QString::fromLatin1("XFLR5 v6.09.06");
 	QString jpegPluginPath;
 
@@ -235,7 +235,6 @@ MainFrame::MainFrame(QWidget *parent, Qt::WFlags flags)
 	m_ColorList.append(QColor(210,210,210));
 	m_ColorList.append(QColor(255,255,255));
 
-	g_pCurFoil = NULL;
 
 	m_UFOType = "";
 
@@ -310,7 +309,7 @@ void MainFrame::AddFoil(Foil *pFoil)
 	if (!IsInserted) m_oaFoil.append(pFoil);
 
 	pFoil->InitFoil();
-	g_pCurFoil = pFoil;
+	s_pCurFoil = pFoil;
 }
 
 
@@ -2597,13 +2596,13 @@ Foil* MainFrame::DeleteFoil(Foil *pFoil, bool bAsk)
 			else                       pNextFoil = NULL;
 			m_oaFoil.removeAt(j);
 			delete pOldFoil;
-			if(g_pCurFoil == pOldFoil) g_pCurFoil = NULL;
+			if(s_pCurFoil == pOldFoil) s_pCurFoil = NULL;
 			break;
 		}
 	}
 	pXDirect->m_pCurOpp = NULL;
 	pXDirect->m_pCurPolar = NULL;
-	g_pCurFoil = NULL;
+	s_pCurFoil = NULL;
 	pXDirect->SetControls();
 	SetSaveState(false);
 
@@ -2775,7 +2774,7 @@ void MainFrame::DeleteProject()
 
 	QXDirect *pXDirect = (QXDirect*)m_pXDirect;
 	pXDirect->m_pXFoil->m_FoilName = "";
-	g_pCurFoil  = NULL;
+	s_pCurFoil  = NULL;
 	pXDirect->m_pCurPolar = NULL;
 	pXDirect->m_pCurOpp   = NULL;
 	pXDirect->SetFoil();
@@ -3080,7 +3079,7 @@ OpPoint *MainFrame::GetOpp(double Alpha)
 		if(!pCurPolar) return NULL;
 		pOpPoint = (OpPoint*)m_oaOpp.at(i);
 		//since alphas are calculated at 1/100th
-		if (pOpPoint->m_strFoilName == g_pCurFoil->m_FoilName)
+		if (pOpPoint->m_strFoilName == s_pCurFoil->m_FoilName)
 		{
 			if (pOpPoint->m_strPlrName == pCurPolar->m_PlrName)
 			{
@@ -3514,7 +3513,7 @@ enumApp MainFrame::LoadXFLR5File(QString PathName)
 		pXDirect->m_bPolar = true;
 		pXDirect->m_pCurPolar = NULL;
 		pXDirect->m_pCurOpp   = NULL;
-		g_pCurFoil = pXDirect->SetFoil(pFoil);
+		s_pCurFoil = pXDirect->SetFoil(pFoil);
 		pXDirect->SetPolar();
 
 		XFile.close();
@@ -3535,10 +3534,10 @@ enumApp MainFrame::LoadXFLR5File(QString PathName)
 			if(pFoil)
 			{
 				AddFoil(pFoil);
-				g_pCurFoil  = pFoil;
+				s_pCurFoil  = pFoil;
 				pXDirect->m_pCurPolar = NULL;
 				pXDirect->m_pCurOpp   = NULL;
-				g_pCurFoil = pXDirect->SetFoil(pFoil);
+				s_pCurFoil = pXDirect->SetFoil(pFoil);
 				pXDirect->SetPolar();
 				QAFoil *pAFoil= (QAFoil*)m_pAFoil;
 				pAFoil->SelectFoil(pFoil);
@@ -3582,7 +3581,7 @@ enumApp MainFrame::LoadXFLR5File(QString PathName)
 				ar.setByteOrder(QDataStream::LittleEndian);
 				if(SerializeProject(ar, false))
 				{
-					g_pCurFoil = pXDirect->SetFoil();
+					s_pCurFoil = pXDirect->SetFoil();
 					UpdateFoils();
 					UpdateView();
 					QApplication::restoreOverrideCursor();
@@ -3644,21 +3643,21 @@ void MainFrame::OnAFoil()
 
 void MainFrame::OnCurFoilStyle()
 {
-	if(!g_pCurFoil) return;
+	if(!s_pCurFoil) return;
 
     LinePickerDlg dlg(this);
-	dlg.InitDialog(g_pCurFoil->m_nFoilStyle, g_pCurFoil->m_nFoilWidth, g_pCurFoil->m_FoilColor);
+	dlg.InitDialog(s_pCurFoil->m_nFoilStyle, s_pCurFoil->m_nFoilWidth, s_pCurFoil->m_FoilColor);
 	dlg.move(m_DlgPos);
 
 	if(QDialog::Accepted==dlg.exec())
 	{
-		g_pCurFoil->m_FoilColor  = dlg.GetColor();
-		g_pCurFoil->m_nFoilStyle = dlg.GetStyle();
-		g_pCurFoil->m_nFoilWidth = dlg.GetWidth();
+		s_pCurFoil->m_FoilColor  = dlg.GetColor();
+		s_pCurFoil->m_nFoilStyle = dlg.GetStyle();
+		s_pCurFoil->m_nFoilWidth = dlg.GetWidth();
 		QXDirect *pXDirect = (QXDirect*)m_pXDirect;
-		pXDirect->m_BufferFoil.m_FoilColor  = g_pCurFoil->m_FoilColor;
-		pXDirect->m_BufferFoil.m_nFoilStyle = g_pCurFoil->m_nFoilStyle;
-		pXDirect->m_BufferFoil.m_nFoilWidth = g_pCurFoil->m_nFoilWidth;
+		pXDirect->m_BufferFoil.m_FoilColor  = s_pCurFoil->m_FoilColor;
+		pXDirect->m_BufferFoil.m_nFoilStyle = s_pCurFoil->m_nFoilStyle;
+		pXDirect->m_BufferFoil.m_nFoilWidth = s_pCurFoil->m_nFoilWidth;
 		SetSaveState(false);
 	}
 	m_DlgPos = dlg.pos();
@@ -3905,7 +3904,7 @@ void MainFrame::OnLoadFile()
 	{
 		QAFoil *pAFoil = (QAFoil*)m_pAFoil;
 		pAFoil->SetParams();
-		pAFoil->SelectFoil(g_pCurFoil);
+		pAFoil->SelectFoil(s_pCurFoil);
 		UpdateView();
 	}
 	else if(m_iApp==INVERSEDESIGN)
@@ -4027,10 +4026,10 @@ void MainFrame::OnResetCurGraphScales()
 
 void MainFrame::OnRenameCurFoil()
 {
-	if(!g_pCurFoil) return;
-	RenameFoil(g_pCurFoil);
+	if(!s_pCurFoil) return;
+	RenameFoil(s_pCurFoil);
 	QXDirect *pXDirect = (QXDirect*)m_pXDirect;
-	pXDirect->SetFoil(g_pCurFoil);
+	pXDirect->SetFoil(s_pCurFoil);
 	UpdateFoils();
 	UpdateView();
 }
@@ -4408,8 +4407,8 @@ void MainFrame::OnSelChangeFoil(int i)
 	int sel = m_pctrlFoil->currentIndex();
 	if (sel >=0) strong = m_pctrlFoil->itemText(sel);
 
-	g_pCurFoil = GetFoil(strong);
-	pXDirect->SetFoil(g_pCurFoil);
+	s_pCurFoil = GetFoil(strong);
+	pXDirect->SetFoil(s_pCurFoil);
 	pXDirect->SetPolar();
 	m_iApp = XFOILANALYSIS;
 	UpdatePolars();
@@ -4886,7 +4885,7 @@ void MainFrame::RemoveOpPoint(bool bCurrent)
 		for (i=m_oaOpp.size()-1; i>=0;i--)
 		{
 			pOpPoint =(OpPoint*)m_oaOpp.at(i);
-			if (pOpPoint->m_strFoilName == g_pCurFoil->m_FoilName &&
+			if (pOpPoint->m_strFoilName == s_pCurFoil->m_FoilName &&
 				pOpPoint->m_strPlrName == pXDirect->m_pCurPolar->m_PlrName)
 			{
 				m_oaOpp.removeAt(i);
@@ -5017,8 +5016,8 @@ void MainFrame::RenameFoil(Foil *pFoil)
 					pOldFoil = (Foil*)m_oaFoil.at(l);
 					if(pOldFoil->m_FoilName == strong)
 					{
-						if(g_pCurFoil == pOldFoil)           g_pCurFoil = NULL;
-						if(g_pCurFoil == pOldFoil) g_pCurFoil = NULL;
+						if(s_pCurFoil == pOldFoil)           s_pCurFoil = NULL;
+						if(s_pCurFoil == pOldFoil) s_pCurFoil = NULL;
 						m_oaFoil.removeAt(l);
 						delete pOldFoil;
 					}
@@ -6057,7 +6056,7 @@ void MainFrame::SetCurrentFoil(Foil* pFoil)
 	QAFoil   *pAFoil = (QAFoil*)m_pAFoil;
 	pXDirect->SetFoil(pFoil);
 	pAFoil->SelectFoil(pFoil);
-	g_pCurFoil = pFoil;
+	s_pCurFoil = pFoil;
 }
 
 
@@ -6152,7 +6151,7 @@ Foil* MainFrame::SetModFoil(Foil* pNewFoil, bool bKeepExistingFoil)
 				{
 						delete pNewFoil;
 						pNewFoil = NULL;
-						g_pCurFoil = NULL;
+						s_pCurFoil = NULL;
 						return pOldFoil;
 				}
 				break;
@@ -6216,7 +6215,7 @@ Foil* MainFrame::SetModFoil(Foil* pNewFoil, bool bKeepExistingFoil)
 						pNewFoil->m_bPoints    = pOldFoil->m_bPoints;
 						m_oaFoil.removeAt(l);
 						delete pOldFoil;
-						if(g_pCurFoil == pOldFoil) g_pCurFoil = NULL;
+						if(s_pCurFoil == pOldFoil) s_pCurFoil = NULL;
 					}
 				}
 				// delete all associated OpPoints
@@ -6252,7 +6251,7 @@ Foil* MainFrame::SetModFoil(Foil* pNewFoil, bool bKeepExistingFoil)
 				// Cancel so exit
 				delete pNewFoil;
 				pNewFoil = NULL;
-				g_pCurFoil = NULL;
+				s_pCurFoil = NULL;
 				return NULL;// foil not added
 			}
 		}
@@ -6265,7 +6264,7 @@ Foil* MainFrame::SetModFoil(Foil* pNewFoil, bool bKeepExistingFoil)
 
 	pAFoil->SelectFoil(pNewFoil);
 	pXDirect->SetFoil(pNewFoil);
-	g_pCurFoil = pNewFoil;
+	s_pCurFoil = pNewFoil;
 
 	return pNewFoil;// foil added
 }
@@ -6675,9 +6674,9 @@ void MainFrame::UpdateFoils()
 	{
 		m_pctrlFoil->setEnabled(true);
 		//select the current foil, if any...
-		if (g_pCurFoil)
+		if (s_pCurFoil)
 		{
-			pos = m_pctrlFoil->findText(g_pCurFoil->m_FoilName);
+			pos = m_pctrlFoil->findText(s_pCurFoil->m_FoilName);
 			if (pos>=0) m_pctrlFoil->setCurrentIndex(pos);
 			else
 			{
@@ -6685,7 +6684,7 @@ void MainFrame::UpdateFoils()
 				m_pctrlFoil->setCurrentIndex(0);
 				strong = m_pctrlFoil->itemText(0);
 				//...and set it
-//				g_pCurFoil = GetFoil(strong);
+//				g_ppCurFoil = GetFoil(strong);
 //				pXDirect->SetFoil(strong);
 			}
 		}
@@ -6721,9 +6720,9 @@ void MainFrame::UpdatePolars()
 	QString strong;
 	m_pctrlPolar->clear();
 
-	g_pCurFoil = g_pCurFoil;
+	s_pCurFoil = s_pCurFoil;
 
-	if(!g_pCurFoil || !g_pCurFoil->m_FoilName.length())
+	if(!s_pCurFoil || !s_pCurFoil->m_FoilName.length())
 	{
 		m_pctrlPolar->setEnabled(false);
 		m_pctrlOpPoint->clear();
@@ -6736,7 +6735,7 @@ void MainFrame::UpdatePolars()
 	for (i=0; i<m_oaPolar.size(); i++)
 	{
 		pPolar = (Polar*)m_oaPolar[i];
-		if(pPolar->m_FoilName == g_pCurFoil->m_FoilName)
+		if(pPolar->m_FoilName == s_pCurFoil->m_FoilName)
 		{
 			size++;
 		}
@@ -6750,7 +6749,7 @@ void MainFrame::UpdatePolars()
 		for (i=0; i<m_oaPolar.size(); i++)
 		{
 			pPolar = (Polar*)m_oaPolar[i];
-			if(pPolar->m_FoilName == g_pCurFoil->m_FoilName)
+			if(pPolar->m_FoilName == s_pCurFoil->m_FoilName)
 			{
 				m_pctrlPolar->addItem(pPolar->m_PlrName);
 			}
@@ -6796,7 +6795,7 @@ void MainFrame::UpdateOpps()
 
 	Polar *pCurPlr    = pXDirect->m_pCurPolar;
 
-	if (!g_pCurFoil || !g_pCurFoil->m_FoilName.length() || !pCurPlr  || !pCurPlr->m_PlrName.length())
+	if (!s_pCurFoil || !s_pCurFoil->m_FoilName.length() || !pCurPlr  || !pCurPlr->m_PlrName.length())
 	{
 		m_pctrlOpPoint->clear();
 		m_pctrlOpPoint->setEnabled(false);
@@ -6808,7 +6807,7 @@ void MainFrame::UpdateOpps()
 	for (i=0; i<m_oaOpp.size(); i++)
 	{
 		pOpp = (OpPoint*)m_oaOpp[i];
-		if (pOpp->m_strFoilName == g_pCurFoil->m_FoilName && pOpp->m_strPlrName  == pCurPlr->m_PlrName)
+		if (pOpp->m_strFoilName == s_pCurFoil->m_FoilName && pOpp->m_strPlrName  == pCurPlr->m_PlrName)
 		{
 			size++;
 		}
@@ -6821,7 +6820,7 @@ void MainFrame::UpdateOpps()
 		for (i=0; i<m_oaOpp.size(); i++)
 		{
 			pOpp = (OpPoint*)m_oaOpp[i];
-			if (pOpp->m_strFoilName == g_pCurFoil->m_FoilName && pOpp->m_strPlrName  == pCurPlr->m_PlrName)
+			if (pOpp->m_strFoilName == s_pCurFoil->m_FoilName && pOpp->m_strPlrName  == pCurPlr->m_PlrName)
 			{
 				if (pCurPlr->m_PolarType !=FIXEDAOAPOLAR)
 				{
@@ -6836,7 +6835,7 @@ void MainFrame::UpdateOpps()
 				}
 			}
 		}
-		if (pXDirect->m_pCurOpp && pXDirect->m_pCurOpp->m_strFoilName==g_pCurFoil->m_FoilName)
+		if (pXDirect->m_pCurOpp && pXDirect->m_pCurOpp->m_strFoilName==s_pCurFoil->m_FoilName)
 		{
 			//select it
 			if (pCurPlr->m_PolarType !=FIXEDAOAPOLAR)
@@ -7057,9 +7056,9 @@ void MainFrame::SetDlgPos(QDialog &Dlg)
 
 void MainFrame::OnDuplicateFoil()
 {
-	if(!g_pCurFoil) return;
+	if(!s_pCurFoil) return;
 	Foil *pNewFoil = new Foil();
-	pNewFoil->CopyFoil(g_pCurFoil);
+	pNewFoil->CopyFoil(s_pCurFoil);
 	pNewFoil->InitFoil();
 
 	if(SetModFoil(pNewFoil))

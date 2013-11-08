@@ -155,7 +155,6 @@ public:
 	double m_CL;				// Wing lift coefficient
 	double m_VCD;			// wing viscous drag coefficient
 	double m_ICD;			// wing induced drag coefficient
-    double m_XCP, m_YCP,m_ZCP;		// centre of pressure position relative to the wing's XCref
 	double m_GCm;		// wing pitching moment
 	double m_GRm;			// wing rolling moment
 	double m_VCm;		// pitching moment induced by viscous drag forces
@@ -165,6 +164,8 @@ public:
 	double m_IYm;		// wing induced yawing moment
 	double m_Ctrl;		//control variable - converged value
 	double m_XNP;       //Neutral point position resulting from stability calculations
+
+	CVector m_CP;
 
 	complex<double> m_EigenValue[8]; //four longitudinal and four lateral modes
 	complex<double> m_EigenVector[8][4]; // (4 longitudinal + 4 lateral) x 4 components

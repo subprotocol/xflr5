@@ -19,6 +19,9 @@
 
 *****************************************************************************/
 
+/** @file This file implements the class used to refine locally the points on a foil */
+
+
 #ifndef CADDDLG_H
 #define CADDDLG_H
 
@@ -30,6 +33,14 @@
 #include "../objects/Foil.h"
 #include "../misc/FloatEdit.h"
 
+/**
+* @class CAddDlg
+* @brief The class which interfaces with the cadd method implemented in XFoil.
+*
+* This class is used to add panels locally on a foil surface, in the areas of high surface curvature.
+* Refer to Xfoil documentation for more documentation
+* One of the early classes of this project.
+*/
 class CAddDlg : public QDialog
 {
 	Q_OBJECT
@@ -71,8 +82,7 @@ private:
 	void* m_pAFoil;
 	double atol;
 	int m_iSplineType;
-
-
+	
 };
 
 #endif // CADDDLG_H

@@ -120,7 +120,7 @@ private:
 
 public:
 	int m_iCurrentMode;	
-	CCurve *m_pCurve;
+	Curve *m_pCurve;
 	double m_Time[20], m_Amplitude[20];
 };
 

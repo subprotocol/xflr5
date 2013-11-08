@@ -79,6 +79,7 @@ class MainFrame : public QMainWindow
 	friend class Plane;
 	friend class BodyGridDlg;
 	friend class XFoilAnalysisDlg;
+	friend class FoilPolarDlg;
 	friend class BatchDlg;
 	friend class BatchThreadDlg;
 	friend class InterpolateFoilsDlg;
@@ -226,7 +227,11 @@ public:
 	QString m_VersionName;
 	QString m_GraphExportFilter;
 
+
 private:
+
+	static Foil *s_pCurFoil;
+
 	//the dialog boxes are declared as member variables to enable translations... seems to be a Qt bug
 	DisplaySettingsDlg *m_pDisplaySettingsDlg;
 	SaveOptionsDlg *m_pSaveOptionsDlg;

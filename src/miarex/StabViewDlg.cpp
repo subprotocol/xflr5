@@ -1024,7 +1024,7 @@ void StabViewDlg::SetTimeCurveStyle(QColor const &Color, int const&Style, int co
 {
 	if(!m_pCurve) return;
 	QMiarex * pMiarex = (QMiarex*)s_pMiarex;
-	CCurve *pCurve;
+	Curve *pCurve;
 	for (int i=0; i<pMiarex->m_TimeGraph[0].GetCurveCount(); i++)
 	{
 		pCurve = pMiarex->m_TimeGraph[0].GetCurve(i);
@@ -1051,7 +1051,7 @@ void StabViewDlg::OnRenameCurve()
 	QMiarex * pMiarex = (QMiarex*)s_pMiarex;
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	
-	CCurve *pCurve;
+	Curve *pCurve;
 	if(!m_pCurve) return;
 
 	QString NewName = "Test Name";
@@ -1138,7 +1138,7 @@ void StabViewDlg::AddCurve()
 	int nCurves = pMiarex->m_TimeGraph[0].GetCurveCount();
 	QString strong = tr("New curve") + QString(" %1").arg(nCurves);
 
-	CCurve *pCurve;
+	Curve *pCurve;
 	for(int ig=0; ig<4; ig++)
 	{
 		pCurve = pMiarex->m_TimeGraph[ig].AddCurve();

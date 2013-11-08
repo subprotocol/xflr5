@@ -77,6 +77,8 @@ private:
     bool m_bWingOut;                            /**< true if the interpolation of viscous properties falls outside the polar mesh */
 	double m_Ai[MAXSPANSTATIONS+1];		        /**< Induced Angle coefficient at the span stations */
 	double m_BendingMoment[MAXSPANSTATIONS+1];	/**< bending moment at the span stations */
+	double m_CDi;                               /**< The wing's induced drag coefficient */
+	double m_CDv;                               /**< The wing's viscous drag coefficient */
 	double m_Cl[MAXSPANSTATIONS+1];		        /**< Local lift coefficient at the span stations */
 	double m_Chord[MAXSPANSTATIONS+1];          /**< chord at the span stations */
     double m_CL;                                /**< The wing's lift coefficient */
@@ -87,7 +89,6 @@ private:
     double m_GYm;                               /**< The wing's total yawing moment */
 	double m_ICd[MAXSPANSTATIONS+1];		    /**< Induced Drag coefficient at the span stations */
     double m_ICm;                               /**< The wing's induced pitching moment */
-    double m_InducedDrag;                       /**< The wing's induced drag coefficient @todo check*/
     int m_IterLim;                              /**< Maximum number of iterations in the calculation */
     double m_IYm;                               /**< The wing's induced yawing moment */
     QString m_LengthUnit;                       /**< Name of the user-defined length unit */
@@ -102,15 +103,13 @@ private:
 	double m_StripArea[MAXSPANSTATIONS+1];		/** <Local strip area at the span stations */
 	double m_Twist[MAXSPANSTATIONS+1];          /**< twist at the span stations */
     double m_VCm;                               /**< The wing's viscous pitching moment */
-    double m_ViscousDrag;                       /**< The wing's viscous drag coefficient @todo check*/
     double m_VYm;                               /**< The wing's viscous yawing moment */
-    double m_XCP;                               /**< The x-position of the center of pressure */
 	double m_XCPSpanAbs[MAXSPANSTATIONS+1];	    /**< Center of Pressure pos at the span stations */
 	double m_XCPSpanRel[MAXSPANSTATIONS+1];	    /**< Center of Pressure pos at the span stations */
 	double m_XTrTop[MAXSPANSTATIONS+1];		    /**< Upper transition location at the span stations */
 	double m_XTrBot[MAXSPANSTATIONS+1];		    /**< Lower transition location at the span stations */
-    double m_YCP;                               /**< The y-position of the center of pressure */
-    double m_ZCP;                               /**< The z-position of the center of pressure */
+
+	CVector m_CP;                               /**< The position of the center of pressure */
 	
 	static int s_NLLTStations;                  /**< The number of LLT stations in the spanwise direction */
     static double s_RelaxMax;                   /**< The relaxation factor for the iterations */

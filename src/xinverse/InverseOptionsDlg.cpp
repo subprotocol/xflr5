@@ -89,7 +89,7 @@ void InverseOptionsDlg::InitDialog()
 	QXInverse *pXInverse = (QXInverse*)m_pXInverse;
 	m_pctrlRefFoil->SetStyle(pXInverse->m_pRefFoil->m_nFoilStyle, pXInverse->m_pRefFoil->m_nFoilWidth, pXInverse->m_pRefFoil->m_FoilColor);
 	m_pctrlModFoil->SetStyle(pXInverse->m_pModFoil->m_nFoilStyle, pXInverse->m_pModFoil->m_nFoilWidth, pXInverse->m_pModFoil->m_FoilColor);
-	m_pctrlSpline->SetStyle(pXInverse->m_Spline.m_Style, pXInverse->m_Spline.m_Width, pXInverse->m_Spline.m_Color);
+	m_pctrlSpline->SetStyle(pXInverse->m_Spline.style(), pXInverse->m_Spline.width(), pXInverse->m_Spline.color());
 	m_pctrlReflected->SetStyle(pXInverse->m_ReflectedStyle, pXInverse->m_ReflectedWidth, pXInverse->m_ReflectedClr);
 }
 
@@ -128,14 +128,14 @@ void InverseOptionsDlg::OnSplineStyle()
 {
 	QXInverse *pXInverse = (QXInverse*)m_pXInverse;
     LinePickerDlg dlg(this);
-	dlg.InitDialog(pXInverse->m_Spline.m_Style, pXInverse->m_Spline.m_Width, pXInverse->m_Spline.m_Color);
+	dlg.InitDialog(pXInverse->m_Spline.style(), pXInverse->m_Spline.width(), pXInverse->m_Spline.color());
 
 	if(QDialog::Accepted==dlg.exec())
 	{
 		m_pctrlModFoil->SetStyle(dlg.GetStyle(),dlg.GetWidth(),dlg.GetColor());
-		pXInverse->m_Spline.m_Style = dlg.GetStyle();
-		pXInverse->m_Spline.m_Width = dlg.GetWidth();
-		pXInverse->m_Spline.m_Color = dlg.GetColor();
+		pXInverse->m_Spline.SetStyle(dlg.GetStyle());
+		pXInverse->m_Spline.SetWidth(dlg.GetWidth());
+		pXInverse->m_Spline.SetColor(dlg.GetColor());
 	}
 }
 
