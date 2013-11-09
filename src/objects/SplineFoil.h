@@ -42,11 +42,8 @@
 struct Picture
 {
 	public:
-		double xExt[SPLINECONTROLSIZE];
-		double yExt[SPLINECONTROLSIZE];
-		double xInt[SPLINECONTROLSIZE];
-		double yInt[SPLINECONTROLSIZE];
-		CVector ExtRearPt, IntRearPt;
+		CVector ExtPt[SPLINECONTROLSIZE];
+		CVector IntPt[SPLINECONTROLSIZE];
 		int m_iExt, m_iInt;
 };
 

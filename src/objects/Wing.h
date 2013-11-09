@@ -19,7 +19,7 @@
 
 *****************************************************************************/
 
-/*! \file This file implements the Wing class.
+/*! @file This file implements the Wing class.
  */
 
 
@@ -33,10 +33,13 @@
 #include "Surface.h"
 #include "Panel.h"
 #include "WingSection.h"
+#include "PointMass.h"
+
 
 /**
-*@brief  This class defines the wing object, provides the methods for the calculation of the wing geometric properties, and
-		 provides methods for LLT, VLM and Panel methods.
+ * @class Wing
+ * @brief  This class defines the wing object, provides the methods for the calculation of the wing geometric properties, and
+		   provides methods for LLT, VLM and Panel methods.
  *
  * A wing is identified and reference by its name, which is used  by the parent Plane objects and by child Polar and WingOPpp objects.
  *
@@ -199,11 +202,6 @@ private:
 	double m_VolumeMass;             /**< the mass of the wing's structure, excluding point masses */
 	double m_TotalMass;              /**< the wing's total mass, i.e. the sum of the volume mass and of the point masses */
 
-	/**< @todo replace with a structure implementing the three variables */
-	QList<double> m_MassValue;       /**< the value of the point mass, in kg */
-	QList<CVector> m_MassPosition;   /**< the absolute position of the point mass */
-	QStringList m_MassTag;           /**< the description of the point mass */
-
 	double m_GChord;                 /**< the mean geometric chord */
 	double m_yMac;                   /**< the mean aerodynamic chord span position  -  @todo meaning and calculation are unclear*/
 	double m_CDi;                    /**< the wing's induced drag coefficient for the current calculation */
@@ -251,7 +249,8 @@ public:
 
 	QColor m_WingColor;                        /**< the wing's color */
 
-	QList<WingSection*> m_WingSection;         /**< the array of wing sections used. A WingSection extends between a foil and the next. */
+	QList<WingSection*> m_WingSection;         /**< the array of wing sections. A WingSection extends between a foil and the next. */
+	QList<PointMass*> m_PointMass;             /**< the array of PointMass objects */
 
 	int m_NSurfaces; 	                       /**< the number of Surface objects built on the wing geometry (=2 x number of WingSection) @todo replace with a QList<Surface>*/
 	Surface m_Surface[2*MAXSPANSECTIONS];      /**< the array of Surface objects associated to the wing @todo replace with a QList<Surface>*/

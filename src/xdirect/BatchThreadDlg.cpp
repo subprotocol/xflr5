@@ -871,7 +871,7 @@ void BatchThreadDlg::timerEvent(QTimerEvent *event)
 
 				CleanUp();
 
-				if(pXDirect->m_bPolar)
+				if(pXDirect->m_bPolarView)
 				{
 					pXDirect->CreatePolarCurves();
 					pXDirect->UpdateView();

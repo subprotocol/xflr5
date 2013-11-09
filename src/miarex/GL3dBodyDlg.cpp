@@ -1775,16 +1775,16 @@ void GL3dBodyDlg::GLDrawMasses()
 	{
 //		glColor3d(m_MassColor.redF()*.75, m_MassColor.greenF()*.75, m_MassColor.blueF()*.75);
 
-		for(int im=0; im<m_pBody->m_MassValue.size(); im++)
+		for(int im=0; im<m_pBody->m_PointMass.size(); im++)
 		{
 			glPushMatrix();
 			{
-				glTranslated(m_pBody->m_MassPosition[im].x,m_pBody->m_MassPosition[im].y,m_pBody->m_MassPosition[im].z);
+				glTranslated(m_pBody->m_PointMass[im]->position().x,m_pBody->m_PointMass[im]->position().y,m_pBody->m_PointMass[im]->position().z);
 				m_3dWidget.GLRenderSphere(QColor(255,190,110),radius,18,18);
 				glColor3d(pMainFrame->m_TextColor.redF(), pMainFrame->m_TextColor.greenF(), pMainFrame->m_TextColor.blueF());
 				m_3dWidget.renderText(0.0, 0.0, 0.0+.02,
-									  m_pBody->m_MassTag[im]
-									  +QString(" %1").arg(m_pBody->m_MassValue[im]*pMainFrame->m_kgtoUnit, 7,'g',3)
+									  m_pBody->m_PointMass[im]->tag()
+									  +QString(" %1").arg(m_pBody->m_PointMass[im]->mass()*pMainFrame->m_kgtoUnit, 7,'g',3)
 									  +MassUnit);
 			}
 			glPopMatrix();

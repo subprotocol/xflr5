@@ -58,10 +58,10 @@ public:
 	void   SetwPosition(double w);
 	double zPos();
 
-	/** @todo declare private and access by public methods, i.a.w. good oop practices */
+
 	QList <CVector> m_CtrlPoint;	/**< the array of points which define the frame.  */
-	int m_iHighlight;               /**< the point over which the mouse hovers, or -1 if none @todo check use*/
-	int m_iSelect;                  /**< the selected pointed, i.e. the last point on which the user has clicked, or -1 if none @todo check use*/
+	int m_iHighlight;               /**< the point over which the mouse hovers, or -1 if none */
+	int m_iSelect;                  /**< the selected pointed, i.e. the last point on which the user has clicked, or -1 if none */
 	CVector m_Position;             /**< the translation vector for the Frame's origin */
 };
 

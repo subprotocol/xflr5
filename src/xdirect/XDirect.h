@@ -62,6 +62,8 @@
 #include "CAddDlg.h"
 #include "XDirectStyleDlg.h"
 
+#define MAXPOLARGRAPHS 5
+
 /**
 * @class QXDirect This class is used to manage direct Foil Analysis.
 *
@@ -323,7 +325,7 @@ private:
 	bool m_bInitBL;            /**< true if the boundary layer should be initialized for the next xfoil calculation */
 	bool m_bBL;                /**< true if the Boundary layer shoud be displayed */
 	bool m_bPressure;          /**< true if the pressure distirbution should be displayed */
-	bool m_bPolar;             /**< true if the polar view is selected, false if the operating point view is selected */
+	bool m_bPolarView;         /**< true if the polar view is selected, false if the operating point view is selected */
 	bool m_bShowUserGraph;     /**< true if the 5th polar graph should be displayed */
 	bool m_bAnimate;           /**< true if a result animation is underway */
 	bool m_bAnimatePlus;       /**< true if the animation is going from lower to higher alpha, false if decreasing */
@@ -385,19 +387,22 @@ private:
 	QList<void*> *m_poaPolar;	/**< pointer to the polar object array */
 	QList<void*> *m_poaOpp;		/**< pointer to the OpPoint object array */
 
-	QGraph* m_pCpGraph;         /**< a pointer to the Cp graphs */
-	QGraph* m_pPolarGraph;      /**< a pointer to the first polar graph @todo replace with an array of 5 graphs*/
-	QGraph* m_pCmGraph;         /**< a pointer to the second polar graph */
-	QGraph* m_pCzGraph;         /**< a pointer to the third polar graph */
-	QGraph* m_pTrGraph;         /**< a pointer to the fourth polar graph */
-	QGraph* m_pUserGraph;       /**< a pointer to the fift polar graph */
+	QGraph* m_pCpGraph;         /**< a pointer to the Cp graph for the OpPoint view */
+//	QGraph* m_pPolarGraph;      /**< a pointer to the first polar graph @todo replace with an array of 5 graphs*/
+//	QGraph* m_pCmGraph;         /**< a pointer to the second polar graph */
+//	QGraph* m_pCzGraph;         /**< a pointer to the third polar graph */
+//	QGraph* m_pTrGraph;         /**< a pointer to the fourth polar graph */
+//	QGraph* m_pUserGraph;       /**< a pointer to the fift polar graph */
+
+	QGraph m_PlrGraph[MAXPOLARGRAPHS];          /**< the WPolar graphs */
+
+
 	QGraph* m_pCurGraph;        /**< a pointer to the graph over which the mouse is hovering */
 
 	QFile m_XFile;		        /**< The instance of the log file to which the text output of the analysis is directed */
 
 	static void *s_pMainFrame;  /**< a pointer to the instance of the application's MainFrame object */
 	static void *s_p2DWidget;   /**< a pointer to the instance of the application's central widget used for 2D drawings */
-
 
 	QColor m_crBLColor;         /**< the color used to draw the boundary layer */
 	QColor m_crPressureColor;   /**< the color used to draw the pressure arrows */

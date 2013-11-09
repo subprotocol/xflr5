@@ -57,9 +57,7 @@ Body::Body()
 	m_CoG.Set(0.0,0.0,0.0);
 	m_VolumeMass =  m_TotalMass = 0.0;	    //for inertia calculations
 	m_CoGIxx = m_CoGIyy = m_CoGIzz = m_CoGIxz = 0.0;
-	m_MassValue.clear();
-	m_MassPosition.clear();
-	m_MassTag.clear();
+	m_PointMass.clear();
 
 	m_Bunch  = 0.0;
 
@@ -1159,17 +1157,16 @@ void Body::Scale(double XFactor, double YFactor, double ZFactor, bool bFrameOnly
 //	ComputeCenterLine();
 }
 
-bool Body::SerializeBody(QDataStream &ar, bool bIsStoring, int ProjectFormat)
+bool Body::SerializeBody(QDataStream &ar, bool bIsStoring)
 {
 	int ArchiveFormat;
-	int i,k,n, nStations;
+	int i,k, nStations;
 	float f,g,h;
 	double x,y,z;
 
 	if(bIsStoring)
 	{
-		if(ProjectFormat==4) ar << 1002;
-		else                 ar << 1006;
+		ar << 1006;
 
 		//1006 : added body LEPosition
 		//1005 : added body alpha color + provisions
@@ -1179,7 +1176,7 @@ bool Body::SerializeBody(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 		//1001 : Added bunching parameter
 		//1000 : first format
 		WriteCString(ar, m_BodyName);
-		if(ProjectFormat>=5) WriteCString(ar, m_BodyDescription);
+		WriteCString(ar, m_BodyDescription);
 
 		WriteCOLORREF(ar, m_BodyColor);
 		ar << m_LineType;
@@ -1205,18 +1202,15 @@ bool Body::SerializeBody(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 		{
 			ar << (float)FramePosition(k) << 0.0f;// << (float)m_FramePosition[k].z;
 		}
-		if(ProjectFormat>=5)
-		{
-			ar << (float)m_VolumeMass;
-			ar << m_MassValue.size();
-			for(i=0; i<m_MassValue.size(); i++) ar << (float)m_MassValue[i];
-			for(i=0; i<m_MassValue.size(); i++) ar << (float)m_MassPosition[i].x << (float)m_MassPosition[i].y << (float)m_MassPosition[i].z;
-			for(i=0; i<m_MassValue.size(); i++)  WriteCString(ar, m_MassTag[i]);
-		}
+		ar << (float)m_VolumeMass;
+		ar << m_PointMass.size();
+		for(i=0; i<m_PointMass.size(); i++) ar << (float)m_PointMass[i]->mass();
+		for(i=0; i<m_PointMass.size(); i++) ar << (float)m_PointMass[i]->position().x << (float)m_PointMass[i]->position().y << (float)m_PointMass[i]->position().z;
+		for(i=0; i<m_PointMass.size(); i++)  WriteCString(ar, m_PointMass[i]->tag());
+
 		ar << (float)m_BodyColor.alphaF();
 		ar << m_LEPosition.x<< m_LEPosition.y<< m_LEPosition.z;
 		ar << 0.0f;
-
 	}
 	else
 	{
@@ -1270,21 +1264,33 @@ bool Body::SerializeBody(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 		if(ArchiveFormat>=1004)
 		{
 			ar >> f;  m_VolumeMass = f;
-			ar >> n;
-			for(i=0; i<n; i++)
+			int nMass;
+			ar >> nMass;
+
+			QVarLengthArray<double> mass;
+			QVarLengthArray<CVector> position;
+			QVarLengthArray<QString> tag;
+
+			for(int im=0; im<nMass; im++)
 			{
 				ar >> f;
-				m_MassValue.append(f);
+				mass.append(f);
 			}
-			for(i=0; i<n; i++)
+			for(int im=0; im<nMass; im++)
 			{
 				ar >> f >> g >> h;
-				m_MassPosition.append(CVector(f,g,h));
+				position.append(CVector(f,g,h));
 			}
-			for(i=0; i<n; i++)
+			for(int im=0; im<nMass; im++)
 			{
-				m_MassTag.append("");
-				ReadCString(ar, m_MassTag[i]);
+				tag.append("");
+				ReadCString(ar, tag[im]);
+			}
+
+			m_PointMass.clear();
+			for(int im=0; im<nMass; im++)
+			{
+				m_PointMass.append(new PointMass(mass[im], position[im], tag[im]));
 			}
 		}
 		ar >> f;
@@ -1415,10 +1421,10 @@ void Body::ComputeBodyAxisInertia()
 	m_CoG = VolumeCoG *m_VolumeMass;
 
 	// add point masses
-	for(i=0; i<m_MassValue.size(); i++)
+	for(i=0; i<m_PointMass.size(); i++)
 	{
-		m_TotalMass += m_MassValue[i];
-		m_CoG += m_MassPosition[i] * m_MassValue[i];
+		m_TotalMass += m_PointMass[i]->mass();
+		m_CoG += m_PointMass[i]->position() * m_PointMass[i]->mass();
 	}
 
 	if(m_TotalMass>0) m_CoG = m_CoG/m_TotalMass;
@@ -1433,13 +1439,13 @@ void Body::ComputeBodyAxisInertia()
 	m_CoGIzz = Izz + m_VolumeMass * (LA.x*LA.x + LA.y*LA.y);
 	m_CoGIxz = Ixz + m_VolumeMass * LA.x*LA.z;
 
-	for(i=0; i<m_MassValue.size(); i++)
+	for(i=0; i<m_PointMass.size(); i++)
 	{
-		LA = m_MassPosition[i] - m_CoG;
-		m_CoGIxx += m_MassValue[i] * (LA.y*LA.y + LA.z*LA.z);
-		m_CoGIyy += m_MassValue[i] * (LA.x*LA.x + LA.z*LA.z);
-		m_CoGIzz += m_MassValue[i] * (LA.x*LA.x + LA.y*LA.y);
-		m_CoGIxz -= m_MassValue[i] * (LA.x*LA.z);
+		LA = m_PointMass[i]->position() - m_CoG;
+		m_CoGIxx += m_PointMass[i]->mass() * (LA.y*LA.y + LA.z*LA.z);
+		m_CoGIyy += m_PointMass[i]->mass() * (LA.x*LA.x + LA.z*LA.z);
+		m_CoGIzz += m_PointMass[i]->mass() * (LA.x*LA.x + LA.y*LA.y);
+		m_CoGIxz -= m_PointMass[i]->mass() * (LA.x*LA.z);
 	}
 }
 
@@ -1654,8 +1660,8 @@ void Body::ComputeVolumeInertia(CVector &CoG, double &CoGIxx, double &CoGIyy, do
 double Body::TotalMass()
 {
 	double TotalMass = m_VolumeMass;
-	for(int im=0; im<m_MassValue.size(); im++)
-		TotalMass += m_MassValue.at(im);
+	for(int im=0; im<m_PointMass.size(); im++)
+		TotalMass += m_PointMass[im]->mass();
 	return TotalMass;
 }
 

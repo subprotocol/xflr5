@@ -104,9 +104,8 @@ private:
 
 	CVector m_PtRef;
 	double m_CoGIxx, m_CoGIyy, m_CoGIzz, m_CoGIxz;
-	QList<double> m_MassValue;
-	QList<CVector> m_MassPosition;
-	QStringList m_MassTag;
+
+	QList<PointMass*> m_PointMass;
 
 	bool m_bChanged;
 };

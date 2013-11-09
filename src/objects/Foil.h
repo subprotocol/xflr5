@@ -63,6 +63,7 @@ class Foil
 	friend class QXInverse;
 	friend class QMiarex;
 	friend class XFoil;
+	friend class OpPoint;
 	friend class FoilPolarDlg;
 	friend class Wing;
 	friend class MainFrame;
@@ -115,7 +116,7 @@ public:
 	bool InitFoil();
 
 	void CopyFoil(Foil *pSrcFoil);
-	bool Serialize(QDataStream &ar, bool bIsStoring, int ProjectFormat=5);
+	bool Serialize(QDataStream &ar, bool bIsStoring);
 	void SetFlap();
 	void SetTEFlap();
 	void SetLEFlap();

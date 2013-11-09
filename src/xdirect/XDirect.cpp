@@ -47,6 +47,7 @@ QXDirect::QXDirect(QWidget *parent) : QWidget(parent)
 {
 	MainFrame*pMainFrame = (MainFrame*)s_pMainFrame;
 
+
 	SetupLayout();
 
 	m_pXFoil = NULL;
@@ -131,8 +132,8 @@ QXDirect::QXDirect(QWidget *parent) : QWidget(parent)
 
 	m_IterLim   = 100;
 
-	m_bPolar          = true;
-	m_iPlrGraph = 1;
+	m_bPolarView          = true;
+	m_iPlrGraph = 0;
 	m_iPlrView  = 0;
 	m_XFoilVar  = 0;
 	m_FoilYPos  = 150;
@@ -142,13 +143,8 @@ QXDirect::QXDirect(QWidget *parent) : QWidget(parent)
 
 	m_posAnimate = 0;
 
-	m_pCmGraph     = NULL;
 	m_pCpGraph     = NULL;
 	m_pCurGraph    = NULL;
-	m_pCzGraph     = NULL;
-	m_pPolarGraph  = NULL;
-	m_pTrGraph     = NULL;
-	m_pUserGraph   = NULL;
 	m_pCurPolar    = NULL;
 	m_pCurOpp      = NULL;
 
@@ -172,19 +168,14 @@ QXDirect::QXDirect(QWidget *parent) : QWidget(parent)
 	m_ASpec = 0.0;
 
 	m_pCpGraph    = new QGraph();
-	m_pPolarGraph = new QGraph();
-	m_pCmGraph    = new QGraph();
-	m_pCzGraph    = new QGraph();
-	m_pTrGraph    = new QGraph();
-	m_pUserGraph  = new QGraph();
 
 	m_pCpGraph->SetVariables(0,0);
 
-	m_pPolarGraph->SetVariables(2,1);
-	m_pCzGraph->SetVariables(0,1);
-	m_pCmGraph->SetVariables(0,5);
-	m_pTrGraph->SetVariables(6,1);
-	m_pUserGraph->SetVariables(0,10);
+	m_PlrGraph[0].SetVariables(2,1);
+	m_PlrGraph[1].SetVariables(0,1);
+	m_PlrGraph[2].SetVariables(0,5);
+	m_PlrGraph[3].SetVariables(6,1);
+	m_PlrGraph[4].SetVariables(0,10);
 
 	m_pCpGraph->SetXTitle(tr("X"));
 	m_pCpGraph->SetYTitle(tr("Cp"));
@@ -199,71 +190,68 @@ QXDirect::QXDirect(QWidget *parent) : QWidget(parent)
 	m_pCpGraph->SetBorderStyle(0);
 	m_pCpGraph->SetGraphName(tr("Cp Graph"));
 
-	m_pPolarGraph->SetXMin(0.0);
-	m_pPolarGraph->SetXMax(0.1);
-	m_pPolarGraph->SetYMin(-0.1);
-	m_pPolarGraph->SetYMax(0.1);
-	m_pPolarGraph->SetType(2);
-	m_pPolarGraph->SetBorderColor(QColor(200,200,200));
-	m_pPolarGraph->SetBorder(true);
-	m_pPolarGraph->SetBorderStyle(0);
-	m_pPolarGraph->SetBorderWidth(3);
-	m_pPolarGraph->SetMargin(50);
-	m_pPolarGraph->SetGraphName(tr("Polar Graph"));
+	m_PlrGraph[0].SetXMin(0.0);
+	m_PlrGraph[0].SetXMax(0.1);
+	m_PlrGraph[0].SetYMin(-0.1);
+	m_PlrGraph[0].SetYMax(0.1);
+	m_PlrGraph[0].SetType(2);
+	m_PlrGraph[0].SetBorderColor(QColor(200,200,200));
+	m_PlrGraph[0].SetBorder(true);
+	m_PlrGraph[0].SetBorderStyle(0);
+	m_PlrGraph[0].SetBorderWidth(3);
+	m_PlrGraph[0].SetMargin(50);
+	m_PlrGraph[0].SetGraphName(tr("Polar Graph"));
 
-	m_pCmGraph->SetXMin(0.0);
-	m_pCmGraph->SetXMax(0.1);
-	m_pCmGraph->SetYMin(-0.1);
-	m_pCmGraph->SetYMax(0.1);
-	m_pCmGraph->SetType(2);
-	m_pCmGraph->SetBorderColor(QColor(200,200,200));
-	m_pCmGraph->SetBorder(true);
-	m_pCmGraph->SetBorderStyle(0);
-	m_pCmGraph->SetBorderWidth(3);
-	m_pCmGraph->SetMargin(50);
-	m_pCmGraph->SetGraphName(tr("Cm Graph"));
+	m_PlrGraph[2].SetXMin(0.0);
+	m_PlrGraph[2].SetXMax(0.1);
+	m_PlrGraph[2].SetYMin(-0.1);
+	m_PlrGraph[2].SetYMax(0.1);
+	m_PlrGraph[2].SetType(2);
+	m_PlrGraph[2].SetBorderColor(QColor(200,200,200));
+	m_PlrGraph[2].SetBorder(true);
+	m_PlrGraph[2].SetBorderStyle(0);
+	m_PlrGraph[2].SetBorderWidth(3);
+	m_PlrGraph[2].SetMargin(50);
+	m_PlrGraph[2].SetGraphName(tr("Cm Graph"));
 
-	m_pCzGraph->SetXMin(0.0);
-	m_pCzGraph->SetXMax(0.1);
-	m_pCzGraph->SetYMin(-0.1);
-	m_pCzGraph->SetYMax(0.1);
-	m_pCzGraph->SetType(2);
-	m_pCzGraph->SetBorderColor(QColor(200,200,200));
-	m_pCzGraph->SetBorder(true);
-	m_pCzGraph->SetBorderStyle(0);
-	m_pCzGraph->SetBorderWidth(3);
-	m_pCzGraph->SetMargin(50);
-	m_pCzGraph->SetGraphName(tr("Cz Graph"));
+	m_PlrGraph[1].SetXMin(0.0);
+	m_PlrGraph[1].SetXMax(0.1);
+	m_PlrGraph[1].SetYMin(-0.1);
+	m_PlrGraph[1].SetYMax(0.1);
+	m_PlrGraph[1].SetType(2);
+	m_PlrGraph[1].SetBorderColor(QColor(200,200,200));
+	m_PlrGraph[1].SetBorder(true);
+	m_PlrGraph[1].SetBorderStyle(0);
+	m_PlrGraph[1].SetBorderWidth(3);
+	m_PlrGraph[1].SetMargin(50);
+	m_PlrGraph[1].SetGraphName(tr("Cz Graph"));
 
-	m_pTrGraph->SetXMin(0.0);
-	m_pTrGraph->SetXMax(0.1);
-	m_pTrGraph->SetYMin(-0.1);
-	m_pTrGraph->SetYMax(0.1);
-	m_pTrGraph->SetType(2);
-	m_pTrGraph->SetBorderColor(QColor(200,200,200));
-	m_pTrGraph->SetBorder(true);
-	m_pTrGraph->SetBorderStyle(0);
-	m_pTrGraph->SetBorderWidth(3);
-	m_pTrGraph->SetMargin(50);
-	m_pTrGraph->SetGraphName(tr("Tr Graph"));
+	m_PlrGraph[3].SetXMin(0.0);
+	m_PlrGraph[3].SetXMax(0.1);
+	m_PlrGraph[3].SetYMin(-0.1);
+	m_PlrGraph[3].SetYMax(0.1);
+	m_PlrGraph[3].SetType(2);
+	m_PlrGraph[3].SetBorderColor(QColor(200,200,200));
+	m_PlrGraph[3].SetBorder(true);
+	m_PlrGraph[3].SetBorderStyle(0);
+	m_PlrGraph[3].SetBorderWidth(3);
+	m_PlrGraph[3].SetMargin(50);
+	m_PlrGraph[3].SetGraphName(tr("Tr Graph"));
 
-	m_pUserGraph->SetXMin(0.0);
-	m_pUserGraph->SetXMax(0.1);
-	m_pUserGraph->SetYMin(-0.1);
-	m_pUserGraph->SetYMax(0.1);
-	m_pUserGraph->SetType(2);
-	m_pUserGraph->SetBorderColor(QColor(200,200,200));
-	m_pUserGraph->SetBorder(true);
-	m_pUserGraph->SetBorderStyle(0);
-	m_pUserGraph->SetBorderWidth(3);
-	m_pUserGraph->SetMargin(50);
-	m_pUserGraph->SetGraphName(tr("User Graph"));
+	m_PlrGraph[4].SetXMin(0.0);
+	m_PlrGraph[4].SetXMax(0.1);
+	m_PlrGraph[4].SetYMin(-0.1);
+	m_PlrGraph[4].SetYMax(0.1);
+	m_PlrGraph[4].SetType(2);
+	m_PlrGraph[4].SetBorderColor(QColor(200,200,200));
+	m_PlrGraph[4].SetBorder(true);
+	m_PlrGraph[4].SetBorderStyle(0);
+	m_PlrGraph[4].SetBorderWidth(3);
+	m_PlrGraph[4].SetMargin(50);
+	m_PlrGraph[4].SetGraphName(tr("User Graph"));
 
-	SetGraphTitles(m_pPolarGraph);
-	SetGraphTitles(m_pCzGraph);
-	SetGraphTitles(m_pCmGraph);
-	SetGraphTitles(m_pTrGraph);
-	SetGraphTitles(m_pUserGraph);
+	for(int ig=0; ig<MAXPOLARGRAPHS; ig++)
+		SetGraphTitles(m_PlrGraph+ig);
 
 	memset(m_ReList, 0, sizeof(m_ReList));
 	memset(m_NCritList, 0, sizeof(m_NCritList));
@@ -309,11 +297,6 @@ QXDirect::QXDirect(QWidget *parent) : QWidget(parent)
  QXDirect::~QXDirect()
 {
 	delete m_pCpGraph;
-	delete m_pCmGraph;
-	delete m_pCzGraph;
-	delete m_pPolarGraph;
-	delete m_pTrGraph;
-	delete m_pUserGraph;
 
 	delete m_pPolarFilterDlg;
 	delete m_pObjectPropsDlg;
@@ -362,8 +345,8 @@ void QXDirect::AddOpData(OpPoint *pOpPoint)
 
 	for (k=0; k<m_pXFoil->n; k++)
 	{
-		pOpPoint->x[k]   = m_pXFoil->x[k+1];
-		pOpPoint->y[k]   = m_pXFoil->y[k+1];
+//		pOpPoint->x[k]   = m_pXFoil->x[k+1];
+//		pOpPoint->y[k]   = m_pXFoil->y[k+1];
 //		pOpPoint->s[k]   = m_pXFoil->s[k+1];
 		pOpPoint->Cpi[k] = m_pXFoil->cpi[k+1];
 		pOpPoint->Qi[k]  = m_pXFoil->qgamm[k+1];
@@ -373,8 +356,8 @@ void QXDirect::AddOpData(OpPoint *pOpPoint)
 	{
 		pOpPoint->Xtr1 =m_pXFoil->xoctr[1];
 		pOpPoint->Xtr2 =m_pXFoil->xoctr[2];
-		pOpPoint->m_bVisc = true; 
-		pOpPoint->m_bDispSurf = true;
+		pOpPoint->m_bViscResults = true;
+		pOpPoint->m_bBL = true;
 		for (k=0; k<m_pXFoil->n; k++) 
 		{
 			pOpPoint->Cpv[k] = m_pXFoil->cpv[k+1];
@@ -383,7 +366,7 @@ void QXDirect::AddOpData(OpPoint *pOpPoint)
 	}
 	else
 	{
-		pOpPoint->m_bVisc = false;
+		pOpPoint->m_bViscResults = false;
 	}
 
 	if(pOpPoint->m_bTEFlap || pOpPoint->m_bLEFlap)
@@ -528,7 +511,7 @@ OpPoint* QXDirect::AddOpPoint(Polar *pPolar, bool bStoreOpp)
 	}
 	m_pCurOpp = pNewPoint;
 
-	if(m_bPolar)
+	if(m_bPolarView)
 	{
 		CreatePolarCurves();
 	}
@@ -546,7 +529,7 @@ void QXDirect::SetControls()
 {
 	MainFrame* pMainFrame = (MainFrame*)s_pMainFrame;
 
-	if(m_bPolar) m_pctrlMiddleControls->setCurrentIndex(1);
+	if(m_bPolarView) m_pctrlMiddleControls->setCurrentIndex(1);
 	else         m_pctrlMiddleControls->setCurrentIndex(0);
 
 	if(m_pCurPolar)
@@ -557,11 +540,11 @@ void QXDirect::SetControls()
 	}
 	else m_pctrlPolarProps->clear();
 
-	pMainFrame->m_pctrlOppView->setChecked(!m_bPolar);
-	pMainFrame->m_pctrlPolarView->setChecked(m_bPolar);
+	pMainFrame->m_pctrlOppView->setChecked(!m_bPolarView);
+	pMainFrame->m_pctrlPolarView->setChecked(m_bPolarView);
 
-	pMainFrame->OpPointsAct->setChecked(!m_bPolar);
-	pMainFrame->PolarsAct->setChecked(m_bPolar);
+	pMainFrame->OpPointsAct->setChecked(!m_bPolarView);
+	pMainFrame->PolarsAct->setChecked(m_bPolarView);
 
 	pMainFrame->showPanels->setChecked(m_bShowPanels);
 	pMainFrame->showNeutralLine->setChecked(m_bNeutralLine);
@@ -571,31 +554,28 @@ void QXDirect::SetControls()
 	pMainFrame->setCpVarGraph->setChecked(m_pCpGraph->GetYVariable()==0);
 	pMainFrame->setQVarGraph->setChecked(m_pCpGraph->GetYVariable()==1);
 
-	pMainFrame->PolarGraphAct[0]->setChecked(m_iPlrView==1 && m_iPlrGraph == 1);
-	pMainFrame->PolarGraphAct[1]->setChecked(m_iPlrView==1 && m_iPlrGraph == 2);
-	pMainFrame->PolarGraphAct[2]->setChecked(m_iPlrView==1 && m_iPlrGraph == 3);
-	pMainFrame->PolarGraphAct[3]->setChecked(m_iPlrView==1 && m_iPlrGraph == 4);
-	pMainFrame->PolarGraphAct[4]->setChecked(m_iPlrView==1 && m_iPlrGraph == 5);
+	for(int ig=0; ig<MAXPOLARGRAPHS; ig++)
+		pMainFrame->PolarGraphAct[ig]->setChecked(m_iPlrView==1 && m_iPlrGraph== ig);
 
 	pMainFrame->TwoPolarGraphsAct->setChecked(m_iPlrView==2);
 	pMainFrame->AllPolarGraphsAct->setChecked(m_iPlrView==0);
 
 	int OppVar = m_pCpGraph->GetYVariable();
-	pMainFrame->CurXFoilCtPlot->setChecked(!m_bPolar  && OppVar==2 && m_XFoilVar ==1);
-	pMainFrame->CurXFoilDbPlot->setChecked(!m_bPolar  && OppVar==2 && m_XFoilVar ==2);
-	pMainFrame->CurXFoilDtPlot->setChecked(!m_bPolar  && OppVar==2 && m_XFoilVar ==3);
-	pMainFrame->CurXFoilRtLPlot->setChecked(!m_bPolar && OppVar==2 && m_XFoilVar ==4);
-	pMainFrame->CurXFoilRtPlot->setChecked(!m_bPolar  && OppVar==2 && m_XFoilVar ==5);
-	pMainFrame->CurXFoilNPlot->setChecked(!m_bPolar   && OppVar==2 && m_XFoilVar ==6);
-	pMainFrame->CurXFoilCdPlot->setChecked(!m_bPolar  && OppVar==2 && m_XFoilVar ==7);
-	pMainFrame->CurXFoilCfPlot->setChecked(!m_bPolar  && OppVar==2 && m_XFoilVar ==8);
-	pMainFrame->CurXFoilUePlot->setChecked(!m_bPolar  && OppVar==2 && m_XFoilVar ==9);
-	pMainFrame->CurXFoilHPlot->setChecked(!m_bPolar   && OppVar==2 && m_XFoilVar ==10);
+	pMainFrame->CurXFoilCtPlot->setChecked(!m_bPolarView  && OppVar==2 && m_XFoilVar ==1);
+	pMainFrame->CurXFoilDbPlot->setChecked(!m_bPolarView  && OppVar==2 && m_XFoilVar ==2);
+	pMainFrame->CurXFoilDtPlot->setChecked(!m_bPolarView  && OppVar==2 && m_XFoilVar ==3);
+	pMainFrame->CurXFoilRtLPlot->setChecked(!m_bPolarView && OppVar==2 && m_XFoilVar ==4);
+	pMainFrame->CurXFoilRtPlot->setChecked(!m_bPolarView  && OppVar==2 && m_XFoilVar ==5);
+	pMainFrame->CurXFoilNPlot->setChecked(!m_bPolarView   && OppVar==2 && m_XFoilVar ==6);
+	pMainFrame->CurXFoilCdPlot->setChecked(!m_bPolarView  && OppVar==2 && m_XFoilVar ==7);
+	pMainFrame->CurXFoilCfPlot->setChecked(!m_bPolarView  && OppVar==2 && m_XFoilVar ==8);
+	pMainFrame->CurXFoilUePlot->setChecked(!m_bPolarView  && OppVar==2 && m_XFoilVar ==9);
+	pMainFrame->CurXFoilHPlot->setChecked(!m_bPolarView   && OppVar==2 && m_XFoilVar ==10);
 
-	m_pctrlShowPressure->setEnabled(!m_bPolar && m_pCurOpp);
-	m_pctrlShowBL->setEnabled(!m_bPolar && m_pCurOpp);
-	m_pctrlAnimate->setEnabled(!m_bPolar && m_pCurOpp);
-	m_pctrlAnimateSpeed->setEnabled(!m_bPolar && m_pCurOpp);
+	m_pctrlShowPressure->setEnabled(!m_bPolarView && m_pCurOpp);
+	m_pctrlShowBL->setEnabled(!m_bPolarView && m_pCurOpp);
+	m_pctrlAnimate->setEnabled(!m_bPolarView && m_pCurOpp);
+	m_pctrlAnimateSpeed->setEnabled(!m_bPolarView && m_pCurOpp);
 //	m_pctrlHighlightOpp->setEnabled(m_bPolar);
 
 	pMainFrame->currentFoilMenu->setEnabled(MainFrame::s_pCurFoil);
@@ -747,11 +727,11 @@ void QXDirect::CreatePolarCurves()
 	Polar *pPolar;
 	QString str;
 
-	m_pPolarGraph->DeleteCurves();
-	m_pCmGraph->DeleteCurves();
-	m_pCzGraph->DeleteCurves();
-	m_pTrGraph->DeleteCurves();
-	m_pUserGraph->DeleteCurves();
+	m_PlrGraph[0].DeleteCurves();
+	m_PlrGraph[2].DeleteCurves();
+	m_PlrGraph[1].DeleteCurves();
+	m_PlrGraph[3].DeleteCurves();
+	m_PlrGraph[4].DeleteCurves();
 
 	for (k=0; k<m_poaPolar->size(); k++)
 	{
@@ -764,14 +744,14 @@ void QXDirect::CreatePolarCurves()
 								(pPolar->m_PolarType==RUBBERCHORDPOLAR && m_bType3) ||
 								(pPolar->m_PolarType==FIXEDAOAPOLAR    && m_bType4))
 			{
-				Curve* pPolarCurve = m_pPolarGraph->AddCurve();
-				Curve* pCmCurve    = m_pCmGraph->AddCurve();
-				Curve* pCzCurve    = m_pCzGraph->AddCurve();
-				Curve* pTr1Curve   = m_pTrGraph->AddCurve();
+				Curve* pPolarCurve = m_PlrGraph[0].AddCurve();
+				Curve* pCmCurve    = m_PlrGraph[2].AddCurve();
+				Curve* pCzCurve    = m_PlrGraph[1].AddCurve();
+				Curve* pTr1Curve   = m_PlrGraph[3].AddCurve();
 				Curve* pTr2Curve = NULL;
-				if(m_pTrGraph->GetYVariable() == 6)	pTr2Curve   = m_pTrGraph->AddCurve();
+				if(m_PlrGraph[3].GetYVariable() == 6)	pTr2Curve   = m_PlrGraph[3].AddCurve();
 
-				Curve* pUserCurve  = m_pUserGraph->AddCurve();
+				Curve* pUserCurve  = m_PlrGraph[4].AddCurve();
 
 				if(pPolar->m_bShowPoints)
 				{
@@ -804,12 +784,12 @@ void QXDirect::CreatePolarCurves()
 				if(pTr2Curve) pTr2Curve->SetWidth(pPolar->m_Width);
 				pUserCurve->SetWidth(pPolar->m_Width);
 
-				FillPolarCurve(pPolarCurve, pPolar, m_pPolarGraph->GetXVariable(), m_pPolarGraph->GetYVariable());
-				FillPolarCurve(pCmCurve, pPolar, m_pCmGraph->GetXVariable(), m_pCmGraph->GetYVariable());
-				FillPolarCurve(pCzCurve, pPolar, m_pCzGraph->GetXVariable(), m_pCzGraph->GetYVariable());
-				FillPolarCurve(pTr1Curve, pPolar, m_pTrGraph->GetXVariable(), m_pTrGraph->GetYVariable());
+				FillPolarCurve(pPolarCurve, pPolar, m_PlrGraph[0].GetXVariable(), m_PlrGraph[0].GetYVariable());
+				FillPolarCurve(pCmCurve, pPolar, m_PlrGraph[2].GetXVariable(), m_PlrGraph[2].GetYVariable());
+				FillPolarCurve(pCzCurve, pPolar, m_PlrGraph[1].GetXVariable(), m_PlrGraph[1].GetYVariable());
+				FillPolarCurve(pTr1Curve, pPolar, m_PlrGraph[3].GetXVariable(), m_PlrGraph[3].GetYVariable());
 				if(pTr2Curve) FillPolarCurve(pTr2Curve, pPolar, 7, 1);
-				FillPolarCurve(pUserCurve, pPolar, m_pUserGraph->GetXVariable(), m_pUserGraph->GetYVariable());
+				FillPolarCurve(pUserCurve, pPolar, m_PlrGraph[4].GetXVariable(), m_PlrGraph[4].GetYVariable());
 
 				pPolarCurve->SetTitle(pPolar->m_PlrName);
 				pCmCurve->SetTitle(pPolar->m_PlrName);
@@ -853,7 +833,6 @@ void QXDirect::DeleteFoil(bool bAsk)
 /** Deletes the current OpPoint, or all of them, depending on the input flag 
 *
 * @param bCurrent true if only the current OpPoint should be deleted, false if all should be deleted.
-*
 */
 void QXDirect::DeleteOpPoint(bool bCurrent)
 {
@@ -895,7 +874,6 @@ void QXDirect::DeleteOpPoint(bool bCurrent)
 
 /**
 * Initializes the comboboxes with the active OpPoint or Polar line style
-* @todo m_CurveColor/Sylte/Width are not necessary, could be replaced with current Opp or Polar properties depinding on the view
 * @param bEnable true if the comboboxes should be enable as a result
 */
 void QXDirect::FillComboBoxes(bool bEnable)
@@ -959,11 +937,11 @@ void QXDirect::FillOppCurve(OpPoint *pOpp, Graph *pGraph, Curve *pCurve, bool bI
 			{
 				if(!bInviscid)
 				{
-					if(pOpp->m_bVisc) pCurve->AppendPoint(pOpp->x[j], pOpp->Cpv[j]);
+					if(pOpp->m_bViscResults) pCurve->AppendPoint(MainFrame::s_pCurFoil->x[j], pOpp->Cpv[j]);
 				}
 				else
 				{
-					pCurve->AppendPoint(pOpp->x[j], pOpp->Cpi[j]);
+					pCurve->AppendPoint(MainFrame::s_pCurFoil->x[j], pOpp->Cpi[j]);
 				}
 			}
 			pGraph->SetYTitle(tr("Cp"));
@@ -975,11 +953,11 @@ void QXDirect::FillOppCurve(OpPoint *pOpp, Graph *pGraph, Curve *pCurve, bool bI
 			{
 				if(!bInviscid)
 				{
-					if(pOpp->m_bVisc) pCurve->AppendPoint(pOpp->x[j], pOpp->Qv[j]);
+					if(pOpp->m_bViscResults) pCurve->AppendPoint(MainFrame::s_pCurFoil->x[j], pOpp->Qv[j]);
 				}
 				else
 				{
-					pCurve->AppendPoint(pOpp->x[j], pOpp->Qi[j]);
+					pCurve->AppendPoint(MainFrame::s_pCurFoil->x[j], pOpp->Qi[j]);
 				}
 			}
 			pGraph->SetYTitle(tr("Q"));
@@ -991,10 +969,10 @@ void QXDirect::FillOppCurve(OpPoint *pOpp, Graph *pGraph, Curve *pCurve, bool bI
 			{
 				if(!bInviscid)
 				{
-					if(pOpp->m_bVisc) pCurve->AppendPoint(pOpp->x[j], pOpp->Cpv[j]);
+					if(pOpp->m_bViscResults) pCurve->AppendPoint(MainFrame::s_pCurFoil->x[j], pOpp->Cpv[j]);
 				}
 				else{
-					pCurve->AppendPoint(pOpp->x[j], pOpp->Cpi[j]);
+					pCurve->AppendPoint(MainFrame::s_pCurFoil->x[j], pOpp->Cpi[j]);
 				}
 			}
 			pGraph->SetYTitle(tr("Cp"));
@@ -1178,32 +1156,32 @@ void * QXDirect::GetVariable(Polar *pPolar, int iVar)
 QGraph* QXDirect::GetGraph(QPoint &pt)
 {
 	//pt is in client coordinates
-	if (m_bPolar)
+	if (m_bPolarView)
 	{
 		if(m_iPlrView == 1)
 		{
-			if(m_iPlrGraph==1)      m_pCurGraph = m_pPolarGraph;
-			else if(m_iPlrGraph==2) m_pCurGraph = m_pCzGraph;
-			else if(m_iPlrGraph==3) m_pCurGraph = m_pTrGraph;
-			else if(m_iPlrGraph==4) m_pCurGraph = m_pCmGraph;
-			else if(m_iPlrGraph==5) m_pCurGraph = m_pUserGraph;
+			if(m_iPlrGraph>=0 && m_iPlrGraph<MAXPOLARGRAPHS) m_pCurGraph = m_PlrGraph + m_iPlrGraph;
+			else                                             m_pCurGraph = NULL;
 
 			if(m_pCurGraph->IsInDrawRect(pt)) return m_pCurGraph;
 			else return NULL;
 		}
 		if(m_iPlrView == 2)
 		{
-			if(m_pPolarGraph->IsInDrawRect(pt)){return m_pPolarGraph;}
-			if(m_pUserGraph->IsInDrawRect(pt)){return m_pUserGraph;}
+			if(m_PlrGraph[0].IsInDrawRect(pt)){return m_PlrGraph;}
+			if(m_PlrGraph[4].IsInDrawRect(pt)){return m_PlrGraph+4;}
 			return NULL;
 		}
-		QRect r;
-		m_pCmGraph->GetClientRect(r);
-		if(m_pPolarGraph->IsInDrawRect(pt)){return m_pPolarGraph;}
-		if(m_pCzGraph->IsInDrawRect(pt)){return m_pCzGraph;}
-		if(m_pCmGraph->IsInDrawRect(pt)){return m_pCmGraph;}
-		if(m_pTrGraph->IsInDrawRect(pt)){return m_pTrGraph;}
-		if(m_pUserGraph->IsInDrawRect(pt)){return m_pUserGraph;}
+		else
+		{
+			QRect r;
+			m_PlrGraph[2].GetClientRect(r);
+			if(m_PlrGraph[0].IsInDrawRect(pt)){return m_PlrGraph;}
+			if(m_PlrGraph[1].IsInDrawRect(pt)){return m_PlrGraph+1;}
+			if(m_PlrGraph[2].IsInDrawRect(pt)){return m_PlrGraph+2;}
+			if(m_PlrGraph[3].IsInDrawRect(pt)){return m_PlrGraph+3;}
+			if(m_PlrGraph[4].IsInDrawRect(pt)){return m_PlrGraph+4;}
+		}
 	}
 	else
 	{
@@ -1313,7 +1291,7 @@ void QXDirect::keyPressEvent(QKeyEvent *event)
 			break;
 		case Qt::Key_H:
 		{
-			if(m_bPolar && event->modifiers().testFlag(Qt::ControlModifier))
+			if(m_bPolarView && event->modifiers().testFlag(Qt::ControlModifier))
 			{
 				OnHighlightOpp();
 			}
@@ -1330,48 +1308,48 @@ void QXDirect::keyPressEvent(QKeyEvent *event)
 			break;
 		case Qt::Key_1:
 			m_iPlrView  = 1;
-			m_iPlrGraph = 1;
-			if(m_bPolar) SetPolarLegendPos();
+			m_iPlrGraph = 0;
+			if(m_bPolarView) SetPolarLegendPos();
 			SetControls();
 			UpdateView();
 			break;
 		case Qt::Key_2:
 			m_iPlrView  = 1;
-			m_iPlrGraph = 2;
-			if(m_bPolar) SetPolarLegendPos();
+			m_iPlrGraph = 1;
+			if(m_bPolarView) SetPolarLegendPos();
 			SetControls();
 			UpdateView();
 			break;
 		case Qt::Key_3:
 			m_iPlrView  = 1;
-			m_iPlrGraph = 3;
-			if(m_bPolar) SetPolarLegendPos();
+			m_iPlrGraph = 2;
+			if(m_bPolarView) SetPolarLegendPos();
 			SetControls();
 			UpdateView();
 			break;
 		case Qt::Key_4:
 			m_iPlrView  = 1;
-			m_iPlrGraph = 4;
-			if(m_bPolar) SetPolarLegendPos();
+			m_iPlrGraph = 3;
+			if(m_bPolarView) SetPolarLegendPos();
 			SetControls();
 			UpdateView();
 			break;
 		case Qt::Key_5:
 			m_iPlrView  = 1;
-			m_iPlrGraph = 5;
-			if(m_bPolar) SetPolarLegendPos();
+			m_iPlrGraph = 4;
+			if(m_bPolarView) SetPolarLegendPos();
 			SetControls();
 			UpdateView();
 			break;
 		case Qt::Key_A:
 			m_iPlrView = 0;
-			if(m_bPolar) SetPolarLegendPos();
+			if(m_bPolarView) SetPolarLegendPos();
 			SetControls();
 			UpdateView();
 			break;
 		case Qt::Key_T:
 			m_iPlrView = 2;
-			if(m_bPolar) SetPolarLegendPos();
+			if(m_bPolarView) SetPolarLegendPos();
 			SetControls();
 			UpdateView();
 			break;
@@ -1384,7 +1362,7 @@ void QXDirect::keyPressEvent(QKeyEvent *event)
 				m_pCurGraph->SetAuto(true);
 				UpdateView();
 			}
-			else if(!m_bPolar)
+			else if(!m_bPolarView)
 			{
 				OnResetFoilScale();
 			}
@@ -1395,7 +1373,7 @@ void QXDirect::keyPressEvent(QKeyEvent *event)
 			}
 			break;
 		case Qt::Key_V:
-			if(m_bPolar && m_pCurGraph)
+			if(m_bPolarView && m_pCurGraph)
 			{
 				GraphDlg::s_ActivePage=0;
 				OnGraphSettings();
@@ -1414,7 +1392,7 @@ void QXDirect::keyPressEvent(QKeyEvent *event)
 		}
 		case Qt::Key_F5:
 		{
-			if(!m_bPolar) return;
+			if(!m_bPolarView) return;
 			OnOpPoints();
 			break;
 		}
@@ -1427,7 +1405,7 @@ void QXDirect::keyPressEvent(QKeyEvent *event)
 		}
 		case Qt::Key_F8:
 		{
-			if(m_bPolar) return;
+			if(m_bPolarView) return;
 			OnPolars();
 			break;
 		}
@@ -1483,7 +1461,7 @@ void QXDirect::LoadSettings(QSettings *pSettings)
 		m_bInitBL         = pSettings->value("InitBL").toBool();
 		m_bBL             = pSettings->value("BoundaryLayer").toBool();
 		m_bPressure       = pSettings->value("Pressure").toBool();
-		m_bPolar          = pSettings->value("PolarView").toBool();
+		m_bPolarView          = pSettings->value("PolarView").toBool();
 		m_bShowUserGraph  = pSettings->value("UserGraph").toBool();
 		m_bShowPanels     = pSettings->value("ShowPanels").toBool();
 		m_bType1          = pSettings->value("Type1").toBool();
@@ -1562,11 +1540,11 @@ void QXDirect::LoadSettings(QSettings *pSettings)
 	}
 	pSettings->endGroup();
 
-	m_pPolarGraph->LoadSettings(pSettings);
-	m_pCmGraph->LoadSettings(pSettings);
-	m_pCzGraph->LoadSettings(pSettings);
-	m_pTrGraph->LoadSettings(pSettings);
-	m_pUserGraph->LoadSettings(pSettings);
+	m_PlrGraph[0].LoadSettings(pSettings);
+	m_PlrGraph[2].LoadSettings(pSettings);
+	m_PlrGraph[1].LoadSettings(pSettings);
+	m_PlrGraph[3].LoadSettings(pSettings);
+	m_PlrGraph[4].LoadSettings(pSettings);
 	m_pCpGraph->LoadSettings(pSettings);
 
 	if(m_pCpGraph->GetYVariable() == 0 || m_pCpGraph->GetYVariable()>=2)
@@ -1580,17 +1558,13 @@ void QXDirect::LoadSettings(QSettings *pSettings)
 		m_pCpGraph->SetInverted(false);
 	}
 
-	SetGraphTitles(m_pPolarGraph);
-	SetGraphTitles(m_pCzGraph);
-	SetGraphTitles(m_pCmGraph);
-	SetGraphTitles(m_pTrGraph);
-	SetGraphTitles(m_pUserGraph);
+	for(int ig=0; ig<MAXPOLARGRAPHS; ig++) SetGraphTitles(m_PlrGraph+ig);
 }
 
 
 void QXDirect::mouseDoubleClickEvent ( QMouseEvent * event )
 {
-	if(!m_bPolar)
+	if(!m_bPolarView)
 	{
 		if (!m_pCpGraph->IsInDrawRect(event->pos())) return;
 	}
@@ -1636,13 +1610,13 @@ void QXDirect::mouseMoveEvent(QMouseEvent *event)
 			m_PointDown.setY(pt.y());
 			if(!m_bAnimate) UpdateView();
 		}
-		else if(m_bPolar)
+		else if(m_bPolarView)
 		{
 			m_PolarLegendOffset.rx() += pt.x()-m_PointDown.x();
 			m_PolarLegendOffset.ry() += pt.y()-m_PointDown.y();
 			UpdateView();
 		}
-		else if (MainFrame::s_pCurFoil  && !m_bPolar)
+		else if (MainFrame::s_pCurFoil  && !m_bPolarView)
 		{
 			// we translate the airfoil
 			
@@ -1667,7 +1641,7 @@ void QXDirect::mouseMoveEvent(QMouseEvent *event)
 
 			if(!m_bAnimate) UpdateView();
 		}
-		else if(MainFrame::s_pCurFoil && !m_bPolar)
+		else if(MainFrame::s_pCurFoil && !m_bPolarView)
 		{
 			//zoom the foil
 			scale = m_fFoilScale;
@@ -1738,7 +1712,7 @@ void QXDirect::mouseReleaseEvent(QMouseEvent *event)
 void QXDirect::OnAllPolarGraphs()
 {
 	m_iPlrView  = 0;
-	m_bPolar = true;
+	m_bPolarView = true;
 	SetPolarLegendPos();
 	SetControls();
 	UpdateView();
@@ -1748,14 +1722,14 @@ void QXDirect::OnAllPolarGraphs()
 void QXDirect::OnAllPolarGraphsSetting()
 {
 	QGraph graph;
-	graph.CopySettings(m_pPolarGraph);
+	graph.CopySettings(m_PlrGraph);
 	m_pGraphDlg->m_pMemGraph = &graph;
-	m_pGraphDlg->m_pGraph    = m_pPolarGraph;
-	m_pGraphDlg->m_GraphArray[0] = m_pPolarGraph;
-	m_pGraphDlg->m_GraphArray[1] = m_pCmGraph;
-	m_pGraphDlg->m_GraphArray[2] = m_pCzGraph;
-	m_pGraphDlg->m_GraphArray[3] = m_pTrGraph;
-	m_pGraphDlg->m_GraphArray[4] = m_pUserGraph;
+	m_pGraphDlg->m_pGraph    = m_PlrGraph;
+	m_pGraphDlg->m_GraphArray[0] = m_PlrGraph;
+	m_pGraphDlg->m_GraphArray[1] = m_PlrGraph+1;
+	m_pGraphDlg->m_GraphArray[2] = m_PlrGraph+2;
+	m_pGraphDlg->m_GraphArray[3] = m_PlrGraph+3;
+	m_pGraphDlg->m_GraphArray[4] = m_PlrGraph+4;
 	m_pGraphDlg->m_NGraph = 5;
 	m_pGraphDlg->SetParams();
 
@@ -1764,11 +1738,11 @@ void QXDirect::OnAllPolarGraphsSetting()
 	}
 	else
 	{
-		m_pPolarGraph->CopySettings(&graph);
-		m_pCmGraph->CopySettings(&graph);
-		m_pCzGraph->CopySettings(&graph);
-		m_pTrGraph->CopySettings(&graph);
-		m_pUserGraph->CopySettings(&graph);
+		m_PlrGraph[0].CopySettings(&graph);
+		m_PlrGraph[2].CopySettings(&graph);
+		m_PlrGraph[1].CopySettings(&graph);
+		m_PlrGraph[3].CopySettings(&graph);
+		m_PlrGraph[4].CopySettings(&graph);
 	}
 	UpdateView();
 }
@@ -1931,7 +1905,7 @@ void QXDirect::OnAnalyze()
 
 	m_bHighlightOpp = bHigh;
 
-	if(m_bPolar) CreatePolarCurves();
+	if(m_bPolarView) CreatePolarCurves();
 
 	SetControls();
 	UpdateView();
@@ -1943,7 +1917,7 @@ void QXDirect::OnBatchAnalysis()
 	MainFrame* pMainFrame = (MainFrame*)s_pMainFrame;
 	if(!MainFrame::s_pCurFoil) 		return;
 
-	m_bPolar = true;
+	m_bPolarView = true;
 	OnPolars();
 	UpdateView();
 
@@ -2021,7 +1995,7 @@ void QXDirect::OnMultiThreadedBatchAnalysis()
 		return;
 	}
 
-	m_bPolar = true;
+	m_bPolarView = true;
 	OnPolars();
 	UpdateView();
 
@@ -2234,7 +2208,7 @@ void QXDirect::OnCdPlot()
 void QXDirect::OnCouplePolarGraphs()
 {
 	m_iPlrView  = 2;
-	m_bPolar = true;
+	m_bPolarView = true;
 	SetControls();
 	UpdateView();
 }
@@ -2243,7 +2217,7 @@ void QXDirect::OnCouplePolarGraphs()
 
 void QXDirect::OnCpGraph()
 {
-	m_bPolar = false;
+	m_bPolarView = false;
 	if(m_pCpGraph->GetYVariable()!=0)
 	{
 //		m_pCpGraph->ResetLimits();
@@ -2337,6 +2311,8 @@ void QXDirect::OnCtPlot()
 void QXDirect::OnCurOppOnly()
 {
 	m_bCurOppOnly = !m_bCurOppOnly;
+	((MainFrame*)s_pMainFrame)->showCurOppOnly->setChecked(m_bCurOppOnly);
+
 	if(m_pCurOpp) m_pCurOpp->m_bIsVisible = true;
 	CreateOppCurves();
 	SetAnalysisParams();
@@ -2475,7 +2451,7 @@ void QXDirect::OnDeleteCurFoil()
 
 	pMainFrame->UpdateFoils();
 
-	if(m_bPolar) CreatePolarCurves();
+	if(m_bPolarView) CreatePolarCurves();
 	else         CreateOppCurves();
 	pMainFrame->SetSaveState(false);
 
@@ -2578,7 +2554,7 @@ void QXDirect::OnDeletePolarOpps()
 	m_pCurOpp=NULL;
 	pMainFrame->SetSaveState(false);
 	pMainFrame->UpdateOpps();
-	if(!m_bPolar) CreateOppCurves();
+	if(!m_bPolarView) CreateOppCurves();
 	SetCurveParams();
 	SetControls();
 	UpdateView();
@@ -2605,7 +2581,7 @@ void QXDirect::OnDeleteFoilOpps()
 	m_pCurOpp = NULL;
 	pMainFrame->SetSaveState(false);
 	pMainFrame->UpdateOpps();
-	if(!m_bPolar) CreateOppCurves();
+	if(!m_bPolarView) CreateOppCurves();
 	SetCurveParams();
 	SetControls();
 	UpdateView();
@@ -3143,7 +3119,7 @@ void QXDirect::OnExportPolarOpps()
 
 			for (j=0; j<pOpPoint->n; j++)
 			{
-				if(pOpPoint->m_bVisc)
+				if(pOpPoint->m_bViscResults)
 				{
 					if(pMainFrame->m_ExportFileType==TXT) strong = QString("%1   %2\n").arg(pOpPoint->Cpi[j], 7,'f',4).arg(pOpPoint->Cpv[j], 7, 'f',4);
 					else                                  strong = QString("%1,%2\n").arg(pOpPoint->Cpi[j], 7,'f',4).arg(pOpPoint->Cpv[j], 7, 'f',4);
@@ -3215,7 +3191,7 @@ void QXDirect::OnFoilCoordinates()
 	bool bBL       = m_bBL;
 	m_bPressure = false;
 	m_bBL       = false;
-	m_bPolar    = false;
+	m_bPolarView    = false;
 	UpdateView();
 
 	bool bFlap       = m_BufferFoil.m_bTEFlap;
@@ -3282,7 +3258,7 @@ void QXDirect::OnFoilGeom()
 	if(!MainFrame::s_pCurFoil)	return;
 
 	StopAnimate();
-	m_bPolar   = false;
+	m_bPolarView   = false;
 
 	void* ptr = m_pCurOpp;
 	m_pCurOpp = NULL;
@@ -3328,7 +3304,7 @@ void QXDirect::OnGraphSettings()
 	pGraph = m_pCurGraph;
 	if(!pGraph) return;
 
-	if(!m_bPolar)
+	if(!m_bPolarView)
 	{
 		m_pGraphDlg->m_iGraphType = 51;
 	}
@@ -3348,7 +3324,7 @@ void QXDirect::OnGraphSettings()
 
 	if(res == QDialog::Accepted)
 	{
-		if(!m_bPolar)
+		if(!m_bPolarView)
 		{
 			if(m_pCpGraph->GetYVariable() == 0 || m_pCpGraph->GetYVariable()>=2)
 			{
@@ -3365,25 +3341,25 @@ void QXDirect::OnGraphSettings()
 		}
 		else
 		{
-			if(m_pPolarGraph == pGraph)
+			if(m_PlrGraph == pGraph)
 			{
-				SetGraphTitles(m_pPolarGraph);
+				SetGraphTitles(m_PlrGraph);
 			}
-			else if(m_pCzGraph == pGraph)
+			else if(m_PlrGraph+1 == pGraph)
 			{
-				SetGraphTitles(m_pCzGraph);
+				SetGraphTitles(m_PlrGraph+1);
 			}
-			else if(m_pCmGraph == pGraph)
+			else if(m_PlrGraph+2 == pGraph)
 			{
-				SetGraphTitles(m_pCmGraph);
+				SetGraphTitles(m_PlrGraph+2);
 			}
-			else if(m_pTrGraph == pGraph)
+			else if(m_PlrGraph+3 == pGraph)
 			{
-				SetGraphTitles(m_pTrGraph);
+				SetGraphTitles(m_PlrGraph+3);
 			}
-			else if(m_pUserGraph == pGraph)
+			else if(m_PlrGraph+4 == pGraph)
 			{
-				SetGraphTitles(m_pUserGraph);
+				SetGraphTitles(m_PlrGraph+4);
 			}
 			if(m_pGraphDlg->m_bVariableChanged)
 			{
@@ -3403,16 +3379,16 @@ void QXDirect::OnGraphSettings()
 
 void QXDirect::OnHighlightOpp()
 {
-	if(!m_bPolar) return;
+	if(!m_bPolarView) return;
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	m_bHighlightOpp = !m_bHighlightOpp;
 
 	pMainFrame->highlightOppAct->setChecked(m_bHighlightOpp);
-	m_pPolarGraph->m_bHighlightPoint = m_bHighlightOpp;
-	m_pCmGraph->m_bHighlightPoint = m_bHighlightOpp;
-	m_pCzGraph->m_bHighlightPoint = m_bHighlightOpp;
-	m_pTrGraph->m_bHighlightPoint = m_bHighlightOpp;
-	m_pUserGraph->m_bHighlightPoint = m_bHighlightOpp;
+	m_PlrGraph[0].m_bHighlightPoint = m_bHighlightOpp;
+	m_PlrGraph[2].m_bHighlightPoint = m_bHighlightOpp;
+	m_PlrGraph[1].m_bHighlightPoint = m_bHighlightOpp;
+	m_PlrGraph[3].m_bHighlightPoint = m_bHighlightOpp;
+	m_PlrGraph[4].m_bHighlightPoint = m_bHighlightOpp;
 
 	CreatePolarCurves();
 	UpdateView();
@@ -3468,7 +3444,7 @@ void QXDirect::OnHideAllOpps()
 		pOpp->m_bIsVisible = false;
 	}
 	pMainFrame->SetSaveState(false);
-	if(!m_bPolar) CreateOppCurves();
+	if(!m_bPolarView) CreateOppCurves();
 	SetAnalysisParams();
 	UpdateView();
 }
@@ -3524,7 +3500,7 @@ void QXDirect::OnHideFoilOpps()
 			pOpp->m_bIsVisible = false;
 	}
 	pMainFrame->SetSaveState(false);
-	if(!m_bPolar) CreateOppCurves();
+	if(!m_bPolarView) CreateOppCurves();
 	SetCurveParams();
 	UpdateView();
 }
@@ -3545,7 +3521,7 @@ void QXDirect::OnHidePolarOpps()
 			pOpp->m_bIsVisible = false;
 	}
 	pMainFrame->SetSaveState(false);
-	if(!m_bPolar) CreateOppCurves();
+	if(!m_bPolarView) CreateOppCurves();
 	SetCurveParams();
 	UpdateView();
 }
@@ -3925,7 +3901,7 @@ void QXDirect::OnNacaFoils()
 {
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	StopAnimate();
-	m_bPolar   = false;
+	m_bPolarView   = false;
 
 	void* ptr0 = MainFrame::s_pCurFoil;
 	void* ptr  = m_pCurOpp;
@@ -4044,10 +4020,10 @@ void QXDirect::OnNPlot()
 
 void QXDirect::OnOpPoints()
 {
-	if(!m_bPolar) return;
+	if(!m_bPolarView) return;
 //	MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
 
-	m_bPolar = false;
+	m_bPolarView = false;
 	CreateOppCurves();
 	SetFoilScale();
 	SetCurveParams();
@@ -4059,9 +4035,9 @@ void QXDirect::OnOpPoints()
 
 void QXDirect::OnPolars()
 {
-	if(m_bPolar) return;
+	if(m_bPolarView) return;
 //	MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
-	m_bPolar = true;
+	m_bPolarView = true;
 	CreatePolarCurves();
 	SetCurveParams();
 	SetAnalysisParams();
@@ -4085,7 +4061,7 @@ void QXDirect::OnPolarFilter()
 		m_bType2 = m_pPolarFilterDlg->m_bType2;
 		m_bType3 = m_pPolarFilterDlg->m_bType3;
 		m_bType4 = m_pPolarFilterDlg->m_bType4;
-		if(m_bPolar)
+		if(m_bPolarView)
 		{
 			CreatePolarCurves();
 			UpdateView();
@@ -4153,7 +4129,7 @@ void QXDirect::OnPanels()
 
 void QXDirect::OnQGraph()
 {
-	m_bPolar = false;
+	m_bPolarView = false;
 	if(m_pCpGraph->GetYVariable()!=1)
 	{
 		m_pCpGraph->ResetLimits();
@@ -4289,25 +4265,25 @@ void QXDirect::OnRenamePolar()
 
 void QXDirect::OnResetAllPolarGraphsScales()
 {
-	m_pPolarGraph->SetAuto(true);
-	m_pPolarGraph->ResetXLimits();
-	m_pPolarGraph->ResetYLimits();
+	m_PlrGraph[0].SetAuto(true);
+	m_PlrGraph[0].ResetXLimits();
+	m_PlrGraph[0].ResetYLimits();
 
-	m_pCmGraph->SetAuto(true);
-	m_pCmGraph->ResetXLimits();
-	m_pCmGraph->ResetYLimits();
+	m_PlrGraph[2].SetAuto(true);
+	m_PlrGraph[2].ResetXLimits();
+	m_PlrGraph[2].ResetYLimits();
 
-	m_pCzGraph->SetAuto(true);
-	m_pCzGraph->ResetXLimits();
-	m_pCzGraph->ResetYLimits();
+	m_PlrGraph[1].SetAuto(true);
+	m_PlrGraph[1].ResetXLimits();
+	m_PlrGraph[1].ResetYLimits();
 
-	m_pTrGraph->SetAuto(true);
-	m_pTrGraph->ResetXLimits();
-	m_pTrGraph->ResetYLimits();
+	m_PlrGraph[3].SetAuto(true);
+	m_PlrGraph[3].ResetXLimits();
+	m_PlrGraph[3].ResetYLimits();
 
-	m_pUserGraph->SetAuto(true);
-	m_pUserGraph->ResetXLimits();
-	m_pUserGraph->ResetYLimits();
+	m_PlrGraph[4].SetAuto(true);
+	m_PlrGraph[4].ResetXLimits();
+	m_PlrGraph[4].ResetYLimits();
 
 	UpdateView();
 }
@@ -4348,7 +4324,7 @@ void QXDirect::OnResetCurPolar()
 
 	pMainFrame->UpdateOpps();
 
-	if(m_bPolar) CreatePolarCurves();
+	if(m_bPolarView) CreatePolarCurves();
 	else         CreateOppCurves();
 	UpdateView();
 }
@@ -4632,21 +4608,25 @@ void QXDirect::OnSetTEGap()
 
 
 
-
 void QXDirect::OnShowAllOpps()
 {
-	MainFrame * pMainFrame = (MainFrame*) s_pMainFrame;
 	OpPoint *pOpp;
+
+	m_bCurOppOnly = false;
+	((MainFrame*)s_pMainFrame)->showCurOppOnly->setChecked(m_bCurOppOnly);
+
 	for (int i=0; i<m_poaOpp->size(); i++)
 	{
 		pOpp = (OpPoint*)m_poaOpp->at(i);
 		pOpp->m_bIsVisible = true;
 	}
-	pMainFrame->SetSaveState(false);
-	if(!m_bPolar) CreateOppCurves();
+	((MainFrame*)s_pMainFrame)->SetSaveState(false);
+	if(!m_bPolarView) CreateOppCurves();
 	SetCurveParams();
 	UpdateView();
 }
+
+
 
 void QXDirect::OnShowAllPolars()
 {
@@ -4669,7 +4649,7 @@ void QXDirect::OnShowBL()
 {
 	if(m_pctrlShowBL->isChecked())
 	{
-		if(m_bPolar) OnOpPoints();
+		if(m_bPolarView) OnOpPoints();
 		m_pctrlShowPressure->setChecked(false);
 		m_bBL = true;
 		m_bPressure = false;
@@ -4687,7 +4667,7 @@ void QXDirect::OnShowCurve()
 	//user has toggled visible switch
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 
-	if(m_bPolar)
+	if(m_bPolarView)
 	{
 		if (m_pCurPolar)
 		{
@@ -4743,12 +4723,18 @@ void QXDirect::OnShowFoilPolars()
 	SetCurveParams();
 	UpdateView();
 }
+
+
+
 void QXDirect::OnShowFoilOpps()
 {
 	if(!MainFrame::s_pCurFoil || !m_pCurPolar) return;
 
 	MainFrame* pMainFrame = (MainFrame*)s_pMainFrame;
 	OpPoint *pOpp;
+
+	m_bCurOppOnly = false;
+	((MainFrame*)s_pMainFrame)->showCurOppOnly->setChecked(m_bCurOppOnly);
 
 	for(int i=0; i<m_poaOpp->size(); i++)
 	{
@@ -4757,8 +4743,9 @@ void QXDirect::OnShowFoilOpps()
 			pOpp->m_bIsVisible = true;
 	}
 	pMainFrame->SetSaveState(false);
-	if(!m_bPolar) CreateOppCurves();
+	if(!m_bPolarView) CreateOppCurves();
 	SetCurveParams();
+
 	UpdateView();
 }
 
@@ -4767,7 +4754,7 @@ void QXDirect::OnShowFoilOpps()
 void QXDirect::OnShowNeutralLine()
 {
 	m_bNeutralLine = !m_bNeutralLine;
-	if(!m_bPolar) UpdateView();
+	if(!m_bPolarView) UpdateView();
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	pMainFrame->showNeutralLine->setChecked(m_bNeutralLine);
 }
@@ -4776,7 +4763,7 @@ void QXDirect::OnShowNeutralLine()
 void QXDirect::OnShowPanels()
 {
 	m_bShowPanels = !m_bShowPanels;
-	if(!m_bPolar)	UpdateView();
+	if(!m_bPolarView)	UpdateView();
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	pMainFrame->showPanels->setChecked(m_bShowPanels);
 }
@@ -4786,7 +4773,7 @@ void QXDirect::OnShowPoints()
 {
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 
-	if(m_bPolar)
+	if(m_bPolarView)
 	{
 		if (m_pCurPolar)
 		{ 
@@ -4813,6 +4800,9 @@ void QXDirect::OnShowPolarOpps()
 	MainFrame* pMainFrame = (MainFrame*)s_pMainFrame;
 	OpPoint *pOpp;
 
+	m_bCurOppOnly = false;
+	((MainFrame*)s_pMainFrame)->showCurOppOnly->setChecked(m_bCurOppOnly);
+
 	for(int i=0; i<m_poaOpp->size(); i++)
 	{
 		pOpp = (OpPoint*)m_poaOpp->at(i);
@@ -4820,7 +4810,7 @@ void QXDirect::OnShowPolarOpps()
 			pOpp->m_bIsVisible = true;
 	}
 	pMainFrame->SetSaveState(false);
-	if(!m_bPolar) CreateOppCurves();
+	if(!m_bPolarView) CreateOppCurves();
 	SetCurveParams();
 	UpdateView();
 }
@@ -4831,7 +4821,7 @@ void QXDirect::OnShowPressure()
 {
 	if(m_pctrlShowPressure->isChecked())
 	{
-		if(m_bPolar) OnOpPoints();
+		if(m_bPolarView) OnOpPoints();
 		m_pctrlShowBL->setChecked(false);
 		m_bBL = false;
 		m_bPressure = true;
@@ -4851,8 +4841,8 @@ void QXDirect::OnSinglePolarGraph()
 	if (!action) return;
 
 	m_iPlrView  = 1;
-	m_iPlrGraph = action->data().toInt()+1;
-	m_bPolar = true;
+	m_iPlrGraph = action->data().toInt();
+	m_bPolarView = true;
 	SetPolarLegendPos();
 	SetControls();
 	UpdateView();
@@ -4989,7 +4979,7 @@ void QXDirect::PaintBL(QPainter &painter, OpPoint* pOpPoint, double scale)
 	double cosa = cos(alpha);
 	double sina = sin(alpha);
 
-	if(!pOpPoint->m_bVisc || !pOpPoint->m_bDispSurf) return;
+	if(!pOpPoint->m_bViscResults || !pOpPoint->m_bBL) return;
 
 	offset = m_FoilOffset;
 	scale  = scale;
@@ -5047,7 +5037,7 @@ void QXDirect::PaintBL(QPainter &painter, OpPoint* pOpPoint, double scale)
 
 void QXDirect::PaintPressure(QPainter &painter, OpPoint* pOpPoint, double scale)
 {
-	if(!pOpPoint->m_bVisc ) return;
+	if(!pOpPoint->m_bViscResults ) return;
 
 	int i;
 	double alpha = -pOpPoint->Alpha*PI/180.0;
@@ -5065,7 +5055,7 @@ void QXDirect::PaintPressure(QPainter &painter, OpPoint* pOpPoint, double scale)
 
 	for(i=0; i<m_BufferFoil.n; i++)
 	{
-		if(pOpPoint->m_bVisc)	cp = pOpPoint->Cpv[i];
+		if(pOpPoint->m_bViscResults)	cp = pOpPoint->Cpv[i];
 		else					cp = pOpPoint->Cpi[i];
 		x = m_BufferFoil.x[i];
 		y = m_BufferFoil.y[i];
@@ -5183,8 +5173,8 @@ void QXDirect::PaintCoupleGraphs(QPainter &painter)
 	QRect Rect3(0, h23, w,h-h23);
 	painter.fillRect(Rect3, pMainFrame->m_BackgroundColor);
 
-	m_pPolarGraph->DrawGraph(Rect1, painter);
-	m_pUserGraph->DrawGraph(Rect2, painter);
+	m_PlrGraph[0].DrawGraph(Rect1, painter);
+	m_PlrGraph[4].DrawGraph(Rect2, painter);
 
 	PaintPolarLegend(m_PolarLegendOffset, h, painter);
 }
@@ -5205,7 +5195,7 @@ void QXDirect::PaintOpPoint(QPainter &painter)
 	{
 		//Draw Cp Graph
 		m_pCpGraph->DrawGraph(painter);
-		QPoint Place(m_rCltRect.right()-330, m_rCltRect.top() + 20);
+		QPoint Place(m_rCltRect.right()/2, m_rCltRect.top() + 20);
 		m_pCpGraph->DrawLegend(painter, Place, pMainFrame->m_TextFont, pMainFrame->m_TextColor);//Graph::DrawLegend uses graph's legend font and color
 	}
 
@@ -5305,7 +5295,7 @@ void QXDirect::PaintOpPoint(QPainter &painter)
 		Back = 12;
 		if(m_pCurOpp->m_bTEFlap) Back++;
 		if(m_pCurOpp->m_bLEFlap) Back++;
-		if(m_pCurOpp->m_bVisc && fabs(m_pCurOpp->Cd)>0.0) Back++;
+		if(m_pCurOpp->m_bViscResults && fabs(m_pCurOpp->Cd)>0.0) Back++;
 		if(m_pCurPolar->m_PolarType==FIXEDLIFTPOLAR) Back++;
 		if(m_pCurPolar->m_PolarType!=FIXEDSPEEDPOLAR && m_pCurPolar->m_PolarType!=FIXEDAOAPOLAR) Back++;
 	}
@@ -5408,7 +5398,7 @@ void QXDirect::PaintOpPoint(QPainter &painter)
 			painter.drawText(XPos,ZPos+D, dwidth, dD, Qt::AlignRight | Qt::AlignTop, Result);
 			D += dD;
 
-			if(m_pCurOpp->m_bVisc && fabs(m_pCurOpp->Cd)>0.0)
+			if(m_pCurOpp->m_bViscResults && fabs(m_pCurOpp->Cd)>0.0)
 			{
 				Result = QString(tr("         L/D = %1")).arg(m_pCurOpp->Cl/m_pCurOpp->Cd, 9, 'f', 3);
 				painter.drawText(XPos,ZPos+D, dwidth, dD, Qt::AlignRight | Qt::AlignTop, Result);
@@ -5460,12 +5450,12 @@ void QXDirect::PaintPolarGraphs(QPainter &painter)
 
 	painter.fillRect(Rect5, pMainFrame->m_BackgroundColor);
 
-	m_pPolarGraph->DrawGraph(Rect1, painter);
-	m_pCzGraph->DrawGraph(Rect2, painter);
-	m_pCmGraph->DrawGraph(Rect3, painter);
-	m_pTrGraph->DrawGraph(Rect4, painter);
+	m_PlrGraph[0].DrawGraph(Rect1, painter);
+	m_PlrGraph[1].DrawGraph(Rect2, painter);
+	m_PlrGraph[2].DrawGraph(Rect3, painter);
+	m_PlrGraph[3].DrawGraph(Rect4, painter);
 
-	if(m_bShowUserGraph)	m_pUserGraph->DrawGraph(Rect6, painter);
+	if(m_bShowUserGraph)	m_PlrGraph[4].DrawGraph(Rect6, painter);
 	else				 	painter.fillRect(Rect6, pMainFrame->m_BackgroundColor);
 
 	PaintPolarLegend(m_PolarLegendOffset,  h, painter);
@@ -5479,7 +5469,7 @@ void QXDirect::PaintPolarLegend(QPoint place, int bottom, QPainter &painter)
 	int i,j,k,l,nc,ny,nFoils;
 
 	LegendSize = 30;
-	LegendWidth = 210;
+	LegendWidth = 240;
 
 	painter.setFont(pMainFrame->m_TextFont);
 
@@ -5515,7 +5505,7 @@ void QXDirect::PaintPolarLegend(QPoint place, int bottom, QPainter &painter)
 	LegendPen.setWidth(1);
 
 	ny =0;
-	for (k = 0; k<nFoils; k++)
+	for (k=0; k<nFoils; k++)
 	{
 		int FoilPlrs = 0;
 		for (l=0; l < m_poaPolar->size(); l++)
@@ -5548,7 +5538,7 @@ void QXDirect::PaintPolarLegend(QPoint place, int bottom, QPainter &painter)
 			painter.drawText(place.x() + (int)(0.5*LegendSize), place.y() + ypos*ny-(int)(ypos/2),
 							 str.at(k));
 		}
-		for (nc=0; nc < m_poaPolar->size(); nc++)
+		for (nc=0; nc<m_poaPolar->size(); nc++)
 		{
 			pPolar = (Polar*)m_poaPolar->at(nc);
 			if(str.at(k) == pPolar->m_FoilName)
@@ -5599,34 +5589,8 @@ void QXDirect::PaintSingleGraph(QPainter &painter)
 	QRect Rect2(2*w3, 0, w-2*w3,h);
 	painter.fillRect(Rect2, pMainFrame->m_BackgroundColor);
 
-	switch (m_iPlrGraph)
-	{
-		case 1:
-		{
-			m_pCurGraph = m_pPolarGraph;
-			break;
-		}
-		case 2:
-		{
-			m_pCurGraph = m_pCzGraph;
-			break;
-		}
-		case 3:
-		{
-			m_pCurGraph = m_pTrGraph;
-			break;
-		}
-		case 4:
-		{
-			m_pCurGraph = m_pCmGraph;
-			break;
-		}
-		case 5:
-		{
-			m_pCurGraph = m_pUserGraph;
-			break;
-		}
-	}
+	if(m_iPlrGraph>=0 && m_iPlrGraph<MAXPOLARGRAPHS) m_pCurGraph = m_PlrGraph + m_iPlrGraph;
+	else                                             m_pCurGraph = NULL;
 
 	if (m_pCurGraph) m_pCurGraph->DrawGraph(Rect1, painter);
 	PaintPolarLegend(m_PolarLegendOffset, h, painter);
@@ -5637,11 +5601,11 @@ void QXDirect::PaintSingleGraph(QPainter &painter)
 void QXDirect::PaintView(QPainter &painter)
 {
 	MainFrame* pMainFrame = (MainFrame*)s_pMainFrame;
-	if(MainFrame::s_pCurFoil && !m_bPolar)
+	if(MainFrame::s_pCurFoil && !m_bPolarView)
 	{
 		PaintOpPoint(painter);
 	}
-	else if (m_bPolar)
+	else if (m_bPolarView)
 	{
 		if(m_iPlrView==0)      PaintPolarGraphs(painter);
 		else if(m_iPlrView==1) PaintSingleGraph(painter);
@@ -5702,7 +5666,7 @@ void QXDirect::SaveSettings(QSettings *pSettings)
 		pSettings->setValue("InitBL", m_bInitBL);
 		pSettings->setValue("BoundaryLayer", m_bBL);
 		pSettings->setValue("Pressure", m_bPressure);
-		pSettings->setValue("PolarView", m_bPolar);
+		pSettings->setValue("PolarView", m_bPolarView);
 		pSettings->setValue("UserGraph", m_bShowUserGraph);
 		pSettings->setValue("ShowPanels", m_bShowPanels);
 		pSettings->setValue("Type1", m_bType1);
@@ -5774,11 +5738,11 @@ void QXDirect::SaveSettings(QSettings *pSettings)
 	}
 	pSettings->endGroup();
 
-	m_pPolarGraph->SaveSettings(pSettings);
-	m_pCmGraph->SaveSettings(pSettings);
-	m_pCzGraph->SaveSettings(pSettings);
-	m_pTrGraph->SaveSettings(pSettings);
-	m_pUserGraph->SaveSettings(pSettings);
+	m_PlrGraph[0].SaveSettings(pSettings);
+	m_PlrGraph[2].SaveSettings(pSettings);
+	m_PlrGraph[1].SaveSettings(pSettings);
+	m_PlrGraph[3].SaveSettings(pSettings);
+	m_PlrGraph[4].SaveSettings(pSettings);
 	m_pCpGraph->SaveSettings(pSettings);
 }
 
@@ -5838,7 +5802,7 @@ void QXDirect::SetBufferFoil()
 
 void QXDirect::SetCurveParams()
 {
-	if(m_bPolar)
+	if(m_bPolarView)
 	{
 		if(m_pCurPolar)
 		{
@@ -6011,7 +5975,6 @@ void QXDirect::SetFoilScale(QRect CltRect)
 {
 	m_rCltRect = CltRect;
 
-
 	int w23 = (int)(2./3.*(double)m_rCltRect.width());
 	m_PolarLegendOffset = QPoint(w23+10, 10);
 
@@ -6066,7 +6029,7 @@ void QXDirect::SetHingeMoments(OpPoint *pOpPoint)
 				xmid = 0.5*(MainFrame::s_pCurFoil->x[i+1]+MainFrame::s_pCurFoil->x[i]) - xof;
 				ymid = 0.5*(MainFrame::s_pCurFoil->y[i+1]+MainFrame::s_pCurFoil->y[i]) - yof;
 
-				if(pOpPoint->m_bVisc)	pmid = 0.5*(pOpPoint->Cpv[i+1] + pOpPoint->Cpv[i]);
+				if(pOpPoint->m_bViscResults)	pmid = 0.5*(pOpPoint->Cpv[i+1] + pOpPoint->Cpv[i]);
 				else					pmid = 0.5*(pOpPoint->Cpi[i+1] + pOpPoint->Cpi[i]);
 
 
@@ -6177,7 +6140,7 @@ Polar * QXDirect::SetPolar(Polar *pPolar)
 	}
 
 	m_pXFoil->InitXFoilAnalysis(m_pCurPolar);
-	if (m_bPolar) CreatePolarCurves();
+	if (m_bPolarView) CreatePolarCurves();
 	SetAnalysisParams();
 	SetOpp();
 
@@ -6308,7 +6271,7 @@ OpPoint * QXDirect::SetOpp(double Alpha)
 	}
 	m_pCurOpp = pOpp;
 
-	if(!m_bPolar) CreateOppCurves();
+	if(!m_bPolarView) CreateOppCurves();
 	else
 	{
 		if(m_bHighlightOpp) CreatePolarCurves();
@@ -6626,14 +6589,14 @@ void QXDirect::UpdateCurve()
 {
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 
-	if(m_bPolar && m_pCurPolar)
+	if(m_bPolarView && m_pCurPolar)
 	{
 		m_pCurPolar->m_Color = m_CurveColor;
 		m_pCurPolar->m_Style = m_CurveStyle;
 		m_pCurPolar->m_Width = (int)m_CurveWidth;
 		CreatePolarCurves();
 	}
-	else if (!m_bPolar && m_pCurOpp)
+	else if (!m_bPolarView && m_pCurOpp)
 	{
 		m_pCurOpp->m_Color = m_CurveColor;
 		m_pCurOpp->m_Style = m_CurveStyle;
@@ -6702,7 +6665,7 @@ void QXDirect::wheelEvent (QWheelEvent *event )
 
 		if(!m_bAnimate) UpdateView();
 	}
-	else if(MainFrame::s_pCurFoil && !m_bPolar)
+	else if(MainFrame::s_pCurFoil && !m_bPolarView)
 	{
 		double scale = m_fFoilScale;
 

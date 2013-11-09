@@ -1818,7 +1818,7 @@ void QMiarex::CreateCpCurves()
 		// the first four curves are necessarily the current opPoint's main wing, second wing, elevator and fin
 		// the next are those the user has chosen to keep for display --> don't reset them
 		pCurve = m_CpGraph.GetCurve(i);
-		if(pCurve) pCurve->ResetCurve();
+		if(pCurve) pCurve->clear();
 	}
 
 	if(!m_pCurWOpp || !m_bShowCp)
@@ -3036,16 +3036,16 @@ void QMiarex::CreateStabTimeCurves()
 	CurveTitle = pStabView->m_pctrlCurveList->currentText();
 	
 	pCurve0 = m_TimeGraph[0].GetCurve(CurveTitle);
-	if(pCurve0) pCurve0->ResetCurve();
+	if(pCurve0) pCurve0->clear();
 	else return;
 	pCurve1 = m_TimeGraph[1].GetCurve(CurveTitle);
-	if(pCurve1) pCurve1->ResetCurve();
+	if(pCurve1) pCurve1->clear();
 	else return;
 	pCurve2 = m_TimeGraph[2].GetCurve(CurveTitle);
-	if(pCurve2) pCurve2->ResetCurve();
+	if(pCurve2) pCurve2->clear();
 	else return;
 	pCurve3 = m_TimeGraph[3].GetCurve(CurveTitle);
-	if(pCurve3) pCurve3->ResetCurve();
+	if(pCurve3) pCurve3->clear();
 	else return;
 	
 	if(!m_pCurWOpp || !m_pCurWOpp->m_bIsVisible) return;
@@ -3147,16 +3147,16 @@ void QMiarex::CreateStabRungeKuttaCurves()
 	StabViewDlg *pStabView =(StabViewDlg*)pMainFrame->m_pStabView;
 	CurveTitle = pStabView->m_pctrlCurveList->currentText();
 	pCurve0 = m_TimeGraph[0].GetCurve(CurveTitle);
-	if(pCurve0) pCurve0->ResetCurve();
+	if(pCurve0) pCurve0->clear();
 	else return;
 	pCurve1 = m_TimeGraph[1].GetCurve(CurveTitle);
-	if(pCurve1) pCurve1->ResetCurve();
+	if(pCurve1) pCurve1->clear();
 	else return;
 	pCurve2 = m_TimeGraph[2].GetCurve(CurveTitle);
-	if(pCurve2) pCurve2->ResetCurve();
+	if(pCurve2) pCurve2->clear();
 	else return;
 	pCurve3 = m_TimeGraph[3].GetCurve(CurveTitle);
-	if(pCurve3) pCurve3->ResetCurve();
+	if(pCurve3) pCurve3->clear();
 	else return;
 
 	//We need a WOpp
@@ -3463,7 +3463,7 @@ void QMiarex::DrawCpLegend(QPainter &painter, QPoint place, int bottom)
 	for (i=0; i<m_CpGraph.GetCurveCount(); i++)
 	{
 		pCurve = m_CpGraph.GetCurve(i);
-		if(pCurve->n)
+		if(pCurve->size())
 		{
 			ny++;
 
@@ -3525,7 +3525,7 @@ void QMiarex::DrawStabTimeLegend(QPainter &painter, QPoint place, int bottom)
 	for (i=0; i<m_TimeGraph[0].GetCurveCount(); i++)
 	{
 		pCurve = m_TimeGraph[0].GetCurve(i);
-		if(pCurve->n && pCurve->IsVisible())
+		if(pCurve->size() && pCurve->IsVisible())
 		{
 			ny++;
 
@@ -5135,7 +5135,7 @@ void QMiarex::GLDrawMasses()
 			glPopMatrix();
 
 			glColor3d(m_MassColor.redF(), m_MassColor.greenF(), m_MassColor.blueF());
-			for(int im=0; im<m_pWingList[iw]->m_MassValue.size(); im++)
+			for(int im=0; im<m_pWingList[iw]->m_PointMass.size(); im++)
 			{
 				glPushMatrix();
 				{
@@ -5145,13 +5145,13 @@ void QMiarex::GLDrawMasses()
 									 m_pCurPlane->WingLE(iw).y,
 									 m_pCurPlane->WingLE(iw).z);
 					}
-					glTranslated(m_pWingList[iw]->m_MassPosition[im].x,
-								 m_pWingList[iw]->m_MassPosition[im].y,
-								 m_pWingList[iw]->m_MassPosition[im].z);
+					glTranslated(m_pWingList[iw]->m_PointMass[im]->position().x,
+								 m_pWingList[iw]->m_PointMass[im]->position().y,
+								 m_pWingList[iw]->m_PointMass[im]->position().z);
 					p3dWidget->GLRenderSphere(m_MassColor,radius,18,18);
 					p3dWidget->renderText(0.0, 0.0, 0.0 +.02,
-										  m_pWingList[iw]->m_MassTag[im]
-										  +QString(" %1").arg(m_pWingList[iw]->m_MassValue[im]*pMainFrame->m_kgtoUnit, 7,'g',3)
+										  m_pWingList[iw]->m_PointMass[im]->tag()
+										  +QString(" %1").arg(m_pWingList[iw]->m_PointMass[im]->mass()*pMainFrame->m_kgtoUnit, 7,'g',3)
 										  +MassUnit);
 				}
 				glPopMatrix();
@@ -5162,15 +5162,17 @@ void QMiarex::GLDrawMasses()
 	if(m_pCurPlane)
 	{
 		glColor3d(m_MassColor.redF(), m_MassColor.greenF(), m_MassColor.blueF());
-		for(int im=0; im<m_pCurPlane->m_MassValue.size(); im++)
+		for(int im=0; im<m_pCurPlane->m_PointMass.size(); im++)
 		{
 			glPushMatrix();
 			{
-				glTranslated(m_pCurPlane->m_MassPosition[im].x,m_pCurPlane->m_MassPosition[im].y,m_pCurPlane->m_MassPosition[im].z);
+				glTranslated(m_pCurPlane->m_PointMass[im]->position().x,
+							 m_pCurPlane->m_PointMass[im]->position().y,
+							 m_pCurPlane->m_PointMass[im]->position().z);
 				p3dWidget->GLRenderSphere(m_MassColor,radius,18,18);
 				p3dWidget->renderText(0.0,0.0,0.0+.02,
-								  m_pCurPlane->m_MassTag[im]
-								  +QString(" %1").arg(m_pCurPlane->m_MassValue[im]*pMainFrame->m_kgtoUnit, 7,'g',3)
+								  m_pCurPlane->m_PointMass[im]->tag()
+								  +QString(" %1").arg(m_pCurPlane->m_PointMass[im]->mass()*pMainFrame->m_kgtoUnit, 7,'g',3)
 								  +MassUnit);
 			}
 			glPopMatrix();
@@ -5198,11 +5200,11 @@ void QMiarex::GLDrawMasses()
 		}
 		glPopMatrix();
 		glColor3d(m_MassColor.redF(), m_MassColor.greenF(), m_MassColor.blueF());
-		for(int im=0; im<m_pCurBody->m_MassValue.size(); im++)
+		for(int im=0; im<m_pCurBody->m_PointMass.size(); im++)
 		{
 			glPushMatrix();
 			{
-				glTranslated(m_pCurBody->m_MassPosition[im].x,m_pCurBody->m_MassPosition[im].y,m_pCurBody->m_MassPosition[im].z);
+				glTranslated(m_pCurBody->m_PointMass[im]->position().x,m_pCurBody->m_PointMass[im]->position().y,m_pCurBody->m_PointMass[im]->position().z);
 				if(m_pCurPlane)
 				{
 					glTranslated(m_pCurPlane->BodyPos().x,
@@ -5213,8 +5215,8 @@ void QMiarex::GLDrawMasses()
 				p3dWidget->GLRenderSphere(m_MassColor,radius,18,18);
 
 				p3dWidget->renderText(0.0, 0.0, 0.0+.02,
-								  m_pCurBody->m_MassTag[im]
-								  +QString(" %1").arg(m_pCurBody->m_MassValue[im]*pMainFrame->m_kgtoUnit, 7,'g',3)
+								  m_pCurBody->m_PointMass[im]->tag()
+								  +QString(" %1").arg(m_pCurBody->m_PointMass[im]->mass()*pMainFrame->m_kgtoUnit, 7,'g',3)
 								  +MassUnit);
 			}
 			glPopMatrix();
@@ -10070,7 +10072,7 @@ void QMiarex::OnKeepCpSection()
 
 	pCurve = m_CpGraph.GetCurve(0);
 	pNewCurve = m_CpGraph.AddCurve();
-	pNewCurve->Copy(pCurve);
+	pNewCurve->CopyData(pCurve);
 
 	m_CpColor = pMainFrame->m_ColorList[(m_CpGraph.GetCurveCount())%24];
 	pCurve->SetColor(m_CpColor);

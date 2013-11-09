@@ -96,9 +96,7 @@ Plane::Plane()
 	m_bDoubleSymFin = true;
 	m_bBiplane      = false;
 
-	m_MassValue.clear();
-	m_MassPosition.clear();
-	m_MassTag.clear();
+	m_PointMass.clear();
 
 
 	m_PlaneName  = QObject::tr("Plane Name");
@@ -220,30 +218,30 @@ void Plane::ComputeBodyAxisInertia()
 	m_CoG = VolumeCoG *VolumeMass;
 
 	// add point masses
-	for(i=0; i<m_MassValue.size(); i++)
+	for(i=0; i<m_PointMass.size(); i++)
 	{
-		m_TotalMass += m_MassValue[i];
-		m_CoG       += m_MassPosition[i] * m_MassValue[i];
+		m_TotalMass += m_PointMass[i]->mass();
+		m_CoG       += m_PointMass[i]->position() * m_PointMass[i]->mass();
 	}
 
 	for(iw=0; iw<MAXWINGS; iw++)
 	{
 		if(pWing[iw])
 		{
-			for(i=0; i<pWing[iw]->m_MassValue.size(); i++)
+			for(i=0; i<pWing[iw]->m_PointMass.size(); i++)
 			{
-				m_TotalMass +=  pWing[iw]->m_MassValue[i];
-				m_CoG       += (pWing[iw]->m_MassPosition[i]+ m_WingLE[iw]) * pWing[iw]->m_MassValue[i];
+				m_TotalMass +=  pWing[iw]->m_PointMass[i]->mass();
+				m_CoG       += (pWing[iw]->m_PointMass[i]->position()+ m_WingLE[iw]) * pWing[iw]->m_PointMass[i]->mass();
 			}
 		}
 	}
 
 	if(getBody())
 	{
-		for(i=0; i<m_pBody->m_MassValue.size(); i++)
+		for(i=0; i<m_pBody->m_PointMass.size(); i++)
 		{
-			m_TotalMass +=  m_pBody->m_MassValue[i];
-			m_CoG       += (m_pBody->m_MassPosition[i]+m_BodyPos) * m_pBody->m_MassValue[i];
+			m_TotalMass +=  m_pBody->m_PointMass[i]->mass();
+			m_CoG       += (m_pBody->m_PointMass[i]->position()+m_BodyPos) * m_pBody->m_PointMass[i]->mass();
 		}
 	}
 	if(m_TotalMass>PRECISION) m_CoG = m_CoG/m_TotalMass;
@@ -259,39 +257,39 @@ void Plane::ComputeBodyAxisInertia()
 	m_CoGIzz = Izz + VolumeMass * (MassPos.x*MassPos.x+ MassPos.y*MassPos.y);
 	m_CoGIxz = Ixz - VolumeMass *  MassPos.x*MassPos.z;
 
-	for(i=0; i<m_MassValue.size(); i++)
+	for(i=0; i<m_PointMass.size(); i++)
 	{
-		MassPos = m_CoG - m_MassPosition[i];
-		m_CoGIxx += m_MassValue[i] * (MassPos.y*MassPos.y + MassPos.z*MassPos.z);
-		m_CoGIyy += m_MassValue[i] * (MassPos.x*MassPos.x + MassPos.z*MassPos.z);
-		m_CoGIzz += m_MassValue[i] * (MassPos.x*MassPos.x + MassPos.y*MassPos.y);
-		m_CoGIxz -= m_MassValue[i] * (MassPos.x*MassPos.z);
+		MassPos = m_CoG - m_PointMass[i]->position();
+		m_CoGIxx += m_PointMass[i]->mass() * (MassPos.y*MassPos.y + MassPos.z*MassPos.z);
+		m_CoGIyy += m_PointMass[i]->mass() * (MassPos.x*MassPos.x + MassPos.z*MassPos.z);
+		m_CoGIzz += m_PointMass[i]->mass() * (MassPos.x*MassPos.x + MassPos.y*MassPos.y);
+		m_CoGIxz -= m_PointMass[i]->mass() * (MassPos.x*MassPos.z);
 	}
 
 	for(iw=0; iw<MAXWINGS; iw++)
 	{
 		if(pWing[iw])
 		{
-			for(i=0; i<pWing[iw]->m_MassValue.size(); i++)
+			for(i=0; i<pWing[iw]->m_PointMass.size(); i++)
 			{
-				MassPos = m_CoG - (pWing[iw]->m_MassPosition[i] + m_WingLE[iw]);
-				m_CoGIxx += pWing[iw]->m_MassValue[i] * (MassPos.y*MassPos.y + MassPos.z*MassPos.z);
-				m_CoGIyy += pWing[iw]->m_MassValue[i] * (MassPos.x*MassPos.x + MassPos.z*MassPos.z);
-				m_CoGIzz += pWing[iw]->m_MassValue[i] * (MassPos.x*MassPos.x + MassPos.y*MassPos.y);
-				m_CoGIxz -= pWing[iw]->m_MassValue[i] * (MassPos.x*MassPos.z);
+				MassPos = m_CoG - (pWing[iw]->m_PointMass[i]->position() + m_WingLE[iw]);
+				m_CoGIxx += pWing[iw]->m_PointMass[i]->mass() * (MassPos.y*MassPos.y + MassPos.z*MassPos.z);
+				m_CoGIyy += pWing[iw]->m_PointMass[i]->mass() * (MassPos.x*MassPos.x + MassPos.z*MassPos.z);
+				m_CoGIzz += pWing[iw]->m_PointMass[i]->mass() * (MassPos.x*MassPos.x + MassPos.y*MassPos.y);
+				m_CoGIxz -= pWing[iw]->m_PointMass[i]->mass() * (MassPos.x*MassPos.z);
 			}
 		}
 	}
 	if(getBody())
 	{
 		Body *pBody = m_pBody;
-		for(i=0; i<pBody->m_MassValue.size(); i++)
+		for(i=0; i<pBody->m_PointMass.size(); i++)
 		{
-			MassPos = m_CoG - (pBody->m_MassPosition[i] + m_BodyPos);
-			m_CoGIxx += pBody->m_MassValue[i] * (MassPos.y*MassPos.y + MassPos.z*MassPos.z);
-			m_CoGIyy += pBody->m_MassValue[i] * (MassPos.x*MassPos.x + MassPos.z*MassPos.z);
-			m_CoGIzz += pBody->m_MassValue[i] * (MassPos.x*MassPos.x + MassPos.y*MassPos.y);
-			m_CoGIxz -= pBody->m_MassValue[i] * (MassPos.x*MassPos.z);
+			MassPos = m_CoG - (pBody->m_PointMass[i]->position() + m_BodyPos);
+			m_CoGIxx += pBody->m_PointMass[i]->mass() * (MassPos.y*MassPos.y + MassPos.z*MassPos.z);
+			m_CoGIyy += pBody->m_PointMass[i]->mass() * (MassPos.x*MassPos.x + MassPos.z*MassPos.z);
+			m_CoGIzz += pBody->m_PointMass[i]->mass() * (MassPos.x*MassPos.x + MassPos.y*MassPos.y);
+			m_CoGIxz -= pBody->m_PointMass[i]->mass() * (MassPos.x*MassPos.z);
 		}
 	}
 }
@@ -366,14 +364,10 @@ void Plane::Duplicate(Plane *pPlane)
 	m_CoGIzz = pPlane->m_CoGIzz;
 	m_CoGIxz = pPlane->m_CoGIxz;
 
-	m_MassValue.clear();
-	m_MassPosition.clear();
-	m_MassTag.clear();
-	for(int i=0; i<pPlane->m_MassValue.size();i++)
+	m_PointMass.clear();
+	for(int i=0; i<pPlane->m_PointMass.size();i++)
 	{
-		m_MassValue.append(pPlane->m_MassValue[i]);
-		m_MassPosition.append(pPlane->m_MassPosition[i]);
-		m_MassTag.append(pPlane->m_MassTag[i]);
+		m_PointMass.append(new PointMass(pPlane->m_PointMass[i]));
 	}
 
 	m_bBody = pPlane->m_bBody ;
@@ -399,8 +393,8 @@ double Plane::TotalMass()
 	if(m_bFin)     Mass += m_Fin.TotalMass();
 	if(getBody())    Mass += m_pBody->TotalMass();
 	
-	for(int i=0; i<m_MassValue.size(); i++)
-		Mass += m_MassValue[i];
+	for(int i=0; i<m_PointMass.size(); i++)
+		Mass += m_PointMass[i]->mass();
 	return Mass;
 }
 
@@ -465,10 +459,10 @@ bool Plane::SerializePlane(QDataStream &ar, bool bIsStoring)
 		}
 
 
-		ar << m_MassValue.size();
-		for(i=0; i<m_MassValue.size(); i++) ar << (float)m_MassValue[i];
-		for(i=0; i<m_MassValue.size(); i++) ar << (float)m_MassPosition[i].x << (float)m_MassPosition[i].y << (float)m_MassPosition[i].z;
-		for(i=0; i<m_MassValue.size(); i++)  WriteCString(ar, m_MassTag[i]);
+		ar << m_PointMass.size();
+		for(i=0; i<m_PointMass.size(); i++) ar << (float)m_PointMass[i]->mass();
+		for(i=0; i<m_PointMass.size(); i++) ar << (float)m_PointMass[i]->position().x << (float)m_PointMass[i]->position().y << (float)m_PointMass[i]->position().z;
+		for(i=0; i<m_PointMass.size(); i++)  WriteCString(ar, m_PointMass[i]->tag());
 
 		return true;
 	}
@@ -567,23 +561,30 @@ bool Plane::SerializePlane(QDataStream &ar, bool bIsStoring)
 		if(ArchiveFormat>=1012)
 		{
 			ar >> nMass;
-			m_MassValue.clear();
-			m_MassPosition.clear();
-			m_MassTag.clear();
-			for(i=0; i<nMass; i++)
+			QVarLengthArray<double> mass;
+			QVarLengthArray<CVector> position;
+			QVarLengthArray<QString> tag;
+
+			for(int im=0; im<nMass; im++)
 			{
 				ar >> f;
-				m_MassValue.append(f);
+				mass.append(f);
 			}
-			for(i=0; i<nMass; i++)
+			for(int im=0; im<nMass; im++)
 			{
 				ar >> f >> g >> h;
-				m_MassPosition.append(CVector(f,g,h));
+				position.append(CVector(f,g,h));
 			}
-			for(i=0; i<nMass; i++)
+			for(int im=0; im<nMass; im++)
 			{
-				m_MassTag.append("");
-				ReadCString(ar, m_MassTag[i]);
+				tag.append("");
+				ReadCString(ar, tag[im]);
+			}
+
+			m_PointMass.clear();
+			for(int im=0; im<nMass; im++)
+			{
+				m_PointMass.append(new PointMass(mass[im], position[im], tag[im]));
 			}
 		}
 

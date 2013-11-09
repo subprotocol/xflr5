@@ -277,7 +277,7 @@ double Spline::GetY(double const &x)
 * Inserts a new point in the array of control points, using crescending x values as the key for insertion
 * @param x the x-coordinate of the point to insert
 * @param y the y-coordinate of the point to insert
-* @return true unless the max number of points has been reached @todo check if SPLINECONTROLSIZE still has a use
+* @return true unless the max number of points has been reached
 */
 bool Spline::InsertPoint(double const &x, double const &y)
 {

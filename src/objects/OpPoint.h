@@ -23,7 +23,7 @@
 /**
  *@file
  *
- * This class defines the surface object on which the panels are constructed for the VLM and 3d-panel calculations.
+ * This class implements the surface object on which the panels are constructed for the VLM and 3d-panel calculations.
  *
  */
 
@@ -60,32 +60,50 @@ public:
 	OpPoint();
 
 private:
-	static void *s_pMainFrame;
-	bool m_bVisc, m_bDispSurf;
-	bool m_bTEFlap, m_bLEFlap;
+	static void *s_pMainFrame;  /**< a static pointer to the application's MainFrame window */
+	bool m_bViscResults;        /**< true if viscous results are stored in this OpPoint */
+	bool m_bBL;                 /**< true if a boundary layer is stored in this OpPoint */
+	bool m_bTEFlap;             /**< true if the parent foil has a flap on the trailing edge */
+	bool m_bLEFlap;             /**< true if the parent foil has a flap on the leading edge */
 
 	int n, nd1, nd2, nd3;
-	double Reynolds;
-	double Mach;
-	double Alpha; /**< The aoa. Used as an index to identify the foil */
-	double Cl, Cm, Cd, Cdp, Xtr1, Xtr2, ACrit;
-	double m_XCP;
-	double x[IQX], y[IQX];
-//	double s[IQX];// foil coordinates
-	double Cpv[IQX], Cpi[IQX];
-	double Qv[IQX], Qi[IQX];
-	double xd1[IQX], yd1[IQX]; /**< first... */
-	double xd2[IWX], yd2[IWX]; /**< ...second... */
-	double xd3[IWX], yd3[IWX]; /**< ...and third part of the boundary layer */
-	double m_TEHMom, m_LEHMom, XForce, YForce;
-	double Cpmn;
+	double Reynolds;            /**< the Re number of the OpPoint */
+	double Mach;                /**< the Mach number of the OpPoint */
+	double Alpha;               /**< the aoa*/
+	double Cl;                  /**< the lift coefficient */
+	double Cm;                  /**< the pitching moment coefficient */
+	double Cd;                  /**< the drag coefficient - viscous only, since we are dealing with 2D analysis */
+	double Cdp;                 /**< @todo check significance in XFoil doc */
+	double Xtr1;                /**< the laminar to turbulent transition point on the upper surface */
+	double Xtr2;                /**< the laminar to turbulent transition point on the lower surface */
+	double ACrit;               /**< the NCrit parameter which defines turbulent transition */
+	double m_XCP;               /**< the x-position of the centre of pressure */
+//	double x[IQX], y[IQX];      /**< the foil coordinates @todo check if still of use */
 
-	QString m_strFoilName;
-	QString m_strPlrName;
+	double Cpv[IQX];            /**< the distribution of Cp on the surfaces for a viscous analysis */
+	double Cpi[IQX];            /**< the distribution of Cp on the surfaces for an inviscid analysis */
+	double Qv[IQX];             /**< the distribution of stream velocity on the surfaces for a viscous analysis */
+	double Qi[IQX];             /**< the distribution of stream velocity on the surfaces for an inviscid analysis */
+	double xd1[IQX];            /**< x-coordinate of the first part of the boundary layer */
+	double yd1[IQX];            /**< y-coordinate of the first part of the boundary layer */
+	double xd2[IWX];            /**< x-coordinate of the second part of the boundary layer */
+	double yd2[IWX];            /**< y-coordinate of the second part of the boundary layer */
+	double xd3[IWX];            /**< x-coordinate of the third part of the boundary layer */
+	double yd3[IWX];            /**< y-coordinate of the third part of the boundary layer */
+	double m_TEHMom;            /**< the moment on the foils trailing edge flap */
+	double m_LEHMom;            /**< the moment on the foils leading edge flap */
+	double XForce;              /**< the y-component of the pressure forces */
+	double YForce;              /**< the y-component of the pressure forces */
+	double Cpmn;                /**< @todo check significance in XFoil doc */
 
-	bool m_bIsVisible, m_bShowPoints;
-	int m_Style, m_Width;
-	QColor m_Color;
+	QString m_strFoilName;      /**< the name of the parent foil */
+	QString m_strPlrName;       /**< the name of the parent polar */
+
+	bool m_bIsVisible;          /**< true if the OpPoint's curve is visible in the active view */
+	bool m_bShowPoints;         /**< true if the OpPoint's curve points are visible in the active graphs */
+	int m_Style;                /**< the index of the style with which to draw the OpPoint's curve */
+	int m_Width;                /**< the width with which to draw the OpPoint's curve */
+	QColor m_Color;             /**< the color with which to draw the OpPoint's curve */
 	
 
 private:

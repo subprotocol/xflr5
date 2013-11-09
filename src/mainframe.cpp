@@ -1032,11 +1032,7 @@ void MainFrame::CreateDockWindows()
 
 	QXDirect::s_p2DWidget              = m_p2DWidget;
 	pXDirect->m_pCpGraph->m_pParent    = m_p2DWidget;
-	pXDirect->m_pPolarGraph->m_pParent = m_p2DWidget;
-	pXDirect->m_pTrGraph->m_pParent    = m_p2DWidget;
-	pXDirect->m_pCzGraph->m_pParent    = m_p2DWidget;
-	pXDirect->m_pCmGraph->m_pParent    = m_p2DWidget;
-	pXDirect->m_pUserGraph->m_pParent  = m_p2DWidget;
+	for(int ig=0; ig<MAXPOLARGRAPHS; ig++) pXDirect->m_PlrGraph[ig].m_pParent = m_p2DWidget;
 	pXDirect->m_poaFoil  = &m_oaFoil;
 	pXDirect->m_poaPolar = &m_oaPolar;
 	pXDirect->m_poaOpp   = &m_oaOpp;
@@ -1060,9 +1056,9 @@ void MainFrame::CreateDockWindows()
 	GL3dWingDlg::s_pMiarex      = m_pMiarex;
 	ThreeDWidget::s_pMiarex     = m_pMiarex;
 	PlaneDlg::s_pMiarex         = m_pMiarex;
-	Wing::s_pMiarex            = m_pMiarex;
-	WPolar::s_pMiarex          = m_pMiarex;
-	WingOpp::s_pMiarex            = m_pMiarex;
+	Wing::s_pMiarex             = m_pMiarex;
+	WPolar::s_pMiarex           = m_pMiarex;
+	WingOpp::s_pMiarex          = m_pMiarex;
 	LLTAnalysisDlg::s_pMiarex   = m_pMiarex;
 	PanelAnalysisDlg::s_pMiarex = m_pMiarex;
 	ManageUFOsDlg::s_pMiarex    = m_pMiarex;
@@ -2780,7 +2776,7 @@ void MainFrame::DeleteProject()
 	pXDirect->SetFoil();
 
 	UpdateFoils();
-	if(pXDirect->m_bPolar) pXDirect->CreatePolarCurves();
+	if(pXDirect->m_bPolarView) pXDirect->CreatePolarCurves();
 	else                   pXDirect->CreateOppCurves();
 
 	QAFoil *pAFoil = (QAFoil*)m_pAFoil;
@@ -2925,7 +2921,8 @@ QColor MainFrame::GetColor(int type)
 						break;
 					}
 				}
-				if(!bFound) return m_ColorList.at(j);
+				if(!bFound)
+					return m_ColorList.at(j);
 			}
 			return QColor((int)((double)qrand()/(double)RAND_MAX*255.0),
 						  (int)((double)qrand()/(double)RAND_MAX*255.0),
@@ -3219,7 +3216,6 @@ bool MainFrame::LoadPolarFileV3(QDataStream &ar, bool bIsStoring, int ArchiveFor
 	Polar *pPolar = NULL;
 	Polar *pOldPlr;
 	OpPoint *pOpp, *pOldOpp;
-//	QXDirect *pXDirect =(QXDirect*)m_pXDirect;
 
 	//first read all available foils
 	int i,l,n;
@@ -3267,7 +3263,6 @@ bool MainFrame::LoadPolarFileV3(QDataStream &ar, bool bIsStoring, int ArchiveFor
 	}
 
 	//Last read all available operating points
-
 	ar>>n;
 	for (i=0;i<n; i++)
 	{
@@ -3291,8 +3286,8 @@ bool MainFrame::LoadPolarFileV3(QDataStream &ar, bool bIsStoring, int ArchiveFor
 				pFoil = GetFoil(pOpp->m_strFoilName);
 				if(pFoil)
 				{
-					memcpy(pOpp->x, pFoil->x, sizeof(pOpp->x));
-					memcpy(pOpp->y, pFoil->y, sizeof(pOpp->y));
+//					memcpy(pOpp->x, pFoil->x, sizeof(pOpp->x));
+//					memcpy(pOpp->y, pFoil->y, sizeof(pOpp->y));
 				}
 				else
 				{
@@ -3312,8 +3307,8 @@ bool MainFrame::LoadPolarFileV3(QDataStream &ar, bool bIsStoring, int ArchiveFor
 				pFoil = GetFoil(pOpp->m_strFoilName);
 				if(pFoil)
 				{
-					memcpy(pOpp->x, pFoil->x, sizeof(pOpp->x));
-					memcpy(pOpp->y, pFoil->y, sizeof(pOpp->y));
+//					memcpy(pOpp->x, pFoil->x, sizeof(pOpp->x));
+//					memcpy(pOpp->y, pFoil->y, sizeof(pOpp->y));
 				}
 				else
 				{
@@ -3337,7 +3332,7 @@ bool MainFrame::LoadPolarFileV3(QDataStream &ar, bool bIsStoring, int ArchiveFor
 				}
 			}
 		}
-//		pXDirect->InsertOpPoint(pOpp);
+		((QXDirect*)m_pXDirect)->InsertOpPoint(pOpp);
 	}
 
 	return true;
@@ -3510,7 +3505,7 @@ enumApp MainFrame::LoadXFLR5File(QString PathName)
 #endif
 		ar.setByteOrder(QDataStream::LittleEndian);
 		Foil *pFoil = ReadPolarFile(ar);
-		pXDirect->m_bPolar = true;
+		pXDirect->m_bPolarView = true;
 		pXDirect->m_pCurPolar = NULL;
 		pXDirect->m_pCurOpp   = NULL;
 		s_pCurFoil = pXDirect->SetFoil(pFoil);
@@ -3788,7 +3783,7 @@ void MainFrame::OnInsertProject()
 	}
 	else if(m_iApp == XFOILANALYSIS)
 	{
-		if(pXDirect->m_bPolar) pXDirect->CreatePolarCurves();
+		if(pXDirect->m_bPolarView) pXDirect->CreatePolarCurves();
 		else		         pXDirect->CreateOppCurves();
 		UpdateFoils();
 	}
@@ -3884,7 +3879,7 @@ void MainFrame::OnLoadFile()
 	{
 		if(m_oaPolar.size())
 		{
-			if(pXDirect->m_bPolar) pXDirect->CreatePolarCurves();
+			if(pXDirect->m_bPolarView) pXDirect->CreatePolarCurves();
 			else                   pXDirect->CreateOppCurves();
 		}
 		UpdateFoils();
@@ -3969,6 +3964,7 @@ void MainFrame::OnNewProject()
 			if(SaveProject(m_FileName))
 			{
 				SetSaveState(true);
+				DeleteProject();
 				statusBar()->showMessage(tr("The project ") + m_ProjectName + tr(" has been saved"));
 			}
 			else return; //save failed, don't close
@@ -4001,7 +3997,7 @@ void MainFrame::OnResetCurGraphScales()
 		case XFOILANALYSIS:
 		{
 			QXDirect *pXDirect = (QXDirect*)m_pXDirect;
-			if(!pXDirect->m_bPolar) pGraph = pXDirect->m_pCpGraph;
+			if(!pXDirect->m_bPolarView) pGraph = pXDirect->m_pCpGraph;
 			else pGraph = pXDirect->m_pCurGraph;
 			break;
 		}
@@ -4653,7 +4649,7 @@ void MainFrame::openRecentFile()
 	{
 		if(m_oaPolar.size())
 		{
-			if(pXDirect->m_bPolar) pXDirect->CreatePolarCurves();
+			if(pXDirect->m_bPolarView) pXDirect->CreatePolarCurves();
 			else                   pXDirect->CreateOppCurves();
 		}
 		OnXDirect();
@@ -6308,20 +6304,18 @@ void MainFrame::SetGraphSettings(Graph *pGraph)
 	QMiarex *pMiarex     = (QMiarex*)m_pMiarex;
 	QXInverse *pXInverse = (QXInverse*)m_pXInverse;
 
-
-	pXDirect->m_pPolarGraph->CopySettings(pGraph, false);
 	pXDirect->m_pCpGraph->CopySettings(pGraph, false);
-	pXDirect->m_pCmGraph->CopySettings(pGraph, false);
-	pXDirect->m_pCzGraph->CopySettings(pGraph, false);
-	pXDirect->m_pTrGraph->CopySettings(pGraph, false);
-	pXDirect->m_pUserGraph->CopySettings(pGraph, false);
+	for(int ig=0; ig<MAXPOLARGRAPHS; ig++)
+	{
+		pXDirect->m_PlrGraph[ig].CopySettings(pGraph, false);
+	}
 
 	pXInverse->m_QGraph.CopySettings(pGraph, false);
 
 	pMiarex->m_LongRLGraph.CopySettings(pGraph, false);
 	pMiarex->m_LatRLGraph.CopySettings(pGraph, false);
 	pMiarex->m_CpGraph.CopySettings(pGraph, false);
-	for(int ig=0; ig<4; ig++)
+	for(int ig=0; ig<MAXGRAPHS; ig++)
 	{
 		pMiarex->m_WPlrGraph[ig].CopySettings(pGraph, false);
 		pMiarex->m_WingGraph[ig].CopySettings(pGraph, false);
@@ -6965,17 +6959,6 @@ void MainFrame::WritePolars(QDataStream &ar, Foil *pFoil)
 			pPolar = (Polar*)m_oaPolar.at(i);
 			pPolar->Serialize(ar, true);
 		}
-		if(m_bSaveOpps)
-		{
-			ar << m_oaOpp.size();
-			OpPoint * pOpp ;
-			for (i=0; i<m_oaOpp.size();i++)
-			{
-				pOpp = (OpPoint*)m_oaOpp.at(i);
-				pOpp->Serialize(ar,true,100002);
-			}
-		}
-		else ar << 0;
 	}
 	else
 	{
@@ -7000,8 +6983,21 @@ void MainFrame::WritePolars(QDataStream &ar, Foil *pFoil)
 		{
 			pPolar = (Polar*)m_oaPolar.at(i);
 			if (pPolar->m_FoilName == pFoil->m_FoilName) pPolar->Serialize(ar, true);
+		}		
+	}
+
+	if(m_bSaveOpps)
+	{
+		ar << m_oaOpp.size();
+		OpPoint * pOpp ;
+		for (i=0; i<m_oaOpp.size();i++)
+		{
+			pOpp = (OpPoint*)m_oaOpp.at(i);
+			pOpp->Serialize(ar,true,100002);
 		}
 	}
+	else ar << 0;
+
 }
 
 

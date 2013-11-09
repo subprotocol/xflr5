@@ -124,14 +124,14 @@ void QGraph::DrawCurve(int nIndex, QPainter &painter)
 	rViewRect.setTopLeft(Min);
 	rViewRect.setBottomRight(Max);
 
-	if(pCurve->n>=1)
+	if(pCurve->size()>=1)
 	{
 		From.setX(int(pCurve->x[0]/m_scalex+m_ptoffset.x()));
 		From.setY(int(pCurve->y[0]/scaley  +m_ptoffset.y()));
 
 		if(pCurve->IsVisible())
 		{
-			for (i=1; i<pCurve->n;i++)
+			for (i=1; i<pCurve->size();i++)
 			{
 				To.setX(int(pCurve->x[i]/m_scalex+m_ptoffset.x()));
 				To.setY(int(pCurve->y[i]/scaley  +m_ptoffset.y()));
@@ -143,7 +143,7 @@ void QGraph::DrawCurve(int nIndex, QPainter &painter)
 
 		if(pCurve->PointsVisible())
 		{
-			for (i=0; i<pCurve->n;i++)
+			for (i=0; i<pCurve->size();i++)
 			{
 				if(pCurve->GetSelected() !=i)
 					painter.drawRect(int(pCurve->x[i]/m_scalex+m_ptoffset.x())-ptside,
@@ -568,7 +568,7 @@ void QGraph::DrawLegend(QPainter &painter, QPoint &Place, QFont &LegendFont, QCo
 		if(pCurve->IsVisible())
 		{
 			pCurve->title(strong);
-			if(pCurve->n>0 && strong.length())//is there anything to draw ?
+			if(pCurve->size()>0 && strong.length())//is there anything to draw ?
 			{
 
 				LegendPen.setColor(pCurve->color());
@@ -626,7 +626,7 @@ void QGraph::ExportToFile(QFile &XFile, enumTextFileType FileType)
 		pCurve = GetCurve(i);
 		if(pCurve) 
 		{
-			maxpoints = qMax(maxpoints,pCurve->n); 
+			maxpoints = qMax(maxpoints,pCurve->size());
 
 			pCurve->title(strong);
 			if(FileType==TXT) out << "     "<<m_XTitle<<"       "<< strong <<"    ";
@@ -641,7 +641,7 @@ void QGraph::ExportToFile(QFile &XFile, enumTextFileType FileType)
 		for(i=0; i<m_oaCurves.size(); i++)
 		{
 			pCurve = GetCurve(i);
-			if(pCurve && j<pCurve->n)
+			if(pCurve && j<pCurve->size())
 			{
 				if(FileType==TXT) strong= QString("%1     %2  ")
 												.arg(pCurve->x[j],13,'g',7).arg(pCurve->y[j],13,'g',7);
@@ -671,6 +671,9 @@ QPoint QGraph::GetOffset()
 
 void QGraph::Highlight(QPainter &painter, Curve *pCurve, int ref)
 {
+	if(!pCurve) return;
+	if(ref<0 || ref>pCurve->size()-1) return;
+
 	painter.save();
 	int x = int(pCurve->x[ref]/m_scalex)  +m_ptoffset.x();
 	int y = int(pCurve->y[ref]/m_scaley)  +m_ptoffset.y();
@@ -678,7 +681,7 @@ void QGraph::Highlight(QPainter &painter, Curve *pCurve, int ref)
 	QPen HighlightPen(QColor(255,100,100));
 	HighlightPen.setWidth(2);
 	painter.setPen(HighlightPen);
-	QRect r(x-3,y-3,6,6);;
+	QRect r(x-3,y-3,6,6);
 	painter.drawRect(r);
 	painter.restore();
 }

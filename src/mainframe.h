@@ -75,6 +75,7 @@ class MainFrame : public QMainWindow
 	friend class Body;
 	friend class Wing;
 	friend class WPolar;
+	friend class OpPoint;
 	friend class CWOpp;
 	friend class Plane;
 	friend class BodyGridDlg;
@@ -154,7 +155,10 @@ private slots:
 
 
 /*___________________________________________Methods_______________________________*/
-private:
+public:
+
+	static Foil * curFoil(){return s_pCurFoil;}
+
 	void AddFoil(Foil *pFoil);
 	Polar* AddPolar(Polar *pPolar);
 	void AddRecentFile(const QString &PathNAme);

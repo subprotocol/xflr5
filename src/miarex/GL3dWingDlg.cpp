@@ -1032,14 +1032,16 @@ void GL3dWingDlg::GLRenderView()
 	if(m_bShowMasses)
 	{
 		glColor3d(pMiarex->m_MassColor.redF(),pMiarex->m_MassColor.greenF(),pMiarex->m_MassColor.blueF());
-		for(int im=0; im<m_pWing->m_MassValue.size(); im++)
+		for(int im=0; im<m_pWing->m_PointMass.size(); im++)
 		{
 			glPushMatrix();
 			{
-				glTranslated(m_pWing->m_MassPosition[im].x,m_pWing->m_MassPosition[im].y,m_pWing->m_MassPosition[im].z);
+				glTranslated(m_pWing->m_PointMass[im]->position().x,
+							 m_pWing->m_PointMass[im]->position().y,
+							 m_pWing->m_PointMass[im]->position().z);
 				double radius = .02;//2cm
 				m_pGLWidget->GLRenderSphere(pMiarex->m_MassColor,radius,18,18);
-				m_pGLWidget->renderText(0.0, 0.0, 0.02, m_pWing->m_MassTag[im]);
+				m_pGLWidget->renderText(0.0, 0.0, 0.02, m_pWing->m_PointMass[im]->tag());
 
 			}
 			glPopMatrix();
@@ -1554,15 +1556,12 @@ void GL3dWingDlg::OnInertia()
 	dlg.m_pWing = m_pWing;
 
 	//save inertia properties
-	QList<double>MassValue;
-	QList<CVector> MassPosition;
-	QStringList MassTag;
+	QList<PointMass*> PtMass;
+	PtMass.clear();
 
-	for(int i=0; i< m_pWing->m_MassValue.size(); i++)
+	for(int i=0; i< m_pWing->m_PointMass.size(); i++)
 	{
-		MassValue.append(m_pWing->m_MassValue[i]);
-		MassPosition.append(m_pWing->m_MassPosition[i]);
-		MassTag.append(m_pWing->m_MassTag[i]);
+		PtMass.append(m_pWing->m_PointMass.at(i));
 	}
 
 	dlg.InitDialog();
@@ -1573,15 +1572,10 @@ void GL3dWingDlg::OnInertia()
 	else
 	{
 		// restore saved inertia
-		m_pWing->m_MassValue.clear();
-		m_pWing->m_MassPosition.clear();
-		m_pWing->m_MassTag.clear();
-
-		for(int i=0; i< MassValue.size(); i++)
+		m_pWing->m_PointMass.clear();
+		for(int i=0; i< PtMass.size(); i++)
 		{
-			m_pWing->m_MassValue.append(MassValue[i]);
-			m_pWing->m_MassPosition.append(MassPosition[i]);
-			m_pWing->m_MassTag.append(MassTag[i]);
+			m_pWing->m_PointMass.append(PtMass.at(i));
 		}
 	}
 }

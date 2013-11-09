@@ -141,14 +141,15 @@ void SplineFoil::Copy(SplineFoil* pSF)
 void SplineFoil::CopyFromPicture(Picture *pPic)
 {
 	m_Extrados.m_CtrlPoint.clear();
-
 	for(int i=0; i<pPic->m_iExt; i++)
 	{
-	   m_Extrados.m_CtrlPoint.append(CVector(pPic->xExt[i], pPic->yExt[i], 0.0));
+	   m_Extrados.m_CtrlPoint.append(pPic->ExtPt[i]);
 	}
+
+	m_Intrados.m_CtrlPoint.clear();
 	for(int i=0; i<pPic->m_iInt; i++)
 	{
-	   m_Intrados.m_CtrlPoint.append(CVector(pPic->xInt[i], pPic->yInt[i], 0.0));
+	   m_Intrados.m_CtrlPoint.append(pPic->IntPt[i]);
 	}
 }
 
@@ -156,18 +157,15 @@ void SplineFoil::CopyFromPicture(Picture *pPic)
 void SplineFoil::CopyToPicture(Picture *pPic)
 {
 	pPic->m_iExt = m_Extrados.m_CtrlPoint.size();
-
 	for (int i=0; i<m_Extrados.m_CtrlPoint.size(); i++)
 	{
-		pPic->xExt[i] = m_Extrados.m_CtrlPoint[i].x;
-		pPic->yExt[i] = m_Extrados.m_CtrlPoint[i].y;
+		pPic->ExtPt[i].Copy(m_Extrados.m_CtrlPoint[i]);
 	}
 
 	pPic->m_iInt = m_Intrados.m_CtrlPoint.size();
 	for (int i=0; i<m_Intrados.m_CtrlPoint.size(); i++)
 	{
-		pPic->xInt[i] = m_Intrados.m_CtrlPoint[i].x;
-		pPic->yInt[i] = m_Intrados.m_CtrlPoint[i].y;
+		pPic->IntPt[i].Copy(m_Intrados.m_CtrlPoint[i]);
 	}
 }
 

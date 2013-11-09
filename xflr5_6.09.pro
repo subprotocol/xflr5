@@ -222,7 +222,8 @@ HEADERS += \
     src/twodwidget.h \
 	src/threedwidget.h \
     src/objects/SplineFoil.h \
-    src/objects/WingOpp.h
+    src/objects/WingOpp.h \
+    src/objects/PointMass.h
 
 
 TRANSLATIONS = translations/xflr5v6.ts \

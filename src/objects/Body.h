@@ -36,6 +36,7 @@
 
 #include "Panel.h"
 #include "NURBSSurface.h"
+#include "PointMass.h"
 #include <QTextStream>
 #include <QColor>
 
@@ -50,7 +51,7 @@ public:
 	bool Intersect(CVector A, CVector B, CVector &I, bool bRight);
 	bool IntersectPanels(CVector A, CVector B, CVector &I);
 	bool IntersectNURBS(CVector A, CVector B, CVector &I, bool bRight);
-	bool SerializeBody(QDataStream &ar, bool bIsStoring, int ProjectFormat=5);
+	bool SerializeBody(QDataStream &ar, bool bIsStoring);
 	bool ImportDefinition(QTextStream &inStream, double mtoUnit);
 	bool ExportDefinition() ;
 
@@ -119,10 +120,8 @@ public:
 
 	CVector m_CoG;
 	double m_VolumeMass, m_TotalMass;	    //for inertia calculations
-//	int m_NMass; //number of point mass values
-	QList<double> m_MassValue;
-	QList<CVector> m_MassPosition;
-	QStringList m_MassTag;
+	QList<PointMass*> m_PointMass;
+
 	double m_CoGIxx,m_CoGIyy,m_CoGIzz,m_CoGIxz;
 
 	QString m_BodyName;

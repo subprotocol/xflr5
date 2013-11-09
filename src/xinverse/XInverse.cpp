@@ -198,10 +198,10 @@ void QXInverse::Clear()
 	m_pRefFoil->m_FoilName = "";
 	m_pModFoil->m_FoilName = "";
 	m_bLoaded = false;
-	m_pReflectedCurve->ResetCurve();
-	m_pMCurve->ResetCurve();
-	m_pQCurve->ResetCurve();
-	m_pQVCurve->ResetCurve();
+	m_pReflectedCurve->clear();
+	m_pMCurve->clear();
+	m_pQCurve->clear();
+	m_pQVCurve->clear();
 }
 
 
@@ -238,7 +238,7 @@ void QXInverse::CreateQCurve()
 {
 	XFoil *pXFoil = (XFoil*)m_pXFoil;
 	double x,y;
-	m_pQCurve->n = 0;
+	m_pQCurve->clear();
 
 	int points;
 	if(m_bFullInverse) points = 257;
@@ -258,8 +258,8 @@ void QXInverse::CreateMCurve()
 	XFoil *pXFoil = (XFoil*)m_pXFoil;
 	int i, points;
 	double x,y;
-	m_pMCurve->n = 0;
-	m_pReflectedCurve->n = 0;
+	m_pMCurve->clear();
+	m_pReflectedCurve->clear();
 
 	if(m_bFullInverse) points = 257;
 	else               points = pXFoil->n;
@@ -1183,7 +1183,7 @@ void QXInverse::OnApplySpline()
 		XFoil *pXFoil = (XFoil*)m_pXFoil;
 		int i, isp;
 		double qscom, xx;
-		for (i=1; i<m_pMCurve->n-1; i++)
+		for (i=1; i<m_pMCurve->size()-1; i++)
 		{
 			xx = m_pMCurve->x[i];
 			if (xx > m_Spline.m_CtrlPoint.first().x &&
@@ -1194,7 +1194,7 @@ void QXInverse::OnApplySpline()
 			}
 		}
 
-		for (i=1; i<m_pMCurve->n-1; i++)
+		for (i=1; i<m_pMCurve->size()-1; i++)
 		{
 			m_pReflectedCurve->y[i] = -m_pMCurve->y[i];
 		}
@@ -1923,12 +1923,11 @@ void QXInverse::ReleaseZoom()
 
 void QXInverse::ResetMixedQ()
 {
-	for (int i=0; i<=m_pQCurve->n; i++)
+	m_pMCurve->clear();
+	for (int i=0; i<=m_pQCurve->size(); i++)
 	{
-		m_pMCurve->x[i] = m_pQCurve->x[i] ;
-		m_pMCurve->y[i] = m_pQCurve->y[i] ;
+		m_pMCurve->AppendPoint(m_pQCurve->x[i], m_pQCurve->y[i]);
 	}
-	m_pMCurve->n = m_pQCurve->n;
 
 //	m_pXFoil->gamqsp(1);
 //	CreateMCurve();
@@ -2021,7 +2020,9 @@ void QXInverse::SetFoil()
 		//a previous xfoil calculation is still active, so add the associated viscous curve
 		double x,y;
 		double dsp, dqv, sp1, sp2, qv1, qv2;
-		m_pQVCurve->n = 0;
+
+		m_pQVCurve->clear();
+
 		for(i=2; i<= pXFoil->n; i++)
 		{
 			dsp = pXFoil->s[i] - pXFoil->s[i-1];

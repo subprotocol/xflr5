@@ -379,7 +379,7 @@ void TwoDWidget::contextMenuEvent (QContextMenuEvent * event)
 		{
 			QXDirect *pXDirect = (QXDirect*)m_pXDirect;
 			pXDirect->m_pCurGraph = pXDirect->GetGraph(CltPt);
-			if(pXDirect->m_bPolar) pMainFrame->OperPolarCtxMenu->exec(ScreenPt);
+			if(pXDirect->m_bPolarView) pMainFrame->OperPolarCtxMenu->exec(ScreenPt);
 			else                   pMainFrame->OperFoilCtxMenu->exec(ScreenPt);
 			break;
 		}

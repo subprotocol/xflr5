@@ -575,7 +575,7 @@ void Graph::ResetCurves()
 	for(int i=0; i<m_oaCurves.size(); i++)
 	{
 		pCurve = (Curve*)m_oaCurves.at(i);
-		pCurve->ResetCurve();
+		pCurve->clear();
 	}
 }
 
@@ -979,7 +979,7 @@ bool Graph::SetXScale()
 			for (nc=0; nc < m_oaCurves.size(); nc++)
 			{
 				pCurve = (Curve*)m_oaCurves[nc];
-				if ((pCurve->IsVisible() ||pCurve->PointsVisible()) && pCurve->n>1)
+				if ((pCurve->IsVisible() ||pCurve->PointsVisible()) && pCurve->size()>1)
 				{
 					bCurve = true;
 					break;//there is something to draw
@@ -993,7 +993,7 @@ bool Graph::SetXScale()
 			for (nc=0; nc < m_oaCurves.size(); nc++)
 			{
 				pCurve = (Curve*)m_oaCurves[nc];
-				if ((pCurve->IsVisible() ||pCurve->PointsVisible())  && pCurve->n>0)
+				if ((pCurve->IsVisible() ||pCurve->PointsVisible())  && pCurve->size()>0)
 				{
 					Cxmin = qMin(Cxmin, pCurve->xMin());
 					Cxmax = qMax(Cxmax, pCurve->xMax());
@@ -1023,7 +1023,7 @@ bool Graph::SetXScale()
 			for (nc=0; nc < m_oaCurves.size(); nc++)
 			{
 				pCurve = (Curve*)m_oaCurves[nc];
-				if ((pCurve->IsVisible() ||pCurve->PointsVisible())  && pCurve->n>0)
+				if ((pCurve->IsVisible() ||pCurve->PointsVisible())  && pCurve->size()>0)
 				{
 					xmin = qMin(xmin, pCurve->x[0]);
 					xmax = qMax(xmax, pCurve->x[0]);
@@ -1144,7 +1144,7 @@ bool Graph::SetYScale()
 			for (nc=0; nc < m_oaCurves.size(); nc++)
 			{
 				pCurve = (Curve*)m_oaCurves[nc];
-				if ((pCurve->IsVisible() ||pCurve->PointsVisible())  && pCurve->n>0)
+				if ((pCurve->IsVisible() ||pCurve->PointsVisible())  && pCurve->size()>0)
 					{
 						bCurve = true;
 						break;
@@ -1158,7 +1158,7 @@ bool Graph::SetYScale()
 			for (nc=0; nc < m_oaCurves.size(); nc++)
 			{
 				pCurve = (Curve*)m_oaCurves[nc];
-				if ((pCurve->IsVisible() ||pCurve->PointsVisible()) && pCurve->n>0)
+				if ((pCurve->IsVisible() ||pCurve->PointsVisible()) && pCurve->size()>0)
 				{
 					Cymin = qMin(Cymin, pCurve->yMin());
 					Cymax = qMax(Cymax, pCurve->yMax());
@@ -1188,7 +1188,7 @@ bool Graph::SetYScale()
 			for (int nc=0; nc < m_oaCurves.size(); nc++)
 			{
 				pCurve = (Curve*)m_oaCurves[nc];
-				if ((pCurve->IsVisible() ||pCurve->PointsVisible())  && pCurve->n>0)
+				if ((pCurve->IsVisible() ||pCurve->PointsVisible())  && pCurve->size()>0)
 				{
 					ymin = qMin(ymin, pCurve->y[0]);
 					ymax = qMax(ymax, pCurve->y[0]);

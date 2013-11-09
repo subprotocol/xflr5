@@ -211,11 +211,8 @@ void DisplaySettingsDlg::reject()
 	pXDirect->m_pCpGraph->CopySettings(&m_MemGraph);
 	pXDirect->m_pCpGraph->SetInverted(true);
 
-	pXDirect->m_pPolarGraph->CopySettings(&m_MemGraph);
-	pXDirect->m_pCmGraph->CopySettings(&m_MemGraph);
-	pXDirect->m_pCzGraph->CopySettings(&m_MemGraph);
-	pXDirect->m_pTrGraph->CopySettings(&m_MemGraph);
-	pXDirect->m_pUserGraph->CopySettings(&m_MemGraph);
+	for(int ig=0; ig<MAXPOLARGRAPHS; ig++)
+		pXDirect->m_PlrGraph[ig].CopySettings(&m_MemGraph);
 
 	for(int ig=0; ig<4; ig++)
 	{
@@ -241,11 +238,8 @@ void DisplaySettingsDlg::OnGraphSettings()
     GraphDlg dlg(this);
 
 	dlg.m_GraphArray[0] = pXDirect->m_pCpGraph;
-	dlg.m_GraphArray[1] = pXDirect->m_pPolarGraph;
-	dlg.m_GraphArray[2] = pXDirect->m_pCmGraph;
-	dlg.m_GraphArray[3] = pXDirect->m_pCzGraph;
-	dlg.m_GraphArray[4] = pXDirect->m_pTrGraph;
-	dlg.m_GraphArray[5] = pXDirect->m_pUserGraph;
+	for(int ig=0; ig<MAXPOLARGRAPHS; ig++)
+		dlg.m_GraphArray[ig+1] = pXDirect->m_PlrGraph+ig;
 
 	dlg.m_GraphArray[6] = pMiarex->m_WingGraph;
 	dlg.m_GraphArray[7] = pMiarex->m_WingGraph+1;

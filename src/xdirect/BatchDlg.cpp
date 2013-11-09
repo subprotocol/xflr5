@@ -332,7 +332,7 @@ void BatchDlg::AddOpPoint()
 	{
 		m_pCurPolar->AddData(pXFoil);
 	}
-	if(pXDirect->m_bPolar)
+	if(pXDirect->m_bPolarView)
 	{
 		pXDirect->CreatePolarCurves();
 		pXDirect->UpdateView();
@@ -1401,7 +1401,7 @@ void BatchDlg::StartAnalysis()
 		}
 	}
 
-	if(pXDirect->m_bPolar)
+	if(pXDirect->m_bPolarView)
 	{
 		pXDirect->CreatePolarCurves();
 		pXDirect->UpdateView();

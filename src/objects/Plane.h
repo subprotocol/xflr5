@@ -100,7 +100,7 @@ private:
 	QString m_PlaneDescription;
 	bool m_bFin, m_bStab;
 	double m_TailVolume;
-	CVector m_CoG;
+	CVector m_CoG;                             /**< the position of the CoG */
 	QString m_PlaneName;
 
 	CVector m_WingLE[MAXWINGS];
@@ -108,11 +108,12 @@ private:
 	CVector m_BodyPos;
 
 public:
-	double m_CoGIxx,m_CoGIyy,m_CoGIzz,m_CoGIxz;
-//	int m_NMass; //number of point mass values
-	QList<double> m_MassValue;
-	QList<CVector> m_MassPosition;
-	QStringList m_MassTag;
+	QList<PointMass*> m_PointMass;             /**< the array of PointMass objects */
+	double m_CoGIxx;                           /**< the Ixx component of the inertia tensor, calculated at the CoG */
+	double m_CoGIyy;                           /**< the Ixx component of the inertia tensor, calculated at the CoG */
+	double m_CoGIzz;                           /**< the Ixx component of the inertia tensor, calculated at the CoG */
+	double m_CoGIxz;                           /**< the Ixx component of the inertia tensor, calculated at the CoG */
+
 	bool m_bDoubleFin, m_bSymFin, m_bDoubleSymFin;
 
 };

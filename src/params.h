@@ -35,7 +35,6 @@ This will allow the user to define larger meshes, at the expense increased size 
 #define MAXSIDELINES       40     /**< The max number of sidelines that can be used to define a body? */
 
 #define MAXPOLARPOINTS   1000     /**< The max number of points on a polar. @todo check usage now that the storage has been transferred to QList type arrays. Needs to be consistent with the max number of points on a graph curve. */
-#define MAXMODEFRAMES     200     /**< @todo Check usage. */
 
 #define BODYPANELTYPE       1     /**< Label for a flat panel type body. @todo replace by an enumeration */
 #define BODYSPLINETYPE      2     /**< Label for a spline type body. @todo replace by an enumeration */

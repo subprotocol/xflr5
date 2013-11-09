@@ -31,9 +31,6 @@
 Curve::Curve()
 {
     CurveColor = QColor(255,0,0,127);
-	memset(x,0,sizeof(x));
-	memset(y,0,sizeof(y));
-	n=0;
 	m_CurveName = "";
 	m_bIsVisible = true;
 	m_bShowPoints = false;
@@ -50,32 +47,43 @@ Curve::Curve()
  */
 int Curve::AppendPoint(double xn, double yn)
 {
-	x[n] = xn;
-	y[n] = yn;
-	n++;
-	return n;
+	x.append(xn);
+	y.append(yn);
+	return size();
 }
 
 /**
  * Copies the data and settings from an existing curve
  * @param pCurve: a pointer to the input curve
  */
-void Curve::Copy(Curve *pCurve)
+void Curve::Duplicate(Curve *pCurve)
 {
 	if(!pCurve) return;
-	int i;
-	n  = pCurve->n;
-	for (i=0; i<n ;i++)
-	{
-		x[i] = pCurve->x[i];
-		y[i] = pCurve->y[i];
-	}
+
+	CopyData(pCurve);
+
 	CurveColor = pCurve->CurveColor;
 	CurveStyle = pCurve->CurveStyle;
 	CurveWidth = pCurve->CurveWidth;
 	m_bIsVisible = pCurve->m_bIsVisible;
 	m_bShowPoints = pCurve->m_bShowPoints;
 	m_CurveName = pCurve->m_CurveName;
+}
+
+/**
+ * Copies the data and settings from an existing curve
+ * @param pCurve: a pointer to the input curve
+ */
+void Curve::CopyData(Curve *pCurve)
+{
+	if(!pCurve) return;
+	clear();
+
+	for (int i=0; i<pCurve->size() ;i++)
+	{
+		x.append(pCurve->x[i]);
+		y.append(pCurve->y[i]);
+	}
 }
 
 
@@ -90,22 +98,6 @@ QColor Curve::color()
 
 
 /**
- * @deprecated Returns the equivalent black and white grey tone for the current curve.
- * Was formerly used for b&w printing
- * @param &color
- * @param &style
- * @param &width
- */
-void Curve::BWStyle(QColor &color, int &style, int &width)
-{
-	color = CurveColor;
-	style = CurveStyle;
-	width = CurveWidth;
-//	GetBWColor(color, style, width);
-}
-
-
-/**
  * Returns the point referenced by the input parameter as a CVector object
  * @param ref the reference of the requested pointed
  * @return a CVector instance of the point, or (0, 0, 0) if the reference is out of bounds
@@ -113,7 +105,7 @@ void Curve::BWStyle(QColor &color, int &style, int &width)
 CVector Curve::point(int ref)
 {
 	CVector r;
-	if(ref<0 || ref>=n){
+	if(ref<0 || ref>=size()){
 		r.x = 0.0;
 		r.y = 0.0;
 	}
@@ -139,8 +131,8 @@ int Curve::closestPoint(double xs, double ys, double &dist )
 	static double d2;
 	ref = -1;
 	dist = 1.e10;
-	if (n<1) return -1;
-	for(int i=0; i<n; i++)
+	if (size()<1) return -1;
+	for(int i=0; i<size(); i++)
 	{
 		d2 =   (xs-x[i])*(xs-x[i])/pGraph->GetXScale()/pGraph->GetXScale() 
 			 + (ys-y[i])*(ys-y[i])/pGraph->GetYScale()/pGraph->GetYScale();
@@ -196,7 +188,7 @@ void Curve::closestPoint(double const &xs, double const &ys, double &xSel, doubl
 	static double d2;
 	dist = 1.e40;
 
-	for(int i=0; i<n; i++)
+	for(int i=0; i<size(); i++)
 	{
 		d2 =   (xs-x[i])*(xs-x[i]) + (ys-y[i])*(ys-y[i]);
 		if (d2<dist)
@@ -216,7 +208,7 @@ void Curve::closestPoint(double const &xs, double const &ys, double &xSel, doubl
  */
 int Curve::count()
 {
-	return n;
+	return x.size();
 }
 
 /**
@@ -269,7 +261,7 @@ double Curve::xMin()
 	double xMin = 99999999.0;
 //	if(n==0) xmin = .0; 
 //	else
-		for(int i=0; i<n;i++)
+		for(int i=0; i<size();i++)
 			xMin = qMin(xMin, x[i]);
 	return xMin;
 }
@@ -284,7 +276,7 @@ double Curve::xMax()
 	double xMax = -99999999.0;
 //	if(n==0) xmax = 1.0; 
 //	else
-		for(int i=0; i<n;i++)
+	for(int i=0; i<size();i++)
 			xMax = qMax(xMax, x[i]);
 	return xMax;
 }
@@ -299,7 +291,7 @@ double Curve::yMin()
 	double yMin = 99999999.0;
 //	if(n==0) ymin = .0; 
 //	else
-		for(int i=0; i<n;i++)
+	for(int i=0; i<size();i++)
 			yMin = qMin(yMin, y[i]);
 	return yMin;
 }
@@ -314,7 +306,7 @@ double Curve::yMax()
 	double yMax = -99999999.0;
 //	if(n==0) ymax = 1.0; 
 //	else
-		for(int i=0; i<n;i++)
+		for(int i=0; i<size();i++)
 			yMax = qMax(yMax, y[i]);
 	return yMax;
 }
@@ -341,11 +333,12 @@ bool Curve::PointsVisible()
 
 
 /**
- * Resets the content of the curve by setting the count to 0
+ * Resets the content of the curve.
  */
-void Curve::ResetCurve()
+void Curve::clear()
 {
-	n = 0;
+	x.clear();
+	y.clear();
 }
 
 

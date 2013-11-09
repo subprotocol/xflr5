@@ -33,8 +33,8 @@ void *OpPoint::s_pMainFrame;
 
 OpPoint::OpPoint()
 {
-	m_bVisc     = false;//not a  viscous point a priori
-	m_bDispSurf = false;// no boundary layer surface either
+	m_bViscResults     = false;//not a  viscous point a priori
+	m_bBL = false;// no boundary layer surface either
 	m_bTEFlap   = false;
 	m_bLEFlap   = false;
 
@@ -50,8 +50,8 @@ OpPoint::OpPoint()
 	memset(Qv,  0, sizeof(Qv));
 	memset(Cpi,  0, sizeof(Cpi));
 	memset(Cpv,  0, sizeof(Cpv));
-	memset(x,  0, sizeof(y));
-	memset(y,  0, sizeof(x));
+//	memset(x,  0, sizeof(x));
+//	memset(y,  0, sizeof(y));
 
 	memset(xd1,  0, sizeof(xd1));
 	memset(xd2,  0, sizeof(xd2));
@@ -92,8 +92,8 @@ bool OpPoint::Serialize(QDataStream &ar, bool bIsStoring, int ArchiveFormat)
 		WriteCString(ar, m_strPlrName);
 		ar << (float)Reynolds << (float)Mach << (float)Alpha;
 		ar << n << nd1 << nd2 << nd3;
-		if(m_bVisc)     a=1; else a=0;
-		if(m_bDispSurf) b=1; else b=0;
+		if(m_bViscResults)     a=1; else a=0;
+		if(m_bBL) b=1; else b=0;
 
 		ar << a << b;
 		ar << (float)Cl << (float)Cm << (float)Cd << (float)Cdp;
@@ -123,10 +123,10 @@ bool OpPoint::Serialize(QDataStream &ar, bool bIsStoring, int ArchiveFormat)
         ar >> f; Alpha = f;
         ar >> n >> nd1 >> nd2 >> nd3;
         ar >> a >> b;
-        if(a) m_bVisc = true; else m_bVisc = false;
+        if(a) m_bViscResults = true; else m_bViscResults = false;
 		if(a!=0 && a!=1) return false;
 
-        if(b) m_bDispSurf = true; else m_bDispSurf = false;
+        if(b) m_bBL = true; else m_bBL = false;
 		if(b!=0 && b!=1) return false;
 
         ar >> f; Cl = f;
@@ -214,9 +214,9 @@ bool OpPoint::ExportOpp(QTextStream &out, QString Version, enumTextFileType File
 	for (k=0; k<n; k++)
 	{
 		if(FileType==CSV) strong=QString("%1  %2   %3   %4   %5\n")
-									   .arg(x[k],7,'f',4).arg(Cpi[k],7,'f',3).arg(Cpv[k],7,'f',3).arg(Qi[k],7,'f',3).arg(Qv[k],7,'f',3);
+									   .arg(MainFrame::curFoil()->x[k],7,'f',4).arg(Cpi[k],7,'f',3).arg(Cpv[k],7,'f',3).arg(Qi[k],7,'f',3).arg(Qv[k],7,'f',3);
 		else              strong=QString("%1,%2,%3,%4,%5\n")
-									   .arg(x[k],7,'f',4).arg(Cpi[k],7,'f',3).arg(Cpv[k],7,'f',3).arg(Qi[k],7,'f',3).arg(Qv[k],7,'f',3);
+									   .arg(MainFrame::curFoil()->x[k],7,'f',4).arg(Cpi[k],7,'f',3).arg(Cpv[k],7,'f',3).arg(Qi[k],7,'f',3).arg(Qv[k],7,'f',3);
 		out<< strong;
 	}
 

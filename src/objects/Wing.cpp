@@ -75,9 +75,8 @@ Wing::Wing()
 	m_CoG.Set(0.0,0.0,0.0);
 	m_CoGIxx = m_CoGIyy = m_CoGIzz = m_CoGIxz = 0.0;
 	m_VolumeMass = m_TotalMass = 0.0;
-	m_MassValue.clear();
-	m_MassPosition.clear();
-	m_MassTag.clear();
+
+	m_PointMass.clear();
 
 	m_bIsFin        = false;
 	m_bDoubleFin    = false;
@@ -508,10 +507,10 @@ void Wing::ComputeBodyAxisInertia()
 	m_CoG = VolumeCoG *m_VolumeMass;
 
 	// add point masses
-	for(int im=0; im<m_MassValue.size(); im++)
+	for(int im=0; im<m_PointMass.size(); im++)
 	{
-		m_TotalMass += m_MassValue[im];
-		m_CoG       += m_MassPosition[im] * m_MassValue[im];
+		m_TotalMass += m_PointMass[im]->mass();
+		m_CoG       += m_PointMass[im]->position() * m_PointMass[im]->mass();
 	}
 
 	if(m_TotalMass>0.0) m_CoG = m_CoG/m_TotalMass;
@@ -527,13 +526,13 @@ void Wing::ComputeBodyAxisInertia()
 	m_CoGIxz = Ixz - m_VolumeMass *  LA.x*LA.z;
 
 	//add the contribution of point masses to total inertia
-	for(int im=0; im<m_MassValue.size(); im++)
+	for(int im=0; im<m_PointMass.size(); im++)
 	{
-		LA = m_MassPosition[im] - m_CoG;
-		m_CoGIxx += m_MassValue[im] * (LA.y*LA.y + LA.z*LA.z);
-		m_CoGIyy += m_MassValue[im] * (LA.x*LA.x + LA.z*LA.z);
-		m_CoGIzz += m_MassValue[im] * (LA.x*LA.x + LA.y*LA.y);
-		m_CoGIxz -= m_MassValue[im] * (LA.x*LA.z);
+		LA = m_PointMass[im]->position() - m_CoG;
+		m_CoGIxx += m_PointMass[im]->mass() * (LA.y*LA.y + LA.z*LA.z);
+		m_CoGIyy += m_PointMass[im]->mass() * (LA.x*LA.x + LA.z*LA.z);
+		m_CoGIzz += m_PointMass[im]->mass() * (LA.x*LA.x + LA.y*LA.y);
+		m_CoGIxz -= m_PointMass[im]->mass() * (LA.x*LA.z);
 	}
 }
 
@@ -1034,14 +1033,11 @@ void Wing::Duplicate(Wing *pWing)
 	m_CoGIzz = pWing->m_CoGIzz;
 	m_CoGIxz = pWing->m_CoGIxz;
 
-	m_MassValue.clear();
-	m_MassPosition.clear();
-	m_MassTag.clear();
-	for(int im=0; im<pWing->m_MassValue.size();im++)
+	m_PointMass.clear();
+
+	for(int im=0; im<pWing->m_PointMass.size();im++)
 	{
-		m_MassValue.append(pWing->m_MassValue[im]);
-		m_MassPosition.append(pWing->m_MassPosition[im]);
-		m_MassTag.append(pWing->m_MassTag[im]);
+		m_PointMass.append(new PointMass(pWing->m_PointMass[im]->mass(), pWing->m_PointMass[im]->position(), pWing->m_PointMass[im]->tag()));
 	}
 
 	m_WingDescription = pWing->m_WingDescription;
@@ -1428,8 +1424,8 @@ void Wing::GetFoils(Foil **pFoil0, Foil **pFoil1, double y, double &t)
 double Wing::TotalMass()
 {
 	double TotalMass = m_VolumeMass;
-	for(int im=0; im<m_MassValue.size(); im++)
-		TotalMass += m_MassValue[im];
+	for(int im=0; im<m_PointMass.size(); im++)
+		TotalMass += m_PointMass[im]->mass();
 	return TotalMass;
 }
 
@@ -1959,10 +1955,10 @@ bool Wing::SerializeWing(QDataStream &ar, bool bIsStoring)
 		WriteCOLORREF(ar,m_WingColor);
 
 		ar << (float)m_VolumeMass;
-		ar << m_MassValue.size();
-		for(int im=0; im<m_MassValue.size(); im++) ar << (float)m_MassValue[im];
-		for(int im=0; im<m_MassValue.size(); im++) ar << (float)m_MassPosition[im].x << (float)m_MassPosition[im].y << (float)m_MassPosition[im].z;
-		for(int im=0; im<m_MassValue.size(); im++)  WriteCString(ar, m_MassTag[im]);
+		ar << m_PointMass.size();
+		for(int im=0; im<m_PointMass.size(); im++) ar << (float)m_PointMass[im]->mass();
+		for(int im=0; im<m_PointMass.size(); im++) ar << (float)m_PointMass[im]->position().x << (float)m_PointMass[im]->position().y << (float)m_PointMass[im]->position().z;
+		for(int im=0; im<m_PointMass.size(); im++)  WriteCString(ar, m_PointMass[im]->tag());
 		ar << m_WingColor.alpha();
 		for(int i=0; i<20; i++) ar<<(float)0.0f;
 		for(int i=0; i<20; i++) ar<<0;
@@ -2150,24 +2146,32 @@ bool Wing::SerializeWing(QDataStream &ar, bool bIsStoring)
 		{
 			ar >> f;  m_VolumeMass = f;
 			int nMass;
-			m_MassValue.clear();
-			m_MassPosition.clear();
-			m_MassTag.clear();
+
 			ar >> nMass;
+			QVarLengthArray<double> mass;
+			QVarLengthArray<CVector> position;
+			QVarLengthArray<QString> tag;
+
 			for(int im=0; im<nMass; im++)
 			{
 				ar >> f;
-				m_MassValue.append(f);
+				mass.append(f);
 			}
 			for(int im=0; im<nMass; im++)
 			{
 				ar >> f >> g >> h;
-				m_MassPosition.append(CVector(f,g,h));
+				position.append(CVector(f,g,h));
 			}
 			for(int im=0; im<nMass; im++)
 			{
-				m_MassTag.append("");
-				ReadCString(ar, m_MassTag[im]);
+				tag.append("");
+				ReadCString(ar, tag[im]);
+			}
+
+			m_PointMass.clear();
+			for(int im=0; im<nMass; im++)
+			{
+				m_PointMass.append(new PointMass(mass[im], position[im], tag[im]));
 			}
 		}
 

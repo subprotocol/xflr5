@@ -137,7 +137,7 @@ bool LLTAnalysisDlg::AlphaLoop()
 		m_IterGraph.SetYMin(0.0);
 		m_IterGraph.SetYMax(0.5);
 		Curve *pCurve = m_IterGraph.GetCurve(0);
-		pCurve->ResetCurve();
+		pCurve->clear();
 
 		m_LLT.LLTInitCl(m_pWPolar->m_QInf, Alpha);
 		if(m_bInitCalc) m_LLT.LLTSetLinearSolution(Alpha);
@@ -247,7 +247,7 @@ bool LLTAnalysisDlg::QInfLoop()
 		}
 		m_IterGraph.SetYMin(0.0);
 		m_IterGraph.SetYMax(0.5);
-		pCurve->ResetCurve();
+		pCurve->clear();
 
 		if(m_bInitCalc) m_LLT.LLTSetLinearSolution(m_pWPolar->m_ASpec);
 		 m_LLT.LLTInitCl(QInf, m_pWPolar->m_ASpec);
@@ -390,9 +390,9 @@ void LLTAnalysisDlg::ResetCurves()
 {
 	Curve*pCurve;
 	pCurve = m_IterGraph.GetCurve(0);
-	if(pCurve) pCurve->ResetCurve();
+	if(pCurve) pCurve->clear();
 	pCurve = m_IterGraph.GetCurve(1);
-	if(pCurve) pCurve->ResetCurve();
+	if(pCurve) pCurve->clear();
 
 }
 

@@ -509,9 +509,12 @@ void PlaneDlg::OnInertia()
 	dlg.m_pPlane = m_pPlane;
 
 	//save inertia properties
-    QList<double> MassValue = m_pPlane->m_MassValue;
-    QList<CVector> MassPosition = m_pPlane->m_MassPosition;
-    QStringList MassTag = m_pPlane->m_MassTag;
+	QList<PointMass*> memPtMass;
+	memPtMass.clear();
+	for(int im=0; im<m_pPlane->m_PointMass.size(); im++)
+	{
+		memPtMass.append(new PointMass(m_pPlane->m_PointMass[im]));
+	}
 	
 	dlg.InitDialog();
 	if(dlg.exec()==QDialog::Accepted)
@@ -521,9 +524,11 @@ void PlaneDlg::OnInertia()
 	else
 	{
 		//restore everything
-        m_pPlane->m_MassValue = MassValue;
-        m_pPlane->m_MassPosition = MassPosition;
-        m_pPlane->m_MassTag = MassTag;
+		m_pPlane->m_PointMass.clear();
+		for(int im=0; im<memPtMass.size(); im++)
+		{
+			m_pPlane->m_PointMass.append(new PointMass(memPtMass[im]));
+		}
 	}
 }
 

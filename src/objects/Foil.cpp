@@ -968,16 +968,13 @@ double Foil::NormalizeGeometry()
  * Loads or Saves the data of this foil to a binary file
  * @param ar the QDataStream object from/to which the data should be serialized
  * @param bIsStoring true if saving the data, false if loading
- * @param ProjectFormat 5 if data from Xflr5 v5.xx, 6 if from/to xflr5 v6.xx
  * @return true if the operation was successful, false otherwise
  */
-bool Foil::Serialize(QDataStream &ar, bool bIsStoring, int ProjectFormat)
+bool Foil::Serialize(QDataStream &ar, bool bIsStoring)
 {
 	// saves or loads the foil to the archive ar
 
-	int ArchiveFormat;
-	if(ProjectFormat>=5)      ArchiveFormat = 1006;
-	else if(ProjectFormat==4) ArchiveFormat = 1005;
+	int ArchiveFormat = 1006;
 	// 1006 : QFLR5 v0.02 : added Foil description
 	// 1005 : added LE Flap data
 	// 1004 : added Points and Centerline property
@@ -991,7 +988,7 @@ bool Foil::Serialize(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 	{
 		ar << ArchiveFormat;
 		WriteCString(ar, m_FoilName);
-		if(ProjectFormat>=5) WriteCString(ar, m_FoilDescription);
+		WriteCString(ar, m_FoilDescription);
 		ar << m_nFoilStyle << m_nFoilWidth;
 		WriteCOLORREF(ar, m_FoilColor);
 		if (m_bVisible)		ar << 1; else ar << 0;

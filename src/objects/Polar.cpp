@@ -201,7 +201,7 @@ void Polar::ResetPolar()
  */
  void Polar::AddData(OpPoint *pOpPoint)
 {
-	if(!pOpPoint->m_bVisc) return;
+	if(!pOpPoint->m_bViscResults) return;
 	m_ACrit = pOpPoint->ACrit;
 	AddPoint(pOpPoint->Alpha, pOpPoint->Cd, pOpPoint->Cdp, pOpPoint->Cl, pOpPoint->Cm,
 			 pOpPoint->Xtr1, pOpPoint->Xtr2, pOpPoint->m_TEHMom, pOpPoint->Cpmn, pOpPoint->Reynolds,

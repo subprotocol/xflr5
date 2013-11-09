@@ -2707,12 +2707,12 @@ void QAFoil::StorePicture()
 }
 
 
+
 void QAFoil::TakePicture()
 {
 	m_bStored = false;
 	m_pSF->CopyToPicture(&m_TmpPic);
 }
-
 
 
 void QAFoil::UpdateView()

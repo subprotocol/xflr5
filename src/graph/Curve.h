@@ -19,9 +19,9 @@
 
 *****************************************************************************/
 
-/*! \file
+/*! @file
  *
- * The class which define a CCurve object for the graphs
+ * This file defines the Curve object for the graphs
  *
  *
  */
@@ -33,6 +33,7 @@
 
 #include "../params.h"
 #include "../objects/CVector.h"
+#include <QVarLengthArray>
 #include <QColor>
 
 class Curve
@@ -43,19 +44,18 @@ public:
 	Curve();
 
 	int     AppendPoint(double xn, double yn);
-	void    BWStyle(QColor &color, int &style, int &width);
-	void    BWStyle();
+	void    clear();
 	int     closestPoint(double xs, double ys, double &dist);
 	void    closestPoint(double xs, double ys, double &dist, int &n);
 	void    closestPoint(double const &xs, double const &ys, double &xSel, double &ySel, double &dist, int &nSel);
 	QColor  color();
-	void    Copy(Curve *pCurve);
+	void    CopyData(Curve *pCurve);
 	int     count();
+	void    Duplicate(Curve *pCurve);
 	int     GetSelected();
 	bool    IsVisible();
 	CVector point(int ref);
 	bool    PointsVisible();
-	void    ResetCurve();
 	void    ShowPoints(bool bShow);
 	void    SetVisible(bool bVisible);
 	void    SetColor(QColor clr);
@@ -63,6 +63,8 @@ public:
 	void    SetSelected(int n);
 	void    SetWidth(int nWidth);
 	void    SetTitle(QString Title);
+	/** Returns the curve's number of points. */
+	int     size() {return x.count();}
 	int     style();
 	void    title(QString &string);
 	int     width();
@@ -74,9 +76,8 @@ public:
 
 
 	//	Curve Data
-	int n;                   /**< the number of data points of this curve. @todo replace with a QList */
-	double x[1000];          /**< the array of the points x-coordinates */
-	double y[1000];          /**< the array of the points y-coordinates */
+	QVarLengthArray<double,  1024> x;          /**< the array of the points x-coordinates */
+	QVarLengthArray<double,  1024> y;          /**< the array of the points y-coordinates */
 
 
 private:	

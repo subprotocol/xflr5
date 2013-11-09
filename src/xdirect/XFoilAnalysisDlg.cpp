@@ -150,7 +150,7 @@ void XFoilAnalysisDlg::AddOpPoint()
 {
 	QXDirect *pXDirect = (QXDirect*)s_pXDirect;
 	pXDirect->AddOpPoint(NULL, pXDirect->m_bStoreOpp);
-	if(pXDirect->m_bPolar)
+	if(pXDirect->m_bPolarView)
 	{
 		pXDirect->CreatePolarCurves();
 		pXDirect->UpdateView();
@@ -480,9 +480,9 @@ void XFoilAnalysisDlg::ResetCurves()
 {
 	Curve*pCurve;
 	pCurve = m_RmsGraph.GetCurve(0);
-	if(pCurve) pCurve->ResetCurve();
+	if(pCurve) pCurve->clear();
 	pCurve = m_RmsGraph.GetCurve(1);
-	if(pCurve) pCurve->ResetCurve();
+	if(pCurve) pCurve->clear();
 
 }
 
