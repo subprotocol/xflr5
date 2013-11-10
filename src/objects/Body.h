@@ -78,7 +78,6 @@ public:
 	void GetPoint(double u, double v, bool bRight, CVector &Pt);
 	void InsertSideLine(int SideLine);
 	void InterpolateCurve(CVector *D, CVector *P, double *v, double *knots, int degree, int Size);
-	void InterpolateSurface();
 	void RemoveActiveFrame();
 	void RemoveSideLine(int SideLine);
 	void Scale(double XFactor, double YFactor, double ZFactor, bool bFrameOnly=false, int FrameID=0);

@@ -107,7 +107,7 @@ private:
 	
 
 private:
-	bool ExportOpp(QTextStream &out, QString Version, enumTextFileType FileType, bool bDataOnly=false);
+	void  ExportOpp(QTextStream &out, QString Version, enumTextFileType FileType, bool bDataOnly=false);
 	bool Serialize(QDataStream &ar, bool bIsStoring, int ArchiveFormat=0);
 	void GetOppProperties(QString &OpPointProperties, bool bData=false);
 };

@@ -304,7 +304,7 @@ QMiarex::QMiarex(QWidget *parent)
 
 	m_iView = W3DVIEW;
 	m_iWingView = 1;
-	m_iWPlrView = 4;
+	m_iWPlrView = ALLPOLARGRAPHS;
 	m_iStabilityView = STABTIMEVIEW;
 	m_iStabTimeView = 4;
 	m_nNodes  = 0;
@@ -1696,12 +1696,12 @@ void QMiarex::SetControls()
 	}
 	else if(m_iView==WPOLARVIEW)
 	{
-		pMainFrame->Graph1->setChecked(m_iWPlrView==1 && (m_pCurWPlrGraph == m_WPlrGraph));
-		pMainFrame->Graph2->setChecked(m_iWPlrView==1 && (m_pCurWPlrGraph == m_WPlrGraph+1));
-		pMainFrame->Graph3->setChecked(m_iWPlrView==1 && (m_pCurWPlrGraph == m_WPlrGraph+2));
-		pMainFrame->Graph4->setChecked(m_iWPlrView==1 && (m_pCurWPlrGraph == m_WPlrGraph+3));
-		pMainFrame->twoGraphs->setChecked(m_iWPlrView==2);
-		pMainFrame->fourGraphs->setChecked(m_iWPlrView==4);
+		pMainFrame->Graph1->setChecked(m_iWPlrView==ONEPOLARGRAPH && (m_pCurWPlrGraph == m_WPlrGraph));
+		pMainFrame->Graph2->setChecked(m_iWPlrView==ONEPOLARGRAPH && (m_pCurWPlrGraph == m_WPlrGraph+1));
+		pMainFrame->Graph3->setChecked(m_iWPlrView==ONEPOLARGRAPH && (m_pCurWPlrGraph == m_WPlrGraph+2));
+		pMainFrame->Graph4->setChecked(m_iWPlrView==ONEPOLARGRAPH && (m_pCurWPlrGraph == m_WPlrGraph+3));
+		pMainFrame->twoGraphs->setChecked(m_iWPlrView==TWOPOLARGRAPHS);
+		pMainFrame->fourGraphs->setChecked(m_iWPlrView==ALLPOLARGRAPHS);
 	}
 
 	pMainFrame->WPlrGraphMenu->setEnabled(m_iView==WPOLARVIEW || m_iView==WSTABVIEW);
@@ -4607,11 +4607,11 @@ QGraph* QMiarex::GetGraph(QPoint &pt)
 	}
 	else if(m_iView==WPOLARVIEW)
 	{
-		if(m_iWPlrView==1)
+		if(m_iWPlrView==ONEPOLARGRAPH)
 		{
 			return m_pCurWPlrGraph;
 		}
-		else if (m_iWPlrView==2)
+		else if (m_iWPlrView==TWOPOLARGRAPHS)
 		{
 			if(m_WPlrGraph[0].IsInDrawRect(pt)){return m_WPlrGraph;}
 			if(m_WPlrGraph[1].IsInDrawRect(pt)){return m_WPlrGraph+1;}
@@ -5982,8 +5982,9 @@ void QMiarex::JoinSurfaces(Surface *pLeftSurf, Surface *pRightSurf, int pl, int 
 
 
 /**
+ * Overrides the QWidget's keyPressEvent method.
  * Dispatches the key press event
- * @param event the QKeyEvent sent by Qt
+ * @param event the QKeyEvent
  */
 void QMiarex::keyPressEvent(QKeyEvent *event)
 {
@@ -6036,7 +6037,7 @@ void QMiarex::keyPressEvent(QKeyEvent *event)
 		{
 			if(m_iView==WPOLARVIEW)
 			{
-				m_iWPlrView  = 1;
+				m_iWPlrView  = ONEPOLARGRAPH;
 				m_pCurGraph = m_WPlrGraph;
 				m_pCurWPlrGraph = m_pCurGraph;
 				SetWPlrLegendPos();
@@ -6065,7 +6066,7 @@ void QMiarex::keyPressEvent(QKeyEvent *event)
 		{
 			if(m_iView==WPOLARVIEW)
 			{
-				m_iWPlrView  = 1;
+				m_iWPlrView  = ONEPOLARGRAPH;
 				m_pCurGraph = m_WPlrGraph+1;
 				m_pCurWPlrGraph = m_pCurGraph;
 				SetWPlrLegendPos();
@@ -6094,7 +6095,7 @@ void QMiarex::keyPressEvent(QKeyEvent *event)
 		{
 			if(m_iView==WPOLARVIEW)
 			{
-				m_iWPlrView  = 1;
+				m_iWPlrView = ONEPOLARGRAPH;
 				m_pCurGraph = m_WPlrGraph+2;
 				m_pCurWPlrGraph = m_pCurGraph;
 				SetWPlrLegendPos();
@@ -6123,7 +6124,7 @@ void QMiarex::keyPressEvent(QKeyEvent *event)
 		{
 			if(m_iView==WPOLARVIEW)
 			{
-				m_iWPlrView  = 1;
+				m_iWPlrView = ONEPOLARGRAPH;
 				m_pCurGraph = m_WPlrGraph+3;
 				m_pCurWPlrGraph = m_pCurGraph;
 				SetWPlrLegendPos();
@@ -6157,7 +6158,7 @@ void QMiarex::keyPressEvent(QKeyEvent *event)
 		{
 			if(m_iView==WPOLARVIEW)
 			{
-				m_iWPlrView = 2;
+				m_iWPlrView = TWOPOLARGRAPHS;
 				SetWPlrLegendPos();
 			}
 			else if(m_iView==WOPPVIEW)
@@ -6178,7 +6179,7 @@ void QMiarex::keyPressEvent(QKeyEvent *event)
 		{
 			if(m_iView==WPOLARVIEW)
 			{
-				m_iWPlrView = 4;
+				m_iWPlrView = ALLPOLARGRAPHS;
 				SetWPlrLegendPos();
 			}
 			else if(m_iView==WOPPVIEW)
@@ -6542,7 +6543,11 @@ bool QMiarex::LoadSettings(QSettings *pSettings)
 		else if(k==4) m_iView = WSTABVIEW;
 
 		m_iWingView = pSettings->value("iWingView").toInt();
-		m_iWPlrView = pSettings->value("iWPlrView").toInt();
+
+		k = pSettings->value("iWPlrView").toInt();
+		if(k==0)      m_iWPlrView  = ALLPOLARGRAPHS;
+		else if(k==1) m_iWPlrView  = ONEPOLARGRAPH;
+		else if(k==2) m_iWPlrView  = TWOPOLARGRAPHS;
 
 		k = pSettings->value("iWStabView").toInt();
 		if(k==0)      m_iStabilityView = STABTIMEVIEW;
@@ -6575,8 +6580,8 @@ bool QMiarex::LoadSettings(QSettings *pSettings)
 
 		m_WakeInterNodes    = pSettings->value("WakeInterNodes").toInt();
 		m_MaxWakeIter       = pSettings->value("MaxWakeIter").toInt();
-		Panel::s_CtrlPos   = pSettings->value("CtrlPos").toDouble();
-		Panel::s_VortexPos = pSettings->value("VortexPos").toDouble();
+		Panel::s_CtrlPos    = pSettings->value("CtrlPos").toDouble();
+		Panel::s_VortexPos  = pSettings->value("VortexPos").toDouble();
 		s_CoreSize          = pSettings->value("CoreSize").toDouble();
 		s_MinPanelSize      = pSettings->value("MinPanelSize").toDouble();
 
@@ -6793,13 +6798,13 @@ void QMiarex::mouseMoveEvent(QMouseEvent *event)
 			else if (m_iView==WPOLARVIEW)
 			{
 				// we translate the legend
-				if(m_iWPlrView==1 || m_iWPlrView==4)
+				if(m_iWPlrView==ONEPOLARGRAPH || m_iWPlrView==ALLPOLARGRAPHS)
 				{
 					m_WPlrLegendOffset.rx() += Delta.x();
 					m_WPlrLegendOffset.ry() += Delta.y();
 					UpdateView();
 				}
-				else if(m_iWPlrView==2)
+				else if(m_iWPlrView==TWOPOLARGRAPHS)
 				{
 					m_WPlrLegendOffset.rx() += Delta.x();
 					m_WPlrLegendOffset.ry() += Delta.y();
@@ -11127,7 +11132,7 @@ void QMiarex::OnSingleGraph1()
 	}
 	else if(m_iView==WPOLARVIEW)
 	{
-		m_iWPlrView = 1;
+		m_iWPlrView = ONEPOLARGRAPH;
 		m_pCurGraph = m_WPlrGraph;
 		m_pCurWPlrGraph = m_pCurGraph;
 		SetWPlrLegendPos();
@@ -11162,7 +11167,7 @@ void QMiarex::OnSingleGraph2()
 	}
 	else if(m_iView==WPOLARVIEW)
 	{
-		m_iWPlrView = 1;
+		m_iWPlrView = ONEPOLARGRAPH;
 		m_pCurGraph = m_WPlrGraph+1;
 		m_pCurWPlrGraph = m_pCurGraph;
 		SetWPlrLegendPos();
@@ -11195,7 +11200,7 @@ void QMiarex::OnSingleGraph3()
 	}
 	else if(m_iView==WPOLARVIEW)
 	{
-		m_iWPlrView = 1;
+		m_iWPlrView = ONEPOLARGRAPH;
 		m_pCurGraph = m_WPlrGraph+2;
 		m_pCurWPlrGraph = m_pCurGraph;
 		SetWPlrLegendPos();
@@ -11228,7 +11233,7 @@ void QMiarex::OnSingleGraph4()
 	}
 	else if(m_iView==WPOLARVIEW)
 	{
-		m_iWPlrView = 1;
+		m_iWPlrView = ONEPOLARGRAPH;
 		m_pCurGraph = m_WPlrGraph+3;
 		m_pCurWPlrGraph = m_pCurGraph;
 		SetWPlrLegendPos();
@@ -11422,7 +11427,7 @@ void QMiarex::OnTwoGraphs()
 	}
 	else if(m_iView==WPOLARVIEW)
 	{
-		m_iWPlrView = 2;
+		m_iWPlrView = TWOPOLARGRAPHS;
 		m_pCurGraph = m_WPlrGraph;
 		m_pCurWPlrGraph = m_pCurGraph;
 		SetWPlrLegendPos();
@@ -11456,7 +11461,7 @@ void QMiarex::OnFourGraphs()
 	}
 	else if(m_iView==WPOLARVIEW)
 	{
-		m_iWPlrView = 4;
+		m_iWPlrView = ALLPOLARGRAPHS;
 		m_pCurGraph = m_WPlrGraph;
 		m_pCurWPlrGraph = m_pCurGraph;
 		SetWPlrLegendPos();
@@ -11750,7 +11755,7 @@ void QMiarex::PaintView(QPainter &painter)
 
 	if (m_iView==WPOLARVIEW)
 	{
-		if (m_iWPlrView == 1)
+		if (m_iWPlrView == ONEPOLARGRAPH)
 		{
 			if(!m_pCurGraph)
 			{
@@ -11761,7 +11766,7 @@ void QMiarex::PaintView(QPainter &painter)
 			m_pCurGraph->DrawGraph(Rect1, painter);
 			DrawWPolarLegend(painter, m_WPlrLegendOffset, Rect1.bottom());
 		}
-		else if(m_iWPlrView == 2)
+		else if(m_iWPlrView == TWOPOLARGRAPHS)
 		{
 //			PaintWCoupleGraphs(painter);
 			Rect1.setRect(0,0,w2,h23);
@@ -11772,7 +11777,7 @@ void QMiarex::PaintView(QPainter &painter)
 	
 			DrawWPolarLegend(painter, m_WPlrLegendOffset, m_r2DCltRect.bottom());
 		}
-		else if(m_iWPlrView == 4)
+		else if(m_iWPlrView == ALLPOLARGRAPHS)
 		{
 //			PaintWFourGraphs(painter);
 			Rect1.setRect(0,0,w3,h2);
@@ -12905,7 +12910,19 @@ bool QMiarex::SaveSettings(QSettings *pSettings)
 			}
 		}
 		pSettings->setValue("iWingView", m_iWingView);
-		pSettings->setValue("iWPlrView", m_iWPlrView);
+
+		switch(m_iWPlrView)
+		{
+			case ONEPOLARGRAPH:
+				pSettings->setValue("iWPlrView", 1);
+				break;
+			case TWOPOLARGRAPHS:
+				pSettings->setValue("iWPlrView", 2);
+				break;
+			default:
+				pSettings->setValue("iWPlrView", 0);
+				break;
+		}
 		switch(m_iStabilityView)
 		{
 			case STABTIMEVIEW:
@@ -15069,17 +15086,17 @@ void QMiarex::SetWPlrLegendPos()
 	int margin = 10;
 	if(m_iView==WPOLARVIEW)
 	{
-		if(m_iWPlrView == 1)
+		if(m_iWPlrView == ONEPOLARGRAPH)
 		{
 			m_WPlrLegendOffset.rx() = (int)(0.70*w)+margin;
 			m_WPlrLegendOffset.ry() = margin;
 		}
-		else if (m_iWPlrView == 2)
+		else if (m_iWPlrView == TWOPOLARGRAPHS)
 		{
 			m_WPlrLegendOffset.rx() = margin;
 			m_WPlrLegendOffset.ry() = h23+margin;
 		}
-		else if	(m_iWPlrView == 4)
+		else if	(m_iWPlrView == ALLPOLARGRAPHS)
 		{
 			m_WPlrLegendOffset.rx() = (int)(0.70*w)+margin;
 			m_WPlrLegendOffset.ry() = margin;

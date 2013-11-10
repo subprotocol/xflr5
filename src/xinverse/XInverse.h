@@ -1,7 +1,7 @@
 /****************************************************************************
 
 	QXInverse Class
-	Copyright (C) 2009 Andre Deperrois adeperrois@xflr5.com
+	Copyright (C) 2009-2013 Andre Deperrois adeperrois@xflr5.com
 
 	This program is free software; you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -32,12 +32,9 @@
 #include <QStackedWidget>
 #include <QVBoxLayout>
 #include <QSettings>
-#include "InverseOptionsDlg.h"
-#include "PertDlg.h"
 #include "../misc/FloatEdit.h"
-#include "../xdirect/XFoil.h"
 #include "../graph/QGraph.h"
-#include "../graph/GraphDlg.h"
+#include "../objects/Foil.h"
 #include "../objects/Spline.h"
 
 
@@ -136,9 +133,9 @@ private:
 
 private:
 
-	GraphDlg *m_pGraphDlg;
-	InverseOptionsDlg *m_pXInverseStyleDlg;
-	PertDlg *m_pPertDlg;
+//	GraphDlg *m_pGraphDlg;
+//	InverseOptionsDlg *m_pXInverseStyleDlg;
+//	PertDlg *m_pPertDlg;
 
 	QTextEdit *m_pctrlOutput;
 	QLabel *m_pctrlSpecif;

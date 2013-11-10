@@ -112,7 +112,7 @@ void Spline::CopySymetric(Spline *pSpline)
 }
 
 /**
-*Draws the control points on a QPainter. @todo separate MMI and object for polymorphism.
+*Draws the control points on a QPainter. @todo separate GUI and object for polymorphism.
 */
 void Spline::DrawCtrlPoints(QPainter &painter, double const &scalex, double const &scaley, QPoint const &Offset)
 {
@@ -159,7 +159,7 @@ void Spline::DrawCtrlPoints(QPainter &painter, double const &scalex, double cons
 
 
 /**
-*Draws the output points on a QPainter. @todo separate MMI and object for polymorphism.
+*Draws the output points on a QPainter. @todo separate GUI and object for polymorphism.
 */
 void Spline::DrawOutputPoints(QPainter & painter, double const &scalex, double const &scaley, QPoint const &Offset)
 {
@@ -189,7 +189,7 @@ void Spline::DrawOutputPoints(QPainter & painter, double const &scalex, double c
 
 
 /**
-*Draws the spline curve on a QPainter. @todo separate MMI and object for polymorphism.
+*Draws the spline curve on a QPainter. @todo separate GUI and object for polymorphism.
 */
 void Spline::DrawSpline(QPainter & painter, double const &scalex, double const &scaley, QPoint const &Offset)
 {
@@ -251,25 +251,27 @@ void Spline::Export(QTextStream &out, bool bExtrados)
 	}
 }
 
-
+/** Returns the y-coordinate of the spline at the specified x-coordinate
+ *@param x the x-coordinate
+ *@return the y-value
+ */
 double Spline::GetY(double const &x)
 {
-        static int i;
+	static int i;
 	static double y;
 
 	if(x<=0.0 || x>=1.0) return 0.0;
 
-        for (i=0; i<m_iRes-1; i++)
-        {
-		if (m_Output[i].x <m_Output[i+1].x  && 
-                        m_Output[i].x <= x && x<=m_Output[i+1].x )
-                {
+	for (i=0; i<m_iRes-1; i++)
+	{
+		if (m_Output[i].x <m_Output[i+1].x  && m_Output[i].x <= x && x<=m_Output[i+1].x )
+		{
 			y = (m_Output[i].y 	+ (m_Output[i+1].y-m_Output[i].y)
-								 /(m_Output[i+1].x-m_Output[i].x)*(x-m_Output[i].x));
+			/(m_Output[i+1].x-m_Output[i].x)*(x-m_Output[i].x));
 			return y;
 		}
 	}
-	return 0.0; /** @todo improve*/
+	return 0.0;
 }
 
 

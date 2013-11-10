@@ -84,7 +84,7 @@ private:
 	static void *s_pMainFrame;  /**< A void pointer to the instance of the MainFrame widget.*/
 	void *m_pParent;            /**< A void pointer to the parent widget. */
 
-	QRect m_rCltRect;           /**< The client window rectangle @todo check usage */
+	QRect m_rCltRect;           /**< The client window rectangle  */
 	CRectangle m_GLViewRect;    /**< The OpenGl viewport.*/
 
 	enumGLView m_iView;         /**<The identification of the type of the calling parent widget*/

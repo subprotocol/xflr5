@@ -121,7 +121,7 @@ private:
 	static void *s_pMainFrame;  /**< A static pointer to the unique instance of the MainFrame class. */
 
 
-	//MMI widget variables
+	//GUI widget variables
 	QPushButton *m_pctrlCancel, *m_pctrlSkip;
 	GraphWidget * m_pGraphWidget;
 	QTextEdit *m_pctrlTextOutput;

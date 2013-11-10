@@ -2237,7 +2237,7 @@ void PanelAnalysisDlg::OnProgress()
 	m_pctrlProgress->setValue((int)m_Progress);
 }
 
-/**  Sets up the MMI */
+/**  Sets up the GUI */
 void PanelAnalysisDlg::SetupLayout()
 {
 	QDesktopWidget desktop;

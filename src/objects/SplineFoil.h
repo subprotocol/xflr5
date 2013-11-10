@@ -53,7 +53,7 @@ struct Picture
 *@brief  The class which defines the splined foil object.
 
 The foil is contructed based on one spline for the upper surface and one spline for the lower surface.
-@todo This class mixes the construction methods and the MMI; would be better to move the MMI to a derived child class for polymorphism.
+@todo This class mixes the construction methods and the GUI; would be better to move the GUI to a derived child class for polymorphism.
 */
 class SplineFoil
 {

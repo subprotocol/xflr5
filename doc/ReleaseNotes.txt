@@ -16,6 +16,7 @@
 
 
 xflr5 v6.09.06, November xxx, 2013
+	- fixed the issues with the animation of foil operating points
 	- removed the option to save as a file for xflr5 v5 or v4 - no point and source of bugs
 	- corrected the automatic polar name of foils in multithreaded analysis
 	- added import/export of the wing geometry via plain-text files
@@ -279,7 +280,7 @@ v4.12 November 16th, 2008
 	- Added option for .csv format option for all txt file exports
 	- Fixed a rare crash bug when using foil polars with zero content
 	- Corrected the bug which prevented to insert a projet in the one currently opened
-	- Improved the MMI of the panel list in the wing design dialog
+	- Improved the GUI of the panel list in the wing design dialog
 
 v4.11 November 2nd, 2008
 	- Changed the twist/washout application method ; used to be set around y-axis irrespective of dihedral;

@@ -21,7 +21,7 @@
 /**
  *@file
  *
- * The class associated to the MMI of 3D analysis
+ * The class associated to the GUI of 3D analysis
  *
  */
 
@@ -618,13 +618,13 @@ public:
 
 	int m_StabilityResponseType;   /**< 0 = initial conditions, 1=forced response, 2=modal response */
 
-	enumStabilityViews m_iStabilityView;			/**< defines which, and how many, graphs will be displayed in Stability view */
+	enumStabilityViews m_iStabilityView;    /**< defines which, and how many, graphs will be displayed in Stability view */
+	enumPolarGraphView m_iWPlrView;         /**< defines how many graphs will be displayed in WPolar view */
 
 	int m_iStabTimeView;        /**< defines whether one or four graphs will be  displayed in time response view */
 	int m_InducedDragPoint;		/**< 0 if downwash is at panel's centroid, 1 if averaged over panel length; used in CWing::VLMTrefftz */
 	int m_Iter ;				/**< the number of iterations for LLT */
 	int m_iWingView;			/**< defines how many graphs will be displayed in WOpp view */
-	int m_iWPlrView;			/**< defines how many graphs will be displayed in WPolar view */
 	int m_MaxWakeIter;			/**< wake roll-up iteration limit */
 	int m_NSurfaces;            /**< the number of surfaces which define the wings of the current wing or plane */
 	int m_NStation ;			/**< the number of stations for LLT */

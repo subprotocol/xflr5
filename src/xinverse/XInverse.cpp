@@ -1,7 +1,7 @@
 /****************************************************************************
 
 	XInverse Class
-	Copyright (C) 2009 Andre Deperrois adeperrois@xflr5.com
+	Copyright (C) 2009-2013 Andre Deperrois adeperrois@xflr5.com
 
 	This program is free software; you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -27,9 +27,13 @@
 
 #include "XInverse.h" 
 #include "FoilSelectionDlg.h"
+#include "PertDlg.h"
 #include "../globals.h"
 #include "../mainframe.h"
 #include "../objects/Foil.h"
+#include "InverseOptionsDlg.h"
+#include "../graph/GraphDlg.h"
+#include "../xdirect/XFoil.h"
 
 
 void *QXInverse::s_pMainFrame;
@@ -39,9 +43,9 @@ QXInverse::QXInverse(QWidget *parent)
 	: QWidget(parent)
 {
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
-	m_pGraphDlg        = new GraphDlg(pMainFrame);
-	m_pXInverseStyleDlg = new InverseOptionsDlg(pMainFrame);
-	m_pPertDlg         = new PertDlg(pMainFrame);
+//	m_pGraphDlg        = new GraphDlg(pMainFrame);
+//	m_pXInverseStyleDlg = new InverseOptionsDlg(pMainFrame);
+//	m_pPertDlg         = new PertDlg(pMainFrame);
 
 	m_bFullInverse = false;
 
@@ -130,9 +134,9 @@ QXInverse::QXInverse(QWidget *parent)
 
 QXInverse::~QXInverse()
 {
-	delete m_pPertDlg;
-	delete m_pGraphDlg;
-	delete m_pXInverseStyleDlg;
+//	delete m_pPertDlg;
+//	delete m_pGraphDlg;
+//	delete m_pXInverseStyleDlg;
 }
 
 void QXInverse::CancelMark()
@@ -1315,6 +1319,8 @@ void QXInverse::OnGraphSettings()
 {
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 
+	GraphDlg *m_pGraphDlg = new GraphDlg(pMainFrame);
+
 	m_pGraphDlg->move(pMainFrame->m_DlgPos);
 	m_pGraphDlg->m_iGraphType = 31;
 	m_pGraphDlg->m_XSel = 0;
@@ -1377,6 +1383,7 @@ void QXInverse::OnInverseApp()
 
 void QXInverse::OnInverseStyles()
 {
+	InverseOptionsDlg *m_pXInverseStyleDlg = new InverseOptionsDlg((MainFrame*)s_pMainFrame);
 	m_pXInverseStyleDlg->m_pXInverse = this;
 	m_pXInverseStyleDlg->InitDialog();
 	m_pXInverseStyleDlg->exec();
@@ -1440,20 +1447,21 @@ void QXInverse::OnPertubate()
 	int m;
 	pXFoil->pert_init(1);
 
+	PertDlg PerturbDlg((MainFrame*)s_pMainFrame);
 
 	for (m=0; m<=qMin(32, pXFoil->nc); m++)
 	{
-		m_pPertDlg->m_cnr[m] = (double)real(pXFoil->cn[m]);
-		m_pPertDlg->m_cni[m] = (double)imag(pXFoil->cn[m]);
+		PerturbDlg.m_cnr[m] = (double)real(pXFoil->cn[m]);
+		PerturbDlg.m_cni[m] = (double)imag(pXFoil->cn[m]);
 	}
-	m_pPertDlg->m_nc = qMin(32, pXFoil->nc);
-	m_pPertDlg->InitDialog();
+	PerturbDlg.m_nc = qMin(32, pXFoil->nc);
+	PerturbDlg.InitDialog();
 
-	if(m_pPertDlg->exec() == QDialog::Accepted)
+	if(PerturbDlg.exec() == QDialog::Accepted)
 	{
 		for (m=0; m<=qMin(32, pXFoil->nc); m++)
 		{
-			pXFoil->cn[m] = complex<double>(m_pPertDlg->m_cnr[m],m_pPertDlg->m_cni[m]);
+			pXFoil->cn[m] = complex<double>(PerturbDlg.m_cnr[m], PerturbDlg.m_cni[m]);
 		}
 
 		pXFoil->pert_process(1);

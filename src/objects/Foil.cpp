@@ -253,7 +253,7 @@ double Foil::DeRotate()
 
 /**
  * Draws the foil in the client area
- * @todo dissociate foil object and MMI
+ * @todo dissociate foil object and GUI
  * @param painter a refernce to the QPainter object on which the foil will be drawn
  * @param alpha the rotation angle in degrees of the foil
  * @param scalex the scaling factor in the x-direction
@@ -331,7 +331,7 @@ void Foil::DrawFoil(QPainter &painter, double const &alpha, double const &scalex
 
 /**
  * Draws the foil's mid line in the client area
- * @todo dissociate foil object and MMI
+ * @todo dissociate foil object and GUI
  * @param painter a refernce to the QPainter object on which the foil will be drawn
  * @param alpha the rotation angle in degrees of the foil
  * @param scalex the scaling factor in the x-direction
@@ -368,7 +368,7 @@ void Foil::DrawMidLine(QPainter &painter, double const &scalex, double const &sc
 
 /**
  * Draws the foil's points in the client area
- * @todo dissociate foil object and MMI
+ * @todo dissociate foil object and GUI
  * @param painter a refernce to the QPainter object on which the foil will be drawn
  * @param alpha the rotation angle in degrees of the foil
  * @param scalex the scaling factor in the x-direction

@@ -19,6 +19,8 @@
 
 *****************************************************************************/
 
+/** @file This file implements the multi-threaded batch foil analysis */
+
 #ifndef BATCHTHREADDLG_H
 #define BATCHTHREADDLG_H
 
@@ -35,14 +37,18 @@
 #include "../misc/FloatEdit.h"
 #include "XFoilTask.h"
 
-
+/**
+ * @struct Analysis a pair of foil and polar used by a thread to perform one foil polar analysis.
+ */
 struct Analysis
 {
-	Foil *pFoil;
-	Polar *pPolar;
+	Foil *pFoil;            /**< a pointer to the Foil to be analyzed by the thread */
+	Polar *pPolar;          /**< a pointer to the polar to be analyzed by the thread */
 };
 
-
+/**
+ * This class implements an interface to perform a multi-threaded batch foil analysis.
+ */
 class BatchThreadDlg : public QDialog
 {
 	Q_OBJECT
@@ -58,10 +64,9 @@ public:
 	void InitDialog();
 
 private:
-	void AddOpPoint(Polar *pPolar);
 
 	void CleanUp();
-	Polar * CreatePolar(Foil *pFoil, double Spec, double Mach, double NCrit);
+	Polar * CreatePolar(Foil *pFoil, double Re, double Mach, double NCrit);
 	void keyPressEvent(QKeyEvent *event);
 	void ReadParams();
 	void SetFileHeader();
@@ -100,56 +105,56 @@ protected:
 	QPushButton *m_pctrlClose, *m_pctrlAnalyze;
 	QTextEdit *m_pctrlTextOutput;
 
-//	static bool s_bStoreOpp;
-	static void* s_pXFoil;
-	static void* s_pXDirect;
-	static void * s_pMainFrame;
-	static bool s_bCurrentFoil;
-	static bool s_bUpdatePolarView;
+	static void* s_pXFoil;             /**< a void pointer to the instance of the XFoil object @todo check if used */
+	static void* s_pXDirect;           /**< a void pointer to the unique instance of the QXDirect class */
+	static void *s_pMainFrame;         /**< a void pointer to the instance of the application's MainFrame class */
+	static bool s_bCurrentFoil;        /**< true if the analysis should be performed only for the current foil */
+	static bool s_bUpdatePolarView;    /**< true if the polar graphs should be updated during the analysis */
 
-	double	m_Mach;
 
-	double	m_ReMin, m_ReMax, m_ReInc;
-//	double	m_SpMin, m_SpMax, m_SpInc;
+	double m_ReMin;             /**< the min Re for a range analysis */
+	double m_ReMax;             /**< the max Re for a range analysis */
+	double m_ReInc;             /**< the incement Re for a range analysis */
+	double m_AlphaMin;          /**< The starting aoa */
+	double m_AlphaMax;          /**< The ending aoa */
+	double m_AlphaInc;          /**< The aoa increment */
+	double m_ClMin;             /**< The starting Cl coefficient  */
+	double m_ClMax;             /**< The ending Cl coefficient */
+	double m_ClInc;             /**< The Cl increment  */
 
-	double m_AlphaMin, m_AlphaMax, m_AlphaInc;
-	double m_ClMin, m_ClMax, m_ClInc;
+//	bool m_bOutput;             /**< true if the output should be displayed in the text widget */
+	bool m_bAlpha;              /**< true if the analysis should be performed for a range of aoa rather than lift coefficient */
+	bool m_bFromList;           /**< true if the analysis should be performed for a list of Re values rather than for a range */
+	bool m_bFromZero;           /**< true if the iterations should start from aoa=0 rather than aoa=alpha_min */
+	bool m_bInitBL;             /**< true if the boundary layer should be restored to the default value before each polar analysis */
+	bool m_bCancel;             /**< true if the user has clicked the cancel button */
+	bool m_bIsRunning;          /**< true until all the pairs of (foil, polar) have been calculated */
 
-	bool m_bOutput;
-	bool m_bAlpha;
-	bool m_bFromList;
-	bool m_bFromZero;
-	bool m_bInitBL;
-	bool m_bCancel;
-	bool m_bIsRunning;
+	enumPolarType m_PolarType;  /**< the type of analysis to perform */
+	int m_IterLim;              /**< the maximum number of iterations for each aoa */
 
-	enumPolarType m_PolarType;
-	int m_IterLim;
+	int m_nAnalysis;            /**< the number of analysis pairs to run */
+	int m_nThreads;             /**< the number of available threads */
 
-	int m_nAnalysis; // number of analysis to run
-	int m_nThreads;  // number of available threads
+	double m_Mach;              /**< the Mach number used if not from the list of Re numbers */
+	double m_NCrit;             /**< the transition criterion used if not from the list of Re numbers */
 
-	double m_NCrit;
-	double m_XTopTr;
-	double m_XBotTr;
-	double *m_ReList;
-	double *m_MachList;
-	double *m_NCritList;
+	double m_XTopTr;            /**< the point of forced transition on the upper surface */
+	double m_XBotTr;            /**< the point of forced transition on the lower surface */
 
-	int m_NRe;
+	double *m_ReList;           /**< a pointer to the array of Re numbers to analyze */
+	double *m_MachList;         /**< a pointer to the array of Mach numbers to analyze */
+	double *m_NCritList;        /**< a pointer to the array of NCrit numbers to analyze */
+	int m_NRe;                  /**< the number of (Re, Ma, NCrit) sets to analyze for each selected foil */
 
-	QList<Analysis *> m_AnalysisPair;
-	XFoilTask *m_pXFoilTask;
+	QList<Analysis *> m_AnalysisPair;  /**< the list of all analysis to be performed. Once performed, an analysis is removed from the list. */
+	XFoilTask *m_pXFoilTask;           /**< the task for a thread */
 
-	QFile *m_pXFile;
+	QFile *m_pXFile;                   /**< a pointer to the output log file */
 
-	Foil *m_pCurFoil;
+	Foil *m_pCurFoil;                  /**< a pointer to the current Foil */
 
-	QFont m_RFont;
-	QFont m_TitleFont;
-
-	QStringList m_FoilList;
-	QString m_PlrName;
+	QStringList m_FoilList;            /**< the list of foils to analyze */
 };
 
 #endif // BATCHTHREADDLG_H

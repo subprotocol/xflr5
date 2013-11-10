@@ -48,7 +48,6 @@
 #include "XFoilAdvancedDlg.h"
 #include "FoilPolarDlg.h"
 #include "BatchDlg.h"
-#include "BatchThreadDlg.h"
 #include "TwoDPanelDlg.h"
 #include "InterpolateFoilsDlg.h"
 #include "NacaFoilDlg.h"
@@ -64,8 +63,9 @@
 
 #define MAXPOLARGRAPHS 5
 
+
 /**
-* @class QXDirect This class is used to manage direct Foil Analysis.
+* @class QXDirect This class is the general interface for Foil direct Analysis.
 *
 * This is the handling class for the QXDirect right toolbar.
 * It provides the methods to modify the foil geometry, define the Polar analysis, perform the analysis, and post-process the results.
@@ -269,7 +269,7 @@ private:
 	XFoilAdvancedDlg *m_pXFoilAdvancedDlg;
 	FoilPolarDlg *m_pFPDlg;
 	BatchDlg *m_pBDlg;
-	BatchThreadDlg *m_pBatchThreadDlg;
+//	BatchThreadDlg *m_pBatchThreadDlg;
 	XDirectStyleDlg *m_pXDirectStyleDlg;
 	ManageFoilsDlg *m_pManageFoilsDlg;
 
@@ -305,7 +305,6 @@ private:
 	QPushButton *m_pctrlAnalyze;
 
 	QCheckBox *m_pctrlShowBL, *m_pctrlShowPressure;
-//	QCheckBox *m_pctrlHighlightOpp;
 	QCheckBox* m_pctrlAnimate;
 	QSlider* m_pctrlAnimateSpeed ;
 
@@ -354,7 +353,7 @@ private:
 	int m_IterLim;             /**< max iteratio limit for XFoil */
 
 	int m_iPlrGraph;           /**< defines whch polar graph is selected if m_iPlrView=1 */
-	int m_iPlrView;	           /**< 0 is all graphs, 1 is a single graph, 2 is two ! */
+	enumPolarGraphView m_iPlrView;  /**< defines the number of graphs to be displayed in the polar view */
 	int m_FoilYPos;            /**< y position for the foil display, in pixels from the bottom of the screen */
 
 	double m_fFoilScale;        /**< the scale for foil display*/
@@ -381,20 +380,14 @@ private:
 
 	Foil m_BufferFoil;          /**< used for screen drawing and temporary geometric mods */
 	Polar* m_pCurPolar;         /**< pointer to the currently selected foil polar */
-	OpPoint * m_pCurOpp;        /**< pointer to the currently selected foil operating point */
+	OpPoint* m_pCurOpp;         /**< pointer to the currently selected foil operating point */
 
 	QList<void*> *m_poaFoil;	/**< pointer to the foil object array */
 	QList<void*> *m_poaPolar;	/**< pointer to the polar object array */
 	QList<void*> *m_poaOpp;		/**< pointer to the OpPoint object array */
 
 	QGraph* m_pCpGraph;         /**< a pointer to the Cp graph for the OpPoint view */
-//	QGraph* m_pPolarGraph;      /**< a pointer to the first polar graph @todo replace with an array of 5 graphs*/
-//	QGraph* m_pCmGraph;         /**< a pointer to the second polar graph */
-//	QGraph* m_pCzGraph;         /**< a pointer to the third polar graph */
-//	QGraph* m_pTrGraph;         /**< a pointer to the fourth polar graph */
-//	QGraph* m_pUserGraph;       /**< a pointer to the fift polar graph */
-
-	QGraph m_PlrGraph[MAXPOLARGRAPHS];          /**< the WPolar graphs */
+	QGraph m_PlrGraph[MAXPOLARGRAPHS];          /**< the 5 Polar graphs */
 
 
 	QGraph* m_pCurGraph;        /**< a pointer to the graph over which the mouse is hovering */

@@ -47,7 +47,7 @@ XFoilTask::XFoilTask()
 }
 
 /**
-* Implements the run method of the QRunnable @todo check if (pure) virtual
+* Implements the run method of the QRunnable virtual base method
 *
 * Asssumes that XFoil has been initialized with foil and polar
 */
@@ -69,8 +69,9 @@ void XFoilTask::run()
 
 	QTimerEvent *event = new QTimerEvent(m_Id);
 	QApplication::postEvent(pBatch, event);
-	//will be truly finished whent this message has been received by the batch analysis engine
+	//will be truly finished whent this message has been received by the parent batch analysis
 }
+
 
 /**
 * Initializes the XFoil calculation

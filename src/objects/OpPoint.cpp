@@ -20,17 +20,16 @@
 *****************************************************************************/
 
 
-// OpPoint.cpp: implementation of the OpPoint class.
-// The Class associated to OpPoint objects
-// resulting from XFoil calculations
-
-
 #include "OpPoint.h"
 #include "../globals.h"
 #include "../mainframe.h"
 
 void *OpPoint::s_pMainFrame;
 
+
+/**
+ * The public constructor
+ */
 OpPoint::OpPoint()
 {
 	m_bViscResults     = false;//not a  viscous point a priori
@@ -73,10 +72,14 @@ OpPoint::OpPoint()
 }
 
 
-// This Object is  used to store the data issued from an XFoil Calculation
-// an array of OperatingPoints is a CPolar
 
 
+/**
+ * Loads or saves the data of this OpPoint to a binary file
+ * @param ar the QDataStream object from/to which the data should be serialized
+ * @param bIsStoring true if saving the data, false if loading
+ * @return true if the operation was successful, false otherwise
+ */
 bool OpPoint::Serialize(QDataStream &ar, bool bIsStoring, int ArchiveFormat)
 {
 	int a, b, k, Format;
@@ -188,7 +191,15 @@ bool OpPoint::Serialize(QDataStream &ar, bool bIsStoring, int ArchiveFormat)
 }
 
 
-bool OpPoint::ExportOpp(QTextStream &out, QString Version, enumTextFileType FileType, bool bDataOnly)
+/**
+ * Exports the data of the polar to a text file
+ * @param out the instance of output QtextStream
+ * @param Version the version name of the program
+ * @param FileType TXT if the data is separated by spaces, CSV for a comma separator
+ * @param bDataOnly true if the analysis parameters should not be output
+ */
+
+void OpPoint::ExportOpp(QTextStream &out, QString Version, enumTextFileType FileType, bool bDataOnly)
 {
 	int k;
 	QString strong;
@@ -221,11 +232,14 @@ bool OpPoint::ExportOpp(QTextStream &out, QString Version, enumTextFileType File
 	}
 
 	out << "\n\n";
-
-	return true;
 }
 
 
+/**
+ * Returns a QString object holding the description and value of the OpPoint's parameters
+ * @param &OpPointProperties the reference of the QString object to be filled with the description
+ * @param bData true if the analysis data should be appended to the string
+ */
 void OpPoint::GetOppProperties(QString &OpPointProperties, bool bData)
 {
 	QString strong;

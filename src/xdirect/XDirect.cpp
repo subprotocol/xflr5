@@ -1,7 +1,7 @@
 /****************************************************************************
 
 	QXDirect Class
-	Copyright (C) 2008-2010 Andre Deperrois adeperrois@xflr5.com
+	Copyright (C) 2008-2013 Andre Deperrois adeperrois@xflr5.com
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -30,10 +30,12 @@
 #include <QGroupBox>
 #include <QThread>
 #include <math.h>
- 
+#include <QtDebug>
+
 #include "../globals.h"
 #include "../mainframe.h"
 #include "XDirect.h"
+#include "BatchThreadDlg.h"
 
 
 
@@ -61,7 +63,7 @@ QXDirect::QXDirect(QWidget *parent) : QWidget(parent)
 	m_pXFoilAnalysisDlg = new XFoilAnalysisDlg(pMainFrame);
 	m_pFPDlg            = new FoilPolarDlg(pMainFrame);
 	m_pBDlg             = new BatchDlg(pMainFrame);
-	m_pBatchThreadDlg   = new BatchThreadDlg(pMainFrame);
+//	m_pBatchThreadDlg   = new BatchThreadDlg(pMainFrame);
 	m_pXFoilAdvancedDlg = new XFoilAdvancedDlg(pMainFrame);
 	m_pXDirectStyleDlg  = new XDirectStyleDlg(pMainFrame);
 	m_pManageFoilsDlg   = new ManageFoilsDlg(pMainFrame);
@@ -134,7 +136,7 @@ QXDirect::QXDirect(QWidget *parent) : QWidget(parent)
 
 	m_bPolarView          = true;
 	m_iPlrGraph = 0;
-	m_iPlrView  = 0;
+	m_iPlrView  = ALLPOLARGRAPHS;
 	m_XFoilVar  = 0;
 	m_FoilYPos  = 150;
 
@@ -306,7 +308,7 @@ QXDirect::QXDirect(QWidget *parent) : QWidget(parent)
 	delete m_pXFoilAnalysisDlg;
 	delete m_pFPDlg;
 	delete m_pBDlg;
-	delete m_pBatchThreadDlg;
+//	delete m_pBatchThreadDlg;
 	delete m_pXFoilAdvancedDlg;
 	delete m_pTwoDPanelDlg;
 	delete m_pIFDlg;
@@ -555,10 +557,10 @@ void QXDirect::SetControls()
 	pMainFrame->setQVarGraph->setChecked(m_pCpGraph->GetYVariable()==1);
 
 	for(int ig=0; ig<MAXPOLARGRAPHS; ig++)
-		pMainFrame->PolarGraphAct[ig]->setChecked(m_iPlrView==1 && m_iPlrGraph== ig);
+		pMainFrame->PolarGraphAct[ig]->setChecked(m_iPlrView==ONEPOLARGRAPH && m_iPlrGraph== ig);
 
-	pMainFrame->TwoPolarGraphsAct->setChecked(m_iPlrView==2);
-	pMainFrame->AllPolarGraphsAct->setChecked(m_iPlrView==0);
+	pMainFrame->TwoPolarGraphsAct->setChecked(m_iPlrView==TWOPOLARGRAPHS);
+	pMainFrame->AllPolarGraphsAct->setChecked(m_iPlrView==ALLPOLARGRAPHS);
 
 	int OppVar = m_pCpGraph->GetYVariable();
 	pMainFrame->CurXFoilCtPlot->setChecked(!m_bPolarView  && OppVar==2 && m_XFoilVar ==1);
@@ -715,6 +717,7 @@ void QXDirect::CreateOppCurves(OpPoint *pOpp)
 	}
 }
 
+
 /**
 *Creates the curves of the graphs for all the visible polars.
 */
@@ -830,6 +833,7 @@ void QXDirect::DeleteFoil(bool bAsk)
 	}
 }
 
+
 /** Deletes the current OpPoint, or all of them, depending on the input flag 
 *
 * @param bCurrent true if only the current OpPoint should be deleted, false if all should be deleted.
@@ -871,6 +875,7 @@ void QXDirect::DeleteOpPoint(bool bCurrent)
 	}
 	m_pCurOpp = NULL;
 }
+
 
 /**
 * Initializes the comboboxes with the active OpPoint or Polar line style
@@ -919,6 +924,7 @@ void QXDirect::FillComboBoxes(bool bEnable)
 	m_pctrlCurveWidth->setCurrentIndex(m_CurveWidth-1);
 }
 
+
 /**
 * Fills the Cp graph curve with the data from the OpPoint.
 *@param pOpp a pointer to the OpPoint for which the curve is drawn
@@ -929,6 +935,9 @@ void QXDirect::FillComboBoxes(bool bEnable)
 void QXDirect::FillOppCurve(OpPoint *pOpp, Graph *pGraph, Curve *pCurve, bool bInviscid)
 {
 	int j;
+
+	Foil *pOpFoil = ((MainFrame*)s_pMainFrame)->GetFoil(pOpp->m_strFoilName);
+
 	switch(m_pCpGraph->GetYVariable())
 	{
 		case 0:
@@ -937,11 +946,11 @@ void QXDirect::FillOppCurve(OpPoint *pOpp, Graph *pGraph, Curve *pCurve, bool bI
 			{
 				if(!bInviscid)
 				{
-					if(pOpp->m_bViscResults) pCurve->AppendPoint(MainFrame::s_pCurFoil->x[j], pOpp->Cpv[j]);
+					if(pOpp->m_bViscResults) pCurve->AppendPoint(pOpFoil->x[j], pOpp->Cpv[j]);
 				}
 				else
 				{
-					pCurve->AppendPoint(MainFrame::s_pCurFoil->x[j], pOpp->Cpi[j]);
+					pCurve->AppendPoint(pOpFoil->x[j], pOpp->Cpi[j]);
 				}
 			}
 			pGraph->SetYTitle(tr("Cp"));
@@ -953,11 +962,11 @@ void QXDirect::FillOppCurve(OpPoint *pOpp, Graph *pGraph, Curve *pCurve, bool bI
 			{
 				if(!bInviscid)
 				{
-					if(pOpp->m_bViscResults) pCurve->AppendPoint(MainFrame::s_pCurFoil->x[j], pOpp->Qv[j]);
+					if(pOpp->m_bViscResults) pCurve->AppendPoint(pOpFoil->x[j], pOpp->Qv[j]);
 				}
 				else
 				{
-					pCurve->AppendPoint(MainFrame::s_pCurFoil->x[j], pOpp->Qi[j]);
+					pCurve->AppendPoint(pOpFoil->x[j], pOpp->Qi[j]);
 				}
 			}
 			pGraph->SetYTitle(tr("Q"));
@@ -969,10 +978,10 @@ void QXDirect::FillOppCurve(OpPoint *pOpp, Graph *pGraph, Curve *pCurve, bool bI
 			{
 				if(!bInviscid)
 				{
-					if(pOpp->m_bViscResults) pCurve->AppendPoint(MainFrame::s_pCurFoil->x[j], pOpp->Cpv[j]);
+					if(pOpp->m_bViscResults) pCurve->AppendPoint(pOpFoil->x[j], pOpp->Cpv[j]);
 				}
 				else{
-					pCurve->AppendPoint(MainFrame::s_pCurFoil->x[j], pOpp->Cpi[j]);
+					pCurve->AppendPoint(pOpFoil->x[j], pOpp->Cpi[j]);
 				}
 			}
 			pGraph->SetYTitle(tr("Cp"));
@@ -1051,7 +1060,8 @@ void QXDirect::FillPolarCurve(Curve *pCurve, Polar *pPolar, int XVar, int YVar)
 	}
 }
 
-/***
+
+/**
 *Returns a pointer to the OpPoint with the specified aoa and which is attached to the active Foil and Polar.
 *@param Alpha the input aoa 
 *@return a pointer to the OpPoint, or NULL if none has been found for this set of (Foil, Polar, aoa);
@@ -1088,6 +1098,7 @@ OpPoint* QXDirect::GetOpPoint(double Alpha)
 	}
 	return NULL;// shouldn't ever get here, fortunately
 }
+
 
 /**
 * Returns a void pointer to the array of the specified variable of the input Polar
@@ -1152,13 +1163,17 @@ void * QXDirect::GetVariable(Polar *pPolar, int iVar)
 }
 
 
-
+/**
+ * Returns a pointer to the graph to which the input client point belongs
+ * @param pt the client point, in this case the position of the mouse
+ * @return  a pointer to the graph
+ */
 QGraph* QXDirect::GetGraph(QPoint &pt)
 {
 	//pt is in client coordinates
 	if (m_bPolarView)
 	{
-		if(m_iPlrView == 1)
+		if(m_iPlrView == ONEPOLARGRAPH)
 		{
 			if(m_iPlrGraph>=0 && m_iPlrGraph<MAXPOLARGRAPHS) m_pCurGraph = m_PlrGraph + m_iPlrGraph;
 			else                                             m_pCurGraph = NULL;
@@ -1166,7 +1181,7 @@ QGraph* QXDirect::GetGraph(QPoint &pt)
 			if(m_pCurGraph->IsInDrawRect(pt)) return m_pCurGraph;
 			else return NULL;
 		}
-		if(m_iPlrView == 2)
+		if(m_iPlrView == TWOPOLARGRAPHS)
 		{
 			if(m_PlrGraph[0].IsInDrawRect(pt)){return m_PlrGraph;}
 			if(m_PlrGraph[4].IsInDrawRect(pt)){return m_PlrGraph+4;}
@@ -1196,8 +1211,11 @@ QGraph* QXDirect::GetGraph(QPoint &pt)
 }
 
 
-
-
+/**
+ * Inserts a new OpPoint in the array. The OpPoints are sorted by FoilName first, then by Re number, then by aoa.
+ * If an OpPoint already exists with the same combination of (FoilName, Re, aoa), it is overwritten.
+ * @param pNewPoint
+ */
 void QXDirect::InsertOpPoint(OpPoint *pNewPoint)
 {
 	if(!pNewPoint) return;
@@ -1257,6 +1275,11 @@ void QXDirect::InsertOpPoint(OpPoint *pNewPoint)
 }
 
 
+/**
+ * Overrides the QWidget's keyPressEvent method.
+ * Dispatches the key press event
+ * @param event the QKeyEvent
+ */
 void QXDirect::keyPressEvent(QKeyEvent *event)
 {
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
@@ -1307,48 +1330,48 @@ void QXDirect::keyPressEvent(QKeyEvent *event)
 			m_bYPressed = true;
 			break;
 		case Qt::Key_1:
-			m_iPlrView  = 1;
+			m_iPlrView  = ONEPOLARGRAPH;
 			m_iPlrGraph = 0;
 			if(m_bPolarView) SetPolarLegendPos();
 			SetControls();
 			UpdateView();
 			break;
 		case Qt::Key_2:
-			m_iPlrView  = 1;
+			m_iPlrView  = ONEPOLARGRAPH;
 			m_iPlrGraph = 1;
 			if(m_bPolarView) SetPolarLegendPos();
 			SetControls();
 			UpdateView();
 			break;
 		case Qt::Key_3:
-			m_iPlrView  = 1;
+			m_iPlrView  = ONEPOLARGRAPH;
 			m_iPlrGraph = 2;
 			if(m_bPolarView) SetPolarLegendPos();
 			SetControls();
 			UpdateView();
 			break;
 		case Qt::Key_4:
-			m_iPlrView  = 1;
+			m_iPlrView  = ONEPOLARGRAPH;
 			m_iPlrGraph = 3;
 			if(m_bPolarView) SetPolarLegendPos();
 			SetControls();
 			UpdateView();
 			break;
 		case Qt::Key_5:
-			m_iPlrView  = 1;
+			m_iPlrView  = ONEPOLARGRAPH;
 			m_iPlrGraph = 4;
 			if(m_bPolarView) SetPolarLegendPos();
 			SetControls();
 			UpdateView();
 			break;
 		case Qt::Key_A:
-			m_iPlrView = 0;
+			m_iPlrView  = ALLPOLARGRAPHS;
 			if(m_bPolarView) SetPolarLegendPos();
 			SetControls();
 			UpdateView();
 			break;
 		case Qt::Key_T:
-			m_iPlrView = 2;
+			m_iPlrView  = TWOPOLARGRAPHS;
 			if(m_bPolarView) SetPolarLegendPos();
 			SetControls();
 			UpdateView();
@@ -1430,10 +1453,14 @@ void QXDirect::keyPressEvent(QKeyEvent *event)
 }
 
 
+
+/**
+ * Overrides the QWidget's keyReleaseEvent method.
+ * Dispatches the key release event
+ * @param event the QKeyEvent
+ */
 void QXDirect::keyReleaseEvent(QKeyEvent *event)
 {
-//	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
-
 	switch (event->key())
 	{
 		case Qt::Key_X:
@@ -1447,7 +1474,10 @@ void QXDirect::keyReleaseEvent(QKeyEvent *event)
 	}
 }
 
-
+/**
+ * Loads the user's default settings from the application QSettings object
+ * @param pSettings a pointer to the QSettings object
+ */
 void QXDirect::LoadSettings(QSettings *pSettings)
 {
 	QString str1, str2, str3;
@@ -1502,7 +1532,20 @@ void QXDirect::LoadSettings(QSettings *pSettings)
 		m_XFoilVar       = pSettings->value("XFoilVar").toInt();
 		m_IterLim        = pSettings->value("IterLim").toInt();
 		m_iPlrGraph      = pSettings->value("PlrGraph").toInt();
-		m_iPlrView       = pSettings->value("PlrView").toInt();
+
+		switch(pSettings->value("PlrView").toInt())
+		{
+			case 1:
+				m_iPlrView = ONEPOLARGRAPH;
+				break;
+			case 2:
+				m_iPlrView = TWOPOLARGRAPHS;
+				break;
+			default:
+				m_iPlrView = ALLPOLARGRAPHS;
+				break;
+		}
+
 		m_Alpha          = pSettings->value("AlphaMin").toDouble();
 		m_AlphaMax       = pSettings->value("AlphaMax").toDouble();
 		m_AlphaDelta     = pSettings->value("AlphaDelta").toDouble();
@@ -1562,7 +1605,12 @@ void QXDirect::LoadSettings(QSettings *pSettings)
 }
 
 
-void QXDirect::mouseDoubleClickEvent ( QMouseEvent * event )
+/**
+ * Overrides the QWidget's mouseDoubleClickEvent method.
+ * Dispatches the event
+ * @param event the QMouseEvent
+ */
+void QXDirect::mouseDoubleClickEvent (QMouseEvent * event)
 {
 	if(!m_bPolarView)
 	{
@@ -1574,6 +1622,12 @@ void QXDirect::mouseDoubleClickEvent ( QMouseEvent * event )
 }
 
 
+
+/**
+ * Overrides the QWidget's mouseMoveEvent method.
+ * Dispatches the event
+ * @param event the QMouseEvent
+ */
 void QXDirect::mouseMoveEvent(QMouseEvent *event)
 {
 	static QPoint pt;
@@ -1672,7 +1726,11 @@ void QXDirect::mouseMoveEvent(QMouseEvent *event)
 
 
 
-
+/**
+ * Overrides the QWidget's mousePressEvent method.
+ * Dispatches the event
+ * @param event the QMouseEvent
+ */
 void QXDirect::mousePressEvent(QMouseEvent *event)
 {
 	QPoint pt(event->x(), event->y()); //client coordinates
@@ -1698,6 +1756,12 @@ void QXDirect::mousePressEvent(QMouseEvent *event)
 	}
 }
 
+
+/**
+ * Overrides the QWidget's mouseReleasEvent method.
+ * Dispatches the event
+ * @param event the QMouseEvent
+ */
 void QXDirect::mouseReleaseEvent(QMouseEvent *event)
 {
 	TwoDWidget *p2DWidget = (TwoDWidget*)s_p2DWidget;
@@ -1708,10 +1772,12 @@ void QXDirect::mouseReleaseEvent(QMouseEvent *event)
 
 
 
-
+/**
+ * The user has requested a display of all polar graphs
+ */
 void QXDirect::OnAllPolarGraphs()
 {
-	m_iPlrView  = 0;
+	m_iPlrView  = ALLPOLARGRAPHS;
 	m_bPolarView = true;
 	SetPolarLegendPos();
 	SetControls();
@@ -1719,6 +1785,10 @@ void QXDirect::OnAllPolarGraphs()
 }
 
 
+
+/**
+ * The user has requested an edition of all polar graphs settings
+ */
 void QXDirect::OnAllPolarGraphsSetting()
 {
 	QGraph graph;
@@ -1748,14 +1818,19 @@ void QXDirect::OnAllPolarGraphsSetting()
 }
 
 
+/**
+ * The user has changed one of the analysis parameters. Reads all the data and maps it.
+ */
 void QXDirect::OnInputChanged()
 {
 	ReadParams();
 }
 
 
-
-
+/**
+ * The user has clicked the animate checkcbox
+ * @param bChecked the new state of the checkbox
+ */
 void QXDirect::OnAnimate(bool bChecked)
 {
 	if(!MainFrame::s_pCurFoil || !m_pCurPolar)
@@ -1799,56 +1874,62 @@ void QXDirect::OnAnimate(bool bChecked)
 }
 
 
-
+/**
+ * Called by the animation timer. Updates the display with the data of the next OpPoint.
+ */
 void QXDirect::OnAnimateSingle()
 {
-	static int pos, size;
+	static int indexCbBox;
 	static QString str;
+	bool bIsValid = false;
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
-	//KickIdle
-	size = (int)m_poaOpp->size();
+
 	OpPoint* pOpPoint;
 
-	if(size<=1) return;
+	if(m_poaOpp->size()<=1) return;
 
-	//find the current position to display
-
-	if(m_bAnimatePlus)
+	// find the next oppoint related to this foil and polar pair
+	while(!bIsValid)
 	{
-		m_posAnimate++;
-		if (m_posAnimate >= size)
+		if(m_bAnimatePlus)
 		{
-			m_posAnimate = size-2;
-			m_bAnimatePlus = false;
+			m_posAnimate++;
+			if (m_posAnimate >= m_poaOpp->size())
+			{
+				m_posAnimate = m_poaOpp->size()-2;
+				m_bAnimatePlus = false;
+			}
 		}
-	}
-	else
-	{
-		m_posAnimate--;
-		if (m_posAnimate <0)
+		else
 		{
-			m_posAnimate = 1;
-			m_bAnimatePlus = true;
+			m_posAnimate--;
+			if (m_posAnimate <0)
+			{
+				m_posAnimate = 1;
+				m_bAnimatePlus = true;
+			}
 		}
-	}
+		if(m_posAnimate<0 || m_posAnimate>=m_poaOpp->size()) return;
 
-	if(m_posAnimate<0 || m_posAnimate>=m_poaOpp->size()) return;
-	pOpPoint = (OpPoint*)m_poaOpp->at(m_posAnimate);
-	if(!pOpPoint) return;
+		pOpPoint = (OpPoint*)m_poaOpp->at(m_posAnimate);
 
-	if (pOpPoint->m_strPlrName  == m_pCurPolar->m_PlrName &&
-		pOpPoint->m_strFoilName == MainFrame::s_pCurFoil->m_FoilName)
-	{
+		if (pOpPoint &&
+			pOpPoint->m_strPlrName  == m_pCurPolar->m_PlrName &&
+			pOpPoint->m_strFoilName == MainFrame::s_pCurFoil->m_FoilName &&
+			pOpPoint != m_pCurOpp)
+		{
+			bIsValid = true;
 			CreateOppCurves(pOpPoint);
 			m_pCurOpp = pOpPoint;
 
 			//select current OpPoint in Combobox
 			if(m_pCurPolar->m_PolarType!=FIXEDAOAPOLAR) str = QString("%1").arg(m_pCurOpp->Alpha,8,'f',2);
 			else                                        str = QString("%1").arg(m_pCurOpp->Reynolds,8,'f',2);
-			pos = pMainFrame->m_pctrlOpPoint->findText(str);
-			if(pos>=0) pMainFrame->m_pctrlOpPoint->setCurrentIndex(pos);
+			indexCbBox = pMainFrame->m_pctrlOpPoint->findText(str);
+			if(indexCbBox>=0) pMainFrame->m_pctrlOpPoint->setCurrentIndex(indexCbBox);
 
 			UpdateView();
+		}
 	}
 }
 
@@ -1998,6 +2079,8 @@ void QXDirect::OnMultiThreadedBatchAnalysis()
 	m_bPolarView = true;
 	OnPolars();
 	UpdateView();
+
+	BatchThreadDlg *m_pBatchThreadDlg   = new BatchThreadDlg(pMainFrame);
 
 	m_pBatchThreadDlg->m_pCurFoil  = MainFrame::s_pCurFoil;
 	m_pBatchThreadDlg->m_Mach      = 0.0;
@@ -2207,7 +2290,7 @@ void QXDirect::OnCdPlot()
 
 void QXDirect::OnCouplePolarGraphs()
 {
-	m_iPlrView  = 2;
+	m_iPlrView  = TWOPOLARGRAPHS;
 	m_bPolarView = true;
 	SetControls();
 	UpdateView();
@@ -4840,7 +4923,7 @@ void QXDirect::OnSinglePolarGraph()
 	QAction *action = qobject_cast<QAction *>(sender());
 	if (!action) return;
 
-	m_iPlrView  = 1;
+	m_iPlrView  = ONEPOLARGRAPH;
 	m_iPlrGraph = action->data().toInt();
 	m_bPolarView = true;
 	SetPolarLegendPos();
@@ -5607,9 +5690,9 @@ void QXDirect::PaintView(QPainter &painter)
 	}
 	else if (m_bPolarView)
 	{
-		if(m_iPlrView==0)      PaintPolarGraphs(painter);
-		else if(m_iPlrView==1) PaintSingleGraph(painter);
-		else if(m_iPlrView==2) PaintCoupleGraphs(painter);
+		if(m_iPlrView==ALLPOLARGRAPHS)      PaintPolarGraphs(painter);
+		else if(m_iPlrView==ONEPOLARGRAPH)  PaintSingleGraph(painter);
+		else if(m_iPlrView==TWOPOLARGRAPHS) PaintCoupleGraphs(painter);
 	}
 	else
 	{
@@ -5701,7 +5784,20 @@ void QXDirect::SaveSettings(QSettings *pSettings)
 		pSettings->setValue("XFoilVar", m_XFoilVar);
 		pSettings->setValue("IterLim", m_IterLim);
 		pSettings->setValue("PlrGraph", m_iPlrGraph);
-		pSettings->setValue("PlrView", m_iPlrView);
+
+		switch(m_iPlrView)
+		{
+			case ONEPOLARGRAPH:
+				pSettings->setValue("PlrView", 1);
+				break;
+			case TWOPOLARGRAPHS:
+				pSettings->setValue("PlrView", 2);
+				break;
+			default:
+				pSettings->setValue("PlrView", 0);
+				break;
+		}
+
 		pSettings->setValue("AlphaMin", m_Alpha);
 		pSettings->setValue("AlphaMax", m_AlphaMax);
 		pSettings->setValue("AlphaDelta", m_AlphaDelta);
@@ -6383,17 +6479,17 @@ void QXDirect::SetPolarLegendPos()
 	int w23 = 2*w3;
 	int margin = 10;
 
-	if(m_iPlrView == 1)
+	if(m_iPlrView == ONEPOLARGRAPH)
 	{
 		m_PolarLegendOffset.rx() = w23+margin;
 		m_PolarLegendOffset.ry() = margin;
 	}
-	else if (m_iPlrView == 2)
+	else if (m_iPlrView == TWOPOLARGRAPHS)
 	{
 		m_PolarLegendOffset.rx() = margin;
 		m_PolarLegendOffset.ry() = h23+margin;
 	}
-	else if	(m_iPlrView == 0)
+	else if	(m_iPlrView == ALLPOLARGRAPHS)
 	{
 		m_PolarLegendOffset.rx() = margin;
 		m_PolarLegendOffset.ry() = h2+30;

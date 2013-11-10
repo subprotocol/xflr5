@@ -1,8 +1,21 @@
 /****************************************************************************
 
 		 SplineSurface Class
-		 Copyright (C) 2012 Andre Deperrois sail7@xflr5.com
-		 All rights reserved
+		 Copyright (C) 2012 Andre Deperrois adeperrois@xflr5.com
+
+	This program is free software; you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation; either version 2 of the License, or
+	(at your option) any later version.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 *****************************************************************************/
 
@@ -14,7 +27,10 @@
 
 void *NURBSSurface::s_pMainFrame;
 
-
+/**
+ * The public constructor.
+ * @param iAxis defines along which preferred axis the paramater u is directed; v is in the y-direction
+ */
 NURBSSurface::NURBSSurface(int iAxis)
 {
 	m_pFrame.clear();
@@ -25,18 +41,11 @@ NURBSSurface::NURBSSurface(int iAxis)
 	m_uAxis = iAxis;//directed in x direction, mainly
 	m_vAxis = 2;//directed in y direction, mainly
 
-//	m_nuLines = 0;
-//	m_nvLines = 0;
 
 	m_iuDegree = 2;
 	m_ivDegree = 2;
 	m_nuKnots = 0;
 	m_nvKnots = 0;
-
-	m_nuPanels = 19;
-	m_nvPanels = 11;
-
-	m_NElements = m_nuPanels * m_nvPanels * 2;
 
 	m_iRes = 31;
 
@@ -45,17 +54,17 @@ NURBSSurface::NURBSSurface(int iAxis)
 	m_EdgeWeightv = 1.0;
 
 	eps = 1.0e-06;
-
-	for(int i=0; i<MAXVLINES;i++) m_uPanels[i] = 1;
-	for(int i=0; i<MAXULINES;i++) m_vPanels[i] = 1;
-
-	m_np = 0;
-
-//	SetKnots();
 }
 
 
 
+/**
+ * Returns the u-parameter for a given value along the axis and a given v parameter
+ * Proceeds by iteration - time consuming,
+ * @param pos the point coordinate for which the parameter u is requested
+ * @param v the specified value of the v-parameter
+ * @return the value of the u-parameter
+ */
 double NURBSSurface::Getu(double pos, double v)
 {
 	if(pos<=m_pFrame.first()->m_Position[m_uAxis]) return 0.0;
@@ -83,13 +92,20 @@ double NURBSSurface::Getu(double pos, double v)
 			zz += zh * b;
 		}
 		if(zz>pos) u2 = u;
-		else     u1 = u;
+		else       u1 = u;
 		iter++;
 	}
 	return (u1+u2)/2.0;
 }
 
 
+/**
+ * Returns the v-parameter for a given value  of u and a geometrical point
+ * Proceeds by iteration - time consuming,
+ * @param u the specified value of the u-parameter
+ * @param r the point for which v is requested
+ * @return the value of the v-parameter
+ */
 
 double NURBSSurface::Getv(double u, CVector r)
 {
@@ -123,13 +139,18 @@ double NURBSSurface::Getv(double u, CVector r)
 }
 
 
+
+/**
+ * Returns the point corresponding to the pair of parameters (u,v)
+ * Assumes that the knots have been set previously
+ *
+ * Scans the u-direction first, then v-direction
+ * @param u the specified u-parameter
+ * @param v the specified v-parameter
+ * @param Pt a reference to the point defined by the pair (u,v)
+*/
 void NURBSSurface::GetPoint(double u, double v, CVector &Pt)
 {
-	//returns the point corresponding to the parametric values u and v
-	//assumes that the knots have been set previously
-
-	//Scan u-direction first, then v-direction
-
 	CVector V, Vv;
 	double wx, weight;
 
@@ -166,12 +187,14 @@ void NURBSSurface::GetPoint(double u, double v, CVector &Pt)
 }
 
 
+/**
+ * Returns the weight of the control point
+ * @param i the index of the point along the edge
+*  @param N the total number of points along the edge
+*  @return the point's weight
+**/
 double NURBSSurface::Weight(double const &d, const int &i, int const &N)
 {
-	// returns the weight of the control point
-	// i is the index of the point along the edge
-	// N is total number of points along the edge
-
 	if(fabs(d-1.0)<PRECISION) return 1.0;
 	if(i<(N+1)/2)             return pow(d, i);
 	else                      return pow(d, N-i-1);
@@ -190,12 +213,15 @@ double NURBSSurface::Weight(int i, int N)
 	else                                 return 1./pow(m_EdgeWeight, i-(int)(N/2));
 }*/
 
-
-
+/**
+ * Intersects a line segment AB with the NURBS surface. The points are expected to be on each side of the NURBS surface.
+ *@param A the first point which defines the ray
+ *@param B the second point which defines the ray
+ *@param I the intersection point
+ *@return true if an intersection point could be determined
+ */
 bool NURBSSurface::IntersectNURBS(CVector A, CVector B, CVector &I)
 {
-	//intersect line AB with NURBS
-	//intersection point is I
 	CVector  tmp, M0, M1;
 	double u, v, dist, t, tp;
 	int iter = 0;
@@ -249,6 +275,9 @@ bool NURBSSurface::IntersectNURBS(CVector A, CVector B, CVector &I)
 }
 
 
+/**
+ * Creates the knot array for the two directions
+ */
 void NURBSSurface::SetKnots()
 {
 	int j;
@@ -256,7 +285,6 @@ void NURBSSurface::SetKnots()
 	if(!FrameSize())return;
 	if(!FramePointCount())return;
 
-	// z-dir knots
 	m_iuDegree = qMin(m_iuDegree, FrameSize());
 	m_nuKnots  = m_iuDegree + FrameSize() + 1;
 	b = (double)(m_nuKnots-2*m_iuDegree-1);
@@ -275,7 +303,6 @@ void NURBSSurface::SetKnots()
 		}
 	}
 
-	//hoop knots = x-direction
 	m_ivDegree = qMin(m_ivDegree, m_pFrame.first()->m_CtrlPoint.size());
 
 	m_nvKnots  = m_ivDegree + FramePointCount() + 1;
@@ -297,6 +324,13 @@ void NURBSSurface::SetKnots()
 }
 
 
+/**
+ * Specifies the degree in the u-direction.
+ * If the degree specified by the input parameter is equal or greater than the Frame count,
+ * then the degree is set to the number of frames minus 1.
+ * @param nvDegree the specified degree
+ * @return the degree which has been set
+ */
 int NURBSSurface::SetvDegree(int nvDegree)
 {
 	if(FramePointCount()>nvDegree) m_ivDegree = nvDegree;
@@ -306,6 +340,15 @@ int NURBSSurface::SetvDegree(int nvDegree)
 
 
 
+
+
+/**
+ * Specifies the degree in the u-direction.
+ * If the degree specified by the input parameter is equal or greater than the Frame count,
+ * then the degree is set to the number of frames minus 1.
+ * @param nuDegree the specified degree
+ * @return the degree which has been set
+ */
 int NURBSSurface::SetuDegree(int nuDegree)
 {
 	if(FrameSize()>nuDegree) m_iuDegree = nuDegree;
@@ -314,6 +357,10 @@ int NURBSSurface::SetuDegree(int nuDegree)
 }
 
 
+/**
+ * Removes a Frame from the array
+ * @param iFrame the index of the frame to remove
+ */
 void NURBSSurface::RemoveFrame(int iFrame)
 {
 	delete m_pFrame.at(iFrame);
@@ -322,7 +369,9 @@ void NURBSSurface::RemoveFrame(int iFrame)
 
 
 
-
+/**
+ * Removes all the Frame objects from the array
+ */
 void NURBSSurface::ClearFrames()
 {
 	if(!FrameSize()) return;
@@ -332,7 +381,10 @@ void NURBSSurface::ClearFrames()
 	}
 }
 
-
+/**
+ * Inserts a Frame in the array. The Frame is positioned in crescending position along the u-axis
+ * @param pNewFrame a pointer to the Frame object to insert.
+ */
 void NURBSSurface::InsertFrame(Frame *pNewFrame)
 {
 	for(int ifr=0; ifr<FrameSize(); ifr++)
@@ -347,9 +399,20 @@ void NURBSSurface::InsertFrame(Frame *pNewFrame)
 	m_pFrame.append(pNewFrame); //either the first if none, either the last...
 }
 
-
+/**
+ * Appends a new Frame at the end of the array
+ * @return a pointer to the Frame which has been created.
+ */
 Frame * NURBSSurface::AppendFrame()
 {
 	m_pFrame.append(new Frame);
 	return m_pFrame.last();
 }
+
+
+
+
+
+
+
+

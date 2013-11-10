@@ -51,7 +51,7 @@ The class stores two geometries:
 	- the current foil, on which the geometrical modifications are applied
 	   such as flap deflection, camber and thickness scaling
 @todo One of the very early classes in this project. Would need a general revision.
-Also it mixes the construction methods and the MMI; would be better to move the MMI to a derived child class for polymorphism.
+Also it mixes the construction methods and the GUI; would be better to move the GUI to a derived child class for polymorphism.
 */
 class Foil
 {

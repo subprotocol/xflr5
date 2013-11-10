@@ -49,7 +49,7 @@
  
  For convenience, the class is derived from the QDialog class. 
  The dialog interface allows the user to visualize the progress of the analysis, and to interrupt it as necessary.
- Ideally for oop good practices, the MMI should be implemented in a class separate from the class which performs the analysis.
+ Ideally for oop good practices, the GUI should be implemented in a class separate from the class which performs the analysis.
  
  All calculations are performed, and all results are stored, in International Standard Units, i.e. m, kg, s, Newtons
  

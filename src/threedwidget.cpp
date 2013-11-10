@@ -475,7 +475,7 @@ void ThreeDWidget::CreateArcballList(ArcBall &ArcBall, double GLScale)
 
 /**
 * Draws the axis in the OpenGL view
-*@param length the length of the axis, in IS units  @todo check
+*@param length the length of the axis
 *@param color the color to use to draw the axis
 *@param style the index of the style to use to draw the axis
 *@param width the width to use to draw the axis

@@ -151,6 +151,9 @@ typedef enum {PNG, JPEG, BMP}	enumImageFormat;
 /** @enum The different formats usable to export data to text format files*/
 typedef enum {TXT, CSV}	enumTextFileType;
 
+/** @enum The different number of graphs in the polar view */
+typedef enum {ONEPOLARGRAPH, TWOPOLARGRAPHS, ALLPOLARGRAPHS} enumPolarGraphView;
+
 
 #define QUESTION (BB || !BB) /**< Shakespeare */
 
