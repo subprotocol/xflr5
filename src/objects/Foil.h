@@ -39,6 +39,7 @@
 #include "CRectangle.h"
 #include <QTextStream>
 
+#define MIDPOINTCOUNT 500
 
 
 /**
@@ -113,7 +114,7 @@ public:
 	void CompMidLine(bool bParams);
 
 	bool ExportFoil(QTextStream &out);
-	bool InitFoil();
+	void InitFoil();
 
 	void CopyFoil(Foil *pSrcFoil);
 	bool Serialize(QDataStream &ar, bool bIsStoring);
@@ -125,58 +126,68 @@ public:
 	void SetTEFlapData(bool bFlap, double xhinge, double yhinge, double angle);
 
 	bool Intersect(CVector const &A, CVector const &B, CVector const &C, CVector const &D, CVector *M);
-//	bool IsBetween(int f, int f1, int f2);
-//	bool IsBetween(int f, double f1, double f2);
 
 private:
-	QString m_FoilDescription;	// a description
-	QColor m_FoilColor;	//... and its color
+	QString m_FoilDescription;	        /**< a free description */
 
-	bool m_bVisible;	//true if the foil is to be displayed
-	bool m_bCenterLine;	//true if the foil mid camber line is to be displayed
-	bool m_bPoints;		//true if the foil's panels are to be displayed
-	bool m_bSaved;		//true if the design modifications have been saved
-	int m_iExt, m_iInt;	//the number of points on the upper and lower surfaces of the current foil
-	int m_iBaseExt, m_iBaseInt;	//the number of points on the upper and lower surfaces of the base foil
+	bool m_bVisible;                     /**< true if the foil is to be displayed */
+	bool m_bCenterLine;                  /**< true if the foil mid camber line is to be displayed */
+	bool m_bPoints;                      /**< true if the foil's panels are to be displayed */
+	bool m_bSaved;                       /**< true if the design modifications have been saved */
 
-	int m_nFoilStyle;
-	int m_nFoilWidth;
-	int m_iHighLight;
+	int m_iBaseInt;                      /**< the number of points on the lower surface of the base foil */
+	int m_iBaseExt;                      /**< the number of points on the upper surface of the base foil */
 
-	int n;				// the number of points of the current foil
-	double  x[IBX],  y[IBX];	// the point coordinates of the current foil
-	double nx[IBX], ny[IBX];	// the normal vector coordinates of the current foil's points
+	int m_iInt;                          /**< the number of points on the lower surface of the current foil */
+	int m_iExt;                          /**< the number of points on the upper surface of the current foil */
 
-	//Base geometry;
-	int nb;				// the number of points of the base foil
-	double  xb[IBX],  yb[IBX];	// the point coordinates of the base foil
+	int m_nFoilStyle;                    /**< the index of the style with which to draw the Foil */
+	int m_nFoilWidth;                    /**< the width with which to draw the Foil */
+	QColor m_FoilColor;                  /**< the color with which to draw the Foil */
 
-	double m_fCamber, m_fXCamber;	//foil camber and max camber position
-	double m_fThickness, m_fXThickness;// foil thickness and thickness position
+	int m_iHighLight;                    /**< the index of the point to highlight in the display */
 
-	double m_Gap;			// trailing edge gap
-	CVector m_LE, m_TE;		// leading edge and trailing edge points
+	int n;                               /**<  the number of points of the current foil */
+	double x[IBX];                       /**< the array of x-coordinates of the current foil points */
+	double y[IBX];                       /**< the array of y-coordinates of the current foil points*/
+	double nx[IBX];                      /**< the array of x-coordinates of the current foil normal vectors*/
+	double ny[IBX];                      /**< the array of x-coordinates of the current foil normal vectors*/
 
-	CVector m_rpBaseMid[1001];	//base mid camber line points
-	CVector m_BaseExtrados[IQX];	//base upper surface points
-	CVector m_BaseIntrados[IQX];	//base lower surface points
+	 // Base geometry;
+	int nb;                              /**< the number of points of the base foil */
+	double xb[IBX];                      /**< the array of x-coordinates of the base foil points */
+	double yb[IBX];                      /**< the array of y-coordinates of the base foil points*/
 
-	CVector m_rpMid[1001];		//mid camber line points
-	CVector m_rpExtrados[IQX];	//upper surface points
-	CVector m_rpIntrados[IQX];	//lower surface points
+
+	double m_fCamber;                    /**< the Foil's max camber */
+	double m_fThickness;                 /**< the Foil's max thickness */
+	double m_fXCamber;                   /**< the x-position of the Foil's max camber point */
+	double m_fXThickness;                /**< the x-position of the Foil's max thickness point */
+
+	double m_Gap;			             /**< the trailing edge gap */
+	CVector m_TE;                        /**< the trailing edge point @todo check if any use*/
+	CVector m_LE;                        /**< the leading edge point */
+
+	CVector m_rpBaseMid[MIDPOINTCOUNT];  /**< the mid camber line points of the base geometry */
+	CVector m_BaseExtrados[IQX];	     /**< the upper surface points of the base geometry */
+	CVector m_BaseIntrados[IQX];    	 /**< the lower surface points of the base geometry */
+
+	CVector m_rpMid[MIDPOINTCOUNT];      /**< the mid camber line points */
+	CVector m_rpExtrados[IQX];	         /**< the upper surface points */
+	CVector m_rpIntrados[IQX];	         /**< the lower surface points */
 
 public:
-	QString m_FoilName;		// the foil's name...
+	QString m_FoilName;		 /**<  the foil's name... */
 
-	// Trailing edge flap  data
-	bool m_bTEFlap;
-	double m_TEFlapAngle;
-	double m_TEXHinge, m_TEYHinge;
-	
-	// Leading edge flap  data
-	bool m_bLEFlap;
-	double m_LEFlapAngle;
-	double m_LEXHinge, m_LEYHinge;
+	bool m_bTEFlap;          /**< true if the foil has a trailing edge flap */
+	double m_TEFlapAngle;    /**< the trailing edge flap angle */
+	double m_TEXHinge;       /**< the x-position of the trailing edge flap, in chord % */
+	double m_TEYHinge;       /**< the y-position of the trailng edge flap, in chord %*/
+
+	bool m_bLEFlap;          /**< true if the foil has a leading edge flap */
+	double m_LEFlapAngle;    /**< the leading edge flap angle */
+	double m_LEXHinge;       /**< the x-position of the leading edge flap, in chord % */
+	double m_LEYHinge;       /**< the y-position of the leading edge flap, in chord %*/
 
 };
 

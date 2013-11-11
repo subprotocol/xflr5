@@ -36,6 +36,7 @@
 #include <QStandardItemModel>
 #include <QRadioButton>
 #include <QSettings>
+#include <QList>
 
 #include "../params.h"
 #include "FoilTableDelegate.h"
@@ -136,6 +137,7 @@ private slots:
 private:
 
 	void CheckButtons();
+	void ClearStack(int pos=0);
 	void DrawScale(QPainter &painter, double scalex);
 	void DrawXGrid(QPainter &painter, double scalex, double scaley, QPoint Offset, QRect dRect);
 	void DrawYGrid(QPainter &painter, double scalex, double scaley, QPoint Offset, QRect dRect);
@@ -161,7 +163,6 @@ private:
 
 	void TakePicture();
 	void SetPicture();
-	void StorePicture();
 	void UpdateView();
 
 	void wheelEvent(QWheelEvent *event);
@@ -237,9 +238,6 @@ private:
 	QColor m_NeutralColor;
 
 
-	int m_StackPos;             /**< the current poistion on the Picture stack */
-	int m_StackSize;            /**< the size of the Picture stack */
-
 	double m_LERad;             /**< the radius of the leading edge circle to draw */
 	double m_fScale;            /**< the current scale of the display */
 	double m_fScaleY;           /**< the ratio between the  y and x scales */
@@ -265,10 +263,11 @@ private:
 	QCursor m_hcMove;           /**< the cursor to display when moving the viewport */
 	QCursor m_hcCross;          /**< the cursor to display in the client area, when not dragging or zooming */
 
-	Picture m_TmpPic;                /**< a temporary Picture to be pushed on the Picture stack */
-	Picture m_UndoPic[MAXSTACKPOS];  /**< the Picture stack */
 
-//	int m_CurrentColumn;
+	int m_StackPos;                   /**< the current position on the Undo stack */
+	QList<SplineFoil> m_UndoStack;    /**< the stack of incremental modifications to the SplineFoil;
+										 we can't use the QStack though, because we need to access
+										 any point in the case of multiple undo operations */
 
 	bool m_bIsImageLoaded;      /**< true if a backgruond image is loaded */
 	QPixmap m_BackImage;        /**< the QPixmap object with the background image */

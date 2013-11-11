@@ -659,7 +659,7 @@ void MainFrame::CreateAFoilActions()
 	connect(UndoAFoilAct, SIGNAL(triggered()), pAFoil, SLOT(OnUndo()));
 
 	RedoAFoilAct= new QAction(QIcon(":/images/OnRedo.png"), tr("Redo"), this);
-	RedoAFoilAct->setShortcut(Qt::CTRL + Qt::Key_Y);
+	RedoAFoilAct->setShortcut(Qt::CTRL + Qt::SHIFT + Qt::Key_Z);
 	RedoAFoilAct->setStatusTip(tr("Restores the last cancelled modifiction made to the splines"));
 	connect(RedoAFoilAct, SIGNAL(triggered()), pAFoil, SLOT(OnRedo()));
 

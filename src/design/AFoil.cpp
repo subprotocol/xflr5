@@ -27,6 +27,7 @@
 #include <QDesktopWidget>
 #include <QHeaderView>
 
+
 #include "../globals.h"
 #include "../mainframe.h"
 #include "../misc/LinePickerDlg.h"
@@ -63,7 +64,7 @@ QAFoil::QAFoil(QWidget *parent)
 	m_hcCross = QCursor(Qt::CrossCursor);
 	m_hcMove  = QCursor(Qt::ClosedHandCursor);
 
-	m_StackPos = m_StackSize = 0;
+	m_StackPos = 0;
 
 	m_MousePos.x = 0.0;
 	m_MousePos.y = 0.0;
@@ -74,6 +75,8 @@ QAFoil::QAFoil(QWidget *parent)
 	m_pSF = new SplineFoil();
 	m_pSF->m_bModified = false;
 	m_pSF->InitSplineFoil();
+	ClearStack();
+	TakePicture();
 
 	m_bZoomPlus    = false;
 	m_bZoomYOnly   = false;
@@ -85,10 +88,6 @@ QAFoil::QAFoil(QWidget *parent)
 	m_bStored      = false;
 	m_bXDown = m_bYDown = m_bZDown = false;
 	m_bIsImageLoaded = false;
-
-
-	memset(&m_TmpPic,0, sizeof(Picture));
-	memset(m_UndoPic, 0, MAXSTACKPOS* sizeof(Picture));
 
 	m_LERad   = 1.0;
 
@@ -131,9 +130,7 @@ QAFoil::QAFoil(QWidget *parent)
 
 	m_pBufferFoil = new Foil();
 
-//	m_CurrentColumn = -1;
 	m_StackPos = 0;
-	m_StackSize = 0;
 	SetupLayout();
 
 	FoilTableDelegate::s_pAFoil = this;
@@ -887,7 +884,6 @@ void QAFoil::mouseMoveEvent(QMouseEvent *event)
 			int n = m_pSF->m_Extrados.m_iSelect;
 			if (n>=0 && n<m_pSF->m_Extrados.m_CtrlPoint.size())
 			{
-				if(!m_bStored) StorePicture();//save for undo only the first time
 //				if(n==1) m_MousePos.x = 0.0;// we can't move point 1 for vertical slope
 				m_pSF->m_Extrados.m_CtrlPoint[n].x = m_MousePos.x;
 				m_pSF->m_Extrados.m_CtrlPoint[n].y = m_MousePos.y;
@@ -908,8 +904,6 @@ void QAFoil::mouseMoveEvent(QMouseEvent *event)
 				int n = m_pSF->m_Intrados.m_iSelect;
 				if (n>=0 && n<m_pSF->m_Intrados.m_CtrlPoint.size())
 				{
-					if(!m_bStored) StorePicture();//save for undo only the first time
-
 					m_pSF->m_Intrados.m_CtrlPoint[n].x = m_MousePos.x;
 					m_pSF->m_Intrados.m_CtrlPoint[n].y = m_MousePos.y;
 					m_pSF->m_Intrados.SplineCurve();
@@ -1052,10 +1046,7 @@ void QAFoil::mousePressEvent(QMouseEvent *event)
 			//Selects the point
 			m_pSF->m_Extrados.m_iSelect = m_pSF->m_Extrados.IsControlPoint(Real, m_fScale/m_fRefScale);
 			if(m_pSF->m_Extrados.m_iSelect<0) m_pSF->m_Intrados.m_iSelect = m_pSF->m_Intrados.IsControlPoint(Real, m_fScale/m_fRefScale);
-			if (m_pSF->m_Extrados.m_iSelect>=0 || m_pSF->m_Intrados.m_iSelect>=0)
-			{
-				TakePicture();
-			}
+
 			if(m_pSF->m_Extrados.m_iSelect ==-10 && m_pSF->m_Intrados.m_iSelect ==-10)
 			{
 				p2DWidget->setCursor(m_hcMove);
@@ -1074,7 +1065,6 @@ void QAFoil::mousePressEvent(QMouseEvent *event)
  */
 void QAFoil::mouseReleaseEvent(QMouseEvent *event)
 {
-	m_bTrans = false;
 	QPoint point = event->pos();
 
 	TwoDWidget *p2DWidget = (TwoDWidget*)s_p2DWidget;
@@ -1122,13 +1112,22 @@ void QAFoil::mouseReleaseEvent(QMouseEvent *event)
 	{
 		ReleaseZoom();
 	}
-
+	else if(m_bTrans)
+	{
+		// nothing to do
+	}
 	else 
 	{
-		m_pSF->CompMidLine();
-		p2DWidget->setCursor(m_hcCross);
+		//we're releasing a point drag
+	   if(event->button()==Qt::LeftButton)
+		{
+			TakePicture();
+			m_pSF->CompMidLine();
+		}
 	}
 
+	p2DWidget->setCursor(m_hcCross);
+	m_bTrans = false;
 	UpdateView();
 }
 
@@ -2036,27 +2035,13 @@ void QAFoil::OnNewSplines()
 		}
 	}
 	m_pSF->InitSplineFoil();
-	TakePicture();
-	StorePicture();
 
 	m_StackPos  = 0;
-	m_StackSize = 0;
+	ClearStack(0);
+	TakePicture();
 
 	pMainFrame->SetSaveState(false);
 	UpdateView();
-}
-
-
-/**
- *The user has requested a Redo operation after an undo
- */
-void QAFoil::OnRedo()
-{
-	if(m_StackPos<m_StackSize-1)
-	{
-		m_StackPos++;
-		SetPicture();
-	}
 }
 
 
@@ -2205,7 +2190,6 @@ void QAFoil::OnSplineControls()
 	if(dlg.exec() == QDialog::Accepted)
 	{
 		TakePicture();
-		StorePicture();
 	}
 	else m_pSF->Copy(&memSF);
 }
@@ -2215,38 +2199,13 @@ void QAFoil::OnSplineControls()
  */
 void QAFoil::OnSplines()
 {
-//	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
-	m_StackSize = 0;
-	m_StackPos = 0;
+	ClearStack();
+
 	TakePicture();
-	StorePicture();
 	FillFoilTable();
 	UpdateView();
 }
 
-
-/**
- * The user has requested to Undi the last modification to the SplineFoil object
- */
-void QAFoil::OnUndo()
-{
-	if(m_StackPos>0)
-	{
-		if(m_StackPos == m_StackSize)
-		{
-			//if we're at the first undo command, save current state
-			TakePicture();
-			StorePicture();//in case we redo
-			m_StackPos--;
-		}
-		m_StackPos--;
-		SetPicture();
-	}
-	else
-	{
-		m_StackPos = 0;
-	}
-}
 
 
 /**
@@ -2744,21 +2703,6 @@ void QAFoil::SetScale(QRect CltRect)
 	SetScale();
 }
 
-/**
- * Restores a SplineFoil definition from the top Picture on the stack
- */
-void QAFoil::SetPicture()
-{
-	m_pSF->CopyFromPicture(m_UndoPic + m_StackPos);
-	m_pSF->m_Intrados.SplineKnots();
-	m_pSF->m_Intrados.SplineCurve();
-	m_pSF->m_Extrados.SplineKnots();
-	m_pSF->m_Extrados.SplineCurve();
-	m_pSF->UpdateSplineFoil();
-
-	UpdateView();
-}
-
 
 
 /**
@@ -2921,38 +2865,89 @@ void QAFoil::ShowFoil(Foil* pFoil, bool bShow)
 	pMainFrame->SetSaveState(false);
 }
 
-/**
- * Pushes the Picture of the current SplineFoil on the Picture stack.
- */
-void QAFoil::StorePicture()
-{
-	if(m_StackPos>=MAXSTACKPOS)
-	{
-		for (int i=1; i<MAXSTACKPOS; i++)
-		{
-			memcpy(&m_UndoPic[i-1],&m_UndoPic[i], sizeof(Picture));
-		}
-		m_StackPos  = MAXSTACKPOS-1;
-		m_StackSize = MAXSTACKPOS-1;
-	}
-	memcpy(&m_UndoPic[m_StackPos], &m_TmpPic, sizeof(Picture));
-	m_bStored = true;
-	m_StackPos++;
-	m_StackSize = m_StackPos;
-}
-
 
 /**
- * Copies the current SplineFoil object to a Picture
+ * Copies the current SplineFoil object to a new SplineFoil object and pushes it on the stack
  */
 void QAFoil::TakePicture()
 {
-	m_bStored = false;
-	m_pSF->CopyToPicture(&m_TmpPic);
+	//clear the downstream part of the stack which becomes obsolete
+	ClearStack(m_StackPos);
+
+	// append a copy of the current object
+	m_UndoStack.append(new SplineFoil(m_pSF));
+
+	// the new current position is the top of the stack
+	m_StackPos = m_UndoStack.size()-1;
+
+	m_bStored = true;
 }
 
+
+
 /**
- * Refreshed the view
+ * Restores a SplineFoil definition from the current position in the stack
+ */
+void QAFoil::SetPicture()
+{
+	SplineFoil SF = m_UndoStack.at(m_StackPos);
+	m_pSF->Copy(&SF);
+	m_pSF->m_Intrados.SplineKnots();
+	m_pSF->m_Intrados.SplineCurve();
+	m_pSF->m_Extrados.SplineKnots();
+	m_pSF->m_Extrados.SplineCurve();
+	m_pSF->UpdateSplineFoil();
+
+	UpdateView();
+}
+
+
+/**
+ * The user has requested to Undo the last modification to the SplineFoil object
+ */
+void QAFoil::OnUndo()
+{
+	if(m_StackPos>0)
+	{
+		m_StackPos--;
+		SetPicture();
+	}
+	else
+	{
+		//nothing to restore
+	}
+}
+
+
+/**
+ *The user has requested a Redo operation after an undo
+ */
+void QAFoil::OnRedo()
+{
+	if(m_StackPos<m_UndoStack.size()-1)
+	{
+		m_StackPos++;
+		SetPicture();
+	}
+}
+
+
+/**
+  * Clears the stack starting at a given position
+  * @param the first stack element to remove
+  */
+void QAFoil::ClearStack(int pos)
+{
+	for(int il=m_UndoStack.size()-1; il>pos; il--)
+	{
+		m_UndoStack.removeAt(il);     // remove from the stack
+	}
+	m_StackPos = m_UndoStack.size()-1;
+}
+
+
+/**
+ * Refresh the view
  */
 void QAFoil::UpdateView()
 {
@@ -3121,10 +3116,7 @@ void QAFoil::OnInsertCtrlPt()
 	//Inserts a point in the spline
 	if(MainFrame::s_pCurFoil) return; // Action can be performed only if the spline foil is selected
 
-	TakePicture();
-	StorePicture();
 	CVector Real = MousetoReal(m_PointDown);
-
 
 	if(Real.y>=0)
 	{
@@ -3141,18 +3133,17 @@ void QAFoil::OnInsertCtrlPt()
 		m_pSF->UpdateSplineFoil();
 	}
 
+	TakePicture();
 }
 
 
 /**
- * The user has requested the deletion of a control point in the SplineFoil at the location of the mouse
+ * The user has requested the deletion of a control point in the SplineFoil at the location of the mouse.
  */
 void QAFoil::OnRemoveCtrlPt()
 {
 	//Removes a point in the spline
 	if(MainFrame::s_pCurFoil) return; // Action can be performed only if the spline foil is selected
-	TakePicture();
-	StorePicture();
 
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 
@@ -3185,6 +3176,8 @@ void QAFoil::OnRemoveCtrlPt()
 			m_pSF->UpdateSplineFoil();
 		}
 	}
+
+	TakePicture();
 }
 
 

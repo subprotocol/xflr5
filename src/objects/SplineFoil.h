@@ -39,19 +39,6 @@
 
 
 /**
- * A structure used to store the position of the SplineFoil control points.
- * @todo remove and replace with a stack of SplineFoil objects ???
- */
-struct Picture
-{
-	public:
-		CVector ExtPt[SPLINECONTROLSIZE];
-		CVector IntPt[SPLINECONTROLSIZE];
-		int m_iExt, m_iInt;
-};
-
-
-/**
 *@class SplineFoil
 *@brief  The class which defines the splined foil object.
 
@@ -68,17 +55,16 @@ class SplineFoil
 
 public:
 	SplineFoil();
+	SplineFoil(SplineFoil *pSF);
 
 private:
-	bool CompMidLine();
+	void CompMidLine();
 
-	bool InitSplineFoil();
+	void InitSplineFoil();
 
 	bool Serialize(QDataStream &ar, bool bIsStoring);
 
 	void Copy(SplineFoil* pSF);
-	void CopyFromPicture(Picture *pPic);
-	void CopyToPicture(Picture *pPic);
 	void DrawCtrlPoints(QPainter &painter, double scalex, double scaley, QPoint Offset);
 	void DrawMidLine(QPainter &painter, double scalex, double scaley, QPoint Offset);
 	void DrawFoil(QPainter &painter, double scalex, double scaley, QPoint Offset);
@@ -86,24 +72,27 @@ private:
 	void ExportToBuffer(Foil *pFoil);
 	void ExportToFile(QTextStream &out);
 	void UpdateSplineFoil();
-	void UpdateSelected(double x, double y);
 	void SetCurveParams(int style, int width, QColor color);
 
-	bool m_bModified;
-	bool m_bVisible, m_bOutPoints, m_bCenterLine;
+	bool m_bModified;                /**< false if the SplineFoil has been serialized in its current dtate, false otherwise */
+	bool m_bVisible;                 /**< true if this SplineFoil object is visible */
+	bool m_bOutPoints;               /**< true if the ouput line points should be displayed */
+	bool m_bCenterLine;              /**< true if the SplineFoil's mean camber line is to be displayed */
+	bool m_bSymetric;                /**< true if the SplineFoil is symetric. In which case the lower surface is set as symetric of the upper surface. */
 
-	bool m_bSymetric;
-	
-	int m_OutPoints;
-	int	m_FoilStyle;
-	int m_FoilWidth;
-	double m_fCamber;
-	double m_fThickness;
-	double m_fxCambMax, m_fxThickMax;
-	QString m_strFoilName;
-	QColor m_FoilColor;
-	Spline m_Extrados;
-	Spline m_Intrados;
-	CVector m_rpMid[1001]; /**< @todo replace with a QVarLengthArray */
+	int m_OutPoints;                 /**< the number of output points with which to draw the SplineFoil. */
+
+	int m_FoilStyle;                 /**< the index of the style with which to draw the SplineFoil */
+	int m_FoilWidth;                 /**< the width with which to draw the SplineFoil */
+	QColor m_FoilColor;              /**< the color with which to draw the SplineFoil */
+
+	double m_fCamber;                /**< the SplineFoil's max camber */
+	double m_fThickness;             /**< the SplineFoil's max thickness */
+	double m_fxCambMax;              /**< the x-position of the SplineFoil's max camber point */
+	double m_fxThickMax;             /**< the x-position of the SplineFoil's max thickness point */
+	QString m_strFoilName;           /**< the SplineFoil's name */
+	Spline m_Extrados;               /**< the spline which defines the upper surface */
+	Spline m_Intrados;               /**< the spline which defines the lower surface */
+	CVector m_rpMid[MIDPOINTCOUNT];  /**< the points on ths SplineFoil's mid camber line @todo replace with a QVarLengthArray */
 };
 #endif

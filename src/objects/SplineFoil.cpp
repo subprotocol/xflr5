@@ -25,12 +25,14 @@
 #include "SplineFoil.h"
 #include "../globals.h"
 
-
+/**
+ * The public costructor.
+ */
 SplineFoil::SplineFoil()
 {
-	m_FoilStyle = 0;
-	m_FoilWidth = 1;
-	m_FoilColor   = QColor(119, 183, 83);
+	m_FoilStyle    = 0;
+	m_FoilWidth    = 1;
+	m_FoilColor    = QColor(119, 183, 83);
 	m_OutPoints    = 0;
 	m_bVisible     = true;
 	m_bOutPoints   = false;
@@ -42,6 +44,21 @@ SplineFoil::SplineFoil()
 }
 
 
+/**
+ * Overloaded constructor.
+ */
+SplineFoil::SplineFoil(SplineFoil *pSF)
+{
+	Copy(pSF);
+}
+
+
+/**
+ * Sets the display style from the input parameters.
+ * @param style the index of the style.
+ * @param width the curve's width.
+ * @param color te curve's color.
+ */
 void SplineFoil::SetCurveParams(int style, int width, QColor color)
 {
 	m_FoilStyle = style;
@@ -51,8 +68,10 @@ void SplineFoil::SetCurveParams(int style, int width, QColor color)
 	m_Extrados.SetSplineParams(style, width, color);
 }
 
-
-bool SplineFoil::InitSplineFoil()
+/**
+ * Initializes the SplineFoil object with stock data.
+ */
+void SplineFoil::InitSplineFoil()
 {
 	m_bModified   = false;
 	m_strFoilName = QObject::tr("Spline Foil");
@@ -80,11 +99,13 @@ bool SplineFoil::InitSplineFoil()
 	CompMidLine();
 	m_OutPoints = m_Extrados.m_iRes + m_Intrados.m_iRes;
 
-	return true;
 }
 
-
-bool SplineFoil::CompMidLine()
+/**
+ * Calculates the SplineFoil's mid-camber line and stores the resutls in the memeber array.
+ * @return
+ */
+void SplineFoil::CompMidLine()
 {
 	double x, yex, yin;
 	m_fThickness = 0.0;
@@ -94,11 +115,10 @@ bool SplineFoil::CompMidLine()
 
 	m_rpMid[0].x   = 0.0;
 	m_rpMid[0].y   = 0.0;
-	m_rpMid[100].x = 1.0;
-	m_rpMid[100].y = 0.0;
-	// use 0.01 step;
-	double step = 0.001;
-	for (int k=0; k<=1000; k++)
+
+	double step = 1.0/(double)MIDPOINTCOUNT;
+
+	for (int k=0; k<MIDPOINTCOUNT; k++)
 	{
 		x = k*step;
 		yex = m_Extrados.GetY(x);
@@ -116,12 +136,15 @@ bool SplineFoil::CompMidLine()
 			m_fxCambMax = x;
 		}	
 	}
-	return true;
+	m_rpMid[MIDPOINTCOUNT-1].x = 1.0;
+	m_rpMid[MIDPOINTCOUNT-1].y = 0.0;
 }
 
 
-
-
+/**
+ * Initializes this SplineFoil object with the data from another.
+ * @param pSF a pointer to the source SplineFoil object.
+ */
 void SplineFoil::Copy(SplineFoil* pSF)
 {
 	m_FoilColor = pSF->m_FoilColor;
@@ -138,41 +161,10 @@ void SplineFoil::Copy(SplineFoil* pSF)
 }
 
 
-void SplineFoil::CopyFromPicture(Picture *pPic)
-{
-	m_Extrados.m_CtrlPoint.clear();
-	for(int i=0; i<pPic->m_iExt; i++)
-	{
-	   m_Extrados.m_CtrlPoint.append(pPic->ExtPt[i]);
-	}
-
-	m_Intrados.m_CtrlPoint.clear();
-	for(int i=0; i<pPic->m_iInt; i++)
-	{
-	   m_Intrados.m_CtrlPoint.append(pPic->IntPt[i]);
-	}
-}
-
 /**
- * Copies the spline object to a Picture
- * @param pPic a pointer to the Picture object to be filled with the SplineFoil data
+ * Exports the current SplineFoil to a Foil object.
+ * @param pFoil a pointer to the existing Foil object to be loaded with the SplineFoil points.
  */
-void SplineFoil::CopyToPicture(Picture *pPic)
-{
-	pPic->m_iExt = m_Extrados.m_CtrlPoint.size();
-	for (int i=0; i<m_Extrados.m_CtrlPoint.size(); i++)
-	{
-		pPic->ExtPt[i].Copy(m_Extrados.m_CtrlPoint[i]);
-	}
-
-	pPic->m_iInt = m_Intrados.m_CtrlPoint.size();
-	for (int i=0; i<m_Intrados.m_CtrlPoint.size(); i++)
-	{
-		pPic->IntPt[i].Copy(m_Intrados.m_CtrlPoint[i]);
-	}
-}
-
-
 void SplineFoil::ExportToBuffer(Foil *pFoil)
 {
 	int i;
@@ -195,7 +187,10 @@ void SplineFoil::ExportToBuffer(Foil *pFoil)
 	pFoil->m_FoilName = m_strFoilName;
 }
 
-
+/**
+ * Exports the SplineFoil's output points to a text file.
+ * @param out the QTextStream to which the output is directed.
+ */
 void SplineFoil::ExportToFile(QTextStream &out)
 {
 	m_Extrados.Export(out, true);
@@ -203,7 +198,12 @@ void SplineFoil::ExportToFile(QTextStream &out)
 }
 
 
-
+/**
+ * Loads or saves the data of this SplineFoil to a binary file
+ * @param ar the QDataStream object from/to which the data should be serialized
+ * @param bIsStoring true if saving the data, false if loading
+ * @return true if the operation was successful, false otherwise
+ */
 bool SplineFoil::Serialize(QDataStream &ar, bool bIsStoring)
 {
 	float f,x,y;
@@ -249,11 +249,14 @@ bool SplineFoil::Serialize(QDataStream &ar, bool bIsStoring)
 		ReadCOLORREF(ar, m_FoilColor);
 		ar >>m_FoilStyle >> m_FoilWidth;
 
+		m_Extrados.SetSplineParams(m_FoilStyle, m_FoilWidth, m_FoilColor);
+		m_Intrados.SetSplineParams(m_FoilStyle, m_FoilWidth, m_FoilColor);
+
 		ar >> n;// m_Extrados.m_iCtrlPoints;
 		m_Extrados.m_CtrlPoint.clear();
 		ar >> m_Extrados.m_iDegree;
 
-		for (k=0; k<n;k++)
+		for (k=0; k<n; k++)
 		{
 			ar >> x;
 			ar >> y;
@@ -269,7 +272,7 @@ bool SplineFoil::Serialize(QDataStream &ar, bool bIsStoring)
 		m_Intrados.m_CtrlPoint.clear();
 		ar >> m_Intrados.m_iDegree;
 
-		for (k=0; k<n;k++)
+		for (k=0; k<n; k++)
 		{
 			ar >> x;
 			ar >> y;
@@ -310,6 +313,9 @@ bool SplineFoil::Serialize(QDataStream &ar, bool bIsStoring)
 }
 
 
+/**
+ * Updates the mid camber line and the number of points after a modification.
+ */
 void SplineFoil::UpdateSplineFoil()
 {
 	CompMidLine();
@@ -317,51 +323,39 @@ void SplineFoil::UpdateSplineFoil()
 }
 
 
-
-
-void SplineFoil::UpdateSelected(double x, double y)
-{
-	int i;
-	for (i=0; i<m_Extrados.m_CtrlPoint.size();i++)
-	{
-		if (m_Extrados.m_iSelect==i && m_Extrados.m_iSelect<m_Extrados.m_CtrlPoint.size())
-		{
-			m_Extrados.m_CtrlPoint[i].x = x;
-			m_Extrados.m_CtrlPoint[i].y = y;
-			m_Extrados.SplineCurve();
-			UpdateSplineFoil();
-			return;
-		}
-	}
-	for (i=0; i<m_Intrados.m_CtrlPoint.size();i++)
-	{
-		if (m_Intrados.m_iSelect==i && m_Intrados.m_iSelect<m_Intrados.m_CtrlPoint.size())
-		{
-			m_Intrados.m_CtrlPoint[i].x = x;
-			m_Intrados.m_CtrlPoint[i].y = y;
-			m_Intrados.SplineCurve();
-			UpdateSplineFoil();
-			return;
-		}
-	}
-}
-
-
-
+/**
+ * Draws the SplineFoil's control points.
+ * @param painter a reference to the QPainter object with which to draw
+ * @param scalex the scale of the view in the x direction
+ * @param scaley the scale of the view in the y direction
+ * @param Offset the postion of the SplineFoil's leading edge point
+ */
 void SplineFoil::DrawCtrlPoints(QPainter &painter, double scalex, double scaley, QPoint Offset)
 {
 	m_Extrados.DrawCtrlPoints(painter, scalex, scaley, Offset);
 	m_Intrados.DrawCtrlPoints(painter, scalex, scaley, Offset);
 }
 
-
+/**
+ * Draws the SplineFoil's output points.
+ * @param painter a reference to the QPainter object with which to draw
+ * @param scalex the scale of the view in the x direction
+ * @param scaley the scale of the view in the y direction
+ * @param Offset the postion of the SplineFoil's leading edge point
+ */
 void SplineFoil::DrawOutPoints(QPainter & painter, double scalex, double scaley, QPoint Offset)
 {
 	m_Extrados.DrawOutputPoints(painter, scalex, scaley, Offset);
 	m_Intrados.DrawOutputPoints(painter, scalex, scaley, Offset);
 }
 
-
+/**
+ * Draws the SplineFoil's curves.
+ * @param painter a reference to the QPainter object with which to draw
+ * @param scalex the scale of the view in the x direction
+ * @param scaley the scale of the view in the y direction
+ * @param Offset the postion of the SplineFoil's leading edge point
+ */
 void SplineFoil::DrawFoil(QPainter &painter, double scalex, double scaley, QPoint Offset)
 {
 	m_Extrados.DrawSpline(painter, scalex, scaley, Offset);
@@ -369,6 +363,13 @@ void SplineFoil::DrawFoil(QPainter &painter, double scalex, double scaley, QPoin
 }
 
 
+/**
+ * Draws the SplineFoil's mid camber line.
+ * @param painter a reference to the QPainter object with which to draw
+ * @param scalex the scale of the view in the x direction
+ * @param scaley the scale of the view in the y direction
+ * @param Offset the postion of the SplineFoil's leading edge point
+ */
 void SplineFoil::DrawMidLine(QPainter &painter, double scalex, double scaley, QPoint Offset)
 {
 	painter.save();
@@ -382,12 +383,14 @@ void SplineFoil::DrawMidLine(QPainter &painter, double scalex, double scaley, QP
 
 	From = QPoint((int)(m_rpMid[0].x*scalex) + Offset.x(), (int)(-m_rpMid[0].y*scaley) + Offset.y());
 
-	for (k=1; k<=100; k++)
+	for (k=1; k<MIDPOINTCOUNT; k+=10)
 	{
-		To.rx() = (int)( m_rpMid[k*10].x*scalex) + Offset.x();
-		To.ry() = (int)(-m_rpMid[k*10].y*scaley) + Offset.y();
+		To.rx() = (int)( m_rpMid[k].x*scalex) + Offset.x();
+		To.ry() = (int)(-m_rpMid[k].y*scaley) + Offset.y();
 		painter.drawLine(From, To);
 		From = To;
 	}
+
+	painter.drawLine(From, QPoint((int)(m_rpMid[MIDPOINTCOUNT-1].x*scalex) + Offset.x(), (int)(-m_rpMid[MIDPOINTCOUNT-1].y*scaley) + Offset.y()));
 	painter.restore();
 }
