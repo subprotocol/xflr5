@@ -153,7 +153,10 @@ void SplineFoil::CopyFromPicture(Picture *pPic)
 	}
 }
 
-
+/**
+ * Copies the spline object to a Picture
+ * @param pPic a pointer to the Picture object to be filled with the SplineFoil data
+ */
 void SplineFoil::CopyToPicture(Picture *pPic)
 {
 	pPic->m_iExt = m_Extrados.m_CtrlPoint.size();

@@ -15120,6 +15120,8 @@ void QMiarex::SetWPlrLegendPos()
  *@param bCurrent if true, the active wopp is set anew
  *@param x the aoa or velocity or control parameter of the operating point to set
  *@return true if an operating point was successfully set
+ *
+ *@todo : after an analysis, the Cp colors on the wing to dot match the aoa selected in the top CbBox - need to investigate.
  */
 bool QMiarex::SetWOpp(bool bCurrent, double x)
 {

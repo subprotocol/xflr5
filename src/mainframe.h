@@ -20,7 +20,8 @@
 
 *****************************************************************************/
 /**
- *@file This file contains the description of the MainFrame class associated to the application's main window
+ *@file mainframe.h
+ *@brief This file contains the description of the MainFrame class associated to the application's main window
  *
 */
 #ifndef MAINFRAME_H

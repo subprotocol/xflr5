@@ -35,8 +35,9 @@
 #include "Quaternion.h"
 #include "CVector.h"
 
-/** enumeration used to identify the type of surface on which the panel lies
- * May be on a bottom, mid, top, side, or body surface
+/**
+ * enumeration used to identify the type of surface on which the panel lies.
+ * May be on a bottom, mid, top, side, or body surface.
  */
 typedef enum {BOTSURFACE, MIDSURFACE, TOPSURFACE, SIDESURFACE, BODYSURFACE} enumPanelPosition;
 

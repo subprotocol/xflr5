@@ -127,7 +127,7 @@ public:
 
 	void InsertSection(int iSection);
 	bool AppendWingSection();
-	bool AppendWingSection(double Chord, double Twist, double Pos, double Dihedral, double Offset, int NXPanels, int NYPanels, int XPanelDist, int YPanelDist, QString RightFoilName, QString LeftFoilName);
+	bool AppendWingSection(double Chord, double Twist, double Pos, double Dihedral, double Offset, int NXPanels, int NYPanels, enumPanelDistribution XPanelDist, enumPanelDistribution YPanelDist, QString RightFoilName, QString LeftFoilName);
 	void RemoveWingSection(int const iSection);
 	
 
@@ -135,8 +135,8 @@ public:
 	int NWingSection() {return m_WingSection.count();}
 	int &NXPanels(const int &iSection);
 	int &NYPanels(const int &iSection);
-	int &XPanelDist(const int &iSection);
-	int &YPanelDist(const int &iSection);
+	enumPanelDistribution &XPanelDist(const int &iSection);
+	enumPanelDistribution &YPanelDist(const int &iSection);
 
 	double RootChord()  {return m_WingSection.first()->m_Chord;}
 	double TipChord()   {return m_WingSection.last()->m_Chord;}

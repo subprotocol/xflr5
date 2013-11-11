@@ -19,7 +19,11 @@
 
 *****************************************************************************/
 
-/** @file This file implements the QXDirect class used to manage direct Foil analysis. */
+/** @file
+ *
+ * This file implements the QXDirect class used to manage direct Foil analysis.
+ *
+*/
 
 #ifndef QXDIRECT_H
 #define QXDIRECT_H
@@ -65,8 +69,8 @@
 
 
 /**
-* @class QXDirect This class is the general interface for Foil direct Analysis.
-*
+* @class QXDirect
+* @brief This class is the general interface for Foil direct Analysis.
 * This is the handling class for the QXDirect right toolbar.
 * It provides the methods to modify the foil geometry, define the Polar analysis, perform the analysis, and post-process the results.
 * One of the very first class of this project.
@@ -143,7 +147,7 @@ private slots:
 	void OnShowBL();
 	void OnShowCurve();
 	void OnShowNeutralLine();
-	void OnShowPoints();
+	void OnShowCurvePoints();
 	void OnShowPanels();
 	void OnShowAllOpps();
 	void OnShowAllPolars();
@@ -164,7 +168,7 @@ private slots:
 	void OnDerotateFoil();
 	void OnNormalizeFoil();
 	void OnCadd();
-	void OnPanels();
+	void OnRefinePanelsGlobally();
 	void OnFoilCoordinates();
 	void OnFoilGeom();
 	void OnResetGraphLegend();
@@ -241,7 +245,7 @@ protected:
 	void SetPolarLegendPos();
 	void SetupLayout();	
 	void StopAnimate();
-	void UpdateCurve();
+	void UpdateCurveStyle();
 
 	void * GetVariable(Polar *pPolar, int iVar);
 	OpPoint* GetOpPoint(double Alpha);
@@ -394,8 +398,8 @@ private:
 
 	QFile m_XFile;		        /**< The instance of the log file to which the text output of the analysis is directed */
 
-	static void *s_pMainFrame;  /**< a pointer to the instance of the application's MainFrame object */
-	static void *s_p2DWidget;   /**< a pointer to the instance of the application's central widget used for 2D drawings */
+	static void *s_pMainFrame;  /**< a static pointer to the instance of the application's MainFrame object */
+	static void *s_p2DWidget;   /**< a static pointer to the instance of the application's central widget used for 2D drawings */
 
 	QColor m_crBLColor;         /**< the color used to draw the boundary layer */
 	QColor m_crPressureColor;   /**< the color used to draw the pressure arrows */

@@ -38,7 +38,10 @@
 #include "Spline.h"
 
 
-
+/**
+ * A structure used to store the position of the SplineFoil control points.
+ * @todo remove and replace with a stack of SplineFoil objects ???
+ */
 struct Picture
 {
 	public:
@@ -101,6 +104,6 @@ private:
 	QColor m_FoilColor;
 	Spline m_Extrados;
 	Spline m_Intrados;
-	CVector m_rpMid[1001];
+	CVector m_rpMid[1001]; /**< @todo replace with a QVarLengthArray */
 };
 #endif

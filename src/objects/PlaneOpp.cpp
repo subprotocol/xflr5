@@ -37,7 +37,7 @@ PlaneOpp::PlaneOpp()
 	m_Style       = 0;
 	m_Width       = 1;
 	m_WPolarType  = FIXEDSPEEDPOLAR;
-	m_VLMType     = 1;
+//	m_VLMType     = 1;
 
 	m_bIsVisible  = true;
 	m_bShowPoints = false;
@@ -116,11 +116,11 @@ bool PlaneOpp::SerializePOpp(QDataStream &ar, bool bIsStoring)
 
 		ar << m_NPanels;
 		for (k=0; k<m_NPanels; k++) ar<<(float)m_Cp[k]<<(float)m_Sigma[k]<<(float)m_G[k];
-		ar << m_VLMType;
+		ar << 0;// m_VLMType;
 
 		for(int iw=0; iw<MAXWINGS; iw++)
 		{
-			if(m_bWing[iw])	m_PlaneWOpp[iw].SerializeWOpp(ar, bIsStoring);
+			if(m_bWing[iw])	m_PlaneWOpp[iw].SerializeWingOpp(ar, bIsStoring);
 		}
 	}
 	else
@@ -262,9 +262,10 @@ bool PlaneOpp::SerializePOpp(QDataStream &ar, bool bIsStoring)
 			}
 		}
 
-		ar >> m_VLMType;
+//		ar >> m_VLMType;
+		ar >> k; //VLMType
 
-		if (!m_PlaneWOpp[0].SerializeWOpp(ar, bIsStoring))
+		if (!m_PlaneWOpp[0].SerializeWingOpp(ar, bIsStoring))
 		{
 			return false;
 		}
@@ -275,7 +276,7 @@ bool PlaneOpp::SerializePOpp(QDataStream &ar, bool bIsStoring)
 		{
 			if(m_bWing[1])
 			{
-				if (!m_PlaneWOpp[1].SerializeWOpp(ar, bIsStoring))
+				if (!m_PlaneWOpp[1].SerializeWingOpp(ar, bIsStoring))
 				{
 					return false;
 				}
@@ -283,7 +284,7 @@ bool PlaneOpp::SerializePOpp(QDataStream &ar, bool bIsStoring)
 		}
 		if(m_bWing[2])
 		{
-			if (!m_PlaneWOpp[2].SerializeWOpp(ar, bIsStoring))
+			if (!m_PlaneWOpp[2].SerializeWingOpp(ar, bIsStoring))
 			{
 				return false;
 			}
@@ -291,7 +292,7 @@ bool PlaneOpp::SerializePOpp(QDataStream &ar, bool bIsStoring)
 		}
 		if(m_bWing[3])
 		{
-			if (!m_PlaneWOpp[3].SerializeWOpp(ar, bIsStoring))
+			if (!m_PlaneWOpp[3].SerializeWingOpp(ar, bIsStoring))
 			{
 				return false;
 			}

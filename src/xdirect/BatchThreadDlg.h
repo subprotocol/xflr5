@@ -19,7 +19,9 @@
 
 *****************************************************************************/
 
-/** @file This file implements the multi-threaded batch foil analysis */
+/** @file
+ * This file implements the multi-threaded batch foil analysis
+*/
 
 #ifndef BATCHTHREADDLG_H
 #define BATCHTHREADDLG_H
@@ -47,7 +49,7 @@ struct Analysis
 };
 
 /**
- * This class implements an interface to perform a multi-threaded batch foil analysis.
+ * @brief This class implements an interface to perform a multi-threaded batch foil analysis.
  */
 class BatchThreadDlg : public QDialog
 {

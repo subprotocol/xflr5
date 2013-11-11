@@ -30,14 +30,17 @@
 #define WINGSECTION_H
 
 
-/**
-*@class WingSection
-*@brief  The class which defines the wing section object used to construct wing geometries.
-
-*/
 
 #include <QString>
 
+/** @enum The different types of panel distribution on the wing */
+typedef enum {COSINE, UNIFORM, SINE, INVERSESINE} enumPanelDistribution;
+
+
+/**
+*@class WingSection
+*@brief  The class which defines the wing section object used to construct wing geometries.
+*/
 class WingSection
 {
 public:
@@ -45,8 +48,8 @@ public:
 	{
 		m_NXPanels   = 0;
 		m_NYPanels   = 0;
-		m_XPanelDist = 0;
-		m_YPanelDist = 0;
+		m_XPanelDist = COSINE;
+		m_YPanelDist = COSINE;
 
 		m_Chord    = 0.0;
 		m_Length   = 0.0;
@@ -63,8 +66,8 @@ public:
 
 	int m_NXPanels;         /**< VLM Panels along chord, for each Wing Panel */
 	int m_NYPanels;         /**< VLM Panels along span, for each Wing Panel */
-	int m_XPanelDist;       /**< VLM Panel distribution type, for each Wing Panel */
-	int m_YPanelDist;       /**< VLM Panel distribution type, for each Wing Panel */
+	enumPanelDistribution m_XPanelDist;       /**< VLM Panel distribution type, for each Wing Panel */
+	enumPanelDistribution m_YPanelDist;       /**< VLM Panel distribution type, for each Wing Panel */
 
 	double m_Chord;         /**< Chord length at each panel side */
 	double m_Length;        /**< the length of each panel */

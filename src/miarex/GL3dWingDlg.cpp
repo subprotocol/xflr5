@@ -98,7 +98,7 @@ GL3dWingDlg::GL3dWingDlg(QWidget *pParent) : QDialog(pParent)
 	m_bPickCenter              = false;
 	m_bShowLight               = false;
 	m_bRightSide               = true;
-	m_bChanged                 =  false;
+	m_bChanged                 = false;
 	m_bDescriptionChanged      = false;
 
 	m_LastPoint.setX(0);
@@ -358,18 +358,18 @@ void GL3dWingDlg::FillTableRow(int row)
 		ind = m_pWingModel->index(row, 6, QModelIndex());
 		m_pWingModel->setData(ind, m_pWing->NXPanels(row));
 
-		if(m_pWing->XPanelDist(row)==0)      strong = tr("Uniform");
-		else if(m_pWing->XPanelDist(row)==1) strong = tr("Cosine");
+		if(m_pWing->XPanelDist(row)==UNIFORM)       strong = tr("Uniform");
+		else if(m_pWing->XPanelDist(row)==COSINE)   strong = tr("Cosine");
 		ind = m_pWingModel->index(row, 7, QModelIndex());
 		m_pWingModel->setData(ind, strong);
 
 		ind = m_pWingModel->index(row, 8, QModelIndex());
 		m_pWingModel->setData(ind, m_pWing->NYPanels(row));
 
-		if(m_pWing->YPanelDist(row)==0)       strong = tr("Uniform");
-		else if(m_pWing->YPanelDist(row)==1)  strong = tr("Cosine");
-		else if(m_pWing->YPanelDist(row)==2)  strong = tr("Sine");
-		else if(m_pWing->YPanelDist(row)==-2) strong = tr("-Sine");
+		if(m_pWing->YPanelDist(row)==UNIFORM)            strong = tr("Uniform");
+		else if(m_pWing->YPanelDist(row)==COSINE)        strong = tr("Cosine");
+		else if(m_pWing->YPanelDist(row)==SINE)          strong = tr("Sine");
+		else if(m_pWing->YPanelDist(row)== INVERSESINE)  strong = tr("-Sine");
 		ind = m_pWingModel->index(row, 9, QModelIndex());
 		m_pWingModel->setData(ind, strong);
 	}
@@ -1971,10 +1971,10 @@ void GL3dWingDlg::ReadSectionData(int sel)
 	pItem = m_pWingModel->item(sel,7);
 	strong =pItem->text();
 	strong.replace(" ","");
-	if(strong==tr("Uniform"))		m_pWing->XPanelDist(sel) =  0;
-	else if(strong==tr("Cosine"))	m_pWing->XPanelDist(sel) =  1;
-	else if(strong==tr("Sine"))		m_pWing->XPanelDist(sel) =  2;
-	else if(strong==tr("-Sine"))	m_pWing->XPanelDist(sel) = -2;
+	if(strong==tr("Uniform"))		m_pWing->XPanelDist(sel) = UNIFORM;
+	else if(strong==tr("Cosine"))	m_pWing->XPanelDist(sel) = COSINE;
+	else if(strong==tr("Sine"))		m_pWing->XPanelDist(sel) = SINE;
+	else if(strong==tr("-Sine"))	m_pWing->XPanelDist(sel) = INVERSESINE;
 
 	pItem = m_pWingModel->item(sel,8);
 	strong =pItem->text();
@@ -1986,10 +1986,10 @@ void GL3dWingDlg::ReadSectionData(int sel)
 	strong =pItem->text();
 	strong.replace(" ","");
 
-	if(strong==tr("Uniform"))		m_pWing->YPanelDist(sel) =  0;
-	else if(strong==tr("Cosine"))	m_pWing->YPanelDist(sel) =  1;
-	else if(strong==tr("Sine"))		m_pWing->YPanelDist(sel) =  2;
-	else if(strong==tr("-Sine"))	m_pWing->YPanelDist(sel) = -2;
+	if(strong==tr("Uniform"))		m_pWing->YPanelDist(sel) = UNIFORM;
+	else if(strong==tr("Cosine"))	m_pWing->YPanelDist(sel) = COSINE;
+	else if(strong==tr("Sine"))		m_pWing->YPanelDist(sel) = SINE;
+	else if(strong==tr("-Sine"))	m_pWing->YPanelDist(sel) = INVERSESINE;
 
 }
 

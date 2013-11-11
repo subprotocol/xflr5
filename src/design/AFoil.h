@@ -20,6 +20,12 @@
 *****************************************************************************/
 
 
+/** @file
+ *
+ * This file implements the QAFoil class used as the interface for direct Foil design.
+ *
+*/
+
 #ifndef QAFOIL_H
 #define QAFOIL_H
 
@@ -38,7 +44,6 @@
 #include "../misc/LineButton.h"
 #include "../objects/Foil.h"
 #include "../objects/SplineFoil.h"
-#include "../xdirect/XFoil.h"
 #include "../xdirect/NacaFoilDlg.h"
 #include "../xdirect/CAddDlg.h"
 #include "../xdirect/TwoDPanelDlg.h"
@@ -50,6 +55,9 @@
 #include "../xdirect/InterpolateFoilsDlg.h"
 
 
+/**
+ * @brief the QAFoil class used as the interface for direct Foil design
+ */
 class QAFoil : public QWidget
 {
 	Q_OBJECT
@@ -83,7 +91,6 @@ private slots:
 	void OnAFoilLECircle();
 	void OnExportSplinesToFile();
 	void OnSplines();
-	void OnSplinedPoints();
 	void OnRenameFoil();
 	void OnGrid();
 	void OnFoilStyle();
@@ -188,68 +195,83 @@ private:
 	QStandardItemModel *m_pFoilModel;
 	FoilTableDelegate *m_pFoilDelegate;
 
-	static void * s_p2DWidget;
-	static void * s_pMainFrame;
+	static void *s_pMainFrame;  /**< a static pointer to the instance of the application's MainFrame object */
+	static void *s_p2DWidget;   /**< a static pointer to the instance of the application's central widget used for 2D drawings */
 
-	bool m_bScale;
-	bool m_bZoomPlus;
-	bool m_bZoomYOnly;
-	bool m_bNeutralLine;
-	bool m_bTrans;
-	bool m_bLECircle;
-	bool m_bStored;
-	bool m_bShowLegend;
-	bool m_bXDown, m_bYDown, m_bZDown;
+	bool m_bScale;              /**< true if the scale should be displayed */
+	bool m_bZoomPlus;           /**< true if the user is in the process of zooming in by drawing a rectangle */
+	bool m_bZoomYOnly;          /**< true if only the y-axis should be scaled */
+	bool m_bNeutralLine;        /**< true if the neutral line should be displayed */
+	bool m_bTrans;              /**< true if the view is being dragged by the user */
+	bool m_bLECircle;           /**< true if the leading edge circle should be displayed */
+	bool m_bStored;             /**< true if the current Picture has been stored on the Undo stack */
+	bool m_bShowLegend;         /**< true is the legend should be shown */
+	bool m_bXDown;              /**< true if the 'X' key is pressed */
+	bool m_bYDown;              /**< true if the 'Y' key is pressed */
+	bool m_bZDown;              /**< true if the 'Z' key is pressed */
+	bool m_bXGrid;              /**< true if the X main grid (vertical lines) should be displayed */
+	bool m_bYGrid;              /**< true if the Y main grid (horizontal lines) should be displayed */
+	bool m_bXMinGrid;           /**< true if the X minor grid (vertical lines) should be displayed */
+	bool m_bYMinGrid;           /**< true if the Y minor grid (horizontal lines) should be displayed */
 
-	bool m_bXGrid,m_bYGrid;
-	bool m_bXMinGrid, m_bYMinGrid;
-	int m_XGridStyle, m_YGridStyle;
-	int m_XGridWidth, m_YGridWidth;
-	int m_XMinStyle, m_YMinStyle;
-	int m_XMinWidth, m_YMinWidth;
-	int m_NeutralStyle, m_NeutralWidth;
-	double m_XGridUnit, m_YGridUnit;
-	double m_XMinUnit, m_YMinUnit;
-	QColor m_XGridColor,m_YGridColor;
-	QColor m_XMinColor,m_YMinColor;
+	int m_XGridStyle;           /**< the style of the main X-grid */
+	int m_YGridStyle;           /**< the style of the main Y-grid */
+	int m_XGridWidth;           /**< the width of the main X-grid */
+	int m_YGridWidth;           /**< the width of the main Y-grid */
+	int m_XMinStyle;            /**< the style of the minor X-grid */
+	int m_YMinStyle;            /**< the style of the minor Y-grid */
+	int m_XMinWidth;            /**< the width of the minor X-grid */
+	int m_YMinWidth;            /**< the width of the minor Y-grid */
+	int m_NeutralStyle;         /**< the style of the neutral line y=0 */
+	int m_NeutralWidth;         /**< the width of the neutral line y=0 */
+
+	double m_XGridUnit;         /**< the unit of the main X-grid */
+	double m_YGridUnit;         /**< the unit of the main Y-grid */
+	double m_XMinUnit;          /**< the unit of the minor X-grid */
+	double m_YMinUnit;          /**< the unit of the minor Y-grid */
+
+	QColor m_XGridColor;        /**< the color of the main X-grid */
+	QColor m_YGridColor;        /**< the color of the main Y-grid */
+	QColor m_XMinColor;         /**< the color of the minor X-grid */
+	QColor m_YMinColor;         /**< the color of the minor Y-grid */
 	QColor m_NeutralColor;
 
 
-	int m_StackPos, m_StackSize;// undo : stack position and stack size
+	int m_StackPos;             /**< the current poistion on the Picture stack */
+	int m_StackSize;            /**< the size of the Picture stack */
 
-	double m_LERad;
-	double m_fScale;
-	double m_fScaleY;//ratio between y and x scales;
-	double m_fRefScale;
+	double m_LERad;             /**< the radius of the leading edge circle to draw */
+	double m_fScale;            /**< the current scale of the display */
+	double m_fScaleY;           /**< the ratio between the  y and x scales */
+	double m_fRefScale;         /**< the reference scale of the display */
 
-	QList<void *> *m_poaFoil;
-	XFoil *m_pXFoil;
+	QList<void *> *m_poaFoil;   /**< a pointer to the array of Foil objects */
+	void *m_pXFoil;             /**< a void pointer to the XFoil object */
+
+	SplineFoil *m_pSF;          /**< a pointer to the SplineFoil object */
+
+	QPoint m_ptOffset;          /**< the foil's leading edge position in screen coordinates */
+	QPoint m_ViewportTrans;     /**< the translation of the viewport */
+	QPoint m_PointDown;         /**< the screen point where the last left-click occured */
+
+	QRect m_rCltRect;           /**< the screen client rectangle */
+	QRect m_ZoomRect;           /**< the user-defined rectangle for zooming in */
+
+	CVector m_MousePos;         /**< the mouse position */
+
+	Foil *m_pBufferFoil;        /**< a pointer to the active buffer foil */
 
 
-//	CFoil *m_pCurFoil;
-	SplineFoil *m_pSF;
+	QCursor m_hcMove;           /**< the cursor to display when moving the viewport */
+	QCursor m_hcCross;          /**< the cursor to display in the client area, when not dragging or zooming */
 
-	QPoint m_ptOffset;//the foil's leading edge position in screen coordinates
-	QPoint m_ViewportTrans; // the translation of the viewport
-	QPoint m_ptPopUp;
-	QPoint m_PointDown;
+	Picture m_TmpPic;                /**< a temporary Picture to be pushed on the Picture stack */
+	Picture m_UndoPic[MAXSTACKPOS];  /**< the Picture stack */
 
-	QRect m_rCltRect;
-	QRect m_ZoomRect;
-	CVector m_MousePos;
-	Foil *m_pBufferFoil;
+//	int m_CurrentColumn;
 
-
-	QCursor m_hcMove;
-	QCursor m_hcCross;
-
-	Picture m_TmpPic;
-	Picture m_UndoPic[MAXSTACKPOS];
-
-	int m_CurrentColumn;
-
-	bool m_bIsImageLoaded;
-	QPixmap m_BackImage;
+	bool m_bIsImageLoaded;      /**< true if a backgruond image is loaded */
+	QPixmap m_BackImage;        /**< the QPixmap object with the background image */
 };
 
 #endif // QAFOIL_H

@@ -21,7 +21,8 @@
 
 
 /**
-*@file This file contains the declaration of the class ThreeDWidget, 
+*@file threedwidget.h
+*@brief This file contains the declaration of the class ThreeDWidget,
 *used for 3d openGL-based drawing in the central area of the application's MainFrame.
 */
 
@@ -87,7 +88,7 @@ private:
 	QRect m_rCltRect;           /**< The client window rectangle  */
 	CRectangle m_GLViewRect;    /**< The OpenGl viewport.*/
 
-	enumGLView m_iView;         /**<The identification of the type of the calling parent widget*/
+	enumGLView m_iView;         /**< The identification of the type of the calling parent widget*/
 };
 
 #endif

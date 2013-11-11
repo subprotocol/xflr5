@@ -2116,7 +2116,7 @@ void MainFrame::CreateXDirectActions()
 	connect(RefineLocalFoil, SIGNAL(triggered()), pXDirect, SLOT(OnCadd()));
 
 	RefineGlobalFoil = new QAction(tr("Refine Globally")+"\t(F3)", this);
-	connect(RefineGlobalFoil, SIGNAL(triggered()), pXDirect, SLOT(OnPanels()));
+	connect(RefineGlobalFoil, SIGNAL(triggered()), pXDirect, SLOT(OnRefinePanelsGlobally()));
 
 	EditCoordsFoil = new QAction(tr("Edit Foil Coordinates"), this);
 	connect(EditCoordsFoil, SIGNAL(triggered()), pXDirect, SLOT(OnFoilCoordinates()));
@@ -5689,7 +5689,7 @@ bool MainFrame::SerializeProject(QDataStream &ar, bool bIsStoring)
 			for (i=0; i<m_oaWOpp.size();i++)
 			{
 				pWOpp = (WingOpp*)m_oaWOpp.at(i);
-				pWOpp->SerializeWOpp(ar, bIsStoring);
+				pWOpp->SerializeWingOpp(ar, bIsStoring);
 			}
 		}
 		else ar << 0;
@@ -5881,7 +5881,7 @@ bool MainFrame::SerializeProject(QDataStream &ar, bool bIsStoring)
 			}
 			else
 			{
-				bWOppOK = pWOpp->SerializeWOpp(ar, bIsStoring);
+				bWOppOK = pWOpp->SerializeWingOpp(ar, bIsStoring);
 				if(pWOpp && bWOppOK)
 				{
 					pWing = pMiarex->GetWing(pWOpp->m_WingName);

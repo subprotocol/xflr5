@@ -19,7 +19,6 @@
 
 *****************************************************************************/
 
-// Simple class implementing the usual properties and methods of a 3D Vector
 
 
 #include <math.h>

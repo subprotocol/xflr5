@@ -1,9 +1,12 @@
 /**
-*@file This files defines the values of the main constant parameters used throughout the program
+*@file
+*
+* This files defines the values of the main constant parameters used throughout the program.
+*
 * A modification of this file triggers the compilation of the whole project.
 * 
 * @todo Set the a dynamic memory allocation at runtime for the panel mesh and for the influence matrix and rhs. 
-This will allow the user to define larger meshes, at the expense increased size of memory usage.
+		This will allow the user to define larger meshes, at the expense increased size of memory usage.
 */
 #ifndef PARAMS_H
 #define PARAMS_H
@@ -145,7 +148,7 @@ typedef enum{FIXEDSPEEDPOLAR, FIXEDLIFTPOLAR, RUBBERCHORDPOLAR, FIXEDAOAPOLAR, S
 /** @enum The different applications available to the user */
 typedef enum {NOAPP, XFOILANALYSIS, DIRECTDESIGN, INVERSEDESIGN, MIAREX}	enumApp;
 
-/** @enum The different image formats usable to export screen captures*/
+/**< @enum The different image formats usable to export screen captures*/
 typedef enum {PNG, JPEG, BMP}	enumImageFormat;
 
 /** @enum The different formats usable to export data to text format files*/

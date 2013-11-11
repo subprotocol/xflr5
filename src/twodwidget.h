@@ -20,7 +20,8 @@
 *****************************************************************************/
 
 /**
-*@file This file contains the declaration of the class TwoDWidget, 
+*@file
+*@brief This file contains the declaration of the class TwoDWidget,
 *used for 2d drawing in the central area of the application's MainFrame.
 */
 #ifndef TWODWIDGET_H

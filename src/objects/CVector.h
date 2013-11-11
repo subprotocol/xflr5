@@ -18,13 +18,23 @@
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 *****************************************************************************/
-
+/**
+  @file This file implements the CVetor class
+  */
 
 #include <math.h>
 
 #ifndef CVector_H
 #define CVector_H
 
+
+/** @brief
+ * A simple class which implements the usual properties, methods and operators associated to a 3D Vector.
+ *
+ * Caution : although the definition of operators allows for compact programming,
+ * the operations take much longer at run time probably due to the temporary memory allocations.
+ * If speed is required, implement directly the vectorial operations component by component in the source code.
+ */
 class CVector  
 {
 public: 

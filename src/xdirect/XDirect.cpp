@@ -638,7 +638,7 @@ void QXDirect::Connect()
 	connect(m_pctrlShowBL, SIGNAL(clicked()), this, SLOT(OnShowBL()));
 	connect(m_pctrlShowPressure, SIGNAL(clicked()), this, SLOT(OnShowPressure()));
 	connect(m_pctrlStoreOpp, SIGNAL(clicked()), this, SLOT(OnStoreOpp()));
-	connect(m_pctrlShowPoints, SIGNAL(clicked()), this, SLOT(OnShowPoints()));
+	connect(m_pctrlShowPoints, SIGNAL(clicked()), this, SLOT(OnShowCurvePoints()));
 	connect(m_pctrlShowCurve, SIGNAL(clicked()), this, SLOT(OnShowCurve()));
 //	connect(m_pctrlHighlightOpp, SIGNAL(clicked()), this, SLOT(OnHighlightOpp()));
 
@@ -1410,7 +1410,7 @@ void QXDirect::keyPressEvent(QKeyEvent *event)
 		case Qt::Key_F3:
 		{
 			if(bShift) OnCadd();
-			else       OnPanels();
+			else       OnRefinePanelsGlobally();
 			break;
 		}
 		case Qt::Key_F5:
@@ -1473,6 +1473,7 @@ void QXDirect::keyReleaseEvent(QKeyEvent *event)
 			QWidget::keyReleaseEvent(event);
 	}
 }
+
 
 /**
  * Loads the user's default settings from the application QSettings object
@@ -1875,7 +1876,8 @@ void QXDirect::OnAnimate(bool bChecked)
 
 
 /**
- * Called by the animation timer. Updates the display with the data of the next OpPoint.
+ * Called by the animation timer.
+ * Updates the display with the data of the next OpPoint.
  */
 void QXDirect::OnAnimateSingle()
 {
@@ -1934,6 +1936,10 @@ void QXDirect::OnAnimateSingle()
 }
 
 
+/**
+ * the user has moved the slider which defines the animation speed
+ * @param val the slider's new position
+ */
 void QXDirect::OnAnimateSpeed(int val)
 {
 	if(m_pAnimateTimer->isActive())
@@ -1942,7 +1948,11 @@ void QXDirect::OnAnimateSpeed(int val)
 	}
 }
 
-
+/**
+ * The user has clicked the analyze button.
+ *
+ * Reads the input parameters, initializes the analysis dialog box, and starts the analysis.
+ */
 void QXDirect::OnAnalyze()
 {
 	if(!MainFrame::s_pCurFoil || !m_pCurPolar) return;
@@ -1955,7 +1965,6 @@ void QXDirect::OnAnalyze()
 
 	bool bHigh = m_bHighlightOpp;
 	m_bHighlightOpp = false;
-
 
 	m_pXFoilAnalysisDlg->SetAlpha(m_Alpha, m_AlphaMax, m_AlphaDelta);
 	m_pXFoilAnalysisDlg->SetCl(m_Cl, m_ClMax, m_ClDelta);
@@ -1992,7 +2001,10 @@ void QXDirect::OnAnalyze()
 	UpdateView();
 }
 
-
+/**
+ * Launches a single-threaded batch analysis
+ *
+ */
 void QXDirect::OnBatchAnalysis()
 {
 	MainFrame* pMainFrame = (MainFrame*)s_pMainFrame;
@@ -2002,8 +2014,6 @@ void QXDirect::OnBatchAnalysis()
 	OnPolars();
 	UpdateView();
 
-
-//	m_pBDlg->move(pMainFrame->m_DlgPos);
 	m_pBDlg->m_pFoil     = MainFrame::s_pCurFoil;
 	m_pBDlg->m_Mach      = 0.0;
 	m_pBDlg->m_ReMin     = m_Reynolds;
@@ -2033,7 +2043,6 @@ void QXDirect::OnBatchAnalysis()
 	m_pBDlg->InitDialog();
 
 	if(m_pBDlg->exec()==QDialog::Accepted) pMainFrame->SetSaveState(false);
-//	pMainFrame->m_DlgPos = m_pBDlg->pos();
 
 	m_Reynolds         = m_pBDlg->m_ReMin;
 	m_ReynoldsMax      = m_pBDlg->m_ReMax;
@@ -2064,6 +2073,10 @@ void QXDirect::OnBatchAnalysis()
 }
 
 
+/**
+ * Launches a multi-threaded batch analysis
+ *
+ */
 void QXDirect::OnMultiThreadedBatchAnalysis()
 {
 	MainFrame* pMainFrame = (MainFrame*)s_pMainFrame;
@@ -2138,62 +2151,10 @@ void QXDirect::OnMultiThreadedBatchAnalysis()
 }
 
 
-void QXDirect::OnCadd()
-{
-	StopAnimate();
-	MainFrame* pMainFrame = (MainFrame*)s_pMainFrame;
-	if(!MainFrame::s_pCurFoil)		return;
 
-	void* ptr = m_pCurOpp;
-	m_pCurOpp = NULL;
-	CreateOppCurves();
-
-	bool bPressure = m_bPressure;
-	bool bBL       = m_bBL;
-	bool bState = m_bShowPanels;
-	m_bPressure = false;
-	m_bBL       = false;
-	OnOpPoints();
-
-
-	m_pCAddDlg->m_pBufferFoil = &m_BufferFoil;
-	m_pCAddDlg->m_pMemFoil    = MainFrame::s_pCurFoil;
-	m_pCAddDlg->m_pXDirect    = this;
-	m_pCAddDlg->m_pAFoil      = NULL;
-	m_pCAddDlg->InitDialog();
-
-
-
-	m_bShowPanels = true;
-	UpdateView();
-
-	if(QDialog::Accepted == m_pCAddDlg->exec())
-	{
-		Foil *pNewFoil = new Foil();
-		pNewFoil->CopyFoil(&m_BufferFoil);
-		pNewFoil->m_FoilColor  = pMainFrame->GetColor(0);
-		pNewFoil->m_nFoilStyle = 1;
-		pNewFoil->m_nFoilWidth = 1;
-		pNewFoil->m_bPoints = false;
-		m_pCurOpp = (OpPoint*)ptr;
-		if(!pMainFrame->SetModFoil(pNewFoil))	SetBufferFoil();
-		pMainFrame->UpdateFoils();
-	}
-	else
-	{
-		m_pCurOpp = (OpPoint*)ptr;
-		SetBufferFoil();
-		m_pXFoil->InitXFoilGeometry(MainFrame::s_pCurFoil);
-	}
-
-	m_bShowPanels = bState;
-
-	m_bPressure = bPressure;
-	m_bBL       = bBL;
-	UpdateView();
-}
-
-
+/**
+ * The user has requested the plot of the Cf variable using current XFoil results.
+ */
 void QXDirect::OnCfPlot()
 {
 	if(!m_pXFoil->lvconv) return;
@@ -2241,6 +2202,135 @@ void QXDirect::OnCfPlot()
 }
 
 
+
+/**
+ * The user has requested the plot of the Ct variable using current XFoil results.
+ */
+void QXDirect::OnCtPlot()
+{
+	if(!m_pXFoil->lvconv) return;
+	int i;
+
+	m_pCpGraph->SetYVariable(2);
+	m_XFoilVar=1;
+	m_pCpGraph->DeleteCurves();
+	m_pCpGraph->ResetLimits();
+	m_pCpGraph->SetAuto(true);
+	m_pCpGraph->SetInverted(false);
+	m_pCpGraph->SetYTitle(tr("Max Shear"));
+	Curve * pCurve0 = m_pCpGraph->AddCurve();
+	Curve * pCurve1 = m_pCpGraph->AddCurve();
+	Curve * pCurve2 = m_pCpGraph->AddCurve();
+	Curve * pCurve3 = m_pCpGraph->AddCurve();
+	pCurve0->SetTitle(tr("Top Shear"));
+	pCurve1->SetTitle(tr("Top Shear eq"));
+	pCurve2->SetTitle(tr("Bot Shear"));
+	pCurve3->SetTitle(tr("Bot Shear eq"));
+
+	double x[IVX][3];
+	int nside1, nside2;
+
+	m_pXFoil->CreateXBL(x, nside1, nside2);
+
+	int it1 = m_pXFoil->itran[1];
+	int it2 = m_pXFoil->itran[2];
+
+	for (i=it1; i<=nside1-1; i++)	pCurve0->AppendPoint(x[i][1], m_pXFoil->ctau[i][1]);
+	for (i=2; i<=nside1-1; i++)		pCurve1->AppendPoint(x[i][1], m_pXFoil->ctq[i][1]);
+
+	for (i=it2; i<=nside2-1; i++)	pCurve2->AppendPoint(x[i][2], m_pXFoil->ctau[i][2]);
+	for (i=2; i<=nside2-1; i++)		pCurve3->AppendPoint(x[i][2], m_pXFoil->ctq[i][2]);
+
+	m_pCpGraph->SetXScale();
+	SetFoilScale();
+	SetControls();
+	UpdateView();
+
+}
+
+
+/**
+ * The user has requested the plot of the Dt variable using current XFoil results.
+ */
+void QXDirect::OnDtPlot()
+{
+	if(!m_pXFoil->lvconv) return;
+	int i;
+
+	m_pCpGraph->SetYVariable(2);
+	m_XFoilVar=3;
+	m_pCpGraph->DeleteCurves();
+	m_pCpGraph->ResetLimits();
+	m_pCpGraph->SetAuto(true);
+	m_pCpGraph->SetInverted(false);
+	m_pCpGraph->SetYTitle(" ");
+
+
+	double x[IVX][3];
+	int nside1, nside2;
+
+	Curve * pCurve1 = m_pCpGraph->AddCurve();
+	Curve * pCurve2 = m_pCpGraph->AddCurve();
+
+	pCurve1->SetTitle("D*");
+	pCurve2->SetTitle("Theta");
+	m_pXFoil->CreateXBL(x, nside1, nside2);
+
+	for (i=2; i<nside1; i++){
+		pCurve1->AppendPoint(x[i][1], m_pXFoil->dstr[i][1]);
+		pCurve2->AppendPoint(x[i][1], m_pXFoil->thet[i][1]);
+	}
+
+	m_pCpGraph->SetXScale();
+	SetFoilScale();
+	SetControls();
+	UpdateView();
+}
+
+
+/**
+ * The user has requested the plot of the Db variable using current XFoil results.
+ */
+void QXDirect::OnDbPlot()
+{
+	if(!m_pXFoil->lvconv) return;
+	int i;
+
+	m_pCpGraph->SetYVariable(2);
+	m_XFoilVar = 2;
+	m_pCpGraph->DeleteCurves();
+	m_pCpGraph->ResetLimits();
+	m_pCpGraph->SetAuto(true);
+	m_pCpGraph->SetInverted(false);
+	m_pCpGraph->SetYTitle(" ");
+
+
+	double x[IVX][3];
+	int nside1, nside2;
+
+	Curve * pCurve1 = m_pCpGraph->AddCurve();
+	Curve * pCurve2 = m_pCpGraph->AddCurve();
+
+	pCurve1->SetTitle("D*");
+	pCurve2->SetTitle("Theta");
+	m_pXFoil->CreateXBL(x, nside1, nside2);
+
+	for (i=2; i<nside2; i++)
+	{
+		pCurve1->AppendPoint(x[i][2], m_pXFoil->dstr[i][2]);
+		pCurve2->AppendPoint(x[i][2], m_pXFoil->thet[i][2]);
+	}
+
+	m_pCpGraph->SetXScale();
+	SetFoilScale();
+	SetControls();
+	UpdateView();
+}
+
+
+/**
+ * The user has requested the plot of the Cd variable using current XFoil results.
+ */
 void QXDirect::OnCdPlot()
 {
 	if(!m_pXFoil->lvconv) return;
@@ -2288,6 +2378,183 @@ void QXDirect::OnCdPlot()
 }
 
 
+/**
+ * The user has requested the plot of the Hk variable using current XFoil results.
+ */
+void QXDirect::OnHPlot()
+{
+	if(!m_pXFoil->lvconv) return;
+	int i;
+
+	m_pCpGraph->SetYVariable(2);
+	m_XFoilVar = 10;
+	m_pCpGraph->DeleteCurves();
+	m_pCpGraph->ResetLimits();
+	m_pCpGraph->SetAuto(true);
+	m_pCpGraph->SetInverted(false);
+	m_pCpGraph->SetYTitle("Hk");
+	Curve * pTopCurve = m_pCpGraph->AddCurve();
+	Curve * pBotCurve = m_pCpGraph->AddCurve();
+	pTopCurve->SetTitle(tr("Top"));
+	pBotCurve->SetTitle(tr("Bot"));
+
+	double x[IVX][3],y[IVX][3];
+	int nside1, nside2;
+
+	m_pXFoil->CreateXBL(x, nside1, nside2);
+	m_pXFoil->FillHk(y, nside1, nside2);
+
+	for (i=2; i<=nside1-1; i++)
+	{
+		pTopCurve->AppendPoint(x[i][1], y[i][1]);
+	}
+	for (i=2; i<=nside2-1; i++)
+	{
+		pBotCurve->AppendPoint(x[i][2], y[i][2]);
+	}
+
+	m_pCpGraph->SetXScale();
+	SetFoilScale();
+	SetControls();
+	UpdateView();
+}
+
+
+/**
+ * The user has requested the plot of the Rt variable using current XFoil results.
+ */
+void QXDirect::OnRtPlot()
+{
+	if(!m_pXFoil->lvconv) return;
+	int i;
+
+	m_pCpGraph->SetYVariable(2);
+	m_XFoilVar=5;
+	m_pCpGraph->DeleteCurves();
+	m_pCpGraph->ResetLimits();
+	m_pCpGraph->SetAuto(true);
+	m_pCpGraph->SetInverted(false);
+	m_pCpGraph->SetYTitle("Re_Theta");
+	Curve * pTopCurve = m_pCpGraph->AddCurve();
+	Curve * pBotCurve = m_pCpGraph->AddCurve();
+	pTopCurve->SetTitle(tr("Top"));
+	pBotCurve->SetTitle(tr("Bot"));
+
+	double x[IVX][3],y[IVX][3];
+	int nside1, nside2;
+
+	m_pXFoil->CreateXBL(x, nside1, nside2);
+	m_pXFoil->FillRTheta(y, nside1, nside2);
+
+	for (i=2; i<=nside1-1; i++)	pTopCurve->AppendPoint(x[i][1], y[i][1]);
+	for (i=2; i<=nside2-1; i++) pBotCurve->AppendPoint(x[i][2], y[i][2]);
+
+	m_pCpGraph->SetXScale();
+	SetFoilScale();
+	SetControls();
+	UpdateView();
+}
+
+
+/**
+ * The user has requested the plot of the RtL variable using current XFoil results.
+ */
+void QXDirect::OnRtLPlot()
+{
+	if(!m_pXFoil->lvconv) return;
+	int i;
+
+	m_pCpGraph->SetYVariable(2);
+	m_XFoilVar=4;
+	m_pCpGraph->DeleteCurves();
+	m_pCpGraph->ResetLimits();
+	m_pCpGraph->SetAuto(true);
+	m_pCpGraph->SetInverted(false);
+	m_pCpGraph->SetYTitle("Re_Theta");
+	Curve * pTopCurve = m_pCpGraph->AddCurve();
+	Curve * pBotCurve = m_pCpGraph->AddCurve();
+	pTopCurve->SetTitle(tr("Top"));
+	pBotCurve->SetTitle(tr("Bot"));
+
+	double x[IVX][3],y[IVX][3];
+	int nside1, nside2;
+
+	m_pXFoil->CreateXBL(x, nside1, nside2);
+	m_pXFoil->FillRTheta(y, nside1, nside2);
+
+	for (i=2; i<=nside1-1; i++){
+		if (y[i][1]>0.0) y[i][1] = log10( y[i][1] );
+		else             y[i][1] = 0.0;
+		pTopCurve->AppendPoint(x[i][1], y[i][1]);
+	}
+	for (i=2; i<=nside2-1; i++){
+		if (y[i][2]>0.0) y[i][2] = log10( y[i][2] );
+		else             y[i][2] = 0.0;
+		pBotCurve->AppendPoint(x[i][2], y[i][2]);
+	}
+	m_pCpGraph->SetXScale();
+	SetFoilScale();
+	SetControls();
+	UpdateView();
+}
+
+
+/**
+ * The user has requested the plot of the Ue variable using current XFoil results.
+ */
+void QXDirect::OnUePlot()
+{
+	if(!m_pXFoil->lvconv) return;
+	int i;
+	double x[IVX][3],y[IVX][3];
+	double uei;
+	int nside1, nside2, ibl;
+
+	m_pCpGraph->SetYVariable(2);
+	m_XFoilVar = 9;
+	m_pCpGraph->DeleteCurves();
+	m_pCpGraph->ResetLimits();
+	m_pCpGraph->SetAuto(true);
+	m_pCpGraph->SetInverted(false);
+	m_pCpGraph->SetYTitle("Ue/Vinf");
+	Curve * pTopCurve = m_pCpGraph->AddCurve();
+	Curve * pBotCurve = m_pCpGraph->AddCurve();
+	pTopCurve->SetTitle(tr("Top"));
+	pBotCurve->SetTitle(tr("Bot"));
+
+	m_pXFoil->CreateXBL(x, nside1, nside2);
+	//---- fill compressible ue arrays
+	for (ibl=2; ibl<= nside1;ibl++)
+	{
+		uei = m_pXFoil->uedg[ibl][1];
+		y[ibl][1] = uei * (1.0-m_pXFoil->tklam)
+						/ (1.0-m_pXFoil->tklam*(uei/m_pXFoil->qinf)*(uei/m_pXFoil->qinf));
+	}
+	for (ibl=2; ibl<= nside2;ibl++)
+	{
+		uei = m_pXFoil->uedg[ibl][2];
+		y[ibl][2] = uei * (1.0-m_pXFoil->tklam)
+						/ (1.0-m_pXFoil->tklam*(uei/m_pXFoil->qinf)*(uei/m_pXFoil->qinf));
+	}
+
+	for (i=2; i<=nside1-1; i++)
+	{
+		pTopCurve->AppendPoint(x[i][1], y[i][1]);
+	}
+	for (i=2; i<=nside2-1; i++)
+	{
+		pBotCurve->AppendPoint(x[i][2], y[i][2]);
+	}
+	m_pCpGraph->SetXScale();
+	SetFoilScale();
+	SetControls();
+	UpdateView();
+}
+
+
+/**
+ * The user has requested to switch to the two polar graph view
+ */
 void QXDirect::OnCouplePolarGraphs()
 {
 	m_iPlrView  = TWOPOLARGRAPHS;
@@ -2297,7 +2564,9 @@ void QXDirect::OnCouplePolarGraphs()
 }
 
 
-
+/**
+ * The user has requested to switch to the Cp graph view
+ */
 void QXDirect::OnCpGraph()
 {
 	m_bPolarView = false;
@@ -2319,7 +2588,9 @@ void QXDirect::OnCpGraph()
 }
 
 
-
+/**
+ * The user has requested an edition of the settings of the Cp graph
+ */
 void QXDirect::OnCpGraphSettings()
 {
 	MainFrame* pMainFrame = (MainFrame*)s_pMainFrame;
@@ -2340,6 +2611,9 @@ void QXDirect::OnCpGraphSettings()
 }
 
 
+/**
+ * The user has toggled the request for the display of the inviscid Cp curve
+ */
 void QXDirect::OnCpi()
 {
 	m_bShowInviscid = !m_bShowInviscid;
@@ -2349,48 +2623,10 @@ void QXDirect::OnCpi()
 	UpdateView();
 }
 
-void QXDirect::OnCtPlot()
-{
-	if(!m_pXFoil->lvconv) return;
-	int i;
 
-	m_pCpGraph->SetYVariable(2);
-	m_XFoilVar=1;
-	m_pCpGraph->DeleteCurves();
-	m_pCpGraph->ResetLimits();
-	m_pCpGraph->SetAuto(true);
-	m_pCpGraph->SetInverted(false);
-	m_pCpGraph->SetYTitle(tr("Max Shear"));
-	Curve * pCurve0 = m_pCpGraph->AddCurve();
-	Curve * pCurve1 = m_pCpGraph->AddCurve();
-	Curve * pCurve2 = m_pCpGraph->AddCurve();
-	Curve * pCurve3 = m_pCpGraph->AddCurve();
-	pCurve0->SetTitle(tr("Top Shear"));
-	pCurve1->SetTitle(tr("Top Shear eq"));
-	pCurve2->SetTitle(tr("Bot Shear"));
-	pCurve3->SetTitle(tr("Bot Shear eq"));
-
-	double x[IVX][3];
-	int nside1, nside2;
-
-	m_pXFoil->CreateXBL(x, nside1, nside2);
-
-	int it1 = m_pXFoil->itran[1];
-	int it2 = m_pXFoil->itran[2];
-
-	for (i=it1; i<=nside1-1; i++)	pCurve0->AppendPoint(x[i][1], m_pXFoil->ctau[i][1]);
-	for (i=2; i<=nside1-1; i++)		pCurve1->AppendPoint(x[i][1], m_pXFoil->ctq[i][1]);
-
-	for (i=it2; i<=nside2-1; i++)	pCurve2->AppendPoint(x[i][2], m_pXFoil->ctau[i][2]);
-	for (i=2; i<=nside2-1; i++)		pCurve3->AppendPoint(x[i][2], m_pXFoil->ctq[i][2]);
-
-	m_pCpGraph->SetXScale();
-	SetFoilScale();
-	SetControls();
-	UpdateView();
-
-}
-
+/**
+ * The user has toggled the switch for the display of the current OpPoint only
+ */
 void QXDirect::OnCurOppOnly()
 {
 	m_bCurOppOnly = !m_bCurOppOnly;
@@ -2403,32 +2639,44 @@ void QXDirect::OnCurOppOnly()
 }
 
 
+/**
+ * The user has changed the color of the current curve
+ */
 void QXDirect::OnCurveColor()
 {
 	QColor Color = QColorDialog::getColor(m_CurveColor);
 	if(Color.isValid()) m_CurveColor = Color;
 
 	FillComboBoxes();
-	UpdateCurve();
+	UpdateCurveStyle();
 }
 
 
+/**
+ * The user has changed the style of the current curve
+ */
 void QXDirect::OnCurveStyle(int index)
 {
 	m_CurveStyle = index;
 	FillComboBoxes();
-	UpdateCurve();
+	UpdateCurveStyle();
 }
 
 
+/**
+ * The user has changed the width of the current curve
+ */
 void QXDirect::OnCurveWidth(int index)
 {
 	m_CurveWidth = index+1;
 	FillComboBoxes();
-	UpdateCurve();
+	UpdateCurveStyle();
 }
 
 
+/**
+ * The user has requested to define a new polar
+ */
 void QXDirect::OnDefinePolar()
 {
 	MainFrame* pMainFrame = (MainFrame*)s_pMainFrame;
@@ -2524,7 +2772,9 @@ void QXDirect::OnDefinePolar()
 }
 
 
-
+/**
+ * The user has requested the deletion of the current Foil.
+ */
 void QXDirect::OnDeleteCurFoil()
 {
 	MainFrame* pMainFrame = (MainFrame*)s_pMainFrame;
@@ -2543,6 +2793,9 @@ void QXDirect::OnDeleteCurFoil()
 }
 
 
+/**
+ * The user has requested the deletion of the current OpPoint.
+ */
 void QXDirect::OnDelCurOpp()
 {
 	MainFrame* pMainFrame = (MainFrame*)s_pMainFrame;
@@ -2569,7 +2822,9 @@ void QXDirect::OnDelCurOpp()
 }
 
 
-
+/**
+ * The user has requested the deletion of the current Polar.
+ */
 void QXDirect::OnDeleteCurPolar()
 {
 	if(!m_pCurPolar) return;
@@ -2617,6 +2872,9 @@ void QXDirect::OnDeleteCurPolar()
 }
 
 
+/**
+ * The user has requested the deletion of the OpPoints associated to the current Polar.
+ */
 void QXDirect::OnDeletePolarOpps()
 {
 	if(!MainFrame::s_pCurFoil || !m_pCurPolar) return;
@@ -2644,7 +2902,9 @@ void QXDirect::OnDeletePolarOpps()
 }
 
 
-
+/**
+ * The user has requested the deletion of the OpPoints associated to the current Foil.
+ */
 void QXDirect::OnDeleteFoilOpps()
 {
 	if(!MainFrame::s_pCurFoil || !m_pCurPolar) return;
@@ -2671,6 +2931,9 @@ void QXDirect::OnDeleteFoilOpps()
 }
 
 
+/**
+ * The user has requested the deletion of the Polars associated to the current Foil.
+ */
 void QXDirect::OnDeleteFoilPolars()
 {
 	if(!MainFrame::s_pCurFoil) return;
@@ -2721,6 +2984,68 @@ void QXDirect::OnDeleteFoilPolars()
 }
 
 
+/**
+ * The user has requested a local refinement of the panels of the current foil
+ */
+void QXDirect::OnCadd()
+{
+	StopAnimate();
+	MainFrame* pMainFrame = (MainFrame*)s_pMainFrame;
+	if(!MainFrame::s_pCurFoil)		return;
+
+	void* ptr = m_pCurOpp;
+	m_pCurOpp = NULL;
+	CreateOppCurves();
+
+	bool bPressure = m_bPressure;
+	bool bBL       = m_bBL;
+	bool bState = m_bShowPanels;
+	m_bPressure = false;
+	m_bBL       = false;
+	OnOpPoints();
+
+
+	m_pCAddDlg->m_pBufferFoil = &m_BufferFoil;
+	m_pCAddDlg->m_pMemFoil    = MainFrame::s_pCurFoil;
+	m_pCAddDlg->m_pXDirect    = this;
+	m_pCAddDlg->m_pAFoil      = NULL;
+	m_pCAddDlg->InitDialog();
+
+
+
+	m_bShowPanels = true;
+	UpdateView();
+
+	if(QDialog::Accepted == m_pCAddDlg->exec())
+	{
+		Foil *pNewFoil = new Foil();
+		pNewFoil->CopyFoil(&m_BufferFoil);
+		pNewFoil->m_FoilColor  = pMainFrame->GetColor(0);
+		pNewFoil->m_nFoilStyle = 1;
+		pNewFoil->m_nFoilWidth = 1;
+		pNewFoil->m_bPoints = false;
+		m_pCurOpp = (OpPoint*)ptr;
+		if(!pMainFrame->SetModFoil(pNewFoil))	SetBufferFoil();
+		pMainFrame->UpdateFoils();
+	}
+	else
+	{
+		m_pCurOpp = (OpPoint*)ptr;
+		SetBufferFoil();
+		m_pXFoil->InitXFoilGeometry(MainFrame::s_pCurFoil);
+	}
+
+	m_bShowPanels = bState;
+
+	m_bPressure = bPressure;
+	m_bBL       = bBL;
+	UpdateView();
+}
+
+
+/**
+ * The user has requested that the foil be derotated
+ */
 void QXDirect::OnDerotateFoil()
 {
 	if(!MainFrame::s_pCurFoil) return;
@@ -2748,80 +3073,9 @@ void QXDirect::OnDerotateFoil()
 }
 
 
-void QXDirect::OnDtPlot()
-{
-	if(!m_pXFoil->lvconv) return;
-	int i;
-
-	m_pCpGraph->SetYVariable(2);
-	m_XFoilVar=3;
-	m_pCpGraph->DeleteCurves();
-	m_pCpGraph->ResetLimits();
-	m_pCpGraph->SetAuto(true);
-	m_pCpGraph->SetInverted(false);
-	m_pCpGraph->SetYTitle(" ");
-
-
-	double x[IVX][3];
-	int nside1, nside2;
-
-	Curve * pCurve1 = m_pCpGraph->AddCurve();
-	Curve * pCurve2 = m_pCpGraph->AddCurve();
-
-	pCurve1->SetTitle("D*");
-	pCurve2->SetTitle("Theta");
-	m_pXFoil->CreateXBL(x, nside1, nside2);
-
-	for (i=2; i<nside1; i++){
-		pCurve1->AppendPoint(x[i][1], m_pXFoil->dstr[i][1]);
-		pCurve2->AppendPoint(x[i][1], m_pXFoil->thet[i][1]);
-	}
-
-	m_pCpGraph->SetXScale();
-	SetFoilScale();
-	SetControls();
-	UpdateView();
-}
-
-void QXDirect::OnDbPlot()
-{
-	if(!m_pXFoil->lvconv) return;
-	int i;
-
-	m_pCpGraph->SetYVariable(2);
-	m_XFoilVar = 2;
-	m_pCpGraph->DeleteCurves();
-	m_pCpGraph->ResetLimits();
-	m_pCpGraph->SetAuto(true);
-	m_pCpGraph->SetInverted(false);
-	m_pCpGraph->SetYTitle(" ");
-
-
-	double x[IVX][3];
-	int nside1, nside2;
-
-	Curve * pCurve1 = m_pCpGraph->AddCurve();
-	Curve * pCurve2 = m_pCpGraph->AddCurve();
-
-	pCurve1->SetTitle("D*");
-	pCurve2->SetTitle("Theta");
-	m_pXFoil->CreateXBL(x, nside1, nside2);
-
-	for (i=2; i<nside2; i++)
-	{
-		pCurve1->AppendPoint(x[i][2], m_pXFoil->dstr[i][2]);
-		pCurve2->AppendPoint(x[i][2], m_pXFoil->thet[i][2]);
-	}
-
-	m_pCpGraph->SetXScale();
-	SetFoilScale();
-	SetControls();
-	UpdateView();
-}
-
-
-
-
+/**
+ * The user has requested to modify the parameters of the active polar
+ */
 void QXDirect::OnEditCurPolar()
 {
 	if (!m_pCurPolar) return;
@@ -2858,7 +3112,9 @@ void QXDirect::OnEditCurPolar()
 }
 
 
-
+/**
+ * The user has requested the export of the current results stored in the XFoil object to a text file
+ */
 void QXDirect::OnExportCurXFoilResults()
 {
 	if(!m_pXFoil->lvconv) return;
@@ -3016,7 +3272,9 @@ void QXDirect::OnExportCurXFoilResults()
 }
 
 
-
+/**
+ * The user has requested the export of all polars to text files
+ */
 void QXDirect::OnExportAllPolars()
 {
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
@@ -3045,7 +3303,9 @@ void QXDirect::OnExportAllPolars()
 }
 
 
-
+/**
+ * The user has requested the export of the current foil to a text file
+ */
 void QXDirect::OnExportCurFoil()
 {
 	if(!MainFrame::s_pCurFoil)	return;
@@ -3075,6 +3335,9 @@ void QXDirect::OnExportCurFoil()
 }
 
 
+/**
+ * The user has requested the export of the current OpPoint to a text file
+ */
 void QXDirect::OnExportCurOpp()
 {
 	if(!MainFrame::s_pCurFoil || !m_pCurPolar || !m_pCurOpp)	return;
@@ -3109,6 +3372,9 @@ void QXDirect::OnExportCurOpp()
 }
 
 
+/**
+ * The user has requested the export of the OpPoints associated to the current Polar to a text file
+ */
 void QXDirect::OnExportPolarOpps()
 {
 	MainFrame * pMainFrame = (MainFrame*)s_pMainFrame;
@@ -3223,6 +3489,9 @@ void QXDirect::OnExportPolarOpps()
 }
 
 
+/**
+ * The user has requested the export of the current Polar to a text file
+ */
 void QXDirect::OnExportCurPolar()
 {
 	if(!MainFrame::s_pCurFoil || !m_pCurPolar)	return;
@@ -3258,6 +3527,9 @@ void QXDirect::OnExportCurPolar()
 }
 
 
+/**
+ * The user has requested an edition of the current foil coordinates
+ */
 void QXDirect::OnFoilCoordinates()
 {
 	if(!MainFrame::s_pCurFoil)	return;
@@ -3334,6 +3606,9 @@ void QXDirect::OnFoilCoordinates()
 }
 
 
+/**
+ * The user has requested to perform an edition of the current foil's thickness and camber properties.
+ */
 void QXDirect::OnFoilGeom()
 {
 	MainFrame* pMainFrame = (MainFrame*)s_pMainFrame;
@@ -3377,7 +3652,9 @@ void QXDirect::OnFoilGeom()
 }
 
 
-
+/**
+ * The user has requested an edition of the current graph's settings
+ */
 void QXDirect::OnGraphSettings()
 {
 	MainFrame* pMainFrame = (MainFrame*)s_pMainFrame;
@@ -3459,7 +3736,9 @@ void QXDirect::OnGraphSettings()
 	UpdateView();
 }
 
-
+/**
+ * The user has requested the highlighting of the current OpPoint on the polar curves
+ */
 void QXDirect::OnHighlightOpp()
 {
 	if(!m_bPolarView) return;
@@ -3478,45 +3757,9 @@ void QXDirect::OnHighlightOpp()
 }
 
 
-void QXDirect::OnHPlot()
-{
-	if(!m_pXFoil->lvconv) return;
-	int i;
-
-	m_pCpGraph->SetYVariable(2);
-	m_XFoilVar = 10;
-	m_pCpGraph->DeleteCurves();
-	m_pCpGraph->ResetLimits();
-	m_pCpGraph->SetAuto(true);
-	m_pCpGraph->SetInverted(false);
-	m_pCpGraph->SetYTitle("Hk");
-	Curve * pTopCurve = m_pCpGraph->AddCurve();
-	Curve * pBotCurve = m_pCpGraph->AddCurve();
-	pTopCurve->SetTitle(tr("Top"));
-	pBotCurve->SetTitle(tr("Bot"));
-
-	double x[IVX][3],y[IVX][3];
-	int nside1, nside2;
-
-	m_pXFoil->CreateXBL(x, nside1, nside2);
-	m_pXFoil->FillHk(y, nside1, nside2);
-
-	for (i=2; i<=nside1-1; i++)
-	{
-		pTopCurve->AppendPoint(x[i][1], y[i][1]);
-	}
-	for (i=2; i<=nside2-1; i++)
-	{
-		pBotCurve->AppendPoint(x[i][2], y[i][2]);
-	}
-
-	m_pCpGraph->SetXScale();
-	SetFoilScale();
-	SetControls();
-	UpdateView();
-}
-
-
+/**
+ * The user has requested to hide all OpPoints
+ */
 void QXDirect::OnHideAllOpps()
 {
 	MainFrame * pMainFrame = (MainFrame*) s_pMainFrame;
@@ -3533,6 +3776,9 @@ void QXDirect::OnHideAllOpps()
 }
 
 
+/**
+ * The user has requested to hide all polar curves
+ */
 void QXDirect::OnHideAllPolars()
 {
 	MainFrame * pMainFrame = (MainFrame*) s_pMainFrame;
@@ -3549,6 +3795,9 @@ void QXDirect::OnHideAllPolars()
 }
 
 
+/**
+ * The user has requested to hide all polar curves associated to the current Foil
+ */
 void QXDirect::OnHideFoilPolars()
 {
 	if(!MainFrame::s_pCurFoil) return;
@@ -3569,6 +3818,9 @@ void QXDirect::OnHideFoilPolars()
 }
 
 
+/**
+ * The user has requested to hide all OpPoint curves associated to the current Foil
+ */
 void QXDirect::OnHideFoilOpps()
 {
 	if(!MainFrame::s_pCurFoil || !m_pCurPolar) return;
@@ -3589,7 +3841,9 @@ void QXDirect::OnHideFoilOpps()
 }
 
 
-
+/**
+ * The user has requested to hide all OpPoint curves associated to the current Polar
+ */
 void QXDirect::OnHidePolarOpps()
 {
 	if(!MainFrame::s_pCurFoil || !m_pCurPolar) return;
@@ -3610,6 +3864,10 @@ void QXDirect::OnHidePolarOpps()
 }
 
 
+/**
+ * The user has requested to import a polar from a text file.
+ * The Polar will be added to the array only if a Foil with the parent name exists.
+ */
 void QXDirect::OnImportXFoilPolar()
 {
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
@@ -3790,6 +4048,11 @@ void QXDirect::OnImportXFoilPolar()
 }
 
 
+/**
+ * The user has requested to import a polar from a text file in JavaFoil format
+ * The Polar will be added to the array only if a Foil with the parent name exists.
+ *  @todo Note: this option has not been tested in years... the JavaFoil format may have changed since
+ */
 void QXDirect::OnImportJavaFoilPolar()
 {
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
@@ -3897,6 +4160,9 @@ void QXDirect::OnImportJavaFoilPolar()
 }
 
 
+/**
+ * The user has requested to restore the boundary layer to its default value prior to the next calculation.
+ */
 void QXDirect::OnInitBL()
 {
 	if(!m_pXFoil) return;
@@ -3912,6 +4178,9 @@ void QXDirect::OnInitBL()
 }
 
 
+/**
+ * The user has requested the launch of the interface to create a foil from the interpolation of two existing Foil objects.
+ */
 void QXDirect::OnInterpolateFoils()
 {
 	MainFrame* pMainFrame = (MainFrame*)s_pMainFrame;
@@ -3960,6 +4229,9 @@ void QXDirect::OnInterpolateFoils()
 }
 
 
+/**
+ * The user has requested the launch of the interface to manage Foil objects.
+ */
 void QXDirect::OnManageFoils()
 {
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
@@ -3980,6 +4252,9 @@ void QXDirect::OnManageFoils()
 }
 
 
+/**
+ * The user has requested the launch of the interface used to create a NACA type foil.
+ */
 void QXDirect::OnNacaFoils()
 {
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
@@ -4033,7 +4308,9 @@ void QXDirect::OnNacaFoils()
 	UpdateView();
 }
 
-
+/**
+ * The user has requested that the length of the current foil be normalized to 1.
+ */
 void QXDirect::OnNormalizeFoil()
 {
 	MainFrame* pMainFrame = (MainFrame*)s_pMainFrame;
@@ -4053,7 +4330,9 @@ void QXDirect::OnNormalizeFoil()
 }
 
 
-
+/**
+ * The user has requested a  plot of the A/A0 variable using current XFoil results.
+ */
 void QXDirect::OnNPlot()
 {
 	if(!m_pXFoil->lvconv) return;
@@ -4100,11 +4379,12 @@ void QXDirect::OnNPlot()
 }
 
 
-
+/**
+ * The user has requested to switch to the OpPoint view
+ */
 void QXDirect::OnOpPoints()
 {
 	if(!m_bPolarView) return;
-//	MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
 
 	m_bPolarView = false;
 	CreateOppCurves();
@@ -4116,10 +4396,12 @@ void QXDirect::OnOpPoints()
 }
 
 
+/**
+ * The user has requested to switch to the Polar view
+ */
 void QXDirect::OnPolars()
 {
 	if(m_bPolarView) return;
-//	MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
 	m_bPolarView = true;
 	CreatePolarCurves();
 	SetCurveParams();
@@ -4128,7 +4410,9 @@ void QXDirect::OnPolars()
 	UpdateView();
 }
 
-
+/**
+ * The user has requested the launch of the interface used to filter the type of polars to be displayed.
+ */
 void QXDirect::OnPolarFilter()
 {
 	m_pPolarFilterDlg->m_bMiarex = false;
@@ -4153,7 +4437,10 @@ void QXDirect::OnPolarFilter()
 }
 
 
-void QXDirect::OnPanels()
+/**
+ * The user has requested the launch of the interface to refine globally the Foil
+*/
+void QXDirect::OnRefinePanelsGlobally()
 {
 	MainFrame* pMainFrame = (MainFrame*)s_pMainFrame;
 	if(!MainFrame::s_pCurFoil)	return;
@@ -4210,6 +4497,9 @@ void QXDirect::OnPanels()
 }
 
 
+/**
+ * The user has requested the display of the velocity in the Cp graph.
+ */
 void QXDirect::OnQGraph()
 {
 	m_bPolarView = false;
@@ -4231,7 +4521,9 @@ void QXDirect::OnQGraph()
 	UpdateView();
 }
 
-
+/**
+ * The user has requested to rename the Polar
+ */
 void QXDirect::OnRenamePolar()
 {
 	if(!m_pCurPolar) return;
@@ -4346,6 +4638,57 @@ void QXDirect::OnRenamePolar()
 }
 
 
+/**
+ *The user has requested the display of the detailed properties of the active OpPoint object.
+ */
+void QXDirect::OnOpPointProps()
+{
+	if(!m_pCurPolar) return;
+	m_pObjectPropsDlg->m_pXDirect = this;
+	m_pObjectPropsDlg->m_pOpp = m_pCurOpp;
+	m_pObjectPropsDlg->m_pPolar = NULL;
+	m_pObjectPropsDlg->m_pMiarex = NULL;
+	m_pObjectPropsDlg->m_pWOpp = NULL;
+	m_pObjectPropsDlg->m_pWPolar = NULL;
+	m_pObjectPropsDlg->InitDialog();
+	m_pObjectPropsDlg->exec();
+}
+
+
+
+
+/**
+ *The user has requested the display of the detailed properties of the active Polar object.
+ */
+void QXDirect::OnPolarProps()
+{
+	if(!m_pCurPolar) return;
+	m_pObjectPropsDlg->m_pXDirect = this;
+	m_pObjectPropsDlg->m_pOpp = NULL;
+	m_pObjectPropsDlg->m_pPolar = m_pCurPolar;
+	m_pObjectPropsDlg->m_pMiarex = NULL;
+	m_pObjectPropsDlg->m_pWOpp = NULL;
+	m_pObjectPropsDlg->m_pWPolar = NULL;
+	m_pObjectPropsDlg->InitDialog();
+	m_pObjectPropsDlg->exec();
+}
+
+
+
+/**
+ * The user has requested to rename the foil
+ */
+void QXDirect::OnRenameFoil()
+{
+	if(!MainFrame::s_pCurFoil) return;
+	MainFrame* pMainFrame = (MainFrame*)s_pMainFrame;
+	pMainFrame->OnRenameCurFoil();
+}
+
+
+/**
+ * The user has requested to reset all polar graph scales to their automatic default value
+ */
 void QXDirect::OnResetAllPolarGraphsScales()
 {
 	m_PlrGraph[0].SetAuto(true);
@@ -4372,6 +4715,9 @@ void QXDirect::OnResetAllPolarGraphsScales()
 }
 
 
+/**
+ * The user has requested to reset the scale of the foil to its automatic default value
+ */
 void QXDirect::OnResetFoilScale()
 {
 	SetFoilScale();
@@ -4380,13 +4726,19 @@ void QXDirect::OnResetFoilScale()
 }
 
 
+/**
+ * The user has requested to reset the polar legend to its default position
+ */
 void QXDirect::OnResetGraphLegend()
 {
 	SetPolarLegendPos();
 	UpdateView();
 }
 
-
+/**
+ * The user has requested the deletion of the dataof the current Polar.
+ * The associated OpPoint objects will be deleted too.
+ */
 void QXDirect::OnResetCurPolar()
 {
 	if(!m_pCurPolar) return;
@@ -4412,7 +4764,9 @@ void QXDirect::OnResetCurPolar()
 	UpdateView();
 }
 
-
+/**
+ * The user has requested to reset the XFoil settings and parameters to their default value.
+ */
 void QXDirect::OnResetXFoil()
 {
 	m_pXFoil->Initialize();
@@ -4424,81 +4778,9 @@ void QXDirect::OnResetXFoil()
 	m_pctrlInitBL->setChecked(m_bInitBL);
 }
 
-
-
-void QXDirect::OnRtPlot()
-{
-	if(!m_pXFoil->lvconv) return;
-	int i;
-
-	m_pCpGraph->SetYVariable(2);
-	m_XFoilVar=5;
-	m_pCpGraph->DeleteCurves();
-	m_pCpGraph->ResetLimits();
-	m_pCpGraph->SetAuto(true);
-	m_pCpGraph->SetInverted(false);
-	m_pCpGraph->SetYTitle("Re_Theta");
-	Curve * pTopCurve = m_pCpGraph->AddCurve();
-	Curve * pBotCurve = m_pCpGraph->AddCurve();
-	pTopCurve->SetTitle(tr("Top"));
-	pBotCurve->SetTitle(tr("Bot"));
-
-	double x[IVX][3],y[IVX][3];
-	int nside1, nside2;
-
-	m_pXFoil->CreateXBL(x, nside1, nside2);
-	m_pXFoil->FillRTheta(y, nside1, nside2);
-
-	for (i=2; i<=nside1-1; i++)	pTopCurve->AppendPoint(x[i][1], y[i][1]);
-	for (i=2; i<=nside2-1; i++) pBotCurve->AppendPoint(x[i][2], y[i][2]);
-
-	m_pCpGraph->SetXScale();
-	SetFoilScale();
-	SetControls();
-	UpdateView();
-}
-
-
-void QXDirect::OnRtLPlot()
-{
-	if(!m_pXFoil->lvconv) return;
-	int i;
-
-	m_pCpGraph->SetYVariable(2);
-	m_XFoilVar=4;
-	m_pCpGraph->DeleteCurves();
-	m_pCpGraph->ResetLimits();
-	m_pCpGraph->SetAuto(true);
-	m_pCpGraph->SetInverted(false);
-	m_pCpGraph->SetYTitle("Re_Theta");
-	Curve * pTopCurve = m_pCpGraph->AddCurve();
-	Curve * pBotCurve = m_pCpGraph->AddCurve();
-	pTopCurve->SetTitle(tr("Top"));
-	pBotCurve->SetTitle(tr("Bot"));
-
-	double x[IVX][3],y[IVX][3];
-	int nside1, nside2;
-
-	m_pXFoil->CreateXBL(x, nside1, nside2);
-	m_pXFoil->FillRTheta(y, nside1, nside2);
-
-	for (i=2; i<=nside1-1; i++){
-		if (y[i][1]>0.0) y[i][1] = log10( y[i][1] );
-		else             y[i][1] = 0.0;
-		pTopCurve->AppendPoint(x[i][1], y[i][1]);
-	}
-	for (i=2; i<=nside2-1; i++){
-		if (y[i][2]>0.0) y[i][2] = log10( y[i][2] );
-		else             y[i][2] = 0.0;
-		pBotCurve->AppendPoint(x[i][2], y[i][2]);
-	}
-	m_pCpGraph->SetXScale();
-	SetFoilScale();
-	SetControls();
-	UpdateView();
-}
-
-
+/**
+ * The user has requested the creation of a .plr file with the Polars of the active Foil object.
+ */
 void QXDirect::OnSavePolars()
 {
 	if(!MainFrame::s_pCurFoil || !m_poaPolar->size()) return;
@@ -4533,6 +4815,9 @@ void QXDirect::OnSavePolars()
 }
 
 
+/**
+ * The user has toggled the switch for a sequential analysis.
+ */
 void QXDirect::OnSequence()
 {
 	m_bSequence = m_pctrlSequence->isChecked();
@@ -4540,6 +4825,9 @@ void QXDirect::OnSequence()
 }
 
 
+/**
+ * The user has requested the launch of the interface to define a L.E. or T.E. flap.
+ */
 void QXDirect::OnSetFlap()
 {
 	if(!MainFrame::s_pCurFoil) return;
@@ -4589,6 +4877,9 @@ void QXDirect::OnSetFlap()
 }
 
 
+/**
+ * The user has requested the launch of the interface to modify the radius of the Foil's leading edge.
+ */
 void QXDirect::OnSetLERadius()
 {
 	if(!MainFrame::s_pCurFoil)	return;
@@ -4636,7 +4927,9 @@ void QXDirect::OnSetLERadius()
 }
 
 
-
+/**
+ * The user has requested the launch of the interface to modify the gap at the Foil's trailing edge.
+ */
 void QXDirect::OnSetTEGap()
 {
 	MainFrame* pMainFrame = (MainFrame*)s_pMainFrame;
@@ -4690,7 +4983,9 @@ void QXDirect::OnSetTEGap()
 }
 
 
-
+/**
+ * The user has requested the display of all OpPoint curves.
+ */
 void QXDirect::OnShowAllOpps()
 {
 	OpPoint *pOpp;
@@ -4710,7 +5005,9 @@ void QXDirect::OnShowAllOpps()
 }
 
 
-
+/**
+ * The user has requested the display of all Polar curves.
+ */
 void QXDirect::OnShowAllPolars()
 {
 	MainFrame * pMainFrame = (MainFrame*) s_pMainFrame;
@@ -4727,7 +5024,9 @@ void QXDirect::OnShowAllPolars()
 }
 
 
-
+/**
+ * The user has toggled the display of the boundary layer
+ */
 void QXDirect::OnShowBL()
 {
 	if(m_pctrlShowBL->isChecked())
@@ -4744,7 +5043,9 @@ void QXDirect::OnShowBL()
 	if(!m_bAnimate)	UpdateView();
 }
 
-
+/**
+ * The user has toggled the display of the curve of the active object
+ */
 void QXDirect::OnShowCurve()
 {
 	//user has toggled visible switch
@@ -4769,6 +5070,9 @@ void QXDirect::OnShowCurve()
 }
 
 
+/**
+ * The user has requested the display of only the Polar curves associated to the active Foil
+ */
 void QXDirect::OnShowFoilPolarsOnly()
 {
 	if(!MainFrame::s_pCurFoil) return;
@@ -4786,8 +5090,9 @@ void QXDirect::OnShowFoilPolarsOnly()
 }
 
 
-
-
+/**
+ * The user has requested the display of the Polar curves associated to the active Foil
+ */
 void QXDirect::OnShowFoilPolars()
 {
 	if(!MainFrame::s_pCurFoil) return;
@@ -4808,7 +5113,9 @@ void QXDirect::OnShowFoilPolars()
 }
 
 
-
+/**
+ * The user has requested the display of the OpPoint curves associated to the active Foil
+ */
 void QXDirect::OnShowFoilOpps()
 {
 	if(!MainFrame::s_pCurFoil || !m_pCurPolar) return;
@@ -4833,7 +5140,9 @@ void QXDirect::OnShowFoilOpps()
 }
 
 
-
+/**
+ * The user has toggled the display of the neutral line y=0.
+ */
 void QXDirect::OnShowNeutralLine()
 {
 	m_bNeutralLine = !m_bNeutralLine;
@@ -4843,6 +5152,9 @@ void QXDirect::OnShowNeutralLine()
 }
 
 
+/**
+ * The user has toggled the display of the Foil's panels.
+ */
 void QXDirect::OnShowPanels()
 {
 	m_bShowPanels = !m_bShowPanels;
@@ -4852,7 +5164,10 @@ void QXDirect::OnShowPanels()
 }
 
 
-void QXDirect::OnShowPoints()
+/**
+ * The user has toggled the display of the curve's points
+ */
+void QXDirect::OnShowCurvePoints()
 {
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 
@@ -4875,7 +5190,9 @@ void QXDirect::OnShowPoints()
 }
 
 
-
+/**
+ * The user has requested the display of the curves of all OpPoint objects associated to the active Polar.
+ */
 void QXDirect::OnShowPolarOpps()
 {
 	if(!MainFrame::s_pCurFoil || !m_pCurPolar) return;
@@ -4899,7 +5216,9 @@ void QXDirect::OnShowPolarOpps()
 }
 
 
-
+/**
+ * The user has toggled the display of the pressure arrows
+ */
 void QXDirect::OnShowPressure()
 {
 	if(m_pctrlShowPressure->isChecked())
@@ -4917,7 +5236,9 @@ void QXDirect::OnShowPressure()
 }
 
 
-
+/**
+ * The user has requested the display of a single polar graph
+ */
 void QXDirect::OnSinglePolarGraph()
 {
 	QAction *action = qobject_cast<QAction *>(sender());
@@ -4932,7 +5253,9 @@ void QXDirect::OnSinglePolarGraph()
 }
 
 
-
+/**
+ * The user has toggled the switch used to define the type of input parameter bewteen aoa, Cl, and Re
+ */
 void QXDirect::OnSpec()
 {
 	if      (m_pctrlSpec1->isChecked()) m_bAlpha = true;
@@ -4941,70 +5264,27 @@ void QXDirect::OnSpec()
 }
 
 
-
+/**
+ * The user has toggled the switch which defines if OpPoints should be stored at the end of the analysis
+ */
 void QXDirect::OnStoreOpp()
 {
 	m_bStoreOpp = m_pctrlStoreOpp->isChecked();
 }
 
 
-
-void QXDirect::OnUePlot()
-{
-	if(!m_pXFoil->lvconv) return;
-	int i;
-	double x[IVX][3],y[IVX][3];
-	double uei;
-	int nside1, nside2, ibl;
-
-	m_pCpGraph->SetYVariable(2);
-	m_XFoilVar = 9;
-	m_pCpGraph->DeleteCurves();
-	m_pCpGraph->ResetLimits();
-	m_pCpGraph->SetAuto(true);
-	m_pCpGraph->SetInverted(false);
-	m_pCpGraph->SetYTitle("Ue/Vinf");
-	Curve * pTopCurve = m_pCpGraph->AddCurve();
-	Curve * pBotCurve = m_pCpGraph->AddCurve();
-	pTopCurve->SetTitle(tr("Top"));
-	pBotCurve->SetTitle(tr("Bot"));
-
-	m_pXFoil->CreateXBL(x, nside1, nside2);
-	//---- fill compressible ue arrays
-	for (ibl=2; ibl<= nside1;ibl++)
-	{
-		uei = m_pXFoil->uedg[ibl][1];
-		y[ibl][1] = uei * (1.0-m_pXFoil->tklam)
-						/ (1.0-m_pXFoil->tklam*(uei/m_pXFoil->qinf)*(uei/m_pXFoil->qinf));
-	}
-	for (ibl=2; ibl<= nside2;ibl++)
-	{
-		uei = m_pXFoil->uedg[ibl][2];
-		y[ibl][2] = uei * (1.0-m_pXFoil->tklam)
-						/ (1.0-m_pXFoil->tklam*(uei/m_pXFoil->qinf)*(uei/m_pXFoil->qinf));
-	}
-
-	for (i=2; i<=nside1-1; i++)
-	{
-		pTopCurve->AppendPoint(x[i][1], y[i][1]);
-	}
-	for (i=2; i<=nside2-1; i++)
-	{
-		pBotCurve->AppendPoint(x[i][2], y[i][2]);
-	}
-	m_pCpGraph->SetXScale();
-	SetFoilScale();
-	SetControls();
-	UpdateView();
-}
-
-
+/**
+ * The user has toggled the switch which defines if the analysis will be viscous or inviscid
+ */
 void QXDirect::OnViscous()
 {
 	m_bViscous = m_pctrlViscous->isChecked();
 }
 
 
+/**
+ * The user has requested the launch of the interface used to define the display style of the Foil
+ */
 void QXDirect::OnXDirectStyle()
 {
 	m_pXDirectStyleDlg->m_pXDirect = this;
@@ -5035,6 +5315,9 @@ void QXDirect::OnXDirectStyle()
 
 
 
+/**
+ * The user has requested the launch of the interface used to define advanced settings for the XFoil analysis
+ */
 void QXDirect::OnXFoilAdvanced()
 {
 	m_pXFoilAdvancedDlg->m_IterLimit = m_IterLim;
@@ -5052,7 +5335,12 @@ void QXDirect::OnXFoilAdvanced()
 	}
 }
 
-
+/**
+ * The method which draws the boundary layer in the OpPoint view.
+ * @param painter a reference to the QPainter object with which to draw
+ * @param pOpPoint the OpPoint object to draw
+ * @param scale the scale of the view
+ */
 void QXDirect::PaintBL(QPainter &painter, OpPoint* pOpPoint, double scale)
 {
 	QPoint offset, From, To;
@@ -5118,6 +5406,12 @@ void QXDirect::PaintBL(QPainter &painter, OpPoint* pOpPoint, double scale)
 }
 
 
+/**
+ * The method which draws the pressure arrows in the OpPoint view.
+ * @param painter a reference to the QPainter object with which to draw
+ * @param pOpPoint the OpPoint object to draw
+ * @param scale the scale of the view
+ */
 void QXDirect::PaintPressure(QPainter &painter, OpPoint* pOpPoint, double scale)
 {
 	if(!pOpPoint->m_bViscResults ) return;
@@ -5242,6 +5536,10 @@ void QXDirect::PaintPressure(QPainter &painter, OpPoint* pOpPoint, double scale)
 }
 
 
+/**
+ * Draws a pair of polar graphs
+ * @param painter a reference to the QPainter object with which to draw
+ */
 void QXDirect::PaintCoupleGraphs(QPainter &painter)
 {
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
@@ -5263,6 +5561,10 @@ void QXDirect::PaintCoupleGraphs(QPainter &painter)
 }
 
 
+/**
+ * Draws the Cp Graph and the foil
+ * @param painter a reference to the QPainter object with which to draw
+ */
 void QXDirect::PaintOpPoint(QPainter &painter)
 {
 	static double Alpha, FoilScale;
@@ -5514,7 +5816,10 @@ void QXDirect::PaintOpPoint(QPainter &painter)
 }
 
 
-
+/**
+ * Paints all polar graphs
+ * @param painter a reference to the QPainter object with which to draw
+ */
 void QXDirect::PaintPolarGraphs(QPainter &painter)
 {
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
@@ -5545,6 +5850,13 @@ void QXDirect::PaintPolarGraphs(QPainter &painter)
 }
 
 
+/**
+ * Paints the legend of the polar graphs
+ * @param place the top-left point where the legend will be placed
+ * @param bottom the number of pixels to the bottom of the client area
+ * @param painter a reference to the QPainter object with which to draw
+ *@todo position improvement required for the two graph display
+ */
 void QXDirect::PaintPolarLegend(QPoint place, int bottom, QPainter &painter)
 {
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
@@ -5660,6 +5972,10 @@ void QXDirect::PaintPolarLegend(QPoint place, int bottom, QPainter &painter)
 }
 
 
+/**
+ * Paints a single polar graph, referenced by it index m_iPlrGraph
+ * @param painter a reference to the QPainter object with which to draw
+ */
 void QXDirect::PaintSingleGraph(QPainter &painter)
 {
 	MainFrame* pMainFrame = (MainFrame*)s_pMainFrame;
@@ -5680,7 +5996,10 @@ void QXDirect::PaintSingleGraph(QPainter &painter)
 }
 
 
-
+/**
+ * Paints the view. Calls either the painting of the OpPoint or the polar view.
+ * @param painter a reference to the QPainter object with which to draw
+ */
 void QXDirect::PaintView(QPainter &painter)
 {
 	MainFrame* pMainFrame = (MainFrame*)s_pMainFrame;
@@ -5701,6 +6020,9 @@ void QXDirect::PaintView(QPainter &painter)
 }
 
 
+/**
+ * Reads the analysis parameters from the widgets.
+ */
 void QXDirect::ReadParams()
 {
 	if(!m_pCurPolar) return;
@@ -5738,6 +6060,10 @@ void QXDirect::ReadParams()
 }
 
 
+/**
+ * Saves the user-defined settings
+ * @param pSettings a pointer to the QSetting object.
+ */
 void QXDirect::SaveSettings(QSettings *pSettings)
 {
 	QString str1, str2, str3;
@@ -5842,7 +6168,9 @@ void QXDirect::SaveSettings(QSettings *pSettings)
 	m_pCpGraph->SaveSettings(pSettings);
 }
 
-
+/**
+ * Initializes the widget values, depending on the type of Polar
+ */
 void QXDirect::SetAnalysisParams()
 {
 	m_pctrlViscous->setChecked(m_bViscous);
@@ -5883,6 +6211,11 @@ void QXDirect::SetAnalysisParams()
 }
 
 
+/**
+ * Sets the buffer Foil as a copy of the active Foil.
+ * All geometric modifications are made on the buffer foil.
+ * The buffer foil is the one displayed in the OpPoint view.
+ */
 void QXDirect::SetBufferFoil()
 {
 	if(!MainFrame::s_pCurFoil || !MainFrame::s_pCurFoil->m_FoilName.length()) return;
@@ -5896,6 +6229,9 @@ void QXDirect::SetBufferFoil()
 }
 
 
+/**
+ * Updates the combobox widgets with the curve data from the active OpPoint or Polar, depending on the active view.
+ */
 void QXDirect::SetCurveParams()
 {
 	if(m_bPolarView)
@@ -5951,7 +6287,14 @@ void QXDirect::SetCurveParams()
 }
 
 
-
+/**
+ * Initializes QXDirect with the data of the input Foil object.
+ * If no Foil is proposed in input, sets the first stock Foil in alphabetical order.
+ * Sets the first Polar object belonging to this Foil, if any.
+ * Sets the first OpPoint object belonging to this Polar, if any.
+ * @param pFoil a pointer to the active Foil object, or NULL if a stock Foil should be used.
+ * @return a pointer to the Foil object which has been set.
+ */
 Foil* QXDirect::SetFoil(Foil* pFoil)
 {
 //	MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
@@ -5999,6 +6342,13 @@ Foil* QXDirect::SetFoil(Foil* pFoil)
 }
 
 
+/**
+ * Initializes QXDirect with the specified name
+ * Sets the first Polar object belonging to this Foil, if any.
+ * Sets the first OpPoint object belonging to this Polar, if any.
+ * @param FoilName to name of the Foil object to set.
+ * @return a pointer to the Foil object which has been set.
+ */
 Foil* QXDirect::SetFoil(QString FoilName)
 {
 //	MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
@@ -6065,8 +6415,10 @@ Foil* QXDirect::SetFoil(QString FoilName)
 }
 
 
-
-
+/**
+ * Sets the Foil scale in the OpPoint view.
+ * @param CltRect the size of the client rectangle
+ */
 void QXDirect::SetFoilScale(QRect CltRect)
 {
 	m_rCltRect = CltRect;
@@ -6078,6 +6430,9 @@ void QXDirect::SetFoilScale(QRect CltRect)
 }
 
 
+/**
+ * Sets the Foil scale in the OpPoint view.
+ */
 void QXDirect::SetFoilScale()
 {
 	QRect rect(10, 10, + m_rCltRect.width()-20, m_rCltRect.height()-2*m_FoilYPos);
@@ -6096,6 +6451,10 @@ void QXDirect::SetFoilScale()
 }
 
 
+/**
+ * Calculates the moments acting on the flap hinges
+ * @param pOpPoint
+ */
 void QXDirect::SetHingeMoments(OpPoint *pOpPoint)
 {
 //	bool bFound;
@@ -6176,6 +6535,15 @@ void QXDirect::SetHingeMoments(OpPoint *pOpPoint)
 	}
 }
 
+
+/**
+ * Initializes QXDirect with the specified Polar object.
+ * If the specified polar is not valid, a stock polar associated to the current foil will be set.
+ * Sets the first OpPoint object belonging to this Polar, if any.
+ * Initializes the XFoil object with the Polar's data.
+ * @param pPolar a pointer to the Polar object to set. If NULL, a stock polar associated to the current foil will be set.
+ * @return a pointer to the Polar object which has been set.
+ */
 Polar * QXDirect::SetPolar(Polar *pPolar)
 {
 	// Finds the plr
@@ -6244,6 +6612,14 @@ Polar * QXDirect::SetPolar(Polar *pPolar)
 }
 
 
+/**
+ * Initializes QXDirect with the Polar with the specified name and associated to the active Foil object.
+ * If the specified polar is not valid, a stock polar associated to the current foil will be set.
+ * Sets the first OpPoint object belonging to this Polar, if any.
+ * Initializes the XFoil object with the Polar's data.
+ * @param pPolar a pointer to the Polar object to set. If NULL, a stock polar associated to the current foil will be set.
+ * @return a pointer to the Polar object which has been set.
+ */
 Polar * QXDirect::SetPolar(QString PlrName)
 {
 	// Finds the plr with name PlrName
@@ -6322,6 +6698,12 @@ Polar * QXDirect::SetPolar(QString PlrName)
 
 
 
+/**
+ * Initializes QXDirect with the OpPoint with the specified aoa.
+ * If the OpPoint cannot be found for the active Foil and Polar, a stock OpPoint associated to the current foil and polar will be set.
+ * @param Alpha the aoa of the OpPoint to ser
+ * @return a pointer to the OpPoint object which has been set.
+ */
 OpPoint * QXDirect::SetOpp(double Alpha)
 {
 	// set the opp, if valid
@@ -6380,7 +6762,9 @@ OpPoint * QXDirect::SetOpp(double Alpha)
 }
 
 
-
+/**
+ * Initializes the widgets with the sequence parameters for the type of the active Polar object.
+ */
 void QXDirect::SetOpPointSequence()
 {
 	m_pctrlSequence->setEnabled(m_pCurPolar);
@@ -6453,7 +6837,10 @@ void QXDirect::SetOpPointSequence()
 }
 
 
-
+/**
+ * Sets the axis titles for the specified graph
+ * @param pGraph a pointer to the Graph object for which the titles will be set
+ */
 void QXDirect::SetGraphTitles(Graph* pGraph)
 {
 	if(!pGraph) return;
@@ -6468,7 +6855,9 @@ void QXDirect::SetGraphTitles(Graph* pGraph)
 }
 
 
-
+/**
+ * Sets the position of the polar graph legend, depending on the number of requested graphs
+ */
 void QXDirect::SetPolarLegendPos()
 {
 	int h   = m_rCltRect.height();
@@ -6496,7 +6885,9 @@ void QXDirect::SetPolarLegendPos()
 	}
 }
 
-
+/**
+ * Creates the GUI associated to the toolbar.
+ */
 void QXDirect::SetupLayout()
 {
 	setAttribute(Qt::WA_AlwaysShowToolTips);
@@ -6668,7 +7059,9 @@ void QXDirect::SetupLayout()
 	setSizePolicy(szPolicyMaximum);
 }
 
-
+/**
+ * Interrupts the OpPoint animation
+ */
 void QXDirect::StopAnimate()
 {
 	if(m_bAnimate)
@@ -6680,8 +7073,10 @@ void QXDirect::StopAnimate()
 	}
 }
 
-
-void QXDirect::UpdateCurve()
+/**
+ * Updates the curve's style based on the selection in the comboboxes.
+ */
+void QXDirect::UpdateCurveStyle()
 {
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 
@@ -6704,7 +7099,9 @@ void QXDirect::UpdateCurve()
 	pMainFrame->SetSaveState(false);
 }
 
-
+/**
+ * Refreshes the 2d central display.
+ */
 void QXDirect::UpdateView()
 {
 	TwoDWidget *p2DWidget = (TwoDWidget*)s_p2DWidget;
@@ -6716,6 +7113,12 @@ void QXDirect::UpdateView()
 }
 
 
+
+/**
+ * Overrides the QWidget's wheelEvent method.
+ * Dispatches the event
+ * @param event the QWheelEvent
+ */
 void QXDirect::wheelEvent (QWheelEvent *event )
 {
 //	point is in client coordinates
@@ -6776,44 +7179,5 @@ void QXDirect::wheelEvent (QWheelEvent *event )
 }
 
 
-
-
-void QXDirect::OnOpPointProps()
-{
-	if(!m_pCurPolar) return;
-	m_pObjectPropsDlg->m_pXDirect = this;
-	m_pObjectPropsDlg->m_pOpp = m_pCurOpp;
-	m_pObjectPropsDlg->m_pPolar = NULL;
-	m_pObjectPropsDlg->m_pMiarex = NULL;
-	m_pObjectPropsDlg->m_pWOpp = NULL;
-	m_pObjectPropsDlg->m_pWPolar = NULL;
-	m_pObjectPropsDlg->InitDialog();
-	m_pObjectPropsDlg->exec();
-}
-
-
-
-void QXDirect::OnPolarProps()
-{
-	if(!m_pCurPolar) return;
-	m_pObjectPropsDlg->m_pXDirect = this;
-	m_pObjectPropsDlg->m_pOpp = NULL;
-	m_pObjectPropsDlg->m_pPolar = m_pCurPolar;
-	m_pObjectPropsDlg->m_pMiarex = NULL;
-	m_pObjectPropsDlg->m_pWOpp = NULL;
-	m_pObjectPropsDlg->m_pWPolar = NULL;
-	m_pObjectPropsDlg->InitDialog();
-	m_pObjectPropsDlg->exec();
-}
-
-
-
-
-void QXDirect::OnRenameFoil()
-{
-	if(!MainFrame::s_pCurFoil) return;
-	MainFrame* pMainFrame = (MainFrame*)s_pMainFrame;
-	pMainFrame->OnRenameCurFoil();
-}
 
 

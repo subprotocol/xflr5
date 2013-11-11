@@ -104,7 +104,7 @@ void ObjectPropsDlg::InitDialog()
 		}
 		else if(m_pWOpp)
 		{
-			m_pWOpp->GetWOppProperties(strange, true);
+			m_pWOpp->GetWingOppProperties(strange);
 			setWindowTitle(tr("Operating Point Properties"));
 		}
 	}

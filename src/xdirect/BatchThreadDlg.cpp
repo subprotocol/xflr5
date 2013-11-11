@@ -345,7 +345,6 @@ void BatchThreadDlg::CleanUp()
  * @param Mach  the value of the Mach number
  * @param NCrit the value of the transition criterion
  * @return a pointer to the Polar object which has been created
- *@todo why no Re in input ?
  */
 Polar * BatchThreadDlg::CreatePolar(Foil *pFoil, double Re, double Mach, double NCrit)
 {

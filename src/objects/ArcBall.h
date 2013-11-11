@@ -78,7 +78,7 @@
 
 
 /**
-*@class Arcball
+*@class ArcBall
 *@brief
  * This class defines the Arcball object used for the calculation of rotations in 3D display.
  *

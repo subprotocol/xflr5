@@ -1,7 +1,7 @@
 /****************************************************************************
 
-	WOpp Class
-	Copyright (C) 2005-2010 Andre Deperrois adeperrois@xflr5.com
+	WingOpp Class
+	Copyright (C) 2005-2013 Andre Deperrois adeperrois@xflr5.com
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -31,6 +31,10 @@
 void *WingOpp::s_pMainFrame;
 void *WingOpp::s_pMiarex;
 
+
+/**
+ * The public constructor.
+ */
 WingOpp::WingOpp()
 {
 	m_bOut         = false;
@@ -40,7 +44,7 @@ WingOpp::WingOpp()
 
 	m_bIsVisible  = true;
 	m_bShowPoints = false;
-	m_WingType    = 0;
+//	m_WingType    = 0;
 
 	m_Color = QColor(255,0,0);
 	m_Style = 0;
@@ -109,7 +113,12 @@ WingOpp::WingOpp()
 	memset(m_FlapMoment,0,sizeof(m_FlapMoment));
 }
 
-
+/**
+ * Exports the data of the WingOpp to a text file
+ * @param out the instance of output QtextStream
+ * @param FileType TXT if the data is separated by spaces, CSV for a comma separator
+ * @return true if the export was successful, false otherwise.
+ */
 bool WingOpp::Export(QTextStream &out, enumTextFileType FileType)
 {
 	QString Header, strong, Format;
@@ -148,7 +157,11 @@ bool WingOpp::Export(QTextStream &out, enumTextFileType FileType)
 }
 
 
-
+/**
+ * Returns the maximum value of the local lift along the span.
+ * Used to calibrate the display of the optimal elliptic curve in hte WingOpp graph.
+ * @return the maximum local lift.
+*/
 double WingOpp::GetMaxLift()
 {
 	int i,nStart;
@@ -167,16 +180,13 @@ double WingOpp::GetMaxLift()
 }
 
 
-void WingOpp::GetBWStyle(QColor &color, int &style, int &width)
-{
-	color = m_Color;
-	style = m_Style;
-	width = m_Width;
-}
-
-
-
-bool WingOpp::SerializeWOpp(QDataStream &ar, bool bIsStoring)
+/**
+ * Loads or saves the data of this WingOpp to a binary file
+ * @param ar the QDataStream object from/to which the data should be serialized
+ * @param bIsStoring true if saving the data, false if loading
+ * @return true if the operation was successful, false otherwise
+ */
+bool WingOpp::SerializeWingOpp(QDataStream &ar, bool bIsStoring)
 {
 	int ArchiveFormat;
 	int a,p,k,l,n;
@@ -266,7 +276,7 @@ bool WingOpp::SerializeWOpp(QDataStream &ar, bool bIsStoring)
 			for (p=0; p<m_NVLMPanels;p++)	ar << (float)m_Sigma[p] ;
 		}
 
-		ar << m_WingType;
+		ar << 0; // m_WingType;
 		ar << m_nWakeNodes << m_NXWakePanels << m_FirstWakePanel << m_WakeFactor;
 		ar << m_nFlaps;
 		for(k=0; k<m_nFlaps; k++)
@@ -489,7 +499,7 @@ bool WingOpp::SerializeWOpp(QDataStream &ar, bool bIsStoring)
 		}
 		if(ArchiveFormat>=1004)
 		{
-			ar>> m_WingType;
+			ar>> k; //m_WingType;
 		}
 		if(ArchiveFormat>=1008)
 		{
@@ -620,7 +630,12 @@ bool WingOpp::SerializeWOpp(QDataStream &ar, bool bIsStoring)
 
 
 
-void WingOpp::GetWOppProperties(QString &WOppProperties, bool bData)
+/**
+ * Returns a QString object holding the description and value of the WingOpp's parameters
+ * @param &WingOppProperties the reference of the QString object to be filled with the description
+ * @param bData true if the analysis data should be appended to the string
+ */
+void WingOpp::GetWingOppProperties(QString &WingOppProperties)
 {
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	QString strong, strange, lenunit, massunit, speedunit;
@@ -629,155 +644,155 @@ void WingOpp::GetWOppProperties(QString &WOppProperties, bool bData)
 	GetSpeedUnit(speedunit, pMainFrame->m_SpeedUnit);
 
 
-	WOppProperties.clear();
+	WingOppProperties.clear();
 
 	if(m_WPolarType==FIXEDSPEEDPOLAR)     strong += "Type 1 ("+QObject::tr("Fixed speed") +")\n";
 	else if(m_WPolarType==FIXEDLIFTPOLAR) strong += "Type 2 ("+QObject::tr("Fixed lift") +")\n";
 	else if(m_WPolarType==FIXEDAOAPOLAR)  strong += "Type 3 ("+QObject::tr("Fixed angle of attack") +")\n";
 	else if(m_WPolarType==STABILITYPOLAR) strong += "Type 4 ("+QObject::tr("Stability analysis") +")\n";
-	WOppProperties += strong;
+	WingOppProperties += strong;
 
 //	WOppProperties += QObject::tr("Method")+" = ";
-	if(m_AnalysisMethod==LLTMETHOD)                             WOppProperties +=QObject::tr("LLT");
-	else if(m_AnalysisMethod==PANELMETHOD && !m_bThinSurface)   WOppProperties +=QObject::tr("3D-Panels");
-	else if(m_AnalysisMethod==PANELMETHOD && m_bVLM1)           WOppProperties +=QObject::tr("3D-Panels/VLM1");
-	else if(m_AnalysisMethod==PANELMETHOD && !m_bVLM1)          WOppProperties +=QObject::tr("3D-Panels/VLM2");
-	WOppProperties +="\n";
+	if(m_AnalysisMethod==LLTMETHOD)                             WingOppProperties +=QObject::tr("LLT");
+	else if(m_AnalysisMethod==PANELMETHOD && !m_bThinSurface)   WingOppProperties +=QObject::tr("3D-Panels");
+	else if(m_AnalysisMethod==PANELMETHOD && m_bVLM1)           WingOppProperties +=QObject::tr("3D-Panels/VLM1");
+	else if(m_AnalysisMethod==PANELMETHOD && !m_bVLM1)          WingOppProperties +=QObject::tr("3D-Panels/VLM2");
+	WingOppProperties +="\n";
 
 
-	if(m_bTiltedGeom) WOppProperties += QObject::tr("Tilted geometry")+"\n";
+	if(m_bTiltedGeom) WingOppProperties += QObject::tr("Tilted geometry")+"\n";
 
-	if(m_bOut) WOppProperties += "Point is out of the flight envelope\n";
+	if(m_bOut) WingOppProperties += "Point is out of the flight envelope\n";
 
 	strong  = QString(QObject::tr("VInf")+"  =%1 ").arg(m_QInf*pMainFrame->m_mstoUnit,7,'f',3);
-	WOppProperties += "\n"+strong + speedunit+"\n";
+	WingOppProperties += "\n"+strong + speedunit+"\n";
 
 	strong  = QString(QObject::tr("Alpha")+" =%1").arg(m_Alpha,7,'f',2);
-	WOppProperties += strong +QString::fromUtf8("°")+"\n";
+	WingOppProperties += strong +QString::fromUtf8("°")+"\n";
 
 	strong  = QString(QObject::tr("Mass")+"  = %1 ").arg(m_Weight*pMainFrame->m_kgtoUnit,7,'f',3);
-	WOppProperties += strong + massunit + "\n";
+	WingOppProperties += strong + massunit + "\n";
 
 	if(fabs(m_Beta)>PRECISION)
 	{
 		strong  = QString(QObject::tr("Beta")+"  = %1").arg(m_Beta,7,'f',2);
-		WOppProperties += strong +QString::fromUtf8("°")+"\n\n";
+		WingOppProperties += strong +QString::fromUtf8("°")+"\n\n";
 	}
 
 	if(m_WPolarType==STABILITYPOLAR)
 	{
 		strong  = QString(QObject::tr("Control value")+" = %1").arg(m_Ctrl,5,'f',2);
-		WOppProperties += strong +"\n";
+		WingOppProperties += strong +"\n";
 		strong  = QString(QObject::tr("XNP")+" = %1 ").arg(m_XNP*pMainFrame->m_mtoUnit,7,'f',3);
-		WOppProperties += "\n"+strong +lenunit+"\n";
+		WingOppProperties += "\n"+strong +lenunit+"\n";
 	}
 	strong  = QString(QObject::tr("XCP")+" = %1 ").arg(m_CP.x*pMainFrame->m_mtoUnit,7,'f',3);
-	WOppProperties += strong +lenunit+"\n";
+	WingOppProperties += strong +lenunit+"\n";
 	strong  = QString(QObject::tr("YCP")+" = %1 ").arg(m_CP.y*pMainFrame->m_mtoUnit,7,'f',3);
-    WOppProperties += strong +lenunit+"\n";
+	WingOppProperties += strong +lenunit+"\n";
 	strong  = QString(QObject::tr("ZCP")+" = %1 ").arg(m_CP.z*pMainFrame->m_mtoUnit,7,'f',3);
-    WOppProperties += strong +lenunit+"\n\n";
+	WingOppProperties += strong +lenunit+"\n\n";
 
 
 	strong  = QString(QObject::tr("CL")+"  = %1").arg(m_CL,9,'f',5);
-	WOppProperties += strong +"\n";
+	WingOppProperties += strong +"\n";
 	strong  = QString(QObject::tr("CD")+"  = %1").arg(m_ICD+m_VCD,9,'f',5);
-	WOppProperties += strong +"\n";
+	WingOppProperties += strong +"\n";
 	strong  = QString(QObject::tr("VCD")+" = %1").arg(m_VCD,9,'f',5);
-	WOppProperties += strong +"\n";
+	WingOppProperties += strong +"\n";
 	strong  = QString(QObject::tr("ICD")+" = %1").arg(m_ICD,9,'f',5);
-	WOppProperties += strong +"\n";
+	WingOppProperties += strong +"\n";
 	strong  = QString(QObject::tr("CX")+"  = %1").arg(m_CX,9,'f',5);
-	WOppProperties += strong +"\n";
+	WingOppProperties += strong +"\n";
 	strong  = QString(QObject::tr("CY")+"  = %1").arg(m_CY,9,'f',5);
-	WOppProperties += strong +"\n";
+	WingOppProperties += strong +"\n";
 
 	strong  = QString(QObject::tr("Cl")+"  = %1").arg(m_GRm,9,'f',5);
-	WOppProperties += strong +"\n";
+	WingOppProperties += strong +"\n";
 
 	strong  = QString(QObject::tr("Cm")+"  = %1").arg(m_GCm,9,'f',5);
-	WOppProperties += strong +"\n";
+	WingOppProperties += strong +"\n";
 	strong  = QString(QObject::tr("ICm")+" = %1").arg(m_ICm,9,'f',5);
-	WOppProperties += strong +"\n";
+	WingOppProperties += strong +"\n";
 	strong  = QString(QObject::tr("VCm")+" = %1").arg(m_VCm,9,'f',5);
-	WOppProperties += strong +"\n";
+	WingOppProperties += strong +"\n";
 
 	strong  = QString(QObject::tr("Cn")+"  = %1").arg(m_GYm,9,'f',5);
-	WOppProperties += strong +"\n";
+	WingOppProperties += strong +"\n";
 	strong  = QString(QObject::tr("ICn")+" = %1").arg(m_IYm,9,'f',5);
-	WOppProperties += strong +"\n";
+	WingOppProperties += strong +"\n";
 	strong  = QString(QObject::tr("VCn")+" = %1").arg(m_VYm,9,'f',5);
-	WOppProperties += strong +"\n";
+	WingOppProperties += strong +"\n";
 
 	if(m_nFlaps>0)
 	{
-		WOppProperties += "\n";
+		WingOppProperties += "\n";
 		for(int ip=0; ip<m_nFlaps; ip++)
 		{
 			strong = QString("Flap Moment[%1] = %2").arg(ip+1).arg(m_FlapMoment[ip]*pMainFrame->m_NmtoUnit, 7,'g',3);
 			GetMomentUnit(strange, pMainFrame->m_MomentUnit);
-			WOppProperties += strong + strange +"\n";
+			WingOppProperties += strong + strange +"\n";
 		}
 	}
 
 
 	if(m_WPolarType==STABILITYPOLAR)
 	{
-		WOppProperties += "\n\n";
-		WOppProperties += QObject::tr("Non-dimensional Stability Derivatives:")+"\n";
+		WingOppProperties += "\n\n";
+		WingOppProperties += QObject::tr("Non-dimensional Stability Derivatives:")+"\n";
 		strong  = QString(QObject::tr("CXu")+"  = %1").arg(CXu,9,'f',5);
-		WOppProperties += strong +"\n";
+		WingOppProperties += strong +"\n";
 		strong  = QString(QObject::tr("CLu")+"  = %1").arg(-CZu,9,'f',5);
-		WOppProperties += strong +"\n";
+		WingOppProperties += strong +"\n";
 		strong  = QString(QObject::tr("Cmu")+"  = %1").arg(Cmu,9,'f',5);
-		WOppProperties += strong +"\n\n";
+		WingOppProperties += strong +"\n\n";
 		strong  = QString(QObject::tr("CXa")+"  = %1").arg(CXa,9,'f',5);
-		WOppProperties += strong +"\n";
+		WingOppProperties += strong +"\n";
 		strong  = QString(QObject::tr("CLa")+"  = %1").arg(CLa,9,'f',5);
-		WOppProperties += strong +"\n";
+		WingOppProperties += strong +"\n";
 		strong  = QString(QObject::tr("Cma")+"  = %1").arg(Cma,9,'f',5);
-		WOppProperties += strong +"\n\n";
+		WingOppProperties += strong +"\n\n";
 		strong  = QString(QObject::tr("CXq")+"  = %1").arg(CXq,9,'f',5);
-		WOppProperties += strong +"\n";
+		WingOppProperties += strong +"\n";
 		strong  = QString(QObject::tr("CLq")+"  = %1").arg(CLq,9,'f',5);
-		WOppProperties += strong +"\n";
+		WingOppProperties += strong +"\n";
 		strong  = QString(QObject::tr("Cmq")+"  = %1").arg(Cmq,9,'f',5);
-		WOppProperties += strong +"\n\n";
+		WingOppProperties += strong +"\n\n";
 		strong  = QString(QObject::tr("CYb")+"  = %1").arg(CYb,9,'f',5);
-		WOppProperties += strong +"\n";
+		WingOppProperties += strong +"\n";
 		strong  = QString(QObject::tr("Clb")+"  = %1").arg(Clb,9,'f',5);
-		WOppProperties += strong +"\n";
+		WingOppProperties += strong +"\n";
 		strong  = QString(QObject::tr("Cnb")+"  = %1").arg(Cnb,9,'f',5);
-		WOppProperties += strong +"\n\n";
+		WingOppProperties += strong +"\n\n";
 		strong  = QString(QObject::tr("CYp")+"  = %1").arg(CYp,9,'f',5);
-		WOppProperties += strong +"\n";
+		WingOppProperties += strong +"\n";
 		strong  = QString(QObject::tr("Clp")+"  = %1").arg(Clp,9,'f',5);
-		WOppProperties += strong +"\n";
+		WingOppProperties += strong +"\n";
 		strong  = QString(QObject::tr("Cnp")+"  = %1").arg(Cnp,9,'f',5);
-		WOppProperties += strong +"\n\n";
+		WingOppProperties += strong +"\n\n";
 		strong  = QString(QObject::tr("CYr")+"  = %1").arg(CYr,9,'f',5);
-		WOppProperties += strong +"\n";
+		WingOppProperties += strong +"\n";
 		strong  = QString(QObject::tr("Clr")+"  = %1").arg(Clr,9,'f',5);
-		WOppProperties += strong +"\n";
+		WingOppProperties += strong +"\n";
 		strong  = QString(QObject::tr("Cnr")+"  = %1").arg(Cnr,9,'f',5);
-		WOppProperties += strong +"\n\n";
+		WingOppProperties += strong +"\n\n";
 
 		if(m_nControls>0)
 		{
 			// (only one)
-			WOppProperties += QObject::tr("Non-dimensional Control Derivatives:")+"\n";
+			WingOppProperties += QObject::tr("Non-dimensional Control Derivatives:")+"\n";
 			strong  = QString(QObject::tr("CXd")+"  = %1").arg(CXe,9,'f',5);
-			WOppProperties += strong +"\n";
+			WingOppProperties += strong +"\n";
 			strong  = QString(QObject::tr("CYd")+"  = %1").arg(CYe,9,'f',5);
-			WOppProperties += strong +"\n";
+			WingOppProperties += strong +"\n";
 			strong  = QString(QObject::tr("CZd")+"  = %1").arg(CZe,9,'f',5);
-			WOppProperties += strong +"\n";
+			WingOppProperties += strong +"\n";
 			strong  = QString(QObject::tr("Cld")+"  = %1").arg(CLe,9,'f',5);
-			WOppProperties += strong +"\n";
+			WingOppProperties += strong +"\n";
 			strong  = QString(QObject::tr("Cmd")+"  = %1").arg(CMe,9,'f',5);
-			WOppProperties += strong +"\n";
+			WingOppProperties += strong +"\n";
 			strong  = QString(QObject::tr("Cnd")+"  = %1").arg(CNe,9,'f',5);
-			WOppProperties += strong +"\n";
+			WingOppProperties += strong +"\n";
 		}
 
 		complex<double> c, angle;
@@ -787,7 +802,7 @@ void WingOpp::GetWOppProperties(QString &WOppProperties, bool bData)
 		span = m_Span;
 
 
-		WOppProperties += "\nLongitudinal modes:\n";
+		WingOppProperties += "\nLongitudinal modes:\n";
 		for(int im=0; im<4; im++)
 		{
 			c = m_EigenValue[im];
@@ -802,42 +817,42 @@ void WingOpp::GetWOppProperties(QString &WOppProperties, bool bData)
 
 			if(c.imag()>=0.0) strange = QString("  Eigenvalue    = %1+%2i").arg(c.real(),10,'f',5).arg(c.imag(),10,'f',5);
 			else              strange = QString("  Eigenvalue    = %1-%2i").arg(c.real(),10,'f',5).arg(fabs(c.imag()),10,'f',5);
-			WOppProperties += strange +"\n";
+			WingOppProperties += strange +"\n";
 
 			strange = QString("  Undamped Natural Frequency = %1 Hz").arg(OmegaN/2.0/PI, 8,'f',3);
-			WOppProperties += strange +"\n";
+			WingOppProperties += strange +"\n";
 
 			strange = QString("  Damped Natural Frequency   = %1 Hz").arg(Omega1/2.0/PI, 8,'f',3);
-			WOppProperties += strange +"\n";
+			WingOppProperties += strange +"\n";
 
 			strange = QString("  Damping Ratio              = %1 ").arg(Dsi, 8,'f',3);
-			WOppProperties += strange +"\n";
+			WingOppProperties += strange +"\n";
 
 
-			WOppProperties += "  Normalized Eigenvector:\n";
+			WingOppProperties += "  Normalized Eigenvector:\n";
 			angle = m_EigenVector[im][3];
 			c = m_EigenVector[im][0]/u0;
 			if(c.imag()>=0.0) strange = QString("    u/u0          = %1+%2i").arg(c.real(),10,'f',5).arg(c.imag(),10,'f',5);
 			else              strange = QString("    u/u0          = %1-%2i").arg(c.real(),10,'f',5).arg(fabs(c.imag()),10,'f',5);
-			WOppProperties += strange +"\n";
+			WingOppProperties += strange +"\n";
 
 			c = m_EigenVector[im][1]/u0;
 			if(c.imag()>=0.0) strange = QString("    w/u0          = %1+%2i").arg(c.real(),10,'f',5).arg(c.imag(),10,'f',5);
 			else              strange = QString("    w/u0          = %1-%2i").arg(c.real(),10,'f',5).arg(fabs(c.imag()),10,'f',5);
-			WOppProperties += strange +"\n";
+			WingOppProperties += strange +"\n";
 
 			c = m_EigenVector[im][2]/(2.0*u0/mac);
 			if(c.imag()>=0.0) strange = QString("    q/(2.u0.MAC)  = %1+%2i").arg(c.real(),10,'f',5).arg(c.imag(),10,'f',5);
 			else              strange = QString("    q/(2.u0.MAC)  = %1-%2i").arg(c.real(),10,'f',5).arg(fabs(c.imag()),10,'f',5);
-			WOppProperties += strange +"\n";
+			WingOppProperties += strange +"\n";
 
 			c = m_EigenVector[im][3]/angle;
 			if(c.imag()>=0.0) strange = QString("    theta(rad)    = %1+%2i").arg(c.real(),10,'f',5).arg(c.imag(),10,'f',5);
 			else              strange = QString("    theta(rad)    = %1-%2i").arg(c.real(),10,'f',5).arg(fabs(c.imag()),10,'f',5);
-			WOppProperties += strange +"\n\n";
+			WingOppProperties += strange +"\n\n";
 		}
 
-		WOppProperties += "\nLateral modes:\n";
+		WingOppProperties += "\nLateral modes:\n";
 		for(int im=4; im<8; im++)
 		{
 			c = m_EigenValue[im];
@@ -852,41 +867,41 @@ void WingOpp::GetWOppProperties(QString &WOppProperties, bool bData)
 
 			if(c.imag()>=0.0) strange = QString("  Eigenvalue    = %1+%2i").arg(c.real(),10,'f',5).arg(c.imag(),10,'f',5);
 			else              strange = QString("  Eigenvalue    = %1-%2i").arg(c.real(),10,'f',5).arg(fabs(c.imag()),10,'f',5);
-			WOppProperties += strange +"\n";
+			WingOppProperties += strange +"\n";
 
 			strange = QString("  Undamped Natural Frequency = %1 Hz").arg(OmegaN/2.0/PI, 8,'f',3);
-			WOppProperties += strange +"\n";
+			WingOppProperties += strange +"\n";
 
 			strange = QString("  Damped Natural Frequency   = %1 Hz").arg(Omega1/2.0/PI, 8,'f',3);
-			WOppProperties += strange +"\n";
+			WingOppProperties += strange +"\n";
 
 			strange = QString("  Damping Ratio              = %1 ").arg(Dsi, 8,'f',3);
-			WOppProperties += strange +"\n";
+			WingOppProperties += strange +"\n";
 
 
-			WOppProperties += "  Normalized Eigenvector:\n";
+			WingOppProperties += "  Normalized Eigenvector:\n";
 
 			angle = m_EigenVector[im][3];
 
 			c = m_EigenVector[im][0]/u0;
 			if(c.imag()>=0.0) strange = QString("    v/u0          = %1+%2i").arg(c.real(),10,'f',5).arg(c.imag(),10,'f',5);
 			else              strange = QString("    v/u0          = %1-%2i").arg(c.real(),10,'f',5).arg(fabs(c.imag()),10,'f',5);
-			WOppProperties += strange +"\n";
+			WingOppProperties += strange +"\n";
 
 			c = m_EigenVector[im][1]/(2.0*u0/span);
 			if(c.imag()>=0.0) strange = QString("    p/(2.u0.Span) = %1+%2i").arg(c.real(),10,'f',5).arg(c.imag(),10,'f',5);
 			else              strange = QString("    p/(2.u0.Span) = %1-%2i").arg(c.real(),10,'f',5).arg(fabs(c.imag()),10,'f',5);
-			WOppProperties += strange +"\n";
+			WingOppProperties += strange +"\n";
 
 			c = m_EigenVector[im][2]/(2.0*u0/span);
 			if(c.imag()>=0.0) strange = QString("    r/(2.u0.Span) = %1+%2i").arg(c.real(),10,'f',5).arg(c.imag(),10,'f',5);
 			else              strange = QString("    r/(2.u0.Span) = %1-%2i").arg(c.real(),10,'f',5).arg(fabs(c.imag()),10,'f',5);
-			WOppProperties += strange +"\n";
+			WingOppProperties += strange +"\n";
 
 			c = m_EigenVector[im][3]/angle;
 			if(c.imag()>=0.0) strange = QString("    phi(rad)      = %1+%2i").arg(c.real(),10,'f',5).arg(c.imag(),10,'f',5);
 			else              strange = QString("    phi(rad)      = %1-%2i").arg(c.real(),10,'f',5).arg(fabs(c.imag()),10,'f',5);
-			WOppProperties += strange +"\n\n";
+			WingOppProperties += strange +"\n\n";
 		}
 
 	}

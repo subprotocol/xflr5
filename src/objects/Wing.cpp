@@ -99,8 +99,6 @@ Wing::Wing()
 	m_CL                = 0.0;
 	m_CDv               = 0.0;
 	m_CDi               = 0.0;
-//	m_RollingMoment     = 0.0;
-//	m_PitchingMoment    = 0.0;
 	m_GYm               = 0.0;
 	m_IYm               = 0.0;
 	m_GCm               = 0.0;
@@ -125,8 +123,8 @@ Wing::Wing()
 
 	m_nFlaps        =  0;
 	m_WingSection.clear();
-	AppendWingSection(.180, .0, 0.0, 1.0, 0.000, 19, 13, 0, 0, "", "");
-	AppendWingSection(.110, .0, 1.0, 1.0, 0.070, 19, 13, 0, 0, "", "");
+	AppendWingSection(.180, .0, 0.0, 1.0, 0.000, 13, 19, COSINE, INVERSESINE, "", "");
+	AppendWingSection(.110, .0, 1.0, 1.0, 0.070, 13, 5,  COSINE, UNIFORM, "", "");
 
 	ComputeGeometry();
 
@@ -134,8 +132,8 @@ Wing::Wing()
 	for (int is=0; is<m_WingSection.size(); is++)
 	{
 		length += Length(is);
-		YPosition(is)     = length;
-		XPanelDist(is) =  1;
+		YPosition(is)  = length;
+		XPanelDist(is) =  COSINE;
 	}
 }
 
@@ -154,11 +152,12 @@ void Wing::ImportDefinition(QString path_to_file)
 	double twist;
 	int nx;
 	int ny;
-	int x_pan_dist;
-	int y_pan_dist;
+	int px, py;
+	enumPanelDistribution x_pan_dist;
+	enumPanelDistribution y_pan_dist;
 	char right_buff[512];
 	char left_buff[512];
-	QString left_af, right_af;
+
 	unsigned counter = 0;
 
 	
@@ -170,11 +169,27 @@ void Wing::ImportDefinition(QString path_to_file)
 			QTextStream infile(&fp);
 			m_WingSection.clear();
 			this->m_WingName = infile.readLine();
-			while (true){
+			while (true)
+			{
 				counter++;
-				infile >> ypos >> chord >> offset >> dihedral >> twist >> nx >> ny >> x_pan_dist >> y_pan_dist >> right_buff >> left_buff;
-				qDebug()<<counter<<" ";
-				if (infile.atEnd()){
+				infile >> ypos >> chord >> offset >> dihedral >> twist >> nx >> ny;
+
+				infile >> px >> py;
+
+				if(px ==2)         x_pan_dist = INVERSESINE;
+				else if(px ==  1)  x_pan_dist  = COSINE;
+				else if(px == -2)  x_pan_dist  = SINE;
+				else               x_pan_dist  = UNIFORM;
+
+				if(py ==2)         y_pan_dist = INVERSESINE;
+				else if(py ==  1)  y_pan_dist  = COSINE;
+				else if(py == -2)  y_pan_dist  = SINE;
+				else               y_pan_dist  = UNIFORM;
+
+				infile >> right_buff >> left_buff;
+
+				if (infile.atEnd())
+				{
 					fp.close();
 					break;
 				}
@@ -204,7 +219,7 @@ void Wing::ImportDefinition(QString path_to_file)
 		{
 			length += Length(is);
 			YPosition(is)     = length;
-			XPanelDist(is) =  1;
+			XPanelDist(is) =  COSINE;
 		}
 	}
 	catch (iostream::failure e){
@@ -219,7 +234,7 @@ void Wing::ImportDefinition(QString path_to_file)
 void Wing::ExportDefinition(QString path_to_file)
 {
 	try{
-	QFile fp(path_to_file);
+		QFile fp(path_to_file);
 		if (!fp.open(QIODevice::WriteOnly)) {
 			QMessageBox::warning(0, QObject::tr("Warning"), QObject::tr("Could not open the file for writing"));
 			return;
@@ -227,10 +242,47 @@ void Wing::ExportDefinition(QString path_to_file)
 			QTextStream out_file(&fp);
 			//Iterate the wing sections are write out the data...
 			out_file << this->m_WingName << endl;
-			for (int is=0; is<m_WingSection.size(); is++) {
+			for (int is=0; is<m_WingSection.size(); is++)
+			{
 				out_file << YPosition(is) << " " << Chord(is) << " " << Offset(is) \
 						<< " " << Dihedral(is) << " " << Twist(is) << " " << NXPanels(is) \
-						<< " " << NYPanels(is) << " " << XPanelDist(is) << " " << YPanelDist(is);
+						<< " " << NYPanels(is) << " ";
+
+				switch(XPanelDist(is))
+				{
+					case COSINE:
+						out_file <<  1;
+						break;
+					case SINE:
+						out_file <<  2;
+						break;
+					case INVERSESINE:
+						out_file << -2;
+						break;
+					default:
+						out_file <<  0; //uniform
+						break;
+				}
+
+				out_file << " " ;
+
+				switch(YPanelDist(is))
+				{
+					case COSINE:
+						out_file <<  1;
+						break;
+					case SINE:
+						out_file <<  2;
+						break;
+					case INVERSESINE:
+						out_file << -2;
+						break;
+					default:
+						out_file <<  0; //uniform
+						break;
+				}
+
+
 				if(RightFoil(is).isEmpty()){
 					out_file  << " " << "/_/";
 				} else {
@@ -414,10 +466,10 @@ void Wing::ComputeVolumeInertia(CVector &CoG, double &CoGIxx, double &CoGIyy, do
 				xrel  = 1.0 - 1.0/2.0 * (1.0-cos((double) l   *PI /(double)NXStations));
 				xrel1 = 1.0 - 1.0/2.0 * (1.0-cos((double)(l+1)*PI /(double)NXStations));
 
-				m_Surface[j].GetPoint(xrel, xrel, yrel, ATop,  1);
-				m_Surface[j].GetPoint(xrel, xrel, yrel, ABot, -1);
-				m_Surface[j].GetPoint(xrel1, xrel1, yrel, CTop,  1);
-				m_Surface[j].GetPoint(xrel1, xrel1, yrel, CBot, -1);
+				m_Surface[j].GetSurfacePoint(xrel, xrel, yrel, ATop,  1);
+				m_Surface[j].GetSurfacePoint(xrel, xrel, yrel, ABot, -1);
+				m_Surface[j].GetSurfacePoint(xrel1, xrel1, yrel, CTop,  1);
+				m_Surface[j].GetSurfacePoint(xrel1, xrel1, yrel, CBot, -1);
 				PtVolume[p] = (ATop+ABot+CTop+CBot)/4.0;
 				Diag1 = ATop - CBot;
 				Diag2 = ABot - CTop;
@@ -557,7 +609,6 @@ void Wing::CreateSurfaces(CVector const &T, double XTilt, double YTilt)
 	double MinPanelSize;
 
 	MainFrame *pMainFrame  = (MainFrame*)s_pMainFrame;
-//	QMiarex   *pMiarex     = (QMiarex*)s_pMiarex;
 
 	if(QMiarex::s_MinPanelSize>0.0) MinPanelSize = QMiarex::s_MinPanelSize;
 	else                            MinPanelSize = 0.0;
@@ -638,13 +689,13 @@ void Wing::CreateSurfaces(CVector const &T, double XTilt, double YTilt)
 			m_Surface[iSurf].m_NXPanels = NXPanels(jss);
 			m_Surface[iSurf].m_NYPanels = NYPanels(jss);
 
+
 			//AVL coding + invert sine and -sine for left wing
 			m_Surface[iSurf].m_XDistType = XPanelDist(jss);
-
-			if(YPanelDist(jss) ==2)        m_Surface[iSurf].m_YDistType = -2;
-			else if(YPanelDist(jss) ==  1) m_Surface[iSurf].m_YDistType =  1;
-			else if(YPanelDist(jss) == -2) m_Surface[iSurf].m_YDistType =  2;
-			else                           m_Surface[iSurf].m_YDistType =  0;
+			if(YPanelDist(jss) ==SINE)               m_Surface[iSurf].m_YDistType = INVERSESINE;
+			else if(YPanelDist(jss) ==  COSINE)      m_Surface[iSurf].m_YDistType =  COSINE;
+			else if(YPanelDist(jss) == INVERSESINE)  m_Surface[iSurf].m_YDistType =  SINE;
+			else                                     m_Surface[iSurf].m_YDistType =  UNIFORM;
 
 			m_Surface[iSurf].CreateXPoints();
 			m_Surface[iSurf].SetFlap();
@@ -709,11 +760,7 @@ void Wing::CreateSurfaces(CVector const &T, double XTilt, double YTilt)
 
 				//AVL coding + invert sine and -sine for left wing
 				m_Surface[iSurf].m_XDistType = XPanelDist(jss);
-
-				if(YPanelDist(jss) ==2)        m_Surface[iSurf].m_YDistType = 2;
-				else if(YPanelDist(jss) ==  1) m_Surface[iSurf].m_YDistType =  1;
-				else if(YPanelDist(jss) == -2) m_Surface[iSurf].m_YDistType = -2;
-				else                           m_Surface[iSurf].m_YDistType =  0;
+				m_Surface[iSurf].m_YDistType = YPanelDist(jss);
 
 				m_Surface[iSurf].CreateXPoints();
 				m_Surface[iSurf].SetFlap();
@@ -1949,8 +1996,46 @@ bool Wing::SerializeWing(QDataStream &ar, bool bIsStoring)
 		ar<<0;
 		for (i=0; i<NWingSection(); i++) ar << NXPanels(i);
 		for (i=0; i<NWingSection(); i++) ar << NYPanels(i);
-		for (i=0; i<NWingSection(); i++) ar << XPanelDist(i);//1005
-		for (i=0; i<NWingSection(); i++) ar << YPanelDist(i);
+//		for (i=0; i<NWingSection(); i++) ar << XPanelDist(i);//1005
+//		for (i=0; i<NWingSection(); i++) ar << YPanelDist(i);
+
+		for (int is=0; is<NWingSection(); is++)
+		{
+			switch(XPanelDist(is))
+			{
+				case COSINE:
+					ar <<  1;
+					break;
+				case SINE:
+					ar <<  2;
+					break;
+				case INVERSESINE:
+					ar << -2;
+					break;
+				default:
+					ar <<  0; //uniform
+					break;
+			}
+		}
+
+		for (int is=0; is<NWingSection(); is++)
+		{
+			switch(YPanelDist(is))
+			{
+				case COSINE:
+					ar <<  1;
+					break;
+				case SINE:
+					ar <<  2;
+					break;
+				case INVERSESINE:
+					ar << -2;
+					break;
+				default:
+					ar <<  0; //uniform
+					break;
+			}
+		}
 
 		WriteCOLORREF(ar,m_WingColor);
 
@@ -2129,12 +2214,23 @@ bool Wing::SerializeWing(QDataStream &ar, bool bIsStoring)
 
 		if (ArchiveFormat >=1005)
 		{
-			for(int is=0; is<=NPanel; is++) ar >> XPanelDist(is);
+			for(int is=0; is<=NPanel; is++)
+			{
+				ar >> k;
+				if(k==1)       XPanelDist(is) = COSINE;
+				else if(k==2)  XPanelDist(is) = SINE;
+				else if(k==-2) XPanelDist(is) = INVERSESINE;
+				else           XPanelDist(is) = UNIFORM;  //case 0
+			}
 		}
 
 		for (int is=0; is<=NPanel; is++)
 		{
-			ar >> YPanelDist(is);
+			ar >> k;
+			if(k==1)       YPanelDist(is) = COSINE;
+			else if(k==2)  YPanelDist(is) = SINE;
+			else if(k==-2) YPanelDist(is) = INVERSESINE;
+			else           YPanelDist(is) = UNIFORM;  //case 0
 		}
 
 		if(ArchiveFormat>=1006)
@@ -2584,13 +2680,13 @@ int & Wing::NYPanels(const int &iSection)   {return m_WingSection[iSection]->m_N
 *@param iSection the index of the section
 *@return the type of distribution of chordwise panels - always cosine type
 */
-int & Wing::XPanelDist(const int &iSection) {return m_WingSection[iSection]->m_XPanelDist;}
+enumPanelDistribution & Wing::XPanelDist(const int &iSection) {return m_WingSection[iSection]->m_XPanelDist;}
 
 /** Returns the type of distribution of spanwise panels at a span section identified by its index
 *@param iSection the index of the section
 *@return the type of distribution of spanwise panels
 */
-int & Wing::YPanelDist(const int &iSection) {return m_WingSection[iSection]->m_YPanelDist;}
+enumPanelDistribution & Wing::YPanelDist(const int &iSection) {return m_WingSection[iSection]->m_YPanelDist;}
 
 /**
  * Returns the name of the foil on the right side of a span section
@@ -2646,17 +2742,17 @@ bool Wing::AppendWingSection()
  * Appends a new section at the tip of the wing, with values specified as input parameters
  */
 bool Wing::AppendWingSection(double Chord, double Twist, double Pos, double Dihedral, double Offset,
-					   int NXPanels, int NYPanels, int XPanelDist, int YPanelDist,
-						QString RightFoilName, QString LeftFoilName)
+							 int NXPanels, int NYPanels, enumPanelDistribution XPanelDist, enumPanelDistribution YPanelDist,
+							 QString RightFoilName, QString LeftFoilName)
 {
 	if(m_WingSection.size()>MAXSPANSECTIONS) return false;
 
 	m_WingSection.append(new WingSection());
-	m_WingSection.last()->m_Chord     = Chord;
-	m_WingSection.last()->m_Twist     = Twist;
-	m_WingSection.last()->m_YPosition       = Pos ;
-	m_WingSection.last()->m_Dihedral  = Dihedral;
-	m_WingSection.last()->m_Offset    = Offset ;
+	m_WingSection.last()->m_Chord      = Chord;
+	m_WingSection.last()->m_Twist      = Twist;
+	m_WingSection.last()->m_YPosition  = Pos ;
+	m_WingSection.last()->m_Dihedral   = Dihedral;
+	m_WingSection.last()->m_Offset     = Offset ;
 
 	m_WingSection.last()->m_NXPanels   = NXPanels ;
 	m_WingSection.last()->m_NYPanels   = NYPanels;

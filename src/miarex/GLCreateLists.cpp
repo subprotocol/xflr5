@@ -81,8 +81,8 @@ void GLCreateGeom(void *pQMiarex, Wing *pWing, int List, Body *pBody)
 				for (l=0; l<SIDEPOINTS; l++)
 				{
 					x = xDistrib[l];
-					pWing->m_Surface[j].GetPoint(x,x,0.0,PtA, PtNormal,1);
-					pWing->m_Surface[j].GetPoint(x,x,1.0,PtB, PtNormal,1);
+					pWing->m_Surface[j].GetSurfacePointNormal(x,x,0.0,PtA, PtNormal,1);
+					pWing->m_Surface[j].GetSurfacePointNormal(x,x,1.0,PtB, PtNormal,1);
 
 					if(pBody && pWing->m_Surface[j].IsCenterSurf() && pWing->m_Surface[j].IsLeftSurf())
 					{
@@ -111,8 +111,8 @@ void GLCreateGeom(void *pQMiarex, Wing *pWing, int List, Body *pBody)
 				for (l=0; l<SIDEPOINTS; l++)
 				{
 					x = xDistrib[l];
-					pWing->m_Surface[j].GetPoint(x,x,0.0,PtA, PtNormal,-1);
-					pWing->m_Surface[j].GetPoint(x,x,1.0,PtB, PtNormal,-1);
+					pWing->m_Surface[j].GetSurfacePointNormal(x,x,0.0,PtA, PtNormal,-1);
+					pWing->m_Surface[j].GetSurfacePointNormal(x,x,1.0,PtB, PtNormal,-1);
 
 					if(pBody && pWing->m_Surface[j].IsCenterSurf() && pWing->m_Surface[j].IsLeftSurf())
 					{
@@ -155,11 +155,11 @@ void GLCreateGeom(void *pQMiarex, Wing *pWing, int List, Body *pBody)
 					for (l=0; l<SIDEPOINTS; l++)
 					{
 						x = xDistrib[l];
-						pWing->m_Surface[j].GetPoint(x,x,0.0,Pt, PtNormal,1);
+						pWing->m_Surface[j].GetSurfacePointNormal(x,x,0.0,Pt, PtNormal,1);
 
 						glVertex3d(Pt.x, Pt.y, Pt.z);
 
-						pWing->m_Surface[j].GetPoint(x,x,0.0,Pt, PtNormal,-1);
+						pWing->m_Surface[j].GetSurfacePointNormal(x,x,0.0,Pt, PtNormal,-1);
 						glVertex3d(Pt.x, Pt.y, Pt.z);
 					}
 				}
@@ -187,11 +187,11 @@ void GLCreateGeom(void *pQMiarex, Wing *pWing, int List, Body *pBody)
 					for (l=0; l<SIDEPOINTS; l++)
 					{
 						x = xDistrib[l];
-						pWing->m_Surface[j].GetPoint(x,x,1.0,Pt, PtNormal,1);
+						pWing->m_Surface[j].GetSurfacePointNormal(x,x,1.0,Pt, PtNormal,1);
 
 						glVertex3d(Pt.x, Pt.y, Pt.z);
 
-						pWing->m_Surface[j].GetPoint(x,x,1.0,Pt, PtNormal,-1);
+						pWing->m_Surface[j].GetSurfacePointNormal(x,x,1.0,Pt, PtNormal,-1);
 						glVertex3d(Pt.x, Pt.y, Pt.z);
 					}
 				}
@@ -237,8 +237,8 @@ void GLCreateGeom(void *pQMiarex, Wing *pWing, int List, Body *pBody)
 					else
 					{
 						x = xDistrib[l];
-						pWing->m_Surface[j].GetPoint(x ,x ,0.0 ,PtA, PtNormal, 1);
-						pWing->m_Surface[j].GetPoint(x, x, 1.0, PtB, PtNormal, 1);
+						pWing->m_Surface[j].GetSurfacePointNormal(x ,x ,0.0 ,PtA, PtNormal, 1);
+						pWing->m_Surface[j].GetSurfacePointNormal(x, x, 1.0, PtB, PtNormal, 1);
 					}
 					glVertex3d(PtA.x, PtA.y, PtA.z);
 				}
@@ -258,8 +258,8 @@ void GLCreateGeom(void *pQMiarex, Wing *pWing, int List, Body *pBody)
 					else
 					{
 						x = (double)l/(double)(SIDEPOINTS-1);
-						pWing->m_Surface[j].GetPoint(x ,x ,0.0 ,PtA, PtNormal, -1);
-						pWing->m_Surface[j].GetPoint(x, x, 1.0, PtB, PtNormal, -1);
+						pWing->m_Surface[j].GetSurfacePointNormal(x ,x ,0.0 ,PtA, PtNormal, -1);
+						pWing->m_Surface[j].GetSurfacePointNormal(x, x, 1.0, PtB, PtNormal, -1);
 					}
 
 					glVertex3d(PtA.x, PtA.y, PtA.z);
@@ -280,8 +280,8 @@ void GLCreateGeom(void *pQMiarex, Wing *pWing, int List, Body *pBody)
 					else
 					{
 						x = xDistrib[l];
-						pWing->m_Surface[j].GetPoint(x ,x ,0.0 ,PtA, PtNormal, 1);
-						pWing->m_Surface[j].GetPoint(x, x, 1.0, PtB, PtNormal, 1);
+						pWing->m_Surface[j].GetSurfacePointNormal(x ,x ,0.0 ,PtA, PtNormal, 1);
+						pWing->m_Surface[j].GetSurfacePointNormal(x, x, 1.0, PtB, PtNormal, 1);
 					}
 
 					glVertex3d(PtB.x, PtB.y, PtB.z);
@@ -301,8 +301,8 @@ void GLCreateGeom(void *pQMiarex, Wing *pWing, int List, Body *pBody)
 					else
 					{
 						x = xDistrib[l];
-						pWing->m_Surface[j].GetPoint(x ,x ,0.0 ,PtA, PtNormal, -1);
-						pWing->m_Surface[j].GetPoint(x, x, 1.0, PtB, PtNormal, -1);
+						pWing->m_Surface[j].GetSurfacePointNormal(x ,x ,0.0 ,PtA, PtNormal, -1);
+						pWing->m_Surface[j].GetSurfacePointNormal(x, x, 1.0, PtB, PtNormal, -1);
 					}
 
 					glVertex3d(PtB.x, PtB.y, PtB.z);
@@ -354,34 +354,34 @@ void GLCreateGeom(void *pQMiarex, Wing *pWing, int List, Body *pBody)
 				glBegin(GL_LINES);
 				{
 					if(pFoilA->m_bTEFlap)
-						pWing->m_Surface[j].GetPoint(pWing->m_Surface[j].m_pFoilA->m_TEXHinge/100.0,
-													 pWing->m_Surface[j].m_pFoilA->m_TEXHinge/100.0,
-													 0.0, Pt, 1);
-					else 	pWing->m_Surface[j].GetPoint(1.0, 1.0, 0.0, Pt, 1);
+						pWing->m_Surface[j].GetSurfacePoint(pWing->m_Surface[j].m_pFoilA->m_TEXHinge/100.0,
+															pWing->m_Surface[j].m_pFoilA->m_TEXHinge/100.0,
+															0.0, Pt, 1);
+					else 	pWing->m_Surface[j].GetSurfacePoint(1.0, 1.0, 0.0, Pt, 1);
 					glVertex3d(Pt.x, Pt.y, Pt.z);
 
 					if(pFoilB->m_bTEFlap)
-						pWing->m_Surface[j].GetPoint(pWing->m_Surface[j].m_pFoilB->m_TEXHinge/100.0,
-													 pWing->m_Surface[j].m_pFoilB->m_TEXHinge/100.0,
-													 1.0, Pt, 1);
-					else 	pWing->m_Surface[j].GetPoint(1.0, 1.0, 1.0, Pt, 1);
+						pWing->m_Surface[j].GetSurfacePoint(pWing->m_Surface[j].m_pFoilB->m_TEXHinge/100.0,
+															pWing->m_Surface[j].m_pFoilB->m_TEXHinge/100.0,
+															1.0, Pt, 1);
+					else 	pWing->m_Surface[j].GetSurfacePoint(1.0, 1.0, 1.0, Pt, 1);
 					glVertex3d(Pt.x, Pt.y, Pt.z);
 				}
 				glEnd();
 				glBegin(GL_LINES);
 				{
 					if(pFoilA->m_bTEFlap)
-						pWing->m_Surface[j].GetPoint(pWing->m_Surface[j].m_pFoilA->m_TEXHinge/100.0,
-													 pWing->m_Surface[j].m_pFoilA->m_TEXHinge/100.0,
-													 0.0, Pt, -1);
-					else 	pWing->m_Surface[j].GetPoint(1.0, 1.0, 0.0, Pt, -1);
+						pWing->m_Surface[j].GetSurfacePoint(pWing->m_Surface[j].m_pFoilA->m_TEXHinge/100.0,
+															pWing->m_Surface[j].m_pFoilA->m_TEXHinge/100.0,
+															0.0, Pt, -1);
+					else 	pWing->m_Surface[j].GetSurfacePoint(1.0, 1.0, 0.0, Pt, -1);
 					glVertex3d(Pt.x, Pt.y, Pt.z);
 
 					if(pFoilB->m_bTEFlap)
-						pWing->m_Surface[j].GetPoint(pWing->m_Surface[j].m_pFoilB->m_TEXHinge/100.0,
-													 pWing->m_Surface[j].m_pFoilB->m_TEXHinge/100.0,
-													 1.0, Pt, -1);
-					else 	pWing->m_Surface[j].GetPoint(1.0, 1.0, 1.0, Pt, -1);
+						pWing->m_Surface[j].GetSurfacePoint(pWing->m_Surface[j].m_pFoilB->m_TEXHinge/100.0,
+															pWing->m_Surface[j].m_pFoilB->m_TEXHinge/100.0,
+															1.0, Pt, -1);
+					else 	pWing->m_Surface[j].GetSurfacePoint(1.0, 1.0, 1.0, Pt, -1);
 					glVertex3d(Pt.x, Pt.y, Pt.z);
 				}
 				glEnd();
@@ -396,34 +396,34 @@ void GLCreateGeom(void *pQMiarex, Wing *pWing, int List, Body *pBody)
 				glBegin(GL_LINES);
 				{
 					if(pFoilA->m_bLEFlap)
-						pWing->m_Surface[j].GetPoint(pWing->m_Surface[j].m_pFoilA->m_LEXHinge/100.0,
-													 pWing->m_Surface[j].m_pFoilA->m_LEXHinge/100.0,
-													 0.0, Pt, 1);
-					else 	pWing->m_Surface[j].GetPoint(1.0, 1.0, 0.0, Pt, 1);
+						pWing->m_Surface[j].GetSurfacePoint(pWing->m_Surface[j].m_pFoilA->m_LEXHinge/100.0,
+															pWing->m_Surface[j].m_pFoilA->m_LEXHinge/100.0,
+															0.0, Pt, 1);
+					else 	pWing->m_Surface[j].GetSurfacePoint(1.0, 1.0, 0.0, Pt, 1);
 					glVertex3d(Pt.x, Pt.y, Pt.z);
 
 					if(pFoilB->m_bLEFlap)
-						pWing->m_Surface[j].GetPoint(pWing->m_Surface[j].m_pFoilB->m_LEXHinge/100.0,
-													 pWing->m_Surface[j].m_pFoilB->m_LEXHinge/100.0,
-													 1.0, Pt, 1);
-					else 	pWing->m_Surface[j].GetPoint(1.0, 1.0, 1.0, Pt, 1);
+						pWing->m_Surface[j].GetSurfacePoint(pWing->m_Surface[j].m_pFoilB->m_LEXHinge/100.0,
+															pWing->m_Surface[j].m_pFoilB->m_LEXHinge/100.0,
+															1.0, Pt, 1);
+					else 	pWing->m_Surface[j].GetSurfacePoint(1.0, 1.0, 1.0, Pt, 1);
 					glVertex3d(Pt.x, Pt.y, Pt.z);
 				}
 				glEnd();
 				glBegin(GL_LINES);
 				{
 					if(pFoilA->m_bLEFlap)
-						pWing->m_Surface[j].GetPoint(pWing->m_Surface[j].m_pFoilA->m_LEXHinge/100.0,
-													 pWing->m_Surface[j].m_pFoilA->m_LEXHinge/100.0,
-													 0.0, Pt, -1);
-					else pWing->m_Surface[j].GetPoint(1.0, 1.0, 0.0, Pt, -1);
+						pWing->m_Surface[j].GetSurfacePoint(pWing->m_Surface[j].m_pFoilA->m_LEXHinge/100.0,
+															pWing->m_Surface[j].m_pFoilA->m_LEXHinge/100.0,
+															0.0, Pt, -1);
+					else pWing->m_Surface[j].GetSurfacePoint(1.0, 1.0, 0.0, Pt, -1);
 					glVertex3d(Pt.x, Pt.y, Pt.z);
 
 					if(pFoilB->m_bLEFlap)
-						pWing->m_Surface[j].GetPoint(pWing->m_Surface[j].m_pFoilB->m_LEXHinge/100.0,
-													 pWing->m_Surface[j].m_pFoilB->m_LEXHinge/100.0,
-													 1.0, Pt, -1);
-					else pWing->m_Surface[j].GetPoint(1.0, 1.0, 1.0, Pt, -1);
+						pWing->m_Surface[j].GetSurfacePoint(pWing->m_Surface[j].m_pFoilB->m_LEXHinge/100.0,
+															pWing->m_Surface[j].m_pFoilB->m_LEXHinge/100.0,
+															1.0, Pt, -1);
+					else pWing->m_Surface[j].GetSurfacePoint(1.0, 1.0, 1.0, Pt, -1);
 					glVertex3d(Pt.x, Pt.y, Pt.z);
 				}
 				glEnd();
@@ -2225,7 +2225,7 @@ void GLCreateTrans(void *pQMiarex, Wing *pWing, WingOpp *pWOpp, int List)
 							for(k=0; k<pWing->m_Surface[j].m_NYPanels; k++)
 							{
 								yrel = pWing->yrel(pWOpp->m_SpanPos[m]);
-								pWing->m_Surface[j].GetPoint(pWOpp->m_XTrTop[m],pWOpp->m_XTrTop[m],yrel,Pt,1);
+								pWing->m_Surface[j].GetSurfacePoint(pWOpp->m_XTrTop[m],pWOpp->m_XTrTop[m],yrel,Pt,1);
 								glVertex3d(Pt.x, Pt.y, Pt.z);
 								m++;
 							}
@@ -2243,7 +2243,7 @@ void GLCreateTrans(void *pQMiarex, Wing *pWing, WingOpp *pWOpp, int List)
 							for(k=0; k<pWing->m_Surface[j].m_NYPanels; k++)
 							{
 								yrel = pWing->yrel(pWOpp->m_SpanPos[m]);
-								pWing->m_Surface[j].GetPoint(pWOpp->m_XTrTop[m],pWOpp->m_XTrTop[m],yrel,Pt,1);
+								pWing->m_Surface[j].GetSurfacePoint(pWOpp->m_XTrTop[m],pWOpp->m_XTrTop[m],yrel,Pt,1);
 								glVertex3d(Pt.x, Pt.y, Pt.z);
 
 								m++;
@@ -2305,7 +2305,7 @@ void GLCreateTrans(void *pQMiarex, Wing *pWing, WingOpp *pWOpp, int List)
 							for(k=0; k<pWing->m_Surface[j].m_NYPanels; k++)
 							{
 								yrel = pWing->yrel(pWOpp->m_SpanPos[m]);
-								pWing->m_Surface[j].GetPoint(pWOpp->m_XTrBot[m],pWOpp->m_XTrBot[m],yrel,Pt,-1);
+								pWing->m_Surface[j].GetSurfacePoint(pWOpp->m_XTrBot[m],pWOpp->m_XTrBot[m],yrel,Pt,-1);
 								glVertex3d(Pt.x, Pt.y, Pt.z);
 								m++;
 							}
@@ -2323,7 +2323,7 @@ void GLCreateTrans(void *pQMiarex, Wing *pWing, WingOpp *pWOpp, int List)
 							for(k=0; k<pWing->m_Surface[j].m_NYPanels; k++)
 							{
 								yrel = pWing->yrel(pWOpp->m_SpanPos[m]);
-								pWing->m_Surface[j].GetPoint(pWOpp->m_XTrBot[m],pWOpp->m_XTrBot[m],yrel,Pt,-1);
+								pWing->m_Surface[j].GetSurfacePoint(pWOpp->m_XTrBot[m],pWOpp->m_XTrBot[m],yrel,Pt,-1);
 								glVertex3d(Pt.x, Pt.y, Pt.z);
 								m++;
 							}
