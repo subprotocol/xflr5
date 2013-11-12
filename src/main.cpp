@@ -34,6 +34,14 @@ int main(int argc, char *argv[])
 #if QT_VERSION >= 0x040600
 //	QGL::setPreferredPaintEngine (QPaintEngine::OpenGL);
 #endif
+#ifdef Q_OS_MACX
+    if ( QSysInfo::MacintoshVersion > QSysInfo::MV_10_8 )
+    {
+        // fix Mac OS X 10.9 (mavericks) font issue
+        // https://bugreports.qt-project.org/browse/QTBUG-32789
+        QFont::insertSubstitution(".Lucida Grande UI", "Lucida Grande");
+    }
+#endif
 	XFLR5Application app(argc, argv);
 	return app.exec();
 }
