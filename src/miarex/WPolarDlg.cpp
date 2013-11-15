@@ -129,7 +129,7 @@ void WPolarDlg::EnableControls()
 
 	m_pctrlViscous->setEnabled(s_WPolar.m_AnalysisMethod==PANELMETHOD);
 	m_pctrlTiltGeom->setEnabled(s_WPolar.m_AnalysisMethod==PANELMETHOD);
-	m_pctrlIgnoreBodyPanels->setEnabled(m_pPlane && m_pPlane->getBody());
+	m_pctrlIgnoreBodyPanels->setEnabled(m_pPlane && m_pPlane->body());
 	m_pctrlBeta->setEnabled(s_WPolar.m_AnalysisMethod==PANELMETHOD);
 	m_pctrlGroundEffect->setEnabled(s_WPolar.m_AnalysisMethod==PANELMETHOD);
 	m_pctrlHeight->setEnabled(m_pctrlGroundEffect->isChecked() && s_WPolar.m_AnalysisMethod==PANELMETHOD);
@@ -241,7 +241,7 @@ void WPolarDlg::InitDialog(Plane *pPlane, Wing *pWing, WPolar *pWPolar)
 	m_pctrlViscous->setChecked(s_WPolar.m_bViscous);
 	m_pctrlTiltGeom->setChecked(s_WPolar.m_bTiltedGeom);
 
-	m_pctrlIgnoreBodyPanels->setChecked(m_pPlane && m_pPlane->getBody() && s_WPolar.m_bIgnoreBodyPanels);
+	m_pctrlIgnoreBodyPanels->setChecked(m_pPlane && m_pPlane->body() && s_WPolar.m_bIgnoreBodyPanels);
 	if(!m_pPlane) s_WPolar.m_bIgnoreBodyPanels=false;
 
 	//	if(s_WPolar.m_bWakeRollUp) 	m_pctrlWakeRollUp->setChecked(true);
@@ -895,7 +895,7 @@ void WPolarDlg::SetWPolarName()
 	else if(s_WPolar.m_AnalysisMethod==VLMMETHOD)
 	{
 		if(pMiarex->m_bVLM1) WPolarName += "-VLM1";
-		else		           WPolarName += "-VLM2";
+		else		         WPolarName += "-VLM2";
 	}
 	else if(s_WPolar.m_AnalysisMethod==PANELMETHOD)
 	{
@@ -943,7 +943,7 @@ void WPolarDlg::SetWPolarName()
 		WPolarName += "-Inviscid";
 	}
 
-	if(s_WPolar.m_bIgnoreBodyPanels && m_pPlane && m_pPlane->getBody())
+	if(s_WPolar.m_bIgnoreBodyPanels && m_pPlane && m_pPlane->body())
     {
 		WPolarName += "-NoBodyPanels";
     }

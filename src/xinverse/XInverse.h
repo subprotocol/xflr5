@@ -204,10 +204,6 @@ private:
 	int m_Mk1;                 /** the index of the first marked point on the graph */
 	int m_Mk2;                 /** the index of the second marked point on the graph */
 
-	int m_tmpPos, m_Pos1, m_Pos2, m_nPos, m_SplineLeftPos, m_SplineRightPos;
-	double xd, yd;
-	double xu, yu;
-
 	double m_fRefScale;        /**< the default scale for the display of the Foil, for the current window size */
 	double m_fScale;           /**< the current scale for the Foil display */
 
@@ -215,14 +211,12 @@ private:
 	int m_ReflectedWidth;      /**< the reflected curve's width */
 	QColor m_ReflectedClr;     /**< the reflected curve's color */
 
-
 	QGraph m_QGraph;           /**< the velocity QGraph object */
 	QGraph *m_pCurGraph;       /**< = &m_QGraph if the mouse hivers over the graph, false otherwise */
 	Curve* m_pQCurve;          /**< a pointer to the inviscid velocity reference Curve */
 	Curve* m_pQVCurve;         /**< a pointer to the viscous velocity reference Curve */
 	Curve* m_pMCurve;          /**< a pointer to the modified specification curve */
 	Curve* m_pReflectedCurve;  /**< a pointer to the reflected curve */
-
 
 	QRect m_rCltRect;          /**< the view's client area, in pixels */
 	QRect m_rGraphRect;        /**< the graph's client are, in pixels */
@@ -233,6 +227,10 @@ private:
 	QPoint m_ptOffset;         /**< the offset position for the display of the Foil */
 
 // temporary allocations
+	int m_tmpPos, m_Pos1, m_Pos2, m_nPos, m_SplineLeftPos, m_SplineRightPos;
+	double xd, yd;
+	double xu, yu;
+
 	QPoint tanpt;
 	QPoint P0, P1, P2;
 

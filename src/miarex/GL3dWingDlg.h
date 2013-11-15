@@ -139,8 +139,6 @@ private:
 	void SetWingScale();
 	void UpdateView();
 
-	bool LoadSettings(QSettings *pSettings);
-	bool SaveSettings(QSettings *pSettings);
 
 
 private:

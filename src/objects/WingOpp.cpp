@@ -20,23 +20,25 @@
 *****************************************************************************/
 
 #include "../mainframe.h"
-#include "../miarex/Miarex.h"
 #include "WingOpp.h"
 #include "Plane.h"
 #include "../globals.h"
 #include <math.h>
 #include <QTextStream>
-
+#include <QtDebug>
 
 void *WingOpp::s_pMainFrame;
-void *WingOpp::s_pMiarex;
 
 
 /**
  * The public constructor.
  */
-WingOpp::WingOpp()
+WingOpp::WingOpp(int PanelArraySize)
 {
+	m_NVLMPanels   = PanelArraySize;
+	m_Cp = m_G = m_Sigma = NULL;
+	Allocate(PanelArraySize);
+
 	m_bOut         = false;
 	m_bVLM1        = true;
 	m_bThinSurface = true;
@@ -44,7 +46,6 @@ WingOpp::WingOpp()
 
 	m_bIsVisible  = true;
 	m_bShowPoints = false;
-//	m_WingType    = 0;
 
 	m_Color = QColor(255,0,0);
 	m_Style = 0;
@@ -56,7 +57,6 @@ WingOpp::WingOpp()
 	m_WakeFactor     = 1.0;
 
 	m_NStation     = 0;
-	m_NVLMPanels   = 0;
 	m_nFlaps       = 0;
 	m_nControls    = 0;
 	m_AnalysisMethod = LLTMETHOD;
@@ -87,7 +87,6 @@ WingOpp::WingOpp()
 	memset(m_EigenValue, 0, sizeof(m_EigenValue)); //four longitudinal and four lateral modes
 	memset(m_EigenVector, 0, sizeof(m_EigenVector));
 
-
 	memset(m_Ai,0,sizeof(m_Ai));
 	memset(m_Twist,0,sizeof(m_Twist));
 	memset(m_Cl,0,sizeof(m_Cl));
@@ -105,12 +104,51 @@ WingOpp::WingOpp()
 	memset(m_XTrTop,0,sizeof(m_XTrTop));
 	memset(m_XTrBot,0,sizeof(m_XTrBot));
 	memset(m_BendingMoment,0,sizeof(m_BendingMoment));
-	memset(m_Cp,0,sizeof(m_Cp));
 	memset(m_Vd,0,sizeof(m_Vd));
 	memset(m_F,0,sizeof(m_F));
-	memset(m_G,0,sizeof(m_G));
-	memset(m_Sigma,0,sizeof(m_Sigma));
+
 	memset(m_FlapMoment,0,sizeof(m_FlapMoment));
+}
+
+
+/**
+ * This course of action will lead us to destruction.
+ */
+WingOpp::~WingOpp()
+{
+	Release();
+}
+
+
+
+/** Allocate memory to the arrays */
+void WingOpp::Allocate(int PanelArraySize)
+{
+	Release();
+
+	m_NVLMPanels = PanelArraySize;
+
+	m_Cp    = new float[PanelArraySize];
+	m_Sigma = new float[PanelArraySize];
+	m_G     = new float[PanelArraySize];
+	memset(m_G,     0, PanelArraySize * sizeof(float));
+	memset(m_Sigma, 0, PanelArraySize * sizeof(float));
+	memset(m_Cp,    0, PanelArraySize * sizeof(float));
+}
+
+
+/**
+ * Releases memory allocated on the heap
+ */
+void WingOpp::Release()
+{
+	if(m_Cp)    delete m_Cp;
+	if(m_Sigma) delete m_Sigma;
+	if(m_G)     delete m_G;
+
+	m_Cp = NULL;
+	m_Sigma = NULL;
+	m_G = NULL;
 }
 
 /**
@@ -228,8 +266,6 @@ bool WingOpp::SerializeWingOpp(QDataStream &ar, bool bIsStoring)
 		else if(m_AnalysisMethod==VLMMETHOD)   ar<<2;
 		else if(m_AnalysisMethod==PANELMETHOD) ar<<3;
 
-
-
 		if(m_bVLM1)        ar << 1; else ar<<0;
 		if(m_bThinSurface) ar << 1; else ar<<0;
 		if(m_bTiltedGeom)  ar << 1; else ar<<0;
@@ -268,12 +304,12 @@ bool WingOpp::SerializeWingOpp(QDataStream &ar, bool bIsStoring)
 		}
 		for (k=0; k<=m_NStation; k++) ar << (float)m_SpanPos[k] << (float)m_StripArea[k];
 		ar << m_NVLMPanels;
-		for (p=0; p<m_NVLMPanels;p++)	ar << (float)m_Cp[p];
-		for (p=0; p<m_NVLMPanels;p++)	ar << (float)m_G[p];
+		for (p=0; p<m_NVLMPanels;p++) ar << m_Cp[p];
+		for (p=0; p<m_NVLMPanels;p++) ar << m_G[p];
 
 		if(m_AnalysisMethod==PANELMETHOD)
 		{
-			for (p=0; p<m_NVLMPanels;p++)	ar << (float)m_Sigma[p] ;
+			for (p=0; p<m_NVLMPanels;p++)	ar << m_Sigma[p] ;
 		}
 
 		ar << 0; // m_WingType;
@@ -472,10 +508,18 @@ bool WingOpp::SerializeWingOpp(QDataStream &ar, bool bIsStoring)
 		if(ArchiveFormat>=1003)
 		{
 			ar>> m_NVLMPanels;
+
+			if(m_G!=NULL)     delete m_G;
+			if(m_Sigma!=NULL) delete m_Sigma;
+			if(m_Cp!=NULL)    delete m_Cp;
+
+			m_G     = new float[m_NVLMPanels];
+			m_Sigma = new float[m_NVLMPanels];
+			m_Cp    = new float[m_NVLMPanels];
+
 			for (p=0; p<m_NVLMPanels;p++)
 			{
 				ar >> f; m_Cp[p] =f;
-
 			}
 		}
 
@@ -906,7 +950,6 @@ void WingOpp::GetWingOppProperties(QString &WingOppProperties)
 
 	}
 }
-
 
 
 

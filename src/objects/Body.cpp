@@ -48,7 +48,7 @@ Body::Body()
 	m_nxPanels = 19;
 	m_nhPanels = 11;
 
-	m_pPanel = NULL; 
+	m_pBodyPanel = NULL; 
 	m_NElements = m_nxPanels * m_nhPanels * 2;
 
 	m_iRes = 31;
@@ -208,16 +208,16 @@ void Body::ComputeAero(double *Cp, double &XCP, double &YCP, double &ZCP,
 
 	for (p=0; p<m_NElements; p++)
 	{
-		PanelForce.x = m_pPanel[p].Normal.x * (-Cp[p]) * m_pPanel[p].Area;
-		PanelForce.y = m_pPanel[p].Normal.y * (-Cp[p]) * m_pPanel[p].Area;
-		PanelForce.z = m_pPanel[p].Normal.z * (-Cp[p]) * m_pPanel[p].Area; // N/q
+		PanelForce.x = m_pBodyPanel[p].Normal.x * (-Cp[p]) * m_pBodyPanel[p].Area;
+		PanelForce.y = m_pBodyPanel[p].Normal.y * (-Cp[p]) * m_pBodyPanel[p].Area;
+		PanelForce.z = m_pBodyPanel[p].Normal.z * (-Cp[p]) * m_pBodyPanel[p].Area; // N/q
 
 		PanelLift = PanelForce.dot(WindNormal);
-		XCP   += m_pPanel[p].CollPt.x * PanelLift;
-		YCP   += m_pPanel[p].CollPt.y * PanelLift;
-        ZCP   += m_pPanel[p].CollPt.z * PanelLift;
+		XCP   += m_pBodyPanel[p].CollPt.x * PanelLift;
+		YCP   += m_pBodyPanel[p].CollPt.y * PanelLift;
+        ZCP   += m_pBodyPanel[p].CollPt.z * PanelLift;
 
-		LeverArm.Set(m_pPanel[p].CollPt.x - CoG.x, m_pPanel[p].CollPt.y, m_pPanel[p].CollPt.z-CoG.z);
+		LeverArm.Set(m_pBodyPanel[p].CollPt.x - CoG.x, m_pBodyPanel[p].CollPt.y, m_pBodyPanel[p].CollPt.z-CoG.z);
 		GeomMoment = LeverArm * PanelForce; // N.m/q
 
 		GCm  += GeomMoment.y;

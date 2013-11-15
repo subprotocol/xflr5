@@ -94,7 +94,7 @@ public:
 	CVector m_Output[IQX2];          /**< the array of output points, size of which is m_iRes @todo use a QVarLengthArray or a QList*/
 
 private:
-	QColor m_Color;                  /**< the spline's color */
+	QColor m_Color;                  /**< the spline's display color */
 	int m_Style;                     /**< the index of the spline's style */
 	int m_Width;                     /**< the width of the spline */
 };

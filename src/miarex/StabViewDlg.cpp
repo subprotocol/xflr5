@@ -1055,13 +1055,11 @@ void StabViewDlg::OnRenameCurve()
 	if(!m_pCurve) return;
 
 	QString NewName = "Test Name";
-    NewNameDlg dlg(this);
-	dlg.move(pMainFrame->m_DlgPos);
+	NewNameDlg dlg(pMainFrame);
 	dlg.m_OldName = m_pCurve->title();
 	dlg.InitDialog();
 
 	if(dlg.exec() != QDialog::Accepted) return;
-	pMainFrame->m_DlgPos = dlg.pos();
 	NewName = dlg.m_NewName;
 
 	for (int i=0; i<pMiarex->m_TimeGraph[0].GetCurveCount(); i++)

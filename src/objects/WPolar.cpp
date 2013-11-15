@@ -99,7 +99,7 @@ void WPolar::AddPoint(PlaneOpp *pPOpp)
 	int i,j,l;
 	int size = m_Alpha.size();
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
-	WingOpp *pWOpp = &pPOpp->m_PlaneWOpp[0];
+	WingOpp *pWOpp = pPOpp->m_pPlaneWOpp[0];
 	if(size)
 	{
 		for (i=0; i<size; i++)
@@ -2341,7 +2341,7 @@ void WPolar::GetPolarProperties(QString &PolarProperties, bool bData)
 				PolarProperties +=strong;
 			}
 			iCtrl=1;
-			if(pPlane->getStab())
+			if(pPlane->stab())
 			{
 				if(fabs(m_ControlGain[iCtrl]>PRECISION))
 				{
@@ -2356,9 +2356,9 @@ void WPolar::GetPolarProperties(QString &PolarProperties, bool bData)
 		pStab = pFin = pWing = NULL;
 		if(pPlane)
 		{
-			pWing = pPlane->getWing();
-			pStab = pPlane->getStab();
-			pFin  = pPlane->getFin();
+			pWing = pPlane->wing();
+			pStab = pPlane->stab();
+			pFin  = pPlane->fin();
 		}
 		else pWing = pMiarex->GetWing(m_UFOName);
 

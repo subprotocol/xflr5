@@ -88,16 +88,6 @@ void Curve::CopyData(Curve *pCurve)
 
 
 /**
- * returns the color of the curve
- * @return the curve's color
- */
-QColor Curve::color()
-{
-	return CurveColor;
-}
-
-
-/**
  * Returns the point referenced by the input parameter as a CVector object
  * @param ref the reference of the requested pointed
  * @return a CVector instance of the point, or (0, 0, 0) if the reference is out of bounds
@@ -203,56 +193,6 @@ void Curve::closestPoint(double const &xs, double const &ys, double &xSel, doubl
 
 
 /**
- * Returns the number of point in this curve
- * @return the number of point in this curve
- */
-int Curve::count()
-{
-	return x.size();
-}
-
-/**
- * Returns the curve style
- * @return the index of the curve's style
- */
-int Curve::style()
-{
-	return CurveStyle;
-}
-
-
-/**
- * Returns the curve's title
- * @param &string a reference to the string to be filled with the curve's title
- */
-void Curve::title(QString &string)
-{
-	string =  m_CurveName;
-}
-
-
-/**
- * Returns the curve's title
- * @return a QString instance of curve's title
- *@overload
- */
-QString Curve::title()
-{
-	return m_CurveName;
-}
-
-
-/**
- * Returns the curve's width in pixels
- * @return the curve's width as an int value
- */
-int Curve::width()
-{
-	return CurveWidth;
-}
-
-
-/**
  * Returns the minimum x value of this curve
  *@return the x min value, or +99999999.0 if the curve has no points
  */
@@ -312,24 +252,6 @@ double Curve::yMax()
 }
 
 
-/**
- * Return the visibility of the curve as a boolean.
- * @return true if the curve should be displayed, false otherwise
- */
-bool Curve::IsVisible()
-{
-	return m_bIsVisible;
-}
-
-
-/**
- * Return the visibility of the points as a boolean.
- * @return true if the points should be displayed, false otherwise
- */
-bool Curve::PointsVisible()
-{
-	return m_bShowPoints;
-}
 
 
 /**

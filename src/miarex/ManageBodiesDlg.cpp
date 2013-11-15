@@ -60,7 +60,7 @@ bool ManageBodiesDlg::IsInUse(Body *pBody)
 	for (i=0; i<m_poaPlane->count();i++)
 	{
 		pOldPlane = (Plane*)m_poaPlane->at(i);
-		if(pOldPlane->getBody() && pOldPlane->getBody()==m_pBody)
+		if(pOldPlane->body() && pOldPlane->body()==m_pBody)
 		{
 			return true;
 		}
@@ -87,7 +87,7 @@ void ManageBodiesDlg::OnDelete()
 		for (i=0; i<m_poaPlane->count();i++)
 		{
 			pOldPlane = (Plane*)m_poaPlane->at(i);
-			if(pOldPlane->getBody() == m_pBody)
+			if(pOldPlane->body() == m_pBody)
 			{
 				pOldPlane->SetBody(NULL);
 				pMainFrame->DeletePlane(pOldPlane, true);
@@ -164,7 +164,7 @@ void ManageBodiesDlg::OnEdit()
 	for (i=0; i< pMiarex->m_poaPlane->size(); i++)
 	{
 		pPlane = (Plane*)m_poaPlane->at(i);
-		if(pPlane->getBody() && pPlane->getBody()==m_pBody)
+		if(pPlane->body() && pPlane->body()==m_pBody)
 		{
 			// Does this plane have results
 			for(int j=0; j<pMiarex->m_poaWPolar->size(); j++)
@@ -217,7 +217,7 @@ void ManageBodiesDlg::OnEdit()
 				for (i=0; i<pMiarex->m_poaPlane->count();i++)
 				{
 					pPlane = (Plane*)pMiarex->m_poaPlane->at(i);
-					if(pPlane->getBody() == m_pBody)
+					if(pPlane->body() == m_pBody)
 					{
 						pMainFrame->DeletePlane(pPlane, true);
 					}

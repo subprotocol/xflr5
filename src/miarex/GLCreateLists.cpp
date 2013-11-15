@@ -450,7 +450,10 @@ void GLCreateCp(void *pQMiarex, CVector *pNode, Panel *pPanel, WingOpp *pWOpp, P
 	double color;
 	double lmin, lmax, range;
 	float *tab;
-	double CpInf[2*VLMMAXMATSIZE], CpSup[2*VLMMAXMATSIZE], Cp100[2*VLMMAXMATSIZE];
+	double *CpInf= new double[2*QMiarex::s_MaxMatSize];
+	double *CpSup= new double[2*QMiarex::s_MaxMatSize];
+	double *Cp100= new double[2*QMiarex::s_MaxMatSize];
+
 	CVector LA,LB,TA,TB;
 
 	glNewList(PANELCP, GL_COMPILE);
@@ -573,6 +576,10 @@ void GLCreateCp(void *pQMiarex, CVector *pNode, Panel *pPanel, WingOpp *pWOpp, P
 		glDisable(GL_POLYGON_OFFSET_FILL);
 	}
 	glEndList();
+
+	delete CpInf;
+	delete CpSup;
+	delete Cp100;
 }
 
 
@@ -1187,8 +1194,6 @@ void GLCreateDrag(void *pQMiarex, Wing *pWing, WPolar* pWPolar, WingOpp *pWOpp, 
 
 void GLCreateMesh(int iList, int size, Panel *pPanel, CVector *pNode, QColor PanelColor, QColor BackColor, bool bBack)
 {
-//	MainFrame *pMainFrame = (MainFrame*)pMiarex->s_pMainFrame;
-
 	int iLA, iLB, iTA, iTB;
 	int p;
 	CVector  N;
@@ -1198,11 +1203,7 @@ void GLCreateMesh(int iList, int size, Panel *pPanel, CVector *pNode, QColor Pan
 	{
 		glEnable(GL_DEPTH_TEST);
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-//		glEnable(GL_POLYGON_OFFSET_FILL);
-//		glPolygonOffset(1.0, 1.0);
 
-//		style = pMiarex->m_VLMStyle;
-//		width = pMiarex->m_VLMWidth;
 
 		glLineWidth(1.0);
 
@@ -1818,7 +1819,6 @@ void GLCreateStreamLines(void *pQMiarex, Wing *PlaneWing[MAXWINGS], CVector *pNo
 	dlg.InitDialog(0, pMiarex->m_MatSize);
 	dlg.setWindowModality(Qt::WindowModal);
 	dlg.SetValue(0);
-	dlg.move(pMainFrame->m_DlgPos);
 	dlg.show();
 
 	GL3DScales *p3DScales = (GL3DScales *)pMainFrame->m_pGL3DScales;
@@ -1895,22 +1895,22 @@ void GLCreateStreamLines(void *pQMiarex, Wing *PlaneWing[MAXWINGS], CVector *pNo
 				{
 					bFound = false;
 
-					if(p3DScales->m_pos==0 && pWing->m_pPanel[p].m_bIsLeading && pWing->m_pPanel[p].m_Pos<=MIDSURFACE)
+					if(p3DScales->m_pos==0 && pWing->m_pWingPanel[p].m_bIsLeading && pWing->m_pWingPanel[p].m_Pos<=MIDSURFACE)
 					{
-						C.Set(pNode[pWing->m_pPanel[p].m_iLA]);
-						D.Set(pNode[pWing->m_pPanel[p].m_iLB]);
+						C.Set(pNode[pWing->m_pWingPanel[p].m_iLA]);
+						D.Set(pNode[pWing->m_pWingPanel[p].m_iLB]);
 						bFound = true;
 					}
-					else if(p3DScales->m_pos==1 && pWing->m_pPanel[p].m_bIsTrailing && pWing->m_pPanel[p].m_Pos<=MIDSURFACE)
+					else if(p3DScales->m_pos==1 && pWing->m_pWingPanel[p].m_bIsTrailing && pWing->m_pWingPanel[p].m_Pos<=MIDSURFACE)
 					{
-						C.Set(pNode[pWing->m_pPanel[p].m_iTA]);
-						D.Set(pNode[pWing->m_pPanel[p].m_iTB]);
+						C.Set(pNode[pWing->m_pWingPanel[p].m_iTA]);
+						D.Set(pNode[pWing->m_pWingPanel[p].m_iTB]);
 						bFound = true;
 					}
-					else if(p3DScales->m_pos==2 && pWing->m_pPanel[p].m_bIsLeading && pWing->m_pPanel[p].m_Pos<=MIDSURFACE)
+					else if(p3DScales->m_pos==2 && pWing->m_pWingPanel[p].m_bIsLeading && pWing->m_pWingPanel[p].m_Pos<=MIDSURFACE)
 					{
-						C.Set(0.0, pNode[pWing->m_pPanel[p].m_iLA].y, 0.0);
-						D.Set(0.0, pNode[pWing->m_pPanel[p].m_iLB].y, 0.0);
+						C.Set(0.0, pNode[pWing->m_pWingPanel[p].m_iLA].y, 0.0);
+						D.Set(0.0, pNode[pWing->m_pWingPanel[p].m_iLB].y, 0.0);
 						bFound = true;
 					}
 
@@ -1925,21 +1925,21 @@ void GLCreateStreamLines(void *pQMiarex, Wing *PlaneWing[MAXWINGS], CVector *pNo
 						if(p3DScales->m_pos==1 && fabs(p3DScales->m_XOffset)<0.001 && fabs(p3DScales->m_ZOffset)<0.001)
 						{
 							//apply Kutta's condition : initial speed vector is parallel to the T.E. bisector angle
-							VA.Set(pNode[pWing->m_pPanel[p].m_iTA] - pNode[pWing->m_pPanel[p].m_iLA]);
+							VA.Set(pNode[pWing->m_pWingPanel[p].m_iTA] - pNode[pWing->m_pWingPanel[p].m_iLA]);
 							VA. Normalize();
-							VB.Set(pNode[pWing->m_pPanel[p].m_iTB] - pNode[pWing->m_pPanel[p].m_iLB]);
+							VB.Set(pNode[pWing->m_pWingPanel[p].m_iTB] - pNode[pWing->m_pWingPanel[p].m_iLB]);
 							VB. Normalize();
-							if(pWing->m_pPanel[p].m_Pos==BOTSURFACE)
+							if(pWing->m_pWingPanel[p].m_Pos==BOTSURFACE)
 							{
 								//corresponding upper panel is the next one coming up
 								for (i=p; i<pWing->m_MatSize;i++)
-									if(pWing->m_pPanel[i].m_Pos>MIDSURFACE && pWing->m_pPanel[i].m_bIsTrailing) break;
-								VAT = pNode[pWing->m_pPanel[i].m_iTA] - pNode[pWing->m_pPanel[i].m_iLA];
+									if(pWing->m_pWingPanel[i].m_Pos>MIDSURFACE && pWing->m_pWingPanel[i].m_bIsTrailing) break;
+								VAT = pNode[pWing->m_pWingPanel[i].m_iTA] - pNode[pWing->m_pWingPanel[i].m_iLA];
 								VAT.Normalize();
 								VA = VA+VAT;
 								VA.Normalize();//VA is parallel to the bisector angle
 
-								VBT = pNode[pWing->m_pPanel[i].m_iTB] - pNode[pWing->m_pPanel[i].m_iLB];
+								VBT = pNode[pWing->m_pWingPanel[i].m_iTB] - pNode[pWing->m_pWingPanel[i].m_iLB];
 								VBT.Normalize();
 								VB = VB+VBT;
 								VB.Normalize();//VB is parallel to the bisector angle
@@ -2028,7 +2028,6 @@ void GLCreateStreamLines(void *pQMiarex, Wing *PlaneWing[MAXWINGS], CVector *pNo
 void GLCreateSurfSpeeds(void *pQMiarex, Panel *pPanel, WPolar *pWPolar, WingOpp *pWOpp)
 {
 	QMiarex * pMiarex = (QMiarex*)pQMiarex;
-	MainFrame *pMainFrame = (MainFrame*)pMiarex->s_pMainFrame;
 
 	if(!pWPolar || !pWOpp || pWOpp->m_AnalysisMethod==LLTMETHOD)
 	{
@@ -2039,7 +2038,6 @@ void GLCreateSurfSpeeds(void *pQMiarex, Panel *pPanel, WPolar *pWPolar, WingOpp 
 	}
 	
     ProgressDlg dlg(pMiarex);
-	dlg.move(pMainFrame->m_DlgPos);
 	dlg.InitDialog(0, pMiarex->m_MatSize);
 	dlg.setModal(true);
 	dlg.SetValue(0);
@@ -2357,7 +2355,7 @@ void GLDrawWingLegend(void *pQMiarex, Wing *pWing, Plane *pPlane, WPolar *pWPola
 
 	total = 12;
 	if(pWPolar) total +=2;
-	if(pPlane && pPlane->getStab())  total ++;
+	if(pPlane && pPlane->stab())  total ++;
 	ZPos = pMiarex->m_r3DCltRect.bottom()- total * dD ;
 	LeftPos = pMiarex->m_r3DCltRect.left() +15;
 
@@ -2410,7 +2408,7 @@ void GLDrawWingLegend(void *pQMiarex, Wing *pWing, Plane *pPlane, WPolar *pWPola
 
 			ZPos +=dD;
 			double Area = pWing->m_PlanformArea;
-			if(pPlane && pPlane->BiPlane()) Area+=pPlane->getWing2()->m_PlanformArea;
+			if(pPlane && pPlane->BiPlane()) Area+=pPlane->wing2()->m_PlanformArea;
 			str1 = QString(QObject::tr("Wing Area      = %1 ")).arg(Area * pMainFrame->m_m2toUnit, a,'f',b);
 			str1 +=surface;
 			pGLWidget->renderText(LeftPos, ZPos, str1, pMainFrame->m_TextFont);
@@ -2442,7 +2440,7 @@ void GLDrawWingLegend(void *pQMiarex, Wing *pWing, Plane *pPlane, WPolar *pWPola
 				ZPos +=dD;
 			}
 
-			if(pPlane && pPlane->getStab())
+			if(pPlane && pPlane->stab())
 			{
 				Result = QString(QObject::tr("Tail Volume    = %1")).arg(pPlane->TailVolume(),c,'f',d);
 				pGLWidget->renderText(LeftPos, ZPos, Result, pMainFrame->m_TextFont);
@@ -2820,8 +2818,8 @@ void GLDrawPanelForceLegend(void *pQMiarex, WPolar *pWPolar)
 		{
 			for (p=0; p<pWingList[iw]->m_MatSize; p++)
 			{
-				rmax = qMax(rmax,pWOppList[iw]->m_Cp[p]*pWingList[iw]->m_pPanel[p].GetArea());
-				rmin = qMin(rmin,pWOppList[iw]->m_Cp[p]*pWingList[iw]->m_pPanel[p].GetArea());
+				rmax = qMax(rmax,pWOppList[iw]->m_Cp[p]*pWingList[iw]->m_pWingPanel[p].GetArea());
+				rmin = qMin(rmin,pWOppList[iw]->m_Cp[p]*pWingList[iw]->m_pWingPanel[p].GetArea());
 			}
 		}
 	}

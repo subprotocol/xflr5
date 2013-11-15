@@ -279,6 +279,8 @@ OTHER_FILES += doc/ReleaseNotes.txt \
     qss/appwidget.css
 
 
+#QMAKE_LFLAGS_WINDOWS += Wl,-stack,32000000
+
 #QMAKE_CFLAGS+=-pg
 #QMAKE_CXXFLAGS+=-pg
 #QMAKE_LFLAGS+=-pg

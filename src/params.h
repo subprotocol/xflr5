@@ -29,10 +29,7 @@
 #define MAXBODIES           3     /**< One only in XFLR5 */
 #define MAXSPANSECTIONS    30     /**< The max number of sections on a half wing */
 #define MAXSPANSTATIONS   250     /**< The max number of stations for LLT. For a VLM analysis, this is the max number of panels in the spanwise direction. */
-#define MAXCHORDPANELS	   50     /**< The max number of panels in the chordwise direction for a VLM analysis. */
-#define VLMMAXMATSIZE    5000     /**< The max number of VLM panels for the whole plane. Sets the size of the influence matrix and its RHS.*/
-#define VLMHALF          2500     /**< Half the value of VLMMAXMATSIZE. */
-#define VLMMAXRHS         100     /**< The max number of points which may be calculated in a single sequence. Has an impact on the memory reserved at program launch the size of the */
+#define MAXCHORDPANELS	  100     /**< The max number of panels in the chordwise direction for a VLM analysis. */
 #define MAXCONTROLS        40     /**< The max number of controls */
 #define MAXBODYFRAMES      60     /**< The max number of frames that can be used to define a body. */
 #define MAXSIDELINES       40     /**< The max number of sidelines that can be used to define a body? */

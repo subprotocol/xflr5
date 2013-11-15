@@ -22,14 +22,12 @@
 #include "ObjectPropsDlg.h"
 #include <QHBoxLayout>
 #include <QVBoxLayout>
+#include <QPushButton>
 #include <QStringList>
 
-#include "../xdirect/XDirect.h"
-#include "../miarex/Miarex.h"
-#include "../mainframe.h"
 #include "../globals.h"
 
-void * ObjectPropsDlg::s_pMainFrame;
+
 
 ObjectPropsDlg::ObjectPropsDlg(QWidget *pParent) : QDialog(pParent)
 {

@@ -21,11 +21,8 @@
 
 
 #include "CtrlTableDelegate.h"
-#include "Miarex.h"
+
 #include <QApplication>
-
-
-void *CtrlTableDelegate::s_pMiarex;
 
 
 CtrlTableDelegate::CtrlTableDelegate(QObject *parent)

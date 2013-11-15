@@ -268,7 +268,7 @@ void ManageUFOsDlg::FillPlaneRow(int row, int n)
 
 	Plane *pPlane = (Plane*)pMainFrame->m_oaPlane.at(row);
 	if(!pPlane) return;
-	Wing *pWing = pPlane->getWing();
+	Wing *pWing = pPlane->wing();
 
 	ind = m_pUFOModel->index(row+n, 0, QModelIndex());
 	m_pUFOModel->setData(ind,pPlane->PlaneName());

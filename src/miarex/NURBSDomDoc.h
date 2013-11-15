@@ -6,6 +6,11 @@
 
 *****************************************************************************/
 
+/**
+ * @file
+ * This file is an attempt to implement an XML format for the input/output of NURBS definitions
+ * Unfinished. @todo : finish the implementation.
+*/
 
 #ifndef NURBSDOMDOC_H
 #define NURBSDOMDOC_H
@@ -13,7 +18,11 @@
 #include <QDomDocument>
 #include <QFile>
 
-
+/**
+ * @class NURBSDomDoc
+ * This class is an attempt to implement an XML format for the input/output of plan definitions
+ * Unfinished. @todo : finish the implementation.
+*/
 class NURBSDomDoc : public QDomDocument
 {
 public:

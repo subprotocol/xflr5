@@ -16,6 +16,8 @@
 
 
 xflr5 v6.09.06, November xxx, 2013
+	- removed the limit on the maximum number of panels - resizing is now enabled without any limit other
+	  than the one set by the compiler. System dependant and unclear. High risk of system crash BEWARE.
 	- fixed the issues with the animation of foil operating points
 	- removed the option to save as a file for xflr5 v5 or v4 - no point and source of bugs
 	- corrected the automatic polar name of foils in multithreaded analysis

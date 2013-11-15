@@ -170,11 +170,11 @@ bool GL3dWingDlg::CheckWing()
 		return false;
 	}
 
-	if(VLMGetPanelTotal()>VLMMAXMATSIZE/2)
-	{
-		QMessageBox::warning(this, tr("Warning"), tr("Too many panels\nReduce the mesh size"));
-		return false;
-	}
+//	if(VLMGetPanelTotal()>VLMMAXMATSIZE/2)
+//	{
+//		QMessageBox::warning(this, tr("Warning"), tr("Too many panels\nReduce the mesh size"));
+//		return false;
+//	}
 
 	if(m_pWing->m_nFlaps>=20)
 	{
@@ -1218,11 +1218,6 @@ void GL3dWingDlg::keyReleaseEvent(QKeyEvent *event)
 }
 
 
-bool GL3dWingDlg::LoadSettings(QSettings *pSettings)
-{
-	return true;
-}
-
 
 void GL3dWingDlg::MouseDoubleClickEvent(QMouseEvent *event)
 {
@@ -2022,10 +2017,6 @@ void GL3dWingDlg::resizeEvent(QResizeEvent *event)
 }
 
 
-bool GL3dWingDlg::SaveSettings(QSettings *pSettings)
-{
-	return true;
-}
 
 
 
@@ -2375,11 +2366,11 @@ void GL3dWingDlg::SetupLayout()
 		DataLayout->addWidget(m_pctrlAreaUnit1,2,3);
 		DataLayout->addWidget(m_pctrlLength2,3,3);
 		DataLayout->addWidget(m_pctrlAreaUnit2,4,3);
-		QString strong = QString("%1").arg(VLMMAXMATSIZE/2);
+		QString strong = QString("%1").arg(QMiarex::s_MaxMatSize/2);
 		QLabel *lab15 = new QLabel(tr("Max is ")+strong);
 		lab13->setAlignment(Qt::AlignLeft);
 		DataLayout->addWidget(lab15 ,13,3);
-		strong = QString("%1").arg(VLMMAXMATSIZE);
+		strong = QString("%1").arg(QMiarex::s_MaxMatSize);
 		QLabel *lab16 = new QLabel(tr("Max is ")+strong);
 		lab15->setAlignment(Qt::AlignLeft);
 		DataLayout->addWidget(lab16, 14, 3);
@@ -2706,11 +2697,11 @@ bool GL3dWingDlg::VLMSetAutoMesh(int total)
 		if(m_pWing->NXPanels(i)==0) m_pWing->NXPanels(i) = 1;
 	}
 
-	if(VLMGetPanelTotal()>VLMMAXMATSIZE/2)
-	{
-		QMessageBox::warning(this, tr("Warning"), tr("Too many panels\nReduce the mesh size"));
-		return false;
-	}
+//	if(VLMGetPanelTotal()>VLMMAXMATSIZE/2)
+//	{
+//		QMessageBox::warning(this, tr("Warning"), tr("Too many panels\nReduce the mesh size"));
+//		return false;
+//	}
 	return true;
 }
 

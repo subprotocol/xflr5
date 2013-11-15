@@ -55,14 +55,21 @@
 #include "xdirect/FoilPolarDlg.h"
 #include "xinverse/XInverse.h"
 
-#include <QDesktopWidget>
+//#include <QDesktopWidget>
 #include <QtGui>
 
 #ifdef Q_WS_MAC
 	#include <CoreFoundation/CoreFoundation.h>
 #endif
 
+
+
 Foil * MainFrame::s_pCurFoil=NULL;
+bool MainFrame::s_bTrace = true;
+QFile *MainFrame::s_pTraceFile = NULL;
+
+
+
 
 QPointer<MainFrame> MainFrame::_self = 0L;
 
@@ -71,6 +78,13 @@ MainFrame::MainFrame(QWidget *parent, Qt::WFlags flags)
 {
 	s_pCurFoil = NULL;
 	m_VersionName = QString::fromLatin1("XFLR5 v6.09.06");
+
+	if(s_bTrace)
+	{
+		QString FileName = QDir::tempPath() + "/Trace.log";
+		s_pTraceFile = new QFile(FileName);
+		if (!s_pTraceFile->open(QIODevice::ReadWrite | QIODevice::Text)) s_bTrace = false;
+	}
 	QString jpegPluginPath;
 
 	//Jpeg format requires a specific plugin to be loaded dynmically at run time
@@ -152,10 +166,6 @@ MainFrame::MainFrame(QWidget *parent, Qt::WFlags flags)
 
 	m_LastDirName = QDir::homePath();
 
-	QDesktopWidget desktop;
-	QRect r = desktop.screenGeometry();
-	m_DlgPos = QPoint((int)(r.width()/3), (int)(r.height()/3));
-
 	QAFoil *pAFoil       = (QAFoil*)m_pAFoil;
 	QXDirect *pXDirect   = (QXDirect*)m_pXDirect;
 	QXInverse *pXInverse = (QXInverse*)m_pXInverse;
@@ -236,8 +246,6 @@ MainFrame::MainFrame(QWidget *parent, Qt::WFlags flags)
 	m_ColorList.append(QColor(255,255,255));
 
 
-	m_UFOType = "";
-
 	m_bSaved     = true;
 	m_bHighlightOpp = m_bHighlightWOpp = false;
 
@@ -259,6 +267,7 @@ MainFrame::~MainFrame()
 	delete m_pDisplaySettingsDlg;
 	delete m_pTranslatorDlg;
 	delete m_pSaveOptionsDlg;
+	s_pTraceFile->close();
 }
 
 
@@ -904,12 +913,11 @@ void MainFrame::CreateDockWindows()
 	GL3dWingDlg::s_pMainFrame      = this;
 	ThreeDWidget::s_pMainFrame     = this;
 	PlaneDlg::s_pMainFrame         = this;
-	Polar::s_pMainFrame           = this;
-	ObjectPropsDlg::s_pMainFrame   = this;
-	Wing::s_pMainFrame            = this;
-	Body::s_pMainFrame            = this;
-	WPolar::s_pMainFrame          = this;
-	WingOpp::s_pMainFrame            = this;
+	Polar::s_pMainFrame            = this;
+	Wing::s_pMainFrame             = this;
+	Body::s_pMainFrame             = this;
+	WPolar::s_pMainFrame           = this;
+	WingOpp::s_pMainFrame          = this;
 	OpPoint::s_pMainFrame          = this;
 	LLTAnalysisDlg::s_pMainFrame   = this;
 	PanelAnalysisDlg::s_pMainFrame = this;
@@ -1058,7 +1066,6 @@ void MainFrame::CreateDockWindows()
 	PlaneDlg::s_pMiarex         = m_pMiarex;
 	Wing::s_pMiarex             = m_pMiarex;
 	WPolar::s_pMiarex           = m_pMiarex;
-	WingOpp::s_pMiarex          = m_pMiarex;
 	LLTAnalysisDlg::s_pMiarex   = m_pMiarex;
 	PanelAnalysisDlg::s_pMiarex = m_pMiarex;
 	ManageUFOsDlg::s_pMiarex    = m_pMiarex;
@@ -1068,10 +1075,7 @@ void MainFrame::CreateDockWindows()
 	ManageBodiesDlg::s_pMiarex  = m_pMiarex;
 
 
-
 	Plane::SetParents(this, m_pMiarex);
-//	CPlane::s_pMainFrame   = this;
-//	CPlane::s_pMiarex      = m_pMiarex;
 
 
 	XFoilAnalysisDlg::s_pXDirect = m_pXDirect;
@@ -1095,7 +1099,6 @@ void MainFrame::CreateDockWindows()
 
 void MainFrame::CreateMenus()
 {
-// Create common File, View and Help menus
 	fileMenu = menuBar()->addMenu(tr("&File"));
 	fileMenu->addAction(newProjectAct);
 	fileMenu->addAction(openAct);
@@ -3443,8 +3446,6 @@ bool MainFrame::LoadSettings()
 
 		m_bSaveOpps   = settings.value("SaveOpps").toBool();
 		m_bSaveWOpps  = settings.value("SaveWOpps").toBool();
-		m_DlgPos.rx() = settings.value("DlgPos_x").toInt();
-		m_DlgPos.ry() = settings.value("DlgPos_y").toInt();
 
 //		a = settings.value("RecentFileSize").toInt();
 		QString RecentF,strange;
@@ -3642,7 +3643,6 @@ void MainFrame::OnCurFoilStyle()
 
     LinePickerDlg dlg(this);
 	dlg.InitDialog(s_pCurFoil->m_nFoilStyle, s_pCurFoil->m_nFoilWidth, s_pCurFoil->m_FoilColor);
-	dlg.move(m_DlgPos);
 
 	if(QDialog::Accepted==dlg.exec())
 	{
@@ -3655,7 +3655,7 @@ void MainFrame::OnCurFoilStyle()
 		pXDirect->m_BufferFoil.m_nFoilWidth = s_pCurFoil->m_nFoilWidth;
 		SetSaveState(false);
 	}
-	m_DlgPos = dlg.pos();
+
 	UpdateView();
 }
 
@@ -4323,7 +4323,7 @@ void MainFrame::OnSelChangeUFO(int i)
 	m_iApp = MIAREX;
 	UpdateWPolars();
 	UpdateWOpps();
-	pMiarex->SetWPlr(false);
+//	pMiarex->SetWPlr(false);
 	pMiarex->m_bIs2DScaleSet = false;
 	pMiarex->Set2DScale();
 	pMiarex->SetControls();
@@ -4919,14 +4919,12 @@ void MainFrame::RenameFoil(Foil *pFoil)
 			NameList.append(pOldFoil->m_FoilName);
 		}
 
-		m_pRenameDlg->move(m_DlgPos);
 		m_pRenameDlg->m_pstrArray = & NameList;
 		m_pRenameDlg->m_strQuestion = tr("Enter the foil's new name");
 		m_pRenameDlg->m_strName = OldName;
 		bool bExists = false;
 		m_pRenameDlg->InitDialog();
 		int resp = m_pRenameDlg->exec();
-		m_DlgPos = m_pRenameDlg->pos();
 
 		strong = m_pRenameDlg->m_strName;
 
@@ -5190,8 +5188,6 @@ void MainFrame::SaveSettings()
 		settings.setValue("ImageFormat", m_ImageFormat);
 		settings.setValue("SaveOpps", m_bSaveOpps);
 		settings.setValue("SaveWOpps", m_bSaveWOpps);
-		settings.setValue("DlgPos_x", m_DlgPos.x());
-		settings.setValue("DlgPos_y", m_DlgPos.y());
 		settings.setValue("RecentFileSize", m_RecentFiles.size());
 		settings.setValue("StyleSheets", m_bStyleSheets);
 		settings.setValue("ReverseZoom", m_bReverseZoom);
@@ -5570,10 +5566,10 @@ bool MainFrame::SerializeUFOProject(QDataStream &ar)
 
 	// next the bodies
 
-	if(pPlane && pPlane->getBody())
+	if(pPlane && pPlane->body())
 	{
 		ar << 1;
-		pPlane->getBody()->SerializeBody(ar, true);
+		pPlane->body()->SerializeBody(ar, true);
 	}
 	else ar <<0; //no plane
 
@@ -6027,7 +6023,6 @@ bool MainFrame::SerializeProject(QDataStream &ar, bool bIsStoring)
 		pMiarex->m_pCurPOpp = NULL;
 
 		pAFoil->m_pSF->Serialize(ar, bIsStoring);
-//		pAFoil->m_pPF->Serialize(ar, bIsStoring);
 
 		for (i=0; i<m_oaWing.size();i++)
 		{
@@ -6166,7 +6161,6 @@ Foil* MainFrame::SetModFoil(Foil* pNewFoil, bool bKeepExistingFoil)
 				NameList.append(pFoil->m_FoilName);
 			}
 
-			m_pRenameDlg->move(m_DlgPos);
 			m_pRenameDlg->m_pstrArray = & NameList;
 			m_pRenameDlg->m_strQuestion = tr("A foil of that name already exists\nPlease enter a new name");
 			m_pRenameDlg->m_strName = pNewFoil->m_FoilName;
@@ -6175,7 +6169,6 @@ Foil* MainFrame::SetModFoil(Foil* pNewFoil, bool bKeepExistingFoil)
 			bool exists = false;
 			QString strong;
 			int resp = m_pRenameDlg->exec();
-			m_DlgPos = m_pRenameDlg->pos();
 			strong = m_pRenameDlg->m_strName;
 
 			if(QDialog::Accepted == resp)
@@ -7032,24 +7025,6 @@ void MainFrame::OnWOppProps()
 
 
 
-void MainFrame::SetDlgPos(QDialog &Dlg)
-{
-	QPoint Position = m_DlgPos;
-	QDesktopWidget desk;
-
-	if(Dlg.frameGeometry().width() +m_DlgPos.x()>desk.width())  Position.rx() += desk.width() -(Dlg.frameGeometry().width() +m_DlgPos.x());
-	if(Dlg.frameGeometry().height()+m_DlgPos.y()>desk.height()) Position.ry() += desk.height()-(Dlg.frameGeometry().height()+m_DlgPos.y());
-
-	if(m_DlgPos.x()<0) Position.rx()=0;
-
-	if(Dlg.width()>desk.rect().width())   Position.rx()=0;
-	if(Dlg.height()>desk.rect().height()) Position.ry()=0;
-
-	Dlg.move(Position);
-}
-
-
-
 void MainFrame::OnDuplicateFoil()
 {
 	if(!s_pCurFoil) return;
@@ -7081,3 +7056,4 @@ void MainFrame::OnDuplicateFoil()
 	}
 }
  
+

@@ -48,7 +48,6 @@ private:
 	WingOpp *m_pWOpp;
 	OpPoint *m_pOpp;
 
-	static void *s_pMainFrame;
 	void *m_pXDirect;
 	void *m_pMiarex;
 

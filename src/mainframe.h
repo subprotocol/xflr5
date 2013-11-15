@@ -208,7 +208,6 @@ public:
 	bool SerializeUFOProject(QDataStream &ar);
 	void SetCentralWidget();
 	void SetCurrentFoil(Foil* pFoil);
-	void SetDlgPos(QDialog &Dlg);
 	void SetGraphSettings(Graph *pGraph);
 	void SetProjectName(QString PathName);
 	void SetMenus();
@@ -232,6 +231,8 @@ public:
 	QString m_VersionName;
 	QString m_GraphExportFilter;
 
+	static bool s_bTrace;
+	static QFile *s_pTraceFile;
 
 private:
 
@@ -421,7 +422,6 @@ private:
 	QString m_FileName;         /**< The absolute path to the file of the current project. */
 	QString m_LanguageFilePath;
 	QString m_LastDirName, m_ExportLastDirName, m_ImageDirName;
-	QString m_UFOType;
 	QList <QColor> m_ColorList;
 
 	QGraph m_RefGraph;//Reference setttings
@@ -433,7 +433,6 @@ public:
  	QFont m_TextFont;
 	QColor m_TextColor;
 	QColor m_BackgroundColor;
-	QPoint m_DlgPos;      /**< Preferred position for the top-right corner of dialog boxes. @deprecated center all dialog boxes in the MainFrame window. */
 	void *m_pGL3DScales;
 	
 	double m_mtoUnit;    /**< Conversion factor from meters to the user selected length unit. */

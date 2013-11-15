@@ -28,6 +28,7 @@
 #include <QTimer>
 #include <QDir>
 #include <math.h>
+#include <QtDebug>
 #include "PanelAnalysisDlg.h"
 #include "../mainframe.h"
 #include "../globals.h"
@@ -37,9 +38,10 @@
 void *PanelAnalysisDlg::s_pMiarex;
 void *PanelAnalysisDlg::s_pMainFrame;
 
-bool g_bTrace = false;
+int PanelAnalysisDlg::s_MaxRHSSize = VLMMAXRHS;
 
-/**<
+
+/**
 * The public constructor
 */
 PanelAnalysisDlg::PanelAnalysisDlg(QWidget *pParent) : QDialog(pParent)
@@ -47,6 +49,14 @@ PanelAnalysisDlg::PanelAnalysisDlg(QWidget *pParent) : QDialog(pParent)
 	setWindowTitle(tr("3D Panel Analysis"));
 
 	SetupLayout();
+
+	m_aij = m_aijWake = NULL;
+	m_RHS = m_RHSRef = m_SigmaRef = m_Sigma = m_Mu = m_Cp = NULL;
+	m_3DQInf = NULL;
+	m_uVl = m_wVl = NULL;
+	m_uRHS = m_vRHS = m_wRHS = m_rRHS = m_cRHS = m_uWake = m_wWake = NULL;
+	m_Index = NULL;
+	m_Speed = NULL;
 
 	m_Alpha      = 0.0;
 	m_AlphaMax   = 0.0;
@@ -63,8 +73,6 @@ PanelAnalysisDlg::PanelAnalysisDlg(QWidget *pParent) : QDialog(pParent)
 	m_b3DSymetric    = false;
 	m_bSequence      = false;
 	m_bWarning       = false;
-//	m_bType4         = false;
-//	m_bXFile         = false;
 	m_bInverted     = false;
 	m_bCancel        = false;
 	m_bTrefftz       = false;
@@ -97,8 +105,6 @@ PanelAnalysisDlg::PanelAnalysisDlg(QWidget *pParent) : QDialog(pParent)
 	m_pPlane  = NULL;
 	m_ppSurface = NULL;
 
-
-//	m_ppPanel        = NULL;
 	m_pPanel         = NULL;
 	m_pWakePanel     = NULL;
 	m_pRefWakePanel  = NULL;
@@ -107,15 +113,7 @@ PanelAnalysisDlg::PanelAnalysisDlg(QWidget *pParent) : QDialog(pParent)
 	m_pMemNode       = NULL;
 	m_pWakeNode      = NULL;
 	m_pRefWakeNode   = NULL;
-	m_pTempWakeNode  = NULL;
 
-	m_aij = m_aijWake = NULL;
-	m_RHS = m_RHSRef = NULL;
-
-	memset(m_Sigma,  0, sizeof(m_Sigma));
-	memset(m_Mu,     0, sizeof(m_Mu));
-	memset(m_Cp,     0, sizeof(m_Cp));
-	memset(m_Speed,  0, sizeof(m_Speed));
 
 	m_Ctrl = 0.0;
 	Theta0 = 0.0;
@@ -137,16 +135,174 @@ PanelAnalysisDlg::PanelAnalysisDlg(QWidget *pParent) : QDialog(pParent)
 	memset(m_Is,    0,  9*sizeof(double));
 	memset(m_Ib,    0,  9*sizeof(double));
 
-	memset(m_Cp,0,sizeof(m_Cp));
-	memset(m_uRHS, 0, sizeof(m_uRHS));
-	memset(m_vRHS, 0, sizeof(m_vRHS));
-	memset(m_wRHS, 0, sizeof(m_wRHS));
-	memset(m_pRHS, 0, sizeof(m_pRHS));
-	memset(m_qRHS, 0, sizeof(m_qRHS));
-	memset(m_rRHS, 0, sizeof(m_rRHS));
+}
 
-	memset(m_uVl, 0, sizeof(m_uVl));
-	memset(m_wVl, 0, sizeof(m_wVl));
+/**
+ * The public destructor.
+ *
+ */
+PanelAnalysisDlg::~PanelAnalysisDlg()
+{
+	Release();
+}
+
+
+/**
+ * Reserves the memory necessary to matrix arrays.
+ *@return true if the memory could be allocated, false otherwise.
+ */
+bool PanelAnalysisDlg::AllocateMatrix(int &memsize)
+{
+	Trace("Allocating matrix arrays");
+
+	int size2 = QMiarex::s_MaxMatSize * QMiarex::s_MaxMatSize;
+	try
+	{
+		m_aij      = new double[size2];
+		m_aijWake  = new double[size2];
+
+		m_uRHS  = new double[QMiarex::s_MaxMatSize];
+		m_vRHS  = new double[QMiarex::s_MaxMatSize];
+		m_wRHS  = new double[QMiarex::s_MaxMatSize];
+		m_pRHS  = new double[QMiarex::s_MaxMatSize];
+		m_qRHS  = new double[QMiarex::s_MaxMatSize];
+		m_rRHS  = new double[QMiarex::s_MaxMatSize];
+		m_cRHS  = new double[QMiarex::s_MaxMatSize];
+		m_uWake = new double[QMiarex::s_MaxMatSize];
+		m_wWake = new double[QMiarex::s_MaxMatSize];
+
+		m_uVl   = new CVector[QMiarex::s_MaxMatSize];
+		m_wVl   = new CVector[QMiarex::s_MaxMatSize];
+		m_Speed = new CVector[QMiarex::s_MaxMatSize];
+		m_Index = new int[QMiarex::s_MaxMatSize];
+	}
+	catch(std::exception & e)
+	{
+		Trace(e.what());
+		QString strange = "Memory allocation error: the request for additional memory has been denied.\nPlease reduce the model's size.";
+		QMessageBox::warning(this, tr("Warning"), strange);
+		AddString(strange);
+		return false;
+	}
+
+	memsize  = sizeof(double)  * 2 * size2; //bytes
+	memsize += sizeof(double)  * 9 * QMiarex::s_MaxMatSize; //bytes
+	memsize += sizeof(CVector) * 3 * QMiarex::s_MaxMatSize;
+	memsize += sizeof(int)     * 1 * QMiarex::s_MaxMatSize;
+
+	memset(m_aij,     0, size2 * sizeof(double));
+	memset(m_aijWake, 0, size2 * sizeof(double));
+
+	memset(m_uRHS,  0, QMiarex::s_MaxMatSize*sizeof(double));
+	memset(m_vRHS,  0, QMiarex::s_MaxMatSize*sizeof(double));
+	memset(m_wRHS,  0, QMiarex::s_MaxMatSize*sizeof(double));
+	memset(m_pRHS,  0, QMiarex::s_MaxMatSize*sizeof(double));
+	memset(m_qRHS,  0, QMiarex::s_MaxMatSize*sizeof(double));
+	memset(m_rRHS,  0, QMiarex::s_MaxMatSize*sizeof(double));
+	memset(m_cRHS,  0, QMiarex::s_MaxMatSize*sizeof(double));
+	memset(m_uWake, 0, QMiarex::s_MaxMatSize*sizeof(double));
+	memset(m_wWake, 0, QMiarex::s_MaxMatSize*sizeof(double));
+
+	memset(m_uVl,   0, QMiarex::s_MaxMatSize*sizeof(CVector));
+	memset(m_wVl,   0, QMiarex::s_MaxMatSize*sizeof(CVector));
+	memset(m_Speed, 0, QMiarex::s_MaxMatSize*sizeof(CVector));
+
+	memset(m_Index, 0, QMiarex::s_MaxMatSize*sizeof(int));
+
+	int RHSSize = 0;
+
+	if(!AllocateRHS(RHSSize))
+	{
+		QString strange = "Memory allocation error: the request for additional memory has been denied.\nPlease educe the model's size.";
+		QMessageBox::warning(this, tr("Warning"), strange);
+		AddString(strange);
+		return false;
+	}
+
+	memsize += RHSSize;
+	return true;
+}
+
+
+/**
+ * Reserves the memory necessary to RHS arrays.
+ *@return true if the memory could be allocated, false otherwise.
+ */
+bool PanelAnalysisDlg::AllocateRHS(int &memsize)
+{
+	Trace("Allocating RHS arrays");
+	int size = QMiarex::s_MaxMatSize * s_MaxRHSSize;
+
+	try
+	{
+		m_RHS      = new double[size];
+		m_RHSRef   = new double[size];
+		m_SigmaRef = new double[size];
+		m_Sigma    = new double[size];
+		m_Mu       = new double[size];
+		m_Cp       = new double[size];
+
+		m_3DQInf   = new double[s_MaxRHSSize];
+	}
+	catch(std::exception &e)
+	{
+		qDebug()<< e.what();
+		return false;
+	}
+
+	memsize = sizeof(double) * 6 * size;
+
+	memset(m_RHS,       0, size*sizeof(double));
+	memset(m_RHSRef,    0, size*sizeof(double));
+	memset(m_Sigma,     0, size*sizeof(double));
+	memset(m_SigmaRef,  0, size*sizeof(double));
+	memset(m_Mu,        0, size*sizeof(double));
+	memset(m_Cp,        0, size*sizeof(double));
+
+	memset(m_3DQInf, 0, s_MaxRHSSize*sizeof(double));
+
+	return true;
+}
+
+
+/**
+ * Releases the memory reserved for matrix and RHS arrays
+ */
+void PanelAnalysisDlg::Release()
+{
+	if(m_aij)     delete m_aij;
+	if(m_aijWake) delete m_aijWake;
+	m_aij = m_aijWake = NULL;
+
+	if(m_RHS)      delete m_RHS;
+	if(m_RHSRef)   delete m_RHSRef;
+	if(m_SigmaRef) delete m_SigmaRef;
+	if(m_Sigma)    delete m_Sigma;
+	if(m_Mu)       delete m_Mu;
+	if(m_Cp)       delete m_Cp;
+	m_RHS = m_RHSRef = m_SigmaRef = m_Sigma = m_Mu = m_Cp = NULL;
+
+	if(m_3DQInf) delete m_3DQInf;
+	m_3DQInf = NULL;
+
+	if(m_uVl) delete m_uVl;
+	if(m_wVl) delete m_wVl;
+	m_uVl = m_wVl = NULL;
+
+	if(m_uRHS) delete m_uRHS;
+	if(m_vRHS) delete m_vRHS;
+	if(m_wRHS) delete m_wRHS;
+	if(m_rRHS) delete m_rRHS;
+	if(m_cRHS) delete m_cRHS;
+	if(m_uWake) delete m_uWake;
+	if(m_wWake) delete m_wWake;
+	m_uRHS = m_vRHS = m_wRHS = m_rRHS = m_cRHS = m_uWake = m_wWake = NULL;
+
+	if(m_Index) delete m_Index;
+	m_Index = NULL;
+
+	if(m_Speed) delete m_Speed;
+	m_Speed = NULL;
 }
 
 
@@ -160,6 +316,8 @@ void PanelAnalysisDlg::AddString(QString strong)
 	m_pctrlTextOutput->ensureCursorVisible();
 	WriteString(strong);
 }
+
+
 
 /**
 * Launches a calculation over the input sequence of aoa.
@@ -199,7 +357,7 @@ bool PanelAnalysisDlg::AlphaLoop()
 	//ComputeOnBodyCp :           1 x nrhs
 	//RelaxWake :                20 x nrhs x MaxWakeIter *
 	//ComputeAeroCoefs :          5 x nrhs
-	
+
 	double TotalTime = 10.0*(double)m_MatSize/400.
 					 + 10.
 					 + 30.*(double)m_MatSize/400.
@@ -225,6 +383,7 @@ bool PanelAnalysisDlg::AlphaLoop()
 	CreateUnitRHS();
 	if (m_bCancel) return true;
 
+
 	if(!m_pWPolar->m_bThinSurfaces)
 	{
 		//compute wake contribution
@@ -242,6 +401,7 @@ bool PanelAnalysisDlg::AlphaLoop()
 		}
 	}
 	if (m_bCancel) return true;
+
 
 	if (!SolveUnitRHS())
 	{
@@ -272,6 +432,8 @@ bool PanelAnalysisDlg::AlphaLoop()
 
 	return true;
 }
+
+
 
 /**
 * Builds the influence matrix, both for VLM or Panel calculations.
@@ -444,6 +606,7 @@ void PanelAnalysisDlg::CreateRHS(double *RHS, CVector VInf, double *VField)
 			m++;
 		}
 		m_Progress += 5.0/(double)m_MatSize;
+
 		qApp->processEvents();
 	}
 }
@@ -454,7 +617,8 @@ void PanelAnalysisDlg::CreateRHS(double *RHS, CVector VInf, double *VField)
 */
 void PanelAnalysisDlg::CreateUnitRHS()
 {
-	//Creates the two RHS for unit speeds along x and z
+	AddString("      Creating the unit RHS vectors...\n");
+
 	CVector VInf;
 
 	VInf.Set(1.0, 0.0, 0.0);
@@ -488,6 +652,7 @@ void PanelAnalysisDlg::CreateWakeContribution()
 
 	int m, mm;
 	m = mm = 0;
+
 
 	for(p=0; p<m_MatSize; p++)
 	{
@@ -528,7 +693,7 @@ void PanelAnalysisDlg::CreateWakeContribution()
 				}
 			}
 			//____________________________________________________________________________
-			//Add the contributions of trailing panels to the matrix coefficients and to the RHS
+			//Add the contributions of the trailing panels to the matrix coefficients and to the RHS
 			mm = 0;
 			for(pp=0; pp<m_MatSize; pp++) //for each matrix column
 			{
@@ -870,8 +1035,7 @@ void PanelAnalysisDlg::ScaleResultstoSpeed(int nval)
 	QString strong="\n";
 	AddString(strong);
 
-	static double SigmaRef[VLMMAXMATSIZE * VLMMAXRHS];
-	memcpy(SigmaRef, m_Sigma, nval*m_MatSize*sizeof(double));
+	memcpy(m_SigmaRef, m_Sigma, nval*m_MatSize*sizeof(double));
 	memcpy(m_RHSRef, m_Mu,    nval*m_MatSize*sizeof(double));
 
 	if(m_pWPolar->m_WPolarType!=FIXEDAOAPOLAR)
@@ -896,7 +1060,7 @@ void PanelAnalysisDlg::ScaleResultstoSpeed(int nval)
 			for(pp=0; pp<m_MatSize; pp++)
 			{
 				m_Mu[p]    = m_RHSRef[pp] * m_3DQInf[q];
-				m_Sigma[p] = SigmaRef[pp] * m_3DQInf[q];
+				m_Sigma[p] = m_SigmaRef[pp] * m_3DQInf[q];
 				p++;
 			}
 		}
@@ -1730,7 +1894,7 @@ void PanelAnalysisDlg::GetSpeedVector(CVector const &C, float *Mu, float *Sigma,
 /**
 *Initializes the dialog and the analysis
 */
-void PanelAnalysisDlg::InitDialog()
+bool PanelAnalysisDlg::InitDialog()
 {
 	m_Progress = 0.0;
 	m_pctrlProgress->setValue(m_Progress);
@@ -1744,6 +1908,29 @@ void PanelAnalysisDlg::InitDialog()
 	m_bCancel   = false;
 	m_bWarning  = false;
 	m_bWakeRollUp    = false;
+
+
+	int nrhs =1;
+	if(m_pWPolar->polarType()==FIXEDAOAPOLAR)       nrhs = (int)fabs((m_QInfMax-m_QInf)*1.0001/m_QInfDelta) +1;
+	else if(m_pWPolar->polarType()==STABILITYPOLAR) nrhs = (int)fabs((m_ControlMax-m_ControlMin)*1.0001/m_ControlDelta) +1;
+	else                                            nrhs = (int)fabs((m_AlphaMax-m_Alpha)*1.0001/m_AlphaDelta) +1;
+
+	if(!m_bSequence) nrhs = 1;
+	else if(nrhs>=VLMMAXRHS)
+	{
+//		QString strange = QString("The number of points to be calculated will be limited to %1").arg(VLMMAXRHS);
+//		QMessageBox::warning(this, tr("Warning"), strange);
+//		nrhs = VLMMAXRHS;
+		s_MaxRHSSize = (int)((double)nrhs * 1.2);
+
+		int RHSSize=0;
+
+		if(!AllocateRHS(RHSSize))
+		{
+			QMessageBox::warning(this, tr("Warning"), "Memory allocation error.\n Please reduce the number of points to calculate.");
+			return false;
+		}
+	}
 
 	SetFileHeader();
 
@@ -1763,7 +1950,7 @@ void PanelAnalysisDlg::InitDialog()
 	}
 
 	if(m_pWPolar->m_WPolarType==STABILITYPOLAR ) m_b3DSymetric=false;
-	if(fabs(m_pWPolar->m_Beta)>0)          m_b3DSymetric=false;
+	if(fabs(m_pWPolar->m_Beta)>0)                m_b3DSymetric=false;
 
 	if (m_b3DSymetric) AddString(tr("Performing symmetric calculation")+"\n");
 	else
@@ -1781,9 +1968,12 @@ void PanelAnalysisDlg::InitDialog()
 
 	m_pctrlProgress->setMinimum(0);
 	m_pctrlProgress->setMaximum(100);
+
+	return true;
 }
 
-/**Overrides the keyPressEvent sent by Qt */
+
+/** Overrides the keyPressEvent sent by Qt */
 void PanelAnalysisDlg::keyPressEvent(QKeyEvent *event)
 {
 	switch (event->key())
@@ -1808,121 +1998,6 @@ void PanelAnalysisDlg::OnCancelAnalysis()
 	m_bSkip = true;
 	m_bExit = true;
     if(m_bIsFinished) { m_bCancel = false; done(1); }
-}
-
-
-/**
-* Relaxes the wake based on the perturbation velocities.
-* Has been disabled due to lack of robustness
-*/
-void PanelAnalysisDlg::RelaxWake()
-{
-	QMiarex *pMiarex = (QMiarex*)s_pMiarex;
-	CVector VL;
-	int mw, kw, lw, llw;
-	int nInter;
-	double t, dx, dx0;
-	double *Mu    = m_Mu   ;
-	double *Sigma = m_Sigma;
-	mw=0;
-
-	//Since the wake roll-up is performed on the tilted geometry,
-	// we define a speed vector parallel to the x-axis
-	CVector QInf(m_QInf, 0.0, 0.0);
-
-	// Andre's method : fit the wake panels on the streamlines
-	// we have the computing power to do it
-
-	CVector LATB, TALB;
-	CVector WLA, WLB,WTA,WTB, WTemp;//wake panel's leading corner points
-
-	dx0 = 0.05;
-
-	AddString(tr("      Relaxing the wake...")+"\n");
-
-	memcpy(m_pTempWakeNode, m_pWakeNode, m_nWakeNodes * sizeof(CVector));
-
-	for (lw=0; lw<m_pWPolar->m_NXWakePanels; lw++)
-	{
-		if(m_bCancel) break;
-		for (kw=0; kw<m_NWakeColumn; kw++)
-		{
-			if(m_bCancel) break;
-
-			mw = kw * m_pWPolar->m_NXWakePanels + lw;
-			//left point
-			WLA.Copy(m_pTempWakeNode[m_pWakePanel[mw].m_iLA]);
-			WTA.Copy(m_pTempWakeNode[m_pWakePanel[mw].m_iTA]);
-			WTemp.Copy(WLA);
-
-			nInter = (int)((WTA.x - WLA.x)/dx0) ;
-			dx = (WTA.x - WLA.x)/nInter;
-
-			for (llw=0; llw<nInter; llw++)
-			{
-				GetSpeedVector(WTemp, Mu, Sigma, VL);
-				VL += QInf;
-				VL.Normalize();
-				t = dx/VL.x;
-				WTemp.x += dx;
-				WTemp.y += VL.y * t;
-				WTemp.z += VL.z * t;
-			}
-			m_pTempWakeNode[m_pWakePanel[mw].m_iTA] = WTemp;
-		}
-		//finally do the same for the right side of the last right column
-
-		WLB.Copy(m_pTempWakeNode[m_pWakePanel[mw].m_iLB]);
-		WTB.Copy(m_pTempWakeNode[m_pWakePanel[mw].m_iTB]);
-		WTemp.Copy(WLB);
-
-		nInter = (int)((WTB.x - WLB.x)/dx0);
-		dx = (WTB.x - WLB.x)/nInter;
-
-		for (llw=0; llw<nInter; llw++)
-		{
-			GetSpeedVector(WTemp, Mu, Sigma, VL);
-			VL += QInf;
-			VL.Normalize();
-			t = dx/VL.x;
-			WTemp.x += dx;
-			WTemp.y += VL.y * t;
-			WTemp.z += VL.z * t;
-		}
-		m_pTempWakeNode[m_pWakePanel[mw].m_iTB] = WTemp;
-		m_Progress += 20.0/(double)m_pWPolar->m_NXWakePanels;
-		qApp->processEvents();
-	}
-
-	// Paste the new wake nodes back into the wake node array
-	memcpy(m_pWakeNode, m_pTempWakeNode, m_nWakeNodes * sizeof(CVector));
-
-	// Re-create the wake panels
-	mw=0;
-	for (mw=0; mw<pMiarex->m_WakeSize; mw++)
-	{
-		if(m_bCancel) break;
-
-		WLA.Copy(m_pWakeNode[m_pWakePanel[mw].m_iLA]);
-		WLB.Copy(m_pWakeNode[m_pWakePanel[mw].m_iLB]);
-		WTA.Copy(m_pWakeNode[m_pWakePanel[mw].m_iTA]);
-		WTB.Copy(m_pWakeNode[m_pWakePanel[mw].m_iTB]);
-		LATB.x = WTB.x - WLA.x;
-		LATB.y = WTB.y - WLA.y;
-		LATB.z = WTB.z - WLA.z;
-		TALB.x = WLB.x - WTA.x;
-		TALB.y = WLB.y - WTA.y;
-		TALB.z = WLB.z - WTA.z;
-
-		m_pWakePanel[mw].Normal = LATB * TALB;
-		m_pWakePanel[mw].Area =  m_pWakePanel[mw].Normal.VAbs()/2.0;
-		m_pWakePanel[mw].Normal.Normalize();
-		m_pWakePanel[mw].SetFrame(WLA, WLB, WTA, WTB);
-	}
-
-	//Udpdate the view
-//	pMiarex->m_bResetglWake = true;
-	pMiarex->UpdateView();
 }
 
 
@@ -2682,7 +2757,7 @@ bool PanelAnalysisDlg::UnitLoop()
 			ComputeOnBodyCp(0.0, m_AlphaDelta, 1);
 			if (m_bCancel) return true;
 
-			if(MaxWakeIter>0 && m_pWPolar->m_bWakeRollUp) RelaxWake();
+//			if(MaxWakeIter>0 && m_pWPolar->m_bWakeRollUp) RelaxWake();
 		}
 
 		ComputeAeroCoefs(0.0, m_AlphaDelta, 1);
@@ -4173,7 +4248,7 @@ void PanelAnalysisDlg::ComputeControlDerivatives()
 
 			for(p=0; p<m_pWing->m_MatSize; p++)
 			{
-				(m_pWing->m_pPanel+p)->RotateBC(m_pPlane->WingLE(0), Quat);
+				(m_pWing->m_pWingPanel+p)->RotateBC(m_pPlane->WingLE(0), Quat);
 			}
 		}
 
@@ -4196,7 +4271,7 @@ void PanelAnalysisDlg::ComputeControlDerivatives()
 
 			for(p=0; p<m_pWingList[2]->m_MatSize; p++)
 			{
-				(m_pWingList[2]->m_pPanel+p)->RotateBC(m_pPlane->WingLE(2), Quat);
+				(m_pWingList[2]->m_pWingPanel+p)->RotateBC(m_pPlane->WingLE(2), Quat);
 			}
 		}
 		pos += m_pWingList[2]->m_MatSize;
@@ -4594,7 +4669,5 @@ void PanelAnalysisDlg::VLMCmn(CVector const &A, CVector const &B, CVector const 
 		V.z += Psi.z * Omega/4.0/PI;
 	}
 }
-
-
 
 

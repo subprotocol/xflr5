@@ -1,7 +1,7 @@
 /****************************************************************************
 
 	Globals Class
-	Copyright (C) 2008-2011 Andre Deperrois adeperrois@xflr5.com
+	Copyright (C) 2008-2013 Andre Deperrois adeperrois@xflr5.com
 
 	This program is free software; you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -24,6 +24,7 @@
 /**@file This file contains the definitions of methods used throughout the program and not specific to one application. */
 
 #include "globals.h"
+#include "mainframe.h"
 #include <QVector3D>
 #include <QPen>
 #include <QApplication>
@@ -33,6 +34,9 @@
 #include <QDateTime> 
 #include <QByteArray>
 #include <math.h>
+#include <QtDebug>
+
+
 
 /** 
 * Returns a double number as its root and its base 10 exponent
@@ -768,21 +772,13 @@ void SetUnits(int LUnit, int AUnit, int SUnit, int WUnit, int FUnit, int MUnit,
 */
 void Trace(int n)
 {
-	QString FileName = QDir::tempPath() + "/Trace.log";
-	QFile *tf = new QFile(FileName);
-	if (!tf->open(QIODevice::ReadWrite | QIODevice::Text)) return;
-
-	QString strong;
-	QTextStream ts(tf);
-	while(!ts.atEnd()) ts>>strong;
-
+	if(!MainFrame::s_bTrace) return;
+	QTextStream ts(MainFrame::s_pTraceFile);
 
 	QDateTime dt = QDateTime::currentDateTime();
-	QString str = dt.toString("dd.MM.yyyy  hh:mm:ss");
-	ts << str << n;
-
-	tf->close();
-
+	QString str = dt.toString("dd.MM.yyyy  hh:mm:ss  ");
+	ts << str << n << "\n";
+	qDebug()<<str<<n;
 }
 
 
@@ -794,26 +790,13 @@ void Trace(int n)
 */
 void Trace(QString msg)
 {
-//	if(!((CXFLR5App*)AfxGetApp())->bTrace) return;
-	QString FileName = QDir::tempPath() + "/Trace.log";
-	QFile *tf = new QFile(FileName);
-	if (!tf->open(QIODevice::ReadWrite | QIODevice::Text)) return;
-
-	QString strong;
-	QTextStream ts(tf);
-	while(!ts.atEnd()) ts>>strong;
-
-
+	if(!MainFrame::s_bTrace) return;
+	QTextStream ts(MainFrame::s_pTraceFile);
 
 	QDateTime dt = QDateTime::currentDateTime();
-	QString str = dt.toString("dd.MM.yyyy  hh:mm:ss");
-	str += msg;
-	str += "\n";
-
-	ts << str;
-
-	tf->close();
-
+	QString str = dt.toString("dd.MM.yyyy  hh:mm:ss  ")+ msg ;
+	ts<<str<<"\n";
+	qDebug()<<str;
 }
 
 
@@ -826,24 +809,18 @@ void Trace(QString msg)
 */
 void Trace(QString msg, int n)
 {
-//	if(!((CXFLR5App*)AfxGetApp())->bTrace) return;
-	QString FileName = QDir::tempPath() + "/Trace.log";
-	QFile *tf = new QFile(FileName);
-	if (!tf->open(QIODevice::ReadWrite | QIODevice::Text)) return;
+	if(!MainFrame::s_bTrace) return;
+	QTextStream ts(MainFrame::s_pTraceFile);
 
 	QString strong;
-	QTextStream ts(tf);
-	while(!ts.atEnd()) ts>>strong;
-
 	strong = QString("  %1").arg(n);
 	strong = msg + strong;
 
 	QDateTime dt = QDateTime::currentDateTime();
-	QString str = dt.toString("dd.MM.yyyy  hh:mm:ss");
+	QString str = dt.toString("dd.MM.yyyy  hh:mm:ss  ");
 	str += strong;
-	str += "\n";
-	ts << str;;
-	tf->close();
+	ts << str << "\n";
+	qDebug()<<str;
 }
 
 
@@ -856,29 +833,20 @@ void Trace(QString msg, int n)
 */
 void Trace(QString msg, double f)
 {
-//	if(!((CXFLR5App*)AfxGetApp())->bTrace) return;
-	QString FileName = QDir::tempPath() + "/Trace.log";
-	QFile *tf = new QFile(FileName);
-	if (!tf->open(QIODevice::ReadWrite | QIODevice::Text)) return;
+	if(!MainFrame::s_bTrace) return;
+	QTextStream ts(MainFrame::s_pTraceFile);
 
 	QString strong;
-	QTextStream ts(tf);
-	while(!ts.atEnd()) ts>>strong;
-
-
 	strong = QString("  %1").arg(f);
 	strong = msg + strong;
 
 
 	QDateTime dt = QDateTime::currentDateTime();
-	QString str = dt.toString("dd.MM.yyyy  hh:mm:ss");
+	QString str = dt.toString("dd.MM.yyyy  hh:mm:ss  ");
 
 	str += strong;
-	str += "\n";
-	ts << str;
-
-
-	tf->close();
+	ts << str << "\n";
+	qDebug()<<str;
 }
 
 

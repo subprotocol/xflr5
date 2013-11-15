@@ -42,6 +42,7 @@
 #include "../objects/Plane.h"
 #include "../objects/CVector.h"
 
+#define VLMMAXRHS 100
 
 /**
  *@class PanelAnalysisDlg
@@ -66,8 +67,9 @@ class PanelAnalysisDlg : public QDialog
 
 public:
     PanelAnalysisDlg(QWidget *pParent);
+	~PanelAnalysisDlg();
 
-	void InitDialog();
+	bool InitDialog();
 
 private slots:
 	void OnCancelAnalysis();
@@ -109,7 +111,6 @@ private:
 	void DoubletNASA4023(CVector const &C, Panel *pPanel, CVector &V, double &phi, bool bWake=false);
 	void GetDoubletInfluence(CVector const &C, Panel *pPanel, CVector &V, double &phi, bool bWake=false, bool bAll=true);
 	void GetSourceInfluence(CVector const &C, Panel *pPanel, CVector &V, double &phi);
-	void RelaxWake();
 	void ScaleResultstoSpeed(int nval);
 	void SetAlpha(double AlphaMin, double AlphaMax, double AlphaDelta);
 	void SetFileHeader();
@@ -139,6 +140,10 @@ private:
 	void Forces(double *Mu, double *Sigma, double alpha, double *VInf, CVector &Force, CVector &Moment, bool bTilted);
 	double ComputeCm(double Alpha);
 
+	bool AllocateMatrix(int &memsize);
+	bool AllocateRHS(int &memsize);
+	void Release();
+
 public:
 	void GetSpeedVector(CVector const &C, double *Mu, double *Sigma, CVector &VT, bool bAll=true);
 	void GetSpeedVector(CVector const &C, float *Mu,  float *Sigma,  CVector &VT, bool bAll=true);
@@ -146,6 +151,8 @@ public:
 private:
 	static void *s_pMiarex;          /**< a void pointer to the instance of the QMiarex class. */
 	static void *s_pMainFrame;       /**< a void pointer to the instance of the MainFrame class. */
+
+	static int s_MaxRHSSize;         /**< the max number of RHS points, used for memeory allocation */
 
 	QFile *m_pXFile;                /**< A pointer to the instance of the output log file */
 
@@ -177,25 +184,24 @@ private:
 
 	double m_Progress;          /**< A measure of the progress of the analysis, used to provide feedback to the user */
 
-	double m_AlphaMin;          /**< The starting aoa for the analysis of type 1 & 2 polars */
 	double m_AlphaMax;          /**< The ending aoa for the analysis of type 1 & 2 polars */
 	double m_AlphaDelta;        /**< The aoa increment for the analysis of type 1 & 2 polars */
 	double m_Alpha;             /**< The angle of attack of the current calculation, in degree */
 	double m_OpAlpha;           /**< The angle of attack of the current calculation used in Tilted analysis, in degree */
 
-    double m_CL;                /**< The lift coefficient */
-    double m_CX;                /**< The drag coefficient */
-    double m_CY;                /**< The side force coefficient */
+	double m_CL;                /**< The lift coefficient */
+	double m_CX;                /**< The drag coefficient */
+	double m_CY;                /**< The side force coefficient */
 	
  	double m_InducedDrag;       /**< The UFO's induced drag coefficient */
 	double m_ViscousDrag;       /**< The UFO's viscous drag coefficient */
 	double m_VCm;               /**< The UFO's viscous pitching moment coefficient */
-    double m_VYm;               /**< The UFO's viscous yawing moment coefficient */
-    double m_ICm;               /**< The UFO's induced pitching moment coefficient */
-    double m_IYm;               /**< The UFO's induced yawing moment coefficient */
-    double m_GCm;               /**< The UFO's total pitching moment coefficient */
-    double m_GRm;               /**< The UFO's total rolling moment coefficient */
-    double m_GYm;               /**< The UFO's total yawing moment coefficient */
+	double m_VYm;               /**< The UFO's viscous yawing moment coefficient */
+	double m_ICm;               /**< The UFO's induced pitching moment coefficient */
+	double m_IYm;               /**< The UFO's induced yawing moment coefficient */
+	double m_GCm;               /**< The UFO's total pitching moment coefficient */
+	double m_GRm;               /**< The UFO's total rolling moment coefficient */
+	double m_GYm;               /**< The UFO's total yawing moment coefficient */
 	double m_QInf;              /**< The value of the velocity used in the current calculation */
 	double m_QInfMax;           /**< The max value of the velocity for the analysis of type 4 polars */
 	double m_QInfDelta;         /**< The increment value of the velocity for the analysis of type 4 polars */
@@ -209,42 +215,42 @@ private:
 	double side, sign, dist, S, GL;
 	double RNUM, DNOM, PN, A, B, PA, PB, SM, SL, AM, AL, Al, pjk, CJKi;
 
-	double XNP;  /**< Neutral point x-position resulting from stability analysis */
+	double XNP;                 /**< Neutral point x-position resulting from stability analysis */
 	double CXu, CZu, Cmu, CXq, CZq, Cmq, CXa, CZa, Cma; // Non dimensional stability derivatives
 	double CYb, CYp, CYr, Clb, Clp, Clr, Cnb, Cnp, Cnr;
 	double CXe, CYe, CZe, Cle, Cme, Cne;
 
-	double *m_aij, *m_aijWake;
-	double *m_RHS, *m_RHSRef;
+	double *m_aij;           /**< coefficient matrix for the panel analysis. Is declared as a common member variable to save memory allocation times*/
+	double *m_aijWake;       /**< coefficient matrix. Is declared as a common member variable to save memory allocation times*/
+	double *m_RHS;           /**< RHS vector. Is declared as a common member variable to save memory allocation times */
+	double *m_RHSRef;        /**< RHS vector. Is declared as a common member variable to save memory allocation times */
+	double *m_SigmaRef;
+	double *m_Sigma;         /**< The array of resulting source strengths of the analysis */
+	double *m_Mu;            /**< The array of resulting doublet strengths, or vortex circulations if the panel is located on a thin surface */
+	double *m_Cp;            /**< The array of lift coef per panel */
+	double *m_3DQInf;        /**< a pointer to the calculated balance speeds for each aoa in Type 2 and Type 7 analysis */
 
-	double m_Sigma[VLMMAXMATSIZE*VLMMAXRHS];		/**< The array of resulting source strengths of the analysis */
-	double m_Mu[VLMMAXMATSIZE*VLMMAXRHS];			/**< The array of resulting doublet strengths, or vortex circulations if the panel is located on a thin surface */
-	double m_Cp[VLMMAXMATSIZE*VLMMAXRHS];			/**< The array of lift coef per panel */
-	double m_3DQInf[VLMMAXRHS];                     /**< The calculated balance speeds for each aoa in Type 2 and Type 7 analysis */
+	CVector *m_uVl, *m_wVl;
+	double *m_uRHS, *m_vRHS, *m_wRHS;
+	double *m_pRHS, *m_qRHS, *m_rRHS;
+	double *m_cRHS;
+	double *m_uWake, *m_wWake;
 
-	CVector m_uVl[VLMMAXMATSIZE],m_wVl[VLMMAXMATSIZE];
-	double m_uRHS[VLMMAXMATSIZE], m_vRHS[VLMMAXMATSIZE], m_wRHS[VLMMAXMATSIZE];
-	double m_pRHS[VLMMAXMATSIZE], m_qRHS[VLMMAXMATSIZE], m_rRHS[VLMMAXMATSIZE];
-	double m_cRHS[VLMMAXMATSIZE];
-	double m_uWake[VLMMAXMATSIZE], m_wWake[VLMMAXMATSIZE];
+	int *m_Index;               /**< a point to the array of indexes used in matrix LU decomposition */
 
-	int m_Index[VLMMAXMATSIZE];
-
-	CVector m_Speed[VLMMAXMATSIZE];                 /**< The calculated surface speeds in a panel analysis */
+	CVector *m_Speed;           /**< a pointer to the calculated surface speeds in a panel analysis */
 
 	QString m_strOut;
 	
-//	CPanel **m_ppPanel;//the sorted array of panel pointers
 	Panel *m_pPanel;           /**< the current working array of array of panels */
 	Panel *m_pWakePanel;       /**< the current working array of wake panel array */
 	Panel *m_pRefWakePanel;    /**< a copy of the reference wake node array if wake needs to be reset */
 	Panel *m_pMemPanel;        /**< a copy of the reference panel array if the panels need to be restored, for instance after control surfaces have been rotated*/
 
-	CVector *m_pNode;	       /**< the working array of Nodes  */
+	CVector *m_pNode;	       /**< the working array of nodes  */
 	CVector *m_pMemNode;	   /**< a copy of the reference node array, if the nodes need to be restored */
 	CVector *m_pWakeNode;	   /**< the current working wake node array */
 	CVector *m_pRefWakeNode;   /**< a copy of the reference wake node array if the flat wake geometry needs to be restored */
-	CVector *m_pTempWakeNode;  /**< the temporary wake node array during relaxation calc */
 
 	
 	WPolar *m_pWPolar;         /**< a pointer to the current WPolar object */

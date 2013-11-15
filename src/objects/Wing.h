@@ -178,8 +178,6 @@ private:
 	static void* s_pMainFrame;       /**< a static pointer to the MainFrame window */
 	static void* s_pMiarex;          /**< a static pointer to the Miarex Application window */
 	static void* s_p3DPanelDlg;      /**< a static pointer to the instance of the PanelAnalysisDlg class if a calculation is on-going*/
-	static CVector *m_pWakeNode;     /**< a static pointer to the array of wake nodes */
-	static Panel *m_pWakePanel;      /**< a static pointer to the array of wake panels */
 
 	static bool s_bVLMSymetric;	     /**< true if the vlm calculation is symmetric */
 
@@ -199,8 +197,8 @@ private:
 
 	double m_QInf0;                  /**< the freestream velocity */
 
-	double m_VolumeMass;             /**< the mass of the wing's structure, excluding point masses */
-	double m_TotalMass;              /**< the wing's total mass, i.e. the sum of the volume mass and of the point masses */
+	double m_VolumeMass;             /**< the mass of the Wing's structure, excluding point masses */
+	double m_TotalMass;              /**< the Wing's total mass, i.e. the sum of the volume mass and of the point masses */
 
 	double m_GChord;                 /**< the mean geometric chord */
 	double m_yMac;                   /**< the mean aerodynamic chord span position  -  @todo meaning and calculation are unclear*/
@@ -247,10 +245,10 @@ public:
 	QString m_WingName;	                       /**< the wing's name; this name is used to identify the wing and as a reference for child Polar and WingOpp objects. */
 	QString m_WingDescription;                 /**< a text field for the description of the wing */
 
-	QColor m_WingColor;                        /**< the wing's color */
+	QColor m_WingColor;                        /**< the Wing's display color */
 
 	QList<WingSection*> m_WingSection;         /**< the array of wing sections. A WingSection extends between a foil and the next. */
-	QList<PointMass*> m_PointMass;             /**< the array of PointMass objects */
+	QList<PointMass*> m_PointMass;             /**< the array of PointMass objects associated to this Wing object*/
 
 	int m_NSurfaces; 	                       /**< the number of Surface objects built on the wing geometry (=2 x number of WingSection) @todo replace with a QList<Surface>*/
 	Surface m_Surface[2*MAXSPANSECTIONS];      /**< the array of Surface objects associated to the wing @todo replace with a QList<Surface>*/
@@ -269,7 +267,7 @@ public:
 	CVector m_CoG;                             /**< the position of the CoG */
 
 	int m_MatSize;                             /**< the size of the influence matrix */
-	Panel *m_pPanel;                           /**< a pointer to the array of panels */
+	Panel *m_pWingPanel;                       /**< a pointer to the first panel of this wing in the array of panels */
 };
 
 #endif

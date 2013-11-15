@@ -65,7 +65,7 @@ public:
 	double Weight(const double &d, int const &i, int const &N);
 
 	static void* s_pMainFrame;      /**< a static pointer to the instance of the MainFrame object */
-	QList<Frame*> m_pFrame;	        /**< the array of Frames at the stations */
+	QList<Frame*> m_pFrame;	        /**< a pointer to the array of Frame objects */
 
 	int m_iuDegree;                 /**< the degree of the NURBS in the u direction */
 	int m_ivDegree;                 /**< the degree of the NURBS in the v direction */
@@ -77,7 +77,7 @@ public:
 
 	int m_iRes;                     /**< the number of output points to draw the NURBS in both directions */
 
-	double m_Bunch;                 /**< a bunch parameter used to modify the output of point density at the end or at the middle of th NURBS */
+	double m_Bunch;                 /**< a bunch parameter used to modify the output of point density at the end or at the middle of the NURBS */
 	double m_EdgeWeightu;           /**< for a full NURBS. Unused, though, not practical */
 	double m_EdgeWeightv;           /**< for a full NURBS. Unused, though, not practical */
 

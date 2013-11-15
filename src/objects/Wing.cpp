@@ -35,9 +35,6 @@
 
 
 
-CVector *Wing::m_pWakeNode;			//pointer to the VLM wake node array
-Panel  *Wing::m_pWakePanel;			//pointer to the VLM Wake Panel array
-
 void* Wing::s_pMainFrame;		//pointer to the Frame window
 void* Wing::s_pMiarex;	//pointer to the Miarex Application window
 void* Wing::s_p3DPanelDlg;//pointer to the 3DPanel analysis dialog class
@@ -92,9 +89,7 @@ Wing::Wing()
 
 	m_QInf0    = 0.0;
 
-	m_pPanel     = NULL;
-	m_pWakeNode  = NULL;
-	m_pWakePanel = NULL;
+	m_pWingPanel     = NULL;
 
 	m_CL                = 0.0;
 	m_CDv               = 0.0;
@@ -394,7 +389,7 @@ void Wing::ComputeGeometry()
 #define NYSTATIONS 40
 
 /**
-* Returns the inertia properties of the structure based on the object's mass and on the existing geometry
+* Calculates and returns the inertia properties of the structure based on the object's mass and on the existing geometry
 * The mass is assumed to have been set previously.
 * Mass = mass of the structure, excluding point masses
 * @param  &CoG a reference to the CoG point, as a result of the calculation
@@ -544,7 +539,7 @@ void Wing::ComputeVolumeInertia(CVector &CoG, double &CoGIxx, double &CoGIyy, do
 * Calculates the inertia tensor in geometrical (body) axis :
 *  - adds the volume inertia AND the inertia of point masses of all components
 *  - the body axis is the frame in which the geometry has been defined
-*  - the origin is the plane's CoG, taking into account all masses
+*  - the origin is the Wing's CoG, taking into account all masses
 */
 void Wing::ComputeBodyAxisInertia()
 {
@@ -1024,13 +1019,11 @@ void Wing::ComputeChords(int NStation, double *chord, double *offset, double *tw
 
 
 /**
-* Copies the gemetrical data from an existing wing
-*@param pWing a pointer to the instance of the reference wing object
+* Copies the gemetrical data from an existing Wing
+*@param pWing a pointer to the instance of the source Wing object
 */
 void Wing::Duplicate(Wing *pWing)
 {
-//	s_pMainFrame    = pWing->s_pMainFrame;
-//	s_pMiarex       = pWing->s_pMiarex;
 	m_NStation      = pWing->m_NStation;
 	m_PlanformSpan  = pWing->m_PlanformSpan;
 	m_ProjectedSpan = pWing->m_ProjectedSpan;
@@ -1052,18 +1045,18 @@ void Wing::Duplicate(Wing *pWing)
 	for (int is=0; is<pWing->m_WingSection.size(); is++)
 	{
 		AppendWingSection();
-		Chord(is)     = pWing->Chord(is);
-		YPosition(is)       = pWing->YPosition(is);
-		Offset(is)    = pWing->Offset(is);
-		Length(is)    = pWing->Length(is);
+		Chord(is)      = pWing->Chord(is);
+		YPosition(is)  = pWing->YPosition(is);
+		Offset(is)     = pWing->Offset(is);
+		Length(is)     = pWing->Length(is);
 		NXPanels(is)   = pWing->NXPanels(is) ;
 		NYPanels(is)   = pWing->NYPanels(is);
 		XPanelDist(is) = pWing->XPanelDist(is);
 		YPanelDist(is) = pWing->YPanelDist(is);
-		Twist(is)     = pWing->Twist(is);
-		Dihedral(is)  = pWing->Dihedral(is);
-		ZPosition(is)      = pWing->ZPosition(is);
-		YProj(is)     = pWing->YProj(is);
+		Twist(is)      = pWing->Twist(is);
+		Dihedral(is)   = pWing->Dihedral(is);
+		ZPosition(is)  = pWing->ZPosition(is);
+		YProj(is)      = pWing->YProj(is);
 
 		RightFoil(is)  = pWing->RightFoil(is);
 		LeftFoil(is)   = pWing->LeftFoil(is);
@@ -1657,7 +1650,7 @@ void Wing::PanelTrefftz(double QInf, double Alpha, double *Mu, double *Sigma, in
 			StripForce.Set(0.0,0.0,0.0);
 			for (l=0; l<coef*m_Surface[j].m_NXPanels; l++)
 			{
-				m_StripArea[m]  += m_pPanel[pp].Area;
+				m_StripArea[m]  += m_pWingPanel[pp].Area;
 				pp++;
 			}
 			m_StripArea[m] /= (double)coef;
@@ -1671,7 +1664,7 @@ void Wing::PanelTrefftz(double QInf, double Alpha, double *Mu, double *Sigma, in
 				// of the upstream part of the wake because the downstream part isn't modelled.
 				// If we were to model the downstream part, the total induced speed would be twice larger,
 				// so just add a factor 2 to account for this.
-				nw  = m_pPanel[p].m_iWake;
+				nw  = m_pWingPanel[p].m_iWake;
 				iTA = pWakePanel[nw].m_iTA;
 				iTB = pWakePanel[nw].m_iTB;
 				C = (pWakeNode[iTA] + pWakeNode[iTB])/2.0;
@@ -1693,7 +1686,7 @@ void Wing::PanelTrefftz(double QInf, double Alpha, double *Mu, double *Sigma, in
 				GammaStrip[m] = (-Mu[pos+p+coef*m_Surface[j].m_NXPanels-1] + Mu[pos+p]) *4.0*PI;
 				Wg += VInf;
 
-				StripForce  = m_pPanel[p].Vortex * Wg;
+				StripForce  = m_pWingPanel[p].Vortex * Wg;
 				StripForce *= GammaStrip[m] * pWPolar->m_Density / q;  // N/q
 
 				//____________________________
@@ -1707,14 +1700,14 @@ void Wing::PanelTrefftz(double QInf, double Alpha, double *Mu, double *Sigma, in
 				pp=p;
 				for(l=0; l<m_Surface[j].m_NXPanels; l++)
 				{
-					if(pWPolar->m_bVLM1 || m_pPanel[pp].m_bIsTrailing)
+					if(pWPolar->m_bVLM1 || m_pWingPanel[pp].m_bIsTrailing)
 					{
-						C = m_pPanel[pp].CtrlPt;
+						C = m_pWingPanel[pp].CtrlPt;
 						C.x = m_PlanformSpan * 1000.0;
 
 						pPanelDlg->GetSpeedVector(C, Mu, Sigma, Wg, false);
 
-						if(m_pPanel[pp].m_bIsTrailing)
+						if(m_pWingPanel[pp].m_bIsTrailing)
 						{
 							m_Vd[m]      = Wg;
 							InducedAngle = atan2(Wg.dot(WindNormal), QInf);
@@ -1724,7 +1717,7 @@ void Wing::PanelTrefftz(double QInf, double Alpha, double *Mu, double *Sigma, in
 						Wg += VInf; //total speed vector
 
 						//induced force
-						dF  = Wg * m_pPanel[pp].Vortex;
+						dF  = Wg * m_pWingPanel[pp].Vortex;
 						dF *= Mu[pp+pos];       // N/rho
 						StripForce += dF;       // N/rho
 					}
@@ -1815,13 +1808,13 @@ void Wing::PanelComputeBending(bool bThinSurface)
 		{
 			if(!bThinSurface)
 			{
-				ypos[m] = m_pPanel[p].CollPt.y;
-				zpos[m] = m_pPanel[p].CollPt.z;
+				ypos[m] = m_pWingPanel[p].CollPt.y;
+				zpos[m] = m_pWingPanel[p].CollPt.z;
  			}
 			else
 			{
-				ypos[m] = m_pPanel[p].VortexPos.y;
-				zpos[m] = m_pPanel[p].Vortex.z;
+				ypos[m] = m_pWingPanel[p].VortexPos.y;
+				zpos[m] = m_pWingPanel[p].Vortex.z;
  			}
 
 			p += coef*m_Surface[j].m_NXPanels;
@@ -1918,7 +1911,7 @@ void Wing::ScaleSweep(double NewSweep)
 
 
 /**
-* Scales the wing's twist angles so that the tip twist is set to the NewTwist value
+* Scales the wing's twist angles so that the tip twist is set to the NewTwist value.
 *@param NewTwist the new value of the average quarter-chord twist, in degrees
 */
 void Wing::ScaleTwist(double NewTwist)
@@ -1948,7 +1941,7 @@ void Wing::ScaleTwist(double NewTwist)
 
 
 /**
- * Loads or Saves the data of this wing to a binary file
+ * Loads or Saves the data of this Wing to a binary file.
  * @param ar the QDataStream object from/to which the data should be serialized
  * @param bIsStoring true if saving the data, false if loading
  * @return true if the operation was successful, false otherwise
@@ -2291,7 +2284,6 @@ bool Wing::SerializeWing(QDataStream &ar, bool bIsStoring)
  */
 int Wing::VLMGetPanelTotal()
 {
-//	QMiarex *pMiarex = (QMiarex*) s_pMiarex;
 	double MinPanelSize;
 
 	if(QMiarex::s_MinPanelSize>0.0) MinPanelSize = QMiarex::s_MinPanelSize;
@@ -2395,25 +2387,25 @@ void Wing::PanelComputeOnBody(double QInf, double Alpha, double *Cp, double *Gam
 			for (l=0; l<coef*m_Surface[j].m_NXPanels; l++)
 			{
 				// Get the force acting on the panel
-				if(m_pPanel[p].m_Pos!=MIDSURFACE)
+				if(m_pWingPanel[p].m_Pos!=MIDSURFACE)
 				{
-					ForcePt = m_pPanel[p].CollPt;
-					PanelForce = m_pPanel[p].Normal * (-Cp[p]) * m_pPanel[p].Area;      // Newtons/q
+					ForcePt = m_pWingPanel[p].CollPt;
+					PanelForce = m_pWingPanel[p].Normal * (-Cp[p]) * m_pWingPanel[p].Area;      // Newtons/q
 				}
 				else
 				{
 					// for each panel along the chord, add the lift coef
-					ForcePt = m_pPanel[p].VortexPos;
-					PanelForce  = WindDirection * m_pPanel[p].Vortex;
+					ForcePt = m_pWingPanel[p].VortexPos;
+					PanelForce  = WindDirection * m_pWingPanel[p].Vortex;
 					PanelForce *= 2.0 * Gamma[p] /QInf;                                 //Newtons/q
 
-					if(!pWPolar->m_bVLM1 && !m_pPanel[p].m_bIsLeading)
+					if(!pWPolar->m_bVLM1 && !m_pWingPanel[p].m_bIsLeading)
 					{
-						Force       = WindDirection * m_pPanel[p].Vortex;
+						Force       = WindDirection * m_pWingPanel[p].Vortex;
 						Force      *= 2.0 * Gamma[p+1] /QInf;                          //Newtons/q
 						PanelForce -= Force;
 					}
-					Cp[p] = PanelForce.dot(m_pPanel[p].Normal)/m_pPanel[p].Area;    //
+					Cp[p] = PanelForce.dot(m_pWingPanel[p].Normal)/m_pWingPanel[p].Area;    //
 				}
 				StripForce += PanelForce;                                           // Newtons/q
 				NForce = PanelForce.dot(SurfaceNormal);                             // Newtons/q
@@ -2591,7 +2583,7 @@ bool Wing::IsWingPanel(int nPanel)
 {
 	for(int p=0; p<m_MatSize; p++)
 	{
-		if(nPanel==m_pPanel[p].m_iElement) return true;
+		if(nPanel==m_pWingPanel[p].m_iElement) return true;
 	}
 	return false;
 }
@@ -2606,10 +2598,10 @@ bool Wing::IsWingNode(int nNode)
 {
 	for(int p=0; p<m_MatSize; p++)
 	{
-		if(nNode==m_pPanel[p].m_iLA) return true;
-		if(nNode==m_pPanel[p].m_iLB) return true;
-		if(nNode==m_pPanel[p].m_iTA) return true;
-		if(nNode==m_pPanel[p].m_iTB) return true;
+		if(nNode==m_pWingPanel[p].m_iLA) return true;
+		if(nNode==m_pWingPanel[p].m_iLB) return true;
+		if(nNode==m_pWingPanel[p].m_iTA) return true;
+		if(nNode==m_pWingPanel[p].m_iTB) return true;
 	}
 	return false;
 }

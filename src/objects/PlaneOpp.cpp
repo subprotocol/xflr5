@@ -27,22 +27,20 @@
 /**
 *The public constructor
 */
-PlaneOpp::PlaneOpp()
+PlaneOpp::PlaneOpp(int PanelArraySize)
 {
 	m_PlaneName   = "";
 	m_PlrName     = "";
 	m_NStation    = 0;
-	m_NPanels  = 0;
+	m_NPanels     = 0;
 	m_Color       = QColor(255,0,0);
 	m_Style       = 0;
 	m_Width       = 1;
 	m_WPolarType  = FIXEDSPEEDPOLAR;
-//	m_VLMType     = 1;
 
 	m_bIsVisible  = true;
 	m_bShowPoints = false;
-	for (int iw=0; iw<MAXWINGS; iw++) m_bWing[iw] = false;
-	m_bWing[0] = true;
+
 
 	m_bOut        = false;
 	m_bVLM1       = true;
@@ -53,10 +51,76 @@ PlaneOpp::PlaneOpp()
 	m_QInf                = 0.0;
 	m_Ctrl                = 0.0;
 
-	memset(m_Cp,    0, sizeof(m_Cp));
-	memset(m_Sigma, 0, sizeof(m_Sigma));
-	memset(m_G,     0, sizeof(m_G));
+
+//	for (int iw=0; iw<MAXWINGS; iw++) m_bWing[iw] = false;
+//	m_bWing[0] = true;
+
+	for (int iw=0; iw<MAXWINGS; iw++) m_pPlaneWOpp[iw] = NULL;
+
+	m_Cp = m_G = m_Sigma = NULL;
+	Allocate(PanelArraySize);
 }
+
+
+/**
+ * Adds a WingOpp to the PlaneOpp and initializes the data
+ * @param iw the index of the wing for which a WingOpp is added
+ * @param PanelArraySize the number of panels on the wing
+ */
+void PlaneOpp::AddWingOpp(int iw, int PanelArraySize)
+{
+//	m_bWing[iw] = true;
+	m_pPlaneWOpp[iw] = new WingOpp(PanelArraySize);
+}
+
+
+
+/**
+ * The public destructor
+ */
+PlaneOpp::~PlaneOpp()
+{
+	Release();
+}
+
+
+
+/** Allocate memory to the arrays */
+void PlaneOpp::Allocate(int PanelArraySize)
+{
+	Release();
+
+	m_NPanels = PanelArraySize;
+
+	m_Cp    = new float[PanelArraySize];
+	m_Sigma = new float[PanelArraySize];
+	m_G     = new float[PanelArraySize];
+	memset(m_G,     0, PanelArraySize * sizeof(float));
+	memset(m_Sigma, 0, PanelArraySize * sizeof(float));
+	memset(m_Cp,    0, PanelArraySize * sizeof(float));
+}
+
+
+/**
+ * Releases memory allocated on the heap
+ */
+void PlaneOpp::Release()
+{
+	if(m_Cp)    delete m_Cp;
+	if(m_Sigma) delete m_Sigma;
+	if(m_G)     delete m_G;
+
+	m_Cp = NULL;
+	m_Sigma = NULL;
+	m_G = NULL;
+
+	for (int iw=0; iw<MAXWINGS; iw++)
+	{
+		if(m_pPlaneWOpp[iw] != NULL) delete m_pPlaneWOpp[iw];
+		m_pPlaneWOpp[iw] = NULL;
+	}
+}
+
 
 
 /**
@@ -71,7 +135,6 @@ bool PlaneOpp::SerializePOpp(QDataStream &ar, bool bIsStoring)
 {
 	int ArchiveFormat;
 	int a, k;
-//	int p, p0;
 	float f, g, h;
 
 	if(bIsStoring)
@@ -92,7 +155,7 @@ bool PlaneOpp::SerializePOpp(QDataStream &ar, bool bIsStoring)
 		WriteCString(ar, m_PlrName);
 		for(int iw=1; iw<MAXWINGS; iw++)
 		{
-			if(m_bWing[iw])    ar << 1; else ar<<0;
+			if(m_pPlaneWOpp[iw])  ar << 1; else ar<<0;
 		}
 
 		if(m_bIsVisible)  ar << 1; else ar<<0;
@@ -120,7 +183,10 @@ bool PlaneOpp::SerializePOpp(QDataStream &ar, bool bIsStoring)
 
 		for(int iw=0; iw<MAXWINGS; iw++)
 		{
-			if(m_bWing[iw])	m_PlaneWOpp[iw].SerializeWingOpp(ar, bIsStoring);
+			if(m_pPlaneWOpp[iw])
+			{
+				m_pPlaneWOpp[iw]->SerializeWingOpp(ar, bIsStoring);
+			}
 		}
 	}
 	else
@@ -131,20 +197,37 @@ bool PlaneOpp::SerializePOpp(QDataStream &ar, bool bIsStoring)
 		ReadCString(ar, m_PlaneName);
 		ReadCString(ar, m_PlrName);
 
+		//always a main wing
+		if(m_pPlaneWOpp[0]!=NULL) delete m_pPlaneWOpp[0];
+		m_pPlaneWOpp[0] = new WingOpp();
+
 		if(ArchiveFormat>=1005)
 		{
 			ar >> a;
 			if (a!=0 && a!=1) return false;
-			if(a) m_bWing[1] = true; else m_bWing[1] = false;
+			if(a)
+			{
+				if(m_pPlaneWOpp[1]!=NULL) delete m_pPlaneWOpp[1];
+				m_pPlaneWOpp[1] = new WingOpp();
+			}
 		}
 
 		ar >> a;
 		if (a!=0 && a!=1) return false;
-		if(a) m_bWing[2] = true; else m_bWing[2] = false;
+		if(a)
+		{
+			if(m_pPlaneWOpp[2]!=NULL) delete m_pPlaneWOpp[2];
+			m_pPlaneWOpp[2] = new WingOpp();
+		}
 
 		ar >> a;
 		if (a!=0 && a!=1) return false;
-		if(a) m_bWing[3] = true; else m_bWing[3] = false;
+		if(a)
+		{
+			if(m_pPlaneWOpp[3]!=NULL) delete m_pPlaneWOpp[3];
+			m_pPlaneWOpp[3] = new WingOpp();
+		}
+
 
 		ar >> a;
 		if (a!=0 && a!=1) return false;
@@ -167,7 +250,6 @@ bool PlaneOpp::SerializePOpp(QDataStream &ar, bool bIsStoring)
 
 		ar >> a;
 		if (a!=0 && a!=1) return false;
-
 //		if(a) m_bMiddle = true; else m_bMiddle = false;
 
 		ar >> m_Style >> m_Width;
@@ -253,6 +335,14 @@ bool PlaneOpp::SerializePOpp(QDataStream &ar, bool bIsStoring)
 
 		if(ArchiveFormat>=1009)
 		{
+			if(m_G!=NULL)     delete m_G;
+			if(m_Sigma!=NULL) delete m_Sigma;
+			if(m_Cp!=NULL)    delete m_Cp;
+
+			m_G     = new float[m_NPanels];
+			m_Sigma = new float[m_NPanels];
+			m_Cp    = new float[m_NPanels];
+
 			for (k=0; k<m_NPanels; k++)
 			{
 				ar >> f >> g >> h;
@@ -262,43 +352,43 @@ bool PlaneOpp::SerializePOpp(QDataStream &ar, bool bIsStoring)
 			}
 		}
 
-//		ar >> m_VLMType;
 		ar >> k; //VLMType
 
-		if (!m_PlaneWOpp[0].SerializeWingOpp(ar, bIsStoring))
+		if (!m_pPlaneWOpp[0]->SerializeWingOpp(ar, bIsStoring))
 		{
 			return false;
 		}
 
-		m_Ctrl = m_PlaneWOpp[0].m_Ctrl; //forgot to save the variable in the POpp serialization...
 
 		if(ArchiveFormat>=1005)
 		{
-			if(m_bWing[1])
+			if(m_pPlaneWOpp[1])
 			{
-				if (!m_PlaneWOpp[1].SerializeWingOpp(ar, bIsStoring))
+				if (!m_pPlaneWOpp[1]->SerializeWingOpp(ar, bIsStoring))
 				{
 					return false;
 				}
 			}
 		}
-		if(m_bWing[2])
+		if(m_pPlaneWOpp[2])
 		{
-			if (!m_PlaneWOpp[2].SerializeWingOpp(ar, bIsStoring))
+			if (!m_pPlaneWOpp[2]->SerializeWingOpp(ar, bIsStoring))
 			{
 				return false;
 			}
 
 		}
-		if(m_bWing[3])
+		if(m_pPlaneWOpp[3])
 		{
-			if (!m_PlaneWOpp[3].SerializeWingOpp(ar, bIsStoring))
+			if (!m_pPlaneWOpp[3]->SerializeWingOpp(ar, bIsStoring))
 			{
 				return false;
 			}
 		}
+
+		m_Ctrl = m_pPlaneWOpp[0]->m_Ctrl; //forgot to save the variable in the POpp serialization...
+
 	}
 	return true;
 }
-
 

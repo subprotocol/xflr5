@@ -64,7 +64,8 @@ class WingOpp
 	friend class ObjectPropsDlg;
 
 public:
-	WingOpp();
+	WingOpp(int PanelArraySize=0);
+	~WingOpp();
 
 private:
 //________________METHODS____________________________________
@@ -73,8 +74,11 @@ private:
 	void GetWingOppProperties(QString &WingOppProperties);
 	double GetMaxLift();
 
+	void Allocate(int PanelArraySize);
+	void Release();
+
 private:
-	static void *s_pMiarex, *s_pMainFrame;
+	static void *s_pMainFrame;
 	QString m_WingName;	// the wing name to which the WingOpp belongs
 	QString m_PlrName; 	// the polar name to which the WingOpp belongs
 
@@ -132,12 +136,14 @@ public:
 	enumAnalysisMethod m_AnalysisMethod;   /**< defines by whih type of method (LLT, VLM, PANEL), this WingOpp was calculated */
 	enumPolarType m_WPolarType;		       /**< defines the type of the parent WPolar */
 
+	float *m_Cp;                           /**< a pointer to the array of lift coefficient for each panel */
+	float *m_G;                            /**< a pointer to the array of vortice or doublet strengths */
+	float *m_Sigma;                        /**< a pointer to the array of source strengths */
+
+
 	double m_Span;                         /**< the parent's Wing span */
 	double m_MAChord;                      /**< the parent's Wing mean aerodynamic chord*/
 	double m_QInf;                         /**< the freestream velocity */
-	float m_Cp[VLMMAXMATSIZE];             /**< the lift coefficient for each panel */
-	float m_G[VLMMAXMATSIZE];              /**< the vortice or doublet strengths */
-	float m_Sigma[VLMMAXMATSIZE];          /**< the source strengths */
 	double m_Alpha;                        /**< the aoa */
 	double m_Beta;                         /**< the sideslip angle */
 	double m_Phi;                          /**< the bank angle */

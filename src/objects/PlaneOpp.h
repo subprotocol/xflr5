@@ -52,27 +52,33 @@ class PlaneOpp
 	friend class WPolar;
 
 public:
-	PlaneOpp();
+	PlaneOpp(int PanelArraySize=0);
+	~PlaneOpp();
+
 	bool SerializePOpp(QDataStream &ar, bool bIsStoring);
 
+	void AddWingOpp(int iw, int PanelArraySize);
+
+	void Allocate(int PanelArraySize);
+	void Release();
+
 private:
-	WingOpp m_PlaneWOpp[MAXWINGS];  /**< the four WingOpp objects associated to the four wings */
+	WingOpp *m_pPlaneWOpp[MAXWINGS];  /**< An array of pointers to the four WingOpp objects associated to the four wings */
 	enumPolarType m_WPolarType;     /**< the type of the parent WPolar object */
 
-	QString m_PlaneName;       /**< the plane's name to which the PlaneOpp is attached */
+	QString m_PlaneName;       /**< the pPane's name to which the PlaneOpp is attached */
 	QString m_PlrName;         /**< the WPolar's name to which the PlaneOpp is attached */
 	
 	double m_Alpha;            /**< the angle of attack*/
 	double m_QInf;             /**< the freestream velocity */
 	double m_Beta;             /**< the sideslip angle */
 	double m_Bank;             /**< the bank angle */
-	double m_Ctrl;             /**< the value of the control Variable */
+	double m_Ctrl;             /**< the value of the control variable */
 	
 	int m_NStation;            /**< unused */
-//	int m_VLMType;             /**< unused */
 
 
-	bool m_bWing[MAXWINGS];    /**< true if respectively a main wing, 2nd wing, elevator, fin are part of the parent Plane object */
+//	bool m_bWing[MAXWINGS];    /**< true if respectively a main wing, 2nd wing, elevator, fin are part of the parent Plane object */
 	bool m_bVLM1;              /**<  true if the PlaneOpp is the result of a horseshoe VLM analysis */
 	bool m_bOut;               /**<  true if the interpolation of viscous properties was outside the Foil Polar mesh */
 
@@ -85,9 +91,9 @@ private:
 
 
 public:
-	float m_G[VLMMAXMATSIZE];        /**< the VLM vortex strengths, or the panel's doublet's strengths */
-	float m_Sigma[VLMMAXMATSIZE];    /**< the panel's source strengths */
-	float m_Cp[VLMMAXMATSIZE];       /**< the array of Cp coefficients */
+	float *m_G;        /**< the VLM vortex strengths, or the panel's doublet's strengths */
+	float *m_Sigma;    /**< the panel's source strengths */
+	float *m_Cp;       /**< the array of Cp coefficients */
 	int m_NPanels;                   /**<  the number of VLM or 3D-panels */
 };
 #endif

@@ -158,7 +158,7 @@ QAFoil::~QAFoil()
 
 
 /**
- * Initializes the state of the button widgets and of the QAction objects
+ * Initializes the state of the button widgets and of the QAction objects.
  */
 void QAFoil::CheckButtons()
 {
@@ -190,7 +190,7 @@ void QAFoil::CheckButtons()
 
 
 /**
- * Draws the scale on the neutral line
+ * Draws the scale on the neutral line.
  * @param painter a reference to the QPainter object with which to draw
  * @param scalex
  */
@@ -261,7 +261,7 @@ void QAFoil::DrawScale(QPainter &painter, double scalex)
 
 
 /**
- * Draws the X main grid
+ * Draws the X main grid.
  * @param painter a reference to the QPainter object with which to draw
  * @param scalex the scale factor in the x-direction
  * @param scaley the scale factor in the y-direction
@@ -299,7 +299,7 @@ void QAFoil::DrawXGrid(QPainter &painter, double scalex, double scaley, QPoint O
 
 
 /**
- * Draws the Y main grid
+ * Draws the Y main grid.
  * @param painter a reference to the QPainter object with which to draw
  * @param scalex the scale factor in the x-direction
  * @param scaley the scale factor in the y-direction
@@ -339,7 +339,7 @@ void QAFoil::DrawYGrid(QPainter &painter, double scalex, double scaley, QPoint O
 
 
 /**
- * Draws the X minor grid
+ * Draws the X minor grid.
  * @param painter a reference to the QPainter object with which to draw
  * @param scalex the scale factor in the x-direction
  * @param scaley the scale factor in the y-direction
@@ -391,7 +391,7 @@ void QAFoil::DrawXMinGrid(QPainter &painter, double scalex, double scaley, QPoin
 
 
 /**
- * Draws the Y minor grid
+ * Draws the Y minor grid.
  * @param painter a reference to the QPainter object with which to draw
  * @param scalex the scale factor in the x-direction
  * @param scaley the scale factor in the y-direction
@@ -442,7 +442,7 @@ void QAFoil::DrawYMinGrid(QPainter &painter, double scalex, double scaley, QPoin
 
 
 /**
- * Fills the table with the data from the Foil objects
+ * Fills the table with the data from the Foil objects.
  */
 void QAFoil::FillFoilTable()
 {
@@ -516,7 +516,7 @@ void QAFoil::FillFoilTable()
 
 
 /**
- * Fills the data from a Foil object in the specified table row
+ * Fills the data from a Foil object in the specified table row.
  * @param row the index of the row to be filled
  */
 void QAFoil::FillTableRow(int row)
@@ -724,7 +724,7 @@ CVector QAFoil::MousetoReal(QPoint &point)
 
 
 /**
- * Loads the user's default settings from the application QSettings object
+ * Loads the user's default settings from the application QSettings object.
  * @param pSettings a pointer to the QSettings object
  */
 void QAFoil::LoadSettings(QSettings *pSettings)
@@ -1133,7 +1133,7 @@ void QAFoil::mouseReleaseEvent(QMouseEvent *event)
 
 
 /**
- * The user has requested that the foil be derotated
+ * The user has requested that the foil be derotated.
  */
 void QAFoil::OnAFoilDerotateFoil()
 {
@@ -1171,7 +1171,7 @@ void QAFoil::OnAFoilDerotateFoil()
 
 
 /**
- * The user has requested that the foil be normalized to unit length
+ * The user has requested that the Foil be normalized to unit length.
  */
 void QAFoil::OnAFoilNormalizeFoil()
 {
@@ -1189,7 +1189,7 @@ void QAFoil::OnAFoilNormalizeFoil()
 
 
 /**
- * The user has requested a local refinement of the panels of the current foil
+ * The user has requested a local refinement of the panels of the current Foil.
  */
 void QAFoil::OnAFoilCadd()
 {
@@ -1240,7 +1240,7 @@ void QAFoil::OnAFoilCadd()
 }
 
 /**
- * The user has requested the display of a circle at the L.E. position
+ * The user has requested the display of a circle at the L.E. position.
  */
 void QAFoil::OnAFoilLECircle()
 {
@@ -1250,7 +1250,6 @@ void QAFoil::OnAFoilLECircle()
 	LECircleDlg.m_Radius      = m_LERad;
 	LECircleDlg.m_bShowRadius = m_bLECircle;
 	LECircleDlg.m_pAFoil      = this;
-	LECircleDlg.move(pMainFrame->m_DlgPos);
 	LECircleDlg.InitDialog();
 
 	if(LECircleDlg.exec()==QDialog::Accepted)
@@ -1258,13 +1257,12 @@ void QAFoil::OnAFoilLECircle()
 		m_LERad = LECircleDlg.m_Radius;
 		m_bLECircle = LECircleDlg.m_bShowRadius;
 	}
-	pMainFrame->m_DlgPos = LECircleDlg.pos();
 	UpdateView();
 }
 
 
 /**
- * The user has requested the launch of the interface to refine globally the Foil
+ * The user has requested the launch of the interface to refine globally the Foil.
 */
 void QAFoil::OnAFoilPanels()
 {
@@ -1316,7 +1314,7 @@ void QAFoil::OnAFoilPanels()
 }
 
 /**
- * The user has requested the launch of the interface to edit the Foil coordinates manually
+ * The user has requested the launch of the interface to edit the Foil coordinates manually.
 */
 void QAFoil::OnAFoilFoilCoordinates()
 {
@@ -1333,7 +1331,6 @@ void QAFoil::OnAFoilFoilCoordinates()
 
 	UpdateView();
 
-	m_pFoilCoordDlg->move(pMainFrame->m_DlgPos);
 	m_pFoilCoordDlg->m_pMemFoil    = MainFrame::s_pCurFoil;
 	m_pFoilCoordDlg->m_pBufferFoil = m_pBufferFoil;
 	m_pFoilCoordDlg->m_pXDirect    = NULL;
@@ -1580,7 +1577,7 @@ void QAFoil::OnAFoilInterpolateFoils()
 
 
 /**
- * The user has requested the launch of the interface used to create a NACA type foil.
+ * The user has requested the launch of the interface used to create a NACA type Foil.
  */
 void QAFoil::OnAFoilNacaFoils()
 {
@@ -1686,7 +1683,7 @@ void QAFoil::OnAFoilSetFlap()
 
 
 /**
- * The user has requested the deletion of the current Foil
+ * The user has requested the deletion of the current Foil.
  */
 void QAFoil::OnDelete()
 {
@@ -1701,7 +1698,7 @@ void QAFoil::OnDelete()
 
 
 /**
- * The user has requested the duplication of the current Foil
+ * The user has requested the duplication of the current Foil.
  */
 void QAFoil::OnDuplicate()
 {
@@ -1725,7 +1722,7 @@ void QAFoil::OnDuplicate()
 
 
 /**
- * The user has requested the export of the current Foil to a text file
+ * The user has requested the export of the current Foil to a text file.
  */
 void QAFoil::OnExportCurFoil()
 {
@@ -1756,7 +1753,7 @@ void QAFoil::OnExportCurFoil()
 
 
 /**
- * The user has requested the export of the current SplineFoil to a text file
+ * The user has requested the export of the current SplineFoil to a text file.
  */
 void QAFoil::OnExportSplinesToFile()
 {
@@ -1811,7 +1808,7 @@ void QAFoil::OnExportSplinesToFile()
 }
 
 /**
- * The visibility of a foil in the table has been toggled
+ * The visibility of a foil in the table has been toggled.
  * @param index a QModelIndex object clicked in the table
  */
 void QAFoil::FoilVisibleClicked(const QModelIndex& index)
@@ -1858,7 +1855,7 @@ void QAFoil::FoilVisibleClicked(const QModelIndex& index)
 }
 
 /**
- * A row has been clicked in the table of Foil objects
+ * A row has been clicked in the table of Foil objects.
  * @param index a QModelIndex object clicked in the table
  */
 void QAFoil::OnFoilClicked(const QModelIndex& index)
@@ -1883,7 +1880,7 @@ void QAFoil::OnFoilClicked(const QModelIndex& index)
 
 
 /**
- * The user has requested an edition of the style of the active Foil
+ * The user has requested an edition of the style of the active Foil.
  */
 void QAFoil::OnFoilStyle()
 {
@@ -1918,7 +1915,7 @@ void QAFoil::OnFoilStyle()
 
 
 /**
- * The user has requested the launch the interface for the edition of the grid parameters
+ * The user has requested the launch the interface for the edition of the grid parameters.
  */
 void QAFoil::OnGrid()
 {
@@ -1990,7 +1987,7 @@ void QAFoil::OnGrid()
 
 
 /**
- * The user has requested that the visibility of all Foil objects be turned off
+ * The user has requested that the visibility of all Foil objects be turned off.
  */
 void QAFoil::OnHideAllFoils()
 {
@@ -2009,7 +2006,7 @@ void QAFoil::OnHideAllFoils()
 
 
 /**
- * The user has requested that the visibility of the active Foil object be turned off
+ * The user has requested that the visibility of the active Foil object be turned off.
  */
 void QAFoil::OnHideCurrentFoil()
 {
@@ -2021,7 +2018,7 @@ void QAFoil::OnHideCurrentFoil()
 
 
 /**
- * The user has requested to restore the default settings for the splines
+ * The user has requested to restore the default settings for the splines.
  */
 void QAFoil::OnNewSplines()
 {
@@ -2058,7 +2055,7 @@ void QAFoil::OnRenameFoil()
 
 
 /**
- * The user has requested that the visibility of all Foil objects be turned on
+ * The user has requested that the visibility of all Foil objects be turned on.
  */
 void QAFoil::OnShowAllFoils()
 {
@@ -2076,7 +2073,7 @@ void QAFoil::OnShowAllFoils()
 
 
 /**
- * The user has requested that the visibility of the active Foil object be turned on
+ * The user has requested that the visibility of the active Foil object be turned on.
  */
 void QAFoil::OnShowCurrentFoil()
 {
@@ -2099,7 +2096,7 @@ void QAFoil::OnShowLegend()
 
 
 /**
- * The user has requested to convert the SplineFoil object to a Foil, and to store it in the database
+ * The user has requested to convert the SplineFoil object to a Foil, and to store it in the database.
  */
 void QAFoil::OnStoreSplines()
 {
@@ -2144,7 +2141,7 @@ void QAFoil::OnStoreSplines()
 
 
 /**
- * The user has requested to reset the x-scale to its default value
+ * The user has requested to reset the x-scale to its default value.
  */
 void QAFoil::OnResetXScale()
 {
@@ -2155,7 +2152,7 @@ void QAFoil::OnResetXScale()
 
 
 /**
- * The user has requested to reset the y-scale to its default value
+ * The user has requested to reset the y-scale to its default value.
  */
 void QAFoil::OnResetYScale()
 {
@@ -2164,7 +2161,7 @@ void QAFoil::OnResetYScale()
 }
 
 /**
- * The user has requested to reset the scales to their default value
+ * The user has requested to reset the scales to their default value.
  */
 void QAFoil::OnResetScales()
 {
@@ -2176,7 +2173,7 @@ void QAFoil::OnResetScales()
 
 
 /**
- * The user has requested the launch of the interface to edit SplineFoil data
+ * The user has requested the launch of the interface to edit SplineFoil data.
  */
 void QAFoil::OnSplineControls()
 {
@@ -2580,7 +2577,7 @@ void QAFoil::PaintFoils(QPainter &painter)
 
 
 /**
- * Ends the zoom-in operation
+ * Ends the zoom-in action.
  */
 void QAFoil::ReleaseZoom()
 {
@@ -2596,7 +2593,7 @@ void QAFoil::ReleaseZoom()
 
 
 /**
- * Saves the user-defined settings
+ * Saves the user-defined settings.
  * @param pSettings a pointer to the QSetting object.
  */
 void QAFoil::SaveSettings(QSettings *pSettings)
@@ -2678,7 +2675,7 @@ void QAFoil::SaveSettings(QSettings *pSettings)
 
 
 /**
- * Sets the default scale for the Foil display
+ * Sets the default scale for the Foil display.
  */
 void QAFoil::SetScale()
 {
@@ -2694,8 +2691,8 @@ void QAFoil::SetScale()
 
 
 /**
- * Overloaded function
- * Sets the default scale for the Foil display based on a specified client rectangle
+ * Overloaded function.
+ * Sets the default scale for the Foil display based on a specified client rectangle.
  */
 void QAFoil::SetScale(QRect CltRect)
 {
@@ -2706,7 +2703,7 @@ void QAFoil::SetScale(QRect CltRect)
 
 
 /**
- * The user has requested the context menu associated to the Foil table
+ * The user has requested the context menu associated to the Foil table.
  * @param position the right-click positon
  */
 void QAFoil::OnFoilTableCtxMenu(const QPoint & position)
@@ -2718,7 +2715,7 @@ void QAFoil::OnFoilTableCtxMenu(const QPoint & position)
 
 
 /**
- * Sets up the interface
+ * Sets up the GUI.
  */
 void QAFoil::SetupLayout()
 {
@@ -2853,7 +2850,7 @@ void QAFoil::SetParams()
 }
 
 /**
- * Turns on or off the display of the current Foil object
+ * Turns on or off the display of the current Foil object.
  * @param pFoil a pointer to the Foil object to show
  * @param bShow the new visibility status of the Foil
  */
@@ -2867,7 +2864,7 @@ void QAFoil::ShowFoil(Foil* pFoil, bool bShow)
 
 
 /**
- * Copies the current SplineFoil object to a new SplineFoil object and pushes it on the stack
+ * Copies the current SplineFoil object to a new SplineFoil object and pushes it on the stack.
  */
 void QAFoil::TakePicture()
 {
@@ -2886,7 +2883,7 @@ void QAFoil::TakePicture()
 
 
 /**
- * Restores a SplineFoil definition from the current position in the stack
+ * Restores a SplineFoil definition from the current position in the stack.
  */
 void QAFoil::SetPicture()
 {
@@ -2903,7 +2900,7 @@ void QAFoil::SetPicture()
 
 
 /**
- * The user has requested to Undo the last modification to the SplineFoil object
+ * The user has requested to Undo the last modification to the SplineFoil object.
  */
 void QAFoil::OnUndo()
 {
@@ -2920,7 +2917,7 @@ void QAFoil::OnUndo()
 
 
 /**
- *The user has requested a Redo operation after an undo
+ *The user has requested a Redo operation after an undo.
  */
 void QAFoil::OnRedo()
 {
@@ -2933,7 +2930,7 @@ void QAFoil::OnRedo()
 
 
 /**
-  * Clears the stack starting at a given position
+  * Clears the stack starting at a given position.
   * @param the first stack element to remove
   */
 void QAFoil::ClearStack(int pos)
@@ -2947,7 +2944,7 @@ void QAFoil::ClearStack(int pos)
 
 
 /**
- * Refresh the view
+ * Refreshes the view.
  */
 void QAFoil::UpdateView()
 {
@@ -3010,7 +3007,7 @@ void QAFoil::wheelEvent(QWheelEvent *event)
 
 
 /**
- * The width of the columns in the Foil table has been changed
+ * The width of the columns in the Foil table has been changed.
  */
 void QAFoil::OnColumnWidths()
 {
@@ -3027,9 +3024,7 @@ void QAFoil::OnColumnWidths()
  */
 void QAFoil::OnAFoilTableColumns()
 {
-	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
-    AFoilTableDlg dlg(this);
-	dlg.move(pMainFrame->m_DlgPos);
+	AFoilTableDlg dlg((MainFrame*)s_pMainFrame);
 
 	dlg.m_bFoilName    = !m_pctrlFoilTable->isColumnHidden(0);
 	dlg.m_bThickness   = !m_pctrlFoilTable->isColumnHidden(1);
@@ -3061,7 +3056,6 @@ void QAFoil::OnAFoilTableColumns()
 		m_pctrlFoilTable->setColumnHidden(10, !dlg.m_bLEXHinge);
 		m_pctrlFoilTable->setColumnHidden(11, !dlg.m_bLEYHinge);
 	}
-	pMainFrame->m_DlgPos = dlg.pos();
 }
 
 
@@ -3113,7 +3107,6 @@ void QAFoil::resizeEvent(QResizeEvent *event)
  */
 void QAFoil::OnInsertCtrlPt()
 {
-	//Inserts a point in the spline
 	if(MainFrame::s_pCurFoil) return; // Action can be performed only if the spline foil is selected
 
 	CVector Real = MousetoReal(m_PointDown);

@@ -2594,7 +2594,6 @@ void QXDirect::OnCpGraph()
 void QXDirect::OnCpGraphSettings()
 {
 	MainFrame* pMainFrame = (MainFrame*)s_pMainFrame;
-	m_pGraphDlg->move(pMainFrame->m_DlgPos);
 
 	QGraph graph;
 	graph.CopySettings(m_pCpGraph);
@@ -2606,7 +2605,7 @@ void QXDirect::OnCpGraphSettings()
 	{
 		m_pCpGraph->CopySettings(&graph);
 	}
-	pMainFrame->m_DlgPos = m_pGraphDlg->pos();
+
 	UpdateView();
 }
 
@@ -3659,7 +3658,6 @@ void QXDirect::OnGraphSettings()
 {
 	MainFrame* pMainFrame = (MainFrame*)s_pMainFrame;
 	QGraph *pGraph = NULL;
-	m_pGraphDlg->move(pMainFrame->m_DlgPos);
 
 	pGraph = m_pCurGraph;
 	if(!pGraph) return;
@@ -3680,7 +3678,6 @@ void QXDirect::OnGraphSettings()
 
 	m_pGraphDlg->SetParams();
 	int res = m_pGraphDlg->exec();
-	pMainFrame->m_DlgPos = m_pGraphDlg->pos();
 
 	if(res == QDialog::Accepted)
 	{
@@ -4458,7 +4455,6 @@ void QXDirect::OnRefinePanelsGlobally()
 	m_bBL       = false;
 	OnOpPoints();
 
-	m_pTwoDPanelDlg->move(pMainFrame->m_DlgPos);
 	m_pTwoDPanelDlg->m_pXDirect = this;
 	m_pTwoDPanelDlg->m_pAFoil   = NULL;
 	m_pTwoDPanelDlg->m_pBufferFoil = &m_BufferFoil;
@@ -4488,7 +4484,6 @@ void QXDirect::OnRefinePanelsGlobally()
 		SetBufferFoil();
 		m_pXFoil->InitXFoilGeometry(MainFrame::s_pCurFoil);
 	}
-	pMainFrame->m_DlgPos = m_pTwoDPanelDlg->pos();
 
 	m_bShowPanels = bState;//restore as it was
 	m_bPressure   = bPressure;
@@ -4542,7 +4537,6 @@ void QXDirect::OnRenamePolar()
 		if(pPolar->m_FoilName == MainFrame::s_pCurFoil->m_FoilName)
 			NameList.append(pPolar->m_PlrName);
 	}
-	m_pRenameDlg->move(pMainFrame->m_DlgPos);
 	m_pRenameDlg->m_pstrArray = & NameList;
 	m_pRenameDlg->m_strQuestion = tr("Enter the new name for the foil polar :");
 	m_pRenameDlg->m_strName     = m_pCurPolar->m_PlrName;
@@ -4553,7 +4547,6 @@ void QXDirect::OnRenamePolar()
 	while (bExists)
 	{
 		resp = m_pRenameDlg->exec();
-		pMainFrame->m_DlgPos = m_pRenameDlg->pos();
 		if(resp==QDialog::Accepted)
 		{
 			if (OldName == m_pRenameDlg->m_strName) return;
@@ -4974,7 +4967,6 @@ void QXDirect::OnSetTEGap()
 		SetBufferFoil();
 		m_pXFoil->InitXFoilGeometry(MainFrame::s_pCurFoil);
 	}
-	pMainFrame->m_DlgPos = m_pTEGapDlg->pos();
 
 	m_bPressure = bPressure;
 	m_bBL       = bBL;

@@ -1,7 +1,7 @@
 /****************************************************************************
 
     CPlane Class
-	Copyright (C) 2006-2009 Andre Deperrois adeperrois@xflr5.com
+	Copyright (C) 2006-2013 Andre Deperrois adeperrois@xflr5.com
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -27,48 +27,48 @@
 void*	Plane::s_pMainFrame;
 void*	Plane::s_pMiarex ;
 
-//
+/** The public constructor. */
 Plane::Plane()
 {
 	m_pBody   = NULL;
 
-	m_Wing.m_WingName   = QObject::tr("Wing");
-	m_Wing.ComputeGeometry();
-	m_Wing2.m_WingName   = QObject::tr("2nd Wing");
-	m_Wing2.ComputeGeometry();
+	m_Wing[0].m_WingName   = QObject::tr("Wing");
+	m_Wing[0].ComputeGeometry();
+	m_Wing[1].m_WingName   = QObject::tr("2nd Wing");
+	m_Wing[1].ComputeGeometry();
 
-	m_Stab.m_WingName    = QObject::tr("Elevator");
-	m_Stab.m_bIsFin      = false;
-	m_Stab.Chord(0)      = 0.100;
-	m_Stab.Chord(1)      = 0.080;
-	m_Stab.YPosition(0)  =   0.0;
-	m_Stab.YPosition(1)  = 0.150;
-	m_Stab.Length(0)     =   0.0;
-	m_Stab.Length(1)     = 0.150;
-	m_Stab.Offset(0)     =   0.0;
-	m_Stab.Offset(1)     = 0.020;
-	m_Stab.NXPanels(0)   = 7;
-	m_Stab.NYPanels(0)   = 7;
-	m_Stab.XPanelDist(0) = SINE;
-	m_Stab.YPanelDist(0) = UNIFORM;
-	m_Stab.ComputeGeometry();
+	m_Wing[2].m_WingName    = QObject::tr("Elevator");
+	m_Wing[2].m_bIsFin      = false;
+	m_Wing[2].Chord(0)      = 0.100;
+	m_Wing[2].Chord(1)      = 0.080;
+	m_Wing[2].YPosition(0)  =   0.0;
+	m_Wing[2].YPosition(1)  = 0.150;
+	m_Wing[2].Length(0)     =   0.0;
+	m_Wing[2].Length(1)     = 0.150;
+	m_Wing[2].Offset(0)     =   0.0;
+	m_Wing[2].Offset(1)     = 0.020;
+	m_Wing[2].NXPanels(0)   = 7;
+	m_Wing[2].NYPanels(0)   = 7;
+	m_Wing[2].XPanelDist(0) = SINE;
+	m_Wing[2].YPanelDist(0) = UNIFORM;
+	m_Wing[2].ComputeGeometry();
 
-	m_Fin.m_WingName    = QObject::tr("Fin");
-	m_Fin.m_bIsFin      = true;
-	m_Fin.Chord(0)      = 0.100;
-	m_Fin.Chord(1)      = 0.060;
-	m_Fin.YPosition(0)  = 0.000;
-	m_Fin.YPosition(1)  = 0.120;
-	m_Fin.Length(0)     = 0.000;
-	m_Fin.Length(1)     = 0.120;
-	m_Fin.Offset(0)     = 0.000;
-	m_Fin.Offset(1)     = 0.040;
-	m_Fin.NXPanels(0)   = 7;
-	m_Fin.NYPanels(0)   = 7;
-	m_Fin.XPanelDist(0) = UNIFORM;
-	m_Fin.YPanelDist(0) = SINE;
+	m_Wing[3].m_WingName    = QObject::tr("Fin");
+	m_Wing[3].m_bIsFin      = true;
+	m_Wing[3].Chord(0)      = 0.100;
+	m_Wing[3].Chord(1)      = 0.060;
+	m_Wing[3].YPosition(0)  = 0.000;
+	m_Wing[3].YPosition(1)  = 0.120;
+	m_Wing[3].Length(0)     = 0.000;
+	m_Wing[3].Length(1)     = 0.120;
+	m_Wing[3].Offset(0)     = 0.000;
+	m_Wing[3].Offset(1)     = 0.040;
+	m_Wing[3].NXPanels(0)   = 7;
+	m_Wing[3].NYPanels(0)   = 7;
+	m_Wing[3].XPanelDist(0) = UNIFORM;
+	m_Wing[3].YPanelDist(0) = SINE;
 
-	m_Fin.ComputeGeometry();
+	m_Wing[3].ComputeGeometry();
 
 	m_TailVolume       =   0.0;
 	m_WingLE[2].x      = 0.600;
@@ -98,18 +98,21 @@ Plane::Plane()
 
 	m_PointMass.clear();
 
-
 	m_PlaneName  = QObject::tr("Plane Name");
 }
 
-
+/**
+ * Calculates and returns the inertia properties of the structure based on the Body and Wing masses and on the existing geometry.
+ * The inertia is calculated in the CoG referential.
+ * @param Mass = mass of the structure, excluding point masses
+ * @param  &CoG a reference to the CoG point, as a result of the calculation
+ * @param  &CoGIxx xx axis component of the inertia tensor, calculated at the Plane's CoG
+ * @param  &CoGIyy yy axis component of the inertia tensor, calculated at the Plane's CoG
+ * @param  &CoGIzz zz axis component of the inertia tensor, calculated at the Plane's CoG
+ * @param  &CoGIxz xz axis component of the inertia tensor, calculated at the Plane's CoG
+*/
 void Plane::ComputeVolumeInertia(double &Mass, CVector & CoG, double &CoGIxx, double &CoGIyy, double &CoGIzz, double &CoGIxz)
 {
-	// the analysis uses each object inertia individually
-	// the export to AVL format is done for each object individually
-	// we add the volume inertias of the wings and body, excluding point masses
-
-	//initialize
 	double Ixx, Iyy, Izz, Ixz, PlaneMass;
 	CVector Pt;
 	CVector CoGBody;
@@ -117,19 +120,18 @@ void Plane::ComputeVolumeInertia(double &Mass, CVector & CoG, double &CoGIxx, do
 	Wing *pWing[MAXWINGS];
 	pWing[0] = pWing[1] = pWing[2] = pWing[3] = NULL;
 
-
-	pWing[0] = &m_Wing;
-	if(m_bBiplane) pWing[1] = &m_Wing2;
-	if(m_bStab)    pWing[2] = &m_Stab;
-	if(m_bFin)     pWing[3] = &m_Fin;
-
+	/** @todo use member array directly and NULL pointer testing*/
+	pWing[0] = m_Wing;
+	if(m_bBiplane) pWing[1] = m_Wing+1;
+	if(m_bStab)    pWing[2] = m_Wing+2;
+	if(m_bFin)     pWing[3] = m_Wing+3;
 
 	CoG.Set(0.0, 0.0, 0.0);
 	CoGIxx = CoGIyy = CoGIzz = CoGIxz = 0.0;
 	PlaneMass = 0.0;
 
 	//get the wing's inertias
-	for(int iw=0; iw<4; iw++)
+	for(int iw=0; iw<MAXWINGS; iw++)
 	{
 		if(pWing[iw] && pWing[iw]->m_VolumeMass>PRECISION)
 		{
@@ -145,7 +147,7 @@ void Plane::ComputeVolumeInertia(double &Mass, CVector & CoG, double &CoGIxx, do
 		}
 	}
 
-	if(getBody())
+	if(body())
 	{
 		if(m_pBody->m_VolumeMass>PRECISION)
 		{
@@ -163,7 +165,7 @@ void Plane::ComputeVolumeInertia(double &Mass, CVector & CoG, double &CoGIxx, do
 	else              CoG.Set(0.0, 0.0, 0.0);
 
 
-	//Deduce inertia tensor in plane CoG from Huyghens/Steiner theorem
+	// Deduce inertia tensor in plane CoG from Huyghens/Steiner theorem
 	// we transfer the inertia of each component, defined in its own CG, 
 	// to the new origin which is the plane's Volume CoG, excluding point masses
 
@@ -179,7 +181,7 @@ void Plane::ComputeVolumeInertia(double &Mass, CVector & CoG, double &CoGIxx, do
 		}
 	}
 
-	if(getBody())
+	if(body())
 	{
 		Pt = CoGBody - CoG;
 		CoGIxx += m_pBody->m_VolumeMass * (Pt.y*Pt.y + Pt.z*Pt.z);
@@ -192,25 +194,27 @@ void Plane::ComputeVolumeInertia(double &Mass, CVector & CoG, double &CoGIxx, do
 
 
 
+
+/**
+* Calculates the inertia tensor in geometrical (body) axis :
+*  - adds the volume inertia AND the inertia of point masses of all components
+*  - the body axis is the frame in which the geometry has been defined
+*  - the origin is the plane's CoG, taking into account all masses
+*/
 void Plane::ComputeBodyAxisInertia()
 {
-	//
-	// Initializes the inertia tensor in geometrical (body) axis :
-	//  - adds the volume inertia AND the point masses of all components
-	//  - the body axis is the frame in which all the geometry has been defined
-	//  - the origin is the plane's CoG, taking into account all masses
-	//
-
 	int i, iw;
 	CVector VolumeCoG, MassPos;
 	Wing *pWing[MAXWINGS];
 	double Ixx, Iyy, Izz, Ixz,  VolumeMass;
 	Ixx = Iyy = Izz = Ixz = VolumeMass = 0.0;
 
-	pWing[0] = &m_Wing;
-	if(m_bBiplane) pWing[1] = &m_Wing2; else pWing[1] = NULL;
-	if(m_bStab)    pWing[2] = &m_Stab;  else pWing[2] = NULL;
-	if(m_bFin)     pWing[3] = &m_Fin;   else pWing[3] = NULL;
+
+	/** @todo use member array directly and NULL pointer testing*/
+	pWing[0] = m_Wing;
+	if(m_bBiplane) pWing[1] = m_Wing+1; else pWing[1] = NULL;
+	if(m_bStab)    pWing[2] = m_Wing+2; else pWing[2] = NULL;
+	if(m_bFin)     pWing[3] = m_Wing+3; else pWing[3] = NULL;
 
 	ComputeVolumeInertia(VolumeMass, VolumeCoG, Ixx, Iyy, Izz, Ixz);
 	m_TotalMass = VolumeMass;
@@ -236,7 +240,7 @@ void Plane::ComputeBodyAxisInertia()
 		}
 	}
 
-	if(getBody())
+	if(body())
 	{
 		for(i=0; i<m_pBody->m_PointMass.size(); i++)
 		{
@@ -280,7 +284,7 @@ void Plane::ComputeBodyAxisInertia()
 			}
 		}
 	}
-	if(getBody())
+	if(body())
 	{
 		Body *pBody = m_pBody;
 		for(i=0; i<pBody->m_PointMass.size(); i++)
@@ -296,33 +300,39 @@ void Plane::ComputeBodyAxisInertia()
 
 
 
-
+/**
+* Calculates the Plane's tail volume = lever_arm_elev x Area_Elev / MAC_Wing / Area_Wing 
+*/
 void Plane::ComputePlane(void)
 {
 	int i;
 	if(m_bStab)
 	{
-		double SLA = m_WingLE[2].x + m_Stab.Chord(0)/4.0 - m_Wing.Chord(0)/4.0;
-		double area = m_Wing.m_ProjectedArea;
-		if(m_bBiplane) area += m_Wing2.m_ProjectedArea;
+		double SLA = m_WingLE[2].x + m_Wing[2].Chord(0)/4.0 - m_Wing[0].Chord(0)/4.0;
+		double area = m_Wing[0].m_ProjectedArea;
+		if(m_bBiplane) area += m_Wing[1].m_ProjectedArea;
 
 		double ProjectedArea = 0.0;
-		for (i=0;i<m_Stab.NWingSection()-1; i++)
+		for (i=0;i<m_Wing[2].NWingSection()-1; i++)
 		{
-			ProjectedArea += m_Stab.Length(i+1)*(m_Stab.Chord(i)+m_Stab.Chord(i+1))/2.0
-							*cos(m_Stab.Dihedral(i)*PI/180.0)*cos(m_Stab.Dihedral(i)*PI/180.0);//m2
+			ProjectedArea += m_Wing[2].Length(i+1)*(m_Wing[2].Chord(i)+m_Wing[2].Chord(i+1))/2.0
+							*cos(m_Wing[2].Dihedral(i)*PI/180.0)*cos(m_Wing[2].Dihedral(i)*PI/180.0);//m2
 		
 		}
 		ProjectedArea *=2.0;
-		m_TailVolume = ProjectedArea * SLA / area/m_Wing.m_MAChord ;
+		m_TailVolume = ProjectedArea * SLA / area/m_Wing[0].m_MAChord ;
 	}
 	else m_TailVolume = 0.0;
-	m_Fin.m_bDoubleFin = m_bDoubleFin;
-	m_Fin.m_bSymFin    = m_bSymFin;
+	m_Wing[3].m_bDoubleFin = m_bDoubleFin;
+	m_Wing[3].m_bSymFin    = m_bSymFin;
 }
 
 
 
+/**
+* Copies the data from an existing Plane
+*@param pPlane a pointer to the instance of the source Plane object
+*/
 void Plane::Duplicate(Plane *pPlane)
 {
 	m_PlaneName        = pPlane->m_PlaneName;
@@ -340,22 +350,12 @@ void Plane::Duplicate(Plane *pPlane)
 
 	for(int iw=0; iw<MAXWINGS; iw++)
 	{
-		m_WingTiltAngle [iw] = pPlane->m_WingTiltAngle[iw];
-		m_WingLE[iw] = pPlane->m_WingLE[iw];
+		m_WingTiltAngle[iw] = pPlane->m_WingTiltAngle[iw];
+		m_WingLE[iw]        = pPlane->m_WingLE[iw];
+		m_Wing[iw].Duplicate(pPlane->m_Wing+iw);
 	}
 
 	m_BodyPos.Copy(pPlane->m_BodyPos);
-
-	m_Wing.Duplicate(&pPlane->m_Wing);
-	m_Wing2.Duplicate(&pPlane->m_Wing2);
-	m_Fin.Duplicate(&pPlane->m_Fin);
-	m_Stab.Duplicate(&pPlane->m_Stab);
-
-	m_Wing.m_WingColor  = pPlane->m_Wing.m_WingColor;
-	m_Wing2.m_WingColor = pPlane->m_Wing2.m_WingColor;
-	m_Stab.m_WingColor  = pPlane->m_Stab.m_WingColor;
-	m_Fin.m_WingColor   = pPlane->m_Fin.m_WingColor;
-
 
 	m_TotalMass  = pPlane->m_TotalMass;
 	m_CoG = pPlane->m_CoG;
@@ -375,30 +375,44 @@ void Plane::Duplicate(Plane *pPlane)
 
 }
 
-
+/**
+* Returns the plane's tail volume
+* @return the plane's tail volume
+*/
 double Plane::TailVolume()
 {
 	if(m_bStab) return m_TailVolume;
 	else        return 0.0;
 }
 
-
+/**
+* Returns the Plane's total mass, i.e. the sum of Volume and Point masses of all its components.
+* @return the Plane's total mass.
+*/
 double Plane::TotalMass()
 {
 	static double Mass;
 	
-	Mass = m_Wing.TotalMass();
-	if(m_bBiplane) Mass += m_Wing2.TotalMass();
-	if(m_bStab)    Mass += m_Stab.TotalMass();
-	if(m_bFin)     Mass += m_Fin.TotalMass();
-	if(getBody())    Mass += m_pBody->TotalMass();
+	Mass = m_Wing[0].TotalMass();
+	if(m_bBiplane) Mass += m_Wing[1].TotalMass();
+	if(m_bStab)    Mass += m_Wing[2].TotalMass();
+	if(m_bFin)     Mass += m_Wing[3].TotalMass();
+	if(body())  Mass += m_pBody->TotalMass();
 	
 	for(int i=0; i<m_PointMass.size(); i++)
 		Mass += m_PointMass[i]->mass();
+		
 	return Mass;
 }
 
 
+
+/**
+ * Loads or Saves the data of this Plane to a binary file.
+ * @param ar the QDataStream object from/to which the data should be serialized
+ * @param bIsStoring true if saving the data, false if loading
+ * @return true if the operation was successful, false otherwise
+ */
 bool Plane::SerializePlane(QDataStream &ar, bool bIsStoring)
 {
 	QMiarex *pMiarex = (QMiarex*)s_pMiarex;
@@ -406,7 +420,7 @@ bool Plane::SerializePlane(QDataStream &ar, bool bIsStoring)
 	int i, nMass;
 	float f,g,h;
 
-	QString strong = "Nobody";
+	QString strong = "";
 	int ArchiveFormat;// identifies the format of the file
 	if (bIsStoring)
 	{
@@ -426,10 +440,10 @@ bool Plane::SerializePlane(QDataStream &ar, bool bIsStoring)
 		WriteCString(ar, m_PlaneName);
 		WriteCString(ar, m_PlaneDescription);
 
-		m_Wing.SerializeWing(ar, true);
-		m_Wing2.SerializeWing(ar, true);
-		m_Stab.SerializeWing(ar, true);
-		m_Fin.SerializeWing(ar, true);
+		m_Wing[0].SerializeWing(ar, true);
+		m_Wing[1].SerializeWing(ar, true);
+		m_Wing[2].SerializeWing(ar, true);
+		m_Wing[3].SerializeWing(ar, true);
 		if(m_bStab)          ar <<1; else ar <<0;
 		if(m_bFin)           ar <<1; else ar <<0;
 		if(m_bDoubleFin)     ar <<1; else ar <<0;
@@ -481,10 +495,11 @@ bool Plane::SerializePlane(QDataStream &ar, bool bIsStoring)
 
 		if(ArchiveFormat>=1011) ReadCString(ar, m_PlaneDescription);
 
-		m_Wing.SerializeWing(ar, false);
-		if(ArchiveFormat>=1007) m_Wing2.SerializeWing(ar, false);
-		m_Stab.SerializeWing(ar, false);
-		m_Fin.SerializeWing(ar, false);
+		/**@todo remove non active wings from serialization */
+		m_Wing[0].SerializeWing(ar, false);
+		if(ArchiveFormat>=1007) m_Wing[1].SerializeWing(ar, false);
+		m_Wing[2].SerializeWing(ar, false);
+		m_Wing[3].SerializeWing(ar, false);
 
 		ar >>k;
 		if(k) m_bStab = true; else m_bStab = false;
@@ -495,16 +510,16 @@ bool Plane::SerializePlane(QDataStream &ar, bool bIsStoring)
 		{
 			ar >>k;
 			if(k) m_bDoubleFin = true;  else m_bDoubleFin = false;
-			m_Fin.m_bDoubleFin = m_bDoubleFin;
+			m_Wing[3].m_bDoubleFin = m_bDoubleFin;
 			ar >>k;
 			if(k) m_bSymFin = true;  else m_bSymFin = false;
-			m_Fin.m_bSymFin = m_bSymFin;
+			m_Wing[3].m_bSymFin = m_bSymFin;
 		}
 		if(ArchiveFormat>=1005)
 		{
 			ar >>k;
 			if(k) m_bDoubleSymFin = true;  else m_bDoubleSymFin = false;
-			m_Fin.m_bDoubleSymFin = m_bDoubleSymFin;
+			m_Wing[3].m_bDoubleSymFin = m_bDoubleSymFin;
 		}
 		if(ArchiveFormat>=1007)
 		{
@@ -595,32 +610,41 @@ bool Plane::SerializePlane(QDataStream &ar, bool bIsStoring)
 }
 
 
-
+/**
+* Initializes the pointers to the application's widgets.
+*/
 void Plane::SetParents(void *pMainFrame, void*pMiarex)
 {
 	s_pMainFrame = pMainFrame;
 	s_pMiarex    = pMiarex;
 }
 
-
+/**
+* Renames each of the Plane's Wing objects with an automatic name.
+*/
 void Plane::RenameWings()
 {
-	m_Wing.m_WingName  = m_PlaneName+"_Wing";
-	m_Wing2.m_WingName = m_PlaneName+"_Wing2";
-	m_Stab.m_WingName  = m_PlaneName+"_Elev";
-	m_Fin.m_WingName   = m_PlaneName+"_Fin";
+	m_Wing[0].m_WingName  = m_PlaneName+"_Wing";
+	m_Wing[1].m_WingName = m_PlaneName+"_Wing2";
+	m_Wing[2].m_WingName  = m_PlaneName+"_Elev";
+	m_Wing[3].m_WingName   = m_PlaneName+"_Fin";
 }
 
-
+/**
+* Creates the Surface objects associated to each of the Plane's Wing objects.
+*/
 void Plane::CreateSurfaces()
 {
-	m_Wing.CreateSurfaces(m_WingLE[0],  0.0, m_WingTiltAngle[0]);
-	m_Wing2.CreateSurfaces(m_WingLE[1], 0.0, m_WingTiltAngle[1]);
-	m_Stab.CreateSurfaces(m_WingLE[2],  0.0, m_WingTiltAngle[2]);
-	m_Fin.CreateSurfaces(m_WingLE[3], -90.0, m_WingTiltAngle[3]);
+	m_Wing[0].CreateSurfaces(m_WingLE[0],  0.0, m_WingTiltAngle[0]);
+	m_Wing[1].CreateSurfaces(m_WingLE[1], 0.0, m_WingTiltAngle[1]);
+	m_Wing[2].CreateSurfaces(m_WingLE[2],  0.0, m_WingTiltAngle[2]);
+	m_Wing[3].CreateSurfaces(m_WingLE[3], -90.0, m_WingTiltAngle[3]);
 }
 
-
+/**
+* Initiliazes the pointer to an existing Body object
+* @param pBody the pointer to the existing Body object
+*/
 void Plane::SetBody(Body *pBody)
 {
 	m_pBody = pBody;
@@ -628,20 +652,6 @@ void Plane::SetBody(Body *pBody)
 }
 
 
-CVector Plane::WingLE(int iw)
-{
-	return m_WingLE[iw];
-}
 
-
-CVector Plane::BodyPos()
-{
-	return m_BodyPos;
-}
-
-double Plane::WingTiltAngle(int iw)
-{
-	return m_WingTiltAngle[iw];
-}
 
 

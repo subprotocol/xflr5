@@ -270,10 +270,10 @@ void StabPolarDlg::InitDialog(Plane *pPlane, Wing *pWing, WPolar *pWPolar)
 	m_pPlane = pPlane;
 	if(m_pPlane)
 	{
-		m_pWingList[0] = pPlane->getWing();
-		m_pWingList[1] = pPlane->getWing2();
-		m_pWingList[2] = pPlane->getStab();
-		m_pWingList[3] = pPlane->getFin();
+		m_pWingList[0] = pPlane->wing();
+		m_pWingList[1] = pPlane->wing2();
+		m_pWingList[2] = pPlane->stab();
+		m_pWingList[3] = pPlane->fin();
 	}
 	else
 	{
@@ -383,9 +383,9 @@ void StabPolarDlg::InitDialog(Plane *pPlane, Wing *pWing, WPolar *pWPolar)
 
 	m_pctrlPlaneInertia->setChecked(s_StabPolar.m_bAutoInertia);
 	m_pctrlViscous->setChecked(s_StabPolar.m_bViscous);
-	m_pctrlIgnoreBodyPanels->setEnabled(m_pPlane && m_pPlane->getBody());
-	m_pctrlIgnoreBodyPanels->setChecked(m_pPlane && m_pPlane->getBody() && s_StabPolar.m_bIgnoreBodyPanels);
-	if(!m_pPlane || !m_pPlane->getBody()) s_StabPolar.m_bIgnoreBodyPanels=false;
+	m_pctrlIgnoreBodyPanels->setEnabled(m_pPlane && m_pPlane->body());
+	m_pctrlIgnoreBodyPanels->setChecked(m_pPlane && m_pPlane->body() && s_StabPolar.m_bIgnoreBodyPanels);
+	if(!m_pPlane || !m_pPlane->body()) s_StabPolar.m_bIgnoreBodyPanels=false;
 //	m_pctrlAVLControls->setChecked(s_StabPolar.m_bThinSurfaces);
 
 	OnAutoInertia();

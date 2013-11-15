@@ -1350,7 +1350,6 @@ void QXInverse::OnExtractFoil()
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 
     FoilSelectionDlg dlg(this);
-	dlg.move(pMainFrame->m_DlgPos);
 	dlg.m_poaFoil = m_poaFoil;
 	dlg.InitDialog();
 
@@ -1375,7 +1374,6 @@ void QXInverse::OnExtractFoil()
 		SetFoil();
 		UpdateView();
 	}
-	pMainFrame->m_DlgPos = dlg.pos();
 }
 
 
@@ -1401,15 +1399,12 @@ void QXInverse::OnFilter()
 void QXInverse::OnGraphSettings()
 {
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
-
 	GraphDlg *m_pGraphDlg = new GraphDlg(pMainFrame);
 
-	m_pGraphDlg->move(pMainFrame->m_DlgPos);
 	m_pGraphDlg->m_iGraphType = 31;
 	m_pGraphDlg->m_XSel = 0;
 	m_pGraphDlg->m_YSel = 0;
 	m_pGraphDlg->m_pGraph = &m_QGraph;
-
 
 	QGraph graph;
 	graph.CopySettings(&m_QGraph);
@@ -1424,7 +1419,7 @@ void QXInverse::OnGraphSettings()
 	{
 		m_QGraph.CopySettings(&graph);
 	}
-	pMainFrame->m_DlgPos = m_pGraphDlg->pos();
+
 	UpdateView();
 }
 

@@ -19,10 +19,9 @@
 
 *****************************************************************************/
 
-/*! @file
+/** @file
  *
- * This file defines the Curve object for the graphs
- *
+ * This file implements the Curve object for the graphs.
  *
  */
 
@@ -36,9 +35,14 @@
 #include <QVarLengthArray>
 #include <QColor>
 
+/**
+* @class Curve
+* This class defines the curve object used by the Graph class.
+*/
 class Curve
 {
 	friend class Graph;
+	friend class QGraph;
 
 public:
 	Curve();
@@ -48,14 +52,12 @@ public:
 	int     closestPoint(double xs, double ys, double &dist);
 	void    closestPoint(double xs, double ys, double &dist, int &n);
 	void    closestPoint(double const &xs, double const &ys, double &xSel, double &ySel, double &dist, int &nSel);
-	QColor  color();
 	void    CopyData(Curve *pCurve);
-	int     count();
 	void    Duplicate(Curve *pCurve);
 	int     GetSelected();
-	bool    IsVisible();
+
 	CVector point(int ref);
-	bool    PointsVisible();
+
 	void    ShowPoints(bool bShow);
 	void    SetVisible(bool bVisible);
 	void    SetColor(QColor clr);
@@ -63,32 +65,54 @@ public:
 	void    SetSelected(int n);
 	void    SetWidth(int nWidth);
 	void    SetTitle(QString Title);
-	/** Returns the curve's number of points. */
+
+	/** Return the visibility of the curve as a boolean. */
+	bool    IsVisible() {return m_bIsVisible;}
+
+	/** Return the visibility of the points as a boolean. */
+	bool    PointsVisible() {return m_bShowPoints; }
+
+	/** Returns the Curve's number of points. */
 	int     size() {return x.count();}
-	int     style();
-	void    title(QString &string);
-	int     width();
-	QString title();
+
+	/** Returns the Curve's number of points. */
+	int     count() {return x.size();}
+
+	/** Returns the Curve style*/
+	int     style() {return CurveStyle;}
+
+	/** Returns the Curve width*/
+	int     width() {return CurveWidth;}
+
+	/** Returns the Curve color*/
+	QColor  color() {return CurveColor;}
+
+	/** Returns the Curve's title */
+	void    title(QString &string) {string =  m_CurveName;}
+
+	/** Returns the Curve's title */
+	QString title(){ return m_CurveName;}
+
 	double  xMin();
 	double  xMax();
 	double  yMin();
 	double  yMax();
 
-
+public:
 	//	Curve Data
 	QVarLengthArray<double,  1024> x;          /**< the array of the points x-coordinates */
 	QVarLengthArray<double,  1024> y;          /**< the array of the points y-coordinates */
 
 
 private:	
-	bool m_bIsVisible;        /**< true if the curve is visible */
-	bool m_bShowPoints;       /**< true if the curve's points are visible */
-	QColor CurveColor;        /**< the curve's display color */
-	QString m_CurveName;      /**< the curves's name */
-	int CurveStyle;           /**< the index of the curve's display style */
-	int CurveWidth;           /**< the width of the curve's display */
-	int m_iSelected;          /**< the index of the curve's currently selected point, or -1 if none is selected */
-	void *m_pParentGraph;     /**< a pointer to the parent graph to which this curve belongs */
+	bool m_bIsVisible;                         /**< true if the curve is visible */
+	bool m_bShowPoints;                        /**< true if the curve's points are visible */
+	QColor CurveColor;                         /**< the curve's display color */
+	QString m_CurveName;                       /**< the curves's name */
+	int CurveStyle;                            /**< the index of the curve's display style */
+	int CurveWidth;                            /**< the width of the curve's display */
+	int m_iSelected;                           /**< the index of the curve's currently selected point, or -1 if none is selected */
+	void *m_pParentGraph;                      /**< a pointer to the parent graph to which this curve belongs */
 };
 
 

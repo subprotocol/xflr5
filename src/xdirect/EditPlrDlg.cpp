@@ -27,7 +27,6 @@
 #include <QHeaderView>
 
 #include "../xdirect/XDirect.h"
-#include "../miarex/Miarex.h"
 
 
 

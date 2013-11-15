@@ -138,7 +138,7 @@ class QMiarex : public QWidget
 public:
 
 	QMiarex(QWidget *parent = NULL);
-    ~QMiarex ();
+	~QMiarex();
 
 
 private slots:
@@ -290,6 +290,7 @@ public:
 	Wing*   AddWing(Wing *pWing);
 	void     AddWOpp(double QInf, double Alpha, bool bPointOut, double *Gamma = NULL, double *Sigma = NULL, double *Cp = NULL);
 	WPolar* AddWPolar(WPolar* pWPolar);
+	void   Connect();
 	double coreSize();
 	int  CreateBodyElements();
 	void CreateCpCurves();
@@ -388,7 +389,10 @@ public:
 	bool VLMIsSameSide(int p, int pp)
 	{
 		return m_Panel[p].m_Pos==m_Panel[pp].m_Pos;
-	};
+	}
+
+	bool Allocate(int &memsize);
+	void Release();
 
 
 //____________________Variables______________________________________
@@ -575,24 +579,18 @@ public:
 	QTimer *m_pTimerWOpp;         /**< A pointer to the timer which signals the animation in the operating point and 3D view */
 	QTimer *m_pTimerMode;         /**< A pointer to the timer which signals the animation of the modes in the 3D view */
 
-	CVector m_Node[2*VLMMAXMATSIZE];		/**< the node array for the currently loaded UFO*/
-	CVector m_TempWakeNode[2*VLMMAXMATSIZE];	/**< the temporary wake node array during relaxation calc*/
+	CVector *m_Node;              /**< the node array for the currently loaded UFO*/
+	CVector *m_MemNode;           /**< used if the analysis should be performed on the tilted geometry */
+	CVector *m_WakeNode;          /**< the current wake node array */
+	CVector *m_RefWakeNode;       /**< the reference wake node array if wake needs to be reset */
 
-	double m_aij[VLMMAXMATSIZE*VLMMAXMATSIZE];    /**< coefficient matrix for the panel analysis. Is declared as a common member variable to save memory allocation times*/
-	double m_aijRef[VLMMAXMATSIZE*VLMMAXMATSIZE]; /**< coefficient matrix. Is declared as a common member variable to save memory allocation times*/
-	double m_RHS[VLMMAXMATSIZE*VLMMAXRHS];			/**< RHS vector. Is declared as a common member variable to save memory allocation times */
-	double m_RHSRef[VLMMAXMATSIZE*VLMMAXRHS];		/**< RHS vector. Is declared as a common member variable to save memory allocation times */
+	Panel *m_Panel;               /**< the panel array for the currently loaded UFO */
+	Panel *m_MemPanel;            /**< used if the analysis should be performed on the tilted geometry */
+	Panel *m_WakePanel;           /**< the reference current wake panel array */
+	Panel *m_RefWakePanel;        /**< the reference wake panel array if wake= new CVector needs to be reset */
 
-	CVector m_MemNode[2*VLMMAXMATSIZE];         /**< used if the analysis should be performed on the tilted geometry */
-	CVector m_WakeNode[2*VLMMAXMATSIZE];        /**< the reference current wake node array */
-	CVector m_RefWakeNode[2*VLMMAXMATSIZE];     /**< the reference wake node array if wake needs to be reset */
-	Panel m_Panel[VLMMAXMATSIZE];		        /**< the panel array for the currently loaded UFO */
-	Panel m_MemPanel[VLMMAXMATSIZE];           /**< used if the analysis should be performed on the tilted geometry */
-	Panel m_WakePanel[VLMMAXMATSIZE];          /**< the reference current wake panel array */
-	Panel m_RefWakePanel[VLMMAXMATSIZE];       /**< the reference wake panel array if wake needs to be reset */
-
-	Wing *m_pWingList[MAXWINGS];         /**< an array of pointers to the four wings of the currently selected plane */
-	WingOpp *m_pWOpp[MAXWINGS];             /**< an array of pointers to the operating points of the four wings of the currently selected plane */
+	Wing *m_pWingList[MAXWINGS];  /**< an array of pointers to the four wings of the currently selected plane */
+	WingOpp *m_pWOpp[MAXWINGS];   /**< an array of pointers to the operating points of the four wings of the currently selected plane */
 
 	CVector m_L[(MAXBODYFRAMES+1)*(MAXSIDELINES+1)]; /**< Array of temporary points to save calculation times for body NURBS surfaces */
 	CVector m_T[(MAXBODYFRAMES+1)*(MAXSIDELINES+1)]; /**< Array of temporary points to save calculation times for body NURBS surfaces */
@@ -715,6 +713,9 @@ public:
 	static void *s_p3dWidget;           /**< a pointer to mainframe's central widget where 23 drawing is performed */
 	static double s_CoreSize;          /**< core radius of the VLM vortices */
 	static double s_MinPanelSize;      /**< wing minimum panel size ; panels of less length are ignored */
+
+	static int s_MaxMatSize;
+	static int s_MaxRHSSize;
 
 public:
 	// style variables... didn't bother to document

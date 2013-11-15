@@ -105,28 +105,33 @@ public:
 
 	NURBSSurface m_SplineSurface;
 
-//	int m_NSideLines;
-//	int m_NStations;			// the number of stations along x-axis where frames are defined
-	int m_iActiveFrame;		// the currently selected frame for display
-	int m_iHighlight;		// the currently selected frame for display
-	int m_LineType; //1=lines  2=B-Splines
-	int m_iRes; //for splines
-	int m_NElements;// = m_nxPanels * m_nhPanels *2
-	int m_nxPanels, m_nhPanels;
-	int m_BodyStyle, m_BodyWidth;
+	int m_iActiveFrame;		                  /**< the currently selected frame for display */
+	int m_iHighlight;                         /**< the currently selected point to highlight */
+	int m_LineType;                           /**< the type of body definition 1=lines  2=B-Splines @todo replace with an enumeration*/
+	int m_iRes;                               /**< the number of output points in one direction of the NURBS surface */
+	int m_NElements;                          /**< the number of mesh elements for this Body object = m_nxPanels * m_nhPanels *2 */
+	int m_nxPanels;                           /**< the number of mesh elements in the direction of the x-axis */
+	int m_nhPanels;                           /**< the number of mesh elements in the hoop direction */
 
-	double m_Bunch;
+	int m_BodyStyle;                          /**< the index of the spline's style */
+	int m_BodyWidth;                          /**< the width of the spline */
+	QColor m_BodyColor;                       /**< the Body's display color */
 
-	CVector m_CoG;
-	double m_VolumeMass, m_TotalMass;	    //for inertia calculations
-	QList<PointMass*> m_PointMass;
+	double m_Bunch;                            /**< a bunch parameter to set the density of the points of the NURBS surface; unused */
 
-	double m_CoGIxx,m_CoGIyy,m_CoGIzz,m_CoGIxz;
+	double m_VolumeMass;                       /**< the mass of the Body's structure, excluding point masses */
+	double m_TotalMass;                        /**< the wing's total mass, i.e. the sum of the volume mass and of the point masses */
+	QList<PointMass*> m_PointMass;             /**< the array of PointMass objects */
 
-	QString m_BodyName;
-	QString m_BodyDescription;
+	double m_CoGIxx;                           /**< the Ixx component of the inertia tensor, calculated at the CoG */
+	double m_CoGIyy;                           /**< the Ixx component of the inertia tensor, calculated at the CoG */
+	double m_CoGIzz;                           /**< the Ixx component of the inertia tensor, calculated at the CoG */
+	double m_CoGIxz;                           /**< the Ixx component of the inertia tensor, calculated at the CoG */
+	CVector m_CoG;                             /**< the position of the CoG */
 
-	QColor m_BodyColor;
+	QString m_BodyName;                        /**< the Body's name, used as it reference */
+	QString m_BodyDescription;                 /**< a free description for the Body */
+
 
 
 	int m_xPanels[MAXBODYFRAMES];
@@ -134,7 +139,7 @@ public:
 
 	CVector m_LEPosition;
 
-	Panel *m_pPanel;
+	Panel *m_pBodyPanel;          /** A pointer to the first body panel in the array */
 
 	//allocate temporary variables to
 	//avoid lengthy memory allocation times on the stack

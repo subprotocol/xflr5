@@ -19,18 +19,18 @@
 
 *****************************************************************************/
 
-
-/*! \file
- *
- * This class defines the polar object for the 2D analysis of foils
+/** 
+ * @file
+ * This file implements the Polar class for the 2D analysis of Foil objects
  *
  */
-
 
 
 #ifndef POLAR_H
 #define POLAR_H
 
+#include "OpPoint.h"
+#include <QList>
 
 /**
 *@brief
@@ -39,12 +39,6 @@
 	The class stores both the analysis parameters and the analysis results.
 	Each instance of this class is uniquely associated to an instance of a Foil object.
 */
-
-
-#include "OpPoint.h"
-#include <QList>
-
-
 class Polar
 {
 	friend class MainFrame;
@@ -58,27 +52,8 @@ class Polar
 	friend class ObjectPropsDlg;
 	friend class XFoil;
 
+
 private:
-	static void *s_pMainFrame;
-
-	int m_ReType;// the reynolds type
-	int m_MaType;//the mach type
-	double m_ASpec;//type 4 polars
-	double m_Mach;
-	double m_ACrit;
-	double m_XTop; 
-	double m_XBot;
-
-	int m_Style;
-	int m_Width;
-    QColor m_Color;
-
-    QString m_PlrName;
-
-	bool m_bIsVisible;
-	bool m_bShowPoints;
-
-
 	void AddData(OpPoint* pOpPoint);
 	void AddData(void* ptrXFoil);
 	void ExportPolar(QTextStream &out, enumTextFileType FileType, bool bDataOnly=false);
@@ -100,7 +75,6 @@ protected:
 	void Remove(int i);
 	void Insert(int i);
 	double GetCm0();
-	void GetBWStyle(QColor &color, int &style, int &width);
 
 public:
 	double GetZeroLiftAngle();
@@ -108,22 +82,45 @@ public:
 	void GetClLimits(double &Clmin, double &Clmax);
 	void GetLinearizedCl(double &Alpha0, double &slope);
 
-	QString m_FoilName;
-	double m_Reynolds;
-	enumPolarType m_PolarType;// the Polar format type - used for Serialize action
+	QString m_FoilName;                 /**< the name of the parent Foil to which this Polar object is attached */
+	double m_Reynolds;                  /**< the Reynolds number for a type 4 analysis (@todo check : the specified aoa in case of a Type 4 Polar ? */
+	enumPolarType m_PolarType;          /**< the Polar type */
 
-	QList <double> m_Alpha;
-	QList <double> m_Cl;
-	QList <double> m_XCp;
-	QList <double> m_Cd;
-	QList <double> m_Cdp;
-	QList <double> m_Cm;
-	QList <double> m_XTr1, m_XTr2;
-	QList <double> m_HMom, m_Cpmn;
-	QList <double> m_ClCd, m_Cl32Cd;
-	QList <double> m_RtCl;
-	QList <double> m_Re;//type 4 polars
+	QList <double> m_Alpha;             /**< the array of aoa values, in degrees */
+	QList <double> m_Cl;                /**< the array of lift coefficients */
+	QList <double> m_XCp;               /**< the array of centre of pressure positions */
+	QList <double> m_Cd;                /**< the array of drag coefficients */
+	QList <double> m_Cdp;               /**< the array of Cdp ? */
+	QList <double> m_Cm;                /**< the array of pitching moment coefficients */
+	QList <double> m_XTr1;              /**< the array of transition points on the top surface */
+	QList <double> m_XTr2;              /**< the array of transition points on the top surface */
+	QList <double> m_HMom;              /**< the array of flap hinge moments */
+	QList <double> m_Cpmn;              /**< the array of Cpmn ? */
+	QList <double> m_ClCd;              /**< the array of glide ratios */
+	QList <double> m_Cl32Cd;            /**< the array of power factors*/
+	QList <double> m_RtCl;              /**< the array of aoa values */
+	QList <double> m_Re;                /**< the array of Re coefficients */
 
+private:
+	static void *s_pMainFrame;          /**< a static pointer to the application's MainFrame window */
+
+    QString m_PlrName;                  /**< the Polar's name, used for references */
+
+	int m_ReType;                       /**< the type of Reynolds number input, cf. XFoil documentation */
+	int m_MaType;                       /**< the type of Mach number input, cf. XFoil documentation */
+	double m_ASpec;                     /**< the specified aoa in the case of Type 4 polars */
+	double m_Mach;                      /**< the Mach number */
+	double m_ACrit;                     /**< the transition criterion */
+	double m_XTop;                      /**< the point of forced transition on the upper surface */
+	double m_XBot;                      /**< the point of forced transition on the lower surface */
+
+	bool m_bIsVisible;                  /**< true if the Polar's curve is visible in the active view */
+	bool m_bShowPoints;                 /**< true if the Polar's curve points are visible in the active graphs */
+
+	int m_Style;                        /**< the index of the style with which to draw the Polar's curve */
+	int m_Width;                        /**< the width with which to draw the Polar's curve */
+	QColor m_Color;                     /**< the color with which to draw the Polar's curve */
+	
 };
 
 #endif

@@ -29,7 +29,6 @@
 #include <QSlider>
 #include <QLabel>
 #include <QSettings>
-#include "Miarex.h"
 #include "../misc/FloatEdit.h"
 
 class GL3DScales : public QWidget

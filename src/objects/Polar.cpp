@@ -349,7 +349,9 @@ void Polar::AddPoint(double Alpha, double Cd, double Cdp, double Cl, double Cm, 
 					bInserted = true;
 					break;
 				}
-                else if (Reynolds < m_Re[i]){// sort by crescending Reynolds numbers
+                else if (Reynolds < m_Re[i])
+				{
+					// sort by crescending Reynolds numbers
                     m_Alpha.insert(i, Alpha);
                     m_Cd.insert(i, Cd);
                     m_Cdp.insert(i, Cdp);
@@ -510,16 +512,6 @@ bool Polar::Serialize(QDataStream &ar, bool bIsStoring)
 		ReadCString(ar, m_FoilName);
 		ReadCString(ar, m_PlrName);
 
-/*		ar >> qi;
-
-		m_PlrName="";
-		for(j=0; j<qi;j++)
-		{
-			m_PlrName += " ";
-			ar >>ch;
-			m_PlrName[j] = char(ch);
-		}*/
-
 		if(m_FoilName =="" || m_PlrName =="" )
 		{
 			return false;
@@ -556,11 +548,6 @@ bool Polar::Serialize(QDataStream &ar, bool bIsStoring)
 		ar >> f; m_XBot =f;
 
 		ReadCOLORREF(ar, m_Color);
-//		b = (int)(colorref/256/256);
-//		colorref -= b*256*256;
-//		g = (int)(colorref/256);
-//		r = colorref - g*256;
-//		m_Color = QColor(r,g,b,255);
 
 		ar >> m_Style >> m_Width;
 
@@ -809,19 +796,6 @@ void Polar::GetLinearizedCl(double &Alpha0, double &slope)
 
 }
 
-
-/**
-*@deprecated
-*Returns an equivalent grey tone for the style of this polar.
-*Used for B&W printing
-*/
-void Polar::GetBWStyle(QColor &color, int &style, int &width)
-{
-	color = m_Color;
-	style = m_Style;
-	width = m_Width;
-//	GetBWColor(color, style, width);
-}
 
 /**
  * Returns a QString object holding the description and value of the polar's parameters

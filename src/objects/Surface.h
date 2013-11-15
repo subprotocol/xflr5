@@ -36,7 +36,7 @@
 #include "CVector.h"
 #include "WingSection.h"
 
-
+#define VLMHALF 2500
 
 /**
 *@class Surface
