@@ -139,8 +139,11 @@ void CtrlTableDelegate::drawCheck(QPainter *painter, const QStyleOptionViewItem 
 										  check(option, option.rect, Qt::Checked).size(),
 										  QRect(option.rect.x() + textMargin, option.rect.y(),
 												option.rect.width() - (textMargin * 2), option.rect.height()));
+
 	QItemDelegate::drawCheck(painter, option, checkRect, state);
 }
+
+
 
 
 bool CtrlTableDelegate::editorEvent(QEvent *event, QAbstractItemModel *model, const QStyleOptionViewItem &option,

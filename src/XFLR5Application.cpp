@@ -112,7 +112,7 @@ XFLR5Application::XFLR5Application(int &argc, char** argv) : QApplication(argc, 
 	}
 #endif
 
-	splash.finish(MainFrame::self());
+	splash.finish(w);
 }
 
 

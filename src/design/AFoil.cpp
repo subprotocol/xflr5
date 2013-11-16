@@ -776,7 +776,7 @@ void QAFoil::LoadSettings(QSettings *pSettings)
 		m_NeutralColor = QColor(r,g,b);
 		m_bNeutralLine = pSettings->value("NeutralLine").toBool();
 		
-		style  = pSettings->value("SFStyle", Qt::SolidLine).toInt();
+//		style  = pSettings->value("SFStyle", Qt::SolidLine).toInt();
 		width  = pSettings->value("SFWidth",1).toInt();
 		r = pSettings->value("SFColorRed",216).toInt();
 		g = pSettings->value("SFColorGreen",183).toInt();
@@ -1244,8 +1244,6 @@ void QAFoil::OnAFoilCadd()
  */
 void QAFoil::OnAFoilLECircle()
 {
-	MainFrame* pMainFrame = (MainFrame*)s_pMainFrame;
-
     LECircleDlg LECircleDlg(this);
 	LECircleDlg.m_Radius      = m_LERad;
 	LECircleDlg.m_bShowRadius = m_bLECircle;
@@ -2277,9 +2275,6 @@ void QAFoil::OnZoomLess()
 void QAFoil::PaintGrids(QPainter &painter)
 {
 	painter.save();
-//	TwoDWidget *p2DWidget = (TwoDWidget*)m_p2DWidget;
-	QColor color;
-	int style, width;
 
 	if(m_bZoomPlus&& !m_ZoomRect.isEmpty())
 	{
@@ -2304,9 +2299,6 @@ void QAFoil::PaintGrids(QPainter &painter)
 	
 	if (m_bNeutralLine)
 	{
-		color = m_NeutralColor;
-		style = m_NeutralStyle;
-		width = m_NeutralWidth;
 		QPen NPen(m_NeutralColor);
 		NPen.setStyle(GetStyle(m_NeutralStyle));
 		NPen.setWidth(m_NeutralWidth);
@@ -2514,8 +2506,6 @@ void QAFoil::PaintFoils(QPainter &painter)
 	painter.save();
 	int k;
 	Foil *pFoil;
-	QColor color;
-	int style, width;
 	MainFrame* pMainFrame = (MainFrame*)s_pMainFrame;
 
 	QPen FoilPen, CenterPen, CtrlPen;
@@ -2552,10 +2542,6 @@ void QAFoil::PaintFoils(QPainter &painter)
 	}
 	if (m_pBufferFoil->m_bVisible)
 	{
-		color = m_pBufferFoil->m_FoilColor;
-		style = m_pBufferFoil->m_nFoilStyle;
-		width = m_pBufferFoil->m_nFoilWidth;
-
 		m_pBufferFoil->DrawFoil(painter, 0.0, m_fScale, m_fScale*m_fScaleY,m_ptOffset);
 
 		if (m_pBufferFoil->m_bCenterLine)
@@ -2872,7 +2858,7 @@ void QAFoil::TakePicture()
 	ClearStack(m_StackPos);
 
 	// append a copy of the current object
-	m_UndoStack.append(new SplineFoil(m_pSF));
+	m_UndoStack.append(SplineFoil(m_pSF));
 
 	// the new current position is the top of the stack
 	m_StackPos = m_UndoStack.size()-1;

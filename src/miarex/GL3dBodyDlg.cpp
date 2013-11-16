@@ -3651,10 +3651,10 @@ void GL3dBodyDlg::SetupLayout()
 		}
 
 		QLabel *BodyDes = new QLabel(tr("Description:"));
-		BodyParams->setStretchFactor(m_pctrlBodyDescription,1);
 
 		m_pctrlBodyDescription = new QTextEdit();
 		m_pctrlBodyDescription->setToolTip(tr("Enter here a short description for the body"));
+		BodyParams->setStretchFactor(m_pctrlBodyDescription,1);
 
 		QHBoxLayout *BodyType = new QHBoxLayout;
 		{

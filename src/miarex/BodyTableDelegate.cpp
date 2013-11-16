@@ -62,7 +62,7 @@ void BodyTableDelegate::paint(QPainter *painter, const QStyleOptionViewItem &opt
 	QStyleOptionViewItem myOption = option;
 	myOption.displayAlignment = Qt::AlignRight | Qt::AlignVCenter;
 	strong = QString("%1").arg(index.model()->data(index, Qt::DisplayRole).toDouble(),0,'f', m_Precision[index.column()]);
-	
+
 //	if(index.row()> *m_pNRows) strong=" ";
 	drawDisplay(painter, myOption, myOption.rect, strong);
 	drawFocus(painter, myOption, myOption.rect);

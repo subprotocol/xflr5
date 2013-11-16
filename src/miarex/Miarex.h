@@ -21,7 +21,7 @@
 /**
  *@file
  *
- * The class associated to the GUI of 3D analysis
+ * This file implementsthe QMiarex class associated to the GUI of 3D analysis
  *
  */
 
@@ -415,9 +415,9 @@ private:
 	StabPolarDlg   *m_pStabPolarDlg;
 	UnitsDlg       *m_pUnitsDlg;
 	ObjectPropsDlg *m_pObjectPropsDlg;
-	GL3dWingDlg    *m_pWingDlg;
 	GL3dBodyDlg    *m_pGL3dBody;
 	GLLightDlg     *m_pGLLightDlg;
+	void    *m_pWingDlg;
 
 public:
 	LLTAnalysisDlg *m_pLLTDlg;                  /**< the dialog class which manages the LLT calculations */

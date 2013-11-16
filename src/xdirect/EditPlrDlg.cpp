@@ -42,6 +42,10 @@ EditPlrDlg::EditPlrDlg(QWidget *pParent) : QDialog(pParent)
 	m_pXDirect    = NULL;
 	m_pPolar      = NULL;
 
+	m_pctrlPointTable = NULL;
+	m_pPointModel     = NULL;
+	m_pFloatDelegate  = NULL;
+
 	SetupLayout();
 }
 
@@ -163,6 +167,7 @@ void EditPlrDlg::closeEvent(QCloseEvent*event)
 
 void EditPlrDlg::resizeEvent(QResizeEvent*event)
 {
+	if(!m_pPointModel || !m_pctrlPointTable) return;
 	int n = m_pPointModel->columnCount();
 	int w = m_pctrlPointTable->width();
 	int w14 = (int)((double)(w-25)/(double)n);
@@ -171,6 +176,7 @@ void EditPlrDlg::resizeEvent(QResizeEvent*event)
 		m_pctrlPointTable->setColumnWidth(i,w14);
 
 }
+
 
 void EditPlrDlg::keyPressEvent(QKeyEvent *event)
 {

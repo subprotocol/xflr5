@@ -266,6 +266,75 @@ QMiarex::QMiarex(QWidget *parent)
 		m_TimeGraph[ig].SetGraphName("Time Response");
 	}
 
+	m_bXPressed = m_bYPressed = false;
+
+	m_bVLM1              = true;
+	m_bTrefftz           = true;
+
+	m_b3DCp              = false;
+	m_bXCP               = true;
+	m_bDownwash          = true;
+	m_bMoments           = false;
+	m_bICd               = true;
+	m_bVCd               = true;
+	m_bTrans             = false;
+	m_bXTop              = false;
+	m_bXBot              = false;
+	m_bInitLLTCalc       = true;
+	m_bXCmRef            = true;
+	m_bLogFile           = true;
+	m_bHalfWing          = false;
+	m_bTransGraph        = true;
+	m_bFoilNames         = false;
+	m_bShowMasses        = false;
+	m_bPanelForce        = false;
+	m_bLongitudinal      = true;
+	m_bCurWOppOnly       = true;
+	m_bStoreWOpp         = true;
+	m_bKeepOutOpps       = false;
+	m_bCurFrameOnly      = true;
+	m_bType1 = m_bType2 = m_bType4 = m_bType5 = m_bType6 = m_bType7 = true;
+	m_bShowElliptic      = false;
+	m_bShowWingCurve[0] = m_bShowWingCurve[1] = m_bShowWingCurve[2] = m_bShowWingCurve[3] = true;
+	m_bAutoScales        = false;
+	m_bAutoScales        = false;
+	m_bAnimateWOpp       = false;
+	m_bAnimateWOppPlus   = true;
+	m_bAnimateMode       = false;
+
+	m_bResetglBody       = false;
+	m_bResetglBodyMesh   = true;
+
+	m_bResetglGeom       = true;
+	m_bResetglOpp        = true;
+	m_bResetglLift       = true;
+	m_bResetglDrag       = true;
+	m_bResetglDownwash   = true;
+	m_bResetglStream     = true;
+	m_bResetglMesh       = true;
+	m_bResetglWake       = true;
+	m_bResetglLegend     = true;
+	m_bResetglFlow       = true;
+	m_bResetglPanelForce = true;
+	m_bResetglPanelCp    = true;
+
+	m_bArcball           = false;
+	m_bStream            = false;
+	m_bVortices          = false;
+	m_bSpeeds            = false;
+	m_bWakePanels        = false;
+	m_bCrossPoint        = false;
+	m_bSurfaces          = true;
+	m_bOutline           = true;
+	m_bVLMPanels         = false;
+	m_bAxes              = true;
+	m_bPickCenter        = false;
+	m_bAutoCpScale	     = false;
+	m_bShowCpScale       = true;
+	m_bIs2DScaleSet      = false;
+	m_bIs3DScaleSet      = false;
+//	m_bForcedResponse    = true;
+
 	//set the axis labels for the time graphs
 	if(m_bLongitudinal)
 	{
@@ -412,74 +481,7 @@ QMiarex::QMiarex(QWidget *parent)
 
 	m_LiftScale = m_DragScale = m_VelocityScale = 0.7;
 
-	m_bXPressed = m_bYPressed = false;
 
-	m_bVLM1              = true;
-	m_bTrefftz           = true;
-
-	m_b3DCp              = false;
-	m_bXCP               = true;
-	m_bDownwash          = true;
-	m_bMoments           = false;
-	m_bICd               = true;
-	m_bVCd               = true;
-	m_bTrans             = false;
-	m_bXTop              = false;
-	m_bXBot              = false;
-
-	m_bXCmRef            = true;
-	m_bLogFile           = true;
-	m_bHalfWing          = false;
-	m_bTransGraph        = true;
-	m_bFoilNames         = false;
-	m_bShowMasses        = false;
-	m_bPanelForce        = false;
-	m_bLongitudinal      = true;
-	m_bCurWOppOnly       = true;
-	m_bStoreWOpp         = true;
-	m_bKeepOutOpps       = false;
-	m_bCurFrameOnly      = true;
-	m_bType1 = m_bType2 = m_bType4 = m_bType5 = m_bType6 = m_bType7 = true;
-	m_bShowElliptic      = false;
-	m_bShowWingCurve[0] = m_bShowWingCurve[1] = m_bShowWingCurve[2] = m_bShowWingCurve[3] = true;
-	m_bAutoScales        = false;
-	m_bAutoScales        = false;
-	m_bAnimateWOpp       = false;
-	m_bAnimateWOppPlus   = true;
-	m_bAnimateMode       = false;
-
-	m_bResetglBody       = false;
-	m_bResetglBodyMesh   = true;
-
-	m_bResetglGeom       = true;
-	m_bResetglOpp        = true;
-	m_bResetglLift       = true;
-	m_bResetglDrag       = true;
-	m_bResetglDownwash   = true;
-	m_bResetglStream     = true;
-	m_bResetglMesh       = true;
-	m_bResetglWake       = true;
-	m_bResetglLegend     = true;
-	m_bResetglFlow       = true;
-	m_bResetglPanelForce = true;
-	m_bResetglPanelCp    = true;
-
-	m_bArcball           = false;
-	m_bStream            = false;
-	m_bVortices          = false;
-	m_bSpeeds            = false;
-	m_bWakePanels        = false;
-	m_bCrossPoint        = false;
-	m_bSurfaces          = true;
-	m_bOutline           = true;
-	m_bVLMPanels         = false;
-	m_bAxes              = true;
-	m_bPickCenter        = false;
-	m_bAutoCpScale	     = false;
-	m_bShowCpScale       = true;
-	m_bIs2DScaleSet      = false;
-	m_bIs3DScaleSet      = false;
-//	m_bForcedResponse    = true;
 	m_StabilityResponseType = 0;
 	
 	m_LastPoint.setX(0);
@@ -571,7 +573,7 @@ void QMiarex::Connect()
 QMiarex::~QMiarex()
 {
     delete m_pPlaneDlg;
-    delete m_pWingDlg;
+	delete (GL3dWingDlg*)m_pWingDlg;
     delete m_pGraphDlg;
     delete m_pRenameDlg;
     delete m_pGL3dBody;
@@ -5808,10 +5810,6 @@ int QMiarex::IsWakeNode(CVector &Pt)
 int QMiarex::IsNode(CVector &Pt)
 {
 	int in;
-//	for (in=0; in<m_nNodes; in++)
-	// explore in reverse order, since we have better chance of 
-	// finding the node close to the last point when creating elements
-	// 
 	for (in=m_nNodes-1; in>=0; in--)
 	{
 		if(Pt.IsSame(m_Node[in])) return in;
@@ -8896,17 +8894,18 @@ void QMiarex::OnEditUFO()
 	Wing* pModWing= new Wing;
 	pModWing->Duplicate(m_pCurWing);
 
-    m_pWingDlg->m_bAcceptName= false;
-    m_pWingDlg->InitDialog(pModWing);
+	GL3dWingDlg *pWingDlg = (GL3dWingDlg*)m_pWingDlg;
+	pWingDlg->m_bAcceptName= false;
+	pWingDlg->InitDialog(pModWing);
 
-    if(QDialog::Accepted == m_pWingDlg->exec())
+	if(QDialog::Accepted == pWingDlg->exec())
 	{
-		if(m_pWingDlg->m_bDescriptionChanged)
+		if(pWingDlg->m_bDescriptionChanged)
 		{
 			pMainFrame->SetSaveState(false);
 			m_pCurWing->rWingDescription() = pModWing->WingDescription();
 		}
-        if(m_pWingDlg->m_bChanged)
+		if(pWingDlg->m_bChanged)
 		{
 			if(bHasResults)
 			{
@@ -10021,7 +10020,7 @@ void QMiarex::OnImportWPolar()
 		{
 			if(strong.length())
 			{
-				textline = strong.toAscii();
+				textline = strong.toLatin1();
 				text = textline.constData();
 
 				res = sscanf(text, "%lf%lf%lf%lf%lf%lf%lf%lf%lf%lf%lf%lf", &alpha, &CL, &ICd, &PCd, &TCd, &CY, &GCm, &GRm, &GYm, &IYm, &QInf, &XCP);
@@ -10190,10 +10189,12 @@ void QMiarex::OnNewWing()
 	Wing *pOldWing;
 	Wing* pWing = new Wing;
 
-	m_pWingDlg->m_bAcceptName= true;
-	if(!m_pWingDlg->InitDialog(pWing)) return;
+	GL3dWingDlg *pWingDlg = (GL3dWingDlg*)m_pWingDlg;
 
-	if(QDialog::Accepted == m_pWingDlg->exec())
+	pWingDlg->m_bAcceptName= true;
+	if(!pWingDlg->InitDialog(pWing)) return;
+
+	if(QDialog::Accepted == pWingDlg->exec())
 	{
 		pMainFrame->SetSaveState(false);
 		bool bExists = false;
@@ -15920,15 +15921,15 @@ void QMiarex::Release()
 Trace("QMiarex::Releasing()");
 	m_pPanelDlg->Release();
 
-	if(m_Node)        delete m_Node;
-	if(m_MemNode)     delete m_MemNode;
-	if(m_WakeNode)    delete m_WakeNode;
-	if(m_RefWakeNode) delete m_RefWakeNode;
+	if(m_Node)        delete[] m_Node;
+	if(m_MemNode)     delete[] m_MemNode;
+	if(m_WakeNode)    delete[] m_WakeNode;
+	if(m_RefWakeNode) delete[] m_RefWakeNode;
 	m_Node = m_MemNode = m_WakeNode = m_RefWakeNode = NULL;
 
-	if(m_Panel)        delete m_Panel;
-	if(m_MemPanel)     delete m_MemPanel;
-	if(m_WakePanel)    delete m_WakePanel;
-	if(m_RefWakePanel) delete m_RefWakePanel;
+	if(m_Panel)        delete[] m_Panel;
+	if(m_MemPanel)     delete[] m_MemPanel;
+	if(m_WakePanel)    delete[] m_WakePanel;
+	if(m_RefWakePanel) delete[] m_RefWakePanel;
 	m_Panel = m_MemPanel = m_WakePanel = m_RefWakePanel = NULL;
 }

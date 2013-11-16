@@ -270,38 +270,38 @@ bool PanelAnalysisDlg::AllocateRHS(int &memsize)
  */
 void PanelAnalysisDlg::Release()
 {
-	if(m_aij)     delete m_aij;
-	if(m_aijWake) delete m_aijWake;
+	if(m_aij)     delete [] m_aij;
+	if(m_aijWake) delete [] m_aijWake;
 	m_aij = m_aijWake = NULL;
 
-	if(m_RHS)      delete m_RHS;
-	if(m_RHSRef)   delete m_RHSRef;
-	if(m_SigmaRef) delete m_SigmaRef;
-	if(m_Sigma)    delete m_Sigma;
-	if(m_Mu)       delete m_Mu;
-	if(m_Cp)       delete m_Cp;
+	if(m_RHS)      delete [] m_RHS;
+	if(m_RHSRef)   delete [] m_RHSRef;
+	if(m_SigmaRef) delete [] m_SigmaRef;
+	if(m_Sigma)    delete [] m_Sigma;
+	if(m_Mu)       delete [] m_Mu;
+	if(m_Cp)       delete [] m_Cp;
 	m_RHS = m_RHSRef = m_SigmaRef = m_Sigma = m_Mu = m_Cp = NULL;
 
 	if(m_3DQInf) delete m_3DQInf;
 	m_3DQInf = NULL;
 
-	if(m_uVl) delete m_uVl;
-	if(m_wVl) delete m_wVl;
+	if(m_uVl) delete [] m_uVl;
+	if(m_wVl) delete [] m_wVl;
 	m_uVl = m_wVl = NULL;
 
-	if(m_uRHS) delete m_uRHS;
-	if(m_vRHS) delete m_vRHS;
-	if(m_wRHS) delete m_wRHS;
-	if(m_rRHS) delete m_rRHS;
-	if(m_cRHS) delete m_cRHS;
-	if(m_uWake) delete m_uWake;
-	if(m_wWake) delete m_wWake;
+	if(m_uRHS)  delete [] m_uRHS;
+	if(m_vRHS)  delete [] m_vRHS;
+	if(m_wRHS)  delete [] m_wRHS;
+	if(m_rRHS)  delete [] m_rRHS;
+	if(m_cRHS)  delete [] m_cRHS;
+	if(m_uWake) delete [] m_uWake;
+	if(m_wWake) delete [] m_wWake;
 	m_uRHS = m_vRHS = m_wRHS = m_rRHS = m_cRHS = m_uWake = m_wWake = NULL;
 
-	if(m_Index) delete m_Index;
+	if(m_Index) delete [] m_Index;
 	m_Index = NULL;
 
-	if(m_Speed) delete m_Speed;
+	if(m_Speed) delete [] m_Speed;
 	m_Speed = NULL;
 }
 

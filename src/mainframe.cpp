@@ -55,8 +55,17 @@
 #include "xdirect/FoilPolarDlg.h"
 #include "xinverse/XInverse.h"
 
-//#include <QDesktopWidget>
-#include <QtGui>
+#include <QMessageBox>
+#include <QtCore>
+#include <QToolBar>
+#include <QDockWidget>
+#include <QAction>
+#include <QMenu>
+#include <QMenuBar>
+#include <QStatusBar>
+#include <QApplication>
+#include <QDesktopServices>
+#include <QFileDialog>
 
 #ifdef Q_WS_MAC
 	#include <CoreFoundation/CoreFoundation.h>
@@ -73,7 +82,7 @@ QFile *MainFrame::s_pTraceFile = NULL;
 
 QPointer<MainFrame> MainFrame::_self = 0L;
 
-MainFrame::MainFrame(QWidget *parent, Qt::WFlags flags)
+MainFrame::MainFrame(QWidget * parent, Qt::WindowFlags flags)
 	: QMainWindow(parent, flags)
 {
 	s_pCurFoil = NULL;
@@ -100,7 +109,7 @@ MainFrame::MainFrame(QWidget *parent, Qt::WFlags flags)
 	QDir dir(qApp->applicationDirPath());
 	jpegPluginPath = dir.canonicalPath() + "/imageformats/qjpeg4.dll";
 #endif
-#ifdef Q_WS_X11
+#ifdef Q_OS_LINUX
 	QDir dir(qApp->applicationDirPath());
 	jpegPluginPath = dir.canonicalPath() + "/imageformats/libqjpeg.so";
 #endif
@@ -268,6 +277,60 @@ MainFrame::~MainFrame()
 	delete m_pTranslatorDlg;
 	delete m_pSaveOptionsDlg;
 	s_pTraceFile->close();
+
+	for(int ioa=m_oaFoil.size()-1; ioa>=0; ioa--)
+	{
+		delete (Foil*)m_oaFoil.at(ioa);
+		m_oaFoil.removeAt(ioa);
+	}
+
+	for(int ioa=m_oaPolar.size()-1; ioa>=0; ioa--)
+	{
+		delete (Polar*)m_oaPolar.at(ioa);
+		m_oaPolar.removeAt(ioa);
+	}
+
+	for(int ioa=m_oaOpp.size()-1; ioa>=0; ioa--)
+	{
+		delete (OpPoint*)m_oaOpp.at(ioa);
+		m_oaOpp.removeAt(ioa);
+	}
+
+	for(int ioa=m_oaPlane.size()-1; ioa>=0; ioa--)
+	{
+		delete (Plane*)m_oaPlane.at(ioa);
+		m_oaPlane.removeAt(ioa);
+	}
+
+	for(int ioa=m_oaWing.size()-1; ioa>=0; ioa--)
+	{
+		delete (Wing*)m_oaWing.at(ioa);
+		m_oaWing.removeAt(ioa);
+	}
+
+	for(int ioa=m_oaWPolar.size()-1; ioa>=0; ioa--)
+	{
+		delete (WPolar*)m_oaWPolar.at(ioa);
+		m_oaWPolar.removeAt(ioa);
+	}
+
+	for(int ioa=m_oaWOpp.size()-1; ioa>=0; ioa--)
+	{
+		delete (WingOpp*)m_oaWOpp.at(ioa);
+		m_oaWOpp.removeAt(ioa);
+	}
+
+	for(int ioa=m_oaPOpp.size()-1; ioa>=0; ioa--)
+	{
+		delete (PlaneOpp*)m_oaPOpp.at(ioa);
+		m_oaPOpp.removeAt(ioa);
+	}
+
+	for(int ioa=m_oaBody.size()-1; ioa>=0; ioa--)
+	{
+		delete (Body*)m_oaBody.at(ioa);
+		m_oaBody.removeAt(ioa);
+	}
 }
 
 
@@ -3729,7 +3792,7 @@ void MainFrame::OnGuidelines()
 	QDir dir(qApp->applicationDirPath());
 	QString FileName = dir.canonicalPath() + "/Guidelines.pdf" ;
 #endif
-#ifdef Q_WS_X11
+#ifdef Q_OS_LINUX
 	QDir dir("/usr/share/xflr5");
 	QString FileName = dir.canonicalPath() + "/Guidelines.pdf" ;
 #endif
@@ -3806,21 +3869,18 @@ void MainFrame::OnLanguage()
 #ifdef Q_WS_WIN
 	TranslationsDir.setPath(qApp->applicationDirPath());
 #endif
-#ifdef Q_WS_X11
+#ifdef Q_OS_LINUX
 	TranslationsDir.setPath("/usr/share/xflr5");
 #endif
 
 	m_pTranslatorDlg->m_TranslationDirPath = TranslationsDir.canonicalPath() + "/translations" ;
 	m_pTranslatorDlg->m_LanguageFilePath = m_LanguageFilePath;
 	m_pTranslatorDlg->InitDialog();
-//	dlg.move(m_DlgPos);
 	if(m_pTranslatorDlg->exec()==QDialog::Accepted)
 	{
 		m_LanguageFilePath = m_pTranslatorDlg->m_LanguageFilePath;
 	}
-//	m_DlgPos = dlg.pos();
 }
-
 
 
 
@@ -6845,7 +6905,7 @@ void MainFrame::UpdateOpps()
 			QByteArray textline;
 			const char *text;
 			double x;
-			textline = str.toAscii();
+			textline = str.toLatin1();
 			text = textline.constData();
 			int res = sscanf(text, "%lf", &x);
 

@@ -450,9 +450,10 @@ void GLCreateCp(void *pQMiarex, CVector *pNode, Panel *pPanel, WingOpp *pWOpp, P
 	double color;
 	double lmin, lmax, range;
 	float *tab;
-	double *CpInf= new double[2*QMiarex::s_MaxMatSize];
-	double *CpSup= new double[2*QMiarex::s_MaxMatSize];
-	double *Cp100= new double[2*QMiarex::s_MaxMatSize];
+
+	double CpInf[2*QMiarex::s_MaxMatSize];
+	double CpSup[2*QMiarex::s_MaxMatSize];
+	double Cp100[2*QMiarex::s_MaxMatSize];
 
 	CVector LA,LB,TA,TB;
 
@@ -577,9 +578,6 @@ void GLCreateCp(void *pQMiarex, CVector *pNode, Panel *pPanel, WingOpp *pWOpp, P
 	}
 	glEndList();
 
-	delete CpInf;
-	delete CpSup;
-	delete Cp100;
 }
 
 

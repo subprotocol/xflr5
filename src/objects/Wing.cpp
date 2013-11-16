@@ -23,9 +23,8 @@
 #include <math.h>
 #include <QtDebug>
 #include <QFile>
-#include <QTranslator>
-#include <QDesktopWidget>
-#include <QtGui>
+
+#include <QMessageBox>
 
 #include "Wing.h"
 #include "../mainframe.h"
@@ -129,6 +128,22 @@ Wing::Wing()
 		length += Length(is);
 		YPosition(is)  = length;
 		XPanelDist(is) =  COSINE;
+	}
+}
+
+
+Wing::~Wing()
+{
+	for(int iws=m_WingSection.size()-1; iws>=0; iws--)
+	{
+		delete m_WingSection.at(iws);
+		m_WingSection.removeAt(iws);
+	}
+
+	for(int ipm=m_PointMass.size()-1; ipm>=0; ipm--)
+	{
+		delete m_PointMass.at(ipm);
+		m_PointMass.removeAt(ipm);
 	}
 }
 

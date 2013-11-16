@@ -552,7 +552,7 @@ void WriteCString(QDataStream &ar, QString const &strong)
 
 	QByteArray textline;
 	char *text;
-	textline = strong.toAscii();
+	textline = strong.toLatin1();
 	text = textline.data();
 	ar << qi;
 	ar.writeRawData(text, qi);

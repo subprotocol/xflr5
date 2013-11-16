@@ -2593,8 +2593,6 @@ void QXDirect::OnCpGraph()
  */
 void QXDirect::OnCpGraphSettings()
 {
-	MainFrame* pMainFrame = (MainFrame*)s_pMainFrame;
-
 	QGraph graph;
 	graph.CopySettings(m_pCpGraph);
 	m_pGraphDlg->m_pMemGraph = m_pCurGraph;
@@ -3656,7 +3654,6 @@ void QXDirect::OnFoilGeom()
  */
 void QXDirect::OnGraphSettings()
 {
-	MainFrame* pMainFrame = (MainFrame*)s_pMainFrame;
 	QGraph *pGraph = NULL;
 
 	pGraph = m_pCurGraph;
@@ -4005,7 +4002,7 @@ void QXDirect::OnImportXFoilPolar()
 		{
 			if(strong.length())
 			{
-				textline = strong.toAscii();
+				textline = strong.toLatin1();
 				text = textline.constData();
 				res = sscanf(text, "%lf%lf%lf%lf%lf%lf%lf%lf%lf", &alpha, &CL, &CD, &CDp, &CM, &Xt, &Xb, &Cpmn, &HMom);
 
@@ -4053,7 +4050,7 @@ void QXDirect::OnImportXFoilPolar()
 void QXDirect::OnImportJavaFoilPolar()
 {
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
-	QString FileName, PolarName, FoilName;
+	QString FoilName;
 	QString strong, str;
 
 	QString PathName;
@@ -4136,7 +4133,7 @@ void QXDirect::OnImportJavaFoilPolar()
 				{
 					strong.replace(',', '.');
 
-					textline = strong.toAscii();
+					textline = strong.toLatin1();
 					text = textline.constData();
 
 					res = sscanf(text, "%lf%lf%lf%lf%lf%lf",&alpha, &CL, &CD, &CM, &Xt, &Xb);

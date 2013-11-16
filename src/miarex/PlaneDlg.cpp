@@ -283,10 +283,12 @@ void PlaneDlg::OnDefineWing()
 	QMiarex *pMiarex= (QMiarex*)s_pMiarex;
 	m_SaveWing.Duplicate(m_pPlane->wing());
 
-	pMiarex->m_pWingDlg->m_bAcceptName = false;
-	pMiarex->m_pWingDlg->InitDialog(m_pPlane->wing());
+	GL3dWingDlg *pWingDlg = (GL3dWingDlg*)pMiarex->m_pWingDlg;
 
-	if(pMiarex->m_pWingDlg->exec() ==QDialog::Accepted)
+	pWingDlg->m_bAcceptName = false;
+	pWingDlg->InitDialog(m_pPlane->wing());
+
+	if(pWingDlg->exec() ==QDialog::Accepted)
 	{
 		SetResults();
 		m_bChanged = true;
@@ -301,11 +303,12 @@ void PlaneDlg::OnDefineFin()
 	QMiarex *pMiarex= (QMiarex*)s_pMiarex;
 	m_SaveWing.Duplicate(m_pPlane->fin());
 
-    pMiarex->m_pWingDlg->m_bAcceptName = false;
-    pMiarex->m_pWingDlg->InitDialog(m_pPlane->fin());
+	GL3dWingDlg *pWingDlg = (GL3dWingDlg*)pMiarex->m_pWingDlg;
+	pWingDlg->m_bAcceptName = false;
+	pWingDlg->InitDialog(m_pPlane->fin());
 
 
-    if(pMiarex->m_pWingDlg->exec() ==QDialog::Accepted)
+	if(pWingDlg->exec() ==QDialog::Accepted)
 	{
 		SetResults();	
 		m_bChanged = true;
@@ -320,10 +323,11 @@ void PlaneDlg::OnDefineStab()
 	QMiarex *pMiarex= (QMiarex*)s_pMiarex;
 	m_SaveWing.Duplicate(m_pPlane->stab());
 
-	pMiarex->m_pWingDlg->m_bAcceptName = false;
-	pMiarex->m_pWingDlg->InitDialog(m_pPlane->stab());
+	GL3dWingDlg *pWingDlg = (GL3dWingDlg*)pMiarex->m_pWingDlg;
+	pWingDlg->m_bAcceptName = false;
+	pWingDlg->InitDialog(m_pPlane->stab());
 
-	if(pMiarex->m_pWingDlg->exec() == QDialog::Accepted)
+	if(pWingDlg->exec() == QDialog::Accepted)
 	{
 		SetResults();	
 		m_bChanged = true;
@@ -339,10 +343,11 @@ void PlaneDlg::OnDefineWing2()
 	QMiarex *pMiarex= (QMiarex*)s_pMiarex;
 	m_SaveWing.Duplicate(m_pPlane->wing2());
 
-	pMiarex->m_pWingDlg->m_bAcceptName = false;
-	pMiarex->m_pWingDlg->InitDialog(m_pPlane->wing2());
+	GL3dWingDlg *pWingDlg = (GL3dWingDlg*)pMiarex->m_pWingDlg;
+	pWingDlg->m_bAcceptName = false;
+	pWingDlg->InitDialog(m_pPlane->wing2());
 
-	if(pMiarex->m_pWingDlg->exec() ==QDialog::Accepted)
+	if(pWingDlg->exec() ==QDialog::Accepted)
 	{
 		SetResults();
 		m_bChanged = true;

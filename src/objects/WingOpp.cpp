@@ -128,12 +128,21 @@ void WingOpp::Allocate(int PanelArraySize)
 
 	m_NVLMPanels = PanelArraySize;
 
-	m_Cp    = new float[PanelArraySize];
-	m_Sigma = new float[PanelArraySize];
-	m_G     = new float[PanelArraySize];
-	memset(m_G,     0, PanelArraySize * sizeof(float));
-	memset(m_Sigma, 0, PanelArraySize * sizeof(float));
-	memset(m_Cp,    0, PanelArraySize * sizeof(float));
+	if(PanelArraySize>0)
+	{
+		m_Cp    = new float[PanelArraySize];
+		m_Sigma = new float[PanelArraySize];
+		m_G     = new float[PanelArraySize];
+		memset(m_G,     0, PanelArraySize * sizeof(float));
+		memset(m_Sigma, 0, PanelArraySize * sizeof(float));
+		memset(m_Cp,    0, PanelArraySize * sizeof(float));
+	}
+	else
+	{
+		m_Cp = NULL;
+		m_Sigma = NULL;
+		m_G = NULL;
+	}
 }
 
 
@@ -142,9 +151,9 @@ void WingOpp::Allocate(int PanelArraySize)
  */
 void WingOpp::Release()
 {
-	if(m_Cp)    delete m_Cp;
-	if(m_Sigma) delete m_Sigma;
-	if(m_G)     delete m_G;
+	if(m_Cp)    delete[] m_Cp;
+	if(m_Sigma) delete[] m_Sigma;
+	if(m_G)     delete[] m_G;
 
 	m_Cp = NULL;
 	m_Sigma = NULL;
@@ -509,9 +518,9 @@ bool WingOpp::SerializeWingOpp(QDataStream &ar, bool bIsStoring)
 		{
 			ar>> m_NVLMPanels;
 
-			if(m_G!=NULL)     delete m_G;
-			if(m_Sigma!=NULL) delete m_Sigma;
-			if(m_Cp!=NULL)    delete m_Cp;
+			if(m_G)     delete m_G;
+			if(m_Sigma) delete m_Sigma;
+			if(m_Cp)    delete m_Cp;
 
 			m_G     = new float[m_NVLMPanels];
 			m_Sigma = new float[m_NVLMPanels];

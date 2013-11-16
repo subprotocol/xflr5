@@ -79,7 +79,8 @@ class Wing
 
 public:
 
-	Wing(); 
+	Wing();
+	~Wing();
 
 	void ImportDefinition(QString path_to_file);
 	void ExportDefinition(QString path_to_file);

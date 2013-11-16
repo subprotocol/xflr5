@@ -2012,13 +2012,6 @@ void GL3dWingDlg::reject()
 }
 
 
-void GL3dWingDlg::resizeEvent(QResizeEvent *event)
-{
-}
-
-
-
-
 
 void GL3dWingDlg::Set3DRotationCenter()
 {

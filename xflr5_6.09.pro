@@ -2,7 +2,8 @@
 # Project created by QtCreator 2009-02-14T15:30:46
 # -------------------------------------------------
 CONFIG += qt
-QT += opengl xml
+QT += opengl
+QT += xml
 TEMPLATE = app
 SOURCES += \
 	src/XFLR5Application.cpp \

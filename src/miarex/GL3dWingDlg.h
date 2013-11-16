@@ -108,7 +108,6 @@ private:
 	void keyReleaseEvent(QKeyEvent *event);
 	void showEvent(QShowEvent *event);
 	void contextMenuEvent(QContextMenuEvent *event);
-	void resizeEvent(QResizeEvent *event);
 
 	bool CheckWing();
 	void CreateXPoints(int NXPanels, int XDist, Foil *pFoilA, Foil *pFoilB, double *xPointA, double *xPointB, int &NXLead, int &NXFlap);
