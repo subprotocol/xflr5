@@ -547,7 +547,7 @@ void PlaneDlg::OnPlaneName()
 
 void PlaneDlg::OnOK()
 {
-	int j, n;
+	int j;
 
 	QString strong;
 	ReadParams();
@@ -556,12 +556,10 @@ void PlaneDlg::OnOK()
 
 	ComputePlane();
 
-	n = m_pPlane->wing()->VLMGetPanelTotal();
-	if(m_pPlane->stab()) n+= m_pPlane->stab()->VLMGetPanelTotal();
-	if(m_pPlane->fin())  n+= m_pPlane->fin()->VLMGetPanelTotal();
-//	if(n>VLMMAXMATSIZE)
+//	int nElem = m_pPlane->VLMPanelTotal();
+//	if(nElem>VLMMAXMATSIZE)
 //	{
-//		strong = QString(tr("Total number of VLM panels =%1\n Max Number =%2\nA reduction of the number of VLM panels is required")).arg(n).arg(VLMMAXMATSIZE);
+//		strong = QString(tr("Total number of VLM panels =%1\n Max Number =%2\nA reduction of the number of VLM panels is required")).arg(nElem).arg(VLMMAXMATSIZE);
 //		QMessageBox::warning(this, tr("Warning"),strong);
 //		return ;
 //	}
@@ -596,7 +594,7 @@ void PlaneDlg::OnOK()
 	if(nSurfaces >2*MAXSPANSECTIONS)
 	{
 		strong = QString(tr("Total number of wing panels =%1\n Max Number =%2\nA reduction of the number of wing panels is required"))
-			.arg(nSurfaces).arg(MAXSPANSECTIONS);
+						.arg(nSurfaces).arg(MAXSPANSECTIONS);
 		QMessageBox::warning(this, tr("Warning"), strong);
 		return ;
 	}
@@ -833,34 +831,8 @@ void PlaneDlg::SetResults()
 	else str =" ";
 	m_pctrlStabVolume->setText(str);
 
-	int total = m_pPlane->wing()->VLMGetPanelTotal();
-//	total += m_pPlane->getWing()->NXPanels(m_pPlane->getWing()->NWingSection()-2);
 
-	if(m_pPlane->wing2())
-	{
-		total += m_pPlane->wing2()->VLMGetPanelTotal();
-//		total += m_pPlane->getWing2()->NXPanels(m_pPlane->getWing2()->NWingSection()-2);
-	}
-
-	if(m_pPlane->stab())
-	{
-		total += m_pPlane->stab()->VLMGetPanelTotal();
-//		total += m_pPlane->getStab()->NXPanels(m_pPlane->getStab()->NWingSection()-2);
-	}
-
-	if(m_pPlane->fin())
-	{
-        //if(m_pPlane->m_bSymFin)  total += 2*m_pPlane->Fin()->VLMGetPanelTotal();
-        if(m_pPlane->m_bDoubleFin ||m_pPlane->m_bSymFin)  total += 2*m_pPlane->fin()->VLMGetPanelTotal();
-		else                                              total +=   m_pPlane->fin()->VLMGetPanelTotal();
-//		total += m_pPlane->getFin()->NXPanels(m_pPlane->getFin()->NWingSection()-2);
-	}
-
-//	total *=2;//in case we have a panel analysis
-
-	if(m_pPlane->body()) total += m_pPlane->body()->m_nxPanels * m_pPlane->body()->m_nhPanels * 2;
-
-	str = QString("%1").arg(total);
+	str = QString("%1").arg(m_pPlane->VLMPanelTotal());
 	m_pctrlVLMTotalPanels->setText(str);
 }
 

@@ -199,14 +199,10 @@ void ThreeDWidget::wheelEvent(QWheelEvent *event)
 }
 
 
-/**
-*Sets the background color for the OpenGl viewport.
-* @todo check usage.
-*/
-void ThreeDWidget::initializeGL()
+/*void ThreeDWidget::initializeGL()
 {
 	glClearColor(.1, 0.0784, 0.1569, 1.0);
-}
+}*/
 
 /**
 *Overrides the keyPressEvent method of the base class.

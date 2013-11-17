@@ -105,7 +105,7 @@ MainFrame::MainFrame(QWidget * parent, Qt::WindowFlags flags)
         jpegPluginPath = dir.canonicalPath() + "/PlugIns/imageformats/libqjpeg.dylib";
 
 #endif
-#ifdef Q_WS_WIN
+#ifdef Q_OS_WIN
 	QDir dir(qApp->applicationDirPath());
 	jpegPluginPath = dir.canonicalPath() + "/imageformats/qjpeg4.dll";
 #endif
@@ -690,10 +690,6 @@ void MainFrame::CreateAFoilActions()
 	AFoilGridAct->setStatusTip(tr("Define the grid settings for the view"));
 	connect(AFoilGridAct, SIGNAL(triggered()), pAFoil, SLOT(OnGrid()));
 	
-	SplinesAct= new QAction(tr("Use Splines"), this);
-	SplinesAct->setStatusTip(tr("Define a foil using one B-Spline for each foil side"));
-	connect(SplinesAct, SIGNAL(triggered()), pAFoil, SLOT(OnSplines()));
-
 	storeSplineAct= new QAction(QIcon(":/images/OnStoreFoil.png"), tr("Store Splines as Foil"), this);
 	storeSplineAct->setStatusTip(tr("Store the current splines in the foil database"));
 	connect(storeSplineAct, SIGNAL(triggered()), pAFoil, SLOT(OnStoreSplines()));
@@ -3788,7 +3784,7 @@ void MainFrame::OnGuidelines()
 
 
 #endif
-#ifdef Q_WS_WIN
+#ifdef Q_OS_WIN
 	QDir dir(qApp->applicationDirPath());
 	QString FileName = dir.canonicalPath() + "/Guidelines.pdf" ;
 #endif
@@ -4847,6 +4843,12 @@ Foil* MainFrame::ReadFoilFile(QTextStream &in)
 	return pFoil;
 }
 
+
+/**
+ *Reads a Foil and its related Polar objects from a binary stream associated to a .plr file.
+ * @param ar the binary stream
+ * @return the pointer to the Foil object which has been created, or NULL if failure.
+ */
 Foil * MainFrame::ReadPolarFile(QDataStream &ar)
 {
 	Foil* pFoil = NULL;

@@ -568,12 +568,11 @@ void QMiarex::Connect()
 
 /**
  * The public destructor.
- *
  */
 QMiarex::~QMiarex()
 {
     delete m_pPlaneDlg;
-	delete (GL3dWingDlg*)m_pWingDlg;
+    delete (GL3dWingDlg*)m_pWingDlg;
     delete m_pGraphDlg;
     delete m_pRenameDlg;
     delete m_pGL3dBody;
@@ -586,11 +585,11 @@ QMiarex::~QMiarex()
     delete m_pGLLightDlg;
     delete m_pModDlg;
     delete m_pPolarFilterDlg;
-	delete m_pW3dPrefsDlg;;
-	delete m_pWPolarDlg;
-	delete m_pStabPolarDlg;
-	delete m_pUnitsDlg;
-	delete m_pObjectPropsDlg;
+    delete m_pW3dPrefsDlg;;
+    delete m_pWPolarDlg;
+    delete m_pStabPolarDlg;
+    delete m_pUnitsDlg;
+    delete m_pObjectPropsDlg;
 
 	Release();
 }
@@ -935,11 +934,7 @@ void QMiarex::AddPOpp(bool bPointOut, double *Cp, double *Gamma, double *Sigma, 
 
 		for(int ip=0; ip<pPOpp->m_NPanels; ip++)
 		{
-//			if(Cp) memcpy(pPOpp->m_Cp, Cp,  sizeof(pPOpp->m_Cp));
-//			if(Gamma)	memcpy(pPOpp->m_G,  Gamma,   sizeof(pPOpp->m_G));
-//			if(Sigma)	memcpy(pPOpp->m_Sigma,  Sigma,   sizeof(pPOpp->m_G));
-
-			pPOpp->m_Cp[ip]              = (float)Cp[ip];
+            pPOpp->m_Cp[ip]              = (float)Cp[ip];
 			if(Gamma) pPOpp->m_G[ip]     = (float)Gamma[ip];
 			if(Sigma) pPOpp->m_Sigma[ip] = (float)Sigma[ip];
 		}
@@ -1256,6 +1251,8 @@ void QMiarex::AddWOpp(double QInf, double Alpha, bool bPointOut, double *Gamma, 
 			pNewPoint->m_CP                  = m_pLLTDlg->m_LLT.m_CP;
 			pNewPoint->m_VCD                 = m_pLLTDlg->m_LLT.m_CDv;
 
+            pNewPoint->ReleasePanelSizeArrays();
+
 			for (l=1; l<m_pCurWing->m_NStation; l++)
 			{
 				pNewPoint->m_SpanPos[l]       = -(float)m_pLLTDlg->m_LLT.m_SpanPos[l];
@@ -1274,7 +1271,6 @@ void QMiarex::AddWOpp(double QInf, double Alpha, bool bPointOut, double *Gamma, 
 				pNewPoint->m_XTrTop[l]        =  (float)m_pLLTDlg->m_LLT.m_XTrTop[m_NStation-l];
 				pNewPoint->m_XTrBot[l]        =  (float)m_pLLTDlg->m_LLT.m_XTrBot[m_NStation-l];
 				pNewPoint->m_BendingMoment[l] =  (float)m_pLLTDlg->m_LLT.m_BendingMoment[m_NStation-l];
-				memset(pNewPoint->m_Cp, 0, sizeof(pNewPoint->m_Cp));
 				if(fabs(m_pLLTDlg->m_LLT.m_BendingMoment[l])>fabs(Cb))	Cb = m_pLLTDlg->m_LLT.m_BendingMoment[l];
 			}
 		}
@@ -5119,7 +5115,6 @@ void QMiarex::GLDrawMasses()
 	{
 		if(m_pWingList[iw])
 		{
-//			glColor3d(m_MassColor.redF()*.75, m_MassColor.greenF()*.75, m_MassColor.blueF()*.75);
 			glColor3d(0.3, 0.3, 1.0);
 			glPushMatrix();
 			{
@@ -5265,6 +5260,7 @@ void QMiarex::GLDrawFoils()
 	ThreeDWidget *p3dWidget = (ThreeDWidget*)s_p3dWidget;
 	int j;
 	Foil *pFoil;
+    double zdist = 25.0/(double)m_r3DCltRect.width();
 
 
 	glColor3d(pMainFrame->m_TextColor.redF(), pMainFrame->m_TextColor.greenF(), pMainFrame->m_TextColor.blueF());
@@ -5279,20 +5275,309 @@ void QMiarex::GLDrawFoils()
 
 				if(pFoil)
 				{
-					p3dWidget->renderText(m_pWingList[iw]->m_Surface[j].m_TA.x, m_pWingList[iw]->m_Surface[j].m_TA.y, m_pWingList[iw]->m_Surface[j].m_TA.z,
-											pFoil->m_FoilName, pMainFrame->m_TextFont);
+                    glPushMatrix();
+                    {
+                        glTranslated(m_pWingList[iw]->m_Surface[j].m_TA.x,
+                                     m_pWingList[iw]->m_Surface[j].m_TA.y,
+                                     m_pWingList[iw]->m_Surface[j].m_TA.z);
+
+                        p3dWidget->renderText(0.0,
+                                              0.0,
+                                              zdist,
+                                              pFoil->m_FoilName, pMainFrame->m_TextFont);
+                    }
+                    glPopMatrix();
 				}
 			}
 			j = m_pWingList[iw]->m_NSurfaces-1;
 			pFoil = m_pWingList[iw]->m_Surface[j].m_pFoilB;
 			if(pFoil)
 			{
-				p3dWidget->renderText(m_pWingList[iw]->m_Surface[j].m_TB.x, m_pWingList[iw]->m_Surface[j].m_TB.y, m_pWingList[iw]->m_Surface[j].m_TB.z,
-										pFoil->m_FoilName, pMainFrame->m_TextFont);
-			}
+                glPushMatrix();
+                {
+                    glTranslated(m_pWingList[iw]->m_Surface[j].m_TB.x,
+                                 m_pWingList[iw]->m_Surface[j].m_TB.y,
+                                 m_pWingList[iw]->m_Surface[j].m_TB.z);
+                    p3dWidget->renderText(0.0,
+                                          0.0,
+                                          zdist,
+                                          pFoil->m_FoilName, pMainFrame->m_TextFont);
+                }
+                glPopMatrix();
+            }
 		}
 	}
 }
+
+
+
+/**
+ * Writes the Wing or the Plane's main properties on the bottom left of the OpenGl viewport.
+ * The attempt to define this as an OpenGL list has lead to issues and has been abandoned.
+ * @param pQMiarex a void pointer to the QMiarex object
+ * @param pWing a pointer to the Wing object, or NULL if the selected object is a Plane
+ * @param pPlane a pointer to the Plane object, or NULL if the selected object is a Wing
+ * @param pWPolar a pointer to the active WPolar, or NULL if none
+ */
+void QMiarex::GLDrawWingLegend(Wing *pWing, Plane *pPlane, WPolar *pWPolar)
+{
+    MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
+    ThreeDWidget *pGLWidget = (ThreeDWidget*)s_p3dWidget;
+    static int dD, ZPos, LeftPos, total;
+    static double Mass;
+    QString Result, str, strong, str1;
+    QString length, surface;
+    QString UFOName;
+
+    QFontMetrics fm(pMainFrame->m_TextFont);
+    dD = fm.height();//pixels
+
+    total = 13;
+    if(pWPolar) total +=2;
+    if(pPlane && pPlane->stab())  total ++;
+    ZPos = m_r3DCltRect.bottom()- total * dD ;
+    LeftPos = m_r3DCltRect.left() +15;
+
+    int a,b,c,d;
+    a=8; b=3;
+    c=7; d=2;
+
+    //glNewList(WINGLEGEND,GL_COMPILE);
+    {
+        //m_GLList++;
+        glDisable(GL_LIGHTING);
+        glDisable(GL_LIGHT0);
+        glColor3d(pMainFrame->m_TextColor.redF(),pMainFrame->m_TextColor.greenF(),pMainFrame->m_TextColor.blueF());
+
+        if(pWing)
+        {
+            GetLengthUnit(length,pMainFrame->m_LengthUnit);
+            GetAreaUnit(surface,pMainFrame->m_AreaUnit);
+            if(pPlane)     UFOName = pPlane->PlaneName();
+            else if(pWing) UFOName = pWing->m_WingName;
+
+            pGLWidget->renderText(LeftPos, ZPos, UFOName, pMainFrame->m_TextFont);
+
+            ZPos +=dD;
+
+            str1 = QString(QObject::tr("Wing Span      = %1 ")).arg(pWing->m_PlanformSpan*pMainFrame->m_mtoUnit, a,'f',b);
+            strong = str1 + length;
+            pGLWidget->renderText(LeftPos, ZPos, QString(strong), pMainFrame->m_TextFont);
+
+            ZPos +=dD;
+            str1 = QString(QObject::tr("XYProj. Span   = %1 ")).arg(pWing->m_ProjectedSpan*pMainFrame->m_mtoUnit,a,'f',b);
+            str1 += length;
+            pGLWidget->renderText(LeftPos, ZPos, str1, pMainFrame->m_TextFont);
+
+            ZPos +=dD;
+            Result = QString(QObject::tr("Root Chord     = %1 ")).arg(pWing->Chord(0)*pMainFrame->m_mtoUnit, a,'f',b);
+            pGLWidget->renderText(LeftPos, ZPos, Result+length, pMainFrame->m_TextFont);
+            ZPos +=dD;
+
+            Result = QString(QObject::tr("M.A.C.         = %1 ")).arg(pWing->m_MAChord*pMainFrame->m_mtoUnit, a,'f',b);
+            pGLWidget->renderText(LeftPos, ZPos, Result+length, pMainFrame->m_TextFont);
+            ZPos +=dD;
+
+            double xcog;
+            if(pWPolar)     xcog = pWPolar->m_CoG.x;
+            else if(pPlane) xcog = pPlane->CoG().x;
+            else if(pWing)  xcog = pWing->m_CoG.x;
+            Result = QString(QObject::tr("X_CG           = %1 ")).arg(xcog*pMainFrame->m_mtoUnit, a,'f',b);
+            pGLWidget->renderText(LeftPos, ZPos, Result+length, pMainFrame->m_TextFont);
+
+            ZPos +=dD;
+            double Area = pWing->m_PlanformArea;
+            if(pPlane && pPlane->BiPlane()) Area+=pPlane->wing2()->m_PlanformArea;
+            str1 = QString(QObject::tr("Wing Area      = %1 ")).arg(Area * pMainFrame->m_m2toUnit, a,'f',b);
+            str1 +=surface;
+            pGLWidget->renderText(LeftPos, ZPos, str1, pMainFrame->m_TextFont);
+
+            ZPos +=dD;
+            str1 = QString(QObject::tr("XYProj. Area   = %1 ")).arg(pWing->m_ProjectedArea * pMainFrame->m_m2toUnit,a,'f',b);
+            strong = str1+surface;
+            pGLWidget->renderText(LeftPos, ZPos, strong, pMainFrame->m_TextFont);
+
+            ZPos +=dD;
+            if(pWPolar)
+            {
+                if(pWPolar->m_WPolarType!=STABILITYPOLAR)  Mass = pWPolar->m_Mass;
+                else
+                {
+                    if(pPlane)     Mass = pPlane->TotalMass();
+                    else if(pWing) Mass = pWing->TotalMass();
+                }
+                GetWeightUnit(str, pMainFrame->m_WeightUnit);
+                str1 = QString(QObject::tr("Plane Mass     = %1 ")).arg(Mass*pMainFrame->m_kgtoUnit,c,'f',d);
+                Result = str1 + str;
+                pGLWidget->renderText(LeftPos, ZPos, Result, pMainFrame->m_TextFont);
+
+                ZPos +=dD;
+                GetAreaUnit(strong, pMainFrame->m_AreaUnit);
+                str1 = QString(QObject::tr("Wing Load      = %1 ")).arg(Mass*pMainFrame->m_kgtoUnit/Area/pMainFrame->m_m2toUnit, a,'f',b);
+                Result = str1 + str+"/" + strong;
+                pGLWidget->renderText(LeftPos, ZPos, Result, pMainFrame->m_TextFont);
+                ZPos +=dD;
+            }
+
+            if(pPlane && pPlane->stab())
+            {
+                Result = QString(QObject::tr("Tail Volume    = %1")).arg(pPlane->TailVolume(),c,'f',d);
+                pGLWidget->renderText(LeftPos, ZPos, Result, pMainFrame->m_TextFont);
+                ZPos +=dD;
+            }
+
+            Result = QString(QObject::tr("Tip Twist      = %1")).arg(pWing->Twist(pWing->NWingSection()-1),c,'f',d);
+            pGLWidget->renderText(LeftPos, ZPos, Result, pMainFrame->m_TextFont);
+            ZPos +=dD;
+
+            Result = QString(QObject::tr("Aspect Ratio   = %1")).arg(pWing->m_AR,c,'f',d);
+            pGLWidget->renderText(LeftPos, ZPos, Result, pMainFrame->m_TextFont);
+            ZPos +=dD;
+
+            Result = QString(QObject::tr("Taper Ratio    = %1")).arg(pWing->m_TR,c,'f',d);
+            pGLWidget->renderText(LeftPos, ZPos, Result, pMainFrame->m_TextFont);
+            ZPos +=dD;
+
+            Result = QString(QObject::tr("Root-Tip Sweep = %1")).arg(pWing->AverageSweep(),c,'f',d);
+            pGLWidget->renderText(LeftPos, ZPos, Result, pMainFrame->m_TextFont);
+            ZPos +=dD;
+
+            if(pPlane) Result = QString(QObject::tr("%1 mesh panels")).arg(pPlane->VLMPanelTotal());
+            else if(pWing)
+            {
+                if(!pWPolar || !pWPolar->thinSurfaces())
+                     Result = QString(QObject::tr("%1 mesh panels")).arg(pWing->VLMPanelTotal(false));
+                else Result = QString(QObject::tr("%1 mesh panels")).arg(pWing->VLMPanelTotal(true));
+            }
+            else Result.clear();
+            pGLWidget->renderText(LeftPos, ZPos, Result, pMainFrame->m_TextFont);
+        }
+    }
+    //glEndList();
+}
+
+
+/**
+ * Writes the operating point's main properties on the bottom right of the OpenGl viewport.
+ * The attempt to define this as an OpenGL list has lead to issues and has been abandoned.
+ * @param pQMiarex a void pointer to the QMiarex object
+ * @param pWing a pointer to the Wing object, or NULL if the selected object is a Plane
+ * @param pWOpp a pointer to the active WingOpp, or NULL if none
+ */
+void QMiarex::GLDrawWOppLegend(Wing *pWing, WingOpp *pWOpp)
+{
+    if(!pWing || !pWOpp) return;
+
+    MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
+
+    ThreeDWidget *pGLWidget = (ThreeDWidget*)s_p3dWidget;
+    int dD, YPos, XPos;
+    QString Result, str;
+    int l;
+
+    QFontMetrics fm(pMainFrame->m_TextFont);
+    dD = fm.height();//pixels
+
+    YPos = m_r3DCltRect.bottom()- 14 * dD;
+    XPos = m_r3DCltRect.right() - 10 ;
+
+    if(pWOpp->m_WPolarType==STABILITYPOLAR) YPos -= dD;
+
+    //glNewList(WOPPLEGEND,GL_COMPILE);
+    {
+        //m_GLList++;
+        glDisable(GL_LIGHTING);
+        glDisable(GL_LIGHT0);
+        glColor3d(pMainFrame->m_TextColor.redF(),pMainFrame->m_TextColor.greenF(),pMainFrame->m_TextColor.blueF());
+        if(pWOpp)
+        {
+            if(pWOpp->m_bOut)
+            {
+                YPos -=dD;
+                Result = QObject::tr("Point is out of the flight envelope");
+                pGLWidget->renderText(XPos-fm.width(Result), YPos, Result, pMainFrame->m_TextFont);
+            }
+
+            GetSpeedUnit(str, pMainFrame->m_SpeedUnit);
+            l = str.length();
+            if     (l==2) Result = QString(QObject::tr("V = %1 ")).arg(pWOpp->m_QInf*pMainFrame->m_mstoUnit,7,'f',2);
+            else if(l==3) Result = QString(QObject::tr("V = %1 ")).arg(pWOpp->m_QInf*pMainFrame->m_mstoUnit,6,'f',1);
+            else if(l==4) Result = QString(QObject::tr("V = %1 ")).arg(pWOpp->m_QInf*pMainFrame->m_mstoUnit,5,'f',1);
+            Result += str;
+            YPos += dD;
+            pGLWidget->renderText(XPos-fm.width(Result), YPos, Result, pMainFrame->m_TextFont);
+
+            Result = QString(QObject::tr("Alpha = %1")).arg(pWOpp->m_Alpha,9,'f',4);
+            Result += QString::fromUtf8("°");
+            YPos += dD;
+            pGLWidget->renderText(XPos-fm.width(Result), YPos, Result, pMainFrame->m_TextFont);
+
+            Result = QString(QObject::tr("Sideslip = %1")).arg(pWOpp->m_Beta, 9,'f',4);
+            Result += QString::fromUtf8("°");
+            YPos += dD;
+            pGLWidget->renderText(XPos-fm.width(Result), YPos, Result, pMainFrame->m_TextFont);
+
+            Result = QString(QObject::tr("Bank = %1")).arg(pWOpp->m_Phi, 9,'f',4);
+            Result += QString::fromUtf8("°");
+            YPos += dD;
+            pGLWidget->renderText(XPos-fm.width(Result), YPos, Result, pMainFrame->m_TextFont);
+
+            Result = QString(QObject::tr("Control pos. = %1 ")).arg(pWOpp->m_Ctrl, 9,'f',4);
+            YPos += dD;
+            pGLWidget->renderText(XPos-fm.width(Result), YPos, Result, pMainFrame->m_TextFont);
+
+            Result = QString(QObject::tr("CL = %1 ")).arg(pWOpp->m_CL, 9,'f',4);
+            YPos += dD;
+            pGLWidget->renderText(XPos-fm.width(Result), YPos, Result, pMainFrame->m_TextFont);
+
+            Result = QString(QObject::tr("CD = %1 ")).arg(pWOpp->m_VCD+pWOpp->m_ICD,9,'f',4);
+            YPos += dD;
+            pGLWidget->renderText(XPos-fm.width(Result), YPos, Result, pMainFrame->m_TextFont);
+
+            double cxielli=pWOpp->m_CL*pWOpp->m_CL/PI/pWing->m_AR;
+            Result = QString(QObject::tr("Efficiency = %1 ")).arg(cxielli/pWOpp->m_ICD,9,'f',4);
+            YPos += dD;
+            pGLWidget->renderText(XPos-fm.width(Result), YPos, Result, pMainFrame->m_TextFont);
+
+            Result = QString(QObject::tr("CL/CD = %1 ")).arg(pWOpp->m_CL/(pWOpp->m_ICD+pWOpp->m_VCD),9,'f',4);
+            YPos += dD;
+            pGLWidget->renderText(XPos-fm.width(Result), YPos, Result, pMainFrame->m_TextFont);
+
+            Result = QString(QObject::tr("Cl = %1 ")).arg(pWOpp->m_GRm, 9,'f',4);
+            YPos += dD;
+            pGLWidget->renderText(XPos-fm.width(Result), YPos, Result, pMainFrame->m_TextFont);
+
+            Result = QString(QObject::tr("Cm = %1 ")).arg(pWOpp->m_GCm,9,'f',4);
+            YPos += dD;
+            pGLWidget->renderText(XPos-fm.width(Result), YPos, Result, pMainFrame->m_TextFont);
+
+            Result = QString(QObject::tr("Cn = %1 ")).arg(pWOpp->m_GYm, 9,'f',4);
+            YPos += dD;
+            pGLWidget->renderText(XPos-fm.width(Result), YPos, Result, pMainFrame->m_TextFont);
+
+            GetLengthUnit(str, pMainFrame->m_LengthUnit);
+            l = str.length();
+            int c, d;
+            if(l==1) {c=8, d=3;}
+            else if(l==2) {c=7, d=3;}
+            else {c=6, d=3;}
+            if(pWOpp->m_WPolarType==STABILITYPOLAR)
+            {
+                Result = QString(QObject::tr("X_NP = %1 ")).arg(pWOpp->m_XNP*pMainFrame->m_mtoUnit, c,'f',d);
+                Result += str;
+                YPos += dD;
+                pGLWidget->renderText(XPos-fm.width(Result), YPos, Result, pMainFrame->m_TextFont);
+            }
+
+            Result = QString(QObject::tr("X_CP = %1 ")).arg(pWOpp->m_CP.x*pMainFrame->m_mtoUnit, c, 'f', d);
+            Result += str;
+            YPos += dD;
+            pGLWidget->renderText(XPos-fm.width(Result), YPos, Result, pMainFrame->m_TextFont);
+        }
+    }
+        //glEndList();
+}
+
 
 
 /**
@@ -5414,12 +5699,16 @@ void QMiarex::GLRenderView()
 
 
 		glLoadIdentity();
-		glDisable(GL_CLIP_PLANE1);
+        glDisable(GL_CLIP_PLANE1);
 
-		if(m_pCurWing)			GLDrawWingLegend(this, m_pCurWing, m_pCurPlane, m_pCurWPolar); //glCallList(WINGLEGEND);
-		if(m_pCurWOpp)			GLDrawWOppLegend(this, m_pCurWing, m_pCurWOpp); // glCallList(WOPPLEGEND);
+        glPushMatrix();
+        {
+            if(m_pCurWing) GLDrawWingLegend(m_pCurWing, m_pCurPlane, m_pCurWPolar); //glCallList(WINGLEGEND);
+            if(m_pCurWOpp) GLDrawWOppLegend(m_pCurWing, m_pCurWOpp); // glCallList(WOPPLEGEND);
+        }
+        glPopMatrix();
 
-		if (m_b3DCp && m_pCurWOpp && m_pCurWOpp->m_AnalysisMethod>=VLMMETHOD)
+        if (m_b3DCp && m_pCurWOpp && m_pCurWOpp->m_AnalysisMethod>=VLMMETHOD)
 		{
 			GLDrawCpLegend(this);
 			//glCallList(WOPPCPLEGENDTXT);
@@ -5501,6 +5790,8 @@ bool QMiarex::InitializePanels()
 
 	if(PanelArraySize>s_MaxMatSize)
 	{
+        QApplication::restoreOverrideCursor();
+
 		Trace(QString("Requesting additional memory for %1 panels").arg(PanelArraySize));
 
 		// allocate 10% more than needed to avoid repeating the operation if the user requirement increases sightly again.
@@ -5511,7 +5802,7 @@ bool QMiarex::InitializePanels()
 
 		if(!Allocate(memsize))
 		{
-			QMessageBox::warning((MainFrame*)s_pMainFrame,tr("Warning"),"The model size exceeds the memory ressources available to the program.\nPlease reduce the panel density.");
+            s_MaxMatSize = 0;
 			return false;
 		}
 
@@ -7549,18 +7840,24 @@ void QMiarex::OnAnalyze()
 	}
 	else if(m_pCurWPolar->m_AnalysisMethod==PANELMETHOD)
 	{
-		if(m_pCurWPolar->m_WPolarType>STABILITYPOLAR)
-		{
-			QString strong;
-			strong = tr("Control polars are not supported in XFLR5 v6.\nPlease use stability polars instead.");
-			QMessageBox::warning(pMainFrame, tr("Warning"), strong+"\n");
-			return;
-		}
-		PanelAnalyze(V0, VMax, VDelta, m_bSequence);
+        if(m_MatSize>0 && m_Panel && m_Node)
+        {
+            if(m_pCurWPolar->m_WPolarType>STABILITYPOLAR)
+            {
+                QString strong;
+                strong = tr("Control polars are not supported in XFLR5 v6.\nPlease use stability polars instead.");
+                QMessageBox::warning(pMainFrame, tr("Warning"), strong+"\n");
+                return;
+            }
+            PanelAnalyze(V0, VMax, VDelta, m_bSequence);
+        }
 	}
 	else if(m_pCurWPolar->m_WPolarType==STABILITYPOLAR)
 	{
-		PanelAnalyze(V0, VMax, VDelta, m_bSequence);
+        if(m_MatSize>0 && m_Panel && m_Node)
+        {
+            PanelAnalyze(V0, VMax, VDelta, m_bSequence);
+        }
 	}
 
 	//restore things as they were
@@ -10356,6 +10653,8 @@ void QMiarex::OnReadAnalysisData()
 	}
 }
 
+
+
 /**
  * The user has requested a change to the type of polars which ought to be displayed
  */
@@ -11913,6 +12212,7 @@ void QMiarex::PaintView(QPainter &painter)
 	}
 	painter.restore();
 }
+
 
 /**
  * Draws the wing in the 2D operating point view
@@ -14364,8 +14664,8 @@ void QMiarex::SetUFO(QString UFOName)
 		if(m_pWingList[iw])
 		{
 			if(!m_pCurPlane && iw==0)  m_pWingList[iw]->CreateSurfaces(T, 0.0, 0.0);
-			else if(iw<3)   m_pWingList[iw]->CreateSurfaces(m_pCurPlane->WingLE(iw),   0.0, m_pCurPlane->WingTiltAngle(iw));
-			else if(iw==3)  m_pWingList[iw]->CreateSurfaces(m_pCurPlane->WingLE(iw), -90.0, m_pCurPlane->WingTiltAngle(iw));
+			else if(iw<3)              m_pWingList[iw]->CreateSurfaces(m_pCurPlane->WingLE(iw),   0.0, m_pCurPlane->WingTiltAngle(iw));
+			else if(iw==3)             m_pWingList[iw]->CreateSurfaces(m_pCurPlane->WingLE(iw), -90.0, m_pCurPlane->WingTiltAngle(iw));
 			for (i=0; i<m_pWingList[iw]->m_NSurfaces; i++)
 			{
 				m_pWingList[iw]->m_Surface[i].SetSidePoints(m_pCurBody, dx, dz);
@@ -15100,8 +15400,6 @@ void QMiarex::SetWPlrLegendPos()
  *@param bCurrent if true, the active wopp is set anew
  *@param x the aoa or velocity or control parameter of the operating point to set
  *@return true if an operating point was successfully set
- *
- *@todo : after an analysis, the Cp colors on the wing to dot match the aoa selected in the top CbBox - need to investigate.
  */
 bool QMiarex::SetWOpp(bool bCurrent, double x)
 {
@@ -15888,7 +16186,14 @@ bool QMiarex::Allocate(int &memsize)
 	}
 	catch(std::exception & e)
 	{
+//        m_Node = m_MemNode = m_WakeNode = m_RefWakeNode = NULL;
+//        m_Panel = m_MemPanel = m_WakePanel = m_RefWakePanel = NULL;
+        Release();
+        s_MaxMatSize = 0;
+
 		Trace(e.what());
+        QString strange = "Memory allocation error: the request for additional memory has been denied.\nPlease reduce the model's size.";
+        QMessageBox::warning((MainFrame*)s_pMainFrame, tr("Warning"), strange);
 		return false;
 	}
 
@@ -15904,9 +16209,12 @@ bool QMiarex::Allocate(int &memsize)
 	memsize  = sizeof(CVector) * 8 * 2 * s_MaxMatSize; //bytes
 	memsize += sizeof(Panel)   * 8 * 2 * s_MaxMatSize; //bytes
 
-
 	int MatrixSize=0;
-	if(!m_pPanelDlg->AllocateMatrix(MatrixSize)) return false;
+    if(!m_pPanelDlg->AllocateMatrix(MatrixSize))
+    {
+        Release();
+        return false;
+    }
 
 	memsize += MatrixSize;
 
@@ -15916,20 +16224,37 @@ bool QMiarex::Allocate(int &memsize)
 }
 
 
+/**
+ * Releases the memory allocated to the Panel and node arrays.
+ * Sets the pointers to NULL and the matrixsize to 0.
+ */
 void QMiarex::Release()
 {
-Trace("QMiarex::Releasing()");
-	m_pPanelDlg->Release();
+    Trace("QMiarex::Releasing()");
+    m_pPanelDlg->Release();
 
-	if(m_Node)        delete[] m_Node;
-	if(m_MemNode)     delete[] m_MemNode;
-	if(m_WakeNode)    delete[] m_WakeNode;
-	if(m_RefWakeNode) delete[] m_RefWakeNode;
-	m_Node = m_MemNode = m_WakeNode = m_RefWakeNode = NULL;
+    if(m_Node)        delete[] m_Node;
+    if(m_MemNode)     delete[] m_MemNode;
+    if(m_WakeNode)    delete[] m_WakeNode;
+    if(m_RefWakeNode) delete[] m_RefWakeNode;
+    m_Node = m_MemNode = m_WakeNode = m_RefWakeNode = NULL;
 
-	if(m_Panel)        delete[] m_Panel;
-	if(m_MemPanel)     delete[] m_MemPanel;
-	if(m_WakePanel)    delete[] m_WakePanel;
-	if(m_RefWakePanel) delete[] m_RefWakePanel;
-	m_Panel = m_MemPanel = m_WakePanel = m_RefWakePanel = NULL;
+    if(m_Panel)        delete[] m_Panel;
+    if(m_MemPanel)     delete[] m_MemPanel;
+    if(m_WakePanel)    delete[] m_WakePanel;
+    if(m_RefWakePanel) delete[] m_RefWakePanel;
+    m_Panel = m_MemPanel = m_WakePanel = m_RefWakePanel = NULL;
+
+    m_MatSize = 0;
+    m_nNodes = 0;
 }
+
+
+
+
+
+
+
+
+
+

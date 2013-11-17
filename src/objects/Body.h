@@ -19,14 +19,8 @@
 
 *****************************************************************************/
 
-/*! \file
- *
- * This class :
- *	- defines the body object
- *	- provides the methods for the calculation of the plane's geometric properties
- *  - porvides methods for the panel calculations
- * The data is stored in International Standard Units, i.e. meters, kg, and seconds
- * Angular data is stored in degrees
+/** @file
+ * This file implements the definition of the Body class.
  */
 
 
@@ -40,7 +34,16 @@
 #include <QTextStream>
 #include <QColor>
 
+typedef enum  {BODYPANELTYPE, BODYSPLINETYPE }     enumBodyLineType;     /**< Label for a spline type body */
 
+/**
+ * This class :
+ *	 - defines the body object,
+ * 	 - provides the methods for the calculation of the plane's geometric properties,
+ *   - porvides methods for the panel calculations.
+ * The data is stored in International Standard Units, i.e. meters, kg, and seconds.
+ * Angular data is stored in degrees.
+ */
 class Body
 {
 public:
@@ -53,8 +56,7 @@ public:
 	bool IntersectNURBS(CVector A, CVector B, CVector &I, bool bRight);
 	bool SerializeBody(QDataStream &ar, bool bIsStoring);
 	bool ImportDefinition(QTextStream &inStream, double mtoUnit);
-	bool ExportDefinition() ;
-
+	bool ExportDefinition();
 
 	int InsertFrame(CVector Real);
 	int InsertPoint(CVector Real);
@@ -72,7 +74,6 @@ public:
 
     void ComputeAero(double *Cp, double &XCP, double &YCP, double &ZCP,
 					 double &GCm, double &GRm, double &GYm, double &Alpha, CVector &CoG);
-//	void ComputeCenterLine();
 	void Duplicate(Body *pBody);
 	void ExportGeometry(QTextStream &outStream, int type, double mtoUnit, int nx, int nh);
 	void GetPoint(double u, double v, bool bRight, CVector &Pt);
@@ -101,13 +102,18 @@ public:
 
 
 	//____________________VARIABLES_____________________________________________
-	static void* s_pMainFrame;		//pointer to the Frame window
+	static void* s_pMainFrame;                /**< a void pointer to the application's MainFrame window */
 
-	NURBSSurface m_SplineSurface;
+	QString m_BodyName;                       /**< the Body's name, used as its reference */
+	QString m_BodyDescription;                /**< a free description for the Body */
+
+
+	NURBSSurface m_SplineSurface;             /**< the spline surface which defines the left (port) side of the body */
+
+	enumBodyLineType m_LineType;              /**< the type of body definition 1=lines  2=B-Splines */
 
 	int m_iActiveFrame;		                  /**< the currently selected frame for display */
 	int m_iHighlight;                         /**< the currently selected point to highlight */
-	int m_LineType;                           /**< the type of body definition 1=lines  2=B-Splines @todo replace with an enumeration*/
 	int m_iRes;                               /**< the number of output points in one direction of the NURBS surface */
 	int m_NElements;                          /**< the number of mesh elements for this Body object = m_nxPanels * m_nhPanels *2 */
 	int m_nxPanels;                           /**< the number of mesh elements in the direction of the x-axis */
@@ -129,17 +135,13 @@ public:
 	double m_CoGIxz;                           /**< the Ixx component of the inertia tensor, calculated at the CoG */
 	CVector m_CoG;                             /**< the position of the CoG */
 
-	QString m_BodyName;                        /**< the Body's name, used as it reference */
-	QString m_BodyDescription;                 /**< a free description for the Body */
 
+	int m_xPanels[MAXBODYFRAMES];              /**< the number of mesh panels between two frames */
+	int m_hPanels[MAXSIDELINES];               /**< the number of mesh panels in the hoop direction, on one side of the Body */
 
+//	CVector m_BodyLEPosition;
 
-	int m_xPanels[MAXBODYFRAMES];
-	int m_hPanels[MAXSIDELINES];
-
-	CVector m_LEPosition;
-
-	Panel *m_pBodyPanel;          /** A pointer to the first body panel in the array */
+	Panel *m_pBodyPanel;                       /** A pointer to the first body panel in the array */
 
 	//allocate temporary variables to
 	//avoid lengthy memory allocation times on the stack

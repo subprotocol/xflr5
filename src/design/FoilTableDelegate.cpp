@@ -61,16 +61,22 @@ void FoilTableDelegate::drawCheck(QPainter *painter, const QStyleOptionViewItem 
 {
 	const int textMargin = QApplication::style()->pixelMetric(QStyle::PM_FocusFrameHMargin) + 1;
 
-	QRect checkRect = QStyle::alignedRect(option.direction, Qt::AlignCenter,
+/*	QRect checkRect = QStyle::alignedRect(option.direction, Qt::AlignCenter,
 										  check(option, option.rect, Qt::Checked).size(),
 										  QRect(option.rect.x() + textMargin, option.rect.y(),
-												option.rect.width() - (textMargin * 2), option.rect.height()));
+												option.rect.width() - (textMargin * 2), option.rect.height()));*/
+	QRect checkRect = QStyle::alignedRect(option.direction,
+										  Qt::AlignCenter,
+										  option.rect.size(),
+										  QRect(option.rect.x() + textMargin, option.rect.y(),
+												option.rect.width() - (2 * textMargin), option.rect.height()));
+
 	QItemDelegate::drawCheck(painter, option, checkRect, state);
 }
 
 
 bool FoilTableDelegate::editorEvent(QEvent *event, QAbstractItemModel *model, const QStyleOptionViewItem &option,
-						 const QModelIndex &index)
+									const QModelIndex &index)
 {
 	if(index.column()<12) return false;
 	// make sure that the item is checkable
@@ -86,10 +92,19 @@ bool FoilTableDelegate::editorEvent(QEvent *event, QAbstractItemModel *model, co
 	if (event->type() == QEvent::MouseButtonRelease)
 	{
 		const int textMargin = QApplication::style()->pixelMetric(QStyle::PM_FocusFrameHMargin) + 1;
-		QRect checkRect = QStyle::alignedRect(option.direction, Qt::AlignCenter,
+/*		QRect checkRect = QStyle::alignedRect(option.direction, Qt::AlignCenter,
 											  check(option, option.rect, Qt::Checked).size(),
 											  QRect(option.rect.x() + textMargin, option.rect.y(),
+													option.rect.width() - (2 * textMargin), option.rect.height()));*/
+		QRect checkRect = QStyle::alignedRect(option.direction,
+											  Qt::AlignCenter,
+											  option.rect.size(),
+											  QRect(option.rect.x() + textMargin, option.rect.y(),
 													option.rect.width() - (2 * textMargin), option.rect.height()));
+
+/*
+QRect QStyle::alignedRect(Qt::LayoutDirection direction, Qt::Alignment alignment, const QSize & size, const QRect & rectangle) [static]
+Returns a new rectangle of the specified size that is aligned to the given rectangle according to the specified alignment and direction.*/
 
 		if (!checkRect.contains(static_cast<QMouseEvent*>(event)->pos())) return false;
 	}

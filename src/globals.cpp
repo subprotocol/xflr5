@@ -438,7 +438,6 @@ bool IsEven(int n)
 * Returns the index of a Qt-style based on the index of the style in the array 
 *@param s the index of the style
 *@return The index of the Qt-style 
-*@todo Use directly the Qt style list ?
 */
 Qt::PenStyle GetStyle(int s)
 {
@@ -1702,12 +1701,11 @@ bool LinBairstow(double *p, complex<double> *root, int n)
 *@param pFoil0 the pointer to the left foil  of the wing's section.
 *@param pFoil1 the pointer to the left foil  of the wing's section.
 *@param Re the Reynolds number at the point's position.
-*@param Cl the lift coefficient at the point's position.
+*@param Cl the lift coefficient at the point's position, used as the input parameter.
 *@param Tau the relative position of the point between the two foils.
 *@param bOutRe true if Cl is outside the min or max Cl of the polar mesh.
 *@param bError if Re is outside the min or max Reynolds number of the polar mesh.
 *@return the interpolated value.
-*@todo check the description of the variables
 */
 double GetVar(QList<void*>*m_poaPolar, int nVar, Foil *pFoil0, Foil *pFoil1, double Re, double Cl, double Tau, bool &bOutRe, bool &bError)
 {
@@ -1808,7 +1806,6 @@ void * GetPlrVariable(Polar *pPolar, int iVar)
 *@param bOutRe true if Cl is outside the min or max Cl of the polar mesh.
 *@param bError if Re is outside the min or max Reynolds number of the polar mesh.
 *@return the interpolated value.
-*@todo check the description of the variables
 */
 double GetPlrPointFromAlpha(QList<void*>*m_poaPolar, Foil *pFoil, double Re, double Alpha, int PlrVar, bool &bOutRe, bool &bError)
 {
@@ -2049,7 +2046,7 @@ double GetPlrPointFromAlpha(QList<void*>*m_poaPolar, Foil *pFoil, double Re, dou
 		// then interpolate Variable
 
 		double v =   (Re - pPolar1->m_Reynolds)
-				  / (pPolar2->m_Reynolds - pPolar1->m_Reynolds);
+				   / (pPolar2->m_Reynolds - pPolar1->m_Reynolds);
 		double Var = Var1 + v * (Var2-Var1);
 		return Var;
 	}
@@ -2068,12 +2065,11 @@ double GetPlrPointFromAlpha(QList<void*>*m_poaPolar, Foil *pFoil, double Re, dou
 *@param m_poaPolar the pointer to the array of polars.
 *@param pFoil the pointer to the foil
 *@param Re the Reynolds number .
-*@param Cl the lift coefficient.
+*@param Cl the lift coefficient, used as the input parameter for interpolation.
 *@param PlrVar the index of the variable to interpolate.
 *@param bOutRe true if Cl is outside the min or max Cl of the polar mesh.
 *@param bError if Re is outside the min or max Reynolds number of the polar mesh.
 *@return the interpolated value.
-*@todo check the description of the variables
 */
 double GetPlrPointFromCl(QList<void*>*m_poaPolar, Foil *pFoil, double Re, double Cl, int PlrVar, bool &bOutRe, bool &bError)
 {
@@ -2419,12 +2415,11 @@ double GetPlrPointFromCl(QList<void*>*m_poaPolar, Foil *pFoil, double Re, double
 *@param pFoil0 the pointer to the left foil  of the wing's section.
 *@param pFoil1 the pointer to the left foil  of the wing's section.
 *@param Re the Reynolds number at the point's position.
-*@param Alpha the apparent (? @todo check) aoa at the point's position.
+*@param Alpha the apparent aoa at the point's position.
 *@param Tau the relative position of the point between the two foils.
 *@param bOutRe true if Cl is outside the min or max Cl of the polar mesh.
 *@param bError if Re is outside the min or max Reynolds number of the polar mesh.
 *@return the interpolated value.
-*@todo check the description of the variables
 */
 double GetCl(QList<void*>*m_poaPolar, Foil *pFoil0, Foil *pFoil1, double Re, double Alpha, double Tau, bool &bOutRe, bool &bError)
 {
@@ -2463,7 +2458,6 @@ double GetCl(QList<void*>*m_poaPolar, Foil *pFoil0, Foil *pFoil1, double Re, dou
 *@param bOutRe true if Cl is outside the min or max Cl of the polar mesh.
 *@param bError if Re is outside the min or max Reynolds number of the polar mesh.
 *@return the interpolated value for the zero-moment lift coefficient.
-*@todo check the description of the variables
 */
 double GetCm0(QList<void*>*m_poaPolar, Foil *pFoil0, Foil *pFoil1, double Re, double Tau, bool &bOutRe, bool &bError)
 {
@@ -2516,12 +2510,11 @@ double GetCm0(QList<void*>*m_poaPolar, Foil *pFoil0, Foil *pFoil1, double Re, do
 *@param pFoil0 the pointer to the left foil  of the wing's section.
 *@param pFoil1 the pointer to the left foil  of the wing's section.
 *@param Re the Reynolds number at the point's position.
-*@param Alpha the apparent (? @todo check) aoa  at the point's position.
+*@param Alpha the apparent aoa  at the point's position.
 *@param Tau the relative position of the point between the two foils.
 *@param bOutRe true if Cl is outside the min or max Cl of the polar mesh.
 *@param bError if Re is outside the min or max Reynolds number of the polar mesh.
 *@return the interpolated value.
-*@todo check the description of the variables
 */
 double GetCm(QList<void*>*m_poaPolar, Foil *pFoil0, Foil *pFoil1, double Re, double Alpha, double Tau, bool &bOutRe, bool &bError)
 {
@@ -2558,12 +2551,11 @@ double GetCm(QList<void*>*m_poaPolar, Foil *pFoil0, Foil *pFoil1, double Re, dou
 *@param pFoil0 the pointer to the left foil  of the wing's section.
 *@param pFoil1 the pointer to the left foil  of the wing's section.
 *@param Re the Reynolds number at the point's position.
-*@param Alpha the apparent (? @todo check) aoa  at the point's position.
+*@param Alpha the apparent aoa  at the point's position.
 *@param Tau the relative position of the point between the two foils.
 *@param bOutRe true if Cl is outside the min or max Cl of the polar mesh.
 *@param bError if Re is outside the min or max Reynolds number of the polar mesh.
 *@return the interpolated value.
-*@todo check the description of the variables
 */
 double GetCd(QList<void*>*m_poaPolar, Foil *pFoil0, Foil *pFoil1, double Re, double Alpha, double Tau, double AR, bool &bOutRe, bool &bError)
 {
@@ -2605,12 +2597,11 @@ double GetCd(QList<void*>*m_poaPolar, Foil *pFoil0, Foil *pFoil1, double Re, dou
 *@param pFoil0 the pointer to the left foil  of the wing's section.
 *@param pFoil1 the pointer to the left foil  of the wing's section.
 *@param Re the Reynolds number at the point's position.
-*@param Alpha the apparent (? @todo check) aoa  at the point's position.
+*@param Alpha the apparent aoa  at the point's position.
 *@param Tau the relative position of the point between the two foils.
 *@param bOutRe true if Cl is outside the min or max Cl of the polar mesh.
 *@param bError if Re is outside the min or max Reynolds number of the polar mesh.
 *@return the interpolated value.
-*@todo check the description of the variables
 */
 double GetXCp(QList<void*>*m_poaPolar, Foil *pFoil0, Foil *pFoil1, double Re, double Alpha, double Tau, bool &bOutRe, bool &bError)
 {
@@ -2648,13 +2639,12 @@ double GetXCp(QList<void*>*m_poaPolar, Foil *pFoil0, Foil *pFoil1, double Re, do
 *@param pFoil0 the pointer to the left foil  of the wing's section.
 *@param pFoil1 the pointer to the left foil  of the wing's section.
 *@param Re the Reynolds number at the point's position.
-*@param Alpha the apparent (? @todo check) aoa  at the point's position.
+*@param Alpha the apparent aoa  at the point's position.
 *@param Tau the relative position of the point between the two foils.
 *@param bTop true if the upper transition is requested, false otherwise
 *@param bOutRe true if Cl is outside the min or max Cl of the polar mesh.
 *@param bError if Re is outside the min or max Reynolds number of the polar mesh.
 *@return the interpolated value.
-*@todo check the description of the variables
 */
 double GetXTr(QList<void*>*m_poaPolar, Foil *pFoil0, Foil *pFoil1, double Re, double Alpha, double Tau, bool bTop, bool &bOutRe, bool &bError)
 {
@@ -2706,7 +2696,6 @@ double GetXTr(QList<void*>*m_poaPolar, Foil *pFoil0, Foil *pFoil1, double Re, do
 *@param Re the Reynolds number at the point's position.
 *@param Tau the relative position of the point between the two foils.
 *@return the interpolated value.
-*@todo check the description of the variables
 */
 double GetZeroLiftAngle(QList<void*>*m_poaPolar, Foil *pFoil0, Foil *pFoil1, double Re, double Tau)
 {
@@ -2814,20 +2803,17 @@ double GetZeroLiftAngle(QList<void*>*m_poaPolar, Foil *pFoil0, Foil *pFoil1, dou
 *@param pFoil1 the pointer to the left foil  of the wing's section.
 *@param Re the Reynolds number at the point's position.
 *@param Tau the relative position of the point between the two foils.
-*@param Alpha0 the zero-lift angle
-*@param Slope the slope of the lift curve
-*@todo check the description of the variables
+*@param Alpha0 the zero-lift angle; if the interpolation fails, returns Alpha0 = 0
+*@param Slope the slope of the lift curve; if the interpolation fails, returns Slope = 2 PI
 */
 void GetLinearizedPolar(QList<void*>*m_poaPolar, Foil *pFoil0, Foil *pFoil1, double Re, double Tau, double &Alpha0, double &Slope)
 {
-	//returns the 0-lift angle of the foil, at Reynolds=Re
-	//if the polar doesn't reach to 0-lift, returns Alpha0 = 0;
 	double Alpha00, Alpha01;
 	double Slope0, Slope1;
 	double AlphaTemp1, AlphaTemp2, SlopeTemp1, SlopeTemp2;
 	int i;
 
-//Find the two polars which enclose Reynolds
+//Find the two polars which enclose the Reynolds number
 	int size = 0;
 	Polar *pPolar, *pPolar1, *pPolar2;
 
@@ -3076,7 +3062,7 @@ int Compare(complex<double> a, complex<double>b)
 /**
 * Bubble sort algorithm for complex numbers
 *@param array the array of complex numbers to sort
-*@param ub @todo check usage
+*@param ub the size of the aray
 */
 void ComplexSort(complex<double>*array, int ub)
 {

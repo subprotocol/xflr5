@@ -262,7 +262,7 @@ macx {
     CONFIG(debug, debug|release) { 
         OBJECTS_DIR = ./build/debug
         MOC_DIR = ./build/debug
-        RCC_DIR = ./build/debug
+		RCC_DIR = ./build/debug
         UI_HEADERS_DIR = ./build/debug
     }
     TARGET = XFLR5
@@ -280,9 +280,16 @@ OTHER_FILES += doc/ReleaseNotes.txt \
     qss/appwidget.css
 
 
-#QMAKE_LFLAGS_WINDOWS += Wl,-stack,32000000
+
+QMAKE_LFLAGS_WINDOWS += -Wl,--large-address-aware
+
+
+#MAKE_LFLAGS_WINDOWS += Wl, -heap,500000000
+
+#QMAKE_LFLAGS_WINDOWS += Wl, -heap, 500000000
 
 #QMAKE_CFLAGS+=-pg
 #QMAKE_CXXFLAGS+=-pg
 #QMAKE_LFLAGS+=-pg
+#QMAKE_CXXFLAGS += -Wall
 

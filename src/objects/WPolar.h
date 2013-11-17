@@ -66,43 +66,32 @@ class WPolar
 
 public:
 	WPolar();
+
 	void AddPoint(WingOpp* pWOpp);
 	void AddPoint(PlaneOpp* pPOpp);
 	void AddPoint(double alpha, double CL, double ICd, double PCd, double CY, double GCm, double VCm, double ICm, double GRm, double GYm, double IYm, double QInf, double XCP);
-
-	/** returns the analysis method of the polar as an index in the enumeration */
-	enumAnalysisMethod analysisMethod() {return m_AnalysisMethod;}
-
 	void CalculatePoint(int i);
 	void Copy(WPolar *pWPolar);
-
-	double density()                    {return m_Density;}     /**< returns the fluid's density, in IS units */
-
 	void DuplicateSpec(WPolar *pWPolar);
 	void Export(QTextStream &out, enumTextFileType FileType, bool bDataOnly=false);
 	void GetPolarProperties(QString &Properties, bool bData=false);
 	void *GetUFOPlrVariable(int iVar);
-
-	bool pointsVisible()                {return m_bShowPoints;} /**< returns true if the polar curve's points should be displayed in the graphs */
-
-	QString polarName()                 {return m_PlrName;}     /**< returns the polar's name as a QString object */
-
-	enumPolarType polarType()           {return m_WPolarType;}  /** returns the type of the polar as an index in the enumeration */
-
 	void Remove(int i);
 	void Remove(double alpha);
 	void ResetWPlr();
 	void RetrieveInertia(void *ptr, bool bPlane);
 	bool SerializeWPlr(QDataStream &ar, bool bIsStoring);
 
-	double sideSlip()                   {return m_Beta;}       /**< returns the sideslip angle */
-
-	QString UFOName()                   {return m_UFOName;}    /**< returns the name of the polar's parent object as a QString object */
-
-	double viscosity()                  {return m_Viscosity;}  /**< returns the fluid's kinematic viscosity, in IS units */
-
-
-	bool visible()                      {return m_bIsVisible;} /**< returns true if the polar curve should be displayed the graphs */
+	enumAnalysisMethod analysisMethod() {return m_AnalysisMethod;} /**< returns the analysis method of the polar as an index in the enumeration. */
+	double density()                    {return m_Density;}        /**< returns the fluid's density, in IS units. */
+	bool pointsVisible()                {return m_bShowPoints;}    /**< returns true if the polar curve's points should be displayed in the graphs. */
+	QString polarName()                 {return m_PlrName;}        /**< returns the polar's name as a QString object. */
+	enumPolarType polarType()           {return m_WPolarType;}     /**< returns the type of the polar as an index in the enumeration. */
+	double sideSlip()                   {return m_Beta;}           /**< returns the sideslip angle, in degrees. */
+	QString UFOName()                   {return m_UFOName;}        /**< returns the name of the polar's parent object as a QString object. */
+	double viscosity()                  {return m_Viscosity;}      /**< returns the fluid's kinematic viscosity, in IS units. */
+	bool visible()                      {return m_bIsVisible;}     /**< returns true if the polar curve should be displayed the graphs. */
+	bool thinSurfaces()                 {return m_bThinSurfaces;}  /**< returns true if the analysis if using thin surfaces, i.e. VLM, false if 3D Panels for the Wing objects. */
 
 	static void GetUFOPlrVariableName(int iVar, QString &Name);
 

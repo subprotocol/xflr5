@@ -21,10 +21,6 @@
 *****************************************************************************/
 
 #include "XFLR5Application.h"
-#include "mainframe.h"
-#include <QSplashScreen>
-#include <QMessageBox>
-
 
 /** 
 *The app's point of entry !
@@ -42,6 +38,7 @@ int main(int argc, char *argv[])
         QFont::insertSubstitution(".Lucida Grande UI", "Lucida Grande");
     }
 #endif
+
 	XFLR5Application app(argc, argv);
 	return app.exec();
 }

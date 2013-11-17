@@ -5,8 +5,6 @@
 *
 * A modification of this file triggers the compilation of the whole project.
 * 
-* @todo Set the a dynamic memory allocation at runtime for the panel mesh and for the influence matrix and rhs. 
-		This will allow the user to define larger meshes, at the expense increased size of memory usage.
 */
 #ifndef PARAMS_H
 #define PARAMS_H
@@ -26,7 +24,7 @@
 
 //3D analysis parameters
 #define MAXWINGS            4     /**< Wing, wing2, elevator, fin, in that order.*/
-#define MAXBODIES           3     /**< One only in XFLR5 */
+#define MAXBODIES           1     /**< One only in XFLR5 */
 #define MAXSPANSECTIONS    30     /**< The max number of sections on a half wing */
 #define MAXSPANSTATIONS   250     /**< The max number of stations for LLT. For a VLM analysis, this is the max number of panels in the spanwise direction. */
 #define MAXCHORDPANELS	  100     /**< The max number of panels in the chordwise direction for a VLM analysis. */
@@ -35,13 +33,6 @@
 #define MAXSIDELINES       40     /**< The max number of sidelines that can be used to define a body? */
 
 #define MAXPOLARPOINTS   1000     /**< The max number of points on a polar. @todo check usage now that the storage has been transferred to QList type arrays. Needs to be consistent with the max number of points on a graph curve. */
-
-#define BODYPANELTYPE       1     /**< Label for a flat panel type body. @todo replace by an enumeration */
-#define BODYSPLINETYPE      2     /**< Label for a spline type body. @todo replace by an enumeration */
-
-//Direct Design
-#define MAXSTACKPOS        50     /**< The max number of undo pictures on the stack in direct design. */
-#define SPLINECONTROLSIZE  50     /**< The maximum number of control points for a spline in direct design. */
 
 
 //XFoil Direct Parameters - refer to XFoil documentation

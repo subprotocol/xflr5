@@ -19,14 +19,12 @@
 
 *****************************************************************************/
 
-/*! @file This file implements the Wing class.
+/** @file This file implements the Wing class.
  */
 
 
 #ifndef WING_H
 #define WING_H
-
-
 
 
 #include "WPolar.h"
@@ -89,7 +87,7 @@ public:
 
 	void CreateSurfaces(CVector const &T, double XTilt, double YTilt);//generic surface, LLT, VLM or Panel
 
-	int  VLMGetPanelTotal(void);
+	int  VLMPanelTotal(bool bThinSurface);
 	void VLMSetBending();
 
 	void PanelTrefftz(double QInf, double Alpha, double *Mu, double *Sigma, int pos, CVector &Force, double &WingIDrag,
@@ -189,7 +187,7 @@ private:
 	double m_bSymFin;                /**< true if the wing describes a double fin symetric about the z=0 plane */
 	double m_bDoubleSymFin;          /**< true if the fin is both double and symetric */
 
-	int m_NStation;                  /**< the number of stations for wing calculation; either the number of points of LLT, @todo check: or the number of spanwise panels  */
+	int m_NStation;                  /**< the number of stations for wing calculation; either the number of points of LLT, or the number of spanwise panels  */
 	int m_nNodes;                    /**< the number of nodes of the panel mesh */
 	int m_AVLIndex;                  /**< a random identification number needed to export to AVL */
 
@@ -209,7 +207,7 @@ private:
 	double m_Maxa;                   /**< the convergence crtierion on the difference of induced angle at any span bewteen two LLT iterations*/
 	double m_ICm;                    /**< the induced par of the pitching moment coefficient */
 	double m_GCm;                    /**< the total pitching moment coefficient */
-	double m_VCm;                    /**< the viscous part of the pitching moment coefficient - @todo check calculated by interpolation of the viscous Cm on the polar mesh*/
+	double m_VCm;                    /**< the viscous part of the pitching moment coefficient */
 	double m_GYm;                    /**< the total yawing moment coefficient */
 	double m_IYm;                    /**< the induced part of the yawing moment coefficient */
 	double m_VYm;                    /**< the viscous part of the yawing moment coefficient */
@@ -233,7 +231,7 @@ private:
 	double m_Chord[MAXSPANSTATIONS+1];         /**< the chord at stations */
 	double m_Offset[MAXSPANSTATIONS+1];        /**< the offset at LLT stations */
 	double m_Twist[MAXSPANSTATIONS+1];         /**< the twist at LLT stations */
-	double m_StripArea[MAXSPANSTATIONS+1];     /**< the area of each chordwise strip @todo check how this is calculated, and check that sum = wing area */
+	double m_StripArea[MAXSPANSTATIONS+1];     /**< the area of each chordwise strip */
 	double m_BendingMoment[MAXSPANSTATIONS+1]; /**< the bending moment at stations */
 	double m_SpanPos[MAXSPANSTATIONS+1];       /**< the span positions of LLT stations */
 	double m_xHinge[MAXCHORDPANELS];           /**< the chorwise position of flap hinges */
@@ -267,7 +265,7 @@ public:
 	double m_CoGIxz;                           /**< the Ixx component of the inertia tensor, calculated at the CoG */
 	CVector m_CoG;                             /**< the position of the CoG */
 
-	int m_MatSize;                             /**< the size of the influence matrix */
+	int m_MatSize;                             /**< the number of mesh panels on this Wing; dependant on the polar type */
 	Panel *m_pWingPanel;                       /**< a pointer to the first panel of this wing in the array of panels */
 };
 

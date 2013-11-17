@@ -116,7 +116,7 @@ WingOpp::WingOpp(int PanelArraySize)
  */
 WingOpp::~WingOpp()
 {
-	Release();
+    ReleasePanelSizeArrays();
 }
 
 
@@ -124,7 +124,7 @@ WingOpp::~WingOpp()
 /** Allocate memory to the arrays */
 void WingOpp::Allocate(int PanelArraySize)
 {
-	Release();
+    ReleasePanelSizeArrays();
 
 	m_NVLMPanels = PanelArraySize;
 
@@ -149,7 +149,7 @@ void WingOpp::Allocate(int PanelArraySize)
 /**
  * Releases memory allocated on the heap
  */
-void WingOpp::Release()
+void WingOpp::ReleasePanelSizeArrays()
 {
 	if(m_Cp)    delete[] m_Cp;
 	if(m_Sigma) delete[] m_Sigma;
@@ -159,6 +159,7 @@ void WingOpp::Release()
 	m_Sigma = NULL;
 	m_G = NULL;
 }
+
 
 /**
  * Exports the data of the WingOpp to a text file

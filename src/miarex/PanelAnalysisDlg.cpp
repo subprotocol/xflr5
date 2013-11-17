@@ -1,7 +1,7 @@
 /****************************************************************************
 
 	PanelAnalysisDlg Class
-	Copyright (C) 2009-2012 Andre Deperrois adeperrois@xflr5.com
+	Copyright (C) 2009-2013 Andre Deperrois adeperrois@xflr5.com
 
 	This program is free software; you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -49,6 +49,8 @@ PanelAnalysisDlg::PanelAnalysisDlg(QWidget *pParent) : QDialog(pParent)
 	setWindowTitle(tr("3D Panel Analysis"));
 
 	SetupLayout();
+
+    m_nRHS = 0;
 
 	m_aij = m_aijWake = NULL;
 	m_RHS = m_RHSRef = m_SigmaRef = m_Sigma = m_Mu = m_Cp = NULL;
@@ -178,9 +180,10 @@ bool PanelAnalysisDlg::AllocateMatrix(int &memsize)
 	}
 	catch(std::exception & e)
 	{
+        Release();
 		Trace(e.what());
 		QString strange = "Memory allocation error: the request for additional memory has been denied.\nPlease reduce the model's size.";
-		QMessageBox::warning(this, tr("Warning"), strange);
+        QMessageBox::warning((MainFrame*)s_pMainFrame, tr("Warning"), strange);
 		AddString(strange);
 		return false;
 	}
@@ -214,7 +217,7 @@ bool PanelAnalysisDlg::AllocateMatrix(int &memsize)
 	if(!AllocateRHS(RHSSize))
 	{
 		QString strange = "Memory allocation error: the request for additional memory has been denied.\nPlease educe the model's size.";
-		QMessageBox::warning(this, tr("Warning"), strange);
+        QMessageBox::warning((MainFrame*)s_pMainFrame, tr("Warning"), strange);
 		AddString(strange);
 		return false;
 	}
@@ -246,6 +249,7 @@ bool PanelAnalysisDlg::AllocateRHS(int &memsize)
 	}
 	catch(std::exception &e)
 	{
+        Release();
 		qDebug()<< e.what();
 		return false;
 	}
@@ -296,7 +300,7 @@ void PanelAnalysisDlg::Release()
 	if(m_cRHS)  delete [] m_cRHS;
 	if(m_uWake) delete [] m_uWake;
 	if(m_wWake) delete [] m_wWake;
-	m_uRHS = m_vRHS = m_wRHS = m_rRHS = m_cRHS = m_uWake = m_wWake = NULL;
+    m_uRHS = m_vRHS = m_wRHS = m_pRHS = m_qRHS = m_rRHS = m_cRHS = m_uWake = m_wWake = NULL;
 
 	if(m_Index) delete [] m_Index;
 	m_Index = NULL;
@@ -330,18 +334,12 @@ void PanelAnalysisDlg::AddString(QString strong)
 bool PanelAnalysisDlg::AlphaLoop()
 {
 	QString str;
-	int nrhs;
 
-	if(m_AlphaMax<m_Alpha) m_AlphaDelta = -fabs(m_AlphaDelta);
-	nrhs  = (int)fabs((m_AlphaMax-m_Alpha)*1.0001/m_AlphaDelta) + 1;
+    if(m_AlphaMax<m_Alpha) m_AlphaDelta = -fabs(m_AlphaDelta);
 
-	if(!m_bSequence) nrhs = 1;
-	else if(nrhs>=VLMMAXRHS)
-	{
-		QString strange = QString("The number of points to be calculated will be limited to %1").arg(VLMMAXRHS);
-		QMessageBox::warning(this, tr("Warning"), strange);
-		nrhs = VLMMAXRHS;
-	}
+//    nrhs  = (int)fabs((m_AlphaMax-m_Alpha)*1.0001/m_AlphaDelta) + 1;
+
+    if(!m_bSequence) m_nRHS = 1;
 
 	int MaxWakeIter = 1;
 //	int Size= m_MatSize;
@@ -352,7 +350,7 @@ bool PanelAnalysisDlg::AlphaLoop()
 	//BuildInfluenceMatrix :     10 x MatSize/400
 	//CreateRHS :                10
 	//CreateWakeContribution :    1
-	//SolveUnitRHS :             30 x MatSize/400
+	//SolveUnitRHS :             90 x MatSize/400
 	//ComputeFarField :          10 x MatSize/400x nrhs
 	//ComputeOnBodyCp :           1 x nrhs
 	//RelaxWake :                20 x nrhs x MaxWakeIter *
@@ -360,14 +358,14 @@ bool PanelAnalysisDlg::AlphaLoop()
 
 	double TotalTime = 10.0*(double)m_MatSize/400.
 					 + 10.
-					 + 30.*(double)m_MatSize/400.
-					 + 10*(double)m_MatSize/400*(double)nrhs
-					 + 1*(double)nrhs
-					 + 5*(double)nrhs ;
+					 + 90.*(double)m_MatSize/400.
+                     + 10*(double)m_MatSize/400*(double)m_nRHS
+                     + 1*(double)m_nRHS
+                     + 5*(double)m_nRHS ;
 
 	if(!m_pWPolar->m_bThinSurfaces) TotalTime +=1.0; //for wake contribution
 
-	if(m_pWPolar->m_bWakeRollUp) TotalTime += 20*nrhs*MaxWakeIter;
+    if(m_pWPolar->m_bWakeRollUp) TotalTime += 20*m_nRHS*MaxWakeIter;
 
 	m_pctrlProgress->setMinimum(0);
 	m_pctrlProgress->setMaximum((int)TotalTime);
@@ -410,25 +408,25 @@ bool PanelAnalysisDlg::AlphaLoop()
 	}
 	if (m_bCancel) return true;
 
-	CreateSourceStrength(m_Alpha, m_AlphaDelta, nrhs);
+    CreateSourceStrength(m_Alpha, m_AlphaDelta, m_nRHS);
 	if (m_bCancel) return true;
 
-	CreateDoubletStrength(m_Alpha, m_AlphaDelta, nrhs);
+    CreateDoubletStrength(m_Alpha, m_AlphaDelta, m_nRHS);
 	if (m_bCancel) return true;
 
-	ComputeFarField(1.0, m_Alpha, m_AlphaDelta, nrhs);
+    ComputeFarField(1.0, m_Alpha, m_AlphaDelta, m_nRHS);
 	if (m_bCancel) return true;
 
-	for(int q=0; q<nrhs; q++)
+    for(int q=0; q<m_nRHS; q++)
 		ComputeBalanceSpeeds(m_Alpha+q*m_AlphaDelta, q);
 
-	ScaleResultstoSpeed(nrhs);
+    ScaleResultstoSpeed(m_nRHS);
 	if (m_bCancel) return true;
 
-	ComputeOnBodyCp(m_Alpha, m_AlphaDelta, nrhs);
+    ComputeOnBodyCp(m_Alpha, m_AlphaDelta, m_nRHS);
 	if (m_bCancel) return true;
 
-	ComputeAeroCoefs(m_Alpha, m_AlphaDelta, nrhs);
+    ComputeAeroCoefs(m_Alpha, m_AlphaDelta, m_nRHS);
 
 	return true;
 }
@@ -1910,26 +1908,18 @@ bool PanelAnalysisDlg::InitDialog()
 	m_bWakeRollUp    = false;
 
 
-	int nrhs =1;
-	if(m_pWPolar->polarType()==FIXEDAOAPOLAR)       nrhs = (int)fabs((m_QInfMax-m_QInf)*1.0001/m_QInfDelta) +1;
-	else if(m_pWPolar->polarType()==STABILITYPOLAR) nrhs = (int)fabs((m_ControlMax-m_ControlMin)*1.0001/m_ControlDelta) +1;
-	else                                            nrhs = (int)fabs((m_AlphaMax-m_Alpha)*1.0001/m_AlphaDelta) +1;
+    m_nRHS = 0;
+    if(m_pWPolar->polarType()==FIXEDAOAPOLAR)       m_nRHS = (int)fabs((m_QInfMax-m_QInf)*1.0001/m_QInfDelta) +1;
+    else if(m_pWPolar->polarType()==STABILITYPOLAR) m_nRHS = (int)fabs((m_ControlMax-m_ControlMin)*1.0001/m_ControlDelta) +1;
+    else                                            m_nRHS = (int)fabs((m_AlphaMax-m_Alpha)*1.0001/m_AlphaDelta) +1;
 
-	if(!m_bSequence) nrhs = 1;
-	else if(nrhs>=VLMMAXRHS)
+    if(!m_bSequence) m_nRHS = 1;
+    else if(m_nRHS>=VLMMAXRHS)
 	{
-//		QString strange = QString("The number of points to be calculated will be limited to %1").arg(VLMMAXRHS);
-//		QMessageBox::warning(this, tr("Warning"), strange);
-//		nrhs = VLMMAXRHS;
-		s_MaxRHSSize = (int)((double)nrhs * 1.2);
-
-		int RHSSize=0;
-
-		if(!AllocateRHS(RHSSize))
-		{
-			QMessageBox::warning(this, tr("Warning"), "Memory allocation error.\n Please reduce the number of points to calculate.");
-			return false;
-		}
+        QString strange = QString("The number of points to be calculated will be limited to %1").arg(VLMMAXRHS);
+        QMessageBox::warning(this, tr("Warning"), strange);
+        m_nRHS = VLMMAXRHS-1;
+        s_MaxRHSSize = (int)((double)m_nRHS * 1.2);
 	}
 
 	SetFileHeader();
@@ -1945,6 +1935,7 @@ bool PanelAnalysisDlg::InitDialog()
 			if(!m_pWingList[iw]->m_bSymetric)
 			{
 				m_b3DSymetric = false;
+                break;
 			}
 		}
 	}
@@ -2013,21 +2004,14 @@ void PanelAnalysisDlg::OnCancelAnalysis()
 bool PanelAnalysisDlg::QInfLoop()
 {
 	QString str;
-	int nrhs;
 	double Alpha = 0.0;
 
 	QMiarex *pMiarex = (QMiarex*)s_pMiarex;
 
 	if(m_QInfMax<m_QInf) m_QInfDelta = -fabs(m_QInfDelta);
-	nrhs  = (int)fabs((m_QInfMax-m_QInf)*1.0001/m_QInfDelta) +1 ;
 
-	if(!m_bSequence) nrhs = 1;
-	else if(nrhs>=VLMMAXRHS)
-	{
-		QString strange = QString("The number of points to be calculated will be limited to %1").arg(VLMMAXRHS);
-		QMessageBox::warning(this, tr("Warning"), strange);
-		nrhs = VLMMAXRHS;
-	}
+    if(!m_bSequence) m_nRHS = 1;
+
 
 //	int MaxWakeIter = 1;
 
@@ -2039,7 +2023,7 @@ bool PanelAnalysisDlg::QInfLoop()
 	//BuildInfluenceMatrix :     10 x m_MatSize/400
 	//CreateRHS :                10
 	//CreateWakeContribution :    1
-	//SolveUnitRHS :             30 x MatSize/400
+	//SolveUnitRHS :             90 x MatSize/400
 	//ComputeFarField :          10 x MatSize/400x 1
 	//ComputeOnBodyCp :           1 x nrhs
 	//RelaxWake :                20 x nrhs x MaxWakeIter *
@@ -2047,10 +2031,10 @@ bool PanelAnalysisDlg::QInfLoop()
 
 	double TotalTime = 10.0*(double)m_MatSize/400.
 					 + 10.
-					 + 30.*(double)m_MatSize/400.
+					 + 90.*(double)m_MatSize/400.
 					 + 10*(double)m_MatSize/400*1.
-					 + 1*(double)nrhs
-					 + 5*(double)nrhs ;
+                     + 1*(double)m_nRHS
+                     + 5*(double)m_nRHS ;
 
 	if(!m_pWPolar->m_bThinSurfaces) TotalTime +=1.0; //for wake contribution
 
@@ -2085,7 +2069,7 @@ bool PanelAnalysisDlg::QInfLoop()
 	CreateUnitRHS();
 	if (m_bCancel) return true;
 
-	CreateSourceStrength(m_Alpha, m_AlphaDelta, nrhs);
+    CreateSourceStrength(m_Alpha, m_AlphaDelta, m_nRHS);
 	if (m_bCancel) return true;
 
 	if(!m_pWPolar->m_bThinSurfaces)
@@ -2119,16 +2103,16 @@ bool PanelAnalysisDlg::QInfLoop()
 	ComputeFarField(1.0, m_OpAlpha, 0.0, 1);
 	if (m_bCancel) return true;
 
-	for(int q=0; q<nrhs; q++)
+    for(int q=0; q<m_nRHS; q++)
 		m_3DQInf[q] = m_QInf+q*m_QInfDelta;
 
-	ScaleResultstoSpeed(nrhs);
+    ScaleResultstoSpeed(m_nRHS);
 	if (m_bCancel) return true;
 
-	ComputeOnBodyCp(m_QInf, m_QInfDelta, nrhs);
+    ComputeOnBodyCp(m_QInf, m_QInfDelta, m_nRHS);
 	if (m_bCancel) return true;
 
-	ComputeAeroCoefs(m_QInf, m_QInfDelta, nrhs);
+    ComputeAeroCoefs(m_QInf, m_QInfDelta, m_nRHS);
 	if (m_bCancel) return true;
 
 	return true;
@@ -2361,7 +2345,6 @@ void PanelAnalysisDlg::SetupLayout()
 */
 bool PanelAnalysisDlg::SolveUnitRHS()
 {
-
 	int Size = m_MatSize;
 	if(m_b3DSymetric) Size = m_SymSize;
 
@@ -2370,14 +2353,13 @@ bool PanelAnalysisDlg::SolveUnitRHS()
 
 	AddString("      Performing LU Matrix decomposition...\n");
 
-	if(!Crout_LU_Decomposition_with_Pivoting(m_aij, m_Index, Size, &m_bCancel, 30.0*(double)m_MatSize/400.0, m_Progress))
+	if(!Crout_LU_Decomposition_with_Pivoting(m_aij, m_Index, Size, &m_bCancel, 90.0*(double)m_MatSize/400.0, m_Progress))
 	{
 		AddString(tr("      Singular Matrix.... Aborting calculation...\n"));
 		m_bInverted = false;
 		return false;
 	}
 	else m_bInverted = true;
-
 
 	AddString("      Solving LU system...\n");
 	Crout_LU_with_Pivoting_Solve(m_aij, m_uRHS, m_Index, m_RHS,      Size, &m_bCancel);
@@ -2631,18 +2613,11 @@ bool PanelAnalysisDlg::UnitLoop()
 	CVector O(0.0,0.0,0.0);
 
 	QMiarex *pMiarex = (QMiarex*)s_pMiarex;
-	int n, nrhs, nWakeIter, MaxWakeIter;
+    int n, nWakeIter, MaxWakeIter;
 
 	if(m_AlphaMax<m_Alpha) m_AlphaDelta = -fabs(m_AlphaDelta);
-	nrhs  = (int)fabs((m_AlphaMax-m_Alpha)*1.0001/m_AlphaDelta) + 1;
 
-	if(!m_bSequence) nrhs = 1;
-	else if(nrhs>=VLMMAXRHS)
-	{
-		QString strange = QString("The number of points to be calculated will be limited to %1").arg(VLMMAXRHS);
-		QMessageBox::warning(this, tr("Warning"), strange);
-		nrhs = VLMMAXRHS;
-	}
+    if(!m_bSequence) m_nRHS = 1;
 
 	if(!m_pWPolar->m_bWakeRollUp) MaxWakeIter = 1;
 	else                          MaxWakeIter = qMax(m_MaxWakeIter, 1);
@@ -2655,18 +2630,18 @@ bool PanelAnalysisDlg::UnitLoop()
 	//BuildInfluenceMatrix :     10 x MatSize/400
 	//CreateRHS :                10
 	//CreateWakeContribution :    1
-	//SolveUnitRHS :             30 x MatSize/400
+	//SolveUnitRHS :             90 x MatSize/400
 	//ComputeFarField :          10 x MatSize/400x nrhs
 	//ComputeOnBodyCp :           1 x nrhs
 	//RelaxWake :                20 x nrhs x MaxWakeIter *
 	//ComputeAeroCoefs :          5 x nrhs
 
-	double TotalTime = 10.0*(double)m_MatSize/400.*(double)nrhs
-					 + 10.*(double)nrhs
-					 + 30.*(double)m_MatSize/400.*(double)nrhs
-					 + 10*(double)m_MatSize/400*(double)nrhs
-					 + 1*(double)nrhs
-					 + 5*(double)nrhs ;
+    double TotalTime = 10.0*(double)m_MatSize/400.*(double)m_nRHS
+                     + 10.*(double)m_nRHS
+                     + 90.*(double)m_MatSize/400.*(double)m_nRHS
+                     + 10*(double)m_MatSize/400*(double)m_nRHS
+                     + 1*(double)m_nRHS
+                     + 5*(double)m_nRHS ;
 
 
 //	if(m_pWPolar->m_bWakeRollUp) TotalTime += 20.0 * (double)nrhs * (double)MaxWakeIter;
@@ -2679,7 +2654,7 @@ bool PanelAnalysisDlg::UnitLoop()
 	str = QString(tr("   Solving the problem... ")+"\n");
 	AddString("\n"+str);
 
-	for (n=0; n<nrhs; n++)
+    for (n=0; n<m_nRHS; n++)
 	{
 		m_OpAlpha = m_Alpha+n*m_AlphaDelta;
 		str = QString("      \n    "+tr("Processing Alpha= %1")+"\n").arg(m_OpAlpha,7,'f',2);
@@ -2914,7 +2889,7 @@ bool PanelAnalysisDlg::ControlLoop()
 	//          Store OpPoint and polar data
 	//	end loop
 	//
-	int i, nrhs;
+    int i;
 	QString str, strlen, strmass, strInertia, outString;
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	QMiarex *pMiarex  = (QMiarex*)s_pMiarex;
@@ -2949,25 +2924,17 @@ bool PanelAnalysisDlg::ControlLoop()
 
 	if(m_ControlMax<m_ControlMin) m_ControlDelta = -fabs(m_ControlDelta);
 
-	nrhs  = (int)fabs((m_ControlMax-m_ControlMin)*1.0001/m_ControlDelta) + 1;
-
-	if(!m_bSequence) nrhs = 1;
-	else if(nrhs==0) nrhs = 1;//compute at least nominal control positions, even if none is active nor defined
-	else if(nrhs>=VLMMAXRHS)
-	{
-		QString strange = QString("The number of points to be calculated will be limited to %1").arg(VLMMAXRHS);
-		QMessageBox::warning(this, tr("Warning"), strange);
-		nrhs = VLMMAXRHS;
-	}
+    if(!m_bSequence) m_nRHS = 1;
+    else if(m_nRHS==0) m_nRHS = 1;//compute at least nominal control positions, even if none is active nor defined
 
 	double TotalTime = 10.0*(double)m_MatSize/400.       //BuildInfluenceMatrix
 					 + 10.                               //CreateRHS
-					 + 30.*(double)m_MatSize/400.        //SolveUnitRHS
+					 + 90.*(double)m_MatSize/400.        //SolveUnitRHS
 					 + 10*(double)m_MatSize/400          //ComputeFarField
 					 + 2+5*6                             //ComputeStabDer
 					 + 1                                 //ComputeOnBodyCp
 					 + 5;                                //ComputeAeroCoefs
-	TotalTime *= (double)nrhs;
+    TotalTime *= (double)m_nRHS;
 
 	m_pctrlProgress->setMinimum(0);
 	m_pctrlProgress->setMaximum((int)TotalTime);
@@ -2979,7 +2946,7 @@ bool PanelAnalysisDlg::ControlLoop()
 	str = QString("   Solving the problem... \n\n");
 	AddString("\n"+str);
 
-	for (i=0; i<nrhs; i++)
+    for (i=0; i<m_nRHS; i++)
 	{
 		// create the geometry for the control parameter
 		// so first restore the initial geometry

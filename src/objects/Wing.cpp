@@ -2294,10 +2294,10 @@ bool Wing::SerializeWing(QDataStream &ar, bool bIsStoring)
 
 
 /**
- * Returns the total number of panels on this wing. the number is given for a double-side mesh of the wing
+ * Returns the number of mesh panels defined on this Wing's surfaces.; the number is given for a double-side mesh of the wing
  * @return the total number of panels
  */
-int Wing::VLMGetPanelTotal()
+int Wing::VLMPanelTotal(bool bThinSurface)
 {
 	double MinPanelSize;
 
@@ -2307,11 +2307,17 @@ int Wing::VLMGetPanelTotal()
 	for (int is=0; is<NWingSection()-1; is++)
 	{
 		//do not create a surface if its length is less than the critical size
-		if (fabs(YPosition(is)-YPosition(is+1)) > MinPanelSize)	total +=NXPanels(is)*NYPanels(is);
+		if (fabs(YPosition(is)-YPosition(is+1)) > MinPanelSize)	total += NXPanels(is)*NYPanels(is);
 	}
-//	if(!m_bMiddle) total *=2;
-	if(!m_bIsFin) return total*2;
-	else          return total;
+	if(!m_bIsFin) total *=2;
+
+	if(!bThinSurface)
+	{
+		total *= 2;
+		total += 2*NXPanels(0); // assuming a uniform number of chordwise panels over the wing
+	}
+
+	return total;
 }
 
 

@@ -776,7 +776,7 @@ void QAFoil::LoadSettings(QSettings *pSettings)
 		m_NeutralColor = QColor(r,g,b);
 		m_bNeutralLine = pSettings->value("NeutralLine").toBool();
 		
-//		style  = pSettings->value("SFStyle", Qt::SolidLine).toInt();
+		style  = pSettings->value("SFStyle", 0).toInt();
 		width  = pSettings->value("SFWidth",1).toInt();
 		r = pSettings->value("SFColorRed",216).toInt();
 		g = pSettings->value("SFColorGreen",183).toInt();
@@ -2189,18 +2189,6 @@ void QAFoil::OnSplineControls()
 	else m_pSF->Copy(&memSF);
 }
 
-/**
- * @todo ???
- */
-void QAFoil::OnSplines()
-{
-	ClearStack();
-
-	TakePicture();
-	FillFoilTable();
-	UpdateView();
-}
-
 
 
 /**
@@ -2637,7 +2625,6 @@ void QAFoil::SaveSettings(QSettings *pSettings)
 
 		pSettings->setValue("LowerRes", m_pSF->m_Intrados.m_iRes);
 		pSettings->setValue("UpperRes", m_pSF->m_Extrados.m_iRes);
-
 
 		pSettings->setValue("LECircle", m_bLECircle);
 		pSettings->setValue("Scale", m_bScale);

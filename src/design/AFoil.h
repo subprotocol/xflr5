@@ -91,7 +91,6 @@ public:
 private slots:
 	void OnAFoilLECircle();
 	void OnExportSplinesToFile();
-	void OnSplines();
 	void OnRenameFoil();
 	void OnGrid();
 	void OnFoilStyle();

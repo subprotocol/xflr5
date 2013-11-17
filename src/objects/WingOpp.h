@@ -75,7 +75,7 @@ private:
 	double GetMaxLift();
 
 	void Allocate(int PanelArraySize);
-	void Release();
+    void ReleasePanelSizeArrays();
 
 private:
 	static void *s_pMainFrame;
@@ -172,7 +172,7 @@ public:
 	double m_GYm;         /**< the total yawing moment */
 	double m_VYm;         /**< the wing viscous yawing moment */
 	double m_IYm;         /**< the wing induced yawing moment */
-	double m_Ctrl;        /**< the control variable @todo check "converged value" */
+	double m_Ctrl;        /**< the control variable */
 	double m_XNP;         /**< the neutral point position resulting from a stability calculations  */
 
 	CVector m_CP;         /**< the position of the centre of pressure */

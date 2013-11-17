@@ -107,7 +107,7 @@ protected:
 	QPushButton *m_pctrlClose, *m_pctrlAnalyze;
 	QTextEdit *m_pctrlTextOutput;
 
-	static void* s_pXFoil;             /**< a void pointer to the instance of the XFoil object @todo check if used */
+	static void* s_pXFoil;             /**< a void pointer to the instance of the XFoil object */
 	static void* s_pXDirect;           /**< a void pointer to the unique instance of the QXDirect class */
 	static void *s_pMainFrame;         /**< a void pointer to the instance of the application's MainFrame class */
 	static bool s_bCurrentFoil;        /**< true if the analysis should be performed only for the current foil */

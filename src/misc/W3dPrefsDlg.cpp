@@ -566,7 +566,7 @@ void W3dPrefsDlg::LoadSettings(QSettings *pSettings)
 		b = pSettings->value("DownwashColorBlue",50).toInt();
 		s_DownwashColor = QColor(r,g,b);
 
-		s_WakeStyle = pSettings->value("WakeStyle",Qt::DashLine).toInt();
+		s_WakeStyle = pSettings->value("WakeStyle",2).toInt();
 		s_WakeWidth = pSettings->value("WakeWidth",1).toInt();
 		r = pSettings->value("WakeColorRed",50).toInt();
 		g = pSettings->value("WakeColorGreen",120).toInt();

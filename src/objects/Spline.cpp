@@ -284,7 +284,7 @@ double Spline::GetY(double const &x)
 bool Spline::InsertPoint(double const &x, double const &y)
 {
 	static int k;
-	if(m_CtrlPoint.size()>=SPLINECONTROLSIZE) return false; 
+
 	if (x>=0.0 && x<=1.0)
 	{ 
 		//No points yet

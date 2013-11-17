@@ -171,7 +171,7 @@ private:
 	bool m_bWarning;            /**< true if one the OpPoints could not be properly interpolated */
 	bool m_bWakeRollUp;         /**< true if wake roll-up is enabled. This option is disabled */
 
-//	int m_State;
+    int m_nRHS;                 /**< the number of RHS to calculate; cannot be greater than VLMMAXRHS */
 	int m_nNodes;               /**< the number of nodes  */
 	int m_MatSize;              /**< the number of panels. Is also the size of the linear problem */
 	int m_SymSize;              /**< the size of the matrix, excluding symetric elements */

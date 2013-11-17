@@ -38,7 +38,6 @@ void AboutQ5::SetupLayout()
 	QGridLayout *LogoLayout = new QGridLayout;
 	QLabel *LabIconQ5 = new QLabel;
 	LabIconQ5->setObjectName("iconXFLR5"); 
-//	LabIconQ5->setGeometry(QRect(20, 0, 61, 71));
 	LabIconQ5->setPixmap(QPixmap(QString::fromUtf8(":/images/xflr5_64.png")));
 	QLabel *lab1  = new QLabel(pMainFrame->m_VersionName);
 	lab1->setAlignment(Qt::AlignVCenter| Qt::AlignLeft);

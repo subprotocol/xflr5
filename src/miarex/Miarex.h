@@ -325,6 +325,8 @@ public:
 	void GLDraw3D();
 	void GLDrawFoils();
 	void GLDrawMasses();
+    void GLDrawWOppLegend(Wing *pWing, WingOpp *pWOpp);
+    void GLDrawWingLegend(Wing *pWing, Plane *pPlane, WPolar *pWPolar);
 	void GLInverseMatrix();
 	void GLRenderView();
 	bool InitializePanels();

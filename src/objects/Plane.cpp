@@ -120,7 +120,6 @@ void Plane::ComputeVolumeInertia(double &Mass, CVector & CoG, double &CoGIxx, do
 	Wing *pWing[MAXWINGS];
 	pWing[0] = pWing[1] = pWing[2] = pWing[3] = NULL;
 
-	/** @todo use member array directly and NULL pointer testing*/
 	pWing[0] = m_Wing;
 	if(m_bBiplane) pWing[1] = m_Wing+1;
 	if(m_bStab)    pWing[2] = m_Wing+2;
@@ -210,7 +209,6 @@ void Plane::ComputeBodyAxisInertia()
 	Ixx = Iyy = Izz = Ixz = VolumeMass = 0.0;
 
 
-	/** @todo use member array directly and NULL pointer testing*/
 	pWing[0] = m_Wing;
 	if(m_bBiplane) pWing[1] = m_Wing+1; else pWing[1] = NULL;
 	if(m_bStab)    pWing[2] = m_Wing+2; else pWing[2] = NULL;
@@ -619,6 +617,7 @@ void Plane::SetParents(void *pMainFrame, void*pMiarex)
 	s_pMiarex    = pMiarex;
 }
 
+
 /**
 * Renames each of the Plane's Wing objects with an automatic name.
 */
@@ -630,16 +629,18 @@ void Plane::RenameWings()
 	m_Wing[3].m_WingName   = m_PlaneName+"_Fin";
 }
 
+
 /**
 * Creates the Surface objects associated to each of the Plane's Wing objects.
 */
 void Plane::CreateSurfaces()
 {
-	m_Wing[0].CreateSurfaces(m_WingLE[0],  0.0, m_WingTiltAngle[0]);
-	m_Wing[1].CreateSurfaces(m_WingLE[1], 0.0, m_WingTiltAngle[1]);
-	m_Wing[2].CreateSurfaces(m_WingLE[2],  0.0, m_WingTiltAngle[2]);
+	m_Wing[0].CreateSurfaces(m_WingLE[0],   0.0, m_WingTiltAngle[0]);
+	m_Wing[1].CreateSurfaces(m_WingLE[1],   0.0, m_WingTiltAngle[1]);
+	m_Wing[2].CreateSurfaces(m_WingLE[2],   0.0, m_WingTiltAngle[2]);
 	m_Wing[3].CreateSurfaces(m_WingLE[3], -90.0, m_WingTiltAngle[3]);
 }
+
 
 /**
 * Initiliazes the pointer to an existing Body object
@@ -652,6 +653,25 @@ void Plane::SetBody(Body *pBody)
 }
 
 
+/**
+ * Returns the number of mesh panels defined on this Plane's surfaces.
+ * @return the number of mesh panels
+ */
+int Plane::VLMPanelTotal()
+{
+	int total = wing()->VLMPanelTotal(true);
 
+	if(wing2()) total += wing2()->VLMPanelTotal(true);
 
+	if(stab())  total += stab()->VLMPanelTotal(true);
 
+	if(fin())
+	{
+		if(m_bDoubleFin ||m_bSymFin)  total += 2*fin()->VLMPanelTotal(true);
+		else                          total +=   fin()->VLMPanelTotal(true);
+	}
+
+	if(body()) total += body()->m_nxPanels * body()->m_nhPanels * 2;
+
+	return total;
+}

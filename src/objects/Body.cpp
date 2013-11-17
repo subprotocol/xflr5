@@ -53,7 +53,7 @@ Body::Body()
 
 	m_iRes = 31;
 
-	m_LEPosition.Set(0.0,0.0,0.0);
+//	m_BodyLEPosition.Set(0.0,0.0,0.0);
 	m_CoG.Set(0.0,0.0,0.0);
 	m_VolumeMass =  m_TotalMass = 0.0;	    //for inertia calculations
 	m_CoGIxx = m_CoGIyy = m_CoGIzz = m_CoGIxz = 0.0;
@@ -252,7 +252,7 @@ void Body::Duplicate(Body *pBody)
 		m_hPanels[i] = pBody->m_hPanels[i];
 	}
 
-	m_LEPosition = pBody->m_LEPosition;
+//	m_BodyLEPosition = pBody->m_BodyLEPosition;
 //	SetKnots();
 }
 
@@ -560,8 +560,8 @@ bool Body::ImportDefinition(QTextStream &inStream, double mtoUnit)
 
 			if(bOK)
 			{
-				m_LineType = res;
-				if(m_LineType !=BODYPANELTYPE && m_LineType !=BODYSPLINETYPE) m_LineType = BODYPANELTYPE;
+				if(res==1) m_LineType = BODYPANELTYPE;
+				else       m_LineType = BODYSPLINETYPE;
 			}
 		}
 		else if (strong.indexOf("OFFSET") >=0)
@@ -1114,7 +1114,8 @@ bool Body::SerializeBody(QDataStream &ar, bool bIsStoring)
 		WriteCString(ar, m_BodyDescription);
 
 		WriteCOLORREF(ar, m_BodyColor);
-		ar << m_LineType;
+		if(m_LineType==BODYPANELTYPE) ar << 1;
+		else                          ar << 2;
 		ar << SideLineCount();
 		ar << FrameSize();
 		ar << m_iRes;
@@ -1144,7 +1145,8 @@ bool Body::SerializeBody(QDataStream &ar, bool bIsStoring)
 		for(i=0; i<m_PointMass.size(); i++)  WriteCString(ar, m_PointMass[i]->tag());
 
 		ar << (float)m_BodyColor.alphaF();
-		ar << m_LEPosition.x<< m_LEPosition.y<< m_LEPosition.z;
+//		ar << m_BodyLEPosition.x<< m_BodyLEPosition.y<< m_BodyLEPosition.z;
+		ar << 0.0 << 0.0 << 0.0;
 		ar << 0.0f;
 	}
 	else
@@ -1157,7 +1159,9 @@ bool Body::SerializeBody(QDataStream &ar, bool bIsStoring)
 		if(ArchiveFormat>=1003) ReadCString(ar, m_BodyDescription);
 
 		ReadCOLORREF(ar, m_BodyColor);
-		ar >> m_LineType;
+		ar >> k;
+		if(k==1) m_LineType = BODYPANELTYPE;
+		else     m_LineType = BODYSPLINETYPE;
 		ar >> NSideLines;
 		ar >> nStations;
 		ar >> m_iRes;
@@ -1233,9 +1237,9 @@ bool Body::SerializeBody(QDataStream &ar, bool bIsStoring)
 		if(ArchiveFormat>=1006)
 		{
 			ar >> x >> y >> z;
-			m_LEPosition.Set(x,y,z);
+//			m_BodyLEPosition.Set(x,y,z);
 		}
-		else m_LEPosition.Set(0.0,0.0,0.0);
+//		else m_BodyLEPosition.Set(0.0,0.0,0.0);
 		ar >> f;
 
 		SetKnots();

@@ -83,7 +83,7 @@ public:
 	void GetLinearizedCl(double &Alpha0, double &slope);
 
 	QString m_FoilName;                 /**< the name of the parent Foil to which this Polar object is attached */
-	double m_Reynolds;                  /**< the Reynolds number for a type 4 analysis (@todo check : the specified aoa in case of a Type 4 Polar ? */
+	double m_Reynolds;                  /**< the Reynolds number for a type 4 analysis */
 	enumPolarType m_PolarType;          /**< the Polar type */
 
 	QList <double> m_Alpha;             /**< the array of aoa values, in degrees */

@@ -165,7 +165,7 @@ private:
 	double m_fXThickness;                /**< the x-position of the Foil's max thickness point */
 
 	double m_Gap;			             /**< the trailing edge gap */
-	CVector m_TE;                        /**< the trailing edge point @todo check if any use*/
+	CVector m_TE;                        /**< the trailing edge point */
 	CVector m_LE;                        /**< the leading edge point */
 
 	CVector m_rpBaseMid[MIDPOINTCOUNT];  /**< the mid camber line points of the base geometry */

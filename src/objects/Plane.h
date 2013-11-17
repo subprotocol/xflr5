@@ -65,6 +65,8 @@ public:
 	void ComputeVolumeInertia(double &Mass, CVector &CoG, double &Ixx, double &Iyy, double &Izz, double &Ixz);
 	void ComputeBodyAxisInertia();
 
+	int VLMPanelTotal();
+
 	/**
 	* Returns the translation to be applied to the Body object.
 	* @return the translation to be applied to the Body object.
@@ -100,19 +102,19 @@ public:
 	/** Returns a reference to the QString holding the Plane's description. */
 	QString& rPlaneDescription() {return m_PlaneDescription;}
 	
-	/** Returns a pointer to the Plane's main wing */
+	/** Returns a pointer to the Plane's main wing. Never NULL, a Plane always has a main Wing. */
 	Wing *wing()  {return m_Wing;}
 
-	/** Returns a pointer to the Plane's secondary wing */
-	Wing *wing2() {if(m_bBiplane) return m_Wing+1; else return NULL;} /** @todo simplify */
+	/** Returns a pointer to the Plane's secondary wing, or NULL if none. */
+	Wing *wing2() {if(m_bBiplane) return m_Wing+1; else return NULL;}
 
-	/** Returns a pointer to the Plane's elevator */
-	Wing *stab()  {if(m_bStab)    return m_Wing+2; else return NULL;}
+	/** Returns a pointer to the Plane's elevator, or NULL if none. */
+	Wing *stab()  {if(m_bStab) return m_Wing+2; else return NULL;}
 
-	/** Returns a pointer to the Plane's fin */
-	Wing *fin()   {if(m_bFin)     return m_Wing+3; else return NULL;}
+	/** Returns a pointer to the Plane's fin, or NULL if none. */
+	Wing *fin()   {if(m_bFin) return m_Wing+3; else return NULL;}
 
-	/** Returns a pointer to the Plane's Body */
+	/** Returns a pointer to the Plane's Body, or NULL if none. */
 	Body *body()  {if(m_bBody)    return m_pBody; else return NULL;}
 	
 	/** Returns the Plane's CoG position */
@@ -126,7 +128,7 @@ private:
 	Body *m_pBody;                              /**< a pointer to the Body object, a NULL if none */
 
 	bool m_bBody;                               /**< true if a Body has been selected for this plane */
-	bool m_bBiplane;                            /**< true if this Plane is a bi-plane @todo remove*/
+	bool m_bBiplane;                            /**< true if this Plane is a bi-plane */
 	bool m_bFin;                                /**< true if this Plane has a fin*/
 	bool m_bStab;                               /**< true if this Plane has an elevator */
 

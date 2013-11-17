@@ -19,6 +19,11 @@
 
 *****************************************************************************/
 
+
+/**
+ *@file This file implements the FloatEdit class
+ *
+*/
 #ifndef FLOATEDIT_H
 #define FLOATEDIT_H
 
@@ -27,6 +32,13 @@
 #include <QKeyEvent>
 #include <QDoubleValidator>
 
+
+/**
+ *This class defines a line edit widget for the specific input of floating point numbers.
+ *It goes back to the very first MFC versions of this program, at a time when no such default widget was available.
+ *Could be advantageously replaced with a QLineEdit + a validator, and be able to read numbers i.a.w. regional options.
+ *@todo replace with QLineEdit + a validator.
+ */
 class FloatEdit : public QLineEdit
 {
 public:

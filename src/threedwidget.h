@@ -22,8 +22,8 @@
 
 /**
 *@file threedwidget.h
-*@brief This file contains the declaration of the class ThreeDWidget,
-*used for 3d openGL-based drawing in the central area of the application's MainFrame.
+*@brief This file implements the declaration of the class ThreeDWidget,
+*Used for 3d openGL-based drawing in the central area of the application's MainFrame.
 */
 
 #ifndef THREEDWIDGET_H
@@ -41,9 +41,8 @@ typedef enum {GLMIAREXVIEW,GLBODYVIEW, GLWINGVIEW} enumGLView;
 
 /**
 *@class ThreeDWidget 
-* @brief This class is used for 3d OpenGl-based drawing in the central area of the application's MainFrame.
-
-* There is a unique instance of this class, attached to the QStackedWidget of the MainFrame.
+* This class is used for 3d OpenGl-based drawing in the central area of the application's MainFrame.
+* There are three instances of this class, one attached to the QStackedWidget of the MainFrame, one for Wing edition, and one for Body edition.
 * Depending on the active application, this class calls the drawings methods in QMiarex, in the GLBodyDlg or in GLWingDlg.
 * All Qt events received by this widget are sent to the child windows for handling.
 */
@@ -69,7 +68,7 @@ public:
 
 private:
 	void contextMenuEvent (QContextMenuEvent * event);
-	void initializeGL();
+//	void initializeGL();
 	void keyPressEvent(QKeyEvent *event);
 	void keyReleaseEvent(QKeyEvent *event);
 	void mousePressEvent(QMouseEvent *event);

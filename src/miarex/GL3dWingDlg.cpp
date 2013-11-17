@@ -2210,14 +2210,10 @@ void GL3dWingDlg::SetWingData()
 	str = QString("%1").arg(m_pWing->AverageSweep(),5,'f',2);
 	m_pctrlSweep->setText(str);
 
-	int VLMTotal=100;
-	VLMTotal = VLMGetPanelTotal();
-	str = QString("%1").arg(VLMTotal);
+	str = QString("%1").arg(m_pWing->VLMPanelTotal(true));
 	m_pctrlVLMPanels->setText(str);
 
-	VLMTotal *= 2;
-	VLMTotal += 2*m_pWing->NXPanels(m_pWing->NWingSection()-1);
-	str = QString("%1").arg(VLMTotal);
+	str = QString("%1").arg(m_pWing->VLMPanelTotal(false));
 	m_pctrl3DPanels->setText(str);
 }
 
@@ -2322,7 +2318,7 @@ void GL3dWingDlg::SetupLayout()
 		QLabel *lab2 = new QLabel(tr("Area"));
 		QLabel *lab3 = new QLabel(tr("Projected Span"));
 		QLabel *lab4 = new QLabel(tr("Projected Area"));
-		QLabel *lab13 = new QLabel(tr("Total VLM Panels"));
+		QLabel *lab13 = new QLabel(tr("Number of VLM Panels"));
 		QLabel *lab14 = new QLabel(tr("Number of 3D Panels"));
 		lab1->setAlignment(Qt::AlignRight);
 		lab2->setAlignment(Qt::AlignRight);
@@ -2359,14 +2355,13 @@ void GL3dWingDlg::SetupLayout()
 		DataLayout->addWidget(m_pctrlAreaUnit1,2,3);
 		DataLayout->addWidget(m_pctrlLength2,3,3);
 		DataLayout->addWidget(m_pctrlAreaUnit2,4,3);
-		QString strong = QString("%1").arg(QMiarex::s_MaxMatSize/2);
-		QLabel *lab15 = new QLabel(tr("Max is ")+strong);
-		lab13->setAlignment(Qt::AlignLeft);
-		DataLayout->addWidget(lab15 ,13,3);
-		strong = QString("%1").arg(QMiarex::s_MaxMatSize);
-		QLabel *lab16 = new QLabel(tr("Max is ")+strong);
-		lab15->setAlignment(Qt::AlignLeft);
-		DataLayout->addWidget(lab16, 14, 3);
+//		QString strong = QString("%1").arg(QMiarex::s_MaxMatSize/2);
+//		QLabel *lab15 = new QLabel(tr("Max is ")+strong);
+//		DataLayout->addWidget(lab15 ,13,3);
+//		strong = QString("%1").arg(QMiarex::s_MaxMatSize);
+//		QLabel *lab16 = new QLabel(tr("Max is ")+strong);
+//		lab15->setAlignment(Qt::AlignLeft);
+//		DataLayout->addWidget(lab16, 14, 3);
 
 
 		QLabel *lab20 = new QLabel(tr("Mean Geom. Chord"));
@@ -2632,7 +2627,6 @@ void GL3dWingDlg::UpdateView()
 
 int GL3dWingDlg::VLMGetPanelTotal()
 {
-//	QMiarex    *pMiarex = (QMiarex*)s_pMiarex;
 	double MinPanelSize;
 	if(QMiarex::s_MinPanelSize>0.0) MinPanelSize = QMiarex::s_MinPanelSize;
 	else                            MinPanelSize = m_pWing->m_PlanformSpan/1000.0;

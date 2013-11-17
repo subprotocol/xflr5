@@ -753,7 +753,7 @@ double Polar::GetZeroLiftAngle()
 
 /**
 * Linearizes Cl vs. Alpha set of points by least square method
-* @param Alpha0 the aoa such that Cl = 0, in degrees
+* @param Alpha0 the zero-lift angle, i.e.such that Cl = 0, in degrees
 * @param slope the slope of the curve Cl=f(aoa), in units 1/°
 */
 void Polar::GetLinearizedCl(double &Alpha0, double &slope)
@@ -774,7 +774,8 @@ void Polar::GetLinearizedCl(double &Alpha0, double &slope)
 	double sum4 = 0.0;
 	double b1, b2;
 
-	for (int k=0; k<n; k++){
+	for (int k=0; k<n; k++)
+	{
 		sum1 += m_Cl[k] * m_Alpha[k];
 		sum2 += m_Alpha[k];
 		sum3 += m_Cl[k];
@@ -793,7 +794,6 @@ void Polar::GetLinearizedCl(double &Alpha0, double &slope)
 
 	slope  = b1; //in cl/°
 	Alpha0 = -b2/b1;
-
 }
 
 

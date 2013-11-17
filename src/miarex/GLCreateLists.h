@@ -19,6 +19,9 @@
 
 *****************************************************************************/
 
+/**
+  * @file this file implements the methods used to create the OpenGL lists for the various objects.
+  */
 
 #ifndef GLCREATELISTS_H
 #define GLCREATELISTS_H
@@ -43,8 +46,6 @@ void GLCreateStreamLines(void *pQMiarex, Wing *PlaneWing[MAXWINGS], CVector *pNo
 void GLCreateSurfSpeeds(void *pQMiarex, Panel *pPanel, WPolar *pWPolar, WingOpp *pWOpp);
 void GLCreateVortices(void *pQMiarex, Panel *pPanel, CVector *pNode, WPolar *pWPolar);
 void GLCreateTrans(void *pQMiarex, Wing *pWing, WingOpp *pWOpp, int List);
-void GLDrawWingLegend(void *pQMiarex, Wing *pWing, Plane *pPlane, WPolar *pWPolar);
-void GLDrawWOppLegend(void* pQMiarex, Wing *pWing, WingOpp *pWOpp);
 void GLCreatePanelForce(void *pQMiarex, WPolar *pWPolar, WingOpp *pWOpp, PlaneOpp *pPOpp);
 void GLDrawPanelForceLegend(void *pQMiarex, WPolar *pWPolar);
 
