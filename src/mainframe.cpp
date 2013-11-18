@@ -74,7 +74,7 @@
 
 
 Foil * MainFrame::s_pCurFoil=NULL;
-bool MainFrame::s_bTrace = true;
+bool MainFrame::s_bTrace = false;
 QFile *MainFrame::s_pTraceFile = NULL;
 
 
@@ -163,7 +163,7 @@ MainFrame::MainFrame(QWidget * parent, Qt::WindowFlags flags)
 
 	m_ImageFormat = PNG;
 	m_ExportFileType = TXT;
-	m_bStyleSheets  = true;
+	m_bStyleSheets  = false;
 	m_bReverseZoom  = false;
 	m_bAlphaChannel = true;
 	m_bSaveOpps     = false;

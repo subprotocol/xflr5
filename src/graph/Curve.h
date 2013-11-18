@@ -48,47 +48,100 @@ public:
 	Curve();
 
 	int     AppendPoint(double xn, double yn);
-	void    clear();
+
+
+	/**
+	 * Resets the content of the curve.
+	 */
+	void    clear()
+	{
+		x.clear();
+		y.clear();
+	}
+
 	int     closestPoint(double xs, double ys, double &dist);
 	void    closestPoint(double xs, double ys, double &dist, int &n);
 	void    closestPoint(double const &xs, double const &ys, double &xSel, double &ySel, double &dist, int &nSel);
 	void    CopyData(Curve *pCurve);
 	void    Duplicate(Curve *pCurve);
-	int     GetSelected();
+
+
+	/**
+	 * Return the index of the currently selected point
+	 *@param the index of the currently selected point
+	*/
+	int selected(){return m_iSelected;}
+
 
 	CVector point(int ref);
 
-	void    ShowPoints(bool bShow);
-	void    SetVisible(bool bVisible);
-	void    SetColor(QColor clr);
-	void    SetStyle(int nStyle);
-	void    SetSelected(int n);
-	void    SetWidth(int nWidth);
-	void    SetTitle(QString Title);
+	/**
+	 * Sets the visibility of the points in the graphs
+	 *@param bShow true if the points are to be displayed, false otherwise
+	 */
+	void ShowPoints(bool bShow){m_bShowPoints = bShow;}
+
+	/**
+	 * Sets the visibility of the curve in the graphs
+	 *@param bVisible true if the curve is to be displayed, false otherwise
+	 */
+	void SetVisible(bool bVisible){m_bIsVisible = bVisible;}
+
+	/**
+	 * Sets the curve's color
+	 * @param clr the new QColor value for the curve
+	 */
+	void SetColor(QColor clr){CurveColor = clr;}
+
+	/**
+	 * Sets the curve's style
+	 * @param nStyle the index of the new curve's style
+	 */
+	void SetStyle(int nStyle){ CurveStyle = nStyle;}
+
+
+	/**
+	 * Sets the index of the currently selected point of this curve
+	 * @param n the point to select
+	 */
+	void SetSelected(int n){	m_iSelected = n;}
+
+	/**
+	 *Sets the curve's width
+	 *@param nWidth the new curve's width in pixels
+	 **/
+	void SetWidth(int nWidth){CurveWidth = nWidth;}
+
+	/**
+	 * Sets the curve title
+	 *@param Title the new curve's title
+	 */
+	void SetTitle(QString Title){ m_CurveName = Title;}
+
 
 	/** Return the visibility of the curve as a boolean. */
-	bool    IsVisible() {return m_bIsVisible;}
+	bool IsVisible() {return m_bIsVisible;}
 
 	/** Return the visibility of the points as a boolean. */
-	bool    PointsVisible() {return m_bShowPoints; }
+	bool PointsVisible() {return m_bShowPoints; }
 
 	/** Returns the Curve's number of points. */
-	int     size() {return x.count();}
+	int size() {return x.count();}
 
 	/** Returns the Curve's number of points. */
-	int     count() {return x.size();}
+	int count() {return x.size();}
 
 	/** Returns the Curve style*/
-	int     style() {return CurveStyle;}
+	int style() {return CurveStyle;}
 
 	/** Returns the Curve width*/
-	int     width() {return CurveWidth;}
+	int width() {return CurveWidth;}
 
 	/** Returns the Curve color*/
 	QColor  color() {return CurveColor;}
 
 	/** Returns the Curve's title */
-	void    title(QString &string) {string =  m_CurveName;}
+	void title(QString &string) {string =  m_CurveName;}
 
 	/** Returns the Curve's title */
 	QString title(){ return m_CurveName;}

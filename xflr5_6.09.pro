@@ -71,6 +71,8 @@ SOURCES += \
 	src/objects/Surface.cpp \
 	src/objects/WPolar.cpp \
 	src/objects/Wing.cpp \
+	src/objects/SplineFoil.cpp \
+	src/objects/WingOpp.cpp \
 	src/misc/SaveOptionsDlg.cpp \
 	src/misc/ProgressDlg.cpp \
 	src/misc/ModDlg.cpp \
@@ -110,9 +112,7 @@ SOURCES += \
     src/main.cpp \
     src/mainframe.cpp \
     src/threedwidget.cpp \
-	src/twodwidget.cpp \
-    src/objects/SplineFoil.cpp \
-    src/objects/WingOpp.cpp
+	src/twodwidget.cpp
 
 HEADERS += \
 	src/XFLR5Application.h \
@@ -186,6 +186,9 @@ HEADERS += \
 	src/objects/Foil.h \
 	src/objects/Body.h \
 	src/objects/ArcBall.h \
+	src/objects/SplineFoil.h \
+	src/objects/WingOpp.h \
+	src/objects/PointMass.h \
 	src/misc/SaveOptionsDlg.h \
 	src/misc/ModDlg.h \
 	src/misc/PolarFilterDlg.h \
@@ -221,10 +224,7 @@ HEADERS += \
     src/globals.h \
     src/mainframe.h \
     src/twodwidget.h \
-	src/threedwidget.h \
-    src/objects/SplineFoil.h \
-    src/objects/WingOpp.h \
-    src/objects/PointMass.h
+	src/threedwidget.h
 
 
 TRANSLATIONS = translations/xflr5v6.ts \

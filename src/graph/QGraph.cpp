@@ -145,7 +145,7 @@ void QGraph::DrawCurve(int nIndex, QPainter &painter)
 		{
 			for (i=0; i<pCurve->size();i++)
 			{
-				if(pCurve->GetSelected() !=i)
+				if(pCurve->selected() !=i)
 					painter.drawRect(int(pCurve->x[i]/m_scalex+m_ptoffset.x())-ptside,
 									 int(pCurve->y[i]/  scaley+m_ptoffset.y())-ptside,
 									 2*ptside,2*ptside);
@@ -155,7 +155,7 @@ void QGraph::DrawCurve(int nIndex, QPainter &painter)
 
 	if(m_bHighlightPoint)
 	{
-		int point = pCurve->GetSelected();
+		int point = pCurve->selected();
 		if(point>=0)
 		{
 			//highlight

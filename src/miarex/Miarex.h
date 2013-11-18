@@ -466,6 +466,14 @@ public:
 
 
 public:
+
+	static bool s_bOutline;                   /**< true if the surface outlines are to be displayed in the 3D view*/
+	static bool s_bSurfaces;                  /**< true if the surfaces are to be displayed in the 3D view*/
+	static bool s_bShowMasses;                /**< true if the point masses are to be displayed on the openGL 3D view */
+	static bool s_bVLMPanels;                 /**< true if the panels are to be displayed in the 3D view*/
+	static bool s_bAxes;                      /**< true if the axes are to be displayed in the 3D view*/
+
+
 	// Class variables
 
 	ArcBall m_ArcBall;                 /**< the instance of the arcball object used for rotating the 3D view */
@@ -477,7 +485,6 @@ public:
 	bool m_bArcball;                   /**< true if the arcball is to be displayed */
 	bool m_bAutoCpScale;		       /**< true if the Cp scale should be set automatically */
 	bool m_bAutoScales;                /**< true if automatic scales are requested for the graphs */
-	bool m_bAxes;                      /**< true if the axes are to be displayed in the 3D view*/
 	bool m_bCrossPoint;                /**< true if the control point on the arcball is to be displayed */
 	bool m_bCurWOppOnly;               /**< true if only the current WOpp is to be displayed */
 	bool m_bCurFrameOnly;              /**< true if only the currently selected body frame is to be displayed */
@@ -496,7 +503,6 @@ public:
 	bool m_bLogFile;			       /**< true if the log file warning is turned on */
 	bool m_bLongitudinal;              /**< true if longitudinal stability results are to be displayed, false if lateral */
 	bool m_bMoments;                   /**< true if the arrows representing moments are to be displayed on the 3D openGl view */
-	bool m_bOutline;                   /**< true if the surface outlines are to be displayed in the 3D view*/
 	bool m_bPanelForce;                /**< true if the forces acting on the panels are to be displayed in the 3D view */
 	bool m_bPickCenter;                /**< true if the user is in the process of picking a new center for OpenGL display */
 	bool m_bResetglGeom;               /**< true if the geometry OpenGL list needs to be re-generated */
@@ -519,12 +525,10 @@ public:
 	bool m_bShowCpScale;               /**< true if the Cp Scale in Miarex is to be displayed */
 	bool m_bShowCpPoints;              /**< true if the points of the active curve should be displayed in Cp view */
 	bool m_bShowElliptic;              /**< true if the elliptic loading should be displayed in the local lift graph */
-	bool m_bShowMasses;                /**< true if the point masses are to be displayed on the openGL 3D view */
 	bool m_bShowWingCurve[MAXWINGS];   /**< true if various plane's wing curves shoud be displayed*/
 	bool m_bSpeeds;                    /**< true if the velocities should be displayed in the operating point or 3D view*/
 	bool m_bStoreWOpp;                 /**< true if the WOpp should be stored after a calculation */
 	bool m_bStream;                    /**< defines whether the streamlines should be displayed in the operating point or 3D view*/
-	bool m_bSurfaces;                  /**< true if the surfaces are to be displayed in the 3D view*/
 	bool m_bTrans;                     /**< true if the view is being dragged */
 	bool m_bTransGraph;	               /**< true if a graph is being dragged */
 	bool m_bTrefftz;                   /**< true if the induced drag should be calculated in the Trefftz plane, false if calculated by summation over panels */
@@ -536,7 +540,6 @@ public:
 	bool m_bType7;                     /**< true if polars of type 71 are to be displayed */
 	bool m_bVCd ;                      /**< true if the viscous drag forces should be displayed in the operating point or 3D view*/
 	bool m_bVLM1;                      /**< true if the horseshoe method is selected, false if the quad ring method is selected */
-	bool m_bVLMPanels;                 /**< true if the panels are to be displayed in the 3D view*/
 	bool m_bVortices;                  /**< true if the panel vortices should be displayed */
 	bool m_bWakePanels;                /**< true if the Cp Scale in Miarex is to be displayed */
 	bool m_bXBot;                      /**< true if the transition on the bottom surface should be displayed in the operating point or in 3D view*/

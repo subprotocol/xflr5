@@ -27,7 +27,8 @@
 #include "GL3DScales.h"
 #include "StabViewDlg.h"
 #include "../objects/Wing.h"
-#include "../misc/ProgressDlg.h"
+#include <QProgressDialog>
+
 
 #define SIDEPOINTS 51
 
@@ -437,7 +438,7 @@ void GLCreateGeom(void *pQMiarex, Wing *pWing, int List, Body *pBody)
 
 void GLCreateCp(void *pQMiarex, CVector *pNode, Panel *pPanel, WingOpp *pWOpp, PlaneOpp *pPOpp)
 {
-    QMiarex * pMiarex = (QMiarex*)pQMiarex;
+	QMiarex * pMiarex = (QMiarex*)pQMiarex;
     if((!pWOpp && !pPOpp) || !pPanel || !pNode || !pMiarex->m_MatSize)
 	{
 		glNewList(PANELCP,GL_COMPILE);
@@ -1311,7 +1312,7 @@ void GLCreateCtrlPts(void *pQMiarex, Panel *pPanel)
 
 void GLCreateVortices(void *pQMiarex, Panel *pPanel, CVector *pNode, WPolar *pWPolar)
 {
-    QMiarex * pMiarex = (QMiarex*)pQMiarex;
+	QMiarex * pMiarex = (QMiarex*)pQMiarex;
     if(!pNode || !pPanel || !pMiarex->m_MatSize)
     {
         glNewList(VLMVORTICES, GL_COMPILE);
@@ -1832,12 +1833,8 @@ void GLCreateStreamLines(void *pQMiarex, Wing *PlaneWing[MAXWINGS], CVector *pNo
 
 	Wing *pWing;
 
-    ProgressDlg dlg(pMiarex);
-	dlg.setWindowTitle("Streamlines calculation");
-	dlg.InitDialog(0, pMiarex->m_MatSize);
-	dlg.setWindowModality(Qt::WindowModal);
-	dlg.SetValue(0);
-	dlg.show();
+	QProgressDialog dlg("Streamlines calculation", "Abort", 0, pMiarex->m_MatSize, pMainFrame);
+//	dlg.setWindowModality(Qt::WindowModal);
 
 	GL3DScales *p3DScales = (GL3DScales *)pMainFrame->m_pGL3DScales;
 	bool bFound;
@@ -1870,12 +1867,7 @@ void GLCreateStreamLines(void *pQMiarex, Wing *PlaneWing[MAXWINGS], CVector *pNo
 		Sigma = NULL;
 	}
 
-
 	pMiarex->m_pPanelDlg->m_pWing   = PlaneWing[0];
-
-
-//Tilt the geometry w.r.t. aoa
-//	pMiarex->RotateGeomY(pWOpp->m_Alpha, RefPoint);
 
 	glNewList(VLMSTREAMLINES,GL_COMPILE);
 	{
@@ -1895,7 +1887,7 @@ void GLCreateStreamLines(void *pQMiarex, Wing *PlaneWing[MAXWINGS], CVector *pNo
 		else if(style == Qt::DotLine)        glLineStipple (1, 0x6666);
 		else if(style == Qt::DashDotLine)    glLineStipple (1, 0xFF18);
 		else if(style == Qt::DashDotDotLine) glLineStipple (1, 0x7E66);
-		else					         glLineStipple (1, 0xFFFF);
+		else                                 glLineStipple (1, 0xFFFF);
 
 		glColor3d(color.redF(), color.greenF(), color.blueF());
 
@@ -2025,13 +2017,15 @@ void GLCreateStreamLines(void *pQMiarex, Wing *PlaneWing[MAXWINGS], CVector *pNo
 						glEnd();
 					}
 
-					dlg.SetValue(m);
+					dlg.setValue(m);
 					m++;
 
-					if(dlg.IsCanceled()) break;
+//					qApp->processEvents();
+					if(dlg.wasCanceled()) break;
 				}
-				if(dlg.IsCanceled()) break;
+				if(dlg.wasCanceled()) break;
 			}
+			if(dlg.wasCanceled()) break;
 		}
 
 		glDisable (GL_LINE_STIPPLE);
@@ -2055,11 +2049,7 @@ void GLCreateSurfSpeeds(void *pQMiarex, Panel *pPanel, WPolar *pWPolar, WingOpp 
 		return;
 	}
 	
-    ProgressDlg dlg(pMiarex);
-	dlg.InitDialog(0, pMiarex->m_MatSize);
-	dlg.setModal(true);
-	dlg.SetValue(0);
-	dlg.show();
+	QProgressDialog dlg("Streamlines calculation", "Abort", 0, pMiarex->m_MatSize, (MainFrame*)QMiarex::s_pMainFrame);
 
 	int p, style;
 	double factor;
@@ -2172,8 +2162,8 @@ void GLCreateSurfSpeeds(void *pQMiarex, Panel *pPanel, WPolar *pWPolar, WingOpp 
 			}
 			glEnd();
 
-			dlg.SetValue(p);
-			if(dlg.IsCanceled()) break;
+			dlg.setValue(p);
+			if(dlg.wasCanceled()) break;
 		}
 
 		glDisable (GL_LINE_STIPPLE);

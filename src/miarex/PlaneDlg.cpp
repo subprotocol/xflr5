@@ -42,6 +42,7 @@ void *PlaneDlg::s_pMiarex;
 void *PlaneDlg::s_pMainFrame;
 
 
+
 PlaneDlg::PlaneDlg(QWidget *parent) :QDialog(parent)
 {
 	setWindowTitle(tr("Plane Editor"));
@@ -396,8 +397,10 @@ void PlaneDlg::OnEditBody()
 		pMiarex->m_bResetglMesh = true;
 		pMainFrame->SetSaveState(false);
 		m_bChanged = true;
+		SetResults();
 	}
 	else m_pPlane->m_pBody->Duplicate(&memBody);
+
 }
 
 

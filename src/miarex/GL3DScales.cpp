@@ -80,10 +80,10 @@ void GL3DScales::SetupLayout()
 		lab0->setAlignment(Qt::AlignVCenter |Qt::AlignRight);
 		lab1->setAlignment(Qt::AlignVCenter |Qt::AlignRight);
 		CpScaleLayout->addWidget(m_pctrlAutoCpScale,1,2);
-		CpScaleLayout->addWidget(lab0,2,1);
-		CpScaleLayout->addWidget(m_pctrlLegendMin,2,2);
-		CpScaleLayout->addWidget(lab1,3,1);
-		CpScaleLayout->addWidget(m_pctrlLegendMax,3,2);
+		CpScaleLayout->addWidget(lab1,2,1);
+		CpScaleLayout->addWidget(m_pctrlLegendMax,2,2);
+		CpScaleLayout->addWidget(lab0,3,1);
+		CpScaleLayout->addWidget(m_pctrlLegendMin,3,2);
 		CpScaleBox->setLayout(CpScaleLayout);
 	}
 

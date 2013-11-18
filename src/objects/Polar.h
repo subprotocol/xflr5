@@ -68,6 +68,9 @@ private:
 				  double Xtr1, double Xtr2, double HMom, double Cpmn, double Reynolds, double XCp);
 	void Copy(Polar *pPolar);
 
+	bool isVisible(){return m_bIsVisible;}
+	bool pointsVisible(){return m_bShowPoints;}
+
 	static void GetPlrVariableName(int iVar, QString &Name);
 
 

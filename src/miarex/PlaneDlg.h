@@ -91,6 +91,7 @@ private:
 	bool m_bDescriptionChanged;
 	bool m_bAcceptName;
 	
+
 private:
 	QLabel *m_pctrlSurf1;
 	QLabel *m_pctrlSurf2;

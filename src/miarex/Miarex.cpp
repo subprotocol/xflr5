@@ -39,6 +39,13 @@ void *QMiarex::s_p3dWidget;
 double QMiarex::s_CoreSize = 0.000001;
 double QMiarex::s_MinPanelSize = 0.0001;
 
+bool QMiarex::s_bAxes = true;
+bool QMiarex::s_bOutline = true;
+bool QMiarex::s_bSurfaces = true;
+bool QMiarex::s_bShowMasses = false;
+bool QMiarex::s_bVLMPanels = false;
+
+
 #define VLMMAXMATSIZE    5000     /**< The max number of VLM panels for the whole plane. Sets the size of the influence matrix and its RHS.*/
 #define VLMHALF          2500     /**< Half the value of VLMMAXMATSIZE. */
 #define VLMMAXRHS         100     /**< The max number of points which may be calculated in a single sequence. Has an impact on the memory reserved at program launch the size of the */
@@ -286,7 +293,6 @@ QMiarex::QMiarex(QWidget *parent)
 	m_bHalfWing          = false;
 	m_bTransGraph        = true;
 	m_bFoilNames         = false;
-	m_bShowMasses        = false;
 	m_bPanelForce        = false;
 	m_bLongitudinal      = true;
 	m_bCurWOppOnly       = true;
@@ -324,10 +330,6 @@ QMiarex::QMiarex(QWidget *parent)
 	m_bSpeeds            = false;
 	m_bWakePanels        = false;
 	m_bCrossPoint        = false;
-	m_bSurfaces          = true;
-	m_bOutline           = true;
-	m_bVLMPanels         = false;
-	m_bAxes              = true;
 	m_bPickCenter        = false;
 	m_bAutoCpScale	     = false;
 	m_bShowCpScale       = true;
@@ -1765,9 +1767,9 @@ void QMiarex::SetControls()
 
 	pMainFrame->W3DScalesAct->setChecked(pMainFrame->m_pctrl3DScalesWidget->isVisible());
 
-	m_pctrlOutline->setChecked(m_bOutline);
-	m_pctrlPanels->setChecked(m_bVLMPanels);
-	m_pctrlAxes->setChecked(m_bAxes);
+	m_pctrlOutline->setChecked(s_bOutline);
+	m_pctrlPanels->setChecked(s_bVLMPanels);
+	m_pctrlAxes->setChecked(s_bAxes);
 	m_pctrlCp->setChecked(m_b3DCp);
 	m_pctrlPanelForce->setChecked(m_bPanelForce);
 	m_pctrlDownwash->setChecked(m_bDownwash);
@@ -1776,10 +1778,10 @@ void QMiarex::SetControls()
 	m_pctrlLift->setChecked(m_bXCP);
 	m_pctrlIDrag->setChecked(m_bICd);
 	m_pctrlVDrag->setChecked(m_bVCd);
-	m_pctrlAxes->setChecked(m_bAxes);
+	m_pctrlAxes->setChecked(s_bAxes);
 	m_pctrlLight->setChecked(GLLightDlg::IsLightOn());
-	m_pctrlSurfaces->setChecked(m_bSurfaces);
-	m_pctrlOutline->setChecked(m_bOutline);
+	m_pctrlSurfaces->setChecked(s_bSurfaces);
+	m_pctrlOutline->setChecked(s_bOutline);
 	m_pctrlStream->setChecked(m_bStream);
 	m_pctrlClipPlanePos->setValue((int)(m_ClipPlanePos*100.0));
 
@@ -1834,8 +1836,8 @@ void QMiarex::CreateCpCurves()
 	SpanPos = m_CurSpanPos*m_pCurWOpp->m_Span/2.000001;
 
 	str1 = m_pCurWing->WingName();
-	str2 = QString(" a=%1").arg(m_pCurWOpp->m_Alpha,5,'f',2);
-	str3 = QString(" x/c=%1").arg(m_CurSpanPos,5,'f',2);
+	str2 = QString(" a=%1").arg(m_pCurWOpp->m_Alpha, 5, 'f', 2);
+	str3 = QString(" y/b=%1").arg(m_CurSpanPos, 5, 'f', 2);
 
 //	if(m_bCurWOppOnly)
 	{
@@ -4711,7 +4713,7 @@ void QMiarex::GLCallViewLists()
 
 	if(m_bMoments && m_pCurWOpp) glCallList(VLMMOMENTS);
 
-	if (m_pCurWOpp && m_bStream && m_pCurWOpp->m_AnalysisMethod>=VLMMETHOD && !m_bResetglStream)
+	if (m_pCurWOpp && m_bStream && m_pCurWOpp->m_AnalysisMethod>=VLMMETHOD && !m_bResetglStream && glIsList(VLMSTREAMLINES) )
 		glCallList(VLMSTREAMLINES);//streamlines are not rotated
 
 	if(m_pCurWOpp && m_bSpeeds && m_pCurWOpp->m_AnalysisMethod>=VLMMETHOD && !m_bResetglFlow)
@@ -4719,9 +4721,9 @@ void QMiarex::GLCallViewLists()
 
 	if (m_pCurWOpp) glRotated(m_pCurWOpp->m_Alpha, 0.0, 1.0, 0.0);
 
-	if(m_bVLMPanels && m_pCurWing)
+	if(s_bVLMPanels && m_pCurWing)
 	{
-		if(!(m_b3DCp&&m_pCurWOpp) && !m_bSurfaces) glCallList(MESHBACK);
+		if(!(m_b3DCp&&m_pCurWOpp) && !s_bSurfaces) glCallList(MESHBACK);
 		glCallList(MESHPANELS);
 	}
 
@@ -4753,7 +4755,7 @@ void QMiarex::GLCallViewLists()
 	glDisable(GL_LIGHTING);
 	glDisable(GL_LIGHT0);
 
-	if(m_bOutline)
+	if(s_bOutline)
 	{
 		for(int iw=0; iw<MAXWINGS; iw++)
 			if(m_pWingList[iw])  glCallList(WINGOUTLINE+iw);
@@ -4774,7 +4776,7 @@ void QMiarex::GLCallViewLists()
 		glDisable(GL_LIGHT0);
 	}
 
-	if(m_bSurfaces)
+	if(s_bSurfaces)
 	{
 		for(int iw=0; iw<MAXWINGS; iw++)
 		{
@@ -4894,12 +4896,12 @@ void QMiarex::GLDraw3D()
 
 		if (m_pCurWPolar && m_pCurWPolar->m_AnalysisMethod==PANELMETHOD)
 		{
-			GLCreateMesh(WINGWAKEPANELS, m_WakeSize, m_WakePanel, m_WakeNode, m_WakeColor, pMainFrame->m_BackgroundColor, false);
+//			GLCreateMesh(WINGWAKEPANELS, m_WakeSize, m_WakePanel, m_WakeNode, m_WakeColor, pMainFrame->m_BackgroundColor, false);
 		}
 		m_bResetglWake = false;
 	}
 
-	if(m_bResetglMesh && m_bVLMPanels && (m_iView==W3DVIEW || m_iView==WSTABVIEW))
+	if(m_bResetglMesh && s_bVLMPanels && (m_iView==W3DVIEW || m_iView==WSTABVIEW))
 	{
 		if(glIsList(MESHPANELS))
 		{
@@ -5055,9 +5057,7 @@ void QMiarex::GLDraw3D()
 		m_bResetglLegend = false;
 	}
 
-	// draw once without streamlines to update the screen
-	// then draw with streamlines
-	if((m_bResetglStream || m_bResetglOpp) && m_iView==W3DVIEW)
+	if((m_bResetglStream) && m_iView==W3DVIEW)
 	{
 		if(glIsList(VLMSTREAMLINES))
 		{
@@ -5066,11 +5066,13 @@ void QMiarex::GLDraw3D()
 		}
 		if(m_bStream)
 		{
+			m_bStream = false; //Disable temporarily during calculation
 			//no need to recalculate if not showing
 			if(m_pCurWing && m_pCurWOpp && m_pCurWOpp->m_AnalysisMethod>=VLMMETHOD)
 			{
-				GLCreateStreamLines(this, m_pWingList, m_Node, m_pCurWPolar, m_pCurWOpp);
 				m_bResetglStream = false;
+				GLCreateStreamLines(this, m_pWingList, m_Node, m_pCurWPolar, m_pCurWOpp);
+				m_bStream  = true;
 			}
 		}
 	}
@@ -5680,7 +5682,7 @@ void QMiarex::GLRenderView()
 
 		glScaled(m_glScaled, m_glScaled, m_glScaled);
 		glTranslated(m_glRotCenter.x, m_glRotCenter.y, m_glRotCenter.z);
-		if(m_bAxes)  p3dWidget->GLDrawAxes(1.0/m_glScaled, m_3DAxisColor, m_3DAxisStyle, m_3DAxisWidth);
+		if(s_bAxes)  p3dWidget->GLDrawAxes(1.0/m_glScaled, m_3DAxisColor, m_3DAxisStyle, m_3DAxisWidth);
 
 		if(m_pCurWPolar && m_pCurWPolar->m_WPolarType==STABILITYPOLAR)
 		{
@@ -5695,7 +5697,7 @@ void QMiarex::GLRenderView()
 
 		if(m_bFoilNames) GLDrawFoils();
 
-		if(m_bShowMasses) GLDrawMasses();
+		if(s_bShowMasses) GLDrawMasses();
 
 
 		glLoadIdentity();
@@ -6691,10 +6693,10 @@ bool QMiarex::LoadSettings(QSettings *pSettings)
 		m_bICd          = pSettings->value("bICd", true).toBool();
 		m_bVCd          = pSettings->value("bVCd", true).toBool();
 		m_bWakePanels   = pSettings->value("bWakePanels").toBool();
-		m_bSurfaces     = pSettings->value("bSurfaces").toBool();
-		m_bOutline      = pSettings->value("bOutline").toBool();
-		m_bVLMPanels    = pSettings->value("bVLMPanels").toBool();
-		m_bAxes         = pSettings->value("bAxes").toBool();
+		s_bSurfaces     = pSettings->value("bSurfaces").toBool();
+		s_bOutline      = pSettings->value("bOutline").toBool();
+		s_bVLMPanels    = pSettings->value("bVLMPanels").toBool();
+		s_bAxes         = pSettings->value("bAxes").toBool();
 		m_b3DCp         = pSettings->value("b3DCp").toBool();
 		m_bDownwash     = pSettings->value("bDownwash").toBool();
 		m_bMoments      = pSettings->value("bMoments").toBool();
@@ -7403,7 +7405,7 @@ void QMiarex::On3DCp()
 
 	if(m_b3DCp)
 	{
-		m_bSurfaces = false;
+		s_bSurfaces = false;
 		m_pctrlSurfaces->setChecked(false);
 		m_bPanelForce = false;
 		m_pctrlPanelForce->setChecked(false);
@@ -7746,7 +7748,7 @@ void QMiarex::OnAllWPolarGraphSettings()
  */
 void QMiarex::OnAxes()
 {
-	m_bAxes = m_pctrlAxes->isChecked();
+	s_bAxes = m_pctrlAxes->isChecked();
 	UpdateView();
 }
 
@@ -9817,7 +9819,7 @@ void QMiarex::OnFoilNames()
  */
 void QMiarex::OnMasses()
 {
-	m_bShowMasses = m_pctrlMasses->isChecked();
+	s_bShowMasses = m_pctrlMasses->isChecked();
 	UpdateView();
 }
 
@@ -10354,6 +10356,7 @@ void QMiarex::OnInitLLTCalc()
 	m_bInitLLTCalc = m_pctrlInitLLTCalc->isChecked();
 }
 
+
 /**
  * The user has requested to store the active curve in the Cp graph display
  * Duplicates the curve and adds it to the graph
@@ -10366,6 +10369,7 @@ void QMiarex::OnKeepCpSection()
 	pCurve = m_CpGraph.GetCurve(0);
 	pNewCurve = m_CpGraph.AddCurve();
 	pNewCurve->CopyData(pCurve);
+	pNewCurve->SetTitle(pCurve->title());
 
 	m_CpColor = pMainFrame->m_ColorList[(m_CpGraph.GetCurveCount())%24];
 	pCurve->SetColor(m_CpColor);
@@ -10375,7 +10379,6 @@ void QMiarex::OnKeepCpSection()
 	m_bShowCpPoints = false;
 	SetCurveParams();
 
-//	m_CurSpanPos = m_SpanPos;
 	CreateCpCurves();
 	UpdateView();
 }
@@ -10593,7 +10596,7 @@ void QMiarex::OnNewPlane()
  */
 void QMiarex::OnOutline()
 {
-	m_bOutline = m_pctrlOutline->isChecked();
+	s_bOutline = m_pctrlOutline->isChecked();
 	UpdateView();
 }
 
@@ -10603,7 +10606,7 @@ void QMiarex::OnOutline()
  */
 void QMiarex::OnPanels()
 {
-	m_bVLMPanels = m_pctrlPanels->isChecked();
+	s_bVLMPanels = m_pctrlPanels->isChecked();
 	UpdateView();
 }
 
@@ -10874,16 +10877,17 @@ void QMiarex::OnRenameCurUFO()
 	UpdateView();
 }
 
+
 /**
  * The user has requested a deletion of all the previously stored curves in the Cp Graph
  */
 void QMiarex::OnResetCpSection()
 {
 	for(int i=m_CpGraph.GetCurveCount()-1; i>3 ;i--)	m_CpGraph.DeleteCurve(i);
-//	m_CurSpanPos = m_SpanPos;
 	CreateCpCurves();
 	UpdateView();
 }
+
 
 /**
  * The user has requested that the results data of the current CWPolar object be deleted.
@@ -11637,8 +11641,8 @@ void QMiarex::OnStreamlines()
  */
 void QMiarex::OnSurfaces()
 {
-	m_bSurfaces = m_pctrlSurfaces->isChecked();
-	if(m_bSurfaces)
+	s_bSurfaces = m_pctrlSurfaces->isChecked();
+	if(s_bSurfaces)
 	{
 		m_b3DCp = false;
 		m_pctrlCp->setChecked(false);
@@ -13044,10 +13048,10 @@ bool QMiarex::SaveSettings(QSettings *pSettings)
 		pSettings->setValue("bICd", m_bICd  );
 		pSettings->setValue("bVCd", m_bVCd  );
 		pSettings->setValue("bWakePanels", m_bWakePanels  );
-		pSettings->setValue("bSurfaces", m_bSurfaces  );
-		pSettings->setValue("bOutline", m_bOutline  );
-		pSettings->setValue("bVLMPanels", m_bVLMPanels  );
-		pSettings->setValue("bAxes", m_bAxes   );
+		pSettings->setValue("bSurfaces", s_bSurfaces  );
+		pSettings->setValue("bOutline", s_bOutline  );
+		pSettings->setValue("bVLMPanels", s_bVLMPanels  );
+		pSettings->setValue("bAxes", s_bAxes   );
 		pSettings->setValue("b3DCp", m_b3DCp  );
 		pSettings->setValue("bDownwash", m_bDownwash  );
 		pSettings->setValue("bMoments", m_bMoments  );

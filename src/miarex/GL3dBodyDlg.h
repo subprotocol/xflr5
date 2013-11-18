@@ -219,7 +219,6 @@ private:
 	bool m_bResetFrame;
 
 	bool m_bChanged;
-	bool m_bShowMasses;
 
 	QPoint m_MousePos;
 	QPoint m_ptPopUp;
@@ -236,8 +235,6 @@ private:
 
 	ArcBall m_ArcBall;
 	QPoint m_LastPoint, m_PointDown;
-
-	static bool s_bSurfaces, s_bOutline, s_bAxes, s_bVLMPanels;
 
 	bool m_bEnableName;
 	bool m_bTrans;

@@ -5873,7 +5873,7 @@ void QXDirect::PaintPolarLegend(QPoint place, int bottom, QPainter &painter)
 		for (i=0; i<m_poaPolar->size(); i++)
 		{
 			pPolar = (Polar*)m_poaPolar->at(i);
-			if (pPolar->m_FoilName == pFoil->m_FoilName && pPolar->m_Alpha.size())
+			if (pPolar->m_FoilName == pFoil->m_FoilName && pPolar->m_Alpha.size() && pPolar->isVisible())
 			{
 				str.append(pFoil->m_FoilName);
 				break;
@@ -5907,8 +5907,8 @@ void QXDirect::PaintPolarLegend(QPoint place, int bottom, QPainter &painter)
 		}
 		if (FoilPlrs)
 		{
-			int YPos = place.y() + (ny+FoilPlrs+2) * ypos;// bottom line of this foil's legend
-			if(abs(bottom) > abs(YPos))
+			int YBotPos = place.y() + (ny+FoilPlrs+2) * ypos;// bottom line of this foil's legend
+			if(abs(bottom) > abs(YBotPos))
 			{
 				ny++;
 			}
@@ -5916,6 +5916,9 @@ void QXDirect::PaintPolarLegend(QPoint place, int bottom, QPainter &painter)
 			{
 			// move rigth if less than client bottom area
 				place.rx() += LegendWidth;
+				ny=1;
+			}
+			else{
 				ny=1;
 			}
 			painter.setPen(TextPen);
@@ -6873,6 +6876,7 @@ void QXDirect::SetPolarLegendPos()
 		m_PolarLegendOffset.ry() = h2+30;
 	}
 }
+
 
 /**
  * Creates the GUI associated to the toolbar.

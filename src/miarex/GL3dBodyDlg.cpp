@@ -60,11 +60,6 @@
 void* GL3dBodyDlg::s_pMainFrame;
 void *GL3dBodyDlg::s_pGLLightDlg;
 
-bool GL3dBodyDlg::s_bSurfaces = true;
-bool GL3dBodyDlg::s_bOutline = true;
-bool GL3dBodyDlg::s_bAxes = true;
-bool GL3dBodyDlg::s_bVLMPanels = false;
-
 
 int GL3dBodyDlg::s_NHoopPoints = 37;
 int GL3dBodyDlg::s_NXPoints = 47;
@@ -1092,7 +1087,7 @@ void GL3dBodyDlg::GLCreateBodyGrid()
 	int style = W3dPrefsDlg::s_3DAxisStyle;
 	int MaxLines = 150;
 	int start = 0;
-	if(s_bAxes) start = 1;
+	if(QMiarex::s_bAxes) start = 1;
 
 	glNewList(BODYFRAMEGRID,GL_COMPILE);
 	{
@@ -1102,7 +1097,7 @@ void GL3dBodyDlg::GLCreateBodyGrid()
 		glEnable (GL_LINE_STIPPLE);
 		glPolygonMode(GL_FRONT,GL_LINE);
 
-		if(s_bAxes)
+		if(QMiarex::s_bAxes)
 		{
 			// Frame axis____________
 			glColor3d(W3dPrefsDlg::s_3DAxisColor.redF(), W3dPrefsDlg::s_3DAxisColor.greenF(), W3dPrefsDlg::s_3DAxisColor.blueF());
@@ -1257,7 +1252,7 @@ void GL3dBodyDlg::GLCreateBodyGrid()
 		glEnable (GL_LINE_STIPPLE);
 		glPolygonMode(GL_FRONT,GL_LINE);
 
-		if(s_bAxes)
+		if(QMiarex::s_bAxes)
 		{
 			// Frame axis____________
 			glColor3d(W3dPrefsDlg::s_3DAxisColor.redF(), W3dPrefsDlg::s_3DAxisColor.greenF(), W3dPrefsDlg::s_3DAxisColor.blueF());
@@ -1717,7 +1712,7 @@ void GL3dBodyDlg::GLRenderBody()
 			glScaled(m_glScaled, m_glScaled, m_glScaled);
 			glTranslated(m_glRotCenter.x, m_glRotCenter.y, m_glRotCenter.z);
 
-			if(s_bAxes)  m_3dWidget.GLDrawAxes(1.0, W3dPrefsDlg::s_3DAxisColor, W3dPrefsDlg::s_3DAxisStyle, W3dPrefsDlg::s_3DAxisWidth);
+			if(QMiarex::s_bAxes)  m_3dWidget.GLDrawAxes(1.0, W3dPrefsDlg::s_3DAxisColor, W3dPrefsDlg::s_3DAxisStyle, W3dPrefsDlg::s_3DAxisWidth);
 
 
 			if(m_bglLight)
@@ -1730,14 +1725,14 @@ void GL3dBodyDlg::GLRenderBody()
 				glDisable(GL_LIGHT0);
 			}
 
-			if(s_bSurfaces && m_pBody)	glCallList(BODYGEOMBASE);
+			if(QMiarex::s_bSurfaces && m_pBody)	glCallList(BODYGEOMBASE);
 
 			glDisable(GL_LIGHTING);
 			glDisable(GL_LIGHT0);
 
-			if(m_pBody && m_pFrame && (s_bOutline||s_bSurfaces)) glCallList(BODYFRAME3D);
-			if(s_bOutline && m_pBody)	glCallList(BODYGEOMBASE+MAXBODIES);
-			if(s_bVLMPanels && m_pBody)
+			if(m_pBody && m_pFrame && (QMiarex::s_bOutline||QMiarex::s_bSurfaces)) glCallList(BODYFRAME3D);
+			if(QMiarex::s_bOutline && m_pBody)	glCallList(BODYGEOMBASE+MAXBODIES);
+			if(QMiarex::s_bVLMPanels && m_pBody)
 			{
 				glCallList(BODYMESHBASE);
 //				glCallList(BODYMESHBASE+MAXBODIES);
@@ -1748,7 +1743,7 @@ void GL3dBodyDlg::GLRenderBody()
 			glDisable(GL_CLIP_PLANE3);
 			glDisable(GL_CLIP_PLANE4);
 
-			if(m_bShowMasses) GLDrawMasses();
+			if(QMiarex::s_bShowMasses) GLDrawMasses();
 		}
 		glPopMatrix();
 
@@ -2375,7 +2370,7 @@ void GL3dBodyDlg::On3DPickCenter()
 
 void GL3dBodyDlg::OnAxes()
 {
-	s_bAxes = m_pctrlAxes->isChecked();
+	QMiarex::s_bAxes = m_pctrlAxes->isChecked();
 //	m_bResetglBody2D = true;
 	UpdateView();
 }
@@ -2705,7 +2700,7 @@ void GL3dBodyDlg::OnLight()
 
 void GL3dBodyDlg::OnShowMasses()
 {
-	m_bShowMasses = m_pctrlShowMasses->isChecked();
+	QMiarex::s_bShowMasses = m_pctrlShowMasses->isChecked();
 	UpdateView();
 }
 
@@ -2753,14 +2748,14 @@ void GL3dBodyDlg::OnOK()
 
 void GL3dBodyDlg::OnOutline()
 {
-	s_bOutline = m_pctrlOutline->isChecked();
+	QMiarex::s_bOutline = m_pctrlOutline->isChecked();
 	UpdateView();
 }
 
 
 void GL3dBodyDlg::OnPanels()
 {
-	s_bVLMPanels = m_pctrlPanels->isChecked();
+	QMiarex::s_bVLMPanels = m_pctrlPanels->isChecked();
 	UpdateView();
 }
 
@@ -3024,7 +3019,7 @@ void GL3dBodyDlg::OnShowCurFrameOnly()
 
 void GL3dBodyDlg::OnSurfaces()
 {
-	s_bSurfaces = m_pctrlSurfaces->isChecked();
+	QMiarex::s_bSurfaces = m_pctrlSurfaces->isChecked();
 	UpdateView();
 }
 
@@ -3255,15 +3250,15 @@ void GL3dBodyDlg::SetControls()
 {
 	m_pctrlBodyName->setEnabled(m_bEnableName);
 
-	m_pctrlOutline->setChecked(s_bOutline);
-	m_pctrlPanels->setChecked(s_bVLMPanels);
-	m_pctrlAxes->setChecked(s_bAxes);
+	m_pctrlOutline->setChecked(QMiarex::s_bOutline);
+	m_pctrlPanels->setChecked(QMiarex::s_bVLMPanels);
+	m_pctrlAxes->setChecked(QMiarex::s_bAxes);
 	m_pctrlLight->setChecked(m_bglLight);
-	m_pctrlShowMasses->setChecked(m_bShowMasses);
-	m_pctrlSurfaces->setChecked(s_bSurfaces);
-	m_pctrlOutline->setChecked(s_bOutline);
+	m_pctrlShowMasses->setChecked(QMiarex::s_bShowMasses);
+	m_pctrlSurfaces->setChecked(QMiarex::s_bSurfaces);
+	m_pctrlOutline->setChecked(QMiarex::s_bOutline);
 	m_pctrlClipPlanePos->setValue((int)(m_ClipPlanePos*100.0));
-	m_pctrlSurfaces->setChecked(s_bSurfaces);
+	m_pctrlSurfaces->setChecked(QMiarex::s_bSurfaces);
 
 	m_pctrlPanelBunch->setSliderPosition((int)(m_pBody->m_Bunch*100.0));
 
