@@ -13,7 +13,7 @@
 #define XFLR5
 #define PI             3.14159265358979  
 #define MAXRECENTFILES         8  /**< Defines the maximum number of file names in the recent file list */
-#define SETTINGSFORMAT    100623  /**< A random number which defines the format of the settings file */
+#define SETTINGSFORMAT     53627  /**< A random number which defines the format of the settings file */
 #define PRECISION  0.00000000001  /**< Values are assumed 0 if less than this value. This is to avoid comparing the equality of two floating point numbers */
 #define MAXCOLORS   30            /**< The number of the different colors used, mainly for the graph curves */
 

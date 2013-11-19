@@ -58,10 +58,10 @@ private:
 	QPushButton *m_pctrlTextFont;
 	QPushButton *m_pctrlGraphSettings;
 	QPushButton *OKButton, *CancelButton;
-	QCheckBox *m_pctrlReverseZoom, *m_pctrlAlphaChannel, *m_pctrlStyleSheets;
+	QCheckBox *m_pctrlReverseZoom, *m_pctrlAlphaChannel;
+//	QCheckBox *m_pctrlStyleSheets;
 
 	QComboBox *m_pctrlStyles;
-	QString m_StyleName;
 	QPushButton *OK, *Cancel;
 
 	void *m_pMainFrame;
@@ -72,7 +72,9 @@ private:
 	QGraph m_MemGraph;
 	bool m_bIsGraphModified;
 	bool m_bReverseZoom, m_bAlphaChannel;
-	bool m_bStyleSheets;
+
+	static bool s_bStyleSheets;
+	static QString s_StyleName, s_StyleSheetName;
 
 };
 

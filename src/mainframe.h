@@ -198,6 +198,7 @@ public:
 	bool LoadPolarFileV3(QDataStream &ar, bool bIsStoring, int ArchiveFormat=0);
 	Foil* ReadFoilFile(QTextStream &ar);
 	Foil* ReadPolarFile(QDataStream &ar);
+	static void ReadStyleSheet(QString styleSheetName, QString &styleSheet);
 	void RemoveOpPoint(bool bCurrent);
 	void RenameFoil(Foil *pFoil);
 	bool SaveProject(QString PathName="");
@@ -222,13 +223,12 @@ public:
 	void UpdateView();
 	void UpdateWPolars();
 	void UpdateWOpps();
+	QString versionName(){return m_VersionName;}
 	void WritePolars(QDataStream &ar, Foil *pFoil=NULL);
 
 /*___________________________________________Variables_______________________________*/
 public:
 	bool m_bMaximized;
-	QString m_StyleName;
-	QString m_VersionName;
 	QString m_GraphExportFilter;
 
 	static bool s_bTrace;
@@ -408,7 +408,6 @@ private:
 
 	enumApp m_iApp;                 /**< The identification number of the active app. */
 
-	bool m_bStyleSheets;        /**< true if the window's widgets should be displayed using custom stylesheets. */
 	bool m_bSaved;              /**< true if the project has not been modified since the last save operation. */
 	bool m_bSaveOpps;           /**< true if foil operating points should be serialized in the project file */
 	bool m_bSaveWOpps;          /**< true if wing operating points should be serialized in the project file */
@@ -422,6 +421,8 @@ private:
 	QString m_FileName;         /**< The absolute path to the file of the current project. */
 	QString m_LanguageFilePath;
 	QString m_LastDirName, m_ExportLastDirName, m_ImageDirName;
+	QString m_VersionName;
+
 	QList <QColor> m_ColorList;
 
 	QGraph m_RefGraph;//Reference setttings

@@ -30,6 +30,12 @@
 #include <QColorDialog>
 #include <QFontDialog>
 #include <QStyleFactory>
+#include <QDir>
+
+
+bool DisplaySettingsDlg::s_bStyleSheets;
+QString DisplaySettingsDlg::s_StyleName;
+QString DisplaySettingsDlg::s_StyleSheetName;
 
 
 
@@ -40,7 +46,7 @@ DisplaySettingsDlg::DisplaySettingsDlg(QWidget *pParent) : QDialog(pParent)
 	m_bIsGraphModified = false;
 	m_bReverseZoom = false;
 	m_bAlphaChannel = true;
-	m_bStyleSheets = false;
+	s_bStyleSheets = false;
 	SetupLayout();
 
 	connect(m_pctrlStyles, SIGNAL(activated(const QString &)),this, SLOT(OnStyleChanged(const QString &)));
@@ -73,7 +79,20 @@ void DisplaySettingsDlg::SetupLayout()
 	m_pctrlStyles->addItems(QStyleFactory::keys());
 	m_pctrlStyles->setCurrentIndex(m_pctrlStyles->findText(defaultStyle));
 
-	m_pctrlStyleSheets = new QCheckBox(tr("Use Stylesheets"));
+	// add custom style sheets
+	QDir styleDir("qss");
+	QString fileName = "*.qss";
+	QStringList filesList = styleDir.entryList(QStringList(fileName), QDir::Files | QDir::NoSymLinks);
+
+	for(int is=0; is<filesList.count(); is++)
+	{
+		QString styleSheetName = filesList.at(is);
+		int len = styleSheetName.length();
+		styleSheetName = styleSheetName.left(len-4);
+		m_pctrlStyles->addItem(styleSheetName);
+	}
+
+//	m_pctrlStyleSheets = new QCheckBox(tr("Use Stylesheets"));
 
 	QGroupBox *GraphBox = new QGroupBox(tr("Graph Settings"));
 	{
@@ -130,7 +149,7 @@ void DisplaySettingsDlg::SetupLayout()
 
 	MainLayout->addStretch(1);
 	MainLayout->addWidget(m_pctrlStyles);
-	MainLayout->addWidget(m_pctrlStyleSheets);
+//	MainLayout->addWidget(m_pctrlStyleSheets);
 	MainLayout->addStretch(1);
 	MainLayout->addWidget(BackBox);
 	MainLayout->addStretch(1);
@@ -152,14 +171,22 @@ void DisplaySettingsDlg::SetupLayout()
 
 void DisplaySettingsDlg::InitDialog()
 {
-	m_pctrlStyleSheets->setChecked(m_bStyleSheets);
+//	m_pctrlStyleSheets->setChecked(m_bStyleSheets);
 	m_MemGraph.CopySettings(m_pRefGraph);
 	m_pctrlBackColor->SetColor(m_BackgroundColor);
+
 	QString FontName = m_TextFont.family() + QString(" %1").arg(m_TextFont.pointSize());
 	m_pctrlTextFont->setText(FontName);
-	m_pctrlStyles->setCurrentIndex(m_pctrlStyles->findText(m_StyleName));
+
+	if(m_pctrlStyles->findText(s_StyleName)>=0)
+		m_pctrlStyles->setCurrentIndex(m_pctrlStyles->findText(s_StyleName));
+	else if(m_pctrlStyles->findText(s_StyleSheetName)>=0)
+		m_pctrlStyles->setCurrentIndex(m_pctrlStyles->findText(s_StyleSheetName));
+
+
 	m_pctrlReverseZoom->setChecked(m_bReverseZoom);
 	m_pctrlAlphaChannel->setChecked(m_bAlphaChannel);
+
 	QPalette palette = m_pctrlTextClr->palette();
 	QColor listColor = palette.color(QPalette::Button);
 	if(listColor.isValid())
@@ -167,7 +194,6 @@ void DisplaySettingsDlg::InitDialog()
 		palette.setColor(QPalette::Button, m_BackgroundColor);
 		palette.setColor(QPalette::ButtonText, m_TextColor);
 		m_pctrlTextClr->setPalette(palette);
-//		m_pctrlTextClr->setAutoFillBackground(true);
 		m_pctrlTextClr->setFont(m_TextFont);
 	}
 }
@@ -175,10 +201,34 @@ void DisplaySettingsDlg::InitDialog()
 
 void DisplaySettingsDlg::OnStyleChanged(const QString &StyleName)
 {
-	qApp->setStyle(StyleName);
-//	QMessageBox::information(window(), tr("Warning"), "The new style will take effect at the next session");
+	//test for style sheet
+	QDir styleDir("qss");
+	QString fileName = "*.qss";
+	QStringList filesList = styleDir.entryList(QStringList(fileName), QDir::Files | QDir::NoSymLinks);
 
-	m_StyleName = StyleName;
+	for(int is=0; is<filesList.count(); is++)
+	{
+		QString styleSheetName = filesList.at(is);
+		int len = styleSheetName.length();
+		styleSheetName = styleSheetName.left(len-4);
+		if(styleSheetName.compare(StyleName)==0)
+		{
+			s_bStyleSheets = true;
+			s_StyleSheetName = styleSheetName;
+			s_StyleName.clear();
+			QString styleSheet;
+			MainFrame::ReadStyleSheet(styleSheetName, styleSheet);
+			qApp->setStyleSheet(styleSheet);
+			ensurePolished();
+			return;
+		}
+	}
+
+	s_bStyleSheets = false;
+	s_StyleSheetName.clear();
+	qApp->setStyleSheet(styleSheet());
+	qApp->setStyle(StyleName);
+	s_StyleName = StyleName;
 }
 
 
@@ -226,6 +276,8 @@ void DisplaySettingsDlg::reject()
 
 	QDialog::reject();
 }
+
+
 
 void DisplaySettingsDlg::OnGraphSettings()
 {

@@ -5918,7 +5918,8 @@ void QXDirect::PaintPolarLegend(QPoint place, int bottom, QPainter &painter)
 				place.rx() += LegendWidth;
 				ny=1;
 			}
-			else{
+			else
+			{
 				ny=1;
 			}
 			painter.setPen(TextPen);

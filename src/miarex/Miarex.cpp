@@ -573,7 +573,9 @@ void QMiarex::Connect()
  */
 QMiarex::~QMiarex()
 {
-    delete m_pPlaneDlg;
+	Release();
+
+	delete m_pPlaneDlg;
     delete (GL3dWingDlg*)m_pWingDlg;
     delete m_pGraphDlg;
     delete m_pRenameDlg;
@@ -592,8 +594,6 @@ QMiarex::~QMiarex()
     delete m_pStabPolarDlg;
     delete m_pUnitsDlg;
     delete m_pObjectPropsDlg;
-
-	Release();
 }
 
 

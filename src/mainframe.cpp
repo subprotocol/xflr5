@@ -163,14 +163,12 @@ MainFrame::MainFrame(QWidget * parent, Qt::WindowFlags flags)
 
 	m_ImageFormat = PNG;
 	m_ExportFileType = TXT;
-	m_bStyleSheets  = false;
 	m_bReverseZoom  = false;
 	m_bAlphaChannel = true;
 	m_bSaveOpps     = false;
 	m_bSaveWOpps    = true;
 	m_bSaveSettings = true;
 
-	m_StyleName.clear();
 	m_GraphExportFilter = "Comma Separated Values (*.csv)";
 
 	m_LastDirName = QDir::homePath();
@@ -202,20 +200,6 @@ MainFrame::MainFrame(QWidget * parent, Qt::WindowFlags flags)
 	SetUnits(m_LengthUnit, m_AreaUnit, m_SpeedUnit, m_WeightUnit, m_ForceUnit, m_MomentUnit,
 			 m_mtoUnit, m_m2toUnit, m_mstoUnit, m_kgtoUnit, m_NtoUnit, m_NmtoUnit);
 
-
-	if(m_bStyleSheets)
-	{
-		QFile file("qss/appwidget.css");
-		if(file.open(QFile::ReadOnly))
-		{
-			QString styleSheet = QLatin1String(file.readAll());
-			pAFoil->setStyleSheet(styleSheet);
-			pXDirect->setStyleSheet(styleSheet);
-			pMiarex->setStyleSheet(styleSheet);
-			pXInverse->setStyleSheet(styleSheet);
-			ensurePolished();
-		}
-	}
 
 	pXDirect->SetAnalysisParams();
 	CreateActions();
@@ -266,6 +250,24 @@ MainFrame::MainFrame(QWidget * parent, Qt::WindowFlags flags)
 	m_pctrlStabViewWidget->hide();
 
 	SetMenus();
+
+	QString styleSheet;
+	if(DisplaySettingsDlg::s_bStyleSheets)
+	{
+		ReadStyleSheet(DisplaySettingsDlg::s_StyleSheetName, styleSheet);
+		qApp->setStyleSheet(styleSheet);
+		ensurePolished();
+	}
+}
+
+
+void MainFrame::ReadStyleSheet(QString styleSheetName, QString &styleSheet)
+{
+	QFile file("qss/"+styleSheetName+".qss");
+	if(file.open(QFile::ReadOnly))
+	{
+		styleSheet = QLatin1String(file.readAll());
+	}
 }
 
 
@@ -276,7 +278,7 @@ MainFrame::~MainFrame()
 	delete m_pDisplaySettingsDlg;
 	delete m_pTranslatorDlg;
 	delete m_pSaveOptionsDlg;
-	s_pTraceFile->close();
+	if(s_pTraceFile) s_pTraceFile->close();
 
 	for(int ioa=m_oaFoil.size()-1; ioa>=0; ioa--)
 	{
@@ -1151,6 +1153,7 @@ void MainFrame::CreateDockWindows()
 	BatchThreadDlg::s_pXDirect    = m_pXDirect;
 	FoilPolarDlg::s_pXDirect      = m_pXDirect;
 
+
 	GraphDlg::s_ActivePage = 0;
 }
 
@@ -1202,6 +1205,7 @@ void MainFrame::CreateMenus()
 	CreateXInverseMenus();
 	CreateMiarexMenus();
 	CreateAFoilMenus();
+
 }
  
 
@@ -3420,7 +3424,7 @@ bool MainFrame::LoadSettings()
 		SettingsFormat = settings.value("SettingsFormat").toInt();
 		if(SettingsFormat != SETTINGSFORMAT) return false;
 
-		m_StyleName = settings.value("StyleName","").toString();
+		DisplaySettingsDlg::s_StyleName = settings.value("StyleName","").toString();
 //		if(!m_StyleName.length()) return false;
 
 		m_GraphExportFilter = settings.value("GraphExportFilter",".csv").toString();
@@ -3522,9 +3526,11 @@ bool MainFrame::LoadSettings()
 			else break;
 		}while(n<MAXRECENTFILES);
 
-		m_bStyleSheets  = settings.value("StyleSheets", false).toBool();
 		m_bReverseZoom  = settings.value("ReverseZoom", false).toBool();
 		m_bAlphaChannel = settings.value("AlphaChannel", true).toBool();
+
+		DisplaySettingsDlg::s_bStyleSheets  = settings.value("ShowStyleSheets", false).toBool();
+		DisplaySettingsDlg::s_StyleSheetName = settings.value("StyleSheetName", "").toString();
 	}
 
 	return true;
@@ -4523,24 +4529,19 @@ void MainFrame::OnStyle()
 //	QXInverse *pXInverse = (QXInverse*)m_pXInverse;
 
 	m_pDisplaySettingsDlg->m_pMainFrame = this;
-//    m_DisplaySettingsDlg->move(m_DlgPos);
-	m_pDisplaySettingsDlg->m_bStyleSheets    = m_bStyleSheets;
 	m_pDisplaySettingsDlg->m_BackgroundColor = m_BackgroundColor;
 	m_pDisplaySettingsDlg->m_TextColor       = m_TextColor;
 	m_pDisplaySettingsDlg->m_TextFont        = m_TextFont;
 	m_pDisplaySettingsDlg->m_pRefGraph       = &m_RefGraph;
-	m_pDisplaySettingsDlg->m_StyleName       = m_StyleName;
 	m_pDisplaySettingsDlg->m_bReverseZoom    = m_bReverseZoom;
 	m_pDisplaySettingsDlg->m_bAlphaChannel   = m_bAlphaChannel;
 	m_pDisplaySettingsDlg->InitDialog();
 
 	if(m_pDisplaySettingsDlg->exec() ==QDialog::Accepted)
 	{
-		m_bStyleSheets    = m_pDisplaySettingsDlg->m_pctrlStyleSheets->isChecked();
 		m_BackgroundColor = m_pDisplaySettingsDlg->m_BackgroundColor;
 		m_TextColor       = m_pDisplaySettingsDlg->m_TextColor;
 		m_TextFont        = m_pDisplaySettingsDlg->m_TextFont;
-		m_StyleName       = m_pDisplaySettingsDlg->m_StyleName;
 		m_bReverseZoom    = m_pDisplaySettingsDlg->m_pctrlReverseZoom->isChecked();
 		m_bAlphaChannel   = m_pDisplaySettingsDlg->m_pctrlAlphaChannel->isChecked();
 		pMiarex->m_bResetglGeom = true;
@@ -5207,7 +5208,7 @@ void MainFrame::SaveSettings()
 		settings.setValue("SizeWidth", size().width());
 		settings.setValue("SizeHeight", size().height());
 		settings.setValue("SizeMaximized", isMaximized());
-		settings.setValue("StyleName", m_StyleName);
+		settings.setValue("StyleName", DisplaySettingsDlg::s_StyleName);
 		settings.setValue("GraphExportFilter", m_GraphExportFilter);
 		settings.setValue("LanguageFilePath", m_LanguageFilePath);
 		settings.setValue("Miarex_Float", m_pctrlMiarexWidget->isFloating());
@@ -5251,9 +5252,11 @@ void MainFrame::SaveSettings()
 		settings.setValue("SaveOpps", m_bSaveOpps);
 		settings.setValue("SaveWOpps", m_bSaveWOpps);
 		settings.setValue("RecentFileSize", m_RecentFiles.size());
-		settings.setValue("StyleSheets", m_bStyleSheets);
+		settings.setValue("ShowStyleSheets", DisplaySettingsDlg::s_bStyleSheets);
 		settings.setValue("ReverseZoom", m_bReverseZoom);
 		settings.setValue("AlphaChannel", m_bAlphaChannel);
+		settings.setValue("StyleSheetName", DisplaySettingsDlg::s_StyleSheetName);
+
 
 		QString RecentF;
 		for(int i=0; i<m_RecentFiles.size() && i<MAXRECENTFILES; i++)
@@ -7069,6 +7072,7 @@ void MainFrame::OnPolarProps()
 		pMiarex->OnWPolarProps();
 	}
 }
+
 
 
 void MainFrame::OnWOppProps()

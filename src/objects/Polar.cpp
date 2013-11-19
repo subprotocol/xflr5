@@ -67,7 +67,7 @@ void Polar::ExportPolar(QTextStream &out, enumTextFileType FileType, bool bDataO
 
 	if(!bDataOnly)
 	{
-		strong =pMainFrame->m_VersionName + "\n\n";
+		strong =pMainFrame->versionName() + "\n\n";
 		out << strong;
 		strong =(" Calculated polar for: ");
 		strong += m_FoilName + "\n\n";

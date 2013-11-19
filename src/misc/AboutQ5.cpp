@@ -39,7 +39,7 @@ void AboutQ5::SetupLayout()
 	QLabel *LabIconQ5 = new QLabel;
 	LabIconQ5->setObjectName("iconXFLR5"); 
 	LabIconQ5->setPixmap(QPixmap(QString::fromUtf8(":/images/xflr5_64.png")));
-	QLabel *lab1  = new QLabel(pMainFrame->m_VersionName);
+	QLabel *lab1  = new QLabel(pMainFrame->versionName());
 	lab1->setAlignment(Qt::AlignVCenter| Qt::AlignLeft);
 	QLabel *XFLR5Link = new QLabel;
 	XFLR5Link->setText("<a href=http://www.xflr5.com>http://www.xflr5.com</a>");
