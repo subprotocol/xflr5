@@ -22,7 +22,7 @@
 #define XDIRECTSTYLEDLG_H
 
 #include <QDialog>
-#include "../misc/LineButton.h"
+#include "../misc/LineBtn.h"
 
 
 class XDirectStyleDlg : public QDialog
@@ -45,7 +45,7 @@ private:
 	void SetupLayout();
 
 	void *m_pXDirect;
-	LineButton *m_pctrlBL, *m_pctrlPressure, *m_pctrlNeutral;
+	LineBtn *m_pctrlBL, *m_pctrlPressure, *m_pctrlNeutral;
 	QPushButton *OKButton;
 
 	QColor m_crFoilColor, m_crBLColor, m_crPressureColor, m_crNeutralColor; //foil display parameters

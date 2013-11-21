@@ -257,8 +257,7 @@ void ThreeDWidget::keyReleaseEvent(QKeyEvent *event)
 */
 void ThreeDWidget::paintGL()
 {
-	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
-	glColor3d(pMainFrame->m_TextColor.redF(),pMainFrame->m_TextColor.greenF(),pMainFrame->m_TextColor.blueF());
+	glColor3d(MainFrame::s_TextColor.redF(),MainFrame::s_TextColor.greenF(),MainFrame::s_TextColor.blueF());
 	if(m_iView==GLMIAREXVIEW)
 	{
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -478,7 +477,6 @@ void ThreeDWidget::CreateArcballList(ArcBall &ArcBall, double GLScale)
 */
 void ThreeDWidget::GLDrawAxes(double length, QColor AxisColor, int AxisStyle, int AxisWidth)
 {
-	MainFrame * pMainFrame =(MainFrame*)s_pMainFrame;
 	double l = .6*length;
 
 	glPolygonMode(GL_FRONT,GL_LINE);
@@ -511,7 +509,7 @@ void ThreeDWidget::GLDrawAxes(double length, QColor AxisColor, int AxisStyle, in
 	glEnd();
 	glDisable (GL_LINE_STIPPLE);
 	//XLabel
-	renderText( l, 0.0, 0.0, "X", pMainFrame->m_TextFont);
+	renderText( l, 0.0, 0.0, "X", MainFrame::s_TextFont);
 
 
 	// Y axis____________
@@ -532,7 +530,7 @@ void ThreeDWidget::GLDrawAxes(double length, QColor AxisColor, int AxisStyle, in
 	glEnd();
 	glDisable (GL_LINE_STIPPLE);
 	//Y Label
-	renderText( 0.0, l, 0.0, "Y", pMainFrame->m_TextFont);
+	renderText( 0.0, l, 0.0, "Y", MainFrame::s_TextFont);
 
 
 	// Z axis____________
@@ -553,7 +551,7 @@ void ThreeDWidget::GLDrawAxes(double length, QColor AxisColor, int AxisStyle, in
 	glEnd();
 	glDisable (GL_LINE_STIPPLE);
 	//ZLabel
-	renderText( 0.0, 0.0, l, "Z", pMainFrame->m_TextFont);
+	renderText( 0.0, 0.0, l, "Z", MainFrame::s_TextFont);
 
 	glDisable (GL_LINE_STIPPLE);
 }

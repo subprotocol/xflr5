@@ -77,7 +77,7 @@ void ManageFoilsDlg::InitDialog(QString FoilName)
 			QStandardItem *pItem = m_pFoilModel->item(0,0);
 			FoilName = pItem->text();
 		}
-		m_pFoil = pMainFrame->GetFoil(FoilName);
+		m_pFoil = MainFrame::foil(FoilName);
 	}
 	else
 	{
@@ -270,19 +270,18 @@ void ManageFoilsDlg::OnExport()
 {
 	if(!m_pFoil)	return;
 
-	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
 	QString FileName;
 
 	FileName = m_pFoil->m_FoilName;
 	FileName.replace("/", " ");
 
 	FileName = QFileDialog::getSaveFileName(this, tr("Export Foil"),
-											pMainFrame->m_LastDirName+"/"+FileName+".dat",
+											MainFrame::s_LastDirName+"/"+FileName+".dat",
 											tr("Foil File (*.dat)"));
 
 	if(!FileName.length()) return;
 	int pos = FileName.lastIndexOf("/");
-	if(pos>0) pMainFrame->m_LastDirName = FileName.left(pos);
+	if(pos>0) MainFrame::s_LastDirName = FileName.left(pos);
 
 	QFile XFile(FileName);
 
@@ -314,7 +313,7 @@ void ManageFoilsDlg::OnDelete()
 		QStandardItem *pItem = m_pFoilModel->item(sel,0);
 		QString FoilName = pItem->text();
 
-		m_pFoil = pMainFrame->GetFoil(FoilName);
+		m_pFoil = MainFrame::foil(FoilName);
 	}
 	else m_pFoil = NULL;
 }
@@ -335,7 +334,7 @@ void ManageFoilsDlg::OnFoilClicked(const QModelIndex& index)
 	QStandardItem *pItem = m_pFoilModel->item(index.row(),0);
 	QString FoilName =pItem->text();
 
-	m_pFoil= pMainFrame->GetFoil(FoilName);
+	m_pFoil= MainFrame::foil(FoilName);
 }
 
 

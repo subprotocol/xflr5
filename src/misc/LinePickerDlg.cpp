@@ -19,7 +19,7 @@
 
 *****************************************************************************/
 
-
+#include <QPushButton>
 #include <QKeyEvent>
 #include <QColorDialog>
 #include <QLabel>
@@ -27,7 +27,7 @@
 
 #include "LinePickerDlg.h"
 #include "../globals.h"
-
+#include "../mainframe.h"
 
 
 LinePickerDlg::LinePickerDlg(QWidget *pParent): QDialog(pParent)
@@ -226,44 +226,55 @@ void LinePickerDlg::SetStyle(int style)
 void LinePickerDlg::SetupLayout()
 {
 	QGridLayout *StyleLayout = new QGridLayout;
-	QLabel *lab1 = new QLabel(tr("Style"));
-	QLabel *lab2 = new QLabel(tr("Width"));
-	QLabel *lab3 = new QLabel(tr("Color"));
-	lab1->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
-	lab2->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
-	lab3->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
-	lab1->setMinimumWidth(60);
-	lab2->setMinimumWidth(60);
-	lab3->setMinimumWidth(60);
-	m_pctrlColor = new LineButton;
-	m_pctrlStyle = new LineCbBox;
-	m_pctrlWidth = new LineCbBox;
-	m_pctrlStyle->setMinimumWidth(140);
-	m_pctrlWidth->setMinimumWidth(140);
-	m_pctrlColor->setMinimumWidth(140);
+	{
+		QLabel *lab1 = new QLabel(tr("Style"));
+		QLabel *lab2 = new QLabel(tr("Width"));
+		QLabel *lab3 = new QLabel(tr("Color"));
+		lab1->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+		lab2->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+		lab3->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+		lab1->setMinimumWidth(60);
+		lab2->setMinimumWidth(60);
+		lab3->setMinimumWidth(60);
+		m_pctrlColor = new LineBtn;
+		m_pctrlStyle = new LineCbBox;
+		m_pctrlWidth = new LineCbBox;
 
-	StyleLayout->addWidget(lab1,1,1);
-	StyleLayout->addWidget(lab2,2,1);
-	StyleLayout->addWidget(lab3,3,1);
-	StyleLayout->addWidget(m_pctrlStyle,1,2);
-	StyleLayout->addWidget(m_pctrlWidth,2,2);
-	StyleLayout->addWidget(m_pctrlColor,3,2);
+		QFontMetrics fm(MainFrame::s_TextFont);
+
+		m_pctrlStyle->setMinimumWidth(17*fm.averageCharWidth());
+		m_pctrlWidth->setMinimumWidth(17*fm.averageCharWidth());
+		m_pctrlColor->setMinimumWidth(17*fm.averageCharWidth());
+		m_pctrlColor->setMinimumHeight(m_pctrlStyle->minimumSizeHint().height());
+
+
+		StyleLayout->addWidget(lab1,1,1);
+		StyleLayout->addWidget(lab2,2,1);
+		StyleLayout->addWidget(lab3,3,1);
+		StyleLayout->addWidget(m_pctrlStyle,1,2);
+		StyleLayout->addWidget(m_pctrlWidth,2,2);
+		StyleLayout->addWidget(m_pctrlColor,3,2);
+	}
 
 	QHBoxLayout *CommandButtons = new QHBoxLayout;
-	OKButton = new QPushButton(tr("OK"));
-	CancelButton = new QPushButton(tr("Cancel"));
-	CommandButtons->addStretch(1);
-	CommandButtons->addWidget(OKButton);
-	CommandButtons->addStretch(1);
-	CommandButtons->addWidget(CancelButton);
-	CommandButtons->addStretch(1);
+	{
+		OKButton = new QPushButton(tr("OK"));
+		CancelButton = new QPushButton(tr("Cancel"));
+		CommandButtons->addStretch(1);
+		CommandButtons->addWidget(OKButton);
+		CommandButtons->addStretch(1);
+		CommandButtons->addWidget(CancelButton);
+		CommandButtons->addStretch(1);
+	}
 
 	QVBoxLayout *MainLayout = new QVBoxLayout;
-	MainLayout->addStretch(1);
-	MainLayout->addLayout(StyleLayout);
-	MainLayout->addStretch(1);
-	MainLayout->addLayout(CommandButtons);
-	MainLayout->addStretch(1);
+	{
+		MainLayout->addStretch(1);
+		MainLayout->addLayout(StyleLayout);
+		MainLayout->addStretch(1);
+		MainLayout->addLayout(CommandButtons);
+		MainLayout->addStretch(1);
+	}
 
 	setMinimumHeight(170);
 	setLayout(MainLayout);

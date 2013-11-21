@@ -936,7 +936,7 @@ void QXDirect::FillOppCurve(OpPoint *pOpp, Graph *pGraph, Curve *pCurve, bool bI
 {
 	int j;
 
-	Foil *pOpFoil = ((MainFrame*)s_pMainFrame)->GetFoil(pOpp->m_strFoilName);
+	Foil *pOpFoil = ((MainFrame*)s_pMainFrame)->foil(pOpp->m_strFoilName);
 
 	switch(m_pCpGraph->GetYVariable())
 	{
@@ -3117,7 +3117,6 @@ void QXDirect::OnExportCurXFoilResults()
 	if(!m_pXFoil->lvconv) return;
 	if(!MainFrame::s_pCurFoil)		  return;
 
-	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	QString FileName,  OutString, strong;
 
 	double x[IVX][3],Hk[IVX][3],UeVinf[IVX][3], Cf[IVX][3], Cd[IVX][3], AA0[IVX][3];
@@ -3132,12 +3131,12 @@ void QXDirect::OnExportCurXFoilResults()
 	FileName.replace("/", " ");
 
 	FileName = QFileDialog::getSaveFileName(this, tr("Export Current XFoil Results"),
-											pMainFrame->m_LastDirName,
+											MainFrame::s_LastDirName,
 											tr("Text File (*.txt);;Comma Separated Values (*.csv)"));
 
 	if(!FileName.length()) return;
 	int pos = FileName.lastIndexOf("/");
-	if(pos>0) pMainFrame->m_LastDirName = FileName.left(pos);
+	if(pos>0) MainFrame::s_LastDirName = FileName.left(pos);
 
 	pos  = FileName.lastIndexOf(".csv");
 	if(pos>0) type = 2;
@@ -3148,7 +3147,7 @@ void QXDirect::OnExportCurXFoilResults()
 
 	QTextStream out(&DestFile);
 
-	out << (pMainFrame->m_VersionName);
+	out << (MainFrame::versionName());
 	out << ("\n");
 	strong = m_pXFoil->m_FoilName+ "\n";
 	out << (strong);
@@ -3274,26 +3273,25 @@ void QXDirect::OnExportCurXFoilResults()
  */
 void QXDirect::OnExportAllPolars()
 {
-	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	QString FileName, DirName;
 	QFile XFile;
 	QTextStream out(&XFile);
 
 	//select the directory for output
-	DirName = QFileDialog::getExistingDirectory(this,  tr("Export Directory"), pMainFrame->m_LastDirName);
+	DirName = QFileDialog::getExistingDirectory(this,  tr("Export Directory"), MainFrame::s_LastDirName);
 
 	Polar *pPolar;
 	for(int l=0; l<m_poaPolar->size(); l++)
 	{
 		pPolar = (Polar*)m_poaPolar->at(l);
 		FileName = DirName + "/" + pPolar->m_FoilName + "_" + pPolar->m_PlrName;
-		if(pMainFrame->m_ExportFileType==TXT) FileName += ".txt";
-		else                                  FileName += ".csv";
+		if(MainFrame::s_ExportFileType==TXT) FileName += ".txt";
+		else                                 FileName += ".csv";
 
 		XFile.setFileName(FileName);
 		if (XFile.open(QIODevice::WriteOnly | QIODevice::Text))
 		{
-			pPolar->ExportPolar(out, pMainFrame->m_ExportFileType);
+			pPolar->ExportPolar(out, MainFrame::s_ExportFileType);
 			XFile.close();
 		}
 	}
@@ -3307,19 +3305,18 @@ void QXDirect::OnExportCurFoil()
 {
 	if(!MainFrame::s_pCurFoil)	return;
 
-	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	QString FileName;
 
 	FileName = MainFrame::s_pCurFoil->m_FoilName;
 	FileName.replace("/", " ");
 
 	FileName = QFileDialog::getSaveFileName(this, tr("Export Foil"),
-											pMainFrame->m_LastDirName+"/"+FileName+".dat",
+											MainFrame::s_LastDirName+"/"+FileName+".dat",
 											tr("Foil File (*.dat)"));
 
 	if(!FileName.length()) return;
 	int pos = FileName.lastIndexOf("/");
-	if(pos>0) pMainFrame->m_LastDirName = FileName.left(pos);
+	if(pos>0) MainFrame::s_LastDirName = FileName.left(pos);
 
 	QFile XFile(FileName);
 
@@ -3339,24 +3336,23 @@ void QXDirect::OnExportCurOpp()
 {
 	if(!MainFrame::s_pCurFoil || !m_pCurPolar || !m_pCurOpp)	return;
 
-	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	QString FileName;
 
 	QString filter;
-	if(pMainFrame->m_ExportFileType==TXT) filter = "Text File (*.txt)";
+	if(MainFrame::s_ExportFileType==TXT) filter = "Text File (*.txt)";
 	else                                  filter = "Comma Separated Values (*.csv)";
 
 	FileName = QFileDialog::getSaveFileName(this, tr("Export OpPoint"),
-											pMainFrame->m_LastDirName ,
+											MainFrame::s_LastDirName ,
 											tr("Text File (*.txt);;Comma Separated Values (*.csv)"),
 											&filter);
 	if(!FileName.length()) return;
 
 	int pos = FileName.lastIndexOf("/");
-	if(pos>0) pMainFrame->m_LastDirName = FileName.left(pos);
+	if(pos>0) MainFrame::s_LastDirName = FileName.left(pos);
 	pos = FileName.lastIndexOf(".csv");
-	if (pos>0) pMainFrame->m_ExportFileType = CSV;
-	else       pMainFrame->m_ExportFileType = TXT;
+	if (pos>0) MainFrame::s_ExportFileType = CSV;
+	else       MainFrame::s_ExportFileType = TXT;
 
 	QFile XFile(FileName);
 
@@ -3364,7 +3360,7 @@ void QXDirect::OnExportCurOpp()
 
 	QTextStream out(&XFile);
 
-	m_pCurOpp->ExportOpp(out, pMainFrame->m_VersionName, pMainFrame->m_ExportFileType);
+	m_pCurOpp->ExportOpp(out, MainFrame::versionName(), MainFrame::s_ExportFileType);
 	XFile.close();
 }
 
@@ -3385,11 +3381,11 @@ void QXDirect::OnExportPolarOpps()
 	QString FileName;
 
 	QString filter;
-	if(pMainFrame->m_ExportFileType==TXT) filter = "Text File (*.txt)";
+	if(MainFrame::s_ExportFileType==TXT) filter = "Text File (*.txt)";
 	else                                  filter = "Comma Separated Values (*.csv)";
 
 	FileName = QFileDialog::getSaveFileName(this, tr("Export OpPoint"),
-											pMainFrame->m_LastDirName ,
+											MainFrame::s_LastDirName ,
 											tr("Text File (*.txt);;Comma Separated Values (*.csv)"),
 											&filter);
 
@@ -3397,10 +3393,10 @@ void QXDirect::OnExportPolarOpps()
 	if(!FileName.length()) return;
 
 	int pos = FileName.lastIndexOf("/");
-	if(pos>0) pMainFrame->m_LastDirName = FileName.left(pos);
+	if(pos>0) MainFrame::s_LastDirName = FileName.left(pos);
 	pos = FileName.lastIndexOf(".csv");
-	if (pos>0) pMainFrame->m_ExportFileType = CSV;
-	else       pMainFrame->m_ExportFileType = TXT;
+	if (pos>0) MainFrame::s_ExportFileType = CSV;
+	else       MainFrame::s_ExportFileType = TXT;
 
 	QFile XFile(FileName);
 
@@ -3410,7 +3406,7 @@ void QXDirect::OnExportPolarOpps()
 
 
 	QString Header, strong;
-	out<<pMainFrame->m_VersionName;
+	out<<MainFrame::versionName();
 	out<<"\n\n";
 	strong = MainFrame::s_pCurFoil->m_FoilName + "\n";
 	out << strong;
@@ -3422,7 +3418,7 @@ void QXDirect::OnExportPolarOpps()
 		pOpPoint = (OpPoint*)m_poaOpp->at(i);
 		if(pOpPoint->m_strFoilName == m_pCurPolar->m_FoilName && pOpPoint->m_strPlrName == m_pCurPolar->m_PlrName )
 		{
-			if(pMainFrame->m_ExportFileType==TXT)
+			if(MainFrame::s_ExportFileType==TXT)
 				strong = QString("Reynolds = %1   Mach = %2  NCrit = %3\n")
 									.arg(pOpPoint->Reynolds, 7, 'f', 0)
 									.arg(pOpPoint->Mach, 4,'f',0)
@@ -3434,11 +3430,11 @@ void QXDirect::OnExportPolarOpps()
 						.arg(pOpPoint->ACrit, 3, 'f',1);
 
 			out<<strong;
-			if(pMainFrame->m_ExportFileType==1) Header = QString("  Alpha        Cd        Cl        Cm        XTr1      XTr2   TEHMom    Cpmn\n");
+			if(MainFrame::s_ExportFileType==1) Header = QString("  Alpha        Cd        Cl        Cm        XTr1      XTr2   TEHMom    Cpmn\n");
 			else        Header = QString("Alpha,Cd,Cl,Cm,XTr1,XTr2,TEHMom,Cpmn\n");
 			out<<Header;
 
-			if(pMainFrame->m_ExportFileType==TXT)
+			if(MainFrame::s_ExportFileType==TXT)
 				strong = QString("%1   %2   %3   %4   %5   %6   %7  %8\n")
 					.arg(pOpPoint->Alpha,7,'f',3)
 					.arg(pOpPoint->Cd,9,'f',3)
@@ -3460,14 +3456,14 @@ void QXDirect::OnExportPolarOpps()
 				.arg(pOpPoint->Cpmn,7,'f',4);
 
 			out<<strong;
-			if(pMainFrame->m_ExportFileType==TXT) out<< " Cpi          Cpv\n-----------------\n";
+			if(MainFrame::s_ExportFileType==TXT) out<< " Cpi          Cpv\n-----------------\n";
 			else                                  out << "Cpi,Cpv\n";
 
 			for (j=0; j<pOpPoint->n; j++)
 			{
 				if(pOpPoint->m_bViscResults)
 				{
-					if(pMainFrame->m_ExportFileType==TXT) strong = QString("%1   %2\n").arg(pOpPoint->Cpi[j], 7,'f',4).arg(pOpPoint->Cpv[j], 7, 'f',4);
+					if(MainFrame::s_ExportFileType==TXT) strong = QString("%1   %2\n").arg(pOpPoint->Cpi[j], 7,'f',4).arg(pOpPoint->Cpv[j], 7, 'f',4);
 					else                                  strong = QString("%1,%2\n").arg(pOpPoint->Cpi[j], 7,'f',4).arg(pOpPoint->Cpv[j], 7, 'f',4);
 				}
 				else
@@ -3493,25 +3489,24 @@ void QXDirect::OnExportCurPolar()
 {
 	if(!MainFrame::s_pCurFoil || !m_pCurPolar)	return;
 
-	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	QString FileName, filter;
 
-	if(pMainFrame->m_ExportFileType==TXT) filter = "Text File (*.txt)";
+	if(MainFrame::s_ExportFileType==TXT) filter = "Text File (*.txt)";
 	else                                  filter = "Comma Separated Values (*.csv)";
 
 	FileName = m_pCurPolar->m_PlrName;
 	FileName.replace("/", " ");
 	FileName = QFileDialog::getSaveFileName(this, tr("Export Polar"),
-											pMainFrame->m_LastDirName + "/"+FileName,
+											MainFrame::s_LastDirName + "/"+FileName,
 											tr("Text File (*.txt);;Comma Separated Values (*.csv)"),
 											&filter);
 	if(!FileName.length()) return;
 
 	int pos = FileName.lastIndexOf("/");
-	if(pos>0) pMainFrame->m_LastDirName = FileName.left(pos);
+	if(pos>0) MainFrame::s_LastDirName = FileName.left(pos);
 	pos = FileName.lastIndexOf(".csv");
-	if (pos>0) pMainFrame->m_ExportFileType = CSV;
-	else       pMainFrame->m_ExportFileType = TXT;
+	if (pos>0) MainFrame::s_ExportFileType = CSV;
+	else       MainFrame::s_ExportFileType = TXT;
 
 	QFile XFile(FileName);
 
@@ -3519,7 +3514,7 @@ void QXDirect::OnExportCurPolar()
 
 	QTextStream out(&XFile);
 
-	m_pCurPolar->ExportPolar(out, pMainFrame->m_ExportFileType);
+	m_pCurPolar->ExportPolar(out, MainFrame::s_ExportFileType);
 	XFile.close();
 }
 
@@ -3873,11 +3868,11 @@ void QXDirect::OnImportXFoilPolar()
 	const char *text;
 
 	PathName = QFileDialog::getOpenFileName(pMainFrame, tr("Open File"),
-											pMainFrame->m_LastDirName,
+											MainFrame::s_LastDirName,
 											tr("XFoil Polar Format (*.*)"));
 	if(!PathName.length())		return ;
 	int pos = PathName.lastIndexOf("/");
-	if(pos>0) pMainFrame->m_LastDirName = PathName.left(pos);
+	if(pos>0) MainFrame::s_LastDirName = PathName.left(pos);
 
 	QFile XFile(PathName);
 	if (!XFile.open(QIODevice::ReadOnly))
@@ -3898,7 +3893,7 @@ void QXDirect::OnImportXFoilPolar()
 	FoilName = strong.right(strong.length()-22);
 	FoilName = FoilName.trimmed();
 
-	if(!pMainFrame->GetFoil(FoilName))
+	if(!MainFrame::foil(FoilName))
 	{
 		str = tr("No Foil with the name ")+FoilName;
 		str+= tr("\ncould be found. The polar(s) will not be stored");
@@ -4059,11 +4054,11 @@ void QXDirect::OnImportJavaFoilPolar()
 	const char *text;
 
 	PathName = QFileDialog::getOpenFileName(pMainFrame, tr("Open File"),
-											pMainFrame->m_LastDirName,
+											MainFrame::s_LastDirName,
 											tr("JavaFoil Polar Format (*.*)"));
 	if(!PathName.length())		return ;
 	int pos = PathName.lastIndexOf("/");
-	if(pos>0) pMainFrame->m_LastDirName = PathName.left(pos);
+	if(pos>0) MainFrame::s_LastDirName = PathName.left(pos);
 
 	QFile XFile(PathName);
 	if (!XFile.open(QIODevice::ReadOnly))
@@ -4088,7 +4083,7 @@ void QXDirect::OnImportJavaFoilPolar()
 
 	FoilName = FoilName.trimmed();
 
-	if(!pMainFrame->GetFoil(FoilName))
+	if(!MainFrame::foil(FoilName))
 	{
 		str = tr("No Foil with the name ")+FoilName;
 		str+= tr("\ncould be found. The polar(s) will not be stored");
@@ -4284,7 +4279,7 @@ void QXDirect::OnNacaFoils()
 		pNewFoil->m_bPoints = false;
 		pNewFoil->m_FoilName = str;
 		m_pCurOpp = (OpPoint*)ptr;
-		Foil *pOldFoil = pMainFrame->GetFoil(str);
+		Foil *pOldFoil = MainFrame::foil(str);
 		if(pOldFoil) pMainFrame->SetModFoil(pNewFoil);
 		else         pMainFrame->AddFoil(pNewFoil);
 		SetFoil(pNewFoil);
@@ -4781,7 +4776,7 @@ void QXDirect::OnSavePolars()
 	FileName = MainFrame::s_pCurFoil->m_FoilName + ".plr";
 	FileName.replace("/", " ");
 
-	FileName = QFileDialog::getSaveFileName(this, tr("Polar File"), pMainFrame->m_LastDirName+"/"+FileName, tr("Polar File (*.plr)"));
+	FileName = QFileDialog::getSaveFileName(this, tr("Polar File"), MainFrame::s_LastDirName+"/"+FileName, tr("Polar File (*.plr)"));
 	if(!FileName.length()) return;
 
 	QString strong = FileName.right(4);
@@ -4791,7 +4786,7 @@ void QXDirect::OnSavePolars()
 	if (!XFile.open(QIODevice::WriteOnly)) return;
 
 	int pos = FileName.lastIndexOf("/");
-	if(pos>0) pMainFrame->m_LastDirName = FileName.left(pos);
+	if(pos>0) MainFrame::s_LastDirName = FileName.left(pos);
 
 	QDataStream ar(&XFile);
 #if QT_VERSION >= 0x040500
@@ -5531,8 +5526,6 @@ void QXDirect::PaintPressure(QPainter &painter, OpPoint* pOpPoint, double scale)
  */
 void QXDirect::PaintCoupleGraphs(QPainter &painter)
 {
-	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
-
 	int h  = m_rCltRect.height();
 	int w  = m_rCltRect.width();
 	int w2 = (int)(w/2);
@@ -5541,7 +5534,7 @@ void QXDirect::PaintCoupleGraphs(QPainter &painter)
 	QRect Rect1(0,0,w2,h23);
 	QRect Rect2(w2,0,w2,h23);
 	QRect Rect3(0, h23, w,h-h23);
-	painter.fillRect(Rect3, pMainFrame->m_BackgroundColor);
+	painter.fillRect(Rect3, MainFrame::s_BackgroundColor);
 
 	m_PlrGraph[0].DrawGraph(Rect1, painter);
 	m_PlrGraph[4].DrawGraph(Rect2, painter);
@@ -5559,8 +5552,7 @@ void QXDirect::PaintOpPoint(QPainter &painter)
 	static double Alpha, FoilScale;
 	FoilScale = m_fFoilScale;
 	QString Result, str, str1;
-	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
-	painter.fillRect(m_rCltRect, pMainFrame->m_BackgroundColor);
+	painter.fillRect(m_rCltRect, MainFrame::s_BackgroundColor);
 
 	if (m_rCltRect.width()<150 || m_rCltRect.height()<150) return;
 
@@ -5570,7 +5562,7 @@ void QXDirect::PaintOpPoint(QPainter &painter)
 		//Draw Cp Graph
 		m_pCpGraph->DrawGraph(painter);
 		QPoint Place(m_rCltRect.right()/2, m_rCltRect.top() + 20);
-		m_pCpGraph->DrawLegend(painter, Place, pMainFrame->m_TextFont, pMainFrame->m_TextColor);//Graph::DrawLegend uses graph's legend font and color
+		m_pCpGraph->DrawLegend(painter, Place, MainFrame::s_TextFont, MainFrame::s_TextColor);//Graph::DrawLegend uses graph's legend font and color
 	}
 
 	if(m_bNeutralLine)
@@ -5602,14 +5594,14 @@ void QXDirect::PaintOpPoint(QPainter &painter)
 	// Write Titles and results
 	QString strong;
 
-	painter.setFont(pMainFrame->m_TextFont);
+	painter.setFont(MainFrame::s_TextFont);
 	int D = 0;
 	int ZPos = m_rCltRect.bottom();
 	int XPos = m_rCltRect.right()-10;
-	QPen WritePen(pMainFrame->m_TextColor);
+	QPen WritePen(MainFrame::s_TextColor);
 	painter.setPen(WritePen);
 
-	QFontMetrics fm(pMainFrame->m_TextFont);
+	QFontMetrics fm(MainFrame::s_TextFont);
 	int dD = fm.height();
 
 	//write the foil's properties
@@ -5811,7 +5803,6 @@ void QXDirect::PaintOpPoint(QPainter &painter)
  */
 void QXDirect::PaintPolarGraphs(QPainter &painter)
 {
-	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	int h  = m_rCltRect.height();
 	int w  = m_rCltRect.width();
 	int h2 = (int)(h/2);
@@ -5825,7 +5816,7 @@ void QXDirect::PaintPolarGraphs(QPainter &painter)
 	QRect Rect5(0,h2, w2,h-h2);
 	QRect Rect6(3*w4,h2,w4,h2);
 
-	painter.fillRect(Rect5, pMainFrame->m_BackgroundColor);
+	painter.fillRect(Rect5, MainFrame::s_BackgroundColor);
 
 	m_PlrGraph[0].DrawGraph(Rect1, painter);
 	m_PlrGraph[1].DrawGraph(Rect2, painter);
@@ -5833,7 +5824,7 @@ void QXDirect::PaintPolarGraphs(QPainter &painter)
 	m_PlrGraph[3].DrawGraph(Rect4, painter);
 
 	if(m_bShowUserGraph)	m_PlrGraph[4].DrawGraph(Rect6, painter);
-	else				 	painter.fillRect(Rect6, pMainFrame->m_BackgroundColor);
+	else				 	painter.fillRect(Rect6, MainFrame::s_BackgroundColor);
 
 	PaintPolarLegend(m_PolarLegendOffset,  h, painter);
 }
@@ -5848,19 +5839,18 @@ void QXDirect::PaintPolarGraphs(QPainter &painter)
  */
 void QXDirect::PaintPolarLegend(QPoint place, int bottom, QPainter &painter)
 {
-	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	int LegendSize, LegendWidth, ypos, x1;
 	int i,j,k,l,nc,ny,nFoils;
 
 	LegendSize = 30;
 	LegendWidth = 240;
 
-	painter.setFont(pMainFrame->m_TextFont);
+	painter.setFont(MainFrame::s_TextFont);
 
-	QFontMetrics fm(pMainFrame->m_TextFont);
+	QFontMetrics fm(MainFrame::s_TextFont);
 	ypos = fm.height();
 
-	QPen TextPen(pMainFrame->m_TextColor);
+	QPen TextPen(MainFrame::s_TextColor);
 	painter.setPen(TextPen);
 	TextPen.setWidth(1);
 
@@ -5971,15 +5961,13 @@ void QXDirect::PaintPolarLegend(QPoint place, int bottom, QPainter &painter)
  */
 void QXDirect::PaintSingleGraph(QPainter &painter)
 {
-	MainFrame* pMainFrame = (MainFrame*)s_pMainFrame;
-
 	int h   = m_rCltRect.height();
 	int w   = m_rCltRect.width();
 	int w3  = (int)(w/3);
 
 	QRect Rect1(0,0,2*w3,h);
 	QRect Rect2(2*w3, 0, w-2*w3,h);
-	painter.fillRect(Rect2, pMainFrame->m_BackgroundColor);
+	painter.fillRect(Rect2, MainFrame::s_BackgroundColor);
 
 	if(m_iPlrGraph>=0 && m_iPlrGraph<MAXPOLARGRAPHS) m_pCurGraph = m_PlrGraph + m_iPlrGraph;
 	else                                             m_pCurGraph = NULL;
@@ -5995,7 +5983,6 @@ void QXDirect::PaintSingleGraph(QPainter &painter)
  */
 void QXDirect::PaintView(QPainter &painter)
 {
-	MainFrame* pMainFrame = (MainFrame*)s_pMainFrame;
 	if(MainFrame::s_pCurFoil && !m_bPolarView)
 	{
 		PaintOpPoint(painter);
@@ -6008,7 +5995,7 @@ void QXDirect::PaintView(QPainter &painter)
 	}
 	else
 	{
-		painter.fillRect(m_rCltRect, pMainFrame->m_BackgroundColor);
+		painter.fillRect(m_rCltRect, MainFrame::s_BackgroundColor);
 	}
 }
 
@@ -6885,156 +6872,180 @@ void QXDirect::SetPolarLegendPos()
 void QXDirect::SetupLayout()
 {
 	setAttribute(Qt::WA_AlwaysShowToolTips);
-	QHBoxLayout *SpecVarsBox = new QHBoxLayout;
 
-	m_pctrlSpec1 = new QRadioButton("a");
-	m_pctrlSpec2 = new QRadioButton(tr("Cl"));
-	m_pctrlSpec3 = new QRadioButton(tr("Re"));
-	m_pctrlSpec1->setFont(QFont("Symbol"));
-	SpecVarsBox->addWidget(m_pctrlSpec1);
-	SpecVarsBox->addWidget(m_pctrlSpec2);
-	SpecVarsBox->addWidget(m_pctrlSpec3);
-
-	m_pctrlSequence = new QCheckBox(tr("Sequence"));
-
-	QGridLayout *SequenceGroup = new QGridLayout;
-	QLabel *AlphaMinLab   = new QLabel(tr("Start="));
-	QLabel *AlphaMaxLab   = new QLabel(tr("End="));
-	QLabel *DeltaAlphaLab = new QLabel(tr("D="));
-	DeltaAlphaLab->setFont(QFont("Symbol"));
-	DeltaAlphaLab->setAlignment(Qt::AlignRight);
-	AlphaMinLab->setAlignment(Qt::AlignRight);
-	AlphaMaxLab->setAlignment(Qt::AlignRight);
-
-	m_pctrlUnit1 = new QLabel(QString::fromUtf8("°"));
-	m_pctrlUnit2 = new QLabel(QString::fromUtf8("°"));
-	m_pctrlUnit3 = new QLabel(QString::fromUtf8("°"));
-
-
-	m_pctrlAlphaMin     = new FloatEdit();
-	m_pctrlAlphaMax     = new FloatEdit();
-	m_pctrlAlphaDelta   = new FloatEdit();
-	m_pctrlAlphaMin->setMinimumHeight(20);
-	m_pctrlAlphaMax->setMinimumHeight(20);
-	m_pctrlAlphaDelta->setMinimumHeight(20);
-	m_pctrlAlphaMin->setAlignment(Qt::AlignRight);
-	m_pctrlAlphaMax->setAlignment(Qt::AlignRight);
-	m_pctrlAlphaDelta->setAlignment(Qt::AlignRight);
-	SequenceGroup->addWidget(AlphaMinLab,1,1);
-	SequenceGroup->addWidget(AlphaMaxLab,2,1);
-	SequenceGroup->addWidget(DeltaAlphaLab,3,1);
-	SequenceGroup->addWidget(m_pctrlAlphaMin,1,2);
-	SequenceGroup->addWidget(m_pctrlAlphaMax,2,2);
-	SequenceGroup->addWidget(m_pctrlAlphaDelta,3,2);
-	SequenceGroup->addWidget(m_pctrlUnit1,1,3);
-	SequenceGroup->addWidget(m_pctrlUnit2,2,3);
-	SequenceGroup->addWidget(m_pctrlUnit3,3,3);
-
-	QHBoxLayout *AnalysisSettings = new QHBoxLayout;
-	m_pctrlViscous  = new QCheckBox(tr("Viscous"));
-	m_pctrlInitBL   = new QCheckBox(tr("Init BL"));
-	AnalysisSettings->addWidget(m_pctrlViscous);
-	AnalysisSettings->addWidget(m_pctrlInitBL);
-
-	m_pctrlStoreOpp = new QCheckBox(tr("Store Opp"));
-	m_pctrlAnalyze  = new QPushButton(tr("Analyze"));
-
-	QVBoxLayout *AnalysisGroup = new QVBoxLayout;
-	AnalysisGroup->addLayout(SpecVarsBox);
-	AnalysisGroup->addStretch(1);
-	AnalysisGroup->addWidget(m_pctrlSequence);
-	AnalysisGroup->addLayout(SequenceGroup);
-	AnalysisGroup->addStretch(1);
-	AnalysisGroup->addLayout(AnalysisSettings);
-	AnalysisGroup->addWidget(m_pctrlStoreOpp);
-	AnalysisGroup->addWidget(m_pctrlAnalyze);
 
 	QGroupBox *AnalysisBox = new QGroupBox(tr("Analysis settings"));
-	AnalysisBox->setLayout(AnalysisGroup);
-
-
-	QVBoxLayout *DisplayGroup = new QVBoxLayout;
-	m_pctrlShowBL        = new QCheckBox(tr("Show BL"));
-	m_pctrlShowPressure  = new QCheckBox(tr("Show Pressure"));
-//	m_pctrlHighlightOpp  = new QCheckBox(tr("Highlight Current OpPoint"));
-//	m_pctrlHighlightOpp->setToolTip(tr("Highlights the currently selected OpPoint, if any, on the currently selected polar curve"));
-	m_pctrlAnimate       = new QCheckBox(tr("Animate"));
-	m_pctrlAnimateSpeed  = new QSlider(Qt::Horizontal);
-	m_pctrlAnimateSpeed->setMinimum(0);
-	m_pctrlAnimateSpeed->setMaximum(500);
-	m_pctrlAnimateSpeed->setSliderPosition(250);
-	m_pctrlAnimateSpeed->setTickInterval(25);
-	m_pctrlAnimateSpeed->setTickPosition(QSlider::TicksBelow);
-	DisplayGroup->addWidget(m_pctrlShowBL);
-	DisplayGroup->addWidget(m_pctrlShowPressure);
-	DisplayGroup->addWidget(m_pctrlAnimate);
-	DisplayGroup->addWidget(m_pctrlAnimateSpeed);
-//	DisplayGroup->addWidget(m_pctrlHighlightOpp);
-	QGroupBox *DisplayBox = new QGroupBox(tr("Display"));
-	DisplayBox->setLayout(DisplayGroup);
-
-	QGroupBox *PolarPropsBox = new QGroupBox(tr("Polar properties"));
-	m_pctrlPolarProps = new QLabel;
-//	m_pctrlPolarProps->setReadOnly(true);
-//	m_pctrlPolarProps->setWordWrapMode(QTextOption::NoWrap);
-	QHBoxLayout *PolarPropsLayout = new QHBoxLayout;
-	PolarPropsLayout->addWidget(m_pctrlPolarProps);
-	PolarPropsBox->setLayout(PolarPropsLayout);
-
-	QHBoxLayout *CurveDisplay = new QHBoxLayout;
-	m_pctrlShowCurve  = new QCheckBox(tr("Curve"));
-	m_pctrlShowPoints = new QCheckBox(tr("Points"));
-	CurveDisplay->addWidget(m_pctrlShowCurve);
-	CurveDisplay->addWidget(m_pctrlShowPoints);
-	QVBoxLayout *CurveGroup = new QVBoxLayout;
-	m_pctrlCurveStyle = new LineCbBox();
-	m_pctrlCurveWidth = new LineCbBox();
-	m_pctrlCurveColor = new LineButton;
-	for (int i=0; i<5; i++)
 	{
-		m_pctrlCurveStyle->addItem("item");
-		m_pctrlCurveWidth->addItem("item");
+		QVBoxLayout *AnalysisGroup = new QVBoxLayout;
+		{
+			m_pctrlSequence = new QCheckBox(tr("Sequence"));
+			m_pctrlStoreOpp = new QCheckBox(tr("Store Opp"));
+			m_pctrlAnalyze  = new QPushButton(tr("Analyze"));
+
+			QHBoxLayout *SpecVarsLayout = new QHBoxLayout;
+			{
+				m_pctrlSpec1 = new QRadioButton("a");
+				m_pctrlSpec2 = new QRadioButton(tr("Cl"));
+				m_pctrlSpec3 = new QRadioButton(tr("Re"));
+				m_pctrlSpec1->setFont(QFont("Symbol"));
+				SpecVarsLayout->addWidget(m_pctrlSpec1);
+				SpecVarsLayout->addWidget(m_pctrlSpec2);
+				SpecVarsLayout->addWidget(m_pctrlSpec3);
+			}
+
+			QGridLayout *SequenceGroupLayout = new QGridLayout;
+			{
+				QLabel *AlphaMinLab   = new QLabel(tr("Start="));
+				QLabel *AlphaMaxLab   = new QLabel(tr("End="));
+				QLabel *DeltaAlphaLab = new QLabel(tr("D="));
+				DeltaAlphaLab->setFont(QFont("Symbol"));
+				DeltaAlphaLab->setAlignment(Qt::AlignRight);
+				AlphaMinLab->setAlignment(Qt::AlignRight);
+				AlphaMaxLab->setAlignment(Qt::AlignRight);
+
+				m_pctrlUnit1 = new QLabel(QString::fromUtf8("°"));
+				m_pctrlUnit2 = new QLabel(QString::fromUtf8("°"));
+				m_pctrlUnit3 = new QLabel(QString::fromUtf8("°"));
+
+				m_pctrlAlphaMin   = new FloatEdit();
+				m_pctrlAlphaMax   = new FloatEdit();
+				m_pctrlAlphaDelta = new FloatEdit();
+				m_pctrlAlphaMin->setMinimumHeight(20);
+				m_pctrlAlphaMax->setMinimumHeight(20);
+				m_pctrlAlphaDelta->setMinimumHeight(20);
+				m_pctrlAlphaMin->setAlignment(Qt::AlignRight);
+				m_pctrlAlphaMax->setAlignment(Qt::AlignRight);
+				m_pctrlAlphaDelta->setAlignment(Qt::AlignRight);
+				SequenceGroupLayout->addWidget(AlphaMinLab,1,1);
+				SequenceGroupLayout->addWidget(AlphaMaxLab,2,1);
+				SequenceGroupLayout->addWidget(DeltaAlphaLab,3,1);
+				SequenceGroupLayout->addWidget(m_pctrlAlphaMin,1,2);
+				SequenceGroupLayout->addWidget(m_pctrlAlphaMax,2,2);
+				SequenceGroupLayout->addWidget(m_pctrlAlphaDelta,3,2);
+				SequenceGroupLayout->addWidget(m_pctrlUnit1,1,3);
+				SequenceGroupLayout->addWidget(m_pctrlUnit2,2,3);
+				SequenceGroupLayout->addWidget(m_pctrlUnit3,3,3);
+			}
+
+			QHBoxLayout *AnalysisSettings = new QHBoxLayout;
+			{
+				m_pctrlViscous  = new QCheckBox(tr("Viscous"));
+				m_pctrlInitBL   = new QCheckBox(tr("Init BL"));
+				AnalysisSettings->addWidget(m_pctrlViscous);
+				AnalysisSettings->addWidget(m_pctrlInitBL);
+			}
+
+			AnalysisGroup->addLayout(SpecVarsLayout);
+			AnalysisGroup->addStretch(1);
+			AnalysisGroup->addWidget(m_pctrlSequence);
+			AnalysisGroup->addLayout(SequenceGroupLayout);
+			AnalysisGroup->addStretch(1);
+			AnalysisGroup->addLayout(AnalysisSettings);
+			AnalysisGroup->addWidget(m_pctrlStoreOpp);
+			AnalysisGroup->addWidget(m_pctrlAnalyze);
+		}
+		AnalysisBox->setLayout(AnalysisGroup);
+
 	}
-	m_pStyleDelegate = new LineDelegate;
-	m_pWidthDelegate = new LineDelegate;
-	m_pctrlCurveStyle->setItemDelegate(m_pStyleDelegate);
-	m_pctrlCurveWidth->setItemDelegate(m_pWidthDelegate);
-
-	QGridLayout *CurveStyleLayout = new QGridLayout;
-	QLabel *lab200 = new QLabel(tr("Style"));
-	QLabel *lab201 = new QLabel(tr("Width"));
-	QLabel *lab202 = new QLabel(tr("Color"));
-	lab200->setAlignment(Qt::AlignRight |Qt::AlignVCenter);
-	lab201->setAlignment(Qt::AlignRight |Qt::AlignVCenter);
-	lab202->setAlignment(Qt::AlignRight |Qt::AlignVCenter);
-	CurveStyleLayout->addWidget(lab200,1,1);
-	CurveStyleLayout->addWidget(lab201,2,1);
-	CurveStyleLayout->addWidget(lab202,3,1);
-	CurveStyleLayout->addWidget(m_pctrlCurveStyle,1,2);
-	CurveStyleLayout->addWidget(m_pctrlCurveWidth,2,2);
-	CurveStyleLayout->addWidget(m_pctrlCurveColor,3,2);
-	CurveStyleLayout->setColumnStretch(2,5);
 
 
-	CurveGroup->addLayout(CurveDisplay);
-	CurveGroup->addLayout(CurveStyleLayout);
-	CurveGroup->addStretch(1);
+	QGroupBox *DisplayBox = new QGroupBox(tr("Display"));
+	{
+		QVBoxLayout *DisplayGroup = new QVBoxLayout;
+		{
+			m_pctrlShowBL        = new QCheckBox(tr("Show BL"));
+			m_pctrlShowPressure  = new QCheckBox(tr("Show Pressure"));
+			m_pctrlAnimate       = new QCheckBox(tr("Animate"));
+			m_pctrlAnimateSpeed  = new QSlider(Qt::Horizontal);
+			m_pctrlAnimateSpeed->setMinimum(0);
+			m_pctrlAnimateSpeed->setMaximum(500);
+			m_pctrlAnimateSpeed->setSliderPosition(250);
+			m_pctrlAnimateSpeed->setTickInterval(25);
+			m_pctrlAnimateSpeed->setTickPosition(QSlider::TicksBelow);
+			DisplayGroup->addWidget(m_pctrlShowBL);
+			DisplayGroup->addWidget(m_pctrlShowPressure);
+			DisplayGroup->addWidget(m_pctrlAnimate);
+			DisplayGroup->addWidget(m_pctrlAnimateSpeed);
+		//	DisplayGroup->addWidget(m_pctrlHighlightOpp);
+		}
+		DisplayBox->setLayout(DisplayGroup);
+	}
+	QGroupBox *PolarPropsBox = new QGroupBox(tr("Polar properties"));
+	{
+		m_pctrlPolarProps = new QLabel;
+	//	m_pctrlPolarProps->setReadOnly(true);
+	//	m_pctrlPolarProps->setWordWrapMode(QTextOption::NoWrap);
+		QHBoxLayout *PolarPropsLayout = new QHBoxLayout;
+		{
+			PolarPropsLayout->addWidget(m_pctrlPolarProps);
+			PolarPropsBox->setLayout(PolarPropsLayout);
+		}
+	}
 
 	QGroupBox *CurveBox = new QGroupBox(tr("Graph Curve Settings"));
-	CurveBox->setLayout(CurveGroup);
+	{
+		QVBoxLayout *CurveGroup = new QVBoxLayout;
+		{
+			QHBoxLayout *CurveDisplay = new QHBoxLayout;
+			{
+				m_pctrlShowCurve  = new QCheckBox(tr("Curve"));
+				m_pctrlShowPoints = new QCheckBox(tr("Points"));
+				CurveDisplay->addWidget(m_pctrlShowCurve);
+				CurveDisplay->addWidget(m_pctrlShowPoints);
+			}
 
-	m_pctrlMiddleControls = new QStackedWidget;
-	m_pctrlMiddleControls->addWidget(DisplayBox);
-	m_pctrlMiddleControls->addWidget(PolarPropsBox);
+			m_pctrlCurveStyle = new LineCbBox();
+			m_pctrlCurveWidth = new LineCbBox();
+			m_pctrlCurveColor = new LineBtn(this);
+			m_pctrlCurveColor->setMinimumHeight(m_pctrlCurveStyle->minimumSizeHint().height());
+
+			for (int i=0; i<5; i++)
+			{
+				m_pctrlCurveStyle->addItem("item");
+				m_pctrlCurveWidth->addItem("item");
+			}
+			m_pStyleDelegate = new LineDelegate;
+			m_pWidthDelegate = new LineDelegate;
+			m_pctrlCurveStyle->setItemDelegate(m_pStyleDelegate);
+			m_pctrlCurveWidth->setItemDelegate(m_pWidthDelegate);
+
+			QGridLayout *CurveStyleLayout = new QGridLayout;
+			QLabel *lab200 = new QLabel(tr("Style"));
+			QLabel *lab201 = new QLabel(tr("Width"));
+			QLabel *lab202 = new QLabel(tr("Color"));
+			lab200->setAlignment(Qt::AlignRight |Qt::AlignVCenter);
+			lab201->setAlignment(Qt::AlignRight |Qt::AlignVCenter);
+			lab202->setAlignment(Qt::AlignRight |Qt::AlignVCenter);
+			CurveStyleLayout->addWidget(lab200,1,1);
+			CurveStyleLayout->addWidget(lab201,2,1);
+			CurveStyleLayout->addWidget(lab202,3,1);
+			CurveStyleLayout->addWidget(m_pctrlCurveStyle,1,2);
+			CurveStyleLayout->addWidget(m_pctrlCurveWidth,2,2);
+			CurveStyleLayout->addWidget(m_pctrlCurveColor,3,2);
+			CurveStyleLayout->setColumnStretch(2,5);
+
+			CurveGroup->addLayout(CurveDisplay);
+			CurveGroup->addLayout(CurveStyleLayout);
+			CurveGroup->addStretch(1);
+		}
+		CurveBox->setLayout(CurveGroup);
+	}
+
 
 	QVBoxLayout *mainLayout = new QVBoxLayout;
-	mainLayout->addStretch(1);
-	mainLayout->addWidget(AnalysisBox);
-	mainLayout->addStretch(1);
-	mainLayout->addWidget(m_pctrlMiddleControls);
-	mainLayout->addStretch(1);
-	mainLayout->addWidget(CurveBox);
-	mainLayout->addStretch(1);
+	{
+		m_pctrlMiddleControls = new QStackedWidget;
+		m_pctrlMiddleControls->addWidget(DisplayBox);
+		m_pctrlMiddleControls->addWidget(PolarPropsBox);
+
+		mainLayout->addStretch(1);
+		mainLayout->addWidget(AnalysisBox);
+		mainLayout->addStretch(1);
+		mainLayout->addWidget(m_pctrlMiddleControls);
+		mainLayout->addStretch(1);
+		mainLayout->addWidget(CurveBox);
+		mainLayout->addStretch(1);
+	}
 
 	setLayout(mainLayout);
 
@@ -7121,12 +7132,12 @@ void QXDirect::wheelEvent (QWheelEvent *event )
 	static double ZoomFactor;
 	if(event->delta()>0)
 	{
-		if(!pMainFrame->m_bReverseZoom) ZoomFactor = 1./1.06;
+		if(!MainFrame::s_bReverseZoom) ZoomFactor = 1./1.06;
 		else                            ZoomFactor = 1.06;
 	}
 	else
 	{
-		if(!pMainFrame->m_bReverseZoom) ZoomFactor = 1.06;
+		if(!MainFrame::s_bReverseZoom) ZoomFactor = 1.06;
 		else                            ZoomFactor = 1./1.06;
 	}
 

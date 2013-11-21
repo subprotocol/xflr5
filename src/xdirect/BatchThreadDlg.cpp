@@ -729,7 +729,7 @@ void BatchThreadDlg::SetFileHeader()
 	QTextStream out(m_pXFile);
 
 	out << "\n";
-	out << pMainFrame->m_VersionName;
+	out << MainFrame::versionName();
 	out << "\n";
 	if(s_bCurrentFoil)
 	{
@@ -833,7 +833,7 @@ void BatchThreadDlg::StartAnalysis()
 	Analysis *pAnalysis=NULL;
 	for(int i=0; i<m_FoilList.count(); i++)
 	{
-		pFoil = pMainFrame->GetFoil(m_FoilList.at(i));
+		pFoil = MainFrame::foil(m_FoilList.at(i));
 		if(pFoil)
 		{
 			for (iRe=0; iRe<=nRe; iRe++)

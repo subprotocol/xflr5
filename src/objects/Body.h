@@ -92,9 +92,9 @@ public:
 	Frame *activeFrame();
 	void SetActiveFrame(Frame *pFrame);
 	double FramePosition(int iFrame);
-	int FrameSize()       {return m_SplineSurface.FrameSize();};
-	int FramePointCount() {return m_SplineSurface.FramePointCount();};
-	int SideLineCount()   {return m_SplineSurface.FramePointCount();};// same as FramePointCount();
+	int FrameSize()       {return m_SplineSurface.FrameSize();}
+	int FramePointCount() {return m_SplineSurface.FramePointCount();}
+	int SideLineCount()   {return m_SplineSurface.FramePointCount();}// same as FramePointCount();
 
 	void ComputeBodyAxisInertia();
 	void ComputeVolumeInertia(CVector &CoG, double &CoGIxx, double &CoGIyy, double &CoGIzz, double &CoGIxz);

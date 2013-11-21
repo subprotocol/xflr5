@@ -105,7 +105,6 @@ public:
 	QList <double> m_Re;                /**< the array of Re coefficients */
 
 private:
-	static void *s_pMainFrame;          /**< a static pointer to the application's MainFrame window */
 
     QString m_PlrName;                  /**< the Polar's name, used for references */
 

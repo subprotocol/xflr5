@@ -45,7 +45,6 @@
 #include "objects/Polar.h"
 #include "objects/OpPoint.h"
 #include "graph/QGraph.h"
-#include "misc/DisplaySettingsDlg.h"
 #include "misc/SaveOptionsDlg.h"
 #include "misc/TranslatorDlg.h"
 #include "misc/RenameDlg.h"
@@ -188,7 +187,6 @@ public:
 	void DeletePlane(void *pPlanePtr, bool bResultsOnly = false);
 	void DeleteWing(void *pWingPtr, bool bResultsOnly = false);
 	QColor GetColor(int type);
-	Foil* GetFoil(QString strFoilName);
 	OpPoint *GetOpp(double Alpha);
 	Polar *GetPolar(QString m_FoilName, QString PolarName);
 	void GLToClient(CVector const &real, QPoint &point);
@@ -223,23 +221,16 @@ public:
 	void UpdateView();
 	void UpdateWPolars();
 	void UpdateWOpps();
-	QString versionName(){return m_VersionName;}
 	void WritePolars(QDataStream &ar, Foil *pFoil=NULL);
 
-/*___________________________________________Variables_______________________________*/
-public:
-	bool m_bMaximized;
-	QString m_GraphExportFilter;
+	static QString versionName(){return s_VersionName;}
+	static Foil* foil(QString strFoilName);
 
-	static bool s_bTrace;
-	static QFile *s_pTraceFile;
+/*___________________________________________Variables_______________________________*/
 
 private:
-
-	static Foil *s_pCurFoil;
-
 	//the dialog boxes are declared as member variables to enable translations... seems to be a Qt bug
-	DisplaySettingsDlg *m_pDisplaySettingsDlg;
+//	DisplaySettingsDlg *m_pDisplaySettingsDlg;
 	SaveOptionsDlg *m_pSaveOptionsDlg;
 	TranslatorDlg *m_pTranslatorDlg;
     RenameDlg *m_pRenameDlg;
@@ -395,7 +386,7 @@ private:
 	QStringList m_RecentFiles;
 
 
-	QList <void *> m_oaFoil;    /**< The array of void pointers to the Foil objects. */
+	static QList <void *> m_oaFoil;    /**< The array of void pointers to the Foil objects. */
 	QList <void *> m_oaPolar;   /**< The array of void pointers to the foil Polar objects. */
 	QList <void *> m_oaOpp;     /**< The array of void pointers to the foil operating point objects. */
 	QList <void *> m_oaPlane;   /**< The array of void pointers to the Plane objects. */
@@ -412,45 +403,51 @@ private:
 	bool m_bSaveOpps;           /**< true if foil operating points should be serialized in the project file */
 	bool m_bSaveWOpps;          /**< true if wing operating points should be serialized in the project file */
 	bool m_bSaveSettings;       /**< true if user-defined settings should be saved on exit. */
-	bool m_bReverseZoom;        /**< true if the rolling forward zooms in rather than out. */
 	bool m_bHighlightOpp;       /**< true if the active OpPoint should be highlighted on the polar curve. */
 	bool m_bHighlightWOpp;      /**< true if the active WingOpp should be highlighted on the polar curve. */
 
 
-	QString m_ProjectName;      /**< The Project's name. */
-	QString m_FileName;         /**< The absolute path to the file of the current project. */
 	QString m_LanguageFilePath;
-	QString m_LastDirName, m_ExportLastDirName, m_ImageDirName;
-	QString m_VersionName;
+	QString m_ExportLastDirName, m_ImageDirName;
+	QString m_FileName;         /**< The absolute path to the file of the current project. */
 
 	QList <QColor> m_ColorList;
 
 	QGraph m_RefGraph;//Reference setttings
-	QColor m_BorderClr;
+	QString m_GraphExportFilter;
 
 	enumImageFormat m_ImageFormat;   /**< The index of the type of image file which should be used. */
 
 public:
- 	QFont m_TextFont;
-	QColor m_TextColor;
-	QColor m_BackgroundColor;
+	static Foil *s_pCurFoil;
+
+	static bool s_bTrace;
+	static bool s_bReverseZoom;        /**< true if the rolling forward zooms in rather than out. */
+	static QFile *s_pTraceFile;
+	static QString s_ProjectName;      /**< The Project's name. */
+	static QString s_LastDirName;
+
+	static QFont s_TextFont;
+	static QColor s_TextColor;
+	static QColor s_BackgroundColor;
+	static bool s_bAlphaChannel;  /**< true if transparency is enabled for 3D displays. */
+	static QString s_VersionName;
+	static enumTextFileType s_ExportFileType;  /**< Defines if the list separator for the output text files should be a space or a comma. */
+
+	static double s_mtoUnit;    /**< Conversion factor from meters to the user selected length unit. */
+	static double s_mstoUnit;   /**< Conversion factor from m/s to the user selected speed unit. */
+	static double s_m2toUnit;   /**< Conversion factor from square meters to the user selected area unit. */
+	static double s_kgtoUnit;   /**< Conversion factor from kg to the user selected mass unit. */
+	static double s_NtoUnit;    /**< Conversion factor from Newtons to the user selected force unit. */
+	static double s_NmtoUnit;   /**< Conversion factor from N.m to the user selected unit for moments. */
+	static int s_LengthUnit;    /**< The index of the user selected unit in the array of length units. @todo use an enumeration instead. */
+	static int s_AreaUnit;      /**< The index of the user selected unit in the array of area units. */
+	static int s_WeightUnit;    /**< The index of the user selected unit in the array of mass units. */
+	static int s_SpeedUnit;     /**< The index of the user selected unit in the array of speed units. */
+	static int s_ForceUnit;     /**< The index of the user selected unit in the array of force units. */
+	static int s_MomentUnit;    /**< The index of the user selected unit in the array of moment units. */
+
 	void *m_pGL3DScales;
-	
-	double m_mtoUnit;    /**< Conversion factor from meters to the user selected length unit. */
-	double m_mstoUnit;   /**< Conversion factor from m/s to the user selected speed unit. */
-	double m_m2toUnit;   /**< Conversion factor from square meters to the user selected area unit. */
-	double m_kgtoUnit;   /**< Conversion factor from kg to the user selected mass unit. */
-	double m_NtoUnit;    /**< Conversion factor from Newtons to the user selected force unit. */
-	double m_NmtoUnit;   /**< Conversion factor from N.m to the user selected unit for moments. */
-	int m_LengthUnit;    /**< The index of the user selected unit in the array of length units. @todo use an enumeration instead. */
-	int m_AreaUnit;      /**< The index of the user selected unit in the array of area units. */
-	int m_WeightUnit;    /**< The index of the user selected unit in the array of mass units. */
-	int m_SpeedUnit;     /**< The index of the user selected unit in the array of speed units. */
-	int m_ForceUnit;     /**< The index of the user selected unit in the array of force units. */
-	int m_MomentUnit;    /**< The index of the user selected unit in the array of moment units. */
-	
-	enumTextFileType m_ExportFileType;  /**< Defines if the list separator for the output text files should be a space or a comma. */
-	bool m_bAlphaChannel;  /**< true if transparency is enabled for 3D displays. */
 
 };
 

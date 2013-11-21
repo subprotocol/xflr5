@@ -29,8 +29,6 @@
 #include "../mainframe.h"
 #include "../globals.h"
 
-void *BodyTransDlg::s_pMainFrame;
-
 
 BodyTransDlg::BodyTransDlg(QWidget *pParent): QDialog(pParent)
 {
@@ -45,8 +43,6 @@ BodyTransDlg::BodyTransDlg(QWidget *pParent): QDialog(pParent)
 
 void BodyTransDlg::InitDialog()
 {
-	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
-
 	m_pctrlXTransFactor->SetValue(m_XTrans);
 	m_pctrlYTransFactor->SetValue(m_YTrans);
 	m_pctrlZTransFactor->SetValue(m_ZTrans);
@@ -58,7 +54,7 @@ void BodyTransDlg::InitDialog()
 	m_pctrlFrameID->setEnabled(m_bFrameOnly);
 
 	QString length;
-	GetLengthUnit(length, pMainFrame->m_LengthUnit);
+	GetLengthUnit(length, MainFrame::s_LengthUnit);
 	m_pctrlLength1->setText(length);
 	m_pctrlLength2->setText(length);
 	m_pctrlLength3->setText(length);
@@ -97,12 +93,11 @@ void BodyTransDlg::keyPressEvent(QKeyEvent *event)
 
 void BodyTransDlg::OnOK()
 {
-	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	m_bFrameOnly = m_pctrlFrameOnly->isChecked();
 	m_FrameID    = m_pctrlFrameID->Value()-1;
-	m_XTrans     = m_pctrlXTransFactor->Value() / pMainFrame->m_mtoUnit;
-	m_YTrans     = m_pctrlYTransFactor->Value() / pMainFrame->m_mtoUnit;
-	m_ZTrans     = m_pctrlZTransFactor->Value() / pMainFrame->m_mtoUnit;
+	m_XTrans     = m_pctrlXTransFactor->Value() / MainFrame::s_mtoUnit;
+	m_YTrans     = m_pctrlYTransFactor->Value() / MainFrame::s_mtoUnit;
+	m_ZTrans     = m_pctrlZTransFactor->Value() / MainFrame::s_mtoUnit;
 	accept();
 }
 
@@ -118,8 +113,6 @@ void BodyTransDlg::OnFrameOnly()
 
 void BodyTransDlg::SetupLayout()
 {
-//	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
-
 	QHBoxLayout *FrameID = new QHBoxLayout;
 	m_pctrlFrameOnly = new QCheckBox(tr("Frame Only"));
 	m_pctrlFrameID = new FloatEdit(0.0,0);

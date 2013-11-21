@@ -26,7 +26,7 @@
 #include <QDialog>
 #include <QCheckBox>
 #include <QSettings>
-#include "../misc/LineButton.h"
+#include "../misc/LineBtn.h"
 #include "../misc/ColorButton.h"
 
 
@@ -66,9 +66,9 @@ private:
 	void SaveSettings(QSettings *pSettings);
 	void LoadSettings(QSettings *pSettings);
 
-	LineButton *m_pctrlAxis, *m_pctrlOutline, *m_pctrlVLMMesh, *m_pctrlTopTrans, *m_pctrlBotTrans;
-	LineButton *m_pctrlLift, *m_pctrlMoments, *m_pctrlInducedDrag, *m_pctrlViscousDrag, *m_pctrlDownwash;
-	LineButton *m_pctrlStreamLines, *m_pctrlWakePanels;
+	LineBtn *m_pctrlAxis, *m_pctrlOutline, *m_pctrlVLMMesh, *m_pctrlTopTrans, *m_pctrlBotTrans;
+	LineBtn *m_pctrlLift, *m_pctrlMoments, *m_pctrlInducedDrag, *m_pctrlViscousDrag, *m_pctrlDownwash;
+	LineBtn *m_pctrlStreamLines, *m_pctrlWakePanels;
 
 	ColorButton *m_pctrlMassColor;
 

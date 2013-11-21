@@ -233,8 +233,8 @@ private:
 	int m_iMargin;
 	QColor m_AxisColor;
 
-	QFont m_TitleLogFont;
-	QFont m_LabelLogFont;
+	QFont m_TitleFont;
+	QFont m_LabelFont;
 
 	QColor m_TitleColor;
 	QColor m_LabelColor;

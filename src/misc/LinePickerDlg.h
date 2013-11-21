@@ -24,7 +24,7 @@
 
 #include <QDialog>
 #include <QComboBox>
-#include "LineButton.h"
+#include "LineBtn.h"
 #include "LineCbBox.h"
 #include "LineDelegate.h"
 
@@ -53,7 +53,7 @@ public:
 
 
 protected:
-	LineButton *m_pctrlColor;
+	LineBtn *m_pctrlColor;
 	LineCbBox *m_pctrlWidth, *m_pctrlStyle;
 	QPushButton *OKButton, *CancelButton;
 

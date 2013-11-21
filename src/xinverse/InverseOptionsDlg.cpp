@@ -33,10 +33,10 @@ InverseOptionsDlg::InverseOptionsDlg(QWidget *pParent) : QDialog(pParent)
 
 void InverseOptionsDlg::SetupLayout()
 {
-	m_pctrlRefFoil   = new LineButton;
-	m_pctrlModFoil   = new LineButton;
-	m_pctrlSpline    = new LineButton;
-	m_pctrlReflected = new LineButton;
+	m_pctrlRefFoil   = new LineBtn(this);
+	m_pctrlModFoil   = new LineBtn(this);
+	m_pctrlSpline    = new LineBtn(this);
+	m_pctrlReflected = new LineBtn(this);
 
 	QLabel * lab1 = new QLabel(tr("Reference Foil"));
 	QLabel * lab2 = new QLabel(tr("Modified Foil"));

@@ -42,7 +42,6 @@
 #include "FoilTableDelegate.h"
 #include "LECircleDlg.h"
 #include "../misc/FloatEdit.h"
-#include "../misc/LineButton.h"
 #include "../objects/Foil.h"
 #include "../objects/SplineFoil.h"
 #include "../xdirect/NacaFoilDlg.h"
@@ -187,9 +186,6 @@ private:
 	FlapDlg *m_pFlapDlg;
 	CAddDlg *m_pCAddDlg;
 
-
-
-	LineButton *m_pctrlFoilStyle;
 
 	QTableView *m_pctrlFoilTable;
 	QStandardItemModel *m_pFoilModel;

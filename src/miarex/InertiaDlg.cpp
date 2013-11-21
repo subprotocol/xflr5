@@ -35,7 +35,6 @@
 #include "InertiaDlg.h"
 
 
-void *InertiaDlg::s_pMainFrame;
 
 InertiaDlg::InertiaDlg(QWidget *pParent) : QDialog(pParent)
 {
@@ -74,18 +73,16 @@ void InertiaDlg::ComputeBodyAxisInertia()
 }
 
 
+/**
+* Computes the inertia in the frame of reference with origin at the CoG.
+*
+* Assumes that the data has been read
+*/
 void InertiaDlg::ComputeInertia()
 {
-	//
-	// Computes the inertia in the frame of reference with origin at the CoG
-	//
-	// assumes that the data has been read
-	//
-
-	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	int i, iw;
 	double TotalMass, TotalIxx, TotalIyy, TotalIzz, TotalIxz;
-	double Unit = pMainFrame->m_mtoUnit * pMainFrame->m_mtoUnit * pMainFrame->m_kgtoUnit;
+	double Unit = MainFrame::s_mtoUnit * MainFrame::s_mtoUnit * MainFrame::s_kgtoUnit;
 	CVector TotalCoG, MassPos;
 
 	m_CoGIxx = m_CoGIyy = m_CoGIzz = m_CoGIxz = 0.0;
@@ -125,9 +122,9 @@ void InertiaDlg::ComputeInertia()
 	}
 
 	// and display the results
-	m_pctrlXCoG->SetValue(m_VolumeCoG.x*pMainFrame->m_mtoUnit);
-	m_pctrlYCoG->SetValue(m_VolumeCoG.y*pMainFrame->m_mtoUnit);
-	m_pctrlZCoG->SetValue(m_VolumeCoG.z*pMainFrame->m_mtoUnit);
+	m_pctrlXCoG->SetValue(m_VolumeCoG.x*MainFrame::s_mtoUnit);
+	m_pctrlYCoG->SetValue(m_VolumeCoG.y*MainFrame::s_mtoUnit);
+	m_pctrlZCoG->SetValue(m_VolumeCoG.z*MainFrame::s_mtoUnit);
 
 	m_pctrlCoGIxx->SetValue(m_CoGIxx*Unit);
 	m_pctrlCoGIyy->SetValue(m_CoGIyy*Unit);
@@ -225,11 +222,11 @@ void InertiaDlg::ComputeInertia()
 	}
 
 	//display the results
-	m_pctrlTotalMass->SetValue(TotalMass*pMainFrame->m_kgtoUnit);
+	m_pctrlTotalMass->SetValue(TotalMass*MainFrame::s_kgtoUnit);
 	
-	m_pctrlXTotalCoG->SetValue(TotalCoG.x*pMainFrame->m_mtoUnit);
-	m_pctrlYTotalCoG->SetValue(TotalCoG.y*pMainFrame->m_mtoUnit);
-	m_pctrlZTotalCoG->SetValue(TotalCoG.z*pMainFrame->m_mtoUnit);
+	m_pctrlXTotalCoG->SetValue(TotalCoG.x*MainFrame::s_mtoUnit);
+	m_pctrlYTotalCoG->SetValue(TotalCoG.y*MainFrame::s_mtoUnit);
+	m_pctrlZTotalCoG->SetValue(TotalCoG.z*MainFrame::s_mtoUnit);
 
 	m_pctrlTotalIxx->SetValue(TotalIxx*Unit);
 	m_pctrlTotalIyy->SetValue(TotalIyy*Unit);
@@ -246,12 +243,11 @@ void InertiaDlg::contextMenuEvent(QContextMenuEvent *event)
 }
 
 
+/**
+* Fills the table with the object's point masses.
+*/
 void InertiaDlg::FillMassModel()
 {
-	//
-	// Fill the table with the object's point masses
-	//
-	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	QModelIndex index;
 	
 	m_pMassModel->setRowCount(m_PointMass.size()+1);
@@ -262,16 +258,16 @@ void InertiaDlg::FillMassModel()
 		if(m_PointMass[i]->mass()>PRECISION || m_PointMass[i]->tag().length())
 		{
 			index = m_pMassModel->index(i, 0, QModelIndex());
-			m_pMassModel->setData(index, m_PointMass[i]->mass()*pMainFrame->m_kgtoUnit);
+			m_pMassModel->setData(index, m_PointMass[i]->mass()*MainFrame::s_kgtoUnit);
 
 			index = m_pMassModel->index(i, 1, QModelIndex());
-			m_pMassModel->setData(index, m_PointMass[i]->position().x*pMainFrame->m_mtoUnit);
+			m_pMassModel->setData(index, m_PointMass[i]->position().x*MainFrame::s_mtoUnit);
 
 			index = m_pMassModel->index(i, 2, QModelIndex());
-			m_pMassModel->setData(index, m_PointMass[i]->position().y*pMainFrame->m_mtoUnit);
+			m_pMassModel->setData(index, m_PointMass[i]->position().y*MainFrame::s_mtoUnit);
 
 			index = m_pMassModel->index(i, 3, QModelIndex());
-			m_pMassModel->setData(index, m_PointMass[i]->position().z*pMainFrame->m_mtoUnit);
+			m_pMassModel->setData(index, m_PointMass[i]->position().z*MainFrame::s_mtoUnit);
 
 			index = m_pMassModel->index(i, 4, QModelIndex());
 			m_pMassModel->setData(index, m_PointMass[i]->tag());
@@ -298,11 +294,10 @@ void InertiaDlg::FillMassModel()
 
 void InertiaDlg::InitDialog()
 {
-	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	QString strong, strMass, strLength;
 
-	GetWeightUnit(strMass, pMainFrame->m_WeightUnit);
-	GetLengthUnit(strLength, pMainFrame->m_LengthUnit);
+	GetWeightUnit(strMass, MainFrame::s_WeightUnit);
+	GetLengthUnit(strLength, MainFrame::s_LengthUnit);
 
 	m_pctrlMassUnit->setText(strMass);
 	m_pctrlMassUnit2->setText(strMass);
@@ -337,7 +332,7 @@ void InertiaDlg::InitDialog()
 		{
 			m_PointMass.append(new PointMass(m_pWing->m_PointMass[i]));
 		}
-		m_pctrlVolumeMass->SetValue(m_pWing->m_VolumeMass * pMainFrame->m_kgtoUnit); //we only display half a wing, AVL way
+		m_pctrlVolumeMass->SetValue(m_pWing->m_VolumeMass * MainFrame::s_kgtoUnit); //we only display half a wing, AVL way
 		m_pctrlVolumeMassLabel->setText(tr("Wing Mass:"));
 		m_pctrlWingInertia->setEnabled(true);
 		setWindowTitle(tr("Inertia properties for ")+m_pWing->m_WingName);
@@ -349,7 +344,7 @@ void InertiaDlg::InitDialog()
 		{
 			m_PointMass.append(new PointMass(m_pBody->m_PointMass[i]->mass(), m_pBody->m_PointMass[i]->position(), m_pBody->m_PointMass[i]->tag()));
 		}
-		m_pctrlVolumeMass->SetValue(m_pBody->m_VolumeMass * pMainFrame->m_kgtoUnit);
+		m_pctrlVolumeMass->SetValue(m_pBody->m_VolumeMass * MainFrame::s_kgtoUnit);
 		m_pctrlVolumeMassLabel->setText(tr("Body Mass:"));
 		m_pctrlBodyInertia->setEnabled(true);
 		setWindowTitle(tr("Inertia properties for ")+m_pBody->m_BodyName);
@@ -368,7 +363,7 @@ void InertiaDlg::InitDialog()
 			m_PointMass.append(new PointMass(m_pPlane->m_PointMass[i]));
 		}
 
-		m_pctrlVolumeMass->SetValue(m_VolumeMass * pMainFrame->m_kgtoUnit);
+		m_pctrlVolumeMass->SetValue(m_VolumeMass * MainFrame::s_kgtoUnit);
 		m_pctrlVolumeMassLabel->setText(tr("Volume Mass:"));
 		m_pctrlVolumeMass->setEnabled(false);
 		m_pctrlWingInertia->setEnabled(true);
@@ -418,15 +413,14 @@ void InertiaDlg::OnCellChanged(QWidget *pWidget)
 }
 
 
+/**
+* Exports the mass and inertia data to AVL format
+*/
 void InertiaDlg::OnExportToAVL()
 {
-	//
-	// Export the mass and inertia data to AVL format
-	//
 	if (!m_pWing && !m_pBody && !m_pPlane) return;
 	QString filter =".mass";
 
-	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	QString FileName, strong;
 	double CoGIxx, CoGIyy, CoGIzz, CoGIxz;
 	CVector CoG;
@@ -452,12 +446,12 @@ void InertiaDlg::OnExportToAVL()
 	else if(m_pBody) FileName = m_pBody->m_BodyName;
 	FileName.replace("/", " ");
 	FileName += ".mass";
-	FileName = QFileDialog::getSaveFileName(this, tr("Export Mass Properties"),pMainFrame->m_LastDirName + "/"+FileName,
+	FileName = QFileDialog::getSaveFileName(this, tr("Export Mass Properties"),MainFrame::s_LastDirName + "/"+FileName,
 	                                        tr("AVL Mass File (*.mass)"), &filter);
 	if(!FileName.length()) return;
 
 	int pos = FileName.lastIndexOf("/");
-	if(pos>0) pMainFrame->m_LastDirName = FileName.left(pos);
+	if(pos>0) MainFrame::s_LastDirName = FileName.left(pos);
 
 	pos = FileName.lastIndexOf(".");
 	if(pos<0) FileName += ".mass";
@@ -468,8 +462,8 @@ void InertiaDlg::OnExportToAVL()
 	QTextStream out(&XFile);
 	out.setCodec("UTF-8");
 
-	double Lunit = 1./pMainFrame->m_mtoUnit;
-	double Munit = 1./pMainFrame->m_kgtoUnit;
+	double Lunit = 1./MainFrame::s_mtoUnit;
+	double Munit = 1./MainFrame::s_kgtoUnit;
 	double Iunit = Munit * Lunit * Lunit;
 
 	out << "#-------------------------------------------------\n";
@@ -732,7 +726,6 @@ void InertiaDlg::OnOK()
 
 void InertiaDlg::ReadData()
 {
-	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	QModelIndex index;
 	bool bOK;
 	double mass, x,y,z;
@@ -760,12 +753,12 @@ void InertiaDlg::ReadData()
 
 		if(fabs(mass)>PRECISION || fabs(x)>PRECISION || fabs(y)>PRECISION || fabs(z)>PRECISION || tag.length())
 		{
-			m_PointMass.append(new PointMass(mass/pMainFrame->m_kgtoUnit,
-											 CVector(x/pMainFrame->m_mtoUnit, y/pMainFrame->m_mtoUnit, z/pMainFrame->m_mtoUnit),
+			m_PointMass.append(new PointMass(mass/MainFrame::s_kgtoUnit,
+											 CVector(x/MainFrame::s_mtoUnit, y/MainFrame::s_mtoUnit, z/MainFrame::s_mtoUnit),
 											 tag));
 		}
 	}
-	m_VolumeMass = m_pctrlVolumeMass->Value() / pMainFrame->m_kgtoUnit;
+	m_VolumeMass = m_pctrlVolumeMass->Value() / MainFrame::s_kgtoUnit;
 }
 
 
@@ -785,10 +778,9 @@ void InertiaDlg::resizeEvent(QResizeEvent *event)
 
 void InertiaDlg::SetupLayout()
 {
-	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	QString strMass, strLength;
-	GetWeightUnit(strMass, pMainFrame->m_WeightUnit);
-	GetLengthUnit(strLength, pMainFrame->m_LengthUnit);
+	GetWeightUnit(strMass, MainFrame::s_WeightUnit);
+	GetLengthUnit(strLength, MainFrame::s_LengthUnit);
 
 	QSizePolicy szPolicyExpanding;
 	szPolicyExpanding.setHorizontalPolicy(QSizePolicy::Expanding);

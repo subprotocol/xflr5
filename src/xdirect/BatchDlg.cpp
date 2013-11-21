@@ -1321,12 +1321,11 @@ void BatchDlg::ResetCurves()
 void BatchDlg::SetFileHeader()
 {
 	QXDirect *pXDirect = (QXDirect*)s_pXDirect;
-	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 
 	QTextStream out(m_pXFile);
 
 	out << "\n";
-	out << pMainFrame->m_VersionName;
+	out << MainFrame::versionName();
 	out << "\n";
 	out << m_pFoil->m_FoilName;
 	out << "\n";
@@ -1387,7 +1386,7 @@ void BatchDlg::StartAnalysis()
 		XFoil *pXFoil = (XFoil*)s_pXFoil;
 		for(int i=0; i<m_FoilList.count();i++)
 		{
-			pFoil = pMainFrame->GetFoil(m_FoilList.at(i));
+			pFoil = MainFrame::foil(m_FoilList.at(i));
 			m_pFoil = pFoil;
 			pXFoil->InitXFoilGeometry(pFoil);
 			pXFoil->lvisc=true;

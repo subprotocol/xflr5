@@ -67,10 +67,9 @@
 #include "../misc/PolarFilterDlg.h"
 #include "../misc/W3dPrefsDlg.h"
 #include "../misc/GLLightDlg.h"
+#include "../misc/LineBtn.h"
 #include "../graph/GraphDlg.h"
-
 #include "../misc/FloatEdit.h"
-#include "../misc/LineButton.h"
 #include "../misc/LineCbBox.h"
 #include "../misc/LineDelegate.h"
 #include "../objects/Body.h"
@@ -446,7 +445,7 @@ public:
 	QCheckBox *m_pctrlShowPoints;
 	LineCbBox *m_pctrlCurveStyle;
 	LineCbBox *m_pctrlCurveWidth;
-	LineButton *m_pctrlCurveColor;
+	LineBtn *m_pctrlCurveColor;
 	LineDelegate *m_pStyleDelegate, *m_pWidthDelegate;
 
 	QCheckBox *m_pctrlAxes, *m_pctrlLight, *m_pctrlSurfaces, *m_pctrlOutline, *m_pctrlPanels;

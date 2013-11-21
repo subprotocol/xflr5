@@ -267,12 +267,12 @@ bool Body::ExportDefinition()
 	FileName.replace("/", " ");
 
 	FileName = QFileDialog::getSaveFileName(pMainFrame, QObject::tr("Export Body Definition"),
-											pMainFrame->m_LastDirName,
+											MainFrame::s_LastDirName,
 											QObject::tr("Text Format (*.txt)"));
 	if(!FileName.length()) return false;
 
 	int pos = FileName.lastIndexOf("/");
-	if(pos>0) pMainFrame->m_LastDirName = FileName.left(pos);
+	if(pos>0) MainFrame::s_LastDirName = FileName.left(pos);
 
 	QFile XFile(FileName);
 
@@ -311,9 +311,9 @@ bool Body::ExportDefinition()
 		for(j=0;j<SideLineCount(); j++)
 		{
 			strong = QString("%1     %2    %3\n")
-					 .arg(m_SplineSurface.m_pFrame[i]->m_Position.x     * pMainFrame->m_mtoUnit,14,'f',7)
-					 .arg(m_SplineSurface.m_pFrame[i]->m_CtrlPoint[j].y * pMainFrame->m_mtoUnit,14,'f',7)
-					 .arg(m_SplineSurface.m_pFrame[i]->m_CtrlPoint[j].z * pMainFrame->m_mtoUnit,14,'f',7);
+					 .arg(m_SplineSurface.m_pFrame[i]->m_Position.x     * MainFrame::s_mtoUnit,14,'f',7)
+					 .arg(m_SplineSurface.m_pFrame[i]->m_CtrlPoint[j].y * MainFrame::s_mtoUnit,14,'f',7)
+					 .arg(m_SplineSurface.m_pFrame[i]->m_CtrlPoint[j].z * MainFrame::s_mtoUnit,14,'f',7);
 			outStream << (strong);
 		}
 		outStream << ("\n");

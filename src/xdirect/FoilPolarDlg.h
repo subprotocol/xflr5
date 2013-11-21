@@ -47,8 +47,6 @@ public:
 	void SetupLayout();
 	void SetDensity();
 
-	static void *s_pXDirect;
-	static void *s_pMainFrame;
 
 	QRadioButton *m_pctrlAuto1;
 	QRadioButton *m_pctrlAuto2;

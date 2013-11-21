@@ -82,7 +82,6 @@ private slots:
 	void OnPlaneInertia();
 
 private:
-	static void *s_pMainFrame;
 	static void *s_pMiarex;
 
 	Plane *m_pPlane;

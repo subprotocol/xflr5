@@ -146,63 +146,68 @@ void AFoilGridDlg::InitDialog()
 void AFoilGridDlg::SetupLayout()
 {
 	QGridLayout *GridData = new QGridLayout;
-	m_pctrlNeutralShow = new QCheckBox(tr("Neutral Line"));
-	m_pctrlScale       = new QCheckBox(tr("X-Scale"));
-	m_pctrlXMajShow = new QCheckBox(tr("X Major Grid"));
-	m_pctrlYMajShow = new QCheckBox(tr("Y Major Grid"));
-	m_pctrlXMinShow = new QCheckBox(tr("X Minor Grid"));
-	m_pctrlYMinShow = new QCheckBox(tr("Y Minor Grid"));
+	{
+		m_pctrlNeutralShow = new QCheckBox(tr("Neutral Line"));
+		m_pctrlScale       = new QCheckBox(tr("X-Scale"));
+		m_pctrlXMajShow = new QCheckBox(tr("X Major Grid"));
+		m_pctrlYMajShow = new QCheckBox(tr("Y Major Grid"));
+		m_pctrlXMinShow = new QCheckBox(tr("X Minor Grid"));
+		m_pctrlYMinShow = new QCheckBox(tr("Y Minor Grid"));
 
-	m_pctrlNeutralStyle = new LineButton;
-	m_pctrlXMajStyle = new LineButton;
-	m_pctrlYMajStyle = new LineButton;
-	m_pctrlXMinStyle = new LineButton;
-	m_pctrlYMinStyle = new LineButton;
+		m_pctrlNeutralStyle = new LineBtn(this);
+		m_pctrlXMajStyle = new LineBtn(this);
+		m_pctrlYMajStyle = new LineBtn(this);
+		m_pctrlXMinStyle = new LineBtn(this);
+		m_pctrlYMinStyle = new LineBtn(this);
 
-	m_pctrlXUnit = new FloatEdit;
-	m_pctrlYUnit = new FloatEdit;
-	m_pctrlXMinUnit = new FloatEdit;
-	m_pctrlYMinUnit = new FloatEdit;
-	m_pctrlXUnit->SetPrecision(3);
-	m_pctrlYUnit->SetPrecision(3);
-	m_pctrlXMinUnit->SetPrecision(3);
-	m_pctrlYMinUnit->SetPrecision(3);
+		m_pctrlXUnit = new FloatEdit;
+		m_pctrlYUnit = new FloatEdit;
+		m_pctrlXMinUnit = new FloatEdit;
+		m_pctrlYMinUnit = new FloatEdit;
+		m_pctrlXUnit->SetPrecision(3);
+		m_pctrlYUnit->SetPrecision(3);
+		m_pctrlXMinUnit->SetPrecision(3);
+		m_pctrlYMinUnit->SetPrecision(3);
 
-	GridData->addWidget(m_pctrlNeutralShow,1,1);
-	GridData->addWidget(m_pctrlXMajShow,2,1);
-	GridData->addWidget(m_pctrlYMajShow,3,1);
-	GridData->addWidget(m_pctrlXMinShow,4,1);
-	GridData->addWidget(m_pctrlYMinShow,5,1);
+		GridData->addWidget(m_pctrlNeutralShow,1,1);
+		GridData->addWidget(m_pctrlXMajShow,2,1);
+		GridData->addWidget(m_pctrlYMajShow,3,1);
+		GridData->addWidget(m_pctrlXMinShow,4,1);
+		GridData->addWidget(m_pctrlYMinShow,5,1);
 
-	GridData->addWidget(m_pctrlNeutralStyle,1,2);
-	GridData->addWidget(m_pctrlXMajStyle,2,2);
-	GridData->addWidget(m_pctrlYMajStyle,3,2);
-	GridData->addWidget(m_pctrlXMinStyle,4,2);
-	GridData->addWidget(m_pctrlYMinStyle,5,2);
+		GridData->addWidget(m_pctrlNeutralStyle,1,2);
+		GridData->addWidget(m_pctrlXMajStyle,2,2);
+		GridData->addWidget(m_pctrlYMajStyle,3,2);
+		GridData->addWidget(m_pctrlXMinStyle,4,2);
+		GridData->addWidget(m_pctrlYMinStyle,5,2);
 
-	GridData->addWidget(m_pctrlScale,1,3);
-	GridData->addWidget(m_pctrlXUnit,2,3);
-	GridData->addWidget(m_pctrlYUnit,3,3);
-	GridData->addWidget(m_pctrlXMinUnit,4,3);
-	GridData->addWidget(m_pctrlYMinUnit,5,3);
-
+		GridData->addWidget(m_pctrlScale,1,3);
+		GridData->addWidget(m_pctrlXUnit,2,3);
+		GridData->addWidget(m_pctrlYUnit,3,3);
+		GridData->addWidget(m_pctrlXMinUnit,4,3);
+		GridData->addWidget(m_pctrlYMinUnit,5,3);
+	}
 
 	QHBoxLayout *CommandButtons = new QHBoxLayout;
-	OKButton      = new QPushButton(tr("Accept"));
-	CancelButton  = new QPushButton(tr("Cancel"));
-	ApplyButton  = new QPushButton(tr("Apply"));
+	{
+		OKButton      = new QPushButton(tr("Accept"));
+		CancelButton  = new QPushButton(tr("Cancel"));
+		ApplyButton  = new QPushButton(tr("Apply"));
 
-	CommandButtons->addStretch(1);
-	CommandButtons->addWidget(ApplyButton);
-	CommandButtons->addStretch(1);
-	CommandButtons->addWidget(OKButton);
-	CommandButtons->addStretch(1);
-	CommandButtons->addWidget(CancelButton);
-	CommandButtons->addStretch(1);
+		CommandButtons->addStretch(1);
+		CommandButtons->addWidget(ApplyButton);
+		CommandButtons->addStretch(1);
+		CommandButtons->addWidget(OKButton);
+		CommandButtons->addStretch(1);
+		CommandButtons->addWidget(CancelButton);
+		CommandButtons->addStretch(1);
+	}
 
 	QVBoxLayout *mainLayout = new QVBoxLayout;
-	mainLayout->addLayout(GridData);
-	mainLayout->addLayout(CommandButtons);
+	{
+		mainLayout->addLayout(GridData);
+		mainLayout->addLayout(CommandButtons);
+	}
 	setLayout(mainLayout);
 }
 

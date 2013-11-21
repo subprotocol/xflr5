@@ -60,7 +60,6 @@ public:
 	OpPoint();
 
 private:
-	static void *s_pMainFrame;  /**< a static pointer to the application's MainFrame window */
 	bool m_bViscResults;        /**< true if viscous results are stored in this OpPoint */
 	bool m_bBL;                 /**< true if a boundary layer is stored in this OpPoint */
 	bool m_bTEFlap;             /**< true if the parent foil has a flap on the trailing edge */

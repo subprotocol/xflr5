@@ -150,7 +150,6 @@ public:
 	
 private:
 	static void *s_pMiarex;          /**< a void pointer to the instance of the QMiarex class. */
-	static void *s_pMainFrame;       /**< a void pointer to the instance of the MainFrame class. */
 
 	static int s_MaxRHSSize;         /**< the max number of RHS points, used for memeory allocation */
 

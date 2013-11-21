@@ -42,9 +42,9 @@ void XDirectStyleDlg::SetupLayout()
 {
 	QGridLayout *StyleLayout = new QGridLayout;
 	{
-		m_pctrlNeutral  = new LineButton;
-		m_pctrlBL       = new LineButton;
-		m_pctrlPressure = new LineButton;
+		m_pctrlNeutral  = new LineBtn(this);
+		m_pctrlBL       = new LineBtn(this);
+		m_pctrlPressure = new LineBtn(this);
 		QLabel *lab1 = new QLabel(tr("Neutral Line"));
 		QLabel *lab2 = new QLabel(tr("Boundary Layer"));
 		QLabel *lab3 = new QLabel(tr("Pressure"));

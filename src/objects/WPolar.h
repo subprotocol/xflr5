@@ -97,7 +97,6 @@ public:
 
 
 private:
-	static void* s_pMainFrame;   /**< a pointer to the unique instance of the application's mainframe */
 	static void* s_pMiarex;      /**< a pointer to the unique instance of the application's QMiarex class */
 
 	double   m_AMem;               /**< A variable which stores the last aoa displayed for this polar. Used to display the same aoa when the user switches to another polar */

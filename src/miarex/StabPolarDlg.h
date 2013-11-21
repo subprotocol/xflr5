@@ -34,7 +34,6 @@
 #include "CtrlTableDelegate.h"
 #include "../misc/FloatEdit.h"
 #include "../objects/Plane.h"
-//#include "../objects/WPolar.h"
 
 
 
@@ -92,7 +91,6 @@ private:
 	QCheckBox *m_pctrlAutoName;
 	QCheckBox *m_pctrlPlaneInertia;
 	QCheckBox *m_pctrlIgnoreBodyPanels;
-//	QCheckBox *m_pctrlAVLControls;
 
 	QRadioButton *m_pctrlUnit1, *m_pctrlUnit2;
 	QRadioButton *m_pctrlArea1, *m_pctrlArea2;
@@ -112,7 +110,6 @@ private:
 
 	QPushButton *OKButton, *CancelButton;
 
-	static void *s_pMainFrame;
 	static void *s_pMiarex;
 	static WPolar s_StabPolar;
 

@@ -216,10 +216,9 @@ void GL3DScales::InitDialog()
 {
 	if(!m_pMainFrame) return;
 	QMiarex *pMiarex = (QMiarex*)m_pMiarex;
-	MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
 	QString str;
 
-	GetLengthUnit(str, pMainFrame->m_LengthUnit);
+	GetLengthUnit(str, MainFrame::s_LengthUnit);
 	m_pctrlLengthUnit1->setText(str);
 	m_pctrlLengthUnit2->setText(str);
 	m_pctrlLengthUnit3->setText(str);
@@ -247,9 +246,9 @@ void GL3DScales::InitDialog()
 	else if(m_pos==1)	m_pctrlTE->setChecked(true);
 	else if(m_pos==2)	m_pctrlLine->setChecked(true);
 
-	m_pctrlDeltaL->SetValue(m_DeltaL* pMainFrame->m_mtoUnit);
-	m_pctrlXOffset->SetValue(m_XOffset* pMainFrame->m_mtoUnit);
-	m_pctrlZOffset->SetValue(m_ZOffset* pMainFrame->m_mtoUnit);
+	m_pctrlDeltaL->SetValue(m_DeltaL* MainFrame::s_mtoUnit);
+	m_pctrlXOffset->SetValue(m_XOffset* MainFrame::s_mtoUnit);
+	m_pctrlZOffset->SetValue(m_ZOffset* MainFrame::s_mtoUnit);
 	m_pctrlXFactor->SetValue(m_XFactor);
 	m_pctrlNXPoint->SetValue(m_NX);
 }
@@ -318,11 +317,10 @@ void GL3DScales::showEvent(QShowEvent *event)
 
 void GL3DScales::ReadStreamParams()
 {
-	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
 	m_NX = m_pctrlNXPoint->Value();
-	m_XOffset = m_pctrlXOffset->Value() / pMainFrame->m_mtoUnit;
-	m_ZOffset = m_pctrlZOffset->Value() / pMainFrame->m_mtoUnit;
-	m_DeltaL  = m_pctrlDeltaL->Value()  / pMainFrame->m_mtoUnit;
+	m_XOffset = m_pctrlXOffset->Value() / MainFrame::s_mtoUnit;
+	m_ZOffset = m_pctrlZOffset->Value() / MainFrame::s_mtoUnit;
+	m_DeltaL  = m_pctrlDeltaL->Value()  / MainFrame::s_mtoUnit;
 	m_XFactor = m_pctrlXFactor->Value();
 
 	if(m_pctrlLE->isChecked())	        m_pos=0;

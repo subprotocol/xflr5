@@ -262,7 +262,7 @@ void ManageBodiesDlg::OnExportGeometry()
 	if(!m_pBody) return;
 	QString LengthUnit, FileName;
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
-	GetLengthUnit(LengthUnit, pMainFrame->m_LengthUnit);
+	GetLengthUnit(LengthUnit, MainFrame::s_LengthUnit);
 
 	FileName = m_pBody->m_BodyName;
 	FileName.replace("/", " ");
@@ -272,13 +272,13 @@ void ManageBodiesDlg::OnExportGeometry()
 	QString filter =".csv";
 
 	FileName = QFileDialog::getSaveFileName(pMainFrame, QObject::tr("Export Body Geometry"),
-											pMainFrame->m_LastDirName ,
+											MainFrame::s_LastDirName ,
 											QObject::tr("Text File (*.txt);;Comma Separated Values (*.csv)"),
 											&filter);
 	if(!FileName.length()) return;
 
 	int pos = FileName.lastIndexOf("/");
-	if(pos>0) pMainFrame->m_LastDirName = FileName.left(pos);
+	if(pos>0) MainFrame::s_LastDirName = FileName.left(pos);
 	pos = FileName.lastIndexOf(".csv");
 	if (pos>0) type = 2;
 
@@ -287,7 +287,7 @@ void ManageBodiesDlg::OnExportGeometry()
 	if (!XFile.open(QIODevice::WriteOnly | QIODevice::Text)) return ;
 
 	QTextStream out(&XFile);
-	m_pBody->ExportGeometry(out, pMainFrame->m_mtoUnit, type, GL3dBodyDlg::s_NXPoints, GL3dBodyDlg::s_NHoopPoints);
+	m_pBody->ExportGeometry(out, MainFrame::s_mtoUnit, type, GL3dBodyDlg::s_NXPoints, GL3dBodyDlg::s_NHoopPoints);
 
 }
 

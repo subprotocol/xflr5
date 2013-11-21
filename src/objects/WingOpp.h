@@ -78,7 +78,6 @@ private:
     void ReleasePanelSizeArrays();
 
 private:
-	static void *s_pMainFrame;
 	QString m_WingName;	// the wing name to which the WingOpp belongs
 	QString m_PlrName; 	// the polar name to which the WingOpp belongs
 

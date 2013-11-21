@@ -25,7 +25,7 @@
 #include <QDialog>
 #include <QPushButton>
 #include <QCheckBox>
-#include "../misc/LineButton.h"
+#include "../misc/LineBtn.h"
 #include "../misc/FloatEdit.h"
 
 
@@ -60,7 +60,7 @@ private:
 
 	void *m_pAFoil;
 	QCheckBox  *m_pctrlNeutralShow, *m_pctrlScale, *m_pctrlXMajShow, *m_pctrlYMajShow, *m_pctrlXMinShow, *m_pctrlYMinShow;
-	LineButton *m_pctrlNeutralStyle, *m_pctrlXMajStyle, *m_pctrlYMajStyle, *m_pctrlXMinStyle, *m_pctrlYMinStyle;
+	LineBtn *m_pctrlNeutralStyle, *m_pctrlXMajStyle, *m_pctrlYMajStyle, *m_pctrlXMinStyle, *m_pctrlYMinStyle;
 	FloatEdit *m_pctrlXUnit, *m_pctrlYUnit,*m_pctrlXMinUnit, *m_pctrlYMinUnit;
 	QPushButton	*ApplyButton, *OKButton, *CancelButton;
 

@@ -28,7 +28,6 @@
 
 
 
-void *Polar::s_pMainFrame;
 /**
 *The public constructor.
 */
@@ -63,11 +62,10 @@ void Polar::ExportPolar(QTextStream &out, enumTextFileType FileType, bool bDataO
 {
 	QString Header, strong;
 	int j;
-	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 
 	if(!bDataOnly)
 	{
-		strong =pMainFrame->versionName() + "\n\n";
+		strong =MainFrame::versionName() + "\n\n";
 		out << strong;
 		strong =(" Calculated polar for: ");
 		strong += m_FoilName + "\n\n";
@@ -864,8 +862,7 @@ void Polar::GetPolarProperties(QString &PolarProperties, bool bData)
 	QTextStream out;
 	strong.clear();
 	out.setString(&strong);
-	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
-	ExportPolar(out, pMainFrame->m_ExportFileType, true);
+	ExportPolar(out, MainFrame::s_ExportFileType, true);
 	PolarProperties += "\n"+strong;
 }
 

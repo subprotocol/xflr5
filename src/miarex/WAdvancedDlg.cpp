@@ -30,7 +30,6 @@
 #include <QMessageBox>
 
 
-void *WAdvancedDlg::s_pMainFrame;
 
 WAdvancedDlg::WAdvancedDlg(QWidget *pParent) : QDialog(pParent)
 {
@@ -267,8 +266,7 @@ void WAdvancedDlg::InitDialog()
 	SetParams();
 
 	QString len;
-	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
-	GetLengthUnit(len,pMainFrame->m_LengthUnit);
+	GetLengthUnit(len,MainFrame::s_LengthUnit);
 
 	m_pctrlAStat->setText(len);
 	m_pctrlLength->setText(len);
@@ -314,12 +312,11 @@ void WAdvancedDlg::OnResetDefaults()
 
 void WAdvancedDlg::ReadParams()
 {
-	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	m_Relax           = m_pctrlRelax->Value();
 	m_AlphaPrec       = m_pctrlAlphaPrec->Value();
 	m_MaxWakeIter     = m_pctrlMaxWakeIter->Value();
-	m_CoreSize        = m_pctrlCoreSize->Value() / pMainFrame->m_mtoUnit;
-	m_MinPanelSize    = m_pctrlMinPanelSize->Value() / pMainFrame->m_mtoUnit;
+	m_CoreSize        = m_pctrlCoreSize->Value() / MainFrame::s_mtoUnit;
+	m_MinPanelSize    = m_pctrlMinPanelSize->Value() / MainFrame::s_mtoUnit;
 	m_VortexPos       = m_pctrlVortexPos->Value()/100.0;
 	m_ControlPos      = m_pctrlControlPos->Value()/100.0;
 	m_WakeInterNodes  = (int)m_pctrlInterNodes->Value();
@@ -336,17 +333,16 @@ void WAdvancedDlg::ReadParams()
 
 void WAdvancedDlg::SetParams()
 {
-	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	m_pctrlIterMax->SetValue(m_Iter);
 	m_pctrlRelax->SetValue(m_Relax);
 	m_pctrlAlphaPrec->SetValue(m_AlphaPrec);
 	m_pctrlNStation->SetValue(m_NStation);
 
-	m_pctrlCoreSize->SetValue(m_CoreSize* pMainFrame->m_mtoUnit);
+	m_pctrlCoreSize->SetValue(m_CoreSize* MainFrame::s_mtoUnit);
 	m_pctrlMaxWakeIter->SetValue(m_MaxWakeIter);
 	m_pctrlInterNodes->SetValue(m_WakeInterNodes);
 
-	m_pctrlMinPanelSize->SetValue(m_MinPanelSize * pMainFrame->m_mtoUnit);
+	m_pctrlMinPanelSize->SetValue(m_MinPanelSize * MainFrame::s_mtoUnit);
 
 	m_pctrlResetWake->setChecked(m_bResetWake);
 	m_pctrlLogFile->setChecked(m_bLogFile);

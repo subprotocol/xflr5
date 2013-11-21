@@ -34,7 +34,6 @@
 #include <QtDebug>
 
 void *StabViewDlg::s_pMiarex;
-void *StabViewDlg::s_pMainFrame;
 
 
 StabViewDlg::StabViewDlg(QWidget *parent) : QWidget(parent)
@@ -286,7 +285,6 @@ void StabViewDlg::keyPressEvent(QKeyEvent *event)
 void StabViewDlg::OnAnimate()
 {
 	QMiarex * pMiarex = (QMiarex*)s_pMiarex;
-//	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	if(m_pctrlAnimate->isChecked())
 	{
 //		pMiarex->m_iView = WSTABVIEW;
@@ -903,10 +901,9 @@ void StabViewDlg::SetupLayout()
 
 void StabViewDlg::SetControls()
 {
-	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	QMiarex * pMiarex = (QMiarex*)s_pMiarex;
 	QString str, strong;
-	GetSpeedUnit(str, pMainFrame->m_SpeedUnit);
+	GetSpeedUnit(str, MainFrame::s_SpeedUnit);
 
 	m_pctrlLongDynamics->setChecked(pMiarex->m_bLongitudinal);
 	m_pctrlLatDynamics->setChecked(!pMiarex->m_bLongitudinal);
@@ -1049,13 +1046,12 @@ void StabViewDlg::SetTimeCurveStyle(QColor const &Color, int const&Style, int co
 void StabViewDlg::OnRenameCurve()
 {
 	QMiarex * pMiarex = (QMiarex*)s_pMiarex;
-	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	
 	Curve *pCurve;
 	if(!m_pCurve) return;
 
 	QString NewName = "Test Name";
-	NewNameDlg dlg(pMainFrame);
+	NewNameDlg dlg(this);
 	dlg.m_OldName = m_pCurve->title();
 	dlg.InitDialog();
 
@@ -1083,7 +1079,6 @@ void StabViewDlg::OnRenameCurve()
 
 void StabViewDlg::OnSelChangeCurve(int sel)
 {
-//	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	QMiarex * pMiarex = (QMiarex*)s_pMiarex;
 	QString strong = m_pctrlCurveList->itemText(sel);
 	m_pCurve = pMiarex->m_TimeGraph[0].GetCurve(strong);

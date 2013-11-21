@@ -35,7 +35,6 @@
 #include "../misc/FloatEdit.h"
 #include "../objects/CVector.h"
 #include "../objects/Plane.h"
-//#include "../objects/Body.h"
 
 class InertiaDlg : public QDialog
 {
@@ -77,7 +76,6 @@ private:
 	Body *m_pBody;
 	Wing *m_pWing;
 	Plane *m_pPlane;
-	static void *s_pMainFrame;
 
 	QStackedWidget *m_pctrlTopStack;
 	QPushButton *m_pctrlWingInertia, *m_pctrlWing2Inertia, *m_pctrlStabInertia, *m_pctrlFinInertia, *m_pctrlBodyInertia;

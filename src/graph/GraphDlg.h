@@ -31,7 +31,7 @@
 #include "../graph/Graph.h"
 #include "../misc/FloatEdit.h"
 #include "../misc/ColorButton.h"
-#include "../misc/LineButton.h"
+#include "../misc/LineBtn.h"
 
 class GraphDlg : public QDialog
 {
@@ -96,12 +96,12 @@ private:
 
 	QCheckBox *m_pctrlXMajGridShow, *m_pctrlYMajGridShow, *m_pctrlXMinGridShow, *m_pctrlYMinGridShow;
 	QCheckBox *m_pctrlAutoXMinUnit, *m_pctrlAutoYMinUnit;
-	LineButton *m_pctrlAxisStyle, *m_pctrlXMajGridStyle, *m_pctrlYMajGridStyle, *m_pctrlXMinGridStyle, *m_pctrlYMinGridStyle;
+	LineBtn *m_pctrlAxisStyle, *m_pctrlXMajGridStyle, *m_pctrlYMajGridStyle, *m_pctrlXMinGridStyle, *m_pctrlYMinGridStyle;
 	FloatEdit *m_pctrlXMinorUnit, *m_pctrlYMinorUnit;
 
 	QCheckBox *m_pctrlGraphBorder;
 	ColorButton *m_pctrlGraphBack;
-	LineButton *m_pctrlBorderStyle;
+	LineBtn *m_pctrlBorderStyle;
 
 	QFont *m_pTitleFont, *m_pLabelFont;
 

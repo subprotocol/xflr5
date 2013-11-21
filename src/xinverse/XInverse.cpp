@@ -308,16 +308,14 @@ void QXInverse::DrawGrid(QPainter &painter, double scale)
 	double scalex;
 	int TickSize;
 
-	MainFrame * pMainFrame = (MainFrame*)s_pMainFrame;
-
 	TickSize = 5;
 	scalex= scale;
 
-	QPen TextPen(pMainFrame->m_TextColor);
+	QPen TextPen(MainFrame::s_TextColor);
 	painter.setPen(TextPen);
 
 	//neutral line first
-//	QPen LinePen(pMainFrame->m_TextColor);
+//	QPen LinePen(MainFrame::m_TextColor);
 //	painter.setPen(LinePen);
 
 	painter.drawLine(0, m_ptOffset.y(), m_rCltRect.right(), m_ptOffset.y());
@@ -1365,7 +1363,7 @@ void QXInverse::OnExtractFoil()
 		m_bSpline = false;
 		m_bSplined  = true;
 		Foil *pFoil;
-		pFoil = pMainFrame->GetFoil(dlg.m_FoilName);
+		pFoil = MainFrame::foil(dlg.m_FoilName);
 		pMainFrame->SetCurrentFoil(pFoil);
 		m_pRefFoil->CopyFoil(pFoil);
 
@@ -1821,7 +1819,6 @@ void QXInverse::OnTangentSpline()
  */
 void QXInverse::PaintGraph(QPainter &painter)
 {
-	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	painter.save();
 
 //  draw  the graph	
@@ -1829,7 +1826,7 @@ void QXInverse::PaintGraph(QPainter &painter)
 	{
 		m_QGraph.DrawGraph(painter);
 		QPoint Place((int)(m_rGraphRect.right()-300), m_rGraphRect.top()+12);
-		m_QGraph.DrawLegend(painter, Place, pMainFrame->m_TextFont, pMainFrame->m_TextColor);
+		m_QGraph.DrawLegend(painter, Place, MainFrame::s_TextFont, MainFrame::s_TextColor);
 	}
 
 // draw the zoom rectangle, if relevant
@@ -1912,9 +1909,8 @@ void QXInverse::PaintFoil(QPainter &painter)
 //draw the reference and modified foils  
 	XFoil *pXFoil = (XFoil*)m_pXFoil;
 	double alpha = pXFoil->alqsp[1]*180./PI;
-	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 
-	QPen TextPen(pMainFrame->m_TextColor);
+	QPen TextPen(MainFrame::s_TextColor);
 
 	if(m_bRefFoil && m_bLoaded)
 	{
@@ -1952,8 +1948,8 @@ void QXInverse::PaintFoil(QPainter &painter)
 		m_pRefFoil->DrawPoints(painter, 1.0,  1.0, m_ptOffset);
 	}
 
-	painter.setFont(pMainFrame->m_TextFont);
-	QFontMetrics fm(pMainFrame->m_TextFont);
+	painter.setFont(MainFrame::s_TextFont);
+	QFontMetrics fm(MainFrame::s_TextFont);
 	int dD = fm.height();
 	int Back = 4;
 	int LeftPos = m_rCltRect.left()+10;
@@ -2002,9 +1998,7 @@ void QXInverse::PaintView(QPainter &painter)
 {
 	painter.save();
 
-	MainFrame* pMainFrame = (MainFrame*)s_pMainFrame;
-
-	painter.fillRect(m_rCltRect, pMainFrame->m_BackgroundColor);
+	painter.fillRect(m_rCltRect, MainFrame::s_BackgroundColor);
 	PaintGraph(painter);
 	PaintFoil(painter);
 
@@ -2594,16 +2588,15 @@ void QXInverse::wheelEvent(QWheelEvent *event)
 {
 	ReleaseZoom();
 
-	MainFrame * pMainFrame = (MainFrame*)s_pMainFrame;
 	static double ZoomFactor;
 	if(event->delta()>0)
 	{
-		if(!pMainFrame->m_bReverseZoom) ZoomFactor = 1./1.06;
+		if(!MainFrame::s_bReverseZoom) ZoomFactor = 1./1.06;
 		else                           ZoomFactor = 1.06;
 	}
 	else
 	{
-		if(!pMainFrame->m_bReverseZoom) ZoomFactor = 1.06;
+		if(!MainFrame::s_bReverseZoom) ZoomFactor = 1.06;
 		else                           ZoomFactor = 1./1.06;
 	}
 

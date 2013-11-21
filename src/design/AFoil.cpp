@@ -197,12 +197,11 @@ void QAFoil::CheckButtons()
 void QAFoil::DrawScale(QPainter &painter, double scalex)
 {
 	int i;
-	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	painter.save();
 
-	painter.setFont(pMainFrame->m_TextFont);
+	painter.setFont(MainFrame::s_TextFont);
 
-	QFontMetrics fm(pMainFrame->m_TextFont);
+	QFontMetrics fm(MainFrame::s_TextFont);
 	int dD = fm.height();
 	int dW = fm.width("0.1");
 
@@ -211,7 +210,7 @@ void QAFoil::DrawScale(QPainter &painter, double scalex)
 	TickSize = (int)(dD/2);
 	offy = m_ptOffset.y();
 
-	QPen TextPen(pMainFrame->m_TextColor);
+	QPen TextPen(MainFrame::s_TextColor);
 	painter.setPen(TextPen);
 
 	double xo = 0.0;
@@ -1726,18 +1725,17 @@ void QAFoil::OnExportCurFoil()
 {
 	if(!MainFrame::s_pCurFoil)	return;
 
-	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	QString FileName;
 
 	FileName = MainFrame::s_pCurFoil->m_FoilName;
 	FileName.replace("/", " ");
 
 	FileName = QFileDialog::getSaveFileName(this, tr("Export Foil"),
-						pMainFrame->m_LastDirName+"/"+FileName+".dat",
+						MainFrame::s_LastDirName+"/"+FileName+".dat",
 						tr("Foil File (*.dat)"));
 	if(!FileName.length()) return;
 	int pos = FileName.lastIndexOf("/");
-	if(pos>0) pMainFrame->m_LastDirName = FileName.left(pos);
+	if(pos>0) MainFrame::s_LastDirName = FileName.left(pos);
 
 	QFile XFile(FileName);
 
@@ -1783,13 +1781,13 @@ void QAFoil::OnExportSplinesToFile()
 
 	FileName.replace("/", " ");
 	FileName = QFileDialog::getSaveFileName(this, tr("Export Splines"), 
-				pMainFrame->m_LastDirName,
+				MainFrame::s_LastDirName,
 				tr("Text File (*.dat)"));
 
 	if(!FileName.length()) return;
 	int pos;
 	pos = FileName.lastIndexOf("/");
-	if(pos>0) pMainFrame->m_LastDirName = FileName.left(pos);
+	if(pos>0) MainFrame::s_LastDirName = FileName.left(pos);
 
 	QFile XFile(FileName);
 
@@ -1817,7 +1815,7 @@ void QAFoil::FoilVisibleClicked(const QModelIndex& index)
 
 	if(index.row()>0)
 	{
-		Foil *pFoil= pMainFrame->GetFoil(pItem->text());
+		Foil *pFoil= MainFrame::foil(pItem->text());
 		MainFrame::s_pCurFoil = pFoil;
 		if(index.column()==12) 
 		{
@@ -1864,7 +1862,7 @@ void QAFoil::OnFoilClicked(const QModelIndex& index)
 	
 	if(index.row()>0)
 	{
-		Foil *pFoil= pMainFrame->GetFoil(pItem->text());
+		Foil *pFoil= MainFrame::foil(pItem->text());
 		MainFrame::s_pCurFoil = pFoil;
 	}
 	else if(index.row()==0)
@@ -2314,9 +2312,8 @@ void QAFoil::PaintGrids(QPainter &painter)
 void QAFoil::PaintLegend(QPainter &painter)
 {
 	painter.save();
-	MainFrame* pMainFrame = (MainFrame*)s_pMainFrame;
 
-	painter.setFont(pMainFrame->m_TextFont);
+	painter.setFont(MainFrame::s_TextFont);
 
 	if(m_bShowLegend)
 	{
@@ -2331,7 +2328,7 @@ void QAFoil::PaintLegend(QPainter &painter)
 
 		painter.setBackgroundMode(Qt::TransparentMode);
 
-		QPen TextPen(pMainFrame->m_TextColor);
+		QPen TextPen(MainFrame::s_TextColor);
 		painter.setPen(TextPen);
 		QPen LegendPen;
 
@@ -2396,7 +2393,6 @@ void QAFoil::PaintView(QPainter &painter)
 {
 	painter.save();
 
-	MainFrame* pMainFrame = (MainFrame*)s_pMainFrame;
 	double xscale = m_fScale          /m_fRefScale;
 	double yscale = m_fScale*m_fScaleY/m_fRefScale;
 
@@ -2404,7 +2400,7 @@ void QAFoil::PaintView(QPainter &painter)
 	QPoint VCenter = QPoint((int)((m_rCltRect.right() + m_rCltRect.left()  )/2),
 							(int)((m_rCltRect.top()   + m_rCltRect.bottom())/2));
 
-	painter.fillRect(m_rCltRect, pMainFrame->m_BackgroundColor);
+	painter.fillRect(m_rCltRect, MainFrame::s_BackgroundColor);
 
 	//draw the background image in the viewport
 	if(m_bIsImageLoaded && !m_BackImage.isNull())
@@ -2421,9 +2417,9 @@ void QAFoil::PaintView(QPainter &painter)
 //	m_ptOffset.rx() = VCenter.x() + m_ViewportTrans.x() - (int)(0.5 *m_fScale);
 //	m_ptOffset.ry() = VCenter.y() + m_ViewportTrans.y() ;
 
-	painter.setFont(pMainFrame->m_TextFont);
+	painter.setFont(MainFrame::s_TextFont);
 
-	QPen TextPen(pMainFrame->m_TextColor);
+	QPen TextPen(MainFrame::s_TextColor);
 	painter.setPen(TextPen);
 
 	PaintGrids(painter);
@@ -2454,11 +2450,10 @@ void QAFoil::PaintView(QPainter &painter)
 void QAFoil::PaintSplines(QPainter &painter)
 {
 	painter.save();
-	MainFrame* pMainFrame = (MainFrame*)s_pMainFrame;
 
 	QPen CtrlPen;
 
-	QBrush FillBrush(pMainFrame->m_BackgroundColor);
+	QBrush FillBrush(MainFrame::s_BackgroundColor);
 	painter.setBrush(FillBrush);
 
 	if(m_pSF->m_bVisible)
@@ -2494,11 +2489,10 @@ void QAFoil::PaintFoils(QPainter &painter)
 	painter.save();
 	int k;
 	Foil *pFoil;
-	MainFrame* pMainFrame = (MainFrame*)s_pMainFrame;
 
 	QPen FoilPen, CenterPen, CtrlPen;
 
-	QBrush FillBrush(pMainFrame->m_BackgroundColor);
+	QBrush FillBrush(MainFrame::s_BackgroundColor);
 	painter.setBrush(FillBrush);
 
 	for (k=0; k< m_poaFoil->size(); k++)
@@ -2942,16 +2936,15 @@ void QAFoil::wheelEvent(QWheelEvent *event)
 	m_ZoomRect.setBottomRight(m_ZoomRect.topLeft());
 	ReleaseZoom();
 
-	MainFrame * pMainFrame = (MainFrame*)s_pMainFrame;
 	static double ZoomFactor, scale;
 	if(event->delta()>0)
 	{
-		if(!pMainFrame->m_bReverseZoom) ZoomFactor = 1./1.06;
+		if(!MainFrame::s_bReverseZoom) ZoomFactor = 1./1.06;
 		else                            ZoomFactor = 1.06;
 	}
 	else
 	{
-		if(!pMainFrame->m_bReverseZoom) ZoomFactor = 1.06;
+		if(!MainFrame::s_bReverseZoom) ZoomFactor = 1.06;
 		else                            ZoomFactor = 1./1.06;
 	}
 
@@ -3037,10 +3030,9 @@ void QAFoil::OnAFoilTableColumns()
  */
 void QAFoil::OnLoadBackImage()
 {
-	MainFrame*pMainFrame = (MainFrame*)s_pMainFrame;
 	QString PathName;
 	PathName = QFileDialog::getOpenFileName(this, tr("Open Image File"),
-											pMainFrame->m_LastDirName,
+											MainFrame::s_LastDirName,
 											"Image files (*.png *.jpg *.bmp)");
 	m_bIsImageLoaded = m_BackImage.load(PathName);
 

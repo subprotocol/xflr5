@@ -39,6 +39,7 @@
 #include "misc/AboutQ5.h"
 #include "misc/ObjectPropsDlg.h"
 #include "misc/LinePickerDlg.h"
+#include "misc/DisplaySettingsDlg.h"
 #include "graph/GraphDlg.h"
 #include "xdirect/XDirect.h"
 #include "xdirect/BatchDlg.h"
@@ -72,22 +73,39 @@
 #endif
 
 
+QPointer<MainFrame> MainFrame::_self = 0L;
 
+QString MainFrame::s_VersionName = QString::fromLatin1("XFLR5 v6.09.06");
+QString MainFrame::s_ProjectName = "";
+QString MainFrame::s_LastDirName = "";
 Foil * MainFrame::s_pCurFoil=NULL;
+QFont MainFrame::s_TextFont;
+QColor MainFrame::s_TextColor       = QColor(220,220,220);
+QColor MainFrame::s_BackgroundColor = QColor(0, 5, 10);
+bool MainFrame::s_bAlphaChannel = true;
+bool MainFrame::s_bReverseZoom = false;
 bool MainFrame::s_bTrace = false;
 QFile *MainFrame::s_pTraceFile = NULL;
+enumTextFileType MainFrame::s_ExportFileType;  /**< Defines if the list separator for the output text files should be a space or a comma. */
 
+double MainFrame::s_mtoUnit  = 1.0;
+double MainFrame::s_mstoUnit = 1.0;
+double MainFrame::s_m2toUnit = 1.0;
+double MainFrame::s_kgtoUnit = 1.0;
+double MainFrame::s_NtoUnit  = 1.0;
+double MainFrame::s_NmtoUnit = 1.0;
+int MainFrame::s_LengthUnit = 0;
+int MainFrame::s_AreaUnit   = 1;
+int MainFrame::s_WeightUnit = 1;
+int MainFrame::s_SpeedUnit  = 0;
+int MainFrame::s_ForceUnit  = 0;
+int MainFrame::s_MomentUnit = 0;
 
-
-
-QPointer<MainFrame> MainFrame::_self = 0L;
+QList <void *> MainFrame::m_oaFoil;
 
 MainFrame::MainFrame(QWidget * parent, Qt::WindowFlags flags)
 	: QMainWindow(parent, flags)
 {
-	s_pCurFoil = NULL;
-	m_VersionName = QString::fromLatin1("XFLR5 v6.09.06");
-
 	if(s_bTrace)
 	{
 		QString FileName = QDir::tempPath() + "/Trace.log";
@@ -125,12 +143,11 @@ MainFrame::MainFrame(QWidget * parent, Qt::WindowFlags flags)
 		}
 	}
 
-	setWindowTitle(m_VersionName);
+	setWindowTitle(s_VersionName);
 	setWindowIcon(QIcon(":/images/xflr5_64.png"));
 
 
 	m_pUnitsDlg = new UnitsDlg(this);
-	m_pDisplaySettingsDlg = new DisplaySettingsDlg(this);
 	m_pRenameDlg = new RenameDlg(this);
 	m_pTranslatorDlg = new TranslatorDlg(this);
 	m_pSaveOptionsDlg = new SaveOptionsDlg(this);
@@ -139,39 +156,26 @@ MainFrame::MainFrame(QWidget * parent, Qt::WindowFlags flags)
 	{
 		QMessageBox::warning(this, tr("Warning"), tr("Your system does not provide support for OpenGL.\nXFLR5 will not operate correctly."));
 	}
-	m_bMaximized = true;
-	m_LengthUnit  = 0;
-	m_AreaUnit    = 1;
-	m_WeightUnit  = 1;
-	m_SpeedUnit   = 0;
-	m_ForceUnit   = 0;
-	m_MomentUnit  = 0;
 	
 	CreateDockWindows();
-	m_ProjectName = "";
 
-	m_BorderClr       = QColor(200,200,200);
-	m_BackgroundColor = QColor(0, 5, 10);
-	m_TextColor       = QColor(220,220,220);
-
-	m_TextFont.setStyleHint(QFont::TypeWriter, QFont::OpenGLCompatible);
-	m_TextFont.setFamily(m_TextFont.defaultFamily());
-	m_TextFont.setPointSize(10);
-	m_TextFont.setStyleStrategy(QFont::OpenGLCompatible);
+	s_TextFont.setStyleHint(QFont::TypeWriter, QFont::OpenGLCompatible);
+	s_TextFont.setFamily(s_TextFont.defaultFamily());
+	s_TextFont.setPointSize(10);
+	s_TextFont.setStyleStrategy(QFont::OpenGLCompatible);
 
 	m_RefGraph.SetGraphName("Reference Graph");
 
 	m_ImageFormat = PNG;
-	m_ExportFileType = TXT;
-	m_bReverseZoom  = false;
-	m_bAlphaChannel = true;
+	s_ExportFileType = TXT;
+
 	m_bSaveOpps     = false;
 	m_bSaveWOpps    = true;
 	m_bSaveSettings = true;
 
 	m_GraphExportFilter = "Comma Separated Values (*.csv)";
 
-	m_LastDirName = QDir::homePath();
+	s_LastDirName = QDir::homePath();
 
 	QAFoil *pAFoil       = (QAFoil*)m_pAFoil;
 	QXDirect *pXDirect   = (QXDirect*)m_pXDirect;
@@ -197,8 +201,8 @@ MainFrame::MainFrame(QWidget * parent, Qt::WindowFlags flags)
 		p3DScales->LoadSettings(&settings);
 	}
 
-	SetUnits(m_LengthUnit, m_AreaUnit, m_SpeedUnit, m_WeightUnit, m_ForceUnit, m_MomentUnit,
-			 m_mtoUnit, m_m2toUnit, m_mstoUnit, m_kgtoUnit, m_NtoUnit, m_NmtoUnit);
+	SetUnits(s_LengthUnit, s_AreaUnit, s_SpeedUnit, s_WeightUnit, s_ForceUnit, s_MomentUnit,
+			 s_mtoUnit, s_m2toUnit, s_mstoUnit, s_kgtoUnit, s_NtoUnit, s_NmtoUnit);
 
 
 	pXDirect->SetAnalysisParams();
@@ -275,7 +279,6 @@ MainFrame::~MainFrame()
 {
 	delete m_pUnitsDlg;
 	delete m_pRenameDlg;
-	delete m_pDisplaySettingsDlg;
 	delete m_pTranslatorDlg;
 	delete m_pSaveOptionsDlg;
 	if(s_pTraceFile) s_pTraceFile->close();
@@ -362,7 +365,7 @@ void MainFrame::AboutQFLR5()
 void MainFrame::AddFoil(Foil *pFoil)
 {
 
-	Foil *pOldFoil = GetFoil(pFoil->m_FoilName);
+	Foil *pOldFoil = foil(pFoil->m_FoilName);
 	if(pOldFoil)
 	{
 		DeleteFoil(pOldFoil, false);
@@ -966,34 +969,17 @@ void MainFrame::CreateDockWindows()
 	QXDirect::s_pMainFrame         = this;
 	QXInverse::s_pMainFrame        = this;
 	QMiarex::s_pMainFrame          = this;
-	WAdvancedDlg::s_pMainFrame     = this;
-	WPolarDlg::s_pMainFrame        = this;
 	ManageUFOsDlg::s_pMainFrame    = this;
-	StabViewDlg::s_pMainFrame      = this;
 	GL3dBodyDlg::s_pMainFrame      = this;
-	GL3dWingDlg::s_pMainFrame      = this;
 	ThreeDWidget::s_pMainFrame     = this;
 	PlaneDlg::s_pMainFrame         = this;
-	Polar::s_pMainFrame            = this;
-	Wing::s_pMainFrame             = this;
 	Body::s_pMainFrame             = this;
-	WPolar::s_pMainFrame           = this;
-	WingOpp::s_pMainFrame          = this;
-	OpPoint::s_pMainFrame          = this;
 	LLTAnalysisDlg::s_pMainFrame   = this;
-	PanelAnalysisDlg::s_pMainFrame = this;
-	InertiaDlg::s_pMainFrame       = this;
 	XFoilAnalysisDlg::s_pMainFrame = this;
-	StabPolarDlg::s_pMainFrame     = this;
-	BodyGridDlg::s_pMainFrame      = this;
 	BatchDlg::s_pMainFrame         = this;
 	BatchThreadDlg::s_pMainFrame   = this;
 	GraphDlg::s_pMainFrame         = this;
 	ManageBodiesDlg::s_pMainFrame  = this;
-	PanelAnalysisDlg::s_pMainFrame = this;
-	WingScaleDlg::s_pMainFrame     = this;
-	FoilPolarDlg::s_pMainFrame     = this;
-	BodyTransDlg::s_pMainFrame     = this;
 
 	m_pctrlXDirectWidget = new QDockWidget("XDirect", this);
 	m_pctrlXDirectWidget->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
@@ -1151,7 +1137,6 @@ void MainFrame::CreateDockWindows()
 	BatchDlg::s_pXDirect          = m_pXDirect;
 	BatchThreadDlg::s_pXFoil      = pXDirect->m_pXFoil;
 	BatchThreadDlg::s_pXDirect    = m_pXDirect;
-	FoilPolarDlg::s_pXDirect      = m_pXDirect;
 
 
 	GraphDlg::s_ActivePage = 0;
@@ -3091,7 +3076,7 @@ QColor MainFrame::GetColor(int type)
 
 
 
-Foil* MainFrame::GetFoil(QString strFoilName)
+Foil* MainFrame::foil(QString strFoilName)
 {
 	//returns a pointer to the foil with the corresponding name
 	// returns NULL if not found
@@ -3349,7 +3334,7 @@ bool MainFrame::LoadPolarFileV3(QDataStream &ar, bool bIsStoring, int ArchiveFor
 			}
 			else
 			{
-				pFoil = GetFoil(pOpp->m_strFoilName);
+				pFoil = foil(pOpp->m_strFoilName);
 				if(pFoil)
 				{
 //					memcpy(pOpp->x, pFoil->x, sizeof(pOpp->x));
@@ -3370,7 +3355,7 @@ bool MainFrame::LoadPolarFileV3(QDataStream &ar, bool bIsStoring, int ArchiveFor
 			}
 			else
 			{
-				pFoil = GetFoil(pOpp->m_strFoilName);
+				pFoil = foil(pOpp->m_strFoilName);
 				if(pFoil)
 				{
 //					memcpy(pOpp->x, pFoil->x, sizeof(pOpp->x));
@@ -3471,25 +3456,25 @@ bool MainFrame::LoadSettings()
 		if(bFloat) m_pctrlStabViewWidget->move(pt);
 		m_pctrlStabViewWidget->resize(size);
 
-		m_LastDirName = settings.value("LastDirName").toString();
+		s_LastDirName = settings.value("LastDirName").toString();
 		m_ImageDirName = settings.value("ImageDirName").toString();
 		m_ExportLastDirName = settings.value("ExportLastDirName").toString();
-		m_LengthUnit  = settings.value("LengthUnit").toInt();
-		m_AreaUnit    = settings.value("AreaUnit").toInt();
-		m_WeightUnit  = settings.value("WeightUnit").toInt();
-		m_SpeedUnit   = settings.value("SpeedUnit").toInt();
-		m_ForceUnit   = settings.value("ForceUnit").toInt();
-		m_MomentUnit  = settings.value("MomentUnit").toInt();
-		m_BackgroundColor.setRed(settings.value("BackgroundColorRed").toInt());
-		m_BackgroundColor.setGreen(settings.value("BackgroundColorGreen").toInt());
-		m_BackgroundColor.setBlue(settings.value("BackgroundColorBlue").toInt());
-		m_TextColor.setRed(settings.value("TextColorRed").toInt());
-		m_TextColor.setGreen(settings.value("TextColorGreen").toInt());
-		m_TextColor.setBlue(settings.value("TextColorBlue").toInt());
+		s_LengthUnit  = settings.value("LengthUnit").toInt();
+		s_AreaUnit    = settings.value("AreaUnit").toInt();
+		s_WeightUnit  = settings.value("WeightUnit").toInt();
+		s_SpeedUnit   = settings.value("SpeedUnit").toInt();
+		s_ForceUnit   = settings.value("ForceUnit").toInt();
+		s_MomentUnit  = settings.value("MomentUnit").toInt();
+		s_BackgroundColor.setRed(settings.value("BackgroundColorRed").toInt());
+		s_BackgroundColor.setGreen(settings.value("BackgroundColorGreen").toInt());
+		s_BackgroundColor.setBlue(settings.value("BackgroundColorBlue").toInt());
+		s_TextColor.setRed(settings.value("TextColorRed").toInt());
+		s_TextColor.setGreen(settings.value("TextColorGreen").toInt());
+		s_TextColor.setBlue(settings.value("TextColorBlue").toInt());
 
-		m_TextFont.setFamily(settings.value("TextFontFamily", "Courier").toString());
-		m_TextFont.setPointSize(settings.value("TextFontPointSize", 10).toInt());
-		m_TextFont.setStyleStrategy(QFont::OpenGLCompatible);
+		s_TextFont.setFamily(settings.value("TextFontFamily", "Courier").toString());
+		s_TextFont.setPointSize(settings.value("TextFontPointSize", 10).toInt());
+		s_TextFont.setStyleStrategy(QFont::OpenGLCompatible);
 
 		switch(settings.value("ImageFormat").toInt())
 		{
@@ -3526,8 +3511,8 @@ bool MainFrame::LoadSettings()
 			else break;
 		}while(n<MAXRECENTFILES);
 
-		m_bReverseZoom  = settings.value("ReverseZoom", false).toBool();
-		m_bAlphaChannel = settings.value("AlphaChannel", true).toBool();
+		s_bReverseZoom  = settings.value("ReverseZoom", false).toBool();
+		s_bAlphaChannel = settings.value("AlphaChannel", true).toBool();
 
 		DisplaySettingsDlg::s_bStyleSheets  = settings.value("ShowStyleSheets", false).toBool();
 		DisplaySettingsDlg::s_StyleSheetName = settings.value("StyleSheetName", "").toString();
@@ -3562,7 +3547,7 @@ enumApp MainFrame::LoadXFLR5File(QString PathName)
 	//QString dir = fileinfo.canonicalPath();
 
 	int pos = PathName.lastIndexOf("/");
-	if(pos>0) m_LastDirName = PathName.left(pos);
+	if(pos>0) s_LastDirName = PathName.left(pos);
 	if(end==".plr")
 	{
 		QDataStream ar(&XFile);
@@ -3812,11 +3797,11 @@ void MainFrame::OnInsertProject()
 	pMiarex->m_bArcball = false;
 
 	PathName = QFileDialog::getOpenFileName(this, tr("Open File"),
-											m_LastDirName,
+											s_LastDirName,
 											tr("Project file (*.wpa)"));
 	if(!PathName.length())		return;
 	int pos = PathName.lastIndexOf("/");
-	if(pos>0) m_LastDirName = PathName.left(pos);
+	if(pos>0) s_LastDirName = PathName.left(pos);
 
 
 	QFile XFile(PathName);
@@ -3873,6 +3858,7 @@ void MainFrame::OnLanguage()
 #endif
 #ifdef Q_OS_LINUX
 	TranslationsDir.setPath("/usr/share/xflr5");
+	TranslationsDir.setPath(".");/** @todo remove - debug only */
 #endif
 
 	m_pTranslatorDlg->m_TranslationDirPath = TranslationsDir.canonicalPath() + "/translations" ;
@@ -3898,7 +3884,7 @@ void MainFrame::OnLoadFile()
 	pMiarex->m_bArcball = false;
 
 	PathNames = QFileDialog::getOpenFileNames(this, tr("Open File"),
-												m_LastDirName,
+												s_LastDirName,
 												tr("XFLR5 file (*.dat *.plr *.wpa)"));
 	if(!PathNames.size()) return;
 	if(PathNames.size() > 1)
@@ -3920,7 +3906,7 @@ void MainFrame::OnLoadFile()
 		PathName = PathNames.at(0);
 		if(!PathName.length()) return;
 		int pos = PathName.lastIndexOf("/");
-		if(pos>0) m_LastDirName = PathName.left(pos);
+		if(pos>0) s_LastDirName = PathName.left(pos);
 
 		App = LoadXFLR5File(PathName);
 	}
@@ -4027,7 +4013,7 @@ void MainFrame::OnNewProject()
 			{
 				SetSaveState(true);
 				DeleteProject();
-				statusBar()->showMessage(tr("The project ") + m_ProjectName + tr(" has been saved"));
+				statusBar()->showMessage(tr("The project ") + s_ProjectName + tr(" has been saved"));
 			}
 			else return; //save failed, don't close
 		}
@@ -4106,7 +4092,7 @@ void MainFrame::OnResetSettings()
         QSettings settings(QSettings::IniFormat,QSettings::UserScope,"XFLR5");
 #endif
 		settings.clear();
-		m_LastDirName = QDir::homePath();
+		s_LastDirName = QDir::homePath();
 		// do not save on exit
 		m_bSaveSettings = false;
 	}
@@ -4193,7 +4179,7 @@ void MainFrame::OnSaveOptions()
 
 void MainFrame::OnSaveProject()
 {
-	if (!m_ProjectName.length() || m_ProjectName=="*")
+	if (!s_ProjectName.length() || s_ProjectName=="*")
 	{
 		OnSaveProjectAs();
 		return;
@@ -4201,7 +4187,7 @@ void MainFrame::OnSaveProject()
 	if(SaveProject(m_FileName))
 	{
 		SetSaveState(true);
-		statusBar()->showMessage(tr("The project ") + m_ProjectName + tr(" has been saved"));
+		statusBar()->showMessage(tr("The project ") + s_ProjectName + tr(" has been saved"));
 	}
 	QMiarex *pMiarex = (QMiarex*)m_pMiarex;
 	pMiarex->m_bArcball = false;
@@ -4216,7 +4202,7 @@ bool MainFrame::OnSaveProjectAs()
 	{
 		SetProjectName(m_FileName);
 		AddRecentFile(m_FileName);
-		statusBar()->showMessage(tr("The project ") + m_ProjectName + tr(" has been saved"));
+		statusBar()->showMessage(tr("The project ") + s_ProjectName + tr(" has been saved"));
 		SetSaveState(true);
 	}
 	QMiarex *pMiarex = (QMiarex*)m_pMiarex;
@@ -4245,13 +4231,13 @@ void MainFrame::OnSaveUFOAsProject()
 
 	FileName.replace("/", " ");
 	PathName = QFileDialog::getSaveFileName(this, tr("Save the Project File"),
-											m_LastDirName+"/"+FileName,
+											s_LastDirName+"/"+FileName,
 											tr("XFLR5 Project File (*.wpa)"), &Filter);
 	if(!PathName.length()) return;//nothing more to do
 	int pos = PathName.indexOf(".wpa", Qt::CaseInsensitive);
 	if(pos<0) PathName += ".wpa";
 	pos = PathName.lastIndexOf("/");
-	if(pos>0) m_LastDirName = PathName.left(pos);
+	if(pos>0) s_LastDirName = PathName.left(pos);
 
 
 	QFile fp(PathName);
@@ -4465,7 +4451,7 @@ void MainFrame::OnSelChangeFoil(int i)
 	int sel = m_pctrlFoil->currentIndex();
 	if (sel >=0) strong = m_pctrlFoil->itemText(sel);
 
-	s_pCurFoil = GetFoil(strong);
+	s_pCurFoil = foil(strong);
 	pXDirect->SetFoil(s_pCurFoil);
 	pXDirect->SetPolar();
 	m_iApp = XFOILANALYSIS;
@@ -4528,27 +4514,28 @@ void MainFrame::OnStyle()
 	QMiarex *pMiarex     = (QMiarex*)m_pMiarex;
 //	QXInverse *pXInverse = (QXInverse*)m_pXInverse;
 
-	m_pDisplaySettingsDlg->m_pMainFrame = this;
-	m_pDisplaySettingsDlg->m_BackgroundColor = m_BackgroundColor;
-	m_pDisplaySettingsDlg->m_TextColor       = m_TextColor;
-	m_pDisplaySettingsDlg->m_TextFont        = m_TextFont;
-	m_pDisplaySettingsDlg->m_pRefGraph       = &m_RefGraph;
-	m_pDisplaySettingsDlg->m_bReverseZoom    = m_bReverseZoom;
-	m_pDisplaySettingsDlg->m_bAlphaChannel   = m_bAlphaChannel;
-	m_pDisplaySettingsDlg->InitDialog();
+	DisplaySettingsDlg DSdlg(this);
 
-	if(m_pDisplaySettingsDlg->exec() ==QDialog::Accepted)
+	DSdlg.m_BackgroundColor = s_BackgroundColor;
+	DSdlg.m_TextColor       = s_TextColor;
+	DSdlg.m_TextFont        = s_TextFont;
+	DSdlg.m_pRefGraph       = &m_RefGraph;
+	DSdlg.m_bReverseZoom    = s_bReverseZoom;
+	DSdlg.m_bAlphaChannel   = s_bAlphaChannel;
+	DSdlg.InitDialog();
+
+	if(DSdlg.exec() ==QDialog::Accepted)
 	{
-		m_BackgroundColor = m_pDisplaySettingsDlg->m_BackgroundColor;
-		m_TextColor       = m_pDisplaySettingsDlg->m_TextColor;
-		m_TextFont        = m_pDisplaySettingsDlg->m_TextFont;
-		m_bReverseZoom    = m_pDisplaySettingsDlg->m_pctrlReverseZoom->isChecked();
-		m_bAlphaChannel   = m_pDisplaySettingsDlg->m_pctrlAlphaChannel->isChecked();
+		s_BackgroundColor = DSdlg.m_BackgroundColor;
+		s_TextColor       = DSdlg.m_TextColor;
+		s_TextFont        = DSdlg.m_TextFont;
+		s_bReverseZoom    = DSdlg.m_pctrlReverseZoom->isChecked();
+		s_bAlphaChannel   = DSdlg.m_pctrlAlphaChannel->isChecked();
 		pMiarex->m_bResetglGeom = true;
 		pMiarex->m_bResetglBody = true;
 		pMiarex->m_bResetglLegend = true;
 
-		if(m_pDisplaySettingsDlg->m_bIsGraphModified)
+		if(DSdlg.m_bIsGraphModified)
 		{
 			SetGraphSettings(&m_RefGraph);
 		}
@@ -4564,25 +4551,25 @@ void MainFrame::OnStyle()
 void MainFrame::OnUnits()
 {
 //    m_UnitsDlg->move(m_DlgPos);
-	m_pUnitsDlg->m_Length = m_LengthUnit;
-	m_pUnitsDlg->m_Area   = m_AreaUnit;
-	m_pUnitsDlg->m_Weight = m_WeightUnit;
-	m_pUnitsDlg->m_Speed  = m_SpeedUnit;
-	m_pUnitsDlg->m_Force  = m_ForceUnit;
-	m_pUnitsDlg->m_Moment = m_MomentUnit;
+	m_pUnitsDlg->m_Length = s_LengthUnit;
+	m_pUnitsDlg->m_Area   = s_AreaUnit;
+	m_pUnitsDlg->m_Weight = s_WeightUnit;
+	m_pUnitsDlg->m_Speed  = s_SpeedUnit;
+	m_pUnitsDlg->m_Force  = s_ForceUnit;
+	m_pUnitsDlg->m_Moment = s_MomentUnit;
 	m_pUnitsDlg->InitDialog();
 
 	if(m_pUnitsDlg->exec()==QDialog::Accepted)
 	{
-		m_LengthUnit = m_pUnitsDlg->m_Length;
-		m_AreaUnit   = m_pUnitsDlg->m_Area;
-		m_WeightUnit = m_pUnitsDlg->m_Weight;
-		m_SpeedUnit  = m_pUnitsDlg->m_Speed;
-		m_ForceUnit  = m_pUnitsDlg->m_Force;
-		m_MomentUnit = m_pUnitsDlg->m_Moment;
+		s_LengthUnit = m_pUnitsDlg->m_Length;
+		s_AreaUnit   = m_pUnitsDlg->m_Area;
+		s_WeightUnit = m_pUnitsDlg->m_Weight;
+		s_SpeedUnit  = m_pUnitsDlg->m_Speed;
+		s_ForceUnit  = m_pUnitsDlg->m_Force;
+		s_MomentUnit = m_pUnitsDlg->m_Moment;
 
-		SetUnits(m_LengthUnit, m_AreaUnit, m_SpeedUnit, m_WeightUnit, m_ForceUnit, m_MomentUnit,
-		m_mtoUnit, m_m2toUnit, m_mstoUnit, m_kgtoUnit, m_NtoUnit, m_NmtoUnit);
+		SetUnits(s_LengthUnit, s_AreaUnit, s_SpeedUnit, s_WeightUnit, s_ForceUnit, s_MomentUnit,
+		s_mtoUnit, s_m2toUnit, s_mstoUnit, s_kgtoUnit, s_NtoUnit, s_NmtoUnit);
 
 		SetSaveState(false);
 
@@ -5139,7 +5126,7 @@ void MainFrame::RenameFoil(Foil *pFoil)
 bool MainFrame::SaveProject(QString PathName)
 {
 	QString Filter = "XFLR5 v6 Project File (*.wpa)";
-	QString FileName = m_ProjectName;
+	QString FileName = s_ProjectName;
 
 	if(!PathName.length())
 	{
@@ -5148,7 +5135,7 @@ bool MainFrame::SaveProject(QString PathName)
 
 
 		PathName = QFileDialog::getSaveFileName(this, tr("Save the Project File"),
-												m_LastDirName+"/"+FileName,
+												s_LastDirName+"/"+FileName,
 												tr("XFLR5 v6 Project File (*.wpa);;XFLR5 v5 Project File (*.*)"),
 												&Filter);
 
@@ -5156,7 +5143,7 @@ bool MainFrame::SaveProject(QString PathName)
 		int pos = PathName.indexOf(".wpa", Qt::CaseInsensitive);
 		if(pos<0) PathName += ".wpa";
 		pos = PathName.lastIndexOf("/");
-		if(pos>0) m_LastDirName = PathName.left(pos);
+		if(pos>0) s_LastDirName = PathName.left(pos);
 	}
 //	int x = QString::compare(Filter, "XFLR5 v5 Project File (*.wpa)", Qt::CaseInsensitive);
 //	x = QString::compare(Filter, "XFLR5 v6 Project File (*.wpa)", Qt::CaseInsensitive);
@@ -5231,30 +5218,30 @@ void MainFrame::SaveSettings()
 		settings.setValue("XInverseSize", m_pctrlXInverseWidget->size());
 		settings.setValue("MiarexSize", m_pctrlMiarexWidget->size());
 		settings.setValue("StabSize", m_pctrlStabViewWidget->size());
-		settings.setValue("LastDirName", m_LastDirName);
+		settings.setValue("LastDirName", s_LastDirName);
 		settings.setValue("ImageDirName", m_ImageDirName);
 		settings.setValue("ExportLastDirName", m_ExportLastDirName);
-		settings.setValue("LengthUnit", m_LengthUnit);
-		settings.setValue("AreaUnit", m_AreaUnit);
-		settings.setValue("WeightUnit", m_WeightUnit);
-		settings.setValue("SpeedUnit", m_SpeedUnit);
-		settings.setValue("ForceUnit", m_ForceUnit);
-		settings.setValue("MomentUnit", m_MomentUnit);
-		settings.setValue("BackgroundColorRed", m_BackgroundColor.red());
-		settings.setValue("BackgroundColorGreen", m_BackgroundColor.green());
-		settings.setValue("BackgroundColorBlue", m_BackgroundColor.blue());
-		settings.setValue("TextColorRed", m_TextColor.red());
-		settings.setValue("TextColorGreen", m_TextColor.green());
-		settings.setValue("TextColorBlue", m_TextColor.blue());
-		settings.setValue("TextFontFamily", m_TextFont.family());
-		settings.setValue("TextFontPointSize", m_TextFont.pointSize());
+		settings.setValue("LengthUnit", s_LengthUnit);
+		settings.setValue("AreaUnit", s_AreaUnit);
+		settings.setValue("WeightUnit", s_WeightUnit);
+		settings.setValue("SpeedUnit", s_SpeedUnit);
+		settings.setValue("ForceUnit", s_ForceUnit);
+		settings.setValue("MomentUnit", s_MomentUnit);
+		settings.setValue("BackgroundColorRed", s_BackgroundColor.red());
+		settings.setValue("BackgroundColorGreen", s_BackgroundColor.green());
+		settings.setValue("BackgroundColorBlue", s_BackgroundColor.blue());
+		settings.setValue("TextColorRed", s_TextColor.red());
+		settings.setValue("TextColorGreen", s_TextColor.green());
+		settings.setValue("TextColorBlue", s_TextColor.blue());
+		settings.setValue("TextFontFamily", s_TextFont.family());
+		settings.setValue("TextFontPointSize", s_TextFont.pointSize());
 		settings.setValue("ImageFormat", m_ImageFormat);
 		settings.setValue("SaveOpps", m_bSaveOpps);
 		settings.setValue("SaveWOpps", m_bSaveWOpps);
 		settings.setValue("RecentFileSize", m_RecentFiles.size());
 		settings.setValue("ShowStyleSheets", DisplaySettingsDlg::s_bStyleSheets);
-		settings.setValue("ReverseZoom", m_bReverseZoom);
-		settings.setValue("AlphaChannel", m_bAlphaChannel);
+		settings.setValue("ReverseZoom", s_bReverseZoom);
+		settings.setValue("AlphaChannel", s_bAlphaChannel);
 		settings.setValue("StyleSheetName", DisplaySettingsDlg::s_StyleSheetName);
 
 
@@ -5423,12 +5410,12 @@ bool MainFrame::SerializeUFOProject(QDataStream &ar)
 	//Archive format introduced in Beta V22
 	// Write units //added in Beta v16
 	// Save analysis settings // added in Beta v22
-	ar << m_LengthUnit;
-	ar << m_AreaUnit;
-	ar << m_WeightUnit;
-	ar << m_SpeedUnit;
-	ar << m_ForceUnit;
-	ar << m_MomentUnit;
+	ar << s_LengthUnit;
+	ar << s_AreaUnit;
+	ar << s_WeightUnit;
+	ar << s_SpeedUnit;
+	ar << s_ForceUnit;
+	ar << s_MomentUnit;
 
 	if(WPolarDlg::s_WPolar.m_WPolarType==FIXEDSPEEDPOLAR)      ar<<1;
 	else if(WPolarDlg::s_WPolar.m_WPolarType==FIXEDLIFTPOLAR)  ar<<2;
@@ -5494,7 +5481,7 @@ bool MainFrame::SerializeUFOProject(QDataStream &ar)
 	{
 		for (i=0; i<pWing->NWingSection(); i++)
 		{
-			pFoil = GetFoil(pWing->RightFoil(i));
+			pFoil = foil(pWing->RightFoil(i));
 			bFound = false;
 			for(j=0;j<FoilList.size();j++)
 			{
@@ -5510,7 +5497,7 @@ bool MainFrame::SerializeUFOProject(QDataStream &ar)
 		{
 			for (i=0; i<pWing->NWingSection(); i++)
 			{
-				pFoil = GetFoil(pWing->LeftFoil(i));
+				pFoil = foil(pWing->LeftFoil(i));
 				bFound = false;
 				for(j=0;j<FoilList.size();j++)
 				{
@@ -5528,7 +5515,7 @@ bool MainFrame::SerializeUFOProject(QDataStream &ar)
 	{
 		for (i=0; i<pStab->NWingSection(); i++)
 		{
-			pFoil = GetFoil(pStab->RightFoil(i));
+			pFoil = foil(pStab->RightFoil(i));
 			bFound = false;
 			for(j=0;j<FoilList.size();j++)
 			{
@@ -5544,7 +5531,7 @@ bool MainFrame::SerializeUFOProject(QDataStream &ar)
 		{
 			for (i=0; i<pStab->NWingSection(); i++)
 			{
-				pFoil = GetFoil(pStab->LeftFoil(i));
+				pFoil = foil(pStab->LeftFoil(i));
 				bFound = false;
 				for(j=0;j<FoilList.size();j++)
 				{
@@ -5561,7 +5548,7 @@ bool MainFrame::SerializeUFOProject(QDataStream &ar)
 	{
 		for (i=0; i<pFin->NWingSection(); i++)
 		{
-			pFoil = GetFoil(pFin->RightFoil(i));
+			pFoil = foil(pFin->RightFoil(i));
 			bFound = false;
 			for(j=0;j<FoilList.size();j++)
 			{
@@ -5577,7 +5564,7 @@ bool MainFrame::SerializeUFOProject(QDataStream &ar)
 		{
 			for (i=0; i<pFin->NWingSection(); i++)
 			{
-				pFoil = GetFoil(pFin->LeftFoil(i));
+				pFoil = foil(pFin->LeftFoil(i));
 				bFound = false;
 				for(j=0;j<FoilList.size();j++)
 				{
@@ -5597,13 +5584,13 @@ bool MainFrame::SerializeUFOProject(QDataStream &ar)
 	ar << FoilList.size();
 	for (i=0; i<FoilList.size(); i++)
 	{
-		pFoil = GetFoil(FoilList[i]);
+		pFoil = foil(FoilList[i]);
 		pFoil->Serialize(ar, true);
 	}
 	int n = 0;
 	for (i=0; i<FoilList.size(); i++)
 	{
-		pFoil = GetFoil(FoilList[i]);
+		pFoil = foil(FoilList[i]);
 		//count polars associated to the foil
 		for (int i=0; i<m_oaPolar.size();i++)
 		{
@@ -5616,7 +5603,7 @@ bool MainFrame::SerializeUFOProject(QDataStream &ar)
 	ar << n;
 	for (i=0; i<FoilList.size(); i++)
 	{
-		pFoil = GetFoil(FoilList[i]);
+		pFoil = foil(FoilList[i]);
 		for (j=0; j<m_oaPolar.size();j++)
 		{
 			pPolar = (Polar*)m_oaPolar.at(j);
@@ -5692,12 +5679,12 @@ bool MainFrame::SerializeProject(QDataStream &ar, bool bIsStoring)
 		//Archive format introduced in Beta V22
 		// Write units //added in Beta v16
 		// Save analysis settings // added in Beta v22
-		ar << m_LengthUnit;
-		ar << m_AreaUnit;
-		ar << m_WeightUnit;
-		ar << m_SpeedUnit;
-		ar << m_ForceUnit;
-		ar << m_MomentUnit;
+		ar << s_LengthUnit;
+		ar << s_AreaUnit;
+		ar << s_WeightUnit;
+		ar << s_SpeedUnit;
+		ar << s_ForceUnit;
+		ar << s_MomentUnit;
 
 		if(WPolarDlg::s_WPolar.m_WPolarType==FIXEDSPEEDPOLAR)      ar<<1;
 		else if(WPolarDlg::s_WPolar.m_WPolarType==FIXEDLIFTPOLAR)  ar<<2;
@@ -5809,19 +5796,19 @@ bool MainFrame::SerializeProject(QDataStream &ar, bool bIsStoring)
 		{
 		// then n is the ArchiveFormat number
 			ArchiveFormat = n;
-			ar >> m_LengthUnit;
-			ar >> m_AreaUnit;
-			ar >> m_WeightUnit;
-			ar >> m_SpeedUnit;
-			ar >> m_ForceUnit;
+			ar >> s_LengthUnit;
+			ar >> s_AreaUnit;
+			ar >> s_WeightUnit;
+			ar >> s_SpeedUnit;
+			ar >> s_ForceUnit;
 
 			if(ArchiveFormat>=100005)
 			{
-				ar >> m_MomentUnit;
+				ar >> s_MomentUnit;
 			}
 
-			SetUnits(m_LengthUnit, m_AreaUnit, m_SpeedUnit, m_WeightUnit, m_ForceUnit, m_MomentUnit,
-					 m_mtoUnit, m_m2toUnit, m_mstoUnit, m_kgtoUnit, m_NtoUnit, m_NmtoUnit);
+			SetUnits(s_LengthUnit, s_AreaUnit, s_SpeedUnit, s_WeightUnit, s_ForceUnit, s_MomentUnit,
+					 s_mtoUnit, s_m2toUnit, s_mstoUnit, s_kgtoUnit, s_NtoUnit, s_NmtoUnit);
 
 			if(ArchiveFormat>=100004)
 			{
@@ -6328,12 +6315,12 @@ void MainFrame::SetProjectName(QString PathName)
 {
 	m_FileName = PathName;
 	int pos = PathName.lastIndexOf("/");
-	if (pos>0) m_ProjectName = PathName.right(PathName.length()-pos-1);
-	else m_ProjectName = PathName;
-	if(m_ProjectName.length()>4)
+	if (pos>0) s_ProjectName = PathName.right(PathName.length()-pos-1);
+	else s_ProjectName = PathName;
+	if(s_ProjectName.length()>4)
 	{
-		m_ProjectName = m_ProjectName.left(m_ProjectName.length()-4);
-		m_pctrlProjectName->setText(m_ProjectName);
+		s_ProjectName = s_ProjectName.left(s_ProjectName.length()-4);
+		m_pctrlProjectName->setText(s_ProjectName);
 	}
 }
 
@@ -6342,13 +6329,13 @@ void MainFrame::SetSaveState(bool bSave)
 {
 	m_bSaved = bSave;
 
-	int len = m_ProjectName.length();
-	if(m_ProjectName.right(1)=="*") m_ProjectName = m_ProjectName.left(len-1);
+	int len = s_ProjectName.length();
+	if(s_ProjectName.right(1)=="*") s_ProjectName = s_ProjectName.left(len-1);
 	if (!bSave)
 	{
-		m_ProjectName += "*";
+		s_ProjectName += "*";
 	}
-	m_pctrlProjectName->setText(m_ProjectName);
+	m_pctrlProjectName->setText(s_ProjectName);
 }
 
 
@@ -6748,7 +6735,7 @@ void MainFrame::UpdateFoils()
 			strong = m_pctrlFoil->itemText(0);
 			//...and set it
 
-			pXDirect->SetFoil(GetFoil(strong));
+			pXDirect->SetFoil(foil(strong));
 		}
 	}
 	else

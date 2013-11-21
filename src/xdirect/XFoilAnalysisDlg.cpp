@@ -511,12 +511,11 @@ void XFoilAnalysisDlg::SetRe(double ReMin, double ReMax, double DeltaRe)
 void XFoilAnalysisDlg::SetFileHeader()
 {
 	QXDirect *pXDirect = (QXDirect*)s_pXDirect;
-	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 
 	QTextStream out(m_pXFile);
 
 	out << "\n";
-	out << pMainFrame->m_VersionName;
+	out << MainFrame::versionName();
 	out << "\n";
 	out << m_FoilName;
 	out << "\n";

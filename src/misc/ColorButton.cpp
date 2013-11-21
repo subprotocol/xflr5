@@ -21,6 +21,7 @@
 
 #include "ColorButton.h"
 #include <QPainter>
+#include <QStyleOption>
 
 ColorButton::ColorButton()
 {
@@ -49,8 +50,11 @@ void ColorButton::paintEvent ( QPaintEvent * event )
 		else         paintcolor = Qt::lightGray;
 	}
 
-
+	QStyleOption opt;
+	opt.init(this);
 	QPainter painter(this);
+	style()->drawPrimitive(QStyle::PE_Widget, &opt, &painter, this);
+
 	painter.setBackgroundMode(Qt::TransparentMode);
 	QRect r = rect();
 

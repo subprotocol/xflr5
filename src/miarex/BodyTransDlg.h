@@ -59,8 +59,6 @@ private:
 	QLabel *m_pctrlLength3;
 	QPushButton *OKButton, *CancelButton;
 
-	static void * s_pMainFrame;
-
 	double m_XTrans, m_YTrans, m_ZTrans;
 	bool   m_bFrameOnly;
 	int    m_FrameID;

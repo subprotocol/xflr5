@@ -31,12 +31,14 @@ LineCbBox::LineCbBox(void *pParent)
 	m_Color = QColor(255,100,50);
 }
 
+
 LineCbBox::LineCbBox(int const &style, int const &width, QColor const &color)
 {
 	m_Style = style;
 	m_Width = width;
 	m_Color = color;
 }
+
 
 void LineCbBox::SetLine(int const &style, int const &width, QColor const &color)
 {
@@ -45,10 +47,14 @@ void LineCbBox::SetLine(int const &style, int const &width, QColor const &color)
 	m_Color = color;
 }
 
+
 void LineCbBox::paintEvent (QPaintEvent *event)
 {
-
+	QStyleOption opt;
+	opt.init(this);
 	QPainter painter(this);
+	style()->drawPrimitive(QStyle::PE_Widget, &opt, &painter, this);
+
 	painter.save();
 
 	QColor ContourColor = Qt::gray;
@@ -57,7 +63,7 @@ void LineCbBox::paintEvent (QPaintEvent *event)
 	else            ContourColor = Qt::lightGray;
 
 	QRect r = event->rect();
-
+	QRect g = rect();
 	painter.setBrush(Qt::NoBrush);
 	painter.setBackgroundMode(Qt::TransparentMode);
 
@@ -67,10 +73,10 @@ void LineCbBox::paintEvent (QPaintEvent *event)
 	painter.setPen(LinePen);
 	painter.drawLine(r.left()+5, r.height()/2, r.width()-10, r.height()/2);
 
-	QPen ContourPen(ContourColor);
-	painter.setPen(ContourPen);
-	r.adjust(0,2,-1,-3);
-	painter.drawRoundRect(r,5,40);
+//	QPen ContourPen(ContourColor);
+//	painter.setPen(ContourPen);
+//	r.adjust(0,2,-1,-3);
+//	painter.drawRoundRect(r,5,40);
 
 	painter.restore();
 }

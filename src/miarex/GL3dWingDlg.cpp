@@ -45,7 +45,6 @@
 
 
 
-void* GL3dWingDlg::s_pMainFrame;		//pointer to the Frame window
 void* GL3dWingDlg::s_pMiarex;	//pointer to the Miarex Application window
 void *GL3dWingDlg::s_pGLLightDlg;
 
@@ -328,16 +327,15 @@ void GL3dWingDlg::FillTableRow(int row)
 {
 	QString strong;
 	QModelIndex ind;
-	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 
 	ind = m_pWingModel->index(row, 0, QModelIndex());
-	m_pWingModel->setData(ind, m_pWing->YPosition(row) * pMainFrame->m_mtoUnit);
+	m_pWingModel->setData(ind, m_pWing->YPosition(row) * MainFrame::s_mtoUnit);
 
 	ind = m_pWingModel->index(row, 1, QModelIndex());
-	m_pWingModel->setData(ind, m_pWing->Chord(row) * pMainFrame->m_mtoUnit);
+	m_pWingModel->setData(ind, m_pWing->Chord(row) * MainFrame::s_mtoUnit);
 
 	ind = m_pWingModel->index(row, 2, QModelIndex());
-	m_pWingModel->setData(ind, m_pWing->Offset(row) * pMainFrame->m_mtoUnit);
+	m_pWingModel->setData(ind, m_pWing->Offset(row) * MainFrame::s_mtoUnit);
 
 	ind = m_pWingModel->index(row, 3, QModelIndex());
 	m_pWingModel->setData(ind, m_pWing->Dihedral(row));
@@ -387,7 +385,6 @@ void GL3dWingDlg::FillTableRow(int row)
 
 void GL3dWingDlg::GLCreateMesh()
 {
-	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	QMiarex *pMiarex = (QMiarex*)s_pMiarex;
 
 	QColor color;
@@ -532,7 +529,7 @@ void GL3dWingDlg::GLCreateMesh()
 		glEnable(GL_POLYGON_OFFSET_FILL);
 		glPolygonOffset(1.0, 1.0);
 
-		color = pMainFrame->m_BackgroundColor;
+		color = MainFrame::s_BackgroundColor;
 //		style = pMiarex->m_VLMStyle;
 		width = pMiarex->m_VLMWidth;
 
@@ -807,10 +804,7 @@ void GL3dWingDlg::GLCreateSectionHighlight()
 
 void GL3dWingDlg::GLDraw3D()
 {
-//	QMiarex *pMiarex= (QMiarex*)s_pMiarex;
-	MainFrame * pMainFrame =(MainFrame*)s_pMainFrame;
-
-	glClearColor(pMainFrame->m_BackgroundColor.redF(), pMainFrame->m_BackgroundColor.greenF(), pMainFrame->m_BackgroundColor.blueF(),0.0);
+	glClearColor(MainFrame::s_BackgroundColor.redF(), MainFrame::s_BackgroundColor.greenF(), MainFrame::s_BackgroundColor.blueF(),0.0);
 
 	if(m_bResetglWing)
 	{
@@ -868,12 +862,10 @@ void GL3dWingDlg::GLDraw3D()
 
 void GL3dWingDlg::GLDrawFoils()
 {
-	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
-
 	int j;
 	Foil *pFoil;
 
-	glColor3d(pMainFrame->m_TextColor.redF(), pMainFrame->m_TextColor.greenF(), pMainFrame->m_TextColor.blueF());
+	glColor3d(MainFrame::s_TextColor.redF(), MainFrame::s_TextColor.greenF(), MainFrame::s_TextColor.blueF());
 
 	for(j=0; j<m_pWing->m_NSurfaces; j++)
 	{
@@ -914,7 +906,6 @@ void GL3dWingDlg::GLInverseMatrix()
 
 void GL3dWingDlg::GLRenderView()
 {
-//	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	QMiarex *pMiarex = (QMiarex*)s_pMiarex;
 
 	GLdouble pts[4];
@@ -1060,13 +1051,12 @@ bool GL3dWingDlg::InitDialog(Wing *pWing)
 {
 	QString str;
 	m_iSection = 0;
-	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 
-	GetAreaUnit(str, pMainFrame->m_AreaUnit);
+	GetAreaUnit(str, MainFrame::s_AreaUnit);
 	m_pctrlAreaUnit1->setText(str);
 	m_pctrlAreaUnit2->setText(str);
 
-	GetLengthUnit(str, pMainFrame->m_LengthUnit);
+	GetLengthUnit(str, MainFrame::s_LengthUnit);
 
 	m_pctrlLength1->setText(str);
 	m_pctrlLength2->setText(str);
@@ -1538,7 +1528,6 @@ void GL3dWingDlg::OnShowMasses()
 void GL3dWingDlg::OnInertia()
 {
     InertiaDlg dlg(this);
-	dlg.s_pMainFrame = s_pMainFrame;
 	dlg.m_pWing = m_pWing;
 
 	//save inertia properties
@@ -1899,7 +1888,6 @@ void GL3dWingDlg::ReadSectionData(int sel)
 	double d;
 
 	bool bOK;
-	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	QString strong;
 	QStandardItem *pItem;
 
@@ -1908,19 +1896,19 @@ void GL3dWingDlg::ReadSectionData(int sel)
 	strong =pItem->text();
 	strong.replace(" ","");
 	d =strong.toDouble(&bOK);
-	if(bOK) m_pWing->YPosition(sel) =d / pMainFrame->m_mtoUnit;
+	if(bOK) m_pWing->YPosition(sel) =d / MainFrame::s_mtoUnit;
 
 	pItem = m_pWingModel->item(sel,1);
 	strong =pItem->text();
 	strong.replace(" ","");
 	d =strong.toDouble(&bOK);
-	if(bOK) m_pWing->Chord(sel) =d / pMainFrame->m_mtoUnit;
+	if(bOK) m_pWing->Chord(sel) =d / MainFrame::s_mtoUnit;
 
 	pItem = m_pWingModel->item(sel,2);
 	strong =pItem->text();
 	strong.replace(" ","");
 	d =strong.toDouble(&bOK);
-	if(bOK) m_pWing->Offset(sel) =d / pMainFrame->m_mtoUnit;
+	if(bOK) m_pWing->Offset(sel) =d / MainFrame::s_mtoUnit;
 
 	pItem = m_pWingModel->item(sel,3);
 	strong =pItem->text();
@@ -2167,28 +2155,27 @@ void GL3dWingDlg::SetWingData()
 	if(!m_pWing) return;
 	//Updates the wing's properties after a change of geometry
 
-	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	QString str;
 
-	str = QString("%1").arg(m_pWing->m_PlanformArea*pMainFrame->m_m2toUnit,7,'f',2);
+	str = QString("%1").arg(m_pWing->m_PlanformArea*MainFrame::s_m2toUnit,7,'f',2);
 	m_pctrlWingArea->setText(str);
 
-	str = QString("%1").arg(m_pWing->m_PlanformSpan*pMainFrame->m_mtoUnit,5,'f',2);
+	str = QString("%1").arg(m_pWing->m_PlanformSpan*MainFrame::s_mtoUnit,5,'f',2);
 	m_pctrlWingSpan->setText(str);
 
-	str = QString("%1").arg(m_pWing->m_ProjectedArea*pMainFrame->m_m2toUnit,7,'f',2);
+	str = QString("%1").arg(m_pWing->m_ProjectedArea*MainFrame::s_m2toUnit,7,'f',2);
 	m_pctrlProjectedArea->setText(str);
 
-	str = QString("%1").arg(m_pWing->m_ProjectedSpan*pMainFrame->m_mtoUnit,5,'f',2);
+	str = QString("%1").arg(m_pWing->m_ProjectedSpan*MainFrame::s_mtoUnit,5,'f',2);
 	m_pctrlProjectedSpan->setText(str);
 
-	str = QString("%1").arg(m_pWing->m_GChord*pMainFrame->m_mtoUnit,5,'f',2);
+	str = QString("%1").arg(m_pWing->m_GChord*MainFrame::s_mtoUnit,5,'f',2);
 	m_pctrlGeomChord->setText(str);
 
-	str = QString("%1").arg(m_pWing->m_MAChord*pMainFrame->m_mtoUnit,5,'f',2);
+	str = QString("%1").arg(m_pWing->m_MAChord*MainFrame::s_mtoUnit,5,'f',2);
 	m_pctrlMAC->setText(str);
 
-	str = QString("%1").arg(m_pWing->m_yMac*pMainFrame->m_mtoUnit,5,'f',2);
+	str = QString("%1").arg(m_pWing->m_yMac*MainFrame::s_mtoUnit,5,'f',2);
 	m_pctrlMACSpanPos->setText(str);
 
 	str = QString("%1").arg(m_pWing->m_AR,5,'f',2);
@@ -2687,13 +2674,12 @@ bool GL3dWingDlg::VLMSetAutoMesh(int total)
 
 void  GL3dWingDlg::WheelEvent(QWheelEvent *event)
 {
-	MainFrame*pMainFrame = (MainFrame*)s_pMainFrame;
 	double ZoomFactor;
 	QPoint glPoint(event->pos().x() + m_pGLWidget->geometry().x(), event->pos().y()+m_pGLWidget->geometry().y());
 
 	if(m_pGLWidget->geometry().contains(glPoint)) m_pGLWidget->setFocus();	//The mouse button has been wheeled
 
-	if(!pMainFrame->m_bReverseZoom) ZoomFactor = 1./1.06;
+	if(!MainFrame::s_bReverseZoom) ZoomFactor = 1./1.06;
 	else                            ZoomFactor = 1.06;
 
 	if(m_pGLWidget->geometry().contains(glPoint))
@@ -2711,7 +2697,7 @@ void GL3dWingDlg::OnImportWing()
 	QString path_to_file;
 	path_to_file = QFileDialog::getOpenFileName(0, 
 												QString("Open File"), 
-												((MainFrame*)this->s_pMainFrame)->m_LastDirName,
+												MainFrame::s_LastDirName,
 												QString("XFLR5 Wing file (*.xwimp)"));
 	m_pWing->ImportDefinition(path_to_file);
 	this->InitDialog(m_pWing);
@@ -2728,7 +2714,7 @@ void GL3dWingDlg::OnExportWing()
 	QString path_to_file;
 	path_to_file = QFileDialog::getSaveFileName(0, 
 												QString("Save File"), 
-												((MainFrame*)this->s_pMainFrame)->m_LastDirName,
+												MainFrame::s_LastDirName,
 												QString("XFLR5 Wing file (*.xwimp)"));
 	if (!path_to_file.endsWith(".xwimp")) {
 		path_to_file.append(".xwimp");

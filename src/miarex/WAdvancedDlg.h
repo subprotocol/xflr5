@@ -85,7 +85,6 @@ private:
 	double m_CoreSize;
 	double m_MinPanelSize;
 
-	static void* s_pMainFrame;
 };
 
 #endif // WADVANCEDDLG_H

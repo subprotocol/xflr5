@@ -154,9 +154,9 @@ void Graph::CopySettings(Graph *pGraph, bool bScales)
 	m_BorderStyle   = pGraph->m_BorderStyle;
 	m_BorderWidth   = pGraph->m_BorderWidth;
 	m_LabelColor    = pGraph->m_LabelColor;
-	m_LabelLogFont  = pGraph->m_LabelLogFont;
+	m_LabelFont  = pGraph->m_LabelFont;
 	m_TitleColor    = pGraph->m_TitleColor;
-	m_TitleLogFont  = pGraph->m_TitleLogFont;
+	m_TitleFont  = pGraph->m_TitleFont;
 	m_AxisStyle     = pGraph->m_AxisStyle;
 	m_AxisWidth     = pGraph->m_AxisWidth;
 	m_XMajClr       = pGraph->m_XMajClr;
@@ -371,13 +371,13 @@ int Graph::GetMargin()
 
 void Graph::GetTitleLogFont(QFont *plgft)
 {
-	*plgft = m_TitleLogFont;
+	*plgft = m_TitleFont;
 }
 
 
 void Graph::GetLabelLogFont(QFont *plgft)
 {
-	*plgft = m_LabelLogFont;
+	*plgft = m_LabelFont;
 }
 
 
@@ -840,7 +840,7 @@ void Graph::SetDefaults()
 
 void Graph::SetLabelLogFont(QFont *plgft)
 {
-	m_LabelLogFont = *plgft;
+	m_LabelFont = *plgft;
 }
 
 
@@ -882,7 +882,7 @@ void Graph::SetTitleColor(QColor crColor)
 
 void Graph::SetTitleLogFont(QFont *plgft)
 {
-	m_TitleLogFont = *plgft;
+	m_TitleFont = *plgft;
 }
 
 

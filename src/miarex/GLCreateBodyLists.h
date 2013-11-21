@@ -14,8 +14,8 @@
 #include <QtOpenGL>
 #include "../objects/Body.h"
 
-void GLCreateBody3DFlatPanels(void *pParent, int iList, Body *pBody);
-void GLCreateBody3DSplines(void *pParent, int iList, Body *pBody, int nx, int nh);
-void GLCreateBodyMesh(void *pParent, int iList, Body *pBody);
+void GLCreateBody3DFlatPanels(int iList, Body *pBody);
+void GLCreateBody3DSplines(int iList, Body *pBody, int nx, int nh);
+void GLCreateBodyMesh(int iList, Body *pBody);
 
 #endif

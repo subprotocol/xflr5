@@ -27,8 +27,6 @@
 
 class LineCbBox : public QComboBox
 {
-	Q_OBJECT
-
 
 public:
 	LineCbBox(void *pParent = NULL);

@@ -25,9 +25,6 @@
 #include "../globals.h"
 #include <math.h>
 #include <QTextStream>
-#include <QtDebug>
-
-void *WingOpp::s_pMainFrame;
 
 
 /**
@@ -691,11 +688,10 @@ bool WingOpp::SerializeWingOpp(QDataStream &ar, bool bIsStoring)
  */
 void WingOpp::GetWingOppProperties(QString &WingOppProperties)
 {
-	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	QString strong, strange, lenunit, massunit, speedunit;
-	GetLengthUnit(lenunit, pMainFrame->m_LengthUnit);
-	GetWeightUnit(massunit, pMainFrame->m_WeightUnit);
-	GetSpeedUnit(speedunit, pMainFrame->m_SpeedUnit);
+	GetLengthUnit(lenunit, MainFrame::s_LengthUnit);
+	GetWeightUnit(massunit, MainFrame::s_WeightUnit);
+	GetSpeedUnit(speedunit, MainFrame::s_SpeedUnit);
 
 
 	WingOppProperties.clear();
@@ -718,13 +714,13 @@ void WingOpp::GetWingOppProperties(QString &WingOppProperties)
 
 	if(m_bOut) WingOppProperties += "Point is out of the flight envelope\n";
 
-	strong  = QString(QObject::tr("VInf")+"  =%1 ").arg(m_QInf*pMainFrame->m_mstoUnit,7,'f',3);
+	strong  = QString(QObject::tr("VInf")+"  =%1 ").arg(m_QInf*MainFrame::s_mstoUnit,7,'f',3);
 	WingOppProperties += "\n"+strong + speedunit+"\n";
 
 	strong  = QString(QObject::tr("Alpha")+" =%1").arg(m_Alpha,7,'f',2);
 	WingOppProperties += strong +QString::fromUtf8("°")+"\n";
 
-	strong  = QString(QObject::tr("Mass")+"  = %1 ").arg(m_Weight*pMainFrame->m_kgtoUnit,7,'f',3);
+	strong  = QString(QObject::tr("Mass")+"  = %1 ").arg(m_Weight*MainFrame::s_kgtoUnit,7,'f',3);
 	WingOppProperties += strong + massunit + "\n";
 
 	if(fabs(m_Beta)>PRECISION)
@@ -737,14 +733,14 @@ void WingOpp::GetWingOppProperties(QString &WingOppProperties)
 	{
 		strong  = QString(QObject::tr("Control value")+" = %1").arg(m_Ctrl,5,'f',2);
 		WingOppProperties += strong +"\n";
-		strong  = QString(QObject::tr("XNP")+" = %1 ").arg(m_XNP*pMainFrame->m_mtoUnit,7,'f',3);
+		strong  = QString(QObject::tr("XNP")+" = %1 ").arg(m_XNP*MainFrame::s_mtoUnit,7,'f',3);
 		WingOppProperties += "\n"+strong +lenunit+"\n";
 	}
-	strong  = QString(QObject::tr("XCP")+" = %1 ").arg(m_CP.x*pMainFrame->m_mtoUnit,7,'f',3);
+	strong  = QString(QObject::tr("XCP")+" = %1 ").arg(m_CP.x*MainFrame::s_mtoUnit,7,'f',3);
 	WingOppProperties += strong +lenunit+"\n";
-	strong  = QString(QObject::tr("YCP")+" = %1 ").arg(m_CP.y*pMainFrame->m_mtoUnit,7,'f',3);
+	strong  = QString(QObject::tr("YCP")+" = %1 ").arg(m_CP.y*MainFrame::s_mtoUnit,7,'f',3);
 	WingOppProperties += strong +lenunit+"\n";
-	strong  = QString(QObject::tr("ZCP")+" = %1 ").arg(m_CP.z*pMainFrame->m_mtoUnit,7,'f',3);
+	strong  = QString(QObject::tr("ZCP")+" = %1 ").arg(m_CP.z*MainFrame::s_mtoUnit,7,'f',3);
 	WingOppProperties += strong +lenunit+"\n\n";
 
 
@@ -783,8 +779,8 @@ void WingOpp::GetWingOppProperties(QString &WingOppProperties)
 		WingOppProperties += "\n";
 		for(int ip=0; ip<m_nFlaps; ip++)
 		{
-			strong = QString("Flap Moment[%1] = %2").arg(ip+1).arg(m_FlapMoment[ip]*pMainFrame->m_NmtoUnit, 7,'g',3);
-			GetMomentUnit(strange, pMainFrame->m_MomentUnit);
+			strong = QString("Flap Moment[%1] = %2").arg(ip+1).arg(m_FlapMoment[ip]*MainFrame::s_NmtoUnit, 7,'g',3);
+			GetMomentUnit(strange, MainFrame::s_MomentUnit);
 			WingOppProperties += strong + strange +"\n";
 		}
 	}

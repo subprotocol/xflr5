@@ -129,10 +129,9 @@ void PlaneDlg::ComputePlane(void)
 
 void PlaneDlg::InitDialog()
 {
-	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	QString len, surf;
-	GetLengthUnit(len, pMainFrame->m_LengthUnit);
-	GetAreaUnit(surf,  pMainFrame->m_AreaUnit);
+	GetLengthUnit(len, MainFrame::s_LengthUnit);
+	GetAreaUnit(surf,  MainFrame::s_AreaUnit);
 
 	m_pctrlLen1->setText(len);
 	m_pctrlLen2->setText(len);
@@ -665,7 +664,6 @@ void PlaneDlg::OnSelChangeBodyList(int pos)
 
 void PlaneDlg::ReadParams()
 {
-	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	QMiarex *pMiarex  = (QMiarex*)s_pMiarex;
 	int sel;
 	QString strong;
@@ -676,21 +674,21 @@ void PlaneDlg::ReadParams()
 	m_pPlane->m_WingTiltAngle[2] = m_pctrlStabTilt->Value();
 	m_pPlane->m_WingTiltAngle[3] = m_pctrlFinTilt->Value();
 
-	m_pPlane->m_WingLE[0].x = m_pctrlXLEWing->Value() / pMainFrame->m_mtoUnit;
-	m_pPlane->m_WingLE[0].z = m_pctrlZLEWing->Value() / pMainFrame->m_mtoUnit;
+	m_pPlane->m_WingLE[0].x = m_pctrlXLEWing->Value() / MainFrame::s_mtoUnit;
+	m_pPlane->m_WingLE[0].z = m_pctrlZLEWing->Value() / MainFrame::s_mtoUnit;
 
-	m_pPlane->m_WingLE[1].x = m_pctrlXLEWing2->Value() / pMainFrame->m_mtoUnit;
-	m_pPlane->m_WingLE[1].z = m_pctrlZLEWing2->Value() / pMainFrame->m_mtoUnit;
+	m_pPlane->m_WingLE[1].x = m_pctrlXLEWing2->Value() / MainFrame::s_mtoUnit;
+	m_pPlane->m_WingLE[1].z = m_pctrlZLEWing2->Value() / MainFrame::s_mtoUnit;
 
-	m_pPlane->m_WingLE[2].x = m_pctrlXLEStab->Value() / pMainFrame->m_mtoUnit;
-	m_pPlane->m_WingLE[2].z = m_pctrlZLEStab->Value() / pMainFrame->m_mtoUnit;
+	m_pPlane->m_WingLE[2].x = m_pctrlXLEStab->Value() / MainFrame::s_mtoUnit;
+	m_pPlane->m_WingLE[2].z = m_pctrlZLEStab->Value() / MainFrame::s_mtoUnit;
 
-	m_pPlane->m_WingLE[3].x = m_pctrlXLEFin->Value() / pMainFrame->m_mtoUnit;
-	m_pPlane->m_WingLE[3].y = m_pctrlYLEFin->Value() / pMainFrame->m_mtoUnit;
-	m_pPlane->m_WingLE[3].z = m_pctrlZLEFin->Value() / pMainFrame->m_mtoUnit;
+	m_pPlane->m_WingLE[3].x = m_pctrlXLEFin->Value() / MainFrame::s_mtoUnit;
+	m_pPlane->m_WingLE[3].y = m_pctrlYLEFin->Value() / MainFrame::s_mtoUnit;
+	m_pPlane->m_WingLE[3].z = m_pctrlZLEFin->Value() / MainFrame::s_mtoUnit;
 
-	m_pPlane->m_BodyPos.x = m_pctrlXBody->Value() / pMainFrame->m_mtoUnit;
-	m_pPlane->m_BodyPos.z = m_pctrlZBody->Value() / pMainFrame->m_mtoUnit;
+	m_pPlane->m_BodyPos.x = m_pctrlXBody->Value() / MainFrame::s_mtoUnit;
+	m_pPlane->m_BodyPos.z = m_pctrlZBody->Value() / MainFrame::s_mtoUnit;
 
 	if(m_pctrlBiplane->isChecked())   m_pPlane->m_bBiplane = true;
 	else                              m_pPlane->m_bBiplane = false;
@@ -726,7 +724,6 @@ void PlaneDlg::reject()
 
 void PlaneDlg::SetParams()
 {
-	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	int i, pos;
 	Body *pBody = NULL;
 	if(m_pPlane->body()) m_pctrlBody->setChecked(true);
@@ -767,24 +764,24 @@ void PlaneDlg::SetParams()
 	m_pctrlStabTilt->SetValue(m_pPlane->m_WingTiltAngle[2]);
 	m_pctrlFinTilt->SetValue(m_pPlane->m_WingTiltAngle[3]);
 
-	m_pctrlXLEWing->SetValue(m_pPlane->m_WingLE[0].x * pMainFrame->m_mtoUnit);
-	m_pctrlZLEWing->SetValue(m_pPlane->m_WingLE[0].z * pMainFrame->m_mtoUnit);
+	m_pctrlXLEWing->SetValue(m_pPlane->m_WingLE[0].x * MainFrame::s_mtoUnit);
+	m_pctrlZLEWing->SetValue(m_pPlane->m_WingLE[0].z * MainFrame::s_mtoUnit);
 
-	m_pctrlXLEWing2->SetValue(m_pPlane->m_WingLE[1].x * pMainFrame->m_mtoUnit);
-	m_pctrlZLEWing2->SetValue(m_pPlane->m_WingLE[1].z * pMainFrame->m_mtoUnit);
+	m_pctrlXLEWing2->SetValue(m_pPlane->m_WingLE[1].x * MainFrame::s_mtoUnit);
+	m_pctrlZLEWing2->SetValue(m_pPlane->m_WingLE[1].z * MainFrame::s_mtoUnit);
 
-	m_pctrlXLEStab->SetValue(m_pPlane->m_WingLE[2].x * pMainFrame->m_mtoUnit);
-	m_pctrlZLEStab->SetValue(m_pPlane->m_WingLE[2].z * pMainFrame->m_mtoUnit);
+	m_pctrlXLEStab->SetValue(m_pPlane->m_WingLE[2].x * MainFrame::s_mtoUnit);
+	m_pctrlZLEStab->SetValue(m_pPlane->m_WingLE[2].z * MainFrame::s_mtoUnit);
 
-	m_pctrlXBody->SetValue(m_pPlane->m_BodyPos.x * pMainFrame->m_mtoUnit);
-	m_pctrlZBody->SetValue(m_pPlane->m_BodyPos.z * pMainFrame->m_mtoUnit);
+	m_pctrlXBody->SetValue(m_pPlane->m_BodyPos.x * MainFrame::s_mtoUnit);
+	m_pctrlZBody->SetValue(m_pPlane->m_BodyPos.z * MainFrame::s_mtoUnit);
 
 	m_pctrlBiplane->setChecked(m_pPlane->wing2());
 	OnBiplane();
 
-	m_pctrlXLEFin->SetValue(m_pPlane->m_WingLE[3].x* pMainFrame->m_mtoUnit);
-	m_pctrlYLEFin->SetValue(m_pPlane->m_WingLE[3].y* pMainFrame->m_mtoUnit);
-	m_pctrlZLEFin->SetValue(m_pPlane->m_WingLE[3].z* pMainFrame->m_mtoUnit);
+	m_pctrlXLEFin->SetValue(m_pPlane->m_WingLE[3].x* MainFrame::s_mtoUnit);
+	m_pctrlYLEFin->SetValue(m_pPlane->m_WingLE[3].y* MainFrame::s_mtoUnit);
+	m_pctrlZLEFin->SetValue(m_pPlane->m_WingLE[3].z* MainFrame::s_mtoUnit);
 	m_pctrlFinCheck->setChecked(m_pPlane->m_bFin);
 	m_pctrlDoubleFin->setChecked(m_pPlane->m_bDoubleFin);
 	m_pctrlSymFin->setChecked(m_pPlane->m_bSymFin);
@@ -796,33 +793,32 @@ void PlaneDlg::SetParams()
 
 void PlaneDlg::SetResults()
 {
-	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	QString str;
 
 //	double area = m_pPlane->Wing()->s_Area;
 //	if(m_pPlane->m_bBiplane) area += m_pPlane->Wing2()->m_Area;
 
-	str = QString("%1").arg(m_pPlane->wing()->m_PlanformArea*pMainFrame->m_m2toUnit,7,'f',2);
+	str = QString("%1").arg(m_pPlane->wing()->m_PlanformArea*MainFrame::s_m2toUnit,7,'f',2);
 	m_pctrlWingSurface->setText(str);
 
-	if(m_pPlane->stab())   str = QString("%1").arg(m_pPlane->stab()->m_PlanformArea*pMainFrame->m_m2toUnit,7,'f',2);
+	if(m_pPlane->stab())   str = QString("%1").arg(m_pPlane->stab()->m_PlanformArea*MainFrame::s_m2toUnit,7,'f',2);
 	else str = " ";
 	m_pctrlStabSurface->setText(str);
 
-	if(m_pPlane->fin())    str = QString("%1").arg(m_pPlane->fin()->m_PlanformArea*pMainFrame->m_m2toUnit,7,'f',2);
+	if(m_pPlane->fin())    str = QString("%1").arg(m_pPlane->fin()->m_PlanformArea*MainFrame::s_m2toUnit,7,'f',2);
 	else str=" ";
 	m_pctrlFinSurface->setText(str);
 
 	double span = m_pPlane->wing()->m_PlanformSpan;
 	if(m_pPlane->wing2()) span = qMax(m_pPlane->wing()->m_PlanformSpan, m_pPlane->wing2()->m_PlanformSpan);
-	str = QString("%1").arg(span*pMainFrame->m_mtoUnit,5,'f',2);
+	str = QString("%1").arg(span*MainFrame::s_mtoUnit,5,'f',2);
 	m_pctrlWingSpan->setText(str);
 
 	ComputePlane();
 	if(m_pPlane->stab())
 	{
 		double SLA = m_pPlane->m_WingLE[2].x + m_pPlane->stab()->Chord(0)/4.0 - m_pPlane->wing()->Chord(0)/4.0;
-		str = QString("%1").arg(SLA*pMainFrame->m_mtoUnit,5,'f',2);
+		str = QString("%1").arg(SLA*MainFrame::s_mtoUnit,5,'f',2);
 	}
 	else  str=" ";
 	m_pctrlStabLeverArm->setText(str);

@@ -28,7 +28,6 @@
 #include <QMessageBox>
 
 
-void *WPolar::s_pMainFrame;
 void *WPolar::s_pMiarex;
 
 /**
@@ -98,7 +97,6 @@ void WPolar::AddPoint(PlaneOpp *pPOpp)
 	bool bInserted = false;
 	int i,j,l;
 	int size = m_Alpha.size();
-	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	WingOpp *pWOpp = pPOpp->m_pPlaneWOpp[0];
 	if(size)
 	{
@@ -383,7 +381,7 @@ void WPolar::AddPoint(PlaneOpp *pPOpp)
 		if(size>=MAXPOLARPOINTS)
 		{
 			QString strong = QObject::tr("The max number of polar points has been reached");
-			QMessageBox::warning(pMainFrame, QObject::tr("Warning"), strong);
+			QMessageBox::warning((QMiarex*)s_pMiarex, QObject::tr("Warning"), strong);
 			return;
 		}
 		m_Alpha.append(pWOpp->m_Alpha);
@@ -1242,7 +1240,6 @@ void WPolar::Copy(WPolar *pWPolar)
  */
 void WPolar::Export(QTextStream &out, enumTextFileType FileType, bool bDataOnly)
 {
-	MainFrame* pMainFrame = (MainFrame*)s_pMainFrame;
 	int j;
 	QString Header, strong, str;
 
@@ -1250,7 +1247,7 @@ void WPolar::Export(QTextStream &out, enumTextFileType FileType, bool bDataOnly)
 	{
 		if(!bDataOnly)
 		{
-			strong =pMainFrame->m_VersionName + "\n\n";
+			strong =MainFrame::versionName() + "\n\n";
 			out << strong;
 
 			strong ="Wing name :        "+ m_UFOName + "\n";
@@ -1259,12 +1256,12 @@ void WPolar::Export(QTextStream &out, enumTextFileType FileType, bool bDataOnly)
 			strong ="Wing polar name :  "+ m_PlrName + "\n";
 			out << strong;
 
-			GetSpeedUnit(str, pMainFrame->m_SpeedUnit);
+			GetSpeedUnit(str, MainFrame::s_SpeedUnit);
 			str +="\n\n";
 
 			if(m_WPolarType==FIXEDSPEEDPOLAR)
 			{
-				strong = QString("Freestream speed : %1 ").arg(m_QInf*pMainFrame->m_mstoUnit,7,'f',3);
+				strong = QString("Freestream speed : %1 ").arg(m_QInf*MainFrame::s_mstoUnit,7,'f',3);
 				strong +=str + "\n";
 			}
 			else if(m_WPolarType==FIXEDAOAPOLAR)
@@ -1303,7 +1300,7 @@ void WPolar::Export(QTextStream &out, enumTextFileType FileType, bool bDataOnly)
 	{
 		if(!bDataOnly)
 		{
-			strong =pMainFrame->m_VersionName + "\n\n";
+			strong =MainFrame::versionName() + "\n\n";
 			out << strong;
 
 			strong ="Wing name :, "+ m_UFOName + "\n";
@@ -1312,9 +1309,9 @@ void WPolar::Export(QTextStream &out, enumTextFileType FileType, bool bDataOnly)
 			strong ="Wing polar name :, "+ m_PlrName + "\n";
 			out << strong;
 
-			GetSpeedUnit(str, pMainFrame->m_SpeedUnit);
+			GetSpeedUnit(str, MainFrame::s_SpeedUnit);
 			str +="\n\n";
-			strong = QString("Freestream speed :, %1 ").arg(m_QInf*pMainFrame->m_mstoUnit,3,'f',1);
+			strong = QString("Freestream speed :, %1 ").arg(m_QInf*MainFrame::s_mstoUnit,3,'f',1);
 			strong +=str;
 			out << strong;
 		}
@@ -1504,13 +1501,12 @@ void * WPolar::GetUFOPlrVariable(int iVar)
  */
 void WPolar::GetUFOPlrVariableName(int iVar, QString &Name)
 {
-	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	QString StrLength;
 	QString StrSpeed;
 	QString StrMoment;
-	GetLengthUnit(StrLength, pMainFrame->m_LengthUnit);
-	GetSpeedUnit(StrSpeed, pMainFrame->m_SpeedUnit);
-	GetMomentUnit(StrMoment, pMainFrame->m_MomentUnit);
+	GetLengthUnit(StrLength, MainFrame::s_LengthUnit);
+	GetSpeedUnit(StrSpeed, MainFrame::s_SpeedUnit);
+	GetMomentUnit(StrMoment, MainFrame::s_MomentUnit);
 
 	switch (iVar)
 	{
@@ -1560,15 +1556,15 @@ void WPolar::GetUFOPlrVariableName(int iVar, QString &Name)
 			Name = QObject::tr("1/Rt(CL)");
 			break;
 		case 15:
-			if(pMainFrame->m_ForceUnit==0)	Name = QObject::tr("Fx (N)");
+			if(MainFrame::s_ForceUnit==0)	Name = QObject::tr("Fx (N)");
 			else                            Name = QObject::tr("Fx (lbf)");
 			break;
 		case 16:
-			if(pMainFrame->m_ForceUnit==0)	Name = QObject::tr("Fy (N)");
+			if(MainFrame::s_ForceUnit==0)	Name = QObject::tr("Fy (N)");
 			else                            Name = QObject::tr("Fy (lbf)");
 			break;
 		case 17:
-			if(pMainFrame->m_ForceUnit==0)	Name = QObject::tr("Fz (N)");
+			if(MainFrame::s_ForceUnit==0)	Name = QObject::tr("Fz (N)");
 			else                            Name = QObject::tr("Fz (lbf)");
 			break;
 		case 18:
@@ -2279,12 +2275,11 @@ bool WPolar::SerializeWPlr(QDataStream &ar, bool bIsStoring)
  */
 void WPolar::GetPolarProperties(QString &PolarProperties, bool bData)
 {
-	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	QMiarex *pMiarex= (QMiarex*)s_pMiarex;
 	QString strong, lenunit, massunit, speedunit;
-	GetLengthUnit(lenunit, pMainFrame->m_LengthUnit);
-	GetWeightUnit(massunit, pMainFrame->m_WeightUnit);
-	GetSpeedUnit(speedunit, pMainFrame->m_SpeedUnit);
+	GetLengthUnit(lenunit, MainFrame::s_LengthUnit);
+	GetWeightUnit(massunit, MainFrame::s_WeightUnit);
+	GetSpeedUnit(speedunit, MainFrame::s_SpeedUnit);
 
 	QString inertiaunit = massunit+"."+lenunit+QString::fromUtf8("²");
 
@@ -2300,7 +2295,7 @@ void WPolar::GetPolarProperties(QString &PolarProperties, bool bData)
 
 	if(m_WPolarType==FIXEDSPEEDPOLAR)
 	{
-		strong  = QString(QObject::tr("VInf =")+"%1 ").arg(m_QInf*pMainFrame->m_mstoUnit,10,'g',2);
+		strong  = QString(QObject::tr("VInf =")+"%1 ").arg(m_QInf*MainFrame::s_mstoUnit,10,'g',2);
 		PolarProperties += strong + speedunit+"\n";
 	}
 	else if(m_WPolarType==FIXEDAOAPOLAR)
@@ -2432,24 +2427,24 @@ void WPolar::GetPolarProperties(QString &PolarProperties, bool bData)
 		PolarProperties += "Using plane inertia\n";
 	}
 
-	strong  = QString(QObject::tr("Mass")+" = %1 ").arg(m_Mass*pMainFrame->m_kgtoUnit,10,'f',3);
+	strong  = QString(QObject::tr("Mass")+" = %1 ").arg(m_Mass*MainFrame::s_kgtoUnit,10,'f',3);
 	PolarProperties += strong + massunit + "\n";
 
-	strong  = QString(QObject::tr("CoG.x")+" = %1 ").arg(m_CoG.x*pMainFrame->m_mtoUnit,10,'g',4);
+	strong  = QString(QObject::tr("CoG.x")+" = %1 ").arg(m_CoG.x*MainFrame::s_mtoUnit,10,'g',4);
 	PolarProperties += strong + lenunit + "\n";
 
-	strong  = QString(QObject::tr("CoG.z")+" = %1 ").arg(m_CoG.z*pMainFrame->m_mtoUnit,10,'g',4);
+	strong  = QString(QObject::tr("CoG.z")+" = %1 ").arg(m_CoG.z*MainFrame::s_mtoUnit,10,'g',4);
 	PolarProperties += strong + lenunit + "\n";
 
 	if(m_WPolarType==STABILITYPOLAR)
 	{
-		strong  = QString("Ixx = %1 ").arg(m_CoGIxx*pMainFrame->m_mtoUnit*pMainFrame->m_mtoUnit*pMainFrame->m_kgtoUnit,10,'g',4);
+		strong  = QString("Ixx = %1 ").arg(m_CoGIxx*MainFrame::s_mtoUnit*MainFrame::s_mtoUnit*MainFrame::s_kgtoUnit,10,'g',4);
 		PolarProperties += strong + inertiaunit + "\n";
-		strong  = QString("Iyy = %1 ").arg(m_CoGIyy*pMainFrame->m_mtoUnit*pMainFrame->m_mtoUnit*pMainFrame->m_kgtoUnit,10,'g',4);
+		strong  = QString("Iyy = %1 ").arg(m_CoGIyy*MainFrame::s_mtoUnit*MainFrame::s_mtoUnit*MainFrame::s_kgtoUnit,10,'g',4);
 		PolarProperties += strong + inertiaunit + "\n";
-		strong  = QString("Izz = %1 ").arg(m_CoGIzz*pMainFrame->m_mtoUnit*pMainFrame->m_mtoUnit*pMainFrame->m_kgtoUnit,10,'g',4);
+		strong  = QString("Izz = %1 ").arg(m_CoGIzz*MainFrame::s_mtoUnit*MainFrame::s_mtoUnit*MainFrame::s_kgtoUnit,10,'g',4);
 		PolarProperties += strong + inertiaunit + "\n";
-		strong  = QString("Ixz = %1 ").arg(m_CoGIxz*pMainFrame->m_mtoUnit*pMainFrame->m_mtoUnit*pMainFrame->m_kgtoUnit,10,'g',4);
+		strong  = QString("Ixz = %1 ").arg(m_CoGIxz*MainFrame::s_mtoUnit*MainFrame::s_mtoUnit*MainFrame::s_kgtoUnit,10,'g',4);
 		PolarProperties += strong + inertiaunit + "\n";
 	}
 
@@ -2479,7 +2474,7 @@ void WPolar::GetPolarProperties(QString &PolarProperties, bool bData)
 
 	if(m_bGround)
 	{
-		strong = QString(QObject::tr("Ground height")+" = %1").arg(m_Height*pMainFrame->m_mtoUnit)+lenunit+"\n";
+		strong = QString(QObject::tr("Ground height")+" = %1").arg(m_Height*MainFrame::s_mtoUnit)+lenunit+"\n";
 		PolarProperties += strong;
 	}
 
@@ -2497,7 +2492,7 @@ void WPolar::GetPolarProperties(QString &PolarProperties, bool bData)
 	QTextStream out;
 	strong.clear();
 	out.setString(&strong);
-	Export(out, pMainFrame->m_ExportFileType, true);
+	Export(out, MainFrame::s_ExportFileType, true);
 	PolarProperties += "\n"+strong;
 }
 

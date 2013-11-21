@@ -35,7 +35,6 @@
 
 
 
-void *StabPolarDlg::s_pMainFrame;
 void *StabPolarDlg::s_pMiarex;
 WPolar StabPolarDlg::s_StabPolar;
 
@@ -124,8 +123,6 @@ void StabPolarDlg::Connect()
 
 void StabPolarDlg::FillUFOInertia()
 {
-	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
-
 	if(m_pPlane)
 	{
 		s_StabPolar.m_Mass = m_pPlane->TotalMass();
@@ -146,13 +143,13 @@ void StabPolarDlg::FillUFOInertia()
 		s_StabPolar.m_CoGIxz = m_pWingList[0]->m_CoGIxz;
 	}
 
-	m_pctrlMass->SetValue(s_StabPolar.m_Mass*pMainFrame->m_kgtoUnit);
-	m_pctrlCoGx->SetValue(s_StabPolar.m_CoG.x*pMainFrame->m_mtoUnit);
-	m_pctrlCoGz->SetValue(s_StabPolar.m_CoG.z*pMainFrame->m_mtoUnit);
-	m_pctrlIxx->SetValue(s_StabPolar.m_CoGIxx*pMainFrame->m_kgtoUnit*pMainFrame->m_mtoUnit*pMainFrame->m_mtoUnit);
-	m_pctrlIyy->SetValue(s_StabPolar.m_CoGIyy*pMainFrame->m_kgtoUnit*pMainFrame->m_mtoUnit*pMainFrame->m_mtoUnit);
-	m_pctrlIzz->SetValue(s_StabPolar.m_CoGIzz*pMainFrame->m_kgtoUnit*pMainFrame->m_mtoUnit*pMainFrame->m_mtoUnit);
-	m_pctrlIxz->SetValue(s_StabPolar.m_CoGIxz*pMainFrame->m_kgtoUnit*pMainFrame->m_mtoUnit*pMainFrame->m_mtoUnit);
+	m_pctrlMass->SetValue(s_StabPolar.m_Mass*MainFrame::s_kgtoUnit);
+	m_pctrlCoGx->SetValue(s_StabPolar.m_CoG.x*MainFrame::s_mtoUnit);
+	m_pctrlCoGz->SetValue(s_StabPolar.m_CoG.z*MainFrame::s_mtoUnit);
+	m_pctrlIxx->SetValue(s_StabPolar.m_CoGIxx*MainFrame::s_kgtoUnit*MainFrame::s_mtoUnit*MainFrame::s_mtoUnit);
+	m_pctrlIyy->SetValue(s_StabPolar.m_CoGIyy*MainFrame::s_kgtoUnit*MainFrame::s_mtoUnit*MainFrame::s_mtoUnit);
+	m_pctrlIzz->SetValue(s_StabPolar.m_CoGIzz*MainFrame::s_kgtoUnit*MainFrame::s_mtoUnit*MainFrame::s_mtoUnit);
+	m_pctrlIxz->SetValue(s_StabPolar.m_CoGIxz*MainFrame::s_kgtoUnit*MainFrame::s_mtoUnit*MainFrame::s_mtoUnit);
 }
 
 
@@ -162,9 +159,8 @@ void StabPolarDlg::FillControlList()
 	m_pControlModel->setRowCount(s_StabPolar.m_nControls);//temporary
 	QString str, strong;
 	QModelIndex ind;
-	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	int i;
-	GetLengthUnit(str, pMainFrame->m_LengthUnit);
+	GetLengthUnit(str, MainFrame::s_LengthUnit);
 
 	s_StabPolar.m_nControls = 0;
 	if(m_pPlane)
@@ -264,7 +260,6 @@ void StabPolarDlg::SetViscous()
 
 void StabPolarDlg::InitDialog(Plane *pPlane, Wing *pWing, WPolar *pWPolar)
 {
-	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	QString strLen, strMass, strInertia;
 
 	m_pPlane = pPlane;
@@ -283,8 +278,8 @@ void StabPolarDlg::InitDialog(Plane *pPlane, Wing *pWing, WPolar *pWPolar)
 		m_pWingList[3] = NULL;
 	}
 
-	GetLengthUnit(strLen, pMainFrame->m_LengthUnit);
-	GetWeightUnit(strMass, pMainFrame->m_WeightUnit);
+	GetLengthUnit(strLen, MainFrame::s_LengthUnit);
+	GetWeightUnit(strMass, MainFrame::s_WeightUnit);
 	strInertia = strMass+"."+strLen+QString::fromUtf8("²");
 	m_pctrlLab299->setText(strMass);
 	m_pctrlLab300->setText(strLen);
@@ -298,7 +293,7 @@ void StabPolarDlg::InitDialog(Plane *pPlane, Wing *pWing, WPolar *pWPolar)
 	m_pctrlViscosity->SetPrecision(3);
 
 	QString str;
-	GetSpeedUnit(str, pMainFrame->m_SpeedUnit);
+	GetSpeedUnit(str, MainFrame::s_SpeedUnit);
 
 	if(m_UnitType==1) m_pctrlUnit1->setChecked(true);
 	else              m_pctrlUnit2->setChecked(true);
@@ -568,8 +563,6 @@ void StabPolarDlg::ReadCtrlData()
 
 void StabPolarDlg::ReadParams()
 {
-	MainFrame* pMainFrame = (MainFrame*)s_pMainFrame;
-
 	if(m_pctrlUnit1->isChecked())
 	{
 		s_StabPolar.m_Density   = m_pctrlDensity->Value();
@@ -585,13 +578,13 @@ void StabPolarDlg::ReadParams()
 	s_StabPolar.m_BankAngle = m_pctrlPhi->Value();
 	SetDensity();
 
-	s_StabPolar.m_Mass  = m_pctrlMass->Value() / pMainFrame->m_kgtoUnit;
-	s_StabPolar.m_CoG.x = m_pctrlCoGx->Value() / pMainFrame->m_mtoUnit;
-	s_StabPolar.m_CoG.z = m_pctrlCoGz->Value() / pMainFrame->m_mtoUnit;
-	s_StabPolar.m_CoGIxx = m_pctrlIxx->Value()  / pMainFrame->m_kgtoUnit / pMainFrame->m_mtoUnit / pMainFrame->m_mtoUnit;
-	s_StabPolar.m_CoGIyy = m_pctrlIyy->Value()  / pMainFrame->m_kgtoUnit / pMainFrame->m_mtoUnit / pMainFrame->m_mtoUnit;
-	s_StabPolar.m_CoGIzz = m_pctrlIzz->Value()  / pMainFrame->m_kgtoUnit / pMainFrame->m_mtoUnit / pMainFrame->m_mtoUnit;
-	s_StabPolar.m_CoGIxz = m_pctrlIxz->Value()  / pMainFrame->m_kgtoUnit / pMainFrame->m_mtoUnit / pMainFrame->m_mtoUnit;
+	s_StabPolar.m_Mass  = m_pctrlMass->Value() / MainFrame::s_kgtoUnit;
+	s_StabPolar.m_CoG.x = m_pctrlCoGx->Value() / MainFrame::s_mtoUnit;
+	s_StabPolar.m_CoG.z = m_pctrlCoGz->Value() / MainFrame::s_mtoUnit;
+	s_StabPolar.m_CoGIxx = m_pctrlIxx->Value()  / MainFrame::s_kgtoUnit / MainFrame::s_mtoUnit / MainFrame::s_mtoUnit;
+	s_StabPolar.m_CoGIyy = m_pctrlIyy->Value()  / MainFrame::s_kgtoUnit / MainFrame::s_mtoUnit / MainFrame::s_mtoUnit;
+	s_StabPolar.m_CoGIzz = m_pctrlIzz->Value()  / MainFrame::s_kgtoUnit / MainFrame::s_mtoUnit / MainFrame::s_mtoUnit;
+	s_StabPolar.m_CoGIxz = m_pctrlIxz->Value()  / MainFrame::s_kgtoUnit / MainFrame::s_mtoUnit / MainFrame::s_mtoUnit;
 
 	s_StabPolar.m_bViscous = m_pctrlViscous->isChecked();
 	s_StabPolar.m_bIgnoreBodyPanels = m_pctrlIgnoreBodyPanels->isChecked();
@@ -921,9 +914,7 @@ void StabPolarDlg::SetWPolarName()
 	QString str, strong;
 	int i, nCtrl;
 	QMiarex *pMiarex= (QMiarex*)s_pMiarex;
-	MainFrame* pMainFrame = (MainFrame*)s_pMainFrame;
-
-	GetSpeedUnit(str, pMainFrame->m_SpeedUnit);
+	GetSpeedUnit(str, MainFrame::s_SpeedUnit);
 	QString WPolarName = "T7";
 
 	if(!m_pPlane && !s_StabPolar.m_bThinSurfaces) WPolarName += "-Panel";
@@ -1076,16 +1067,16 @@ void StabPolarDlg::SetWPolarName()
 
 	if(!s_StabPolar.m_bAutoInertia)
 	{
-		GetWeightUnit(str, pMainFrame->m_WeightUnit);
-		strong = QString("-%1").arg(s_StabPolar.m_Mass*pMainFrame->m_kgtoUnit,0,'f',3);
+		GetWeightUnit(str, MainFrame::s_WeightUnit);
+		strong = QString("-%1").arg(s_StabPolar.m_Mass*MainFrame::s_kgtoUnit,0,'f',3);
 		WPolarName += strong+str;
-		GetLengthUnit(str, pMainFrame->m_LengthUnit);
-		strong = QString("-x%1").arg(s_StabPolar.m_CoG.x*pMainFrame->m_mtoUnit,0,'f',3);
+		GetLengthUnit(str, MainFrame::s_LengthUnit);
+		strong = QString("-x%1").arg(s_StabPolar.m_CoG.x*MainFrame::s_mtoUnit,0,'f',3);
 		WPolarName += strong + str;
 
 		if(fabs(s_StabPolar.m_CoG.z)>=.000001)
 		{
-			strong = QString("-z%1").arg(s_StabPolar.m_CoG.z*pMainFrame->m_mtoUnit,0,'f',3);
+			strong = QString("-z%1").arg(s_StabPolar.m_CoG.z*MainFrame::s_mtoUnit,0,'f',3);
 			WPolarName += strong + str;
 		}
 	}
@@ -1151,7 +1142,6 @@ void StabPolarDlg::showEvent(QShowEvent *event)
 
 void StabPolarDlg::OnAutoInertia()
 {
-	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	s_StabPolar.m_bAutoInertia = m_pctrlPlaneInertia->isChecked();
 	if(s_StabPolar.m_bAutoInertia)
 	{
@@ -1159,13 +1149,13 @@ void StabPolarDlg::OnAutoInertia()
 	}
 	else
 	{
-		m_pctrlMass->SetValue(s_StabPolar.m_Mass*pMainFrame->m_kgtoUnit);
-		m_pctrlCoGx->SetValue(s_StabPolar.m_CoG.x*pMainFrame->m_mtoUnit);
-		m_pctrlCoGz->SetValue(s_StabPolar.m_CoG.z*pMainFrame->m_mtoUnit);
-		m_pctrlIxx->SetValue(s_StabPolar.m_CoGIxx*pMainFrame->m_kgtoUnit*pMainFrame->m_mtoUnit*pMainFrame->m_mtoUnit);
-		m_pctrlIyy->SetValue(s_StabPolar.m_CoGIyy*pMainFrame->m_kgtoUnit*pMainFrame->m_mtoUnit*pMainFrame->m_mtoUnit);
-		m_pctrlIzz->SetValue(s_StabPolar.m_CoGIzz*pMainFrame->m_kgtoUnit*pMainFrame->m_mtoUnit*pMainFrame->m_mtoUnit);
-		m_pctrlIxz->SetValue(s_StabPolar.m_CoGIxz*pMainFrame->m_kgtoUnit*pMainFrame->m_mtoUnit*pMainFrame->m_mtoUnit);
+		m_pctrlMass->SetValue(s_StabPolar.m_Mass*MainFrame::s_kgtoUnit);
+		m_pctrlCoGx->SetValue(s_StabPolar.m_CoG.x*MainFrame::s_mtoUnit);
+		m_pctrlCoGz->SetValue(s_StabPolar.m_CoG.z*MainFrame::s_mtoUnit);
+		m_pctrlIxx->SetValue(s_StabPolar.m_CoGIxx*MainFrame::s_kgtoUnit*MainFrame::s_mtoUnit*MainFrame::s_mtoUnit);
+		m_pctrlIyy->SetValue(s_StabPolar.m_CoGIyy*MainFrame::s_kgtoUnit*MainFrame::s_mtoUnit*MainFrame::s_mtoUnit);
+		m_pctrlIzz->SetValue(s_StabPolar.m_CoGIzz*MainFrame::s_kgtoUnit*MainFrame::s_mtoUnit*MainFrame::s_mtoUnit);
+		m_pctrlIxz->SetValue(s_StabPolar.m_CoGIxz*MainFrame::s_kgtoUnit*MainFrame::s_mtoUnit*MainFrame::s_mtoUnit);
 
 	}
 	m_pctrlMass->setEnabled(!s_StabPolar.m_bAutoInertia);

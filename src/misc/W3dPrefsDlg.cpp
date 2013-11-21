@@ -23,6 +23,7 @@
 #include <QCheckBox>
 #include <QGridLayout>
 #include <QColorDialog>
+#include <QPushButton>
 #include "../params.h"
 #include "W3dPrefsDlg.h"
 #include "../misc/LinePickerDlg.h"
@@ -144,18 +145,18 @@ void W3dPrefsDlg::SetupLayout()
 	lab12->setAlignment(Qt::AlignVCenter|Qt::AlignRight);
 	lab13->setAlignment(Qt::AlignVCenter|Qt::AlignRight);
 
-	m_pctrlAxis     = new LineButton;
-	m_pctrlOutline  = new LineButton;
-	m_pctrlVLMMesh  = new LineButton;
-	m_pctrlTopTrans = new LineButton;
-	m_pctrlBotTrans = new LineButton;
-	m_pctrlLift     = new LineButton;
-	m_pctrlMoments  = new LineButton;
-	m_pctrlInducedDrag = new LineButton;
-	m_pctrlViscousDrag = new LineButton;
-	m_pctrlDownwash    = new LineButton;
-	m_pctrlWakePanels  = new LineButton;
-	m_pctrlStreamLines  = new LineButton;
+	m_pctrlAxis     = new LineBtn(this);
+	m_pctrlOutline  = new LineBtn(this);
+	m_pctrlVLMMesh  = new LineBtn(this);
+	m_pctrlTopTrans = new LineBtn(this);
+	m_pctrlBotTrans = new LineBtn(this);
+	m_pctrlLift     = new LineBtn(this);
+	m_pctrlMoments  = new LineBtn(this);
+	m_pctrlInducedDrag = new LineBtn(this);
+	m_pctrlViscousDrag = new LineBtn(this);
+	m_pctrlDownwash    = new LineBtn(this);
+	m_pctrlWakePanels  = new LineBtn(this);
+	m_pctrlStreamLines  = new LineBtn(this);
 	m_pctrlMassColor = new ColorButton;
 	m_pctrlShowWake = new QCheckBox(tr("Show Wake Panels"));
 

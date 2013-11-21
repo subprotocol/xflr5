@@ -22,13 +22,8 @@
 #include <QGroupBox>
 
 #include "FoilPolarDlg.h"
-#include "XDirect.h"
 #include "../globals.h"
 #include "../mainframe.h"
-
-
-void *FoilPolarDlg::s_pXDirect;
-void *FoilPolarDlg::s_pMainFrame;
 
 
 FoilPolarDlg::FoilPolarDlg(QWidget *pParent) : QDialog(pParent)
@@ -270,10 +265,8 @@ void FoilPolarDlg::EditingFinished()
 
 void FoilPolarDlg::InitDialog()
 {
-	QXDirect* pXDirect = (QXDirect*)s_pXDirect;
-	MainFrame *pMainFrame =(MainFrame*)s_pMainFrame;
-	if(pXDirect && MainFrame::s_pCurFoil) m_FoilName = MainFrame::s_pCurFoil->m_FoilName;
-	else                                   m_FoilName = "";
+	if(MainFrame::s_pCurFoil) m_FoilName = MainFrame::s_pCurFoil->m_FoilName;
+	else                      m_FoilName = "";
 
 	QString str = tr("Analysis parameters for ");
 	setWindowTitle(str+ m_FoilName);
@@ -316,11 +309,11 @@ void FoilPolarDlg::InitDialog()
 		}
 	}
 
-	GetLengthUnit(str, pMainFrame->m_LengthUnit);
+	GetLengthUnit(str, MainFrame::s_LengthUnit);
 	m_pctrlLengthUnit1->setText(str);
 	m_pctrlLengthUnit2->setText(str);
 
-	GetWeightUnit(str, pMainFrame->m_WeightUnit);
+	GetWeightUnit(str, MainFrame::s_WeightUnit);
 	m_pctrlMassUnit->setText(str);
 
 	m_pctrlUnit1->setChecked(m_UnitType==1);

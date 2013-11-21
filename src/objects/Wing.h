@@ -174,7 +174,6 @@ public:
 
 //__________________________Variables_______________________
 private:
-	static void* s_pMainFrame;       /**< a static pointer to the MainFrame window */
 	static void* s_pMiarex;          /**< a static pointer to the Miarex Application window */
 	static void* s_p3DPanelDlg;      /**< a static pointer to the instance of the PanelAnalysisDlg class if a calculation is on-going*/
 

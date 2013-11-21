@@ -34,11 +34,11 @@
 #include <QPushButton>
 #include <QToolButton>
 #include <QSettings>
-#include "../objects/ArcBall.h"
 #include "BodyGridDlg.h"
 #include "BodyTableDelegate.h"
 #include "../misc/FloatEdit.h"
-#include "../misc/LineButton.h"
+#include "../misc/LineBtn.h"
+#include "../objects/ArcBall.h"
 #include "../objects/Body.h"
 #include "../threedwidget.h"
 
@@ -196,7 +196,7 @@ private:
 	QTextEdit *m_pctrlBodyDescription;
 
 	QRadioButton *m_pctrlFlatPanels, *m_pctrlBSplines;
-	LineButton *m_pctrlBodyStyle;
+	LineBtn *m_pctrlBodyStyle;
 	FloatEdit *m_pctrlNXPanels, *m_pctrlNHoopPanels;
 	QComboBox *m_pctrlXDegree, *m_pctrlHoopDegree;
 	QPushButton *m_pctrlMenuButton;

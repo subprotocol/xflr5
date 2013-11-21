@@ -58,10 +58,9 @@ void ManageUFOsDlg::InitDialog(QString &UFOName)
 	QMiarex *pMiarex = (QMiarex*)s_pMiarex;
 
 	QString strong;
-	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	QString strArea, strLength;
-	GetLengthUnit(strLength, pMainFrame->m_LengthUnit);
-	GetAreaUnit(strArea, pMainFrame->m_AreaUnit);
+	GetLengthUnit(strLength, MainFrame::s_LengthUnit);
+	GetAreaUnit(strArea, MainFrame::s_AreaUnit);
 	m_pUFOModel->setHeaderData(0, Qt::Horizontal, tr("Name"));
 	m_pUFOModel->setHeaderData(1, Qt::Horizontal, tr("Span")+" ("+strLength+")");
 	m_pUFOModel->setHeaderData(2, Qt::Horizontal, tr("Area")+" ("+strArea+")");
@@ -237,13 +236,13 @@ void ManageUFOsDlg::FillWingRow(int row)
 	if(pWing->m_WingDescription.length()) m_pUFOModel->setData(ind, pWing->m_WingDescription, Qt::ToolTipRole);
 
 	ind = m_pUFOModel->index(row, 1, QModelIndex());
-	m_pUFOModel->setData(ind, pWing->m_PlanformSpan*pMainFrame->m_mtoUnit);
+	m_pUFOModel->setData(ind, pWing->m_PlanformSpan*MainFrame::s_mtoUnit);
 
 	ind = m_pUFOModel->index(row, 2, QModelIndex());
-	m_pUFOModel->setData(ind, pWing->m_PlanformArea*pMainFrame->m_m2toUnit);
+	m_pUFOModel->setData(ind, pWing->m_PlanformArea*MainFrame::s_m2toUnit);
 
 	ind = m_pUFOModel->index(row, 3, QModelIndex());
-	m_pUFOModel->setData(ind, pWing->m_MAChord*pMainFrame->m_mtoUnit);
+	m_pUFOModel->setData(ind, pWing->m_MAChord*MainFrame::s_mtoUnit);
 
 	ind = m_pUFOModel->index(row, 4, QModelIndex());
 	m_pUFOModel->setData(ind, pWing->m_AR);
@@ -275,13 +274,13 @@ void ManageUFOsDlg::FillPlaneRow(int row, int n)
 	if(pPlane->PlaneDescription().length()) m_pUFOModel->setData(ind, pPlane->PlaneDescription(), Qt::ToolTipRole);
 
 	ind = m_pUFOModel->index(row+n, 1, QModelIndex());
-	m_pUFOModel->setData(ind, pWing->m_PlanformSpan*pMainFrame->m_mtoUnit);
+	m_pUFOModel->setData(ind, pWing->m_PlanformSpan*MainFrame::s_mtoUnit);
 
 	ind = m_pUFOModel->index(row+n, 2, QModelIndex());
-	m_pUFOModel->setData(ind, pWing->m_PlanformArea*pMainFrame->m_m2toUnit);
+	m_pUFOModel->setData(ind, pWing->m_PlanformArea*MainFrame::s_m2toUnit);
 
 	ind = m_pUFOModel->index(row+n, 3, QModelIndex());
-	m_pUFOModel->setData(ind, pWing->m_MAChord*pMainFrame->m_mtoUnit);
+	m_pUFOModel->setData(ind, pWing->m_MAChord*MainFrame::s_mtoUnit);
 
 	ind = m_pUFOModel->index(row+n, 4, QModelIndex());
 	m_pUFOModel->setData(ind, pWing->m_AR);

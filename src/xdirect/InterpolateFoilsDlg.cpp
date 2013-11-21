@@ -197,7 +197,7 @@ void InterpolateFoilsDlg::OnSelChangeFoil1(int i)
 	QString strong  = m_pctrlFoil1->currentText();
 
 	i=0;
-	Foil* pFoil = pMainFrame->GetFoil(strong);
+	Foil* pFoil = MainFrame::foil(strong);
 
 	if(pFoil)
 	{
@@ -228,7 +228,7 @@ void InterpolateFoilsDlg::OnSelChangeFoil2(int i)
 	MainFrame * pMainFrame = (MainFrame*)m_pMainFrame;
 	QString strong  = m_pctrlFoil2->currentText();
 
-	Foil* pFoil = pMainFrame->GetFoil(strong);
+	Foil* pFoil = MainFrame::foil(strong);
 
 	if(pFoil)
 	{
@@ -260,10 +260,10 @@ void InterpolateFoilsDlg::Update()
 	QString strong;
 
 	strong = m_pctrlFoil1->currentText();
-	Foil* pFoil1 = pMainFrame->GetFoil(strong);
+	Foil* pFoil1 = MainFrame::foil(strong);
 
 	strong = m_pctrlFoil2->currentText();
-	Foil* pFoil2 = pMainFrame->GetFoil(strong);
+	Foil* pFoil2 = MainFrame::foil(strong);
 
 	if(!pFoil1 || !pFoil2) return;
 

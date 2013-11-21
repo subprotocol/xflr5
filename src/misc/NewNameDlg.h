@@ -33,7 +33,7 @@ class NewNameDlg : public QDialog
 	friend class StabViewDlg;
 	Q_OBJECT
 public:
-    NewNameDlg(QWidget *pParent);
+	NewNameDlg(QWidget *pParent=NULL);
 	void InitDialog();
 	void keyPressEvent(QKeyEvent *event);
 	

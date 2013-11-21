@@ -227,7 +227,7 @@ void QGraph::DrawTitles(QPainter &painter)
 	else if(yo>ymax)         yp = ymax;
 	else                     yp = ymin;
 
-	painter.setFont(m_TitleLogFont);
+	painter.setFont(m_TitleFont);
 
 	QPen TitlePen(m_TitleColor);
 	painter.setPen(TitlePen);
@@ -255,9 +255,9 @@ void QGraph::DrawXTicks(QPainter &painter)
 	painter.save();
 	QString strLabel, strLabelExp;
 
-	QFontMetrics fm(m_LabelLogFont);
+	QFontMetrics fm(m_LabelFont);
 
-	painter.setFont(m_LabelLogFont);
+	painter.setFont(m_LabelFont);
 
 
 	TickSize = 5;
@@ -333,8 +333,8 @@ void QGraph::DrawYTicks(QPainter &painter)
 	painter.save();
 	QString strLabel, strLabelExp;
 	exp = 0;
-	QFontMetrics fm(m_LabelLogFont);
-	painter.setFont(m_LabelLogFont);
+	QFontMetrics fm(m_LabelFont);
+	painter.setFont(m_LabelFont);
 
 	fmheight  = fm.height();
 	fmheight2 = (int)(fmheight/2);

@@ -31,7 +31,6 @@
 #include <QMessageBox>
 #include <math.h>
 
-void* WPolarDlg::s_pMainFrame;
 void* WPolarDlg::s_pMiarex;
 WPolar WPolarDlg::s_WPolar;
 
@@ -143,7 +142,6 @@ void WPolarDlg::EnableControls()
 
 void WPolarDlg::InitDialog(Plane *pPlane, Wing *pWing, WPolar *pWPolar)
 {
-	MainFrame* pMainFrame = (MainFrame*)s_pMainFrame;
 	QString str, str1;
 
 	m_pPlane = pPlane;
@@ -202,7 +200,7 @@ void WPolarDlg::InitDialog(Plane *pPlane, Wing *pWing, WPolar *pWPolar)
 
 	OnUnit();
 
-	m_pctrlHeight->SetValue(s_WPolar.m_Height*pMainFrame->m_mtoUnit);
+	m_pctrlHeight->SetValue(s_WPolar.m_Height*MainFrame::s_mtoUnit);
 
 	if(s_WPolar.m_bGround)
 	{
@@ -215,23 +213,23 @@ void WPolarDlg::InitDialog(Plane *pPlane, Wing *pWing, WPolar *pWPolar)
 		m_pctrlGroundEffect->setChecked(false);
 	}
 
-	GetSpeedUnit(str, pMainFrame->m_SpeedUnit);
+	GetSpeedUnit(str, MainFrame::s_SpeedUnit);
 	m_pctrlSpeedUnit->setText(str);
 
 	SetWingLoad();
 
-	GetLengthUnit(str, pMainFrame->m_LengthUnit);
+	GetLengthUnit(str, MainFrame::s_LengthUnit);
 	m_pctrlLengthUnit1->setText(str);
 	m_pctrlLengthUnit2->setText(str);
 	m_pctrlLengthUnit3->setText(str);
-	m_pctrlXCmRef->SetValue(s_WPolar.m_CoG.x*pMainFrame->m_mtoUnit);
-	m_pctrlZCmRef->SetValue(s_WPolar.m_CoG.z*pMainFrame->m_mtoUnit);
+	m_pctrlXCmRef->SetValue(s_WPolar.m_CoG.x*MainFrame::s_mtoUnit);
+	m_pctrlZCmRef->SetValue(s_WPolar.m_CoG.z*MainFrame::s_mtoUnit);
 
-	GetWeightUnit(str1, pMainFrame->m_WeightUnit);
+	GetWeightUnit(str1, MainFrame::s_WeightUnit);
 	m_pctrlWeightUnit->setText(str1);
 
-	m_pctrlQInf->SetValue(s_WPolar.m_QInf*pMainFrame->m_mstoUnit);
-	m_pctrlWeight->SetValue(s_WPolar.m_Mass*pMainFrame->m_kgtoUnit);
+	m_pctrlQInf->SetValue(s_WPolar.m_QInf*MainFrame::s_mstoUnit);
+	m_pctrlWeight->SetValue(s_WPolar.m_Mass*MainFrame::s_kgtoUnit);
 	m_pctrlBeta->SetValue(s_WPolar.m_Beta);
 	m_pctrlAlpha->SetValue(s_WPolar.m_ASpec);
 
@@ -375,23 +373,22 @@ void WPolarDlg::OnTiltedGeom()
 
 void WPolarDlg::OnPlaneInertia()
 {
-	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	if(m_pctrlPlaneInertia->isChecked())
 	{
 		if(m_pPlane)
 		{
-			m_pctrlWeight->SetValue(m_pPlane->TotalMass() * pMainFrame->m_kgtoUnit);
-			m_pctrlXCmRef->SetValue(m_pPlane->CoG().x * pMainFrame->m_mtoUnit);
-			m_pctrlZCmRef->SetValue(m_pPlane->CoG().z * pMainFrame->m_mtoUnit);
+			m_pctrlWeight->SetValue(m_pPlane->TotalMass() * MainFrame::s_kgtoUnit);
+			m_pctrlXCmRef->SetValue(m_pPlane->CoG().x * MainFrame::s_mtoUnit);
+			m_pctrlZCmRef->SetValue(m_pPlane->CoG().z * MainFrame::s_mtoUnit);
 			s_WPolar.m_Mass    = m_pPlane->TotalMass();
 			s_WPolar.m_CoG.x     = m_pPlane->CoG().x;
 			s_WPolar.m_CoG.z     = m_pPlane->CoG().z;
 		}
 		else if(m_pWing)
 		{
-			m_pctrlWeight->SetValue(m_pWing->TotalMass() * pMainFrame->m_kgtoUnit);
-			m_pctrlXCmRef->SetValue(m_pWing->m_CoG.x * pMainFrame->m_mtoUnit);
-			m_pctrlZCmRef->SetValue(m_pWing->m_CoG.z * pMainFrame->m_mtoUnit);
+			m_pctrlWeight->SetValue(m_pWing->TotalMass() * MainFrame::s_kgtoUnit);
+			m_pctrlXCmRef->SetValue(m_pWing->m_CoG.x * MainFrame::s_mtoUnit);
+			m_pctrlZCmRef->SetValue(m_pWing->m_CoG.z * MainFrame::s_mtoUnit);
 			s_WPolar.m_Mass    = m_pWing->TotalMass();
 			s_WPolar.m_CoG.x     = m_pWing->m_CoG.x;
 			s_WPolar.m_CoG.z     = m_pWing->m_CoG.z;
@@ -399,9 +396,9 @@ void WPolarDlg::OnPlaneInertia()
 	}
 	else
 	{
-		s_WPolar.m_Mass    = m_pctrlWeight->Value() / pMainFrame->m_kgtoUnit;
-		s_WPolar.m_CoG.x     = m_pctrlXCmRef->Value() / pMainFrame->m_mtoUnit;
-		s_WPolar.m_CoG.z     = m_pctrlZCmRef->Value() / pMainFrame->m_mtoUnit;
+		s_WPolar.m_Mass    = m_pctrlWeight->Value() / MainFrame::s_kgtoUnit;
+		s_WPolar.m_CoG.x     = m_pctrlXCmRef->Value() / MainFrame::s_mtoUnit;
+		s_WPolar.m_CoG.z     = m_pctrlZCmRef->Value() / MainFrame::s_mtoUnit;
 	}
 	s_WPolar.m_bAutoInertia = m_pctrlPlaneInertia->isChecked();
 	SetWPolarName();
@@ -536,14 +533,13 @@ void WPolarDlg::OnWPolarType()
 
 void WPolarDlg::ReadValues()
 {
-	MainFrame* pMainFrame = (MainFrame*)s_pMainFrame;
 	s_WPolar.m_ASpec     = m_pctrlAlpha->Value();
 	s_WPolar.m_Beta      = m_pctrlBeta->Value();
-	s_WPolar.m_Mass      = m_pctrlWeight->Value() / pMainFrame->m_kgtoUnit;
-	s_WPolar.m_CoG.x     = m_pctrlXCmRef->Value() / pMainFrame->m_mtoUnit;
-	s_WPolar.m_CoG.z     = m_pctrlZCmRef->Value() / pMainFrame->m_mtoUnit;
-	s_WPolar.m_QInf      = m_pctrlQInf->Value() / pMainFrame->m_mstoUnit;
-	s_WPolar.m_Height    = m_pctrlHeight->Value() / pMainFrame->m_mtoUnit;
+	s_WPolar.m_Mass      = m_pctrlWeight->Value() / MainFrame::s_kgtoUnit;
+	s_WPolar.m_CoG.x     = m_pctrlXCmRef->Value() / MainFrame::s_mtoUnit;
+	s_WPolar.m_CoG.z     = m_pctrlZCmRef->Value() / MainFrame::s_mtoUnit;
+	s_WPolar.m_QInf      = m_pctrlQInf->Value() / MainFrame::s_mstoUnit;
+	s_WPolar.m_Height    = m_pctrlHeight->Value() / MainFrame::s_mtoUnit;
 
 	if(m_pctrlUnit1->isChecked())
 	{
@@ -874,12 +870,11 @@ void WPolarDlg::SetWPolarName()
 	QString str, strong;
 	QString WPolarName;
 	QMiarex *pMiarex = (QMiarex*)s_pMiarex;
-	MainFrame* pMainFrame = (MainFrame*)s_pMainFrame;
 
 	if (s_WPolar.m_WPolarType==FIXEDSPEEDPOLAR)
 	{
-		GetSpeedUnit(str, pMainFrame->m_SpeedUnit);
-		WPolarName = QString("T1-%1 ").arg(s_WPolar.m_QInf * pMainFrame->m_mstoUnit,0,'f',1);
+		GetSpeedUnit(str, MainFrame::s_SpeedUnit);
+		WPolarName = QString("T1-%1 ").arg(s_WPolar.m_QInf * MainFrame::s_mstoUnit,0,'f',1);
 		WPolarName += str;
 	}
 	else if(s_WPolar.m_WPolarType==FIXEDLIFTPOLAR)
@@ -910,16 +905,16 @@ void WPolarDlg::SetWPolarName()
 
 	if(!s_WPolar.m_bAutoInertia)
 	{
-		GetWeightUnit(str, pMainFrame->m_WeightUnit);
-		strong = QString("-%1").arg(s_WPolar.m_Mass*pMainFrame->m_kgtoUnit,0,'f',3);
+		GetWeightUnit(str, MainFrame::s_WeightUnit);
+		strong = QString("-%1").arg(s_WPolar.m_Mass*MainFrame::s_kgtoUnit,0,'f',3);
 		if(s_WPolar.m_WPolarType==FIXEDLIFTPOLAR)   WPolarName += strong+str;
-		GetLengthUnit(str, pMainFrame->m_LengthUnit);
-		strong = QString("-x%1").arg(s_WPolar.m_CoG.x*pMainFrame->m_mtoUnit,0,'f',3);
+		GetLengthUnit(str, MainFrame::s_LengthUnit);
+		strong = QString("-x%1").arg(s_WPolar.m_CoG.x*MainFrame::s_mtoUnit,0,'f',3);
 		WPolarName += strong + str;
 
 		if(fabs(s_WPolar.m_CoG.z)>=.000001)
 		{
-			strong = QString("-z%1").arg(s_WPolar.m_CoG.z*pMainFrame->m_mtoUnit,0,'f',3);
+			strong = QString("-z%1").arg(s_WPolar.m_CoG.z*MainFrame::s_mtoUnit,0,'f',3);
 			WPolarName += strong + str;
 		}
 	}
@@ -963,8 +958,7 @@ void WPolarDlg::SetWPolarName()
 void WPolarDlg::SetReynolds()
 {
 	QString strange, str, strUnit;
-	MainFrame* pMainFrame = (MainFrame*)s_pMainFrame;
-	GetSpeedUnit(strUnit, pMainFrame->m_SpeedUnit);
+	GetSpeedUnit(strUnit, MainFrame::s_SpeedUnit);
 
 	if(s_WPolar.m_WPolarType ==FIXEDSPEEDPOLAR)
 	{
@@ -985,7 +979,7 @@ void WPolarDlg::SetReynolds()
 		double area;
 		if (s_WPolar.m_RefAreaType==1) area =m_pWing->m_PlanformArea;
 		else area = m_pWing->m_ProjectedArea;
-		double QCl =  sqrt(2.* 9.81 /s_WPolar.m_Density* s_WPolar.m_Mass /area) * pMainFrame->m_mstoUnit;
+		double QCl =  sqrt(2.* 9.81 /s_WPolar.m_Density* s_WPolar.m_Mass /area) * MainFrame::s_mstoUnit;
 		str = QString("%1").arg(QCl,5,'f',2);
 		str += strUnit;
 		strange = tr("Vinf.sqrt(Cl) =");
@@ -1015,16 +1009,15 @@ void WPolarDlg::SetReynolds()
 void WPolarDlg::SetWingLoad()
 {
 	QString str,str1, str2;
-	MainFrame* pMainFrame = (MainFrame*)s_pMainFrame;
 	double area;
 	if (s_WPolar.m_RefAreaType==1) area =m_pWing->m_PlanformArea;
 	else area = m_pWing->m_ProjectedArea;
 	m_WingLoad = s_WPolar.m_Mass/area;//kg/dm2
 
-	str = QString("%1").arg(m_WingLoad * pMainFrame->m_kgtoUnit / pMainFrame->m_m2toUnit,7,'f',3);
+	str = QString("%1").arg(m_WingLoad * MainFrame::s_kgtoUnit / MainFrame::s_m2toUnit,7,'f',3);
 
-	GetWeightUnit(str1, pMainFrame->m_WeightUnit);
-	GetAreaUnit(str2, pMainFrame->m_AreaUnit);
+	GetWeightUnit(str1, MainFrame::s_WeightUnit);
+	GetAreaUnit(str2, MainFrame::s_AreaUnit);
 	m_pctrlWingLoad->setText(tr("Wing Loading = ")+str+str1+"/"+str2);
 }
 

@@ -40,7 +40,6 @@
 #include "../threedwidget.h"
 #include "../misc/FloatEdit.h"
 #include "../misc/ColorButton.h"
-#include "../misc/LineButton.h"
 #include "../objects/Wing.h"
 
 
@@ -142,7 +141,6 @@ private:
 
 private:
 	static void *s_pMiarex;
-	static void *s_pMainFrame;
 	static void *s_pGLLightDlg;
 	static QList <void*> *s_poaFoil;
 	static QList <void*> *s_poaWing;

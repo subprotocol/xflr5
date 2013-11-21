@@ -24,8 +24,6 @@
 #include "../globals.h"
 #include "../mainframe.h"
 
-void *OpPoint::s_pMainFrame;
-
 
 /**
  * The public constructor
@@ -296,8 +294,7 @@ void OpPoint::GetOppProperties(QString &OpPointProperties, bool bData)
 	QTextStream out;
 	strong.clear();
 	out.setString(&strong);
-	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
-	ExportOpp(out, pMainFrame->m_VersionName, pMainFrame->m_ExportFileType, true);
+	ExportOpp(out, MainFrame::versionName(), MainFrame::s_ExportFileType, true);
 	OpPointProperties += "\n"+strong;
 }
 

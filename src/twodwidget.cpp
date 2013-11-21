@@ -338,7 +338,7 @@ void TwoDWidget::paintEvent(QPaintEvent *event)
 	else
 	{
 		QPainter painter(this);
-		painter.fillRect(rect(), pMainFrame->m_BackgroundColor);
+		painter.fillRect(rect(), MainFrame::s_BackgroundColor);
 	}
 }
 

@@ -18,7 +18,7 @@
 static CVector m_T[(NXPOINTS+1)*(NHOOPPOINTS+1)]; //temporary points to save calculation times for body NURBS surfaces
 
 
-void GLCreateBody3DSplines(void *pParent, int iList, Body *pBody, int nx, int nh)
+void GLCreateBody3DSplines( int iList, Body *pBody, int nx, int nh)
 {
 	int i,j,k,l;
 	int p;
@@ -28,7 +28,6 @@ void GLCreateBody3DSplines(void *pParent, int iList, Body *pBody, int nx, int nh
 	double hinc, u;
 	CVector N, LATB, TALB;
 	CVector LA, LB, TA, TB;
-	MainFrame *pMainFrame = (MainFrame*)pParent;
 
 	nx = qMin(nx, NXPOINTS);
 	nh = qMax(3, nh);
@@ -47,7 +46,7 @@ void GLCreateBody3DSplines(void *pParent, int iList, Body *pBody, int nx, int nh
 	}
 	glNewList(iList, GL_COMPILE);
 	{
-		if(pMainFrame->m_bAlphaChannel && pBody->m_BodyColor.alpha()<255)
+		if(MainFrame::s_bAlphaChannel && pBody->m_BodyColor.alpha()<255)
 		{
 			glColor4d(pBody->m_BodyColor.redF(),pBody->m_BodyColor.greenF(),pBody->m_BodyColor.blueF(), pBody->m_BodyColor.alphaF());
 			glEnable (GL_BLEND);
@@ -214,18 +213,16 @@ void GLCreateBody3DSplines(void *pParent, int iList, Body *pBody, int nx, int nh
 
 
 
-void GLCreateBody3DFlatPanels(void *pParent, int iList, Body *pBody)
+void GLCreateBody3DFlatPanels(int iList, Body *pBody)
 {
 	int j,k;
 	QColor color;
 	int style, width;
 	CVector P1, P2, P3, P4, N, P1P3, P2P4, Tj, Tjp1;
 
-	MainFrame *pMainFrame = (MainFrame*)pParent;
-
 	glNewList(iList,GL_COMPILE);
 	{
-		if(pMainFrame->m_bAlphaChannel)
+		if(MainFrame::s_bAlphaChannel)
 		{
 			glColor4d(pBody->m_BodyColor.redF(),pBody->m_BodyColor.greenF(),pBody->m_BodyColor.blueF(), pBody->m_BodyColor.alphaF());
 			glEnable(GL_BLEND);
@@ -363,7 +360,7 @@ void GLCreateBody3DFlatPanels(void *pParent, int iList, Body *pBody)
 
 
 
-void GLCreateBodyMesh(void *pParent, int iList, Body *pBody)
+void GLCreateBodyMesh(int iList, Body *pBody)
 {
 	if(!pBody) return;
 
@@ -374,7 +371,6 @@ void GLCreateBodyMesh(void *pParent, int iList, Body *pBody)
 	CVector PLA, PLB, PTA, PTB;
 	QColor color;
 
-	MainFrame *pMainFrame = (MainFrame*)pParent;
 
 	nx = pBody->m_nxPanels;
 	nh = pBody->m_nhPanels;
@@ -513,7 +509,7 @@ void GLCreateBodyMesh(void *pParent, int iList, Body *pBody)
 			glEnable(GL_POLYGON_OFFSET_FILL);
 			glPolygonOffset(1.0, 1.0);
 
-			color = pMainFrame->m_BackgroundColor;
+			color = MainFrame::s_BackgroundColor;
 //			style = W3dPrefsDlg::s_VLMStyle;
 //			width = W3dPrefsDlg::s_VLMWidth;
 
@@ -720,7 +716,7 @@ void GLCreateBodyMesh(void *pParent, int iList, Body *pBody)
 			glPolygonOffset(1.0, 1.0);
 			glDisable (GL_LINE_STIPPLE);
 
-			color = pMainFrame->m_BackgroundColor;
+			color = MainFrame::s_BackgroundColor;
 //			style = W3dPrefsDlg::s_VLMStyle;
 //			width = W3dPrefsDlg::s_VLMWidth;
 

@@ -22,7 +22,7 @@
 #ifndef INVERSEOPTIONSDLG_H
 #define INVERSEOPTIONSDLG_H
 
-#include "../misc/LineButton.h"
+#include "../misc/LineBtn.h"
 #include <QDialog>
 
 
@@ -45,7 +45,7 @@ private:
 	void SetupLayout();
 	void InitDialog();
 
-	LineButton *m_pctrlRefFoil, *m_pctrlModFoil, *m_pctrlSpline, *m_pctrlReflected;
+	LineBtn *m_pctrlRefFoil, *m_pctrlModFoil, *m_pctrlSpline, *m_pctrlReflected;
 
 	void * m_pXInverse;
 };

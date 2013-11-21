@@ -237,9 +237,8 @@ GL3dBodyDlg::GL3dBodyDlg(QWidget *pParent): QDialog(pParent)
 
 void GL3dBodyDlg::SetTableUnits()
 {
-	MainFrame *pMainFrame = (MainFrame*)(s_pMainFrame);
 	QString length;
-	GetLengthUnit(length, pMainFrame->m_LengthUnit);
+	GetLengthUnit(length, MainFrame::s_LengthUnit);
 
 	m_pFrameModel->setHeaderData(0, Qt::Horizontal, "x ("+length+")");
 	m_pFrameModel->setHeaderData(1, Qt::Horizontal, tr("NPanels"));
@@ -256,8 +255,6 @@ GL3dBodyDlg::~GL3dBodyDlg()
 
 void GL3dBodyDlg::FillFrameCell(int iItem, int iSubItem)
 {
-	MainFrame *pMainFrame = (MainFrame*)(s_pMainFrame);
-
 	QModelIndex ind;
 
 	switch (iSubItem)
@@ -265,7 +262,7 @@ void GL3dBodyDlg::FillFrameCell(int iItem, int iSubItem)
 		case 0:
 		{
 			ind = m_pFrameModel->index(iItem, 0, QModelIndex());
-			m_pFrameModel->setData(ind, m_pBody->getFrame(iItem)->m_Position.x * pMainFrame->m_mtoUnit);
+			m_pFrameModel->setData(ind, m_pBody->getFrame(iItem)->m_Position.x * MainFrame::s_mtoUnit);
 			break;
 		}
 		case 1:
@@ -299,10 +296,9 @@ void GL3dBodyDlg::FillFrameDataTable()
 void GL3dBodyDlg::FillFrameTableRow(int row)
 {
 	QModelIndex ind;
-	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 
 	ind = m_pFrameModel->index(row, 0, QModelIndex());
-	m_pFrameModel->setData(ind, m_pBody->getFrame(row)->m_Position.x * pMainFrame->m_mtoUnit);
+	m_pFrameModel->setData(ind, m_pBody->getFrame(row)->m_Position.x * MainFrame::s_mtoUnit);
 
 	ind = m_pFrameModel->index(row, 1, QModelIndex());
 	m_pFrameModel->setData(ind, m_pBody->m_xPanels[row]);
@@ -311,8 +307,6 @@ void GL3dBodyDlg::FillFrameTableRow(int row)
 
 void GL3dBodyDlg::FillPointCell(int iItem, int iSubItem)
 {
-	MainFrame *pMainFrame = (MainFrame*)(s_pMainFrame);
-	QString strong;
 	QModelIndex ind;
 
 	if(!m_pBody) return;
@@ -323,13 +317,13 @@ void GL3dBodyDlg::FillPointCell(int iItem, int iSubItem)
 		case 0:
 		{
 			ind = m_pPointModel->index(iItem, 0, QModelIndex());
-			m_pPointModel->setData(ind, m_pBody->getFrame(l)->m_CtrlPoint[iItem].y * pMainFrame->m_mtoUnit);
+			m_pPointModel->setData(ind, m_pBody->getFrame(l)->m_CtrlPoint[iItem].y * MainFrame::s_mtoUnit);
 			break;
 		}
 		case 1:
 		{
 			ind = m_pPointModel->index(iItem, 1, QModelIndex());
-			m_pPointModel->setData(ind, m_pBody->getFrame(l)->m_CtrlPoint[iItem].z*pMainFrame->m_mtoUnit);
+			m_pPointModel->setData(ind, m_pBody->getFrame(l)->m_CtrlPoint[iItem].z*MainFrame::s_mtoUnit);
 
 			break;
 		}
@@ -366,15 +360,13 @@ void GL3dBodyDlg::FillPointDataTable()
 void GL3dBodyDlg::FillPointTableRow(int row)
 {
 	if(!m_pFrame) return;
-	QString str, strong;
 	QModelIndex ind;
-	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 
 	ind = m_pPointModel->index(row, 0, QModelIndex());
-	m_pPointModel->setData(ind, m_pFrame->m_CtrlPoint[row].y * pMainFrame->m_mtoUnit);
+	m_pPointModel->setData(ind, m_pFrame->m_CtrlPoint[row].y * MainFrame::s_mtoUnit);
 
 	ind = m_pPointModel->index(row, 1, QModelIndex());
-	m_pPointModel->setData(ind, m_pFrame->m_CtrlPoint[row].z * pMainFrame->m_mtoUnit);
+	m_pPointModel->setData(ind, m_pFrame->m_CtrlPoint[row].z * MainFrame::s_mtoUnit);
 
 	ind = m_pPointModel->index(row, 2, QModelIndex());
 	m_pPointModel->setData(ind, m_pBody->m_hPanels[row]);
@@ -388,7 +380,6 @@ void GL3dBodyDlg::GLCreateBodyOverlay()
 	int style, width;
 
 	QColor color;
-//	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 
 	if(!m_pBody)
 	{
@@ -553,7 +544,6 @@ void GL3dBodyDlg::GLCreateBodyPoints()
 	int k,width;
 	double zpos;
 	QColor color;
-//	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 
 	if(!m_pBody)
 	{
@@ -659,7 +649,6 @@ void GL3dBodyDlg::GLCreateBodyFrames()
 	double hinc, u, v;
 	int nh,style, width;
 	QColor color;
-//	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 
 	if(!m_pBody || ! m_pFrame || (m_pBody && m_pBody->m_iActiveFrame<0))
 	{
@@ -883,13 +872,12 @@ void GL3dBodyDlg::GLCreateBodyFrames()
 
 void GL3dBodyDlg::GLDrawBodyFrameScale()
 {
-	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	int i;
 	QString strong;
 
-    double unit = m_BodyGridDlg->m_Unit2 * pMainFrame->m_mtoUnit;
+	double unit = m_BodyGridDlg->m_Unit2 * MainFrame::s_mtoUnit;
 
-	QFontMetrics fm(pMainFrame->m_TextFont);
+	QFontMetrics fm(MainFrame::s_TextFont);
 	double LabelWidth;
 	double h2 = (double)m_3dWidget.geometry().height() /2.0;
 	double w2 = (double)m_3dWidget.geometry().width()  /2.0;
@@ -921,7 +909,7 @@ void GL3dBodyDlg::GLDrawBodyFrameScale()
 		}
 		glEnd();
 
-		glColor3d(pMainFrame->m_TextColor.redF(),pMainFrame->m_TextColor.greenF(),pMainFrame->m_TextColor.blueF());
+		glColor3d(MainFrame::s_TextColor.redF(),MainFrame::s_TextColor.greenF(),MainFrame::s_TextColor.blueF());
         for(i=0; i<fabs(1.0-m_FrameScaledOffset.x)/m_BodyGridDlg->m_Unit2/m_FrameScale; i++)
 		{
 			strong = QString("%1").arg((double)i*unit, 6,'f', 2);
@@ -929,7 +917,7 @@ void GL3dBodyDlg::GLDrawBodyFrameScale()
 									m_FrameScaledOffset.y-0.04,
 									0.0,
 									strong,
-									pMainFrame->m_TextFont);
+									MainFrame::s_TextFont);
 		}
         for(i=1; i<fabs(m_FrameScaledOffset.x-(m_VerticalSplit))/m_BodyGridDlg->m_Unit2/m_FrameScale; i++)
 		{
@@ -938,7 +926,7 @@ void GL3dBodyDlg::GLDrawBodyFrameScale()
 									m_FrameScaledOffset.y-0.04,
 									0.0,
 									strong,
-									pMainFrame->m_TextFont);
+									MainFrame::s_TextFont);
 		}
 	}
 
@@ -960,7 +948,7 @@ void GL3dBodyDlg::GLDrawBodyFrameScale()
 		}
 		glEnd();
 
-		glColor3d(pMainFrame->m_TextColor.redF(),pMainFrame->m_TextColor.greenF(),pMainFrame->m_TextColor.blueF());
+		glColor3d(MainFrame::s_TextColor.redF(),MainFrame::s_TextColor.greenF(),MainFrame::s_TextColor.blueF());
         for(i=0; i<fabs(m_glTop-m_FrameScaledOffset.y)/m_BodyGridDlg->m_Unit2/m_FrameScale; i++)
 		{
 			strong = QString("%1").arg((double)i*unit, 6,'f', 2);
@@ -983,13 +971,12 @@ void GL3dBodyDlg::GLDrawBodyFrameScale()
 
 void GL3dBodyDlg::GLDrawBodyLineScale()
 {
-	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	int i;
 	QString strong;
 
-    double unit = m_BodyGridDlg->m_Unit * pMainFrame->m_mtoUnit;
+	double unit = m_BodyGridDlg->m_Unit * MainFrame::s_mtoUnit;
 
-	QFontMetrics fm(pMainFrame->m_TextFont);
+	QFontMetrics fm(MainFrame::s_TextFont);
 	double LabelWidth;
 	double h2 = (double)m_3dWidget.geometry().height() /2.0;
 	double w2 = (double)m_3dWidget.geometry().width()  /2.0;
@@ -1021,7 +1008,7 @@ void GL3dBodyDlg::GLDrawBodyLineScale()
 		}
 		glEnd();
 
-		glColor3d(pMainFrame->m_TextColor.redF(),pMainFrame->m_TextColor.greenF(),pMainFrame->m_TextColor.blueF());
+		glColor3d(MainFrame::s_TextColor.redF(),MainFrame::s_TextColor.greenF(),MainFrame::s_TextColor.blueF());
         for(i=0; i<fabs(m_VerticalSplit-m_BodyScaledOffset.x)/m_BodyGridDlg->m_Unit/m_BodyScale; i++)
 		{
 			strong = QString("%1").arg((double)i*unit, 6,'f', 2);
@@ -1058,7 +1045,7 @@ void GL3dBodyDlg::GLDrawBodyLineScale()
 			}
 		}
 		glEnd();
-		glColor3d(pMainFrame->m_TextColor.redF(),pMainFrame->m_TextColor.greenF(),pMainFrame->m_TextColor.blueF());
+		glColor3d(MainFrame::s_TextColor.redF(),MainFrame::s_TextColor.greenF(),MainFrame::s_TextColor.blueF());
         for(i=0; i<fabs(m_glTop-m_BodyScaledOffset.y)/m_BodyScale/m_BodyGridDlg->m_Unit; i++)
 		{
 			strong = QString("%1").arg((double)i*unit, 6,'f', 2);
@@ -1393,9 +1380,7 @@ void GL3dBodyDlg::GLCreateBodyGrid()
 
 void GL3dBodyDlg::GLDraw3D()
 {
-	MainFrame * pMainFrame =(MainFrame*)s_pMainFrame;
-
-	glClearColor(pMainFrame->m_BackgroundColor.redF(), pMainFrame->m_BackgroundColor.greenF(), pMainFrame->m_BackgroundColor.blueF(),0.0);
+	glClearColor(MainFrame::s_BackgroundColor.redF(), MainFrame::s_BackgroundColor.greenF(), MainFrame::s_BackgroundColor.blueF(),0.0);
 
 	if((m_bResetglBody2D || m_bResetglBodyPoints) && m_pBody)
 	{
@@ -1457,8 +1442,8 @@ void GL3dBodyDlg::GLDraw3D()
 			glDeleteLists(BODYGEOMBASE+MAXBODIES,1);
 			m_GLList -=2;
 		}
-		if(m_pBody->m_LineType==BODYPANELTYPE)	     GLCreateBody3DFlatPanels(s_pMainFrame, BODYGEOMBASE, m_pBody);
-		else if(m_pBody->m_LineType==BODYSPLINETYPE) GLCreateBody3DSplines(s_pMainFrame, BODYGEOMBASE, m_pBody, s_NXPoints, s_NHoopPoints);
+		if(m_pBody->m_LineType==BODYPANELTYPE)	     GLCreateBody3DFlatPanels(BODYGEOMBASE, m_pBody);
+		else if(m_pBody->m_LineType==BODYSPLINETYPE) GLCreateBody3DSplines(BODYGEOMBASE, m_pBody, s_NXPoints, s_NHoopPoints);
 
 		m_bResetglBody = false;
 		if(glIsList(BODYMESHBASE))
@@ -1467,7 +1452,7 @@ void GL3dBodyDlg::GLDraw3D()
 			glDeleteLists(BODYMESHBASE+MAXBODIES,1);
 			m_GLList -=2;
 		}
-		GLCreateBodyMesh(s_pMainFrame, BODYMESHBASE, m_pBody);
+		GLCreateBodyMesh(BODYMESHBASE, m_pBody);
 		m_bResetglBodyMesh = false;
 	}
 }
@@ -1475,13 +1460,12 @@ void GL3dBodyDlg::GLDraw3D()
 
 void GL3dBodyDlg::GLDrawBodyLegend()
 {
-	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	QString strong, strLengthUnit;
 
 	int width;
 	QColor color;
 
-	GetLengthUnit(strLengthUnit, pMainFrame->m_LengthUnit);
+	GetLengthUnit(strLengthUnit, MainFrame::s_LengthUnit);
 
 //	glNewList(BODYLEGEND,GL_COMPILE);//create 2D Splines or Lines
 
@@ -1491,7 +1475,7 @@ void GL3dBodyDlg::GLDrawBodyLegend()
 	glEnable (GL_LINE_STIPPLE);
 	glPolygonMode(GL_FRONT,GL_LINE);
 
-	color = pMainFrame->m_TextColor;
+	color = MainFrame::s_TextColor;
 //	style = 0;
 	width = 3;
 
@@ -1519,17 +1503,17 @@ void GL3dBodyDlg::GLDrawBodyLegend()
 		// Draw the labels
 		CVector real;
 		m_3dWidget.ClientToGL(m_MousePos, real);
-		QFontMetrics fm(pMainFrame->m_TextFont);
+		QFontMetrics fm(MainFrame::s_TextFont);
 		int dD = fm.height();
 
 		strong = QString(tr("Frame %1")).arg(m_pBody->m_iActiveFrame+1,2);
-		m_3dWidget.renderText(m_FrameRect.left() +dD ,dD,strong, pMainFrame->m_TextFont);
+		m_3dWidget.renderText(m_FrameRect.left() +dD ,dD,strong, MainFrame::s_TextFont);
 
 		strong = QString(tr("Scale = %1")).arg(m_FrameScale/m_BodyRefScale,4,'f',2);
-		m_3dWidget.renderText(m_FrameRect.left() +dD ,2*dD,strong, pMainFrame->m_TextFont);
+		m_3dWidget.renderText(m_FrameRect.left() +dD ,2*dD,strong, MainFrame::s_TextFont);
 
 		strong = QString(tr("Scale = %1")).arg(m_BodyScale/m_BodyRefScale,4,'f',2);
-		m_3dWidget.renderText(m_BodyLineRect.left() +dD ,dD,strong, pMainFrame->m_TextFont);
+		m_3dWidget.renderText(m_BodyLineRect.left() +dD ,dD,strong, MainFrame::s_TextFont);
 
 		if(m_FrameRect.contains(m_MousePos))
 		{
@@ -1537,13 +1521,13 @@ void GL3dBodyDlg::GLDrawBodyLegend()
 			real.y =  (real.y - m_FrameScaledOffset.y)/m_FrameScale;
 			real.z = 0.0;
 
-			strong = QString("y = %1 ").arg(real.x * pMainFrame->m_mtoUnit,9,'f',3);
+			strong = QString("y = %1 ").arg(real.x * MainFrame::s_mtoUnit,9,'f',3);
 			strong += strLengthUnit;
-			m_3dWidget.renderText(m_FrameRect.left() +dD ,3*dD,strong, pMainFrame->m_TextFont);
+			m_3dWidget.renderText(m_FrameRect.left() +dD ,3*dD,strong, MainFrame::s_TextFont);
 
-			strong = QString("z = %1 ").arg(real.y * pMainFrame->m_mtoUnit,9,'f',3);
+			strong = QString("z = %1 ").arg(real.y * MainFrame::s_mtoUnit,9,'f',3);
 			strong += strLengthUnit;
-			m_3dWidget.renderText(m_FrameRect.left() +dD ,4*dD,strong, pMainFrame->m_TextFont);
+			m_3dWidget.renderText(m_FrameRect.left() +dD ,4*dD,strong, MainFrame::s_TextFont);
 		}
 		else if(m_BodyLineRect.contains(m_MousePos))
 		{
@@ -1551,13 +1535,13 @@ void GL3dBodyDlg::GLDrawBodyLegend()
 			real.y =  (real.y - m_BodyScaledOffset.y)/m_BodyScale;
 			real.z = 0.0;
 
-			strong = QString("x = %1 ").arg(real.x * pMainFrame->m_mtoUnit,9,'f',3);
+			strong = QString("x = %1 ").arg(real.x * MainFrame::s_mtoUnit,9,'f',3);
 			strong += strLengthUnit;
-			m_3dWidget.renderText(m_BodyLineRect.left() +dD ,2*dD,strong, pMainFrame->m_TextFont);
+			m_3dWidget.renderText(m_BodyLineRect.left() +dD ,2*dD,strong, MainFrame::s_TextFont);
 
-			strong = QString("z = %1 ").arg(real.y * pMainFrame->m_mtoUnit,9,'f',3);
+			strong = QString("z = %1 ").arg(real.y * MainFrame::s_mtoUnit,9,'f',3);
 			strong += strLengthUnit;
-			m_3dWidget.renderText(m_BodyLineRect.left() +dD ,3*dD,strong, pMainFrame->m_TextFont);
+			m_3dWidget.renderText(m_BodyLineRect.left() +dD ,3*dD,strong, MainFrame::s_TextFont);
 		}
 	}
 }
@@ -1582,7 +1566,6 @@ void GL3dBodyDlg::GLRenderBody()
 {
 //	int width;
 
-//	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	GLdouble pts[4];
 
 	pts[0]= 1.0; pts[1]=0.0; pts[2]=0.0; pts[3]=-m_VerticalSplit;		//x=m_VerticalSplit
@@ -1753,15 +1736,13 @@ void GL3dBodyDlg::GLRenderBody()
 }
 
 
-
+/**
+* Draws the point masses, the object masses, and the CG position on the OpenGL viewport.
+**/
 void GL3dBodyDlg::GLDrawMasses()
 {
-	//
-	// draws the point masses, the object masses, and the CG position on the OpenGL viewport
-	//
-	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	QString MassUnit;
-	GetWeightUnit(MassUnit, pMainFrame->m_WeightUnit);
+	GetWeightUnit(MassUnit, MainFrame::s_WeightUnit);
 
 	double radius = .01;//2cm
 
@@ -1776,10 +1757,10 @@ void GL3dBodyDlg::GLDrawMasses()
 			{
 				glTranslated(m_pBody->m_PointMass[im]->position().x,m_pBody->m_PointMass[im]->position().y,m_pBody->m_PointMass[im]->position().z);
 				m_3dWidget.GLRenderSphere(QColor(255,190,110),radius,18,18);
-				glColor3d(pMainFrame->m_TextColor.redF(), pMainFrame->m_TextColor.greenF(), pMainFrame->m_TextColor.blueF());
+				glColor3d(MainFrame::s_TextColor.redF(), MainFrame::s_TextColor.greenF(), MainFrame::s_TextColor.blueF());
 				m_3dWidget.renderText(0.0, 0.0, 0.0+.02,
 									  m_pBody->m_PointMass[im]->tag()
-									  +QString(" %1").arg(m_pBody->m_PointMass[im]->mass()*pMainFrame->m_kgtoUnit, 7,'g',3)
+									  +QString(" %1").arg(m_pBody->m_PointMass[im]->mass()*MainFrame::s_kgtoUnit, 7,'g',3)
 									  +MassUnit);
 			}
 			glPopMatrix();
@@ -1791,10 +1772,10 @@ void GL3dBodyDlg::GLDrawMasses()
 	{
 		glTranslated(m_pBody->m_CoG.x,m_pBody->m_CoG.y,m_pBody->m_CoG.z);
 		m_3dWidget.GLRenderSphere(QColor(255,0,0),radius,18,18);
-		glColor3d(pMainFrame->m_TextColor.redF(), pMainFrame->m_TextColor.greenF(), pMainFrame->m_TextColor.blueF());
+		glColor3d(MainFrame::s_TextColor.redF(), MainFrame::s_TextColor.greenF(), MainFrame::s_TextColor.blueF());
 		m_3dWidget.renderText(0.0, 0.0, 0.0+.02,
-							  "CoG "+QString("%1").arg(m_pBody->TotalMass()*pMainFrame->m_kgtoUnit, 7,'g',3) + MassUnit,
-							  pMainFrame->m_TextFont);
+							  "CoG "+QString("%1").arg(m_pBody->TotalMass()*MainFrame::s_kgtoUnit, 7,'g',3) + MassUnit,
+							  MainFrame::s_TextFont);
 	}
 	glPopMatrix();
 }
@@ -2448,7 +2429,7 @@ void GL3dBodyDlg::OnExportBodyGeom()
 	if(!m_pBody) return;
 	QString LengthUnit, FileName;
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
-	GetLengthUnit(LengthUnit, pMainFrame->m_LengthUnit);
+	GetLengthUnit(LengthUnit, MainFrame::s_LengthUnit);
 
 	FileName = m_pBody->m_BodyName;
 	FileName.replace("/", " ");
@@ -2458,13 +2439,13 @@ void GL3dBodyDlg::OnExportBodyGeom()
 	QString filter =".csv";
 
 	FileName = QFileDialog::getSaveFileName(pMainFrame, QObject::tr("Export Body Geometry"),
-											pMainFrame->m_LastDirName ,
+											MainFrame::s_LastDirName ,
 											QObject::tr("Text File (*.txt);;Comma Separated Values (*.csv)"),
 											&filter);
 	if(!FileName.length()) return;
 
 	int pos = FileName.lastIndexOf("/");
-	if(pos>0) pMainFrame->m_LastDirName = FileName.left(pos);
+	if(pos>0) MainFrame::s_LastDirName = FileName.left(pos);
 	pos = FileName.lastIndexOf(".csv");
 	if (pos>0) type = 2;
 
@@ -2474,7 +2455,7 @@ void GL3dBodyDlg::OnExportBodyGeom()
 
 	QTextStream out(&XFile);
 
-	m_pBody->ExportGeometry(out, pMainFrame->m_mtoUnit, type, s_NXPoints, s_NHoopPoints);
+	m_pBody->ExportGeometry(out, MainFrame::s_mtoUnit, type, s_NXPoints, s_NHoopPoints);
 }
 
 
@@ -2491,12 +2472,12 @@ void GL3dBodyDlg::OnImportBodyDef()
     UnitsDlg Dlg(this);
 
 	Dlg.m_bLengthOnly = true;
-	Dlg.m_Length    = pMainFrame->m_LengthUnit;
-	Dlg.m_Area      = pMainFrame->m_AreaUnit;
-	Dlg.m_Speed     = pMainFrame->m_SpeedUnit;
-	Dlg.m_Weight    = pMainFrame->m_WeightUnit;
-	Dlg.m_Force     = pMainFrame->m_ForceUnit;
-	Dlg.m_Moment    = pMainFrame->m_MomentUnit;
+	Dlg.m_Length    = MainFrame::s_LengthUnit;
+	Dlg.m_Area      = MainFrame::s_AreaUnit;
+	Dlg.m_Speed     = MainFrame::s_SpeedUnit;
+	Dlg.m_Weight    = MainFrame::s_WeightUnit;
+	Dlg.m_Force     = MainFrame::s_ForceUnit;
+	Dlg.m_Moment    = MainFrame::s_MomentUnit;
 	Dlg.m_Question = QObject::tr("Choose the length unit to read this file :");
 	Dlg.InitDialog();
 
@@ -2539,11 +2520,11 @@ void GL3dBodyDlg::OnImportBodyDef()
 	QString PathName;
 
 	PathName = QFileDialog::getOpenFileName(pMainFrame, QObject::tr("Open File"),
-											pMainFrame->m_LastDirName,
+											MainFrame::s_LastDirName,
 											QObject::tr("All files (*.*)"));
 	if(!PathName.length()) return;
 	int pos = PathName.lastIndexOf("/");
-	if(pos>0) pMainFrame->m_LastDirName = PathName.left(pos);
+	if(pos>0) MainFrame::s_LastDirName = PathName.left(pos);
 
 	QFile XFile(PathName);
 	if (!XFile.open(QIODevice::ReadOnly))
@@ -2590,7 +2571,6 @@ void GL3dBodyDlg::ReadFrameSectionData(int sel)
 	int k;
 
 	bool bOK;
-	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	QString strong;
 	QStandardItem *pItem;
 
@@ -2599,11 +2579,11 @@ void GL3dBodyDlg::ReadFrameSectionData(int sel)
 	strong = pItem->text();
 	strong.replace(" ","");
 	x = strong.toDouble(&bOK);
-	if(bOK) m_pBody->getFrame(sel)->SetuPosition(x / pMainFrame->m_mtoUnit);
+	if(bOK) m_pBody->getFrame(sel)->SetuPosition(x / MainFrame::s_mtoUnit);
 
 	for(int ic=0; ic<m_pBody->getFrame(sel)->PointCount(); ic++)
 	{
-		m_pBody->getFrame(sel)->m_CtrlPoint[ic].x  = x / pMainFrame->m_mtoUnit;
+		m_pBody->getFrame(sel)->m_CtrlPoint[ic].x  = x / MainFrame::s_mtoUnit;
 	}
 
 	pItem = m_pFrameModel->item(sel,1);
@@ -3027,10 +3007,8 @@ void GL3dBodyDlg::OnSurfaces()
 void GL3dBodyDlg::OnTranslateBody()
 {
 	if(!m_pBody) return;
-//	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 
     BodyTransDlg dlg(this);
-	BodyTransDlg::s_pMainFrame = s_pMainFrame;
 	dlg.m_FrameID    = m_pBody->m_iActiveFrame;
 	dlg.InitDialog();
 
@@ -3062,7 +3040,6 @@ void GL3dBodyDlg::ReadPointSectionData(int sel)
 	int k;
 
 	bool bOK;
-	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	QString strong;
 	QStandardItem *pItem;
 
@@ -3071,13 +3048,13 @@ void GL3dBodyDlg::ReadPointSectionData(int sel)
 	strong = pItem->text();
 	strong.replace(" ","");
 	d =strong.toDouble(&bOK);
-	if(bOK) m_pFrame->m_CtrlPoint[sel].y =d / pMainFrame->m_mtoUnit;
+	if(bOK) m_pFrame->m_CtrlPoint[sel].y =d / MainFrame::s_mtoUnit;
 
 	pItem = m_pPointModel->item(sel,1);
 	strong = pItem->text();
 	strong.replace(" ","");
 	d =strong.toDouble(&bOK);
-	if(bOK) m_pFrame->m_CtrlPoint[sel].z =d / pMainFrame->m_mtoUnit;
+	if(bOK) m_pFrame->m_CtrlPoint[sel].z =d / MainFrame::s_mtoUnit;
 
 	pItem = m_pPointModel->item(sel,2);
 	strong = pItem->text();
@@ -3483,7 +3460,6 @@ void GL3dBodyDlg::SetupLayout()
 {
 	int i;
 	QString str;
-//	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 
 	QSizePolicy szPolicyExpanding;
 	szPolicyExpanding.setHorizontalPolicy(QSizePolicy::Expanding);
@@ -3639,7 +3615,7 @@ void GL3dBodyDlg::SetupLayout()
 		QHBoxLayout *BodyDef = new QHBoxLayout;
 		{
 			m_pctrlBodyName = new QLineEdit(tr("BodyName"));
-			m_pctrlBodyStyle = new LineButton;
+			m_pctrlBodyStyle = new LineBtn(this);
 			m_pctrlBodyStyle->setSizePolicy(szPolicyMinimum);
 			BodyDef->addWidget(m_pctrlBodyName);
 			BodyDef->addWidget(m_pctrlBodyStyle);

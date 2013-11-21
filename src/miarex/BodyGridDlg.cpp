@@ -32,7 +32,6 @@
 #include "../misc/LinePickerDlg.h"
 #include "BodyGridDlg.h"
 
-void *BodyGridDlg::s_pMainFrame;
 
 BodyGridDlg::BodyGridDlg(QWidget *pParent):QDialog(pParent)
 {
@@ -67,9 +66,8 @@ BodyGridDlg::BodyGridDlg(QWidget *pParent):QDialog(pParent)
 
 void BodyGridDlg::InitDialog()
 {
-	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	QString length;
-	GetLengthUnit(length, pMainFrame->m_LengthUnit);
+	GetLengthUnit(length, MainFrame::s_LengthUnit);
 	m_pctrlLength1->setText(length);
 	m_pctrlLength2->setText(length);
 	m_pctrlLength3->setText(length);
@@ -106,10 +104,7 @@ void BodyGridDlg::InitDialog()
 void BodyGridDlg::SetupLayout()
 {
 	setWindowTitle(tr("Grid Parameters"));
-//	QDesktopWidget desktop;
-//	QRect r = desktop.geometry();
-//	setMinimumHeight(r.height()/3);
-//	move(r.width()/3, r.height()/6);
+
 
 	m_pctrlScales   = new QCheckBox(tr("Show Scales"));
 	m_pctrlGrid     = new QCheckBox(tr("Main Grid"));
@@ -117,10 +112,10 @@ void BodyGridDlg::SetupLayout()
 	m_pctrlMinGrid  = new QCheckBox(tr("Minor Grid"));
 	m_pctrlMinGrid2 = new QCheckBox(tr("Minor Grid"));
 
-	m_pctrlLine  = new LineButton;
-	m_pctrlLine2 = new LineButton;
-	m_pctrlMinLine  = new LineButton;
-	m_pctrlMinLine2 = new LineButton;
+	m_pctrlLine  = new LineBtn(this);
+	m_pctrlLine2 = new LineBtn(this);
+	m_pctrlMinLine  = new LineBtn(this);
+	m_pctrlMinLine2 = new LineBtn(this);
 
 	m_pctrlUnit  = new FloatEdit(100.00);
 	m_pctrlUnit2 = new FloatEdit(101.00);
@@ -133,59 +128,69 @@ void BodyGridDlg::SetupLayout()
 
 	m_pctrlLength1 = new QLabel("mm");
 	m_pctrlLength2 = new QLabel("mm");
-
-	QGridLayout *BodyLayout = new QGridLayout;
-	BodyLayout->addWidget(m_pctrlGrid,1,1);
-	BodyLayout->addWidget(m_pctrlLine,1,2);
-	BodyLayout->addWidget(m_pctrlUnit,1,3);
-	BodyLayout->addWidget(m_pctrlLength1, 1,4);
-	BodyLayout->addWidget(m_pctrlMinGrid,2,1);
-	BodyLayout->addWidget(m_pctrlMinLine,2,2);
-	BodyLayout->addWidget(m_pctrlMinUnit,2,3);
-	BodyLayout->addWidget(m_pctrlLength2, 2,4);
-
-	QGroupBox *BodyBox = new QGroupBox(tr("Body Grid"));
-	BodyBox->setLayout(BodyLayout);
-
 	m_pctrlLength3 = new QLabel("mm");
 	m_pctrlLength4 = new QLabel("mm");
 
-	QGridLayout *FrameLayout = new QGridLayout;
-	FrameLayout->addWidget(m_pctrlGrid2,1,1);
-	FrameLayout->addWidget(m_pctrlLine2,1,2);
-	FrameLayout->addWidget(m_pctrlUnit2,1,3);
-	FrameLayout->addWidget(m_pctrlLength3, 1,4);
-	FrameLayout->addWidget(m_pctrlMinGrid2,2,1);
-	FrameLayout->addWidget(m_pctrlMinLine2,2,2);
-	FrameLayout->addWidget(m_pctrlMinUnit2,2,3);
-	FrameLayout->addWidget(m_pctrlLength4, 2,4);
+	QGroupBox *BodyBox = new QGroupBox(tr("Body Grid"));
+	{
+		QGridLayout *BodyLayout = new QGridLayout;
+		{
+			BodyLayout->addWidget(m_pctrlGrid,1,1);
+			BodyLayout->addWidget(m_pctrlLine,1,2);
+			BodyLayout->addWidget(m_pctrlUnit,1,3);
+			BodyLayout->addWidget(m_pctrlLength1, 1,4);
+			BodyLayout->addWidget(m_pctrlMinGrid,2,1);
+			BodyLayout->addWidget(m_pctrlMinLine,2,2);
+			BodyLayout->addWidget(m_pctrlMinUnit,2,3);
+			BodyLayout->addWidget(m_pctrlLength2, 2,4);
+		}
+		BodyBox->setLayout(BodyLayout);
+	}
+
 
 	QGroupBox *FrameBox = new QGroupBox(tr("Frame Grid"));
-	FrameBox->setLayout(FrameLayout);
+	{
+		QGridLayout *FrameLayout = new QGridLayout;
+		{
+			FrameLayout->addWidget(m_pctrlGrid2,1,1);
+			FrameLayout->addWidget(m_pctrlLine2,1,2);
+			FrameLayout->addWidget(m_pctrlUnit2,1,3);
+			FrameLayout->addWidget(m_pctrlLength3, 1,4);
+			FrameLayout->addWidget(m_pctrlMinGrid2,2,1);
+			FrameLayout->addWidget(m_pctrlMinLine2,2,2);
+			FrameLayout->addWidget(m_pctrlMinUnit2,2,3);
+			FrameLayout->addWidget(m_pctrlLength4, 2,4);
+		}
+		FrameBox->setLayout(FrameLayout);
+	}
 
 	QHBoxLayout *CommandButtons = new QHBoxLayout;
-	QPushButton *OKButton = new QPushButton(tr("OK"));
-	QPushButton *Cancel = new QPushButton(tr("Cancel"));
-	CommandButtons->addStretch(1);
-	CommandButtons->addWidget(OKButton);
-	CommandButtons->addStretch(1);
-	CommandButtons->addWidget(Cancel);
-	CommandButtons->addStretch(1);
+	{
+		QPushButton *OKButton = new QPushButton(tr("OK"));
+		QPushButton *Cancel = new QPushButton(tr("Cancel"));
+		CommandButtons->addStretch(1);
+		CommandButtons->addWidget(OKButton);
+		CommandButtons->addStretch(1);
+		CommandButtons->addWidget(Cancel);
+		CommandButtons->addStretch(1);
+		connect(OKButton, SIGNAL(clicked()),this, SLOT(OnOK()));
+		connect(Cancel, SIGNAL(clicked()), this, SLOT(reject()));
+	}
 
 	QVBoxLayout *MainLayout = new QVBoxLayout;
-	MainLayout->addWidget(m_pctrlScales);
-	MainLayout->addStretch(1);
-	MainLayout->addWidget(BodyBox);
-	MainLayout->addStretch(1);
-	MainLayout->addWidget(FrameBox);
-	MainLayout->addStretch(1);
-	MainLayout->addLayout(CommandButtons);
-	MainLayout->addStretch(1);
+	{
+		MainLayout->addWidget(m_pctrlScales);
+		MainLayout->addStretch(1);
+		MainLayout->addWidget(BodyBox);
+		MainLayout->addStretch(1);
+		MainLayout->addWidget(FrameBox);
+		MainLayout->addStretch(1);
+		MainLayout->addLayout(CommandButtons);
+		MainLayout->addStretch(1);
+	}
 
 	setLayout(MainLayout);
 
-	connect(OKButton, SIGNAL(clicked()),this, SLOT(OnOK()));
-	connect(Cancel, SIGNAL(clicked()), this, SLOT(reject()));
 
 	connect(m_pctrlGrid, SIGNAL(clicked()), this, SLOT(OnGrid()));
 	connect(m_pctrlMinGrid, SIGNAL(clicked()), this, SLOT(OnMinGrid()));

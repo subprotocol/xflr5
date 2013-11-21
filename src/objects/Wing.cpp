@@ -21,7 +21,6 @@
 
 
 #include <math.h>
-#include <QtDebug>
 #include <QFile>
 
 #include <QMessageBox>
@@ -33,10 +32,8 @@
 #include "../miarex/LLTAnalysisDlg.h"
 
 
-
-void* Wing::s_pMainFrame;		//pointer to the Frame window
-void* Wing::s_pMiarex;	//pointer to the Miarex Application window
-void* Wing::s_p3DPanelDlg;//pointer to the 3DPanel analysis dialog class
+void* Wing::s_pMiarex     = NULL;
+void* Wing::s_p3DPanelDlg = NULL;
 bool Wing::s_bVLMSymetric;
 
 
@@ -321,7 +318,6 @@ void Wing::ExportDefinition(QString path_to_file)
  */
 void Wing::ComputeGeometry()
 {
-	MainFrame *pMainFrame  = (MainFrame*)s_pMainFrame;
 	Foil *pFoilA, *pFoilB;
 	double MinPanelSize;
 	int is;
@@ -344,8 +340,8 @@ void Wing::ComputeGeometry()
 
 	for (is=0; is<NWingSection()-1; is++)
 	{
-		pFoilA = pMainFrame->GetFoil(RightFoil(is));
-		pFoilB = pMainFrame->GetFoil(RightFoil(is+1));
+		pFoilA = MainFrame::foil(RightFoil(is));
+		pFoilB = MainFrame::foil(RightFoil(is+1));
 		surface   += Length(is+1)*(Chord(is)+Chord(is+1))/2.0;//m2
 		xysurface += (Length(is+1)*(Chord(is)+Chord(is+1))/2.0)*cos(Dihedral(is)*PI/180.0);
 		m_ProjectedSpan += Length(is+1)*cos(Dihedral(is)*PI/180.0);
@@ -385,14 +381,14 @@ void Wing::ComputeGeometry()
 
 	for (int is=1; is<NWingSection(); is++)
 	{
-		pFoilA = pMainFrame->GetFoil(RightFoil(is-1));
-		pFoilB = pMainFrame->GetFoil(RightFoil(is));
+		pFoilA = MainFrame::foil(RightFoil(is-1));
+		pFoilB = MainFrame::foil(RightFoil(is));
 		if(pFoilA && pFoilB && (!m_bIsFin || (m_bIsFin && m_bSymFin) || (m_bIsFin && m_bDoubleFin)))
 		{
 			if(pFoilA->m_bTEFlap && pFoilB->m_bTEFlap && fabs(YPosition(is)-YPosition(is-1))>MinPanelSize)	m_nFlaps++;
 		}
-		pFoilA = pMainFrame->GetFoil(LeftFoil(is-1));
-		pFoilB = pMainFrame->GetFoil(LeftFoil(is));
+		pFoilA = MainFrame::foil(LeftFoil(is-1));
+		pFoilB = MainFrame::foil(LeftFoil(is));
 		if(pFoilA && pFoilB)
 		{
 			if(pFoilA->m_bTEFlap && pFoilB->m_bTEFlap && fabs(YPosition(is)-YPosition(is-1))>MinPanelSize)	m_nFlaps++;
@@ -618,7 +614,6 @@ void Wing::CreateSurfaces(CVector const &T, double XTilt, double YTilt)
 	CVector VNormal[MAXSPANSECTIONS+1], VNSide[MAXSPANSECTIONS+1];
 	double MinPanelSize;
 
-	MainFrame *pMainFrame  = (MainFrame*)s_pMainFrame;
 
 	if(QMiarex::s_MinPanelSize>0.0) MinPanelSize = QMiarex::s_MinPanelSize;
 	else                            MinPanelSize = 0.0;
@@ -657,8 +652,8 @@ void Wing::CreateSurfaces(CVector const &T, double XTilt, double YTilt)
 	{
 		if (fabs(YPosition(jss)-YPosition(jss+1)) > MinPanelSize)
 		{
-			m_Surface[iSurf].m_pFoilA   = pMainFrame->GetFoil(LeftFoil(jss+1));
-			m_Surface[iSurf].m_pFoilB   = pMainFrame->GetFoil(LeftFoil(jss));
+			m_Surface[iSurf].m_pFoilA   = MainFrame::foil(LeftFoil(jss+1));
+			m_Surface[iSurf].m_pFoilB   = MainFrame::foil(LeftFoil(jss));
 
 			m_Surface[iSurf].m_Length   =  YPosition(jss+1) - YPosition(jss);
 
@@ -729,8 +724,8 @@ void Wing::CreateSurfaces(CVector const &T, double XTilt, double YTilt)
 		{
 			if (fabs(YPosition(jss)-YPosition(jss+1)) > MinPanelSize)
 			{
-				m_Surface[iSurf].m_pFoilA   = pMainFrame->GetFoil(RightFoil(jss));
-				m_Surface[iSurf].m_pFoilB   = pMainFrame->GetFoil(RightFoil(jss+1));
+				m_Surface[iSurf].m_pFoilA   = MainFrame::foil(RightFoil(jss));
+				m_Surface[iSurf].m_pFoilB   = MainFrame::foil(RightFoil(jss+1));
 
 				m_Surface[iSurf].m_Length   =  YPosition(jss+1) - YPosition(jss);
 
@@ -1114,8 +1109,6 @@ void Wing::Duplicate(Wing *pWing)
  */
 bool Wing::ExportAVLWing(QTextStream &out, int index, double x, double y, double z, double Thetax, double Thetay)
 {
-	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
-
 	int j;
 	QString strong, str;
 
@@ -1179,10 +1172,10 @@ bool Wing::ExportAVLWing(QTextStream &out, int index, double x, double y, double
 		out << ("#______________\nSECTION                                                     |  (keyword)\n");
 
 		strong = QString("%1 %2 %3 %4 %5  %6  %7   | Xle Yle Zle   Chord Ainc   [ Nspan Sspace ]\n")
-				 .arg(ASurface.m_LA.x          *pMainFrame->m_mtoUnit,9,'f',4)
-				 .arg(ASurface.m_LA.y          *pMainFrame->m_mtoUnit,9,'f',4)
-				 .arg(ASurface.m_LA.z          *pMainFrame->m_mtoUnit,9,'f',4)
-				 .arg(ASurface.GetChord(0.0)   *pMainFrame->m_mtoUnit,9,'f',4)
+				 .arg(ASurface.m_LA.x          *MainFrame::s_mtoUnit,9,'f',4)
+				 .arg(ASurface.m_LA.y          *MainFrame::s_mtoUnit,9,'f',4)
+				 .arg(ASurface.m_LA.z          *MainFrame::s_mtoUnit,9,'f',4)
+				 .arg(ASurface.GetChord(0.0)   *MainFrame::s_mtoUnit,9,'f',4)
 				 .arg(m_Surface[j].m_TwistA,7,'f',3)
 				 .arg(ASurface.m_NYPanels,3)
 				 .arg(ASurface.m_YDistType,3);
@@ -1214,10 +1207,10 @@ bool Wing::ExportAVLWing(QTextStream &out, int index, double x, double y, double
 /*			out << ("\n#______________\nSECTION                                                     |  (keyword)\n");
 
 			strong = QString("%1 %2 %3 %4 %5  %6  %7   | Xle Yle Zle   Chord Ainc   [ Nspan Sspace ]\n")
-				 .arg(ASurface.m_LB.x          *pMainFrame->m_mtoUnit,9,'f',4)
-				 .arg(ASurface.m_LB.y          *pMainFrame->m_mtoUnit,9,'f',4)
-				 .arg(ASurface.m_LB.z          *pMainFrame->m_mtoUnit,9,'f',4)
-				 .arg(ASurface.GetChord(1.0)   *pMainFrame->m_mtoUnit,9,'f',4)
+				 .arg(ASurface.m_LB.x          *MainFrame::m_mtoUnit,9,'f',4)
+				 .arg(ASurface.m_LB.y          *MainFrame::m_mtoUnit,9,'f',4)
+				 .arg(ASurface.m_LB.z          *MainFrame::m_mtoUnit,9,'f',4)
+				 .arg(ASurface.GetChord(1.0)   *MainFrame::m_mtoUnit,9,'f',4)
 				 .arg(m_Surface[j].m_TwistB,7,'f',3)
 				 .arg(ASurface.NYPanels,3)
 				 .arg(ASurface.m_YDistType,3);
@@ -1254,10 +1247,10 @@ bool Wing::ExportAVLWing(QTextStream &out, int index, double x, double y, double
 	{
 		out << ("#______________\nSECTION                                                     |  (keyword)\n");
 		strong = QString("%1 %2 %3 %4 %5  %6  %7   | Xle Yle Zle   Chord Ainc   [ Nspan Sspace ]\n")
-				 .arg(ASurface.m_LB.x          *pMainFrame->m_mtoUnit,9,'f',4)
-				 .arg(ASurface.m_LB.y          *pMainFrame->m_mtoUnit,9,'f',4)
-				 .arg(ASurface.m_LB.z          *pMainFrame->m_mtoUnit,9,'f',4)
-				 .arg(ASurface.GetChord(1.0)   *pMainFrame->m_mtoUnit,9,'f',4)
+				 .arg(ASurface.m_LB.x          *MainFrame::s_mtoUnit,9,'f',4)
+				 .arg(ASurface.m_LB.y          *MainFrame::s_mtoUnit,9,'f',4)
+				 .arg(ASurface.m_LB.z          *MainFrame::s_mtoUnit,9,'f',4)
+				 .arg(ASurface.GetChord(1.0)   *MainFrame::s_mtoUnit,9,'f',4)
 				 .arg(m_Surface[j-1].m_TwistB,7,'f',3)
 				 .arg(ASurface.m_NYPanels,3)
 				 .arg(ASurface.m_YDistType,3);
@@ -1432,8 +1425,6 @@ double Wing::Dihedral(double yob)
  */
 void Wing::GetFoils(Foil **pFoil0, Foil **pFoil1, double y, double &t)
 {
-	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
-
 	if  (y>0.0)
 	{
 		//search Right wing
@@ -1442,8 +1433,8 @@ void Wing::GetFoils(Foil **pFoil0, Foil **pFoil1, double y, double &t)
 			if (YPosition(is)<=y && y<=YPosition(is+1))
 			{
 
-				*pFoil0 = pMainFrame->GetFoil(RightFoil(is));
-				*pFoil1 = pMainFrame->GetFoil(RightFoil(is+1));
+				*pFoil0 = MainFrame::foil(RightFoil(is));
+				*pFoil1 = MainFrame::foil(RightFoil(is+1));
 				t = (y-YPosition(is))/(YPosition(is+1) - YPosition(is));
 				return;
 			}
@@ -1457,8 +1448,8 @@ void Wing::GetFoils(Foil **pFoil0, Foil **pFoil1, double y, double &t)
 		{
 			if (YPosition(is)<=y && y<YPosition(is+1))
 			{
-				*pFoil0 = pMainFrame->GetFoil(LeftFoil(is));
-				*pFoil1 = pMainFrame->GetFoil(LeftFoil(is+1));
+				*pFoil0 = MainFrame::foil(LeftFoil(is));
+				*pFoil1 = MainFrame::foil(LeftFoil(is+1));
 				t = (y-YPosition(is))/(YPosition(is+1) - YPosition(is));
 				return;
 			}
@@ -1964,7 +1955,6 @@ void Wing::ScaleTwist(double NewTwist)
 bool Wing::SerializeWing(QDataStream &ar, bool bIsStoring)
 {
 	int i;
-//	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	int ArchiveFormat;// identifies the format of the file
 
 	if(bIsStoring)
@@ -2519,12 +2509,11 @@ void Wing::PanelComputeViscous(double QInf, double Alpha, WPolar *pWPolar, doubl
 
 	WingVDrag = 0.0;
 
-	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	QMiarex *pMiarex = (QMiarex*)s_pMiarex;
 
 	bOutRe = bError = bPointOutRe = bPointOutCl = false;
 
-	GetLengthUnit(strLength, pMainFrame->m_LengthUnit);
+	GetLengthUnit(strLength, MainFrame::s_LengthUnit);
 
 	// Calculate the Reynolds number on each strip
 	for (m=0; m<m_NStation; m++)  m_Re[m] = m_Chord[m] * QInf /pWPolar->m_Viscosity;
@@ -2559,8 +2548,8 @@ void Wing::PanelComputeViscous(double QInf, double Alpha, WPolar *pWPolar, doubl
 			if(bError) bPointOutCl = true;
 			if(bPointOutCl)
 			{
-				GetLengthUnit(string, pMainFrame->m_LengthUnit);
-				strong = QString(QObject::tr("           Span pos = %1 ")).arg(m_SpanPos[m]*pMainFrame->m_mtoUnit, 9,'f',2);
+				GetLengthUnit(string, MainFrame::s_LengthUnit);
+				strong = QString(QObject::tr("           Span pos = %1 ")).arg(m_SpanPos[m]*MainFrame::s_mtoUnit, 9,'f',2);
 				strong += string;
 				strong += ",  Re = ";
 				ReynoldsFormat(string, m_Re[m]);
@@ -2574,8 +2563,8 @@ void Wing::PanelComputeViscous(double QInf, double Alpha, WPolar *pWPolar, doubl
 			}
 			else if(bPointOutRe)
 			{
-				GetLengthUnit(string, pMainFrame->m_LengthUnit);
-				strong = QString(QObject::tr("           Span pos = %1 ")).arg(m_SpanPos[m]*pMainFrame->m_mtoUnit,9,'f',2);
+				GetLengthUnit(string, MainFrame::s_LengthUnit);
+				strong = QString(QObject::tr("           Span pos = %1 ")).arg(m_SpanPos[m]*MainFrame::s_mtoUnit,9,'f',2);
 				strong += string;
 				strong += ",  Re = ";
 				ReynoldsFormat(string, m_Re[m]);

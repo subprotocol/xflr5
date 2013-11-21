@@ -32,6 +32,7 @@
 #include "../mainframe.h"
 
 
+
 void *LLTAnalysisDlg::s_pMainFrame;
 void *LLTAnalysisDlg::s_pMiarex;
 
@@ -413,11 +414,10 @@ void LLTAnalysisDlg::SetAlpha(double AlphaMin, double AlphaMax, double DeltaAlph
 void LLTAnalysisDlg::SetFileHeader()
 {
 	QMiarex *pMiarex = (QMiarex*)s_pMiarex;
-	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 
 	QTextStream out(m_pXFile);
 	out << "\n";
-	out << pMainFrame->m_VersionName;
+	out << MainFrame::versionName();
 	out << "\n";
 	out << m_pWing->m_WingName;
 	out << "\n";
@@ -441,7 +441,7 @@ void LLTAnalysisDlg::SetupLayout()
 {
 	QDesktopWidget desktop;
 	QRect r = desktop.geometry();
-	setMinimumHeight(r.height()*2/3);
+//	setMinimumHeight(r.height()*2/3);
 	setMinimumWidth(r.width()/2);
 
 	m_pctrlTextOutput = new QTextEdit;
@@ -461,20 +461,25 @@ void LLTAnalysisDlg::SetupLayout()
 	m_pctrlSkip   = new QPushButton(tr("Skip"));
 	m_pctrlCancel = new QPushButton(tr("Cancel"));
 
+
 	connect(m_pctrlSkip,   SIGNAL(clicked()), this, SLOT(OnSkipPoint()));
 	connect(m_pctrlCancel, SIGNAL(clicked()), this, SLOT(OnCancelAnalysis()));
 
 	QHBoxLayout *buttonsLayout = new QHBoxLayout;
-	buttonsLayout->addStretch(1);
-	buttonsLayout->addWidget(m_pctrlSkip);
-	buttonsLayout->addStretch(1);
-	buttonsLayout->addWidget(m_pctrlCancel);
-	buttonsLayout->addStretch(1);
+	{
+		buttonsLayout->addStretch(1);
+		buttonsLayout->addWidget(m_pctrlSkip);
+		buttonsLayout->addStretch(1);
+		buttonsLayout->addWidget(m_pctrlCancel);
+		buttonsLayout->addStretch(1);
+	}
 
 	QVBoxLayout *mainLayout = new QVBoxLayout;
-	mainLayout->addWidget(m_pctrlTextOutput);
-	mainLayout->addWidget(m_pGraphWidget,2);
-	mainLayout->addLayout(buttonsLayout);
+	{
+		mainLayout->addWidget(m_pctrlTextOutput);
+		mainLayout->addWidget(m_pGraphWidget,2);
+		mainLayout->addLayout(buttonsLayout);
+	}
 	setLayout(mainLayout);
 }
 

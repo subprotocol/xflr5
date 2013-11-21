@@ -36,7 +36,6 @@
 #include "Miarex.h"
 
 void *PanelAnalysisDlg::s_pMiarex;
-void *PanelAnalysisDlg::s_pMainFrame;
 
 int PanelAnalysisDlg::s_MaxRHSSize = VLMMAXRHS;
 
@@ -183,7 +182,7 @@ bool PanelAnalysisDlg::AllocateMatrix(int &memsize)
         Release();
 		Trace(e.what());
 		QString strange = "Memory allocation error: the request for additional memory has been denied.\nPlease reduce the model's size.";
-        QMessageBox::warning((MainFrame*)s_pMainFrame, tr("Warning"), strange);
+		QMessageBox::warning(this, tr("Warning"), strange);
 		AddString(strange);
 		return false;
 	}
@@ -217,7 +216,7 @@ bool PanelAnalysisDlg::AllocateMatrix(int &memsize)
 	if(!AllocateRHS(RHSSize))
 	{
 		QString strange = "Memory allocation error: the request for additional memory has been denied.\nPlease educe the model's size.";
-        QMessageBox::warning((MainFrame*)s_pMainFrame, tr("Warning"), strange);
+		QMessageBox::warning(this, tr("Warning"), strange);
 		AddString(strange);
 		return false;
 	}
@@ -983,7 +982,6 @@ void PanelAnalysisDlg::ComputeBalanceSpeeds(double Alpha, int q)
 	QString strong, strange;
 	CVector Force, WindNormal;
 	double TempCl,Lift;
-	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	WindNormal.Set(-sin(Alpha*PI/180.0),   0.0, cos(Alpha*PI/180.0));
 
 	Force.Set(0.0,0.0,0.0);
@@ -1010,8 +1008,8 @@ void PanelAnalysisDlg::ComputeBalanceSpeeds(double Alpha, int q)
 		else
 		{
 			m_3DQInf[q] =  sqrt(2.0* 9.81 * m_pWPolar->m_Mass/m_pWPolar->m_Density/TempCl/m_pWPolar->m_WArea);
-			strong = QString("           Alpha=%1   QInf=%2").arg(Alpha, 5,'f',2).arg(m_3DQInf[q]*pMainFrame->m_mstoUnit,5,'f',2);
-			GetSpeedUnit(strange, pMainFrame->m_SpeedUnit);
+			strong = QString("           Alpha=%1   QInf=%2").arg(Alpha, 5,'f',2).arg(m_3DQInf[q]*MainFrame::s_mstoUnit,5,'f',2);
+			GetSpeedUnit(strange, MainFrame::s_SpeedUnit);
 			strong+= strange + "\n";
 			AddString(strong);
 		}
@@ -1111,7 +1109,6 @@ void PanelAnalysisDlg::ScaleResultstoSpeed(int nval)
 */
 void PanelAnalysisDlg::ComputeAeroCoefs(double V0, double VDelta, int nrhs)
 {
-	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	int q;
 	QString str, strong;
 
@@ -1137,8 +1134,8 @@ void PanelAnalysisDlg::ComputeAeroCoefs(double V0, double VDelta, int nrhs)
 		for (q=0; q<nrhs; q++)
 		{
 			if(m_bCancel) return;
-			GetSpeedUnit(strong, pMainFrame->m_SpeedUnit);
-			str = QString(tr("      Computing Plane for QInf=%1")).arg((V0+q*VDelta)*pMainFrame->m_mstoUnit,7,'f',2);
+			GetSpeedUnit(strong, MainFrame::s_SpeedUnit);
+			str = QString(tr("      Computing Plane for QInf=%1")).arg((V0+q*VDelta)*MainFrame::s_mstoUnit,7,'f',2);
 			str += strong+"\n";
 			AddString(str);
 			ComputePlane(m_Alpha, V0+q*VDelta, q);
@@ -2271,12 +2268,10 @@ void PanelAnalysisDlg::SourceNASA4023(CVector const &C, Panel *pPanel, CVector &
 */
 void PanelAnalysisDlg::SetFileHeader()
 {
-	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
-
 	QTextStream out(m_pXFile);
 
 	out << "\n";
-	out << pMainFrame->m_VersionName;
+	out << MainFrame::versionName();
 	out << "\n";
 	QDateTime dt = QDateTime::currentDateTime();
 	QString str = dt.toString("dd.MM.yyyy  hh:mm:ss");
@@ -2498,14 +2493,13 @@ void PanelAnalysisDlg::StartAnalysis()
 		AddString(strong);
 	}
 
-	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	if(m_pPlane)
 	{
 		QString len, str;
-		GetLengthUnit(len, pMainFrame->m_LengthUnit);
+		GetLengthUnit(len, MainFrame::s_LengthUnit);
 		if(fabs(m_pPlane->WingLE(0).z-m_pPlane->WingLE(2).z)<.0001)
 		{	
-			str = QString("%1 ").arg(m_pPlane->WingLE(0).z*pMainFrame->m_mtoUnit, 7, 'g', 3);
+			str = QString("%1 ").arg(m_pPlane->WingLE(0).z*MainFrame::s_mtoUnit, 7, 'g', 3);
 			strong = tr("Warning: The wing and elevator lie in the same plane z=")+str+len+"\n";
 			AddString(strong);
 			strong = tr("It is recommended to slightly offset the wing or the elevator to avoid numerical instabilities")+"\n\n";
@@ -2891,35 +2885,34 @@ bool PanelAnalysisDlg::ControlLoop()
 	//
     int i;
 	QString str, strlen, strmass, strInertia, outString;
-	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	QMiarex *pMiarex  = (QMiarex*)s_pMiarex;
 
-	GetLengthUnit(strlen, pMainFrame->m_LengthUnit);
-	GetWeightUnit(strmass, pMainFrame->m_WeightUnit);
+	GetLengthUnit(strlen, MainFrame::s_LengthUnit);
+	GetWeightUnit(strmass, MainFrame::s_WeightUnit);
 	strInertia = strmass+"."+strlen+QString::fromUtf8("²");
 
 
-	str = QString("   Mass=%1 ").arg(m_pWPolar->m_Mass*pMainFrame->m_kgtoUnit, 12,'f',3)+strmass+"\n";
+	str = QString("   Mass=%1 ").arg(m_pWPolar->m_Mass*MainFrame::s_kgtoUnit, 12,'f',3)+strmass+"\n";
 	AddString(str);
 
 	str = "\n   ___Center of Gravity Position - Body axis____\n";
 	AddString(str);
-	str = QString("    CoG_x=%1 ").arg(m_pWPolar->m_CoG.x * pMainFrame->m_mtoUnit, 12,'f',4)+strlen+"\n";
+	str = QString("    CoG_x=%1 ").arg(m_pWPolar->m_CoG.x * MainFrame::s_mtoUnit, 12,'f',4)+strlen+"\n";
 	AddString(str);
-	str = QString("    CoG_y=%1 ").arg(m_pWPolar->m_CoG.y * pMainFrame->m_mtoUnit, 12,'f',4)+strlen+"\n";
+	str = QString("    CoG_y=%1 ").arg(m_pWPolar->m_CoG.y * MainFrame::s_mtoUnit, 12,'f',4)+strlen+"\n";
 	AddString(str);
-	str = QString("    CoG_z=%1 ").arg(m_pWPolar->m_CoG.z * pMainFrame->m_mtoUnit, 12,'f',4)+strlen+"\n";
+	str = QString("    CoG_z=%1 ").arg(m_pWPolar->m_CoG.z * MainFrame::s_mtoUnit, 12,'f',4)+strlen+"\n";
 	AddString(str);
 
 	str = "\n   ___Inertia - Body Axis - CoG Origin____\n";
 	AddString(str);
-	str = QString("    Ibxx=%1 ").arg(m_Ib[0][0]*pMainFrame->m_mtoUnit*pMainFrame->m_mtoUnit*pMainFrame->m_kgtoUnit, 12,'g',4);
+	str = QString("    Ibxx=%1 ").arg(m_Ib[0][0]*MainFrame::s_mtoUnit*MainFrame::s_mtoUnit*MainFrame::s_kgtoUnit, 12,'g',4);
 	AddString(str+strInertia+"\n");
-	str = QString("    Ibyy=%1 ").arg(m_Ib[1][1]*pMainFrame->m_mtoUnit*pMainFrame->m_mtoUnit*pMainFrame->m_kgtoUnit, 12,'g',4);
+	str = QString("    Ibyy=%1 ").arg(m_Ib[1][1]*MainFrame::s_mtoUnit*MainFrame::s_mtoUnit*MainFrame::s_kgtoUnit, 12,'g',4);
 	AddString(str+strInertia+"\n");
-	str = QString("    Ibzz=%1 ").arg(m_Ib[2][2]*pMainFrame->m_mtoUnit*pMainFrame->m_mtoUnit*pMainFrame->m_kgtoUnit, 12,'g',4);
+	str = QString("    Ibzz=%1 ").arg(m_Ib[2][2]*MainFrame::s_mtoUnit*MainFrame::s_mtoUnit*MainFrame::s_kgtoUnit, 12,'g',4);
 	AddString(str+strInertia+"\n");
-	str = QString("    Ibxz=%1 ").arg(m_Ib[0][2]*pMainFrame->m_mtoUnit*pMainFrame->m_mtoUnit*pMainFrame->m_kgtoUnit, 12,'g',4);
+	str = QString("    Ibxz=%1 ").arg(m_Ib[0][2]*MainFrame::s_mtoUnit*MainFrame::s_mtoUnit*MainFrame::s_kgtoUnit, 12,'g',4);
 	AddString(str+strInertia+"\n\n");
 
 	if(m_ControlMax<m_ControlMin) m_ControlDelta = -fabs(m_ControlDelta);
@@ -2990,13 +2983,13 @@ bool PanelAnalysisDlg::ControlLoop()
 
 			str = "\n      ___Inertia - Stability Axis - CoG Origin____\n";
 			AddString(str);
-			str = QString("      Isxx=%1 ").arg(m_Is[0][0]*pMainFrame->m_mtoUnit*pMainFrame->m_mtoUnit*pMainFrame->m_kgtoUnit, 12,'g',4);
+			str = QString("      Isxx=%1 ").arg(m_Is[0][0]*MainFrame::s_mtoUnit*MainFrame::s_mtoUnit*MainFrame::s_kgtoUnit, 12,'g',4);
 			AddString(str+strInertia+"\n");
-			str = QString("      Isyy=%1 ").arg(m_Is[1][1]*pMainFrame->m_mtoUnit*pMainFrame->m_mtoUnit*pMainFrame->m_kgtoUnit, 12,'g',4);
+			str = QString("      Isyy=%1 ").arg(m_Is[1][1]*MainFrame::s_mtoUnit*MainFrame::s_mtoUnit*MainFrame::s_kgtoUnit, 12,'g',4);
 			AddString(str+strInertia+"\n");
-			str = QString("      Iszz=%1 ").arg(m_Is[2][2]*pMainFrame->m_mtoUnit*pMainFrame->m_mtoUnit*pMainFrame->m_kgtoUnit, 12,'g',4);
+			str = QString("      Iszz=%1 ").arg(m_Is[2][2]*MainFrame::s_mtoUnit*MainFrame::s_mtoUnit*MainFrame::s_kgtoUnit, 12,'g',4);
 			AddString(str+strInertia+"\n");
-			str = QString("      Isxz=%1 ").arg(m_Is[0][2]*pMainFrame->m_mtoUnit*pMainFrame->m_mtoUnit*pMainFrame->m_kgtoUnit, 12,'g',4);
+			str = QString("      Isxz=%1 ").arg(m_Is[0][2]*MainFrame::s_mtoUnit*MainFrame::s_mtoUnit*MainFrame::s_kgtoUnit, 12,'g',4);
 			AddString(str+strInertia+"\n\n");
 
 			// Compute stability and control derivatives in stability axes
@@ -3235,10 +3228,9 @@ void PanelAnalysisDlg::ComputeNDStabDerivatives()
 	str = QString("      Mq=%1         Cmq=%2\n").arg(Mq,12,'g',5).arg(Cmq, 12, 'g', 5);
 	AddString(str);
 
-	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	QString strLength;
-	GetLengthUnit(strLength, pMainFrame->m_LengthUnit);
-	str = QString("      Neutral Point position=%1").arg(XNP*pMainFrame->m_mtoUnit, 10,'f',5);
+	GetLengthUnit(strLength, MainFrame::s_LengthUnit);
+	str = QString("      Neutral Point position=%1").arg(XNP*MainFrame::s_mtoUnit, 10,'f',5);
 	str += strLength;
 	str +="\n\n";
 	AddString(str);
@@ -3720,7 +3712,6 @@ void PanelAnalysisDlg::BuildRotationMatrix()
 */
 bool PanelAnalysisDlg::ComputeTrimmedConditions()
 {
-	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	QString strong, strange;
 	int p;
 	static double Lift, phi, VerticalCl;
@@ -3822,8 +3813,8 @@ bool PanelAnalysisDlg::ComputeTrimmedConditions()
 	else
 	{
 		u0 =  sqrt( 2.0* 9.81 * m_pWPolar->m_Mass /m_pWPolar->m_Density/m_pWPolar->m_WArea / VerticalCl );
-		strong = QString("VInf = %2").arg(u0*pMainFrame->m_mstoUnit,0,'f',5);
-		GetSpeedUnit(strange, pMainFrame->m_SpeedUnit);
+		strong = QString("VInf = %2").arg(u0*MainFrame::s_mstoUnit,0,'f',5);
+		GetSpeedUnit(strange, MainFrame::s_SpeedUnit);
 		strong+= strange + "\n";
 		if(m_bTrace) AddString(strong);
 

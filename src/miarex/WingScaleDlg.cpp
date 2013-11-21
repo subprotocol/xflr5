@@ -27,7 +27,6 @@
 #include "../globals.h"
 
 
-void * WingScaleDlg::s_pMainFrame;
 
 WingScaleDlg::WingScaleDlg(QWidget *pParent) : QDialog(pParent)
 {
@@ -149,8 +148,7 @@ void WingScaleDlg::SetupLayout()
 void WingScaleDlg::InitDialog(double const &RefSpan, double const &RefChord, double const &RefSweep, double const &RefTwist)
 {
 	QString len;
-	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
-	GetLengthUnit(len, pMainFrame->m_LengthUnit);
+	GetLengthUnit(len, MainFrame::s_LengthUnit);
 	m_pctrlUnit20->setText(len);
 	m_pctrlUnit21->setText(len);
 
@@ -171,10 +169,10 @@ void WingScaleDlg::InitDialog(double const &RefSpan, double const &RefChord, dou
 
 	QString strong;
 
-	strong = QString("%1").arg(m_RefSpan * pMainFrame->m_mtoUnit,8,'f',3);
+	strong = QString("%1").arg(m_RefSpan * MainFrame::s_mtoUnit,8,'f',3);
 	m_pctrlRefSpan->setText(strong);
 
-	strong = QString("%1").arg(m_RefChord * pMainFrame->m_mtoUnit,8,'f',3);
+	strong = QString("%1").arg(m_RefChord * MainFrame::s_mtoUnit,8,'f',3);
 	m_pctrlRefChord->setText(strong);
 
 	strong = QString("%1").arg(m_RefSweep,8,'f',2);
@@ -184,8 +182,8 @@ void WingScaleDlg::InitDialog(double const &RefSpan, double const &RefChord, dou
 	strong = QString("%1").arg(m_RefTwist,8,'f',2);
 	m_pctrlRefTwist->setText(strong);
 
-	m_pctrlNewSpan->SetValue(m_NewSpan * pMainFrame->m_mtoUnit);
-	m_pctrlNewChord->SetValue(m_NewChord * pMainFrame->m_mtoUnit);
+	m_pctrlNewSpan->SetValue(m_NewSpan * MainFrame::s_mtoUnit);
+	m_pctrlNewChord->SetValue(m_NewChord * MainFrame::s_mtoUnit);
 	m_pctrlNewSweep->SetValue(m_NewSweep);
 	m_pctrlNewTwist->SetValue(m_NewTwist);
 
@@ -227,15 +225,13 @@ void WingScaleDlg::EnableControls()
 
 void WingScaleDlg::ReadData()
 {
-	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
-
 	m_bSpan  = m_pctrlSpan->isChecked();
 	m_bChord = m_pctrlChord->isChecked();
 	m_bSweep = m_pctrlSweep->isChecked();
 	m_bTwist = m_pctrlTwist->isChecked();
 
-	m_NewSpan  = m_pctrlNewSpan->Value()  / pMainFrame->m_mtoUnit;
-	m_NewChord = m_pctrlNewChord->Value() / pMainFrame->m_mtoUnit;
+	m_NewSpan  = m_pctrlNewSpan->Value()  / MainFrame::s_mtoUnit;
+	m_NewChord = m_pctrlNewChord->Value() / MainFrame::s_mtoUnit;
 	m_NewSweep = m_pctrlNewSweep->Value();
 	m_NewTwist = m_pctrlNewTwist->Value();
 }
