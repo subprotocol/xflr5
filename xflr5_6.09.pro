@@ -83,7 +83,6 @@ SOURCES += \
 	src/misc/LinePickerDlg.cpp \
 	src/misc/LineDelegate.cpp \
 	src/misc/LineCbBox.cpp \
-	src/misc/LineButton.cpp \
 	src/misc/FloatEditDelegate.cpp \
 	src/misc/DisplaySettingsDlg.cpp \
 	src/misc/ColorButton.cpp \
@@ -112,7 +111,8 @@ SOURCES += \
     src/main.cpp \
     src/mainframe.cpp \
     src/threedwidget.cpp \
-	src/twodwidget.cpp
+	src/twodwidget.cpp \
+    src/misc/LineBtn.cpp
 
 HEADERS += \
 	src/XFLR5Application.h \
@@ -202,7 +202,6 @@ HEADERS += \
 	src/misc/W3dPrefsDlg.h \
 	src/misc/ColorButton.h \
 	src/misc/LineCbBox.h \
-	src/misc/LineButton.h \
 	src/misc/AboutQ5.h \
 	src/misc/FloatEdit.h \
 	src/misc/GLLightDlg.h \
@@ -224,7 +223,8 @@ HEADERS += \
     src/globals.h \
     src/mainframe.h \
     src/twodwidget.h \
-	src/threedwidget.h
+	src/threedwidget.h \
+    src/misc/LineBtn.h
 
 
 TRANSLATIONS = translations/xflr5v6.ts \
