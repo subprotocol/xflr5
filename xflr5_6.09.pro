@@ -277,7 +277,9 @@ macx {
     ICON = mac/xflr5.icns
 }
 OTHER_FILES += doc/ReleaseNotes.txt \
-    qss/appwidget.css
+    qss/appwidget.css \
+    qss/xflr5_style.qss \
+    qss/default.qss
 
 
 

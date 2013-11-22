@@ -298,14 +298,13 @@ void ManageUFOsDlg::FillPlaneRow(int row, int n)
 
 void ManageUFOsDlg::OnRename()
 {
-	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	QMiarex *pMiarex = (QMiarex*)s_pMiarex;
 
 	if(m_pPlane)      pMiarex->RenameUFO(m_pPlane->PlaneName());
 	else if (m_pWing) pMiarex->RenameUFO(m_pWing->m_WingName);
 
 	FillUFOTable();
-	pMainFrame->SetSaveState(false);
+	MainFrame::SetSaveState(false);
 }
 
 
@@ -368,8 +367,7 @@ void ManageUFOsDlg::OnDescriptionChanged()
 	{
 		m_pWing->m_WingDescription = m_pctrlDescription->toPlainText();
 	}
-	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
-	pMainFrame->SetSaveState(false);
+	MainFrame::SetSaveState(false);
 }
 
 

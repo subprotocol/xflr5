@@ -130,8 +130,7 @@ void ManageBodiesDlg::OnDoubleClickTable(const QModelIndex &index)
 void ManageBodiesDlg::OnDescriptionChanged()
 {
 	if(m_pBody) m_pBody->m_BodyDescription = m_pctrlDescription->toPlainText();
-	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
-	pMainFrame->SetSaveState(false);
+	MainFrame::SetSaveState(false);
 }
 
 
@@ -238,7 +237,7 @@ void ManageBodiesDlg::OnEdit()
 			pMiarex->m_bResetglGeom     = true;
 			pMiarex->m_bResetglMesh     = true;
 			pMainFrame->UpdateWOpps();
-			pMainFrame->SetSaveState(false);
+			MainFrame::SetSaveState(false);
 			pMiarex->m_bIs2DScaleSet = false;
 			pMiarex->SetScale();
 			pMiarex->UpdateView();
@@ -315,7 +314,6 @@ void ManageBodiesDlg::OnNameList(QListWidgetItem *pItem)
 
 void ManageBodiesDlg::OnNew()
 {
-	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	QMiarex * pMiarex = (QMiarex*)s_pMiarex;
 	GL3dBodyDlg *pGL3dBodyDlg = (GL3dBodyDlg*)m_pGL3dBodyDlg;
 	Body *pBody = new Body;
@@ -323,7 +321,7 @@ void ManageBodiesDlg::OnNew()
 	if(pGL3dBodyDlg->exec() == QDialog::Accepted)
 	{
 		pMiarex->AddBody(pBody);
-		pMainFrame->SetSaveState(false);
+		MainFrame::SetSaveState(false);
 		UpdateBodyList();
 	}
 	else delete pBody;

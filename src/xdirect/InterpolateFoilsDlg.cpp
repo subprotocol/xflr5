@@ -36,7 +36,6 @@ InterpolateFoilsDlg::InterpolateFoilsDlg(QWidget *pParent) : QDialog(pParent)
 	setWindowTitle(tr("Interpolate Foils"));
 	m_pXDirect = NULL;
 	m_pAFoil = NULL;
-	m_pMainFrame = NULL;
 	m_pBufferFoil = NULL;
 	m_poaFoil = NULL;
 
@@ -193,7 +192,6 @@ void InterpolateFoilsDlg::keyPressEvent(QKeyEvent *event)
 
 void InterpolateFoilsDlg::OnSelChangeFoil1(int i)
 {
-	MainFrame * pMainFrame = (MainFrame*)m_pMainFrame;
 	QString strong  = m_pctrlFoil1->currentText();
 
 	i=0;
@@ -225,7 +223,6 @@ void InterpolateFoilsDlg::OnSelChangeFoil1(int i)
 void InterpolateFoilsDlg::OnSelChangeFoil2(int i)
 {
 	i=0;
-	MainFrame * pMainFrame = (MainFrame*)m_pMainFrame;
 	QString strong  = m_pctrlFoil2->currentText();
 
 	Foil* pFoil = MainFrame::foil(strong);
@@ -253,7 +250,6 @@ void InterpolateFoilsDlg::OnSelChangeFoil2(int i)
 
 void InterpolateFoilsDlg::Update()
 {
-	MainFrame * pMainFrame = (MainFrame*)m_pMainFrame;
 	QAFoil *pAFoil = (QAFoil*)m_pAFoil;
 	QXDirect *pXDirect = (QXDirect*)m_pXDirect;
 	XFoil *pXFoil = (XFoil*)s_pXFoil;

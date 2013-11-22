@@ -609,7 +609,6 @@ Body* QMiarex::AddBody(Body *pBody)
 {
 	bool bExists   = false;
 	bool bInserted = false;
-	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	Body *pOldBody;
 	int i,j;
 
@@ -647,7 +646,7 @@ Body* QMiarex::AddBody(Body *pBody)
 				m_poaBody->append(pBody);
 				bInserted = true;
 			}
-			pMainFrame->SetSaveState(false);
+			MainFrame::SetSaveState(false);
 			return pBody;
 		}
 		else
@@ -748,9 +747,10 @@ void QMiarex::AddPOpp(bool bPointOut, double *Cp, double *Gamma, double *Sigma, 
 {
 
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
-	PlaneOpp *pOldPOpp=NULL;
+
+	PlaneOpp *pOldPOpp = NULL;
 	WingOpp *pWOpp=NULL;
-	int i,j,l,p;
+	int i,l,p;
 	double Cb = 0.0;
 
 	if(!pPOpp)
@@ -763,27 +763,6 @@ void QMiarex::AddPOpp(bool bPointOut, double *Cp, double *Gamma, double *Sigma, 
 		if(pPOpp==NULL) return;
 
 		pPOpp->m_Color = pMainFrame->GetColor(6);
-		bool bFound;
-		for(i=0; i<MAXCOLORS;i++)
-		{
-			bFound = false;
-			for (j=0; j<m_poaWOpp->size();j++)
-			{
-				pWOpp = (WingOpp*)m_poaWOpp->at(j);
-				if(pWOpp->m_Color == pMainFrame->m_ColorList[i]) bFound = true;
-			}
-			for (j=0; j<m_poaPOpp->size();j++)
-			{
-				pOldPOpp = (PlaneOpp*)m_poaPOpp->at(j);
-				if(pOldPOpp->m_Color == pMainFrame->m_ColorList[i]) bFound = true;
-			}
-			if(!bFound)
-			{
-				pPOpp->m_Color = pMainFrame->m_ColorList[i];
-				break;
-			}
-		}
-
 
 		for(int iw=0; iw<MAXWINGS; iw++)
 		{
@@ -966,7 +945,7 @@ void QMiarex::AddPOpp(bool bPointOut, double *Cp, double *Gamma, double *Sigma, 
 		//add the data to the polar object
 		m_pCurWPolar->AddPoint(pPOpp);
 	}
-	pMainFrame->SetSaveState(false);
+	MainFrame::SetSaveState(false);
 
 	bool bIsInserted = false;
 
@@ -1177,12 +1156,11 @@ Wing* QMiarex::AddWing(Wing *pWing)
 void QMiarex::AddWOpp(double QInf, double Alpha, bool bPointOut, double *Gamma, double *Sigma, double *Cp)
 {
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
-	int i,j,l;
+	int i,l;
 	if(!m_bKeepOutOpps && bPointOut) return;
-	pMainFrame->SetSaveState(false);
+	MainFrame::SetSaveState(false);
 
 	WingOpp *pWOpp;
-	PlaneOpp *pPOpp;
 	WingOpp * pNewPoint;
 	pNewPoint = new WingOpp(m_MatSize);
 	if(pNewPoint == NULL)
@@ -1194,26 +1172,6 @@ void QMiarex::AddWOpp(double QInf, double Alpha, bool bPointOut, double *Gamma, 
 	{
 		//load WOpp with data
 		pNewPoint->m_Color = pMainFrame->GetColor(5);
-		bool bFound;
-		for(i=0; i<MAXCOLORS;i++)
-		{
-			bFound = false;
-			for (j=0; j<m_poaWOpp->size();j++)
-			{
-				pWOpp = (WingOpp*)m_poaWOpp->at(j);
-				if(pWOpp->m_Color == pMainFrame->m_ColorList[i]) bFound = true;
-			}
-			for (j=0; j<m_poaPOpp->size();j++)
-			{
-				pPOpp = (PlaneOpp*)m_poaPOpp->at(j);
-				if(pPOpp->m_Color == pMainFrame->m_ColorList[i]) bFound = true;
-			}
-			if(!bFound)
-			{
-				pNewPoint->m_Color = pMainFrame->m_ColorList[i];
-				break;
-			}
-		}
 
 		pNewPoint->m_WingName  = m_pCurWing->WingName();
 
@@ -1659,10 +1617,10 @@ void QMiarex::SetControls()
 
 	m_pctrlInitLLTCalc->setEnabled(m_pCurWPolar && m_pCurWPolar->m_AnalysisMethod==LLTMETHOD);
 
-	pMainFrame->m_pctrlWOppView->setChecked(m_iView==WOPPVIEW);
-	pMainFrame->m_pctrlWPolarView->setChecked(m_iView==WPOLARVIEW);
-	pMainFrame->m_pctrl3dView->setChecked(m_iView==W3DVIEW);
-	pMainFrame->m_pctrlCpView->setChecked(m_iView==WCPVIEW);
+	pMainFrame->WOppAct->setChecked(m_iView==WOPPVIEW);
+	pMainFrame->WPolarAct->setChecked(m_iView==WPOLARVIEW);
+	pMainFrame->W3DAct->setChecked(m_iView==W3DVIEW);
+	pMainFrame->CpViewAct->setChecked(m_iView==WCPVIEW);
 
 	pMainFrame->WOppAct->setChecked(m_iView==WOPPVIEW);
 	pMainFrame->WPolarAct->setChecked(m_iView==WPOLARVIEW);
@@ -2791,27 +2749,6 @@ bool QMiarex::CreateWakeElems(int PanelIndex)
 */
 void QMiarex::CreateWOpp(WingOpp *pWOpp, Wing *pWing)
 {
-	int i,j;
-	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
-	WingOpp *pOldWOpp = NULL;
-	bool bFound;
-
-	for(i=0; i<30; i++)
-	{
-		bFound = false;
-		for (j=0; j<m_poaWOpp->size(); j++)
-		{
-			pOldWOpp = (WingOpp*)m_poaWOpp->at(j);
-			if(pOldWOpp->m_Color == pMainFrame->m_ColorList[i]) bFound = true;
-		}
-		if(!bFound)
-		{
-			pWOpp->m_Color = pMainFrame->m_ColorList[i];
-			break;
-		}
-	}
-
-
 	pWOpp->m_WingName            = pWing->m_WingName;
 	pWOpp->m_NStation            = pWing->m_NStation;
 
@@ -3415,8 +3352,7 @@ void QMiarex::DeleteBody(Body *pThisBody)
 {
 	if(!pThisBody)	return;
 
-	MainFrame* pMainFrame = (MainFrame*)s_pMainFrame;
-	pMainFrame->SetSaveState(false);
+	MainFrame::SetSaveState(false);
 	int i;
 
 	// ... Find the Body in the object array and remove it...
@@ -4075,7 +4011,7 @@ void QMiarex::EditCurPlane()
 	{
 		if(m_pPlaneDlg->m_bDescriptionChanged)
 		{
-			pMainFrame->SetSaveState(false);
+			MainFrame::SetSaveState(false);
 			m_pCurPlane->rPlaneDescription() = pModPlane->PlaneDescription();
 		}
         if(m_pPlaneDlg->m_bChanged)
@@ -8372,7 +8308,7 @@ void QMiarex::OnDefineStabPolar()
 
 	if(res == QDialog::Accepted)
 	{
-		pMainFrame->SetSaveState(false);
+		MainFrame::SetSaveState(false);
 
 		WPolar* pNewStabPolar       = new WPolar;
 		if (m_pCurPlane) pNewStabPolar->m_UFOName = m_pCurPlane->PlaneName();
@@ -8461,7 +8397,7 @@ void QMiarex::OnDefineWPolar()
 	if (res == QDialog::Accepted)
 	{
 		//Then add WPolar to array
-		pMainFrame->SetSaveState(false);
+		MainFrame::SetSaveState(false);
 		pNewWPolar->DuplicateSpec(&WPolarDlg::s_WPolar);
 		pNewWPolar->m_UFOName = UFOName();
 		pNewWPolar->m_PlrName = m_pWPolarDlg->s_WPolar.m_PlrName;
@@ -8545,7 +8481,7 @@ void QMiarex::OnEditCurWPolar()
 
 	if (res == QDialog::Accepted)
 	{
-		pMainFrame->SetSaveState(false);
+		MainFrame::SetSaveState(false);
 
 		pNewWPolar->m_UFOName = UFOName();
 		pNewWPolar->m_PlrName = WPolarName;
@@ -8599,7 +8535,7 @@ void QMiarex::OnDeleteAllWPlrOpps()
 	if(!m_pCurWPolar) return;
 
 	MainFrame* pMainFrame = (MainFrame*)s_pMainFrame;
-	pMainFrame->SetSaveState(false);
+	MainFrame::SetSaveState(false);
 	WingOpp* pWOpp;
 	PlaneOpp* pPOpp;
 	int i;
@@ -8650,7 +8586,7 @@ void QMiarex::OnDeleteAllWOpps()
 {
 
 	MainFrame* pMainFrame = (MainFrame*)s_pMainFrame;
-	pMainFrame->SetSaveState(false);
+	MainFrame::SetSaveState(false);
 	WingOpp* pWOpp;
 	PlaneOpp* pPOpp;
 	int i;
@@ -8737,7 +8673,7 @@ void QMiarex::OnDeleteCurWOpp()
 		m_pCurWOpp = NULL;
 		pMainFrame->UpdateWOpps();
 		SetWOpp(true);
-		pMainFrame->SetSaveState(false);
+		MainFrame::SetSaveState(false);
 		if (m_iView==WOPPVIEW)      CreateWOppCurves();
 		else if(m_iView==WCPVIEW)   CreateCpCurves();
 		else if(m_iView==WSTABVIEW) CreateStabilityCurves();
@@ -8783,7 +8719,7 @@ void QMiarex::OnDeleteCurWOpp()
 		{
 			m_pCurWOpp = NULL;
 		}
-		pMainFrame->SetSaveState(false);
+		MainFrame::SetSaveState(false);
 		if (m_iView==WOPPVIEW)      CreateWOppCurves();
 		else if(m_iView==WCPVIEW)   CreateCpCurves();
 		else if(m_iView==WSTABVIEW) CreateStabilityCurves();
@@ -8844,7 +8780,7 @@ void QMiarex::OnDeleteUFOWOpps()
 	else if(m_iView==WSTABVIEW) CreateStabilityCurves();
 
 	MainFrame* pMainFrame = (MainFrame*)s_pMainFrame;
-	pMainFrame->SetSaveState(false);
+	MainFrame::SetSaveState(false);
 	pMainFrame->UpdateWOpps();
 	SetControls();
 	UpdateView();
@@ -8905,7 +8841,7 @@ void QMiarex::OnDeleteUFOWPolars()
 	m_pCurWPolar = NULL;
 	SetWPlr();
 	pMainFrame->UpdateWPolars();
-	pMainFrame->SetSaveState(false);
+	MainFrame::SetSaveState(false);
 	SetControls();
 	UpdateView();
 }
@@ -8971,7 +8907,7 @@ void QMiarex::OnDeleteCurWPolar()
 	m_pCurPOpp = NULL;
 	m_pCurWOpp = NULL;
 	m_pCurWPolar = NULL;
-	pMainFrame->SetSaveState(false);
+	MainFrame::SetSaveState(false);
 	SetWPlr();
 
 	pMainFrame->UpdateWPolars();
@@ -9130,7 +9066,7 @@ void QMiarex::OnEditCurBody()
 		m_bResetglGeom     = true;
 		m_bResetglMesh     = true;
 		pMainFrame->UpdateWOpps();
-		pMainFrame->SetSaveState(false);
+		MainFrame::SetSaveState(false);
 		m_bIs2DScaleSet = false;
 		SetScale();
 		UpdateView();
@@ -9190,7 +9126,7 @@ void QMiarex::OnEditUFO()
 	{
 		if(pWingDlg->m_bDescriptionChanged)
 		{
-			pMainFrame->SetSaveState(false);
+			MainFrame::SetSaveState(false);
 			m_pCurWing->rWingDescription() = pModWing->WingDescription();
 		}
 		if(pWingDlg->m_bChanged)
@@ -9922,7 +9858,6 @@ void QMiarex::OnHalfWing()
 void QMiarex::OnHideAllWPolars()
 {
 	int i;
-	MainFrame* pMainFrame = (MainFrame*)s_pMainFrame;
 	WPolar *pWPolar;
 	for (i=0; i<m_poaWPolar->size(); i++)
 	{
@@ -9932,7 +9867,7 @@ void QMiarex::OnHideAllWPolars()
 	}
 	if(m_iView==WPOLARVIEW)		CreateWPolarCurves();
 	else if(m_iView==WSTABVIEW)	CreateStabilityCurves();
-	pMainFrame->SetSaveState(false);
+	MainFrame::SetSaveState(false);
 	SetCurveParams();
 	UpdateView();
 }
@@ -9973,8 +9908,7 @@ void QMiarex::OnHideAllWPlrOpps()
 			}
 		}
 	}
-	MainFrame* pMainFrame = (MainFrame*)s_pMainFrame;
-	pMainFrame->SetSaveState(false);
+	MainFrame::SetSaveState(false);
 	SetCurveParams();
 
 	if (m_iView==WOPPVIEW)      CreateWOppCurves();
@@ -10006,8 +9940,7 @@ void QMiarex::OnHideAllWOpps()
 		pPOpp = (PlaneOpp*)m_poaPOpp->at(i);
 		pPOpp->m_bIsVisible = false;
 	}
-	MainFrame* pMainFrame = (MainFrame*)s_pMainFrame;
-	pMainFrame->SetSaveState(false);
+	MainFrame::SetSaveState(false);
 	SetCurveParams();
 
 	if (m_iView==WOPPVIEW)      CreateWOppCurves();
@@ -10047,8 +9980,7 @@ void QMiarex::OnHideUFOWOpps()
 	else if(m_iView==WCPVIEW)   CreateCpCurves();
 	else if(m_iView==WSTABVIEW) CreateStabilityCurves();
 
-	MainFrame* pMainFrame = (MainFrame*)s_pMainFrame;
-	pMainFrame->SetSaveState(false);
+	MainFrame::SetSaveState(false);
 	SetCurveParams();
 	UpdateView();
 }
@@ -10066,7 +9998,6 @@ void QMiarex::OnHideUFOWPolars()
 	else if(m_pCurWing) UFOName = m_pCurWing->WingName();
 	else return;
 
-	MainFrame* pMainFrame = (MainFrame*)s_pMainFrame;
 	WPolar *pWPolar;
 	for (i=0; i<m_poaWPolar->size(); i++)
 	{
@@ -10082,7 +10013,7 @@ void QMiarex::OnHideUFOWPolars()
 	else if(m_iView==WSTABVIEW)	CreateStabilityCurves();
 
 	SetCurveParams();
-	pMainFrame->SetSaveState(false);
+	MainFrame::SetSaveState(false);
 	UpdateView();
 }
 
@@ -10224,7 +10155,7 @@ void QMiarex::OnImportBody()
 
 		m_pCurBody = NULL;
 		UpdateView();
-		pMainFrame->SetSaveState(false);
+		MainFrame::SetSaveState(false);
 	}
 }
 
@@ -10330,7 +10261,7 @@ void QMiarex::OnImportWPolar()
 	SetWPlr(pWPolar);
 	pMainFrame->UpdateWPolars();
 	UpdateView();
-	pMainFrame->SetSaveState(false);
+	MainFrame::SetSaveState(false);
 }
 
 
@@ -10446,7 +10377,6 @@ void QMiarex::OnMoment()
  */
 void QMiarex::OnNewBody()
 {
-	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	Body *pBody = new Body;
 
     m_pGL3dBody->move(GL3dBodyDlg::s_WindowPos);
@@ -10457,7 +10387,7 @@ void QMiarex::OnNewBody()
     if(m_pGL3dBody->exec() == QDialog::Accepted)
 	{
 		AddBody(pBody);
-		pMainFrame->SetSaveState(false);
+		MainFrame::SetSaveState(false);
 	}
 	else delete pBody;
 }
@@ -10482,7 +10412,7 @@ void QMiarex::OnNewWing()
 
 	if(QDialog::Accepted == pWingDlg->exec())
 	{
-		pMainFrame->SetSaveState(false);
+		MainFrame::SetSaveState(false);
 		bool bExists = false;
 		for(i=0; i<m_poaWing->size(); i++)
 		{
@@ -10505,7 +10435,7 @@ void QMiarex::OnNewWing()
 		}
 
 		m_pCurWing = AddWing(pWing);
-		pMainFrame->SetSaveState(false);
+		MainFrame::SetSaveState(false);
 		m_pCurPlane = NULL;
 		SetUFO();
 		pMainFrame->UpdateUFOs();
@@ -10540,7 +10470,7 @@ void QMiarex::OnNewPlane()
 
 	if(QDialog::Accepted == m_pPlaneDlg->exec())
 	{
-		pMainFrame->SetSaveState(false);
+		MainFrame::SetSaveState(false);
 
 		bool bExists = false;
 		for(i=0; i<m_poaPlane->size(); i++)
@@ -10781,7 +10711,7 @@ void QMiarex::OnRenameCurWPolar()
 				}
 			}
 
-			pMainFrame->SetSaveState(false);
+			MainFrame::SetSaveState(false);
 		}
 		else if(resp ==10)
 		{
@@ -10830,7 +10760,7 @@ void QMiarex::OnRenameCurWPolar()
 			}
 
 			bExists = false;
-			pMainFrame->SetSaveState(false);
+			MainFrame::SetSaveState(false);
 		}
 		else
 		{
@@ -10932,7 +10862,7 @@ void QMiarex::OnResetCurWPolar()
 	else if(m_iView==WCPVIEW)   CreateCpCurves();
 
 
-	pMainFrame->SetSaveState(false);
+	MainFrame::SetSaveState(false);
 	UpdateView();
 }
 
@@ -11093,7 +11023,7 @@ void QMiarex::OnShowAllWOpps()
 		pPOpp->m_bIsVisible = true;
 	}
 
-	pMainFrame->SetSaveState(false);
+	MainFrame::SetSaveState(false);
 	SetCurveParams();
 
 	if (m_iView==WOPPVIEW)      CreateWOppCurves();
@@ -11111,7 +11041,6 @@ void QMiarex::OnShowAllWOpps()
 void QMiarex::OnShowAllWPolars()
 {
 	int i;
-	MainFrame* pMainFrame = (MainFrame*)s_pMainFrame;
 	WPolar *pWPolar;
 	for (i=0; i<m_poaWPolar->size(); i++)
 	{
@@ -11121,7 +11050,7 @@ void QMiarex::OnShowAllWPolars()
 	if(m_iView==WPOLARVIEW)		CreateWPolarCurves();
 	else if(m_iView==WSTABVIEW)	CreateStabilityCurves();
 
-	pMainFrame->SetSaveState(false);
+	MainFrame::SetSaveState(false);
 	SetCurveParams();
 	UpdateView();
 }
@@ -11140,7 +11069,6 @@ void QMiarex::OnShowUFOWPolarsOnly()
 	else if(m_pCurWing) UFOName = m_pCurWing->WingName();
 	else return;
 
-	MainFrame* pMainFrame = (MainFrame*)s_pMainFrame;
 	WPolar *pWPolar;
 	for (i=0; i<m_poaWPolar->size(); i++)
 	{
@@ -11152,7 +11080,7 @@ void QMiarex::OnShowUFOWPolarsOnly()
 	else if(m_iView==WSTABVIEW)	CreateStabilityCurves();
 
 	SetCurveParams();
-	pMainFrame->SetSaveState(false);
+	MainFrame::SetSaveState(false);
 	UpdateView();
 }
 
@@ -11170,7 +11098,6 @@ void QMiarex::OnShowUFOWPolars()
 	else if(m_pCurWing) UFOName = m_pCurWing->WingName();
 	else return;
 
-	MainFrame* pMainFrame = (MainFrame*)s_pMainFrame;
 	WPolar *pWPolar;
 	for (i=0; i<m_poaWPolar->size(); i++)
 	{
@@ -11182,7 +11109,7 @@ void QMiarex::OnShowUFOWPolars()
 	else if(m_iView==WSTABVIEW)	CreateStabilityCurves();
 
 	SetCurveParams();
-	pMainFrame->SetSaveState(false);
+	MainFrame::SetSaveState(false);
 	UpdateView();
 }
 
@@ -11217,8 +11144,7 @@ void QMiarex::OnShowUFOWOpps()
 	else if(m_iView==WCPVIEW)   CreateCpCurves();
 	else if(m_iView==WSTABVIEW) CreateStabilityCurves();
 
-	MainFrame* pMainFrame = (MainFrame*)s_pMainFrame;
-	pMainFrame->SetSaveState(false);
+	MainFrame::SetSaveState(false);
 	SetCurveParams();
 	UpdateView();
 }
@@ -11259,8 +11185,8 @@ void QMiarex::OnShowAllWPlrOpps()
 			}
 		}
 	}
-	MainFrame* pMainFrame = (MainFrame*)s_pMainFrame;
-	pMainFrame->SetSaveState(false);
+
+	MainFrame::SetSaveState(false);
 	SetCurveParams();
 
 	if (m_iView==WOPPVIEW)      CreateWOppCurves();
@@ -11913,7 +11839,7 @@ void QMiarex::OnUFOInertia()
 			m_pCurPOpp = NULL;
 		}
 		SetWPlr();
-		pMainFrame->SetSaveState(false);
+		MainFrame::SetSaveState(false);
 		if(m_iView==WPOLARVIEW) CreateWPolarCurves();
 		UpdateView();
 	}
@@ -13767,7 +13693,7 @@ bool QMiarex::SetModBody(Body *pModBody)
 					}
 				}
 				if(!bInserted)	m_poaBody->append(pModBody);
-				pMainFrame->SetSaveState(false);
+				MainFrame::SetSaveState(false);
 				return true;
 			}
 		}
@@ -13829,7 +13755,7 @@ bool QMiarex::SetModBody(Body *pModBody)
             pModBody->m_BodyName = m_pRenameDlg->m_strName;
 			m_pCurBody = pModBody;
 
-			pMainFrame->SetSaveState(false);
+			MainFrame::SetSaveState(false);
 			return true;
 		}
 		else
@@ -13849,7 +13775,6 @@ bool QMiarex::SetModBody(Body *pModBody)
  */
 bool QMiarex::SetModPlane(Plane *pModPlane)
 {
-	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	if(!pModPlane) pModPlane = m_pCurPlane;
 	Plane * pPlane;
 	Wing *pWing;
@@ -13936,7 +13861,7 @@ bool QMiarex::SetModPlane(Plane *pModPlane)
 
 			}
 
-			pMainFrame->SetSaveState(false);
+			MainFrame::SetSaveState(false);
 		}
 		else if(resp ==10)
 		{
@@ -14049,7 +13974,7 @@ bool QMiarex::SetModPlane(Plane *pModPlane)
 			}
 			if(!bInserted) m_poaPlane->append(m_pCurPlane);
 			bExists = false;
-			pMainFrame->SetSaveState(false);
+			MainFrame::SetSaveState(false);
 		}
 		else
 		{
@@ -14070,7 +13995,6 @@ bool QMiarex::SetModPlane(Plane *pModPlane)
  */
 bool QMiarex::SetModWing(Wing *pModWing)
 {
-	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	if(!pModWing) pModWing = m_pCurWing;
 	Wing * pWing, *pOldWing;
 	Plane *pPlane, *pOldPlane;
@@ -14151,7 +14075,7 @@ bool QMiarex::SetModWing(Wing *pModWing)
 						break;
 					}
 				}
-				pMainFrame->SetSaveState(false);
+				MainFrame::SetSaveState(false);
 				return true;
 			}
 		}
@@ -14250,7 +14174,7 @@ bool QMiarex::SetModWing(Wing *pModWing)
             pModWing->m_WingName = m_pRenameDlg->m_strName;
 //			m_pCurWing = pModWing;
 
-			pMainFrame->SetSaveState(false);
+			MainFrame::SetSaveState(false);
 			return true;
 		}
 		else
@@ -14270,7 +14194,6 @@ bool QMiarex::SetModWing(Wing *pModWing)
  */
 bool QMiarex::SetModWPolar(WPolar *pModWPolar)
 {
-	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	if(!pModWPolar) pModWPolar = m_pCurWPolar;
 	WPolar *pWPolar, *pOldWPolar;
 
@@ -14325,7 +14248,7 @@ bool QMiarex::SetModWPolar(WPolar *pModWPolar)
 			m_pCurWPolar = pModWPolar;
 			m_pCurWOpp = NULL;
 			m_pCurPOpp = NULL;
-			pMainFrame->SetSaveState(false);
+			MainFrame::SetSaveState(false);
 			return true;
 		}
 
@@ -15754,7 +15677,7 @@ void QMiarex::UpdateCurve()
 		CreateCpCurves();
 	}
 	UpdateView();
-	pMainFrame->SetSaveState(false);
+	MainFrame::SetSaveState(false);
 }
 
 

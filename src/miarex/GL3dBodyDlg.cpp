@@ -2908,8 +2908,7 @@ void GL3dBodyDlg::OnSelChangeXDegree(int sel)
 	if(!m_pBody) return;
 	if (sel <0) return;
 
-	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
-	pMainFrame->SetSaveState(false);
+	MainFrame::SetSaveState(false);
 
 	TakePicture();
 	StorePicture();
@@ -2928,8 +2927,7 @@ void GL3dBodyDlg::OnSelChangeHoopDegree(int sel)
 	if(!m_pBody) return;
 	if (sel <0) return;
 
-	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
-	pMainFrame->SetSaveState(false);
+	MainFrame::SetSaveState(false);
 
 	TakePicture();
 	StorePicture();
@@ -2945,8 +2943,7 @@ void GL3dBodyDlg::OnSelChangeHoopDegree(int sel)
 void GL3dBodyDlg::OnEdgeWeight()
 {
 	if(!m_pBody) return;
-	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
-	pMainFrame->SetSaveState(false);
+	MainFrame::SetSaveState(false);
 
 	m_bChanged = true;
 	TakePicture();
@@ -2967,8 +2964,7 @@ void GL3dBodyDlg::OnNURBSPanels()
 {
 	if(!m_pBody) return;
 
-	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
-	pMainFrame->SetSaveState(false);
+	MainFrame::SetSaveState(false);
 
 	m_bChanged = true;
 	TakePicture();

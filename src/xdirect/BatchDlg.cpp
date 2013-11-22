@@ -1371,7 +1371,6 @@ void BatchDlg::SetPlrName(Polar *pPolar)
 void BatchDlg::StartAnalysis()
 {
 	QXDirect *pXDirect = (QXDirect*)s_pXDirect;
-	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	Foil *pFoil;
 	QString strong;
 

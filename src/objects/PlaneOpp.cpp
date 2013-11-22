@@ -71,6 +71,7 @@ void PlaneOpp::AddWingOpp(int iw, int PanelArraySize)
 {
 //	m_bWing[iw] = true;
 	m_pPlaneWOpp[iw] = new WingOpp(PanelArraySize);
+	m_pPlaneWOpp[iw]->m_Color = m_Color;
 }
 
 

@@ -85,6 +85,7 @@ QColor MainFrame::s_BackgroundColor = QColor(0, 5, 10);
 bool MainFrame::s_bAlphaChannel = true;
 bool MainFrame::s_bReverseZoom = false;
 bool MainFrame::s_bTrace = false;
+bool MainFrame::s_bSaved = true;
 QFile *MainFrame::s_pTraceFile = NULL;
 enumTextFileType MainFrame::s_ExportFileType;  /**< Defines if the list separator for the output text files should be a space or a comma. */
 
@@ -102,6 +103,8 @@ int MainFrame::s_ForceUnit  = 0;
 int MainFrame::s_MomentUnit = 0;
 
 QList <void *> MainFrame::m_oaFoil;
+QLabel *MainFrame::m_pctrlProjectName = NULL;
+
 
 MainFrame::MainFrame(QWidget * parent, Qt::WindowFlags flags)
 	: QMainWindow(parent, flags)
@@ -162,7 +165,6 @@ MainFrame::MainFrame(QWidget * parent, Qt::WindowFlags flags)
 	s_TextFont.setStyleHint(QFont::TypeWriter, QFont::OpenGLCompatible);
 	s_TextFont.setFamily(s_TextFont.defaultFamily());
 	s_TextFont.setPointSize(10);
-	s_TextFont.setStyleStrategy(QFont::OpenGLCompatible);
 
 	m_RefGraph.SetGraphName("Reference Graph");
 
@@ -243,7 +245,7 @@ MainFrame::MainFrame(QWidget * parent, Qt::WindowFlags flags)
 	m_ColorList.append(QColor(255,255,255));
 
 
-	m_bSaved     = true;
+	s_bSaved     = true;
 	m_bHighlightOpp = m_bHighlightWOpp = false;
 
 	m_iApp = NOAPP;
@@ -517,7 +519,7 @@ void MainFrame::closeEvent (QCloseEvent * event)
 //	pMiarex->m_GL3dView.hide();
 //	pMiarex->m_GL3dView.close();
 
-	if(!m_bSaved)
+	if(!s_bSaved)
 	{
 		int resp = QMessageBox::question(this, tr("Exit"), tr("Save the project before exit ?"),
 										 QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel,
@@ -935,24 +937,16 @@ void MainFrame::CreateAFoilMenus()
 
 void MainFrame::CreateAFoilToolbar()
 {
-	m_pctrlZoomY = new QToolButton;
-	m_pctrlZoomY->setDefaultAction(zoomYAct);
-	m_pctrlZoomY->setCheckable(true);
-
-	m_pctrlZoomIn = new QToolButton;
-	m_pctrlZoomIn->setDefaultAction(zoomInAct);
-	m_pctrlZoomIn->setCheckable(true);
-
 	m_pctrlAFoilToolBar = addToolBar(tr("Foil"));
 	m_pctrlAFoilToolBar->addAction(newProjectAct);
 	m_pctrlAFoilToolBar->addAction(openAct);
 	m_pctrlAFoilToolBar->addAction(saveAct);	
 	m_pctrlAFoilToolBar->addSeparator();
-	m_pctrlAFoilToolBar->addWidget(m_pctrlZoomIn);
+	m_pctrlAFoilToolBar->addAction(zoomInAct);
 	m_pctrlAFoilToolBar->addAction(zoomLessAct);
 	m_pctrlAFoilToolBar->addAction(ResetXYScaleAct);
 	m_pctrlAFoilToolBar->addAction(ResetXScaleAct);
-	m_pctrlAFoilToolBar->addWidget(m_pctrlZoomY);
+	m_pctrlAFoilToolBar->addAction(zoomYAct);
 	m_pctrlAFoilToolBar->addSeparator();
 	m_pctrlAFoilToolBar->addAction(UndoAFoilAct);
 	m_pctrlAFoilToolBar->addAction(RedoAFoilAct);
@@ -1841,27 +1835,6 @@ void MainFrame::CreateMiarexMenus()
 
 void MainFrame::CreateMiarexToolbar()
 {
-	m_pctrl3dView = new QToolButton;
-	m_pctrl3dView->setDefaultAction(W3DAct);
-	m_pctrl3dView->setCheckable(true);
-	m_pctrlWPolarView = new QToolButton;
-	m_pctrlWPolarView->setDefaultAction(WPolarAct);
-	m_pctrlWPolarView->setCheckable(true);
-	m_pctrlWOppView = new QToolButton;
-	m_pctrlWOppView->setDefaultAction(WOppAct);
-	m_pctrlWOppView->setCheckable(true);
-	m_pctrlCpView = new QToolButton;
-	m_pctrlCpView->setDefaultAction(CpViewAct);
-	m_pctrlCpView->setCheckable(true);
-	
-	m_pctrlStabilityButton = new QToolButton;
-	m_pctrlStabilityButton->setDefaultAction(StabTimeAct);
-	m_pctrlStabilityButton->setCheckable(true);
-
-	m_pctrlRootLocusButton = new QToolButton;
-	m_pctrlRootLocusButton->setDefaultAction(RootLocusAct);
-	m_pctrlRootLocusButton->setCheckable(true);
-
 	m_pctrlUFO    = new QComboBox();
 	m_pctrlWPolar = new QComboBox;
 	m_pctrlWOpp   = new QComboBox;
@@ -1880,12 +1853,12 @@ void MainFrame::CreateMiarexToolbar()
 	m_pctrlMiarexToolBar->addAction(openAct);
 	m_pctrlMiarexToolBar->addAction(saveAct);
 	m_pctrlMiarexToolBar->addSeparator();
-	m_pctrlMiarexToolBar->addWidget(m_pctrlWOppView);
-	m_pctrlMiarexToolBar->addWidget(m_pctrlWPolarView);
-	m_pctrlMiarexToolBar->addWidget(m_pctrl3dView);
-	m_pctrlMiarexToolBar->addWidget(m_pctrlCpView);
-	m_pctrlMiarexToolBar->addWidget(m_pctrlRootLocusButton);
-	m_pctrlMiarexToolBar->addWidget(m_pctrlStabilityButton);
+	m_pctrlMiarexToolBar->addAction(WOppAct);
+	m_pctrlMiarexToolBar->addAction(WPolarAct);
+	m_pctrlMiarexToolBar->addAction(W3DAct);
+	m_pctrlMiarexToolBar->addAction(CpViewAct);
+	m_pctrlMiarexToolBar->addAction(RootLocusAct);
+	m_pctrlMiarexToolBar->addAction(StabTimeAct);
 
 	m_pctrlMiarexToolBar->addSeparator();
 	m_pctrlMiarexToolBar->addWidget(m_pctrlUFO);
@@ -1918,13 +1891,6 @@ void MainFrame::CreateToolbars()
 
 void MainFrame::CreateXDirectToolbar()
 {
-	m_pctrlPolarView = new QToolButton;
-	m_pctrlPolarView->setDefaultAction(PolarsAct);
-	m_pctrlPolarView->setCheckable(true);
-	m_pctrlOppView = new QToolButton;
-	m_pctrlOppView->setDefaultAction(OpPointsAct);
-	m_pctrlOppView->setCheckable(true);
-
 	m_pctrlFoil    = new QComboBox;
 	m_pctrlPolar   = new QComboBox;
 	m_pctrlOpPoint = new QComboBox;
@@ -1943,8 +1909,8 @@ void MainFrame::CreateXDirectToolbar()
 	m_pctrlXDirectToolBar->addAction(openAct);
 	m_pctrlXDirectToolBar->addAction(saveAct);
 	m_pctrlXDirectToolBar->addSeparator();
-	m_pctrlXDirectToolBar->addWidget(m_pctrlOppView);
-	m_pctrlXDirectToolBar->addWidget(m_pctrlPolarView);
+	m_pctrlXDirectToolBar->addAction(OpPointsAct);
+	m_pctrlXDirectToolBar->addAction(PolarsAct);
 	m_pctrlXDirectToolBar->addSeparator();
 	m_pctrlXDirectToolBar->addWidget(m_pctrlFoil);
 	m_pctrlXDirectToolBar->addWidget(m_pctrlPolar);
@@ -2564,18 +2530,6 @@ void MainFrame::CreateXInverseToolbar()
 	connect(m_pctrlFullInverse,  SIGNAL(clicked()), pXInverse, SLOT(OnInverseApp()));
 	connect(m_pctrlMixedInverse, SIGNAL(clicked()), pXInverse, SLOT(OnInverseApp()));
 
-	m_pctrlInvZoomX = new QToolButton;
-	m_pctrlInvZoomX->setDefaultAction(InverseZoomX);
-	m_pctrlInvZoomX->setCheckable(true);
-
-	m_pctrlInvZoomY = new QToolButton;
-	m_pctrlInvZoomY->setDefaultAction(InverseZoomY);
-	m_pctrlInvZoomY->setCheckable(true);
-
-	m_pctrlInvZoomIn = new QToolButton;
-	m_pctrlInvZoomIn->setDefaultAction(InverseZoomIn);
-	m_pctrlInvZoomIn->setCheckable(true);
-
 	m_pctrlXInverseToolBar = addToolBar(tr("XInverse"));
 	m_pctrlXInverseToolBar->addAction(newProjectAct);
 	m_pctrlXInverseToolBar->addAction(openAct);
@@ -2587,9 +2541,9 @@ void MainFrame::CreateXInverseToolbar()
 	m_pctrlXInverseToolBar->addAction(ExtractFoil);
 	m_pctrlXInverseToolBar->addAction(StoreFoil);
 	m_pctrlXInverseToolBar->addSeparator();
-	m_pctrlXInverseToolBar->addWidget(m_pctrlInvZoomIn);
-	m_pctrlXInverseToolBar->addWidget(m_pctrlInvZoomX);
-	m_pctrlXInverseToolBar->addWidget(m_pctrlInvZoomY);
+	m_pctrlXInverseToolBar->addAction(InverseZoomIn);
+	m_pctrlXInverseToolBar->addAction(InverseZoomX);
+	m_pctrlXInverseToolBar->addAction(InverseZoomY);
 	m_pctrlXInverseToolBar->addAction(resetCurGraphScales);
 	m_pctrlXInverseToolBar->addAction(InverseResetScale);
 }
@@ -3472,8 +3426,10 @@ bool MainFrame::LoadSettings()
 		s_TextColor.setGreen(settings.value("TextColorGreen").toInt());
 		s_TextColor.setBlue(settings.value("TextColorBlue").toInt());
 
-		s_TextFont.setFamily(settings.value("TextFontFamily", "Courier").toString());
+		s_TextFont = QFont(settings.value("TextFontFamily", "Courier").toString());
 		s_TextFont.setPointSize(settings.value("TextFontPointSize", 10).toInt());
+		s_TextFont.setItalic(settings.value("TextFontItalic", false).toBool());
+		s_TextFont.setBold(settings.value("TextFontBold", false).toBool());
 		s_TextFont.setStyleStrategy(QFont::OpenGLCompatible);
 
 		switch(settings.value("ImageFormat").toInt())
@@ -3598,7 +3554,7 @@ enumApp MainFrame::LoadXFLR5File(QString PathName)
 		{
 			if(end==".wpa")
 			{
-				if(!m_bSaved)
+				if(!s_bSaved)
 				{
 					QString strong = tr("Save the current project ?");
 					int resp =  QMessageBox::question(this ,tr("Save"), strong,  QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel);
@@ -3998,7 +3954,7 @@ void MainFrame::OnNewProject()
 {
 	QMiarex *pMiarex = (QMiarex*)m_pMiarex;
 	pMiarex->m_bArcball = false;
-	if(!m_bSaved)
+	if(!s_bSaved)
 	{
 		int resp = QMessageBox::question(this, tr("Question"), tr("Save the current project ?"),
 										  QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel);
@@ -5235,6 +5191,9 @@ void MainFrame::SaveSettings()
 		settings.setValue("TextColorBlue", s_TextColor.blue());
 		settings.setValue("TextFontFamily", s_TextFont.family());
 		settings.setValue("TextFontPointSize", s_TextFont.pointSize());
+		settings.setValue("TextFontItalic", s_TextFont.italic());
+		settings.setValue("TextFontBold", s_TextFont.bold());
+
 		settings.setValue("ImageFormat", m_ImageFormat);
 		settings.setValue("SaveOpps", m_bSaveOpps);
 		settings.setValue("SaveWOpps", m_bSaveWOpps);
@@ -6327,7 +6286,7 @@ void MainFrame::SetProjectName(QString PathName)
 
 void MainFrame::SetSaveState(bool bSave)
 {
-	m_bSaved = bSave;
+	s_bSaved = bSave;
 
 	int len = s_ProjectName.length();
 	if(s_ProjectName.right(1)=="*") s_ProjectName = s_ProjectName.left(len-1);
@@ -6337,8 +6296,6 @@ void MainFrame::SetSaveState(bool bSave)
 	}
 	m_pctrlProjectName->setText(s_ProjectName);
 }
-
-
 
 
 

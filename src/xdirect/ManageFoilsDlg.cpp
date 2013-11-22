@@ -52,7 +52,6 @@ void ManageFoilsDlg::InitDialog(QString FoilName)
 {
 	FillFoilTable();
 	QString strong;
-	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
 
 	if(m_pFoilModel->rowCount())
 	{
@@ -261,7 +260,7 @@ void ManageFoilsDlg::OnRename()
 	{
 		pMainFrame->RenameFoil(m_pFoil);
 		FillFoilTable();
-		pMainFrame->SetSaveState(false);
+		MainFrame::SetSaveState(false);
 	}
 }
 

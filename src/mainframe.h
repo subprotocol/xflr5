@@ -30,7 +30,6 @@
 #include <QWidget>
 #include <QStringList>
 #include <QStackedWidget>
-#include <QToolButton>
 #include <QComboBox>
 #include <QRadioButton>
 #include <QLabel>
@@ -211,7 +210,6 @@ public:
 	void SetProjectName(QString PathName);
 	void SetMenus();
 	Foil* SetModFoil(Foil* pNewFoil, bool bKeepExistingFoil = false);
-	void SetSaveState(bool bSave);
 	QString ShortenFileName(QString &PathName);
 	void UpdateFoils();
 	void UpdatePolars();
@@ -224,6 +222,7 @@ public:
 	void WritePolars(QDataStream &ar, Foil *pFoil=NULL);
 
 	static QString versionName(){return s_VersionName;}
+	static void SetSaveState(bool bSave);
 	static Foil* foil(QString strFoilName);
 
 /*___________________________________________Variables_______________________________*/
@@ -311,7 +310,6 @@ private:
 	QAction *InsertSplinePt, *RemoveSplinePt;
 	QAction *AFoilTableColumns, *AFoilTableColumnWidths;
 	QAction *AFoilLoadImage, *AFoilClearImage;
-	QToolButton *m_pctrlZoomY, *m_pctrlZoomIn;
 
 	//Miarex Actions
 	QAction *WPolarAct, *WOppAct, *W3DAct, *CpViewAct, *StabTimeAct, *RootLocusAct;
@@ -342,8 +340,8 @@ private:
 	QAction *exporttoAVL, *resetWingScale, *scaleWingAct;
 	QAction *ManageUFOs;
 	QAction *m_pImportWPolar, *m_pUFOInertia;
-	QToolButton *m_pctrl3dView, *m_pctrlWPolarView, *m_pctrlWOppView, *m_pctrlCpView;
-	QToolButton *m_pctrlStabilityButton, *m_pctrlRootLocusButton;//, *m_pctrlModalViewButton;
+//	QToolButton *m_pctrl3dView, *m_pctrlWPolarView, *m_pctrlWOppView, *m_pctrlCpView;
+//	QToolButton *m_pctrlStabilityButton, *m_pctrlRootLocusButton;//, *m_pctrlModalViewButton;
 
 
 	//XDirect Actions
@@ -370,18 +368,16 @@ private:
 	QAction *ManageFoilsAct, *RenamePolarAct;
 	QAction *m_pImportJavaFoilPolar, *m_pImportXFoilPolar;
 	QAction *highlightOppAct;
-	QToolButton *m_pctrlPolarView, *m_pctrlOppView;
 
 	QComboBox *m_pctrlFoil, *m_pctrlPolar, * m_pctrlOpPoint;
 	QComboBox *m_pctrlUFO, *m_pctrlWPolar, * m_pctrlWOpp;
 	QRadioButton *m_pctrlFullInverse, *m_pctrlMixedInverse;
-	QLabel *m_pctrlProjectName;
+	static QLabel *m_pctrlProjectName;
 
 	//XInverse Actions
 	QAction *StoreFoil, *ExtractFoil, *InverseStyles, *InverseResetScale, *InverseInsertCtrlPt, *InverseRemoveCtrlPt;
 	QAction *InvQInitial, *InvQSpec, *InvQViscous, *InvQPoints, *InvQReflected;
 	QAction *InverseResetGraphScale, *XInverseGraphDlg, *InverseZoomIn, *InverseZoomX, *InverseZoomY;
-	QToolButton *m_pctrlInvZoomX, *m_pctrlInvZoomY, *m_pctrlInvZoomIn;
 
 	QStringList m_RecentFiles;
 
@@ -399,7 +395,7 @@ private:
 
 	enumApp m_iApp;                 /**< The identification number of the active app. */
 
-	bool m_bSaved;              /**< true if the project has not been modified since the last save operation. */
+	static bool s_bSaved;       /**< true if the project has not been modified since the last save operation. */
 	bool m_bSaveOpps;           /**< true if foil operating points should be serialized in the project file */
 	bool m_bSaveWOpps;          /**< true if wing operating points should be serialized in the project file */
 	bool m_bSaveSettings;       /**< true if user-defined settings should be saved on exit. */

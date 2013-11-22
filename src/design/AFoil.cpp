@@ -610,7 +610,7 @@ void QAFoil::keyPressEvent(QKeyEvent *event)
 			}
 			else if(m_bZoomYOnly)
 			{
-				pMainFrame->m_pctrlZoomY->setChecked(false);
+				pMainFrame->zoomYAct->setChecked(false);
 				m_bZoomYOnly = false;
 			}
 			break;
@@ -843,7 +843,6 @@ void QAFoil::mouseDoubleClickEvent (QMouseEvent * event)
 void QAFoil::mouseMoveEvent(QMouseEvent *event)
 {
 	if(!hasFocus()) setFocus();
-	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	QPoint point = event->pos();
 	m_MousePos = MousetoReal(point);
 	CVector Real = m_MousePos;
@@ -896,7 +895,7 @@ void QAFoil::mouseMoveEvent(QMouseEvent *event)
 					m_pSF->UpdateSplineFoil();
 				}
 				m_pSF->m_bModified = true;
-				pMainFrame->SetSaveState(false);
+				MainFrame::SetSaveState(false);
 			}
 			else
 			{
@@ -916,7 +915,7 @@ void QAFoil::mouseMoveEvent(QMouseEvent *event)
 						m_pSF->UpdateSplineFoil();
 					}
 					m_pSF->m_bModified = true;
-					pMainFrame->SetSaveState(false);
+					MainFrame::SetSaveState(false);
 				}
 			}
 
@@ -1542,7 +1541,6 @@ void QAFoil::OnAFoilInterpolateFoils()
 
 	m_pIFDlg->m_poaFoil = m_poaFoil;
 	m_pIFDlg->m_pBufferFoil = m_pBufferFoil;
-	m_pIFDlg->m_pMainFrame = s_pMainFrame;
 	m_pIFDlg->m_pXDirect  = NULL;
 	m_pIFDlg->m_pAFoil    = this;
 	m_pIFDlg->InitDialog();
@@ -1810,7 +1808,6 @@ void QAFoil::OnExportSplinesToFile()
 void QAFoil::FoilVisibleClicked(const QModelIndex& index)
 {
 	if(index.row()>=m_poaFoil->size()+1) return;
-	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	QStandardItem *pItem = m_pFoilModel->item(index.row(),0);
 
 	if(index.row()>0)
@@ -1829,7 +1826,7 @@ void QAFoil::FoilVisibleClicked(const QModelIndex& index)
 		{
 			pFoil->m_bCenterLine = !pFoil->m_bCenterLine;
 		}
-		pMainFrame->SetSaveState(false);
+		MainFrame::SetSaveState(false);
 	}
 	else if(index.row()==0)
 	{
@@ -1857,7 +1854,6 @@ void QAFoil::FoilVisibleClicked(const QModelIndex& index)
 void QAFoil::OnFoilClicked(const QModelIndex& index)
 {
 	if(index.row()>=m_poaFoil->size()+1) return;
-	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	QStandardItem *pItem = m_pFoilModel->item(index.row(),0);
 	
 	if(index.row()>0)
@@ -1880,7 +1876,6 @@ void QAFoil::OnFoilClicked(const QModelIndex& index)
  */
 void QAFoil::OnFoilStyle()
 {
-	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	if(!MainFrame::s_pCurFoil)
 	{
         LinePickerDlg dlg(this);
@@ -1899,7 +1894,7 @@ void QAFoil::OnFoilStyle()
 
 		if(QDialog::Accepted==dlg.exec())
 		{
-			pMainFrame->SetSaveState(false);
+			MainFrame::SetSaveState(false);
 			MainFrame::s_pCurFoil->m_nFoilStyle = dlg.GetStyle();
 			MainFrame::s_pCurFoil->m_nFoilWidth = dlg.GetWidth();
 			MainFrame::s_pCurFoil->m_FoilColor = dlg.GetColor();
@@ -1987,8 +1982,7 @@ void QAFoil::OnGrid()
  */
 void QAFoil::OnHideAllFoils()
 {
-	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
-	pMainFrame->SetSaveState(false);
+	MainFrame::SetSaveState(false);
 	Foil*pFoil;
 	for (int k=0; k<m_poaFoil->size(); k++)
 	{
@@ -2033,7 +2027,7 @@ void QAFoil::OnNewSplines()
 	ClearStack(0);
 	TakePicture();
 
-	pMainFrame->SetSaveState(false);
+	MainFrame::SetSaveState(false);
 	UpdateView();
 }
 
@@ -2055,8 +2049,7 @@ void QAFoil::OnRenameFoil()
  */
 void QAFoil::OnShowAllFoils()
 {
-	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
-	pMainFrame->SetSaveState(false);
+	MainFrame::SetSaveState(false);
 	Foil*pFoil;
 	for (int k=0; k<m_poaFoil->size(); k++)
 	{
@@ -2200,7 +2193,7 @@ void QAFoil::OnZoomIn()
 		{
 			m_bZoomPlus = true;
 			MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
-			pMainFrame->m_pctrlZoomIn->setChecked(true);
+			pMainFrame->zoomInAct->setChecked(true);
 
 		}
 		else
@@ -2223,8 +2216,8 @@ void QAFoil::OnZoomYOnly()
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	TwoDWidget *p2Dwidget = (TwoDWidget*)s_p2DWidget;
 	m_bZoomYOnly = !m_bZoomYOnly;
-	if(m_bZoomYOnly)	pMainFrame->m_pctrlZoomY->setChecked(true);
-	else				pMainFrame->m_pctrlZoomY->setChecked(false);
+	pMainFrame->zoomYAct->setChecked(m_bZoomYOnly);
+
 	p2Dwidget->setFocus();
 }
 
@@ -2550,7 +2543,7 @@ void QAFoil::PaintFoils(QPainter &painter)
 void QAFoil::ReleaseZoom()
 {
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
-	pMainFrame->m_pctrlZoomIn->setChecked(false);
+	pMainFrame->zoomInAct->setChecked(false);
 	TwoDWidget *p2DWidget = (TwoDWidget*)s_p2DWidget;
 	m_bZoomPlus = false;
 
@@ -2824,9 +2817,8 @@ void QAFoil::SetParams()
 void QAFoil::ShowFoil(Foil* pFoil, bool bShow)
 {
 	if(!pFoil) return;
-	MainFrame* pMainFrame = (MainFrame*)s_pMainFrame;
 	MainFrame::s_pCurFoil->m_bVisible = bShow;
-	pMainFrame->SetSaveState(false);
+	MainFrame::SetSaveState(false);
 }
 
 

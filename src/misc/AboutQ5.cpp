@@ -34,7 +34,6 @@ AboutQ5::AboutQ5(QWidget *parent) : QDialog(parent)
 
 void AboutQ5::SetupLayout()
 {
-	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
 	QGridLayout *LogoLayout = new QGridLayout;
 	QLabel *LabIconQ5 = new QLabel;
 	LabIconQ5->setObjectName("iconXFLR5"); 

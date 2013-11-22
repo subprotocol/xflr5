@@ -380,7 +380,6 @@ void PlaneDlg::OnEditBody()
 {
 	if(!m_pPlane->m_pBody) return;
 	QMiarex * pMiarex = (QMiarex*)s_pMiarex;
-	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 
 	Body memBody;
 	memBody.Duplicate(m_pPlane->m_pBody);
@@ -394,7 +393,7 @@ void PlaneDlg::OnEditBody()
 		pMiarex->m_bResetglBodyMesh = true;
 		pMiarex->m_bResetglGeom = true;
 		pMiarex->m_bResetglMesh = true;
-		pMainFrame->SetSaveState(false);
+		MainFrame::SetSaveState(false);
 		m_bChanged = true;
 		SetResults();
 	}

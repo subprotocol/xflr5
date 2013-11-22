@@ -65,7 +65,6 @@ public:
 
 	void *m_pXDirect;
 	void *m_pAFoil;
-	void* m_pMainFrame;
 	double m_Frac;
 	QString m_NewFoilName;
 };

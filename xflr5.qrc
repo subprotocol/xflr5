@@ -29,5 +29,9 @@
         <file>images/OnXView.png</file>
         <file>images/OnZView.png</file>
         <file>images/OnIsoView.png</file>
+        <file>qss/images/checkbox_unchecked.png</file>
+        <file>qss/images/checkbox.png</file>
+        <file>qss/images/down_arrow.png</file>
+        <file>qss/images/handle.png</file>
     </qresource>
 </RCC>

@@ -50,9 +50,6 @@ private slots:
 	void OnCancelAnalysis();
 	void OnSkipPoint();
 
-signals:
-	void SkipPoint();
-	void CancelAnalysis();
 
 private:
 	void AddOpPoint();

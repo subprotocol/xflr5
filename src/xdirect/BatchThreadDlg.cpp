@@ -807,7 +807,6 @@ void BatchThreadDlg::WriteString(QString &strong)
 void BatchThreadDlg::StartAnalysis()
 {
 	QXDirect *pXDirect = (QXDirect*)s_pXDirect;
-	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	Foil *pFoil;
 	Polar *pPolar;
 	QString strong;
@@ -820,7 +819,7 @@ void BatchThreadDlg::StartAnalysis()
 	if(s_bCurrentFoil)
 	{
 		m_FoilList.clear();
-		m_FoilList.append(((MainFrame*)s_pMainFrame)->curFoil()->m_FoilName);
+		m_FoilList.append(MainFrame::curFoil()->m_FoilName);
 	}
 
 	if(!m_bFromList) nRe = (int)fabs((m_ReMax-m_ReMin)/m_ReInc);
