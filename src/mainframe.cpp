@@ -4210,7 +4210,7 @@ void MainFrame::OnSaveUFOAsProject()
 #endif
 	ar.setByteOrder(QDataStream::LittleEndian);
 	SerializeUFOProject(ar);
-	m_FileName = PathName;
+//	m_FileName = PathName;
 	fp.close();
 
 }
