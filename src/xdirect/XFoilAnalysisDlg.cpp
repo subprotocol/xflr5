@@ -166,11 +166,11 @@ bool XFoilAnalysisDlg::AlphaLoop()
 
 	int ia, total;
 
-	if(m_AlphaMax< m_AlphaMin) m_DeltaAlpha = -fabs(m_DeltaAlpha);
-	if(m_ClMax< m_ClMin)       m_DeltaCl = -fabs(m_DeltaCl);
+	if(m_AlphaMax< m_AlphaMin) m_DeltaAlpha = -qAbs(m_DeltaAlpha);
+	if(m_ClMax< m_ClMin)       m_DeltaCl = -qAbs(m_DeltaCl);
 
-	if      ( m_bAlpha && fabs(m_DeltaAlpha)<1.e-3) total = 0;
-	else if (!m_bAlpha && fabs(m_DeltaCl)<1.e-4)    total = 0;
+	if      ( m_bAlpha && qAbs(m_DeltaAlpha)<1.e-3) total = 0;
+	else if (!m_bAlpha && qAbs(m_DeltaCl)<1.e-4)    total = 0;
 	else
 	{
 		if(m_bAlpha) total=int((m_AlphaMax-m_AlphaMin)*1.0001/m_DeltaAlpha);//*1.0001 to make sure upper limit is included
@@ -411,7 +411,7 @@ bool XFoilAnalysisDlg::ReLoop()
 	int ia;
 	double Re;
 
-	if(m_ReMax< m_ReMin) m_DeltaRe = -fabs(m_DeltaRe);
+	if(m_ReMax< m_ReMin) m_DeltaRe = -qAbs(m_DeltaRe);
 
 	int total=int((m_ReMax*1.0001-m_ReMin)/m_DeltaRe);//*1.0001 to make sure upper limit is included
 
@@ -444,11 +444,11 @@ bool XFoilAnalysisDlg::ReLoop()
 				return false;
 			}
 
-			if (fabs(m_pXFoil->alfa-m_pXFoil->awake) > 0.00001)
+			if (qAbs(m_pXFoil->alfa-m_pXFoil->awake) > 0.00001)
 				m_pXFoil->lwake  = false;
-			if (fabs(m_pXFoil->alfa-m_pXFoil->avisc) > 0.00001)
+			if (qAbs(m_pXFoil->alfa-m_pXFoil->avisc) > 0.00001)
 				m_pXFoil->lvconv = false;
-			if (fabs(m_pXFoil->minf-m_pXFoil->mvisc) > 0.00001)
+			if (qAbs(m_pXFoil->minf-m_pXFoil->mvisc) > 0.00001)
 				m_pXFoil->lvconv = false;
 
 			m_pXFoil->lwake = false;

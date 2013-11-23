@@ -60,14 +60,12 @@ bool GL3dWingDlg::s_bWindowMaximized=false;
 GL3dWingDlg::GL3dWingDlg(QWidget *pParent) : QDialog(pParent)
 {
 	setWindowTitle(tr("Wing Edition"));
-	setWindowFlags(Qt::Window);
-//	setSizeGripEnabled(true);
+    setWindowFlags(Qt::Window);
 
 	m_pWing = NULL;
 
 
 	m_iSection   = -1;
-//	m_yMAC       = 0.0;
 	m_GLList     = 0;
 
 	m_UFOOffset.Set( 0.0, 0.0, 0.0);
@@ -127,6 +125,7 @@ GL3dWingDlg::GL3dWingDlg(QWidget *pParent) : QDialog(pParent)
 	m_pContextMenu->addAction(m_pResetSection);
 
 	SetupLayout();
+
 	Connect();
 
 	setMouseTracking(true);
@@ -518,6 +517,7 @@ void GL3dWingDlg::GLCreateMesh()
 				}
 			}
 		}
+        glDisable(GL_DEPTH_TEST);
 	}
 	glEndList();
 
@@ -652,6 +652,7 @@ void GL3dWingDlg::GLCreateMesh()
 				}
 			}
 		}
+        glDisable(GL_DEPTH_TEST);
 		glDisable(GL_POLYGON_OFFSET_FILL);
 	}
 	glEndList();
@@ -669,7 +670,7 @@ void GL3dWingDlg::GLCreateSectionHighlight()
 	for(j=0; j<m_pWing->NWingSection(); j++)
 	{
 		if(j==m_iSection) break;
-		if(fabs(m_pWing->YPosition(j+1)-m_pWing->YPosition(j)) > QMiarex::s_MinPanelSize)
+		if(qAbs(m_pWing->YPosition(j+1)-m_pWing->YPosition(j)) > QMiarex::s_MinPanelSize)
 			section++;
 	}
 
@@ -677,8 +678,7 @@ void GL3dWingDlg::GLCreateSectionHighlight()
 	{
 		m_GLList++;
 
-		glPolygonMode(GL_FRONT,GL_LINE);
-		glDisable (GL_LINE_STIPPLE);
+        glDisable (GL_LINE_STIPPLE);
 		glColor3d(1.0, 0.0, 0.0);
 		glLineWidth(3);
 
@@ -872,14 +872,14 @@ void GL3dWingDlg::GLDrawFoils()
 		pFoil = m_pWing->m_Surface[j].m_pFoilA;
 
 		if(pFoil) m_pGLWidget->renderText(m_pWing->m_Surface[j].m_TA.x, m_pWing->m_Surface[j].m_TA.y, m_pWing->m_Surface[j].m_TA.z,
-								    pFoil->m_FoilName);
+                                          pFoil->m_FoilName);
 
 	}
 
 	j = m_pWing->m_NSurfaces-1;
 	pFoil = m_pWing->m_Surface[j].m_pFoilB;
 	if(pFoil) m_pGLWidget->renderText(m_pWing->m_Surface[j].m_TB.x, m_pWing->m_Surface[j].m_TB.y, m_pWing->m_Surface[j].m_TB.z,
-							    pFoil->m_FoilName);
+                                      pFoil->m_FoilName);
 
 }
 
@@ -902,11 +902,12 @@ void GL3dWingDlg::GLInverseMatrix()
 }
 
 
-
-
 void GL3dWingDlg::GLRenderView()
 {
 	QMiarex *pMiarex = (QMiarex*)s_pMiarex;
+
+    QString MassUnit;
+    GetWeightUnit(MassUnit, MainFrame::s_WeightUnit);
 
 	GLdouble pts[4];
 	pts[0]= 0.0; pts[1]=0.0; pts[2]=-1.0; pts[3]= m_ClipPlanePos;  //x=m_VerticalSplit
@@ -924,24 +925,6 @@ void GL3dWingDlg::GLRenderView()
 		m_pGLWidget->GLSetupLight((GLLightDlg*)s_pGLLightDlg, m_UFOOffset.y, 1.0);
 		glDisable(GL_LIGHTING);
 		glDisable(GL_LIGHT0);
-/*		if(m_bShowLight)
-		{
-			glDisable(GL_LIGHTING);
-			glDisable(GL_LIGHT0);
-			glPushMatrix();
-			{
-				glTranslated(( m_GLLightDlg.m_XLight+ m_UFOOffset.x)*m_GLScale,
-							 ( m_GLLightDlg.m_YLight+ m_UFOOffset.y)*m_GLScale,
-							   m_GLLightDlg.m_ZLight*m_GLScale);
-				double radius = (m_GLLightDlg.m_ZLight+2.0)/40.0*m_GLScale;
-				QColor color;
-				color = QColor((int)(m_GLLightDlg.m_Red  *255),
-							(int)(m_GLLightDlg.m_Green*255),
-							(int)(m_GLLightDlg.m_Blue *255));
-				GLRenderSphere(color,radius,18,18);
-			}
-			glPopMatrix();
-		}*/
 
 		glLoadIdentity();
 		if(m_bCrossPoint && m_bArcball)
@@ -1028,8 +1011,10 @@ void GL3dWingDlg::GLRenderView()
 							 m_pWing->m_PointMass[im]->position().z);
 				double radius = .02;//2cm
 				m_pGLWidget->GLRenderSphere(pMiarex->m_MassColor,radius,18,18);
-				m_pGLWidget->renderText(0.0, 0.0, 0.02, m_pWing->m_PointMass[im]->tag());
-
+                m_pGLWidget->renderText( 0.0, 0.0, 0.0 +.02,
+                                         m_pWing->m_PointMass[im]->tag()
+                                        +QString(" %1").arg(m_pWing->m_PointMass[im]->mass()*MainFrame::s_kgtoUnit, 7,'g',3)
+                                        +MassUnit);
 			}
 			glPopMatrix();
 		}
@@ -1043,8 +1028,6 @@ void GL3dWingDlg::GLRenderView()
 	glDisable(GL_CLIP_PLANE1);
 	glFinish();
 }
-
-
 
 
 bool GL3dWingDlg::InitDialog(Wing *pWing)
@@ -2202,7 +2185,7 @@ void GL3dWingDlg::SetupLayout()
 //	QDesktopWidget desktop;
 //	QRect r = desktop.screenGeometry();
 //	setMaximumHeight(r.height());
-	setMinimumHeight(700);
+    setMinimumHeight(700);
 
 	QSizePolicy szPolicyExpanding;
 	szPolicyExpanding.setHorizontalPolicy(QSizePolicy::Expanding);
@@ -2217,8 +2200,9 @@ void GL3dWingDlg::SetupLayout()
 	szPolicyMaximum.setVerticalPolicy(QSizePolicy::Maximum);
 
 	m_pGLWidget = new ThreeDWidget(this);
-	m_pGLWidget->m_iView = GLWINGVIEW;
-	m_ArcBall.m_p3dWidget = m_pGLWidget;
+    m_pGLWidget->m_iView = GLWINGVIEW;
+
+    m_ArcBall.m_p3dWidget = m_pGLWidget;
 
 /*_____________Start Top Layout Here____________*/
 	QVBoxLayout *DefLayout = new QVBoxLayout;
@@ -2273,7 +2257,6 @@ void GL3dWingDlg::SetupLayout()
 
 	LeftLayout->addWidget(m_pctrlControlsWidget);
 	LeftLayout->addWidget(m_pGLWidget,1);
-
 
 	QGridLayout *DataLayout = new QGridLayout;
 	{
@@ -2478,8 +2461,6 @@ void GL3dWingDlg::SetupLayout()
 		ThreeDView->addLayout(ViewResetLayout);
 	}
 
-
-
 	QHBoxLayout *ThreeDViewControls = new QHBoxLayout;
 	{
 		QLabel *ClipLabel = new QLabel(tr("Clip Plane"));
@@ -2613,8 +2594,8 @@ int GL3dWingDlg::VLMGetPanelTotal()
 	for (int i=0; i<m_pWing->NWingSection()-1; i++)
 	{
 			//do not create a surface if its length is less than the critical size
-//			if(fabs(m_pWing->TPos[j]-m_pWing->TPos(j+1))/m_pWing->m_Span >0.001){
-			if (fabs(m_pWing->YPosition(i)-m_pWing->YPosition(i+1)) > MinPanelSize)
+//			if(qAbs(m_pWing->TPos[j]-m_pWing->TPos(j+1))/m_pWing->m_Span >0.001){
+			if (qAbs(m_pWing->YPosition(i)-m_pWing->YPosition(i+1)) > MinPanelSize)
 				total +=m_pWing->NXPanels(i)*m_pWing->NYPanels(i);
 	}
 //	if(!m_bMiddle) total *=2;
@@ -2653,7 +2634,7 @@ bool GL3dWingDlg::VLMSetAutoMesh(int total)
 //		d2 = 5./2./m_pWing->m_Span/m_pWing->m_Span/m_pWing->m_Span *8. * pow(m_pWing->TPos(i+1),3) + 0.5;
 //		m_pWing->NYPanels(i) = (int) (NYTotal * (0.8*d1+0.2*d2)* (m_pWing->TPos(i+1)-m_pWing->TPos(i))/m_pWing->m_Span);
 
-		m_pWing->NYPanels(i) = (int)(fabs(m_pWing->YPosition(i+1) - m_pWing->YPosition(i))* (double)NYTotal/m_pWing->m_PlanformSpan);
+		m_pWing->NYPanels(i) = (int)(qAbs(m_pWing->YPosition(i+1) - m_pWing->YPosition(i))* (double)NYTotal/m_pWing->m_PlanformSpan);
 
 		m_pWing->NXPanels(i) = (int) (size/NYTotal);
 		m_pWing->NXPanels(i) = qMin(m_pWing->NXPanels(i), MAXCHORDPANELS);

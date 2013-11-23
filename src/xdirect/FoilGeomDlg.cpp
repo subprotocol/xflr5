@@ -348,7 +348,7 @@ void FoilGeomDlg::InitDialog()
 	m_fXCamber    = m_pMemFoil->m_fXCamber;
 	m_fXThickness = m_pMemFoil->m_fXThickness;
 
-	if(fabs(m_fCamber) <0.0001)
+	if(qAbs(m_fCamber) <0.0001)
 	{
 //		m_pctrlCamb->SetWindowText("The foil's camber is too small to be scaled"); //TODO
 		m_pctrlCamberSlide->setEnabled(false);

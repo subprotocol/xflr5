@@ -72,11 +72,11 @@ void GraphDlg::Connect()
 	connect(m_pctrlXMinGridShow, SIGNAL(stateChanged(int)), this, SLOT(OnXMinGridShow(int)));
 	connect(m_pctrlYMinGridShow, SIGNAL(stateChanged(int)), this, SLOT(OnYMinGridShow(int)));
 
-	connect(m_pctrlAxisStyle, SIGNAL(clicked()), this, SLOT(OnAxisStyle()));
-	connect(m_pctrlXMajGridStyle, SIGNAL(clicked()), this, SLOT(OnXMajGridStyle()));
-	connect(m_pctrlYMajGridStyle, SIGNAL(clicked()), this, SLOT(OnYMajGridStyle()));
-	connect(m_pctrlXMinGridStyle, SIGNAL(clicked()), this, SLOT(OnXMinGridStyle()));
-	connect(m_pctrlYMinGridStyle, SIGNAL(clicked()), this, SLOT(OnYMinGridStyle()));
+    connect(m_pctrlAxisStyle, SIGNAL(clickedLB()), this, SLOT(OnAxisStyle()));
+    connect(m_pctrlXMajGridStyle, SIGNAL(clickedLB()), this, SLOT(OnXMajGridStyle()));
+    connect(m_pctrlYMajGridStyle, SIGNAL(clickedLB()), this, SLOT(OnYMajGridStyle()));
+    connect(m_pctrlXMinGridStyle, SIGNAL(clickedLB()), this, SLOT(OnXMinGridStyle()));
+    connect(m_pctrlYMinGridStyle, SIGNAL(clickedLB()), this, SLOT(OnYMinGridStyle()));
 
 	connect(m_pctrlAutoXMinUnit, SIGNAL(clicked()), this, SLOT(OnAutoMinGrid()));
 	connect(m_pctrlAutoYMinUnit, SIGNAL(clicked()), this, SLOT(OnAutoMinGrid()));

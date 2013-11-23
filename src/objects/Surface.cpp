@@ -328,7 +328,7 @@ double Surface::GetChord(double const &tau)
 	ChordA = V1.VAbs();
 	ChordB = V2.VAbs();
 
-	return ChordA + (ChordB-ChordA) * fabs(tau);
+	return ChordA + (ChordB-ChordA) * qAbs(tau);
 }
 
 
@@ -340,7 +340,7 @@ double Surface::GetChord(double const &tau)
 double Surface::GetOffset(double const &tau)
 {
 	//chord spacing
-	return m_LA.x + (m_LB.x-m_LA.x) * fabs(tau);
+	return m_LA.x + (m_LB.x-m_LA.x) * qAbs(tau);
 }
 
 /**
@@ -479,7 +479,7 @@ void Surface::GetPanel(int const &k, int const &l, enumPanelPosition const &pos)
 double Surface::GetStripWidth(int const &k)
 {
 	GetPanel(k, 0, MIDSURFACE);
-	return fabs(LA.y-LB.y);
+	return qAbs(LA.y-LB.y);
 }
 
 /**
@@ -823,7 +823,7 @@ bool Surface::RotateFlap(double const &Angle)
 	if(m_pFoilA && m_pFoilB)
 	{
 		//get the approximate initial angle
-		if(fabs(m_pFoilA->m_TEFlapAngle - m_pFoilB->m_TEFlapAngle)>0.1)
+		if(qAbs(m_pFoilA->m_TEFlapAngle - m_pFoilB->m_TEFlapAngle)>0.1)
 		{
 			QMessageBox msgBox;
 			msgBox.setStandardButtons(QMessageBox::Ok);

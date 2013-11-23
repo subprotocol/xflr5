@@ -468,7 +468,7 @@ void WPolarDlg::OnOK()
 	}
 	s_WPolar.m_PlrName = m_pctrlWPolarName->text();
 
-	if(fabs(s_WPolar.m_Mass)<PRECISION && s_WPolar.m_WPolarType==FIXEDLIFTPOLAR)
+	if(qAbs(s_WPolar.m_Mass)<PRECISION && s_WPolar.m_WPolarType==FIXEDLIFTPOLAR)
 	{
 		QMessageBox::warning(this, tr("Warning"),tr("Mass must be non-zero for type 2 polars"));
 		m_pctrlWeight->setFocus();
@@ -912,7 +912,7 @@ void WPolarDlg::SetWPolarName()
 		strong = QString("-x%1").arg(s_WPolar.m_CoG.x*MainFrame::s_mtoUnit,0,'f',3);
 		WPolarName += strong + str;
 
-		if(fabs(s_WPolar.m_CoG.z)>=.000001)
+		if(qAbs(s_WPolar.m_CoG.z)>=.000001)
 		{
 			strong = QString("-z%1").arg(s_WPolar.m_CoG.z*MainFrame::s_mtoUnit,0,'f',3);
 			WPolarName += strong + str;
@@ -921,7 +921,7 @@ void WPolarDlg::SetWPolarName()
 //	else WPolarName += "-Plane_Inertia";
 
 
-	if(fabs(s_WPolar.m_Beta) > .001)
+	if(qAbs(s_WPolar.m_Beta) > .001)
 	{
 		strong = QString(QString::fromUtf8("-b%1°")).arg(s_WPolar.m_Beta,0,'f',2);
 		WPolarName += strong;

@@ -157,13 +157,13 @@ void StabViewDlg::FillEigenThings()
 
 		c = pMiarex->m_pCurWOpp->m_EigenValue[m_iCurrentMode];
 		if(c.imag()>=0.0) strange = QString("%1+%2i").arg(c.real(),9,'f',4).arg(c.imag(),9,'f',4);
-		else              strange = QString("%1-%2i").arg(c.real(),9,'f',4).arg(fabs(c.imag()),9,'f',4);
+		else              strange = QString("%1-%2i").arg(c.real(),9,'f',4).arg(qAbs(c.imag()),9,'f',4);
 		m_pctrlEigenValue->setText(strange);
         ModeDescription.append("Lambda="+strange+"<br/>");
 
         sum  = c.real() * 2.0;                          // is a real number
         prod = c.real()*c.real() + c.imag()*c.imag();  // is a positive real number
-        OmegaN = fabs(c.imag());
+        OmegaN = qAbs(c.imag());
         if(OmegaN>PRECISION) Omega1 = sqrt(prod);
         else                 Omega1 = 0.0;
         Sigma1 = sum /2.0;
@@ -186,25 +186,25 @@ void StabViewDlg::FillEigenThings()
 			angle = pMiarex->m_pCurWOpp->m_EigenVector[m_iCurrentMode][3];
 			c = pMiarex->m_pCurWOpp->m_EigenVector[m_iCurrentMode][0]/u0;
 			if(c.imag()>=0.0) strange = QString("%1+%2i").arg(c.real(),10,'f',5).arg(c.imag(),10,'f',5);
-			else              strange = QString("%1-%2i").arg(c.real(),10,'f',5).arg(fabs(c.imag()),10,'f',5);
+			else              strange = QString("%1-%2i").arg(c.real(),10,'f',5).arg(qAbs(c.imag()),10,'f',5);
 			m_pctrlEigenVector1->setText(strange);
             ModeDescription.append("v1="+strange+"<br/>");
 
 			c = pMiarex->m_pCurWOpp->m_EigenVector[m_iCurrentMode][1]/u0;
 			if(c.imag()>=0.0) strange = QString("%1+%2i").arg(c.real(),10,'f',5).arg(c.imag(),10,'f',5);
-			else              strange = QString("%1-%2i").arg(c.real(),10,'f',5).arg(fabs(c.imag()),10,'f',5);
+			else              strange = QString("%1-%2i").arg(c.real(),10,'f',5).arg(qAbs(c.imag()),10,'f',5);
 			m_pctrlEigenVector2->setText(strange);
             ModeDescription.append("v2="+strange+"<br/>");
 
 			c = pMiarex->m_pCurWOpp->m_EigenVector[m_iCurrentMode][2]/(2.0*u0/mac);
 			if(c.imag()>=0.0) strange = QString("%1+%2i").arg(c.real(),10,'f',5).arg(c.imag(),10,'f',5);
-			else              strange = QString("%1-%2i").arg(c.real(),10,'f',5).arg(fabs(c.imag()),10,'f',5);
+			else              strange = QString("%1-%2i").arg(c.real(),10,'f',5).arg(qAbs(c.imag()),10,'f',5);
 			m_pctrlEigenVector3->setText(strange);
             ModeDescription.append("v3="+strange+"<br/>");
 
 			c = pMiarex->m_pCurWOpp->m_EigenVector[m_iCurrentMode][3]/angle;
 			if(c.imag()>=0.0) strange = QString("%1+%2i").arg(c.real(),10,'f',5).arg(c.imag(),10,'f',5);
-			else              strange = QString("%1-%2i").arg(c.real(),10,'f',5).arg(fabs(c.imag()),10,'f',5);
+			else              strange = QString("%1-%2i").arg(c.real(),10,'f',5).arg(qAbs(c.imag()),10,'f',5);
 			m_pctrlEigenVector4->setText(strange);
             ModeDescription.append("v4="+strange);
 		}
@@ -214,25 +214,25 @@ void StabViewDlg::FillEigenThings()
 
 			c = pMiarex->m_pCurWOpp->m_EigenVector[m_iCurrentMode][0]/u0;
 			if(c.imag()>=0.0) strange = QString("%1+%2i").arg(c.real(),10,'f',5).arg(c.imag(),10,'f',5);
-			else              strange = QString("%1-%2i").arg(c.real(),10,'f',5).arg(fabs(c.imag()),10,'f',5);
+			else              strange = QString("%1-%2i").arg(c.real(),10,'f',5).arg(qAbs(c.imag()),10,'f',5);
 			m_pctrlEigenVector1->setText(strange);
             ModeDescription.append("v1="+strange+"<br/>");
 
 			c = pMiarex->m_pCurWOpp->m_EigenVector[m_iCurrentMode][1]/(2.0*u0/span);
 			if(c.imag()>=0.0) strange = QString("%1+%2i").arg(c.real(),10,'f',5).arg(c.imag(),10,'f',5);
-			else              strange = QString("%1-%2i").arg(c.real(),10,'f',5).arg(fabs(c.imag()),10,'f',5);
+			else              strange = QString("%1-%2i").arg(c.real(),10,'f',5).arg(qAbs(c.imag()),10,'f',5);
 			m_pctrlEigenVector2->setText(strange);
             ModeDescription.append("v2="+strange+"<br/>");
 
 			c = pMiarex->m_pCurWOpp->m_EigenVector[m_iCurrentMode][2]/(2.0*u0/span);
 			if(c.imag()>=0.0) strange = QString("%1+%2i").arg(c.real(),10,'f',5).arg(c.imag(),10,'f',5);
-			else              strange = QString("%1-%2i").arg(c.real(),10,'f',5).arg(fabs(c.imag()),10,'f',5);
+			else              strange = QString("%1-%2i").arg(c.real(),10,'f',5).arg(qAbs(c.imag()),10,'f',5);
 			m_pctrlEigenVector3->setText(strange);
             ModeDescription.append("v3="+strange+"<br/>");
 
 			c = pMiarex->m_pCurWOpp->m_EigenVector[m_iCurrentMode][3]/angle;
 			if(c.imag()>=0.0) strange = QString("%1+%2i").arg(c.real(),10,'f',5).arg(c.imag(),10,'f',5);
-			else              strange = QString("%1-%2i").arg(c.real(),10,'f',5).arg(fabs(c.imag()),10,'f',5);
+			else              strange = QString("%1-%2i").arg(c.real(),10,'f',5).arg(qAbs(c.imag()),10,'f',5);
 			m_pctrlEigenVector4->setText(strange);
             ModeDescription.append("v4="+strange);
 
@@ -348,7 +348,7 @@ void StabViewDlg::OnAnimateRestart()
 	omega = pWOpp->m_EigenValue[m_iCurrentMode].imag();
 	s2 = sigma*sigma;
 	o2 = omega*omega;
-//	maxso  = qMax(fabs(sigma), fabs(omega));
+//	maxso  = qMax(qAbs(sigma), qAbs(omega));
 
 	//calculate state at t=0 for normalization
 	if(pMiarex->m_bLongitudinal)
@@ -392,14 +392,14 @@ void StabViewDlg::OnAnimateRestart()
 		ModeState[5] = m_vabs[2]/(s2+o2) * (sigma*cos(m_phi[2])+omega*sin(m_phi[2]));
 	}
 	//max 10% span
-	norm1 = qMax(fabs(ModeState[0]), fabs(ModeState[1]));
-	norm1 = qMax(norm1, fabs(ModeState[2]));
+	norm1 = qMax(qAbs(ModeState[0]), qAbs(ModeState[1]));
+	norm1 = qMax(norm1, qAbs(ModeState[2]));
 	if(norm1>0.0)  norm1 = pWing->m_PlanformSpan *.10 / norm1;
 	else           norm1 = 1.0;
 
 	//max 10degrees
-	norm2 = qMax(fabs(ModeState[3]), fabs(ModeState[4]));
-	norm2 = qMax(norm2, fabs(ModeState[5]));
+	norm2 = qMax(qAbs(ModeState[3]), qAbs(ModeState[4]));
+	norm2 = qMax(norm2, qAbs(ModeState[5]));
 	if(norm2>0.0)  norm2 = PI*(10.0/180.0)/ norm2;
 	else           norm2 = 1.0;
 

@@ -365,8 +365,6 @@ void ThreeDWidget::CreateArcballList(ArcBall &ArcBall, double GLScale)
 
 	glNewList(ARCBALL,GL_COMPILE);
 	{
-		glPolygonMode(GL_FRONT_AND_BACK,GL_LINE);
-
 		glColor3d(0.3,0.3,.5);
 		glLineWidth(1.0);
 
@@ -430,8 +428,6 @@ void ThreeDWidget::CreateArcballList(ArcBall &ArcBall, double GLScale)
 
 	glNewList(ARCPOINT,GL_COMPILE);
 	{
-		glPolygonMode(GL_FRONT,GL_LINE);
-
 		glColor3d(0.3,0.1,.2);
 		glLineWidth(2.0);
 
@@ -479,13 +475,11 @@ void ThreeDWidget::GLDrawAxes(double length, QColor AxisColor, int AxisStyle, in
 {
 	double l = .6*length;
 
-	glPolygonMode(GL_FRONT,GL_LINE);
 	glLineWidth((GLfloat)(AxisWidth));
 
 	glColor3d(AxisColor.redF(),AxisColor.greenF(),AxisColor.blueF());
 
 	glEnable (GL_LINE_STIPPLE);
-
 
 	if     (AxisStyle == 1) glLineStipple (1, 0xCFCF);
 	else if(AxisStyle == 2) glLineStipple (1, 0x6666);
@@ -819,3 +813,35 @@ void ThreeDWidget::GLToClient(CVector const &real, QPoint &point)
 }
 
 
+
+
+/**
+*Converts OpenGL Viewport coordinates to client coordinates
+*@param x the viewport x-coordinate.
+*@param y the viewport y-coordinate.
+*@param point the client coordinates.
+*/
+void ThreeDWidget::GLToClient(double const &x, double const &y, QPoint &point)
+{
+    //
+    //converts an opengl 2D vector to screen client coordinates
+    //
+    static double dx, dy, h2, w2;
+
+    h2 = m_GLViewRect.height() /2.0;
+    w2 = m_GLViewRect.width()  /2.0;
+
+    dx = ( x + w2)/2.0;
+    dy = (-y + h2)/2.0;
+
+    if(w2>h2)
+    {
+        point.setX((int)(dx * (double)geometry().width()));
+        point.setY((int)(dy * (double)geometry().width()));
+    }
+    else
+    {
+        point.setX((int)(dx * (double)geometry().height()));
+        point.setY((int)(dy * (double)geometry().height()));
+    }
+}

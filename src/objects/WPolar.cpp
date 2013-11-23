@@ -104,7 +104,7 @@ void WPolar::AddPoint(PlaneOpp *pPOpp)
 		{
 			if(m_WPolarType<FIXEDAOAPOLAR)
 			{
-				if (fabs(pPOpp->m_Alpha-m_Alpha[i]) < 0.001)
+                if (qAbs(pPOpp->m_Alpha-m_Alpha[i]) < 0.001)
 				{
 					// then erase former result
 					m_Alpha[i]      =  pWOpp->m_Alpha;
@@ -190,7 +190,7 @@ void WPolar::AddPoint(PlaneOpp *pPOpp)
 			else if(m_WPolarType==FIXEDAOAPOLAR)
 			{
 				// type 4, sort by speed
-				if (fabs(pPOpp->m_QInf - m_QInfinite[i]) < 0.001)
+                if (qAbs(pPOpp->m_QInf - m_QInfinite[i]) < 0.001)
 				{
 					// then erase former result
 					m_Alpha[i]      = pWOpp->m_Alpha;
@@ -275,7 +275,7 @@ void WPolar::AddPoint(PlaneOpp *pPOpp)
 			else if(m_WPolarType==STABILITYPOLAR)
 			{
 				// Control or stability analysis, sort by control value
-				if (fabs(pPOpp->m_Alpha - m_Alpha[i])<0.0001)
+                if (qAbs(pPOpp->m_Alpha - m_Alpha[i])<0.0001)
 				{
 					// then erase former result
 					m_Alpha[i]      = pWOpp->m_Alpha;
@@ -461,7 +461,7 @@ void WPolar::AddPoint(WingOpp *pWOpp)
 		{
 			if(m_WPolarType<FIXEDAOAPOLAR)
 			{
-				if (fabs(pWOpp->m_Alpha - m_Alpha[i]) < 0.001)
+                if (qAbs(pWOpp->m_Alpha - m_Alpha[i]) < 0.001)
 				{
 					// then erase former result
 					m_Alpha[i]      =  pWOpp->m_Alpha;
@@ -548,7 +548,7 @@ void WPolar::AddPoint(WingOpp *pWOpp)
 			else if (m_WPolarType==FIXEDAOAPOLAR)
 			{
 				// type 4, sort by speed
-				if (fabs(pWOpp->m_QInf - m_QInfinite[i]) < 0.001)
+                if (qAbs(pWOpp->m_QInf - m_QInfinite[i]) < 0.001)
 				{
 					// then erase former result
 					m_Alpha[i]      =  pWOpp->m_Alpha;
@@ -635,7 +635,7 @@ void WPolar::AddPoint(WingOpp *pWOpp)
 			else if (m_WPolarType==STABILITYPOLAR)
 			{
 				// Control or Stability Polar, sort by crescending ctrl value
-				if (fabs(pWOpp->m_Alpha - m_Alpha[i])<0.0001)
+                if (qAbs(pWOpp->m_Alpha - m_Alpha[i])<0.0001)
 				{
 					// then erase former result
 					m_Alpha[i]      =  pWOpp->m_Alpha;
@@ -838,7 +838,7 @@ void WPolar::AddPoint(double alpha, double CL, double ICd, double PCd, double CY
 		{
 			if(m_WPolarType<FIXEDAOAPOLAR)
 			{
-				if (fabs(alpha - m_Alpha[i]) < 0.001)
+                if (qAbs(alpha - m_Alpha[i]) < 0.001)
 				{
 					// then erase former result
 					m_Alpha[i]      =  alpha;
@@ -1003,7 +1003,7 @@ void WPolar::CalculatePoint(int i)
 		m_Cl32Cd[i] =  -(double)pow(-m_CL[i],1.5)/m_TCd[i];
 	}
 
-	if(fabs(m_CL[i])>0.) m_Gamma[i]  =  atan(m_TCd[i]/m_CL[i]) * 180.0/PI;
+    if(qAbs(m_CL[i])>0.) m_Gamma[i]  =  atan(m_TCd[i]/m_CL[i]) * 180.0/PI;
 	else m_Gamma[i] = 90.0;
 	m_Vz[i] = (double)sqrt(2*m_Mass*9.81/m_Density/m_WArea)/m_Cl32Cd[i];
 	m_Vx[i] = m_QInfinite[i] * (double)cos(m_Gamma[i]*PI/180.0);
@@ -1036,38 +1036,38 @@ void WPolar::CalculatePoint(int i)
 	c = m_EigenValue[2][i];
 	sum  = c.real() * 2.0;                          // is a real number
 	prod = c.real()*c.real() + c.imag()*c.imag();  // is a positive real number
-	OmegaN = fabs(c.imag());
+    OmegaN = qAbs(c.imag());
 	if(OmegaN>PRECISION) Omega1 = sqrt(prod);
 	else                 Omega1 = 0.0;
 	Sigma1 = sum /2.0;
 	if(Omega1 > PRECISION) Dsi = -Sigma1/Omega1;
 	else                   Dsi = 0.0;
 	m_PhugoidDamping[i] = Dsi;
-	m_PhugoidFrequency[i] = fabs(c.imag()/2.0/PI);
+    m_PhugoidFrequency[i] = qAbs(c.imag()/2.0/PI);
 
 	c = m_EigenValue[0][i];
 	sum  = c.real() * 2.0;                          // is a real number
 	prod = c.real()*c.real() + c.imag()*c.imag();  // is a positive real number
-	OmegaN = fabs(c.imag());
+    OmegaN = qAbs(c.imag());
 	if(OmegaN>PRECISION) Omega1 = sqrt(prod);
 	else                 Omega1 = 0.0;
 	Sigma1 = sum /2.0;
 	if(Omega1 > PRECISION) Dsi = -Sigma1/Omega1;
 	else                   Dsi = 0.0;
 	m_ShortPeriodDamping[i] = Dsi;
-	m_ShortPeriodFrequency[i] = fabs(c.imag()/2.0/PI);
+    m_ShortPeriodFrequency[i] = qAbs(c.imag()/2.0/PI);
 
 	c = m_EigenValue[5][i];
 	sum  = c.real() * 2.0;                          // is a real number
 	prod = c.real()*c.real() + c.imag()*c.imag();  // is a positive real number
-	OmegaN = fabs(c.imag());
+    OmegaN = qAbs(c.imag());
 	if(OmegaN>PRECISION) Omega1 = sqrt(prod);
 	else                 Omega1 = 0.0;
 	Sigma1 = sum /2.0;
 	if(Omega1 > PRECISION) Dsi = -Sigma1/Omega1;
 	else                   Dsi = 0.0;
 	m_DutchRollDamping[i] = Dsi;
-	m_DutchRollFrequency[i] = fabs(c.imag()/2.0/PI);
+    m_DutchRollFrequency[i] = qAbs(c.imag()/2.0/PI);
 
 	m_RollDamping[i]= m_EigenValue[4][i].real();
 	m_SpiralDamping[i]= m_EigenValue[7][i].real();
@@ -1656,7 +1656,7 @@ void WPolar::Remove(double alpha)
 {
 	for(int ia=0;ia<m_Alpha.size(); ia++)
 	{
-		if(fabs(m_Alpha.at(ia)-alpha)<PRECISION)
+        if(qAbs(m_Alpha.at(ia)-alpha)<PRECISION)
 		{
 			Remove(ia);
 			break;
@@ -2124,7 +2124,7 @@ bool WPolar::SerializeWPlr(QDataStream &ar, bool bIsStoring)
 			{
 				for (j=0; j<m_Alpha.size(); j++)
 				{
-					if(fabs(Alpha-m_Alpha[j])<0.001)
+                    if(qAbs(Alpha-m_Alpha[j])<0.001)
 					{
 						break;
 					}
@@ -2134,7 +2134,7 @@ bool WPolar::SerializeWPlr(QDataStream &ar, bool bIsStoring)
 			{
 				for (j=0; j<m_Alpha.size(); j++)
 				{
-					if(fabs(QInfinite-m_QInfinite[j])<0.001)
+                    if(qAbs(QInfinite-m_QInfinite[j])<0.001)
 					{
 						break;
 					}
@@ -2304,7 +2304,7 @@ void WPolar::GetPolarProperties(QString &PolarProperties, bool bData)
 		PolarProperties += strong +QString::fromUtf8("°")+"\n";
 	}
 
-	if(fabs(m_Beta)>PRECISION)
+    if(qAbs(m_Beta)>PRECISION)
 	{
 		strong  = QString(QObject::tr("Beta")+" = %1").arg(m_Beta,7,'f',2);
 		PolarProperties += strong +QString::fromUtf8("°")+"\n";
@@ -2330,7 +2330,7 @@ void WPolar::GetPolarProperties(QString &PolarProperties, bool bData)
 
 		if(pPlane)
 		{
-			if(fabs(m_ControlGain[iCtrl]>PRECISION))
+            if(qAbs(m_ControlGain[iCtrl])>PRECISION)
 			{
 				strong = QString(QString::fromUtf8("Wing Tilt: gain=%1°/unit\n")).arg(m_ControlGain[iCtrl],0,'f',2);
 				PolarProperties +=strong;
@@ -2338,7 +2338,7 @@ void WPolar::GetPolarProperties(QString &PolarProperties, bool bData)
 			iCtrl=1;
 			if(pPlane->stab())
 			{
-				if(fabs(m_ControlGain[iCtrl]>PRECISION))
+                if(qAbs(m_ControlGain[iCtrl])>PRECISION)
 				{
 					strong = QString(QString::fromUtf8("Elev. Tilt: gain=%1°/unit\n")).arg(m_ControlGain[iCtrl],0,'f',2);
 					PolarProperties +=strong;
@@ -2366,7 +2366,7 @@ void WPolar::GetPolarProperties(QString &PolarProperties, bool bData)
 			{
 				if(pWing->m_Surface[j].m_bTEFlap)
 				{
-					if(fabs(m_ControlGain[iCtrl])>PRECISION)
+                    if(qAbs(m_ControlGain[iCtrl])>PRECISION)
 					{
 						strong = QString(QString::fromUtf8("Wing Flap %1: g=%2°/unit\n"))
 										.arg(nFlap+1)
@@ -2387,7 +2387,7 @@ void WPolar::GetPolarProperties(QString &PolarProperties, bool bData)
 			{
 				if(pStab->m_Surface[j].m_bTEFlap)
 				{
-					if(fabs(m_ControlGain[iCtrl]>PRECISION))
+                    if(qAbs(m_ControlGain[iCtrl])>PRECISION)
 					{
 						strong = QString(QString::fromUtf8("Elev. Flap %1: gain=%2°/unit\n"))
 										.arg(nFlap+1)
@@ -2407,7 +2407,7 @@ void WPolar::GetPolarProperties(QString &PolarProperties, bool bData)
 			{
 				if(pFin->m_Surface[j].m_bTEFlap)
 				{
-					if(fabs(m_ControlGain[iCtrl])>PRECISION)
+                    if(qAbs(m_ControlGain[iCtrl])>PRECISION)
 					{
 						strong = QString(QString::fromUtf8("Fin Flap %1: gain=%2°/unit\n"))
 										.arg(nFlap+1)

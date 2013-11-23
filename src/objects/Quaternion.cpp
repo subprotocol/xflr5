@@ -20,13 +20,13 @@
 *****************************************************************************/
 
 #include "Quaternion.h"
-# include <math.h>
-
+#include <math.h>
+#include <QtGlobal>
 
 
 void Quaternion::QuattoMat(double m[][4])
 {
-	if(fabs(a)<=1.0) theta = 2.0 * acos(a);
+	if(qAbs(a)<=1.0) theta = 2.0 * acos(a);
 	else             theta = 0.0;
 
 	t1 =  cos(theta);

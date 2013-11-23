@@ -385,13 +385,13 @@ void Wing::ComputeGeometry()
 		pFoilB = MainFrame::foil(RightFoil(is));
 		if(pFoilA && pFoilB && (!m_bIsFin || (m_bIsFin && m_bSymFin) || (m_bIsFin && m_bDoubleFin)))
 		{
-			if(pFoilA->m_bTEFlap && pFoilB->m_bTEFlap && fabs(YPosition(is)-YPosition(is-1))>MinPanelSize)	m_nFlaps++;
+			if(pFoilA->m_bTEFlap && pFoilB->m_bTEFlap && qAbs(YPosition(is)-YPosition(is-1))>MinPanelSize)	m_nFlaps++;
 		}
 		pFoilA = MainFrame::foil(LeftFoil(is-1));
 		pFoilB = MainFrame::foil(LeftFoil(is));
 		if(pFoilA && pFoilB)
 		{
-			if(pFoilA->m_bTEFlap && pFoilB->m_bTEFlap && fabs(YPosition(is)-YPosition(is-1))>MinPanelSize)	m_nFlaps++;
+			if(pFoilA->m_bTEFlap && pFoilB->m_bTEFlap && qAbs(YPosition(is)-YPosition(is-1))>MinPanelSize)	m_nFlaps++;
 		}
 	}
 }
@@ -628,7 +628,7 @@ void Wing::CreateSurfaces(CVector const &T, double XTilt, double YTilt)
 
 	for(int is=0; is<NWingSection()-1;is++)
 	{
-		if (fabs(YPosition(is)-YPosition(is+1)) > MinPanelSize)
+		if (qAbs(YPosition(is)-YPosition(is+1)) > MinPanelSize)
 		{
 			VNormal[nSurf].Set(0.0, 0.0, 1.0);
 			VNormal[nSurf].RotateX(O, Dihedral(is));
@@ -650,7 +650,7 @@ void Wing::CreateSurfaces(CVector const &T, double XTilt, double YTilt)
 	int iSurf = m_NSurfaces-1;
 	for (int jss=0; jss<NWingSection()-1; jss++)
 	{
-		if (fabs(YPosition(jss)-YPosition(jss+1)) > MinPanelSize)
+		if (qAbs(YPosition(jss)-YPosition(jss+1)) > MinPanelSize)
 		{
 			m_Surface[iSurf].m_pFoilA   = MainFrame::foil(LeftFoil(jss+1));
 			m_Surface[iSurf].m_pFoilB   = MainFrame::foil(LeftFoil(jss));
@@ -722,7 +722,7 @@ void Wing::CreateSurfaces(CVector const &T, double XTilt, double YTilt)
 		iSurf = nSurf;
 		for (int jss=0; jss<NWingSection()-1; jss++)
 		{
-			if (fabs(YPosition(jss)-YPosition(jss+1)) > MinPanelSize)
+			if (qAbs(YPosition(jss)-YPosition(jss+1)) > MinPanelSize)
 			{
 				m_Surface[iSurf].m_pFoilA   = MainFrame::foil(RightFoil(jss));
 				m_Surface[iSurf].m_pFoilB   = MainFrame::foil(RightFoil(jss+1));
@@ -880,7 +880,7 @@ void Wing::ComputeChords(int NStation)
 		for (k=0; k<=NStation; k++)
 		{
 			yob   = cos(k*PI/NStation);
-			y = fabs(yob * m_PlanformSpan/2);
+			y = qAbs(yob * m_PlanformSpan/2);
 			for (int is=0; is<NWingSection(); is++)
 			{
 				if(YPosition(is) < y && y <=YPosition(is+1))
@@ -966,7 +966,7 @@ void Wing::ComputeChords(int NStation, double *chord, double *offset, double *tw
 		for (int k=0; k<=NStation; k++)
 		{
 			yob   = cos(k*PI/NStation);
-			y = fabs(yob * m_PlanformSpan/2);
+			y = qAbs(yob * m_PlanformSpan/2);
 			for (int is=0; is<NWingSection(); is++)
 			{
 				if(YPosition(is) < y && y <=YPosition(is+1))
@@ -1192,7 +1192,7 @@ bool Wing::ExportAVLWing(QTextStream &out, int index, double x, double y, double
 			strong.replace(" ", "_");
 			strong += str;
 			double mean_angle = (ASurface.m_pFoilA->m_TEFlapAngle + ASurface.m_pFoilB->m_TEFlapAngle)/2.0;
-			if(fabs(mean_angle)>0.0) str = QString("%1  ").arg(1.0/mean_angle,5,'f',2);
+			if(qAbs(mean_angle)>0.0) str = QString("%1  ").arg(1.0/mean_angle,5,'f',2);
 			else                     str = "1.0   ";
 			strong += str;
 			str = QString("%1  %2  %3  %4  -1.0  ")
@@ -1227,7 +1227,7 @@ bool Wing::ExportAVLWing(QTextStream &out, int index, double x, double y, double
 			strong.replace(" ", "_");
 			strong += str;
 
-			if(fabs(mean_angle)>0.0) str = QString("%1  ").arg(1.0/mean_angle,5,'f',2);
+			if(qAbs(mean_angle)>0.0) str = QString("%1  ").arg(1.0/mean_angle,5,'f',2);
 			else                     str = "1.0   ";
 			strong += str;
 
@@ -1291,7 +1291,7 @@ double Wing::C4(double yob, double xRef)
 {
 	double chord, offset, tau;
 	double C4 = 0.0;
-	double y = fabs(yob*m_PlanformSpan/2.0);
+	double y = qAbs(yob*m_PlanformSpan/2.0);
 	for(int is=0; is<NWingSection()-1; is++)
 	{
 		if(YPosition(is)<= y && y <=YPosition(is+1))
@@ -1317,7 +1317,7 @@ double Wing::Chord(double yob)
 	double tau;
 	double y;
 
-	y= fabs(yob*m_PlanformSpan/2.0);//geometry is symetric
+	y= qAbs(yob*m_PlanformSpan/2.0);//geometry is symetric
 	for(int is=0; is<NWingSection()-1; is++)
 	{
 		if(YPosition(is)<=y && y <=YPosition(is+1))
@@ -1341,7 +1341,7 @@ double Wing::Offset(double yob)
 	double tau, y;
 	double offset = 0.0;
 
-	y= fabs(yob*m_PlanformSpan/2.0);
+	y= qAbs(yob*m_PlanformSpan/2.0);
 	for(int is=0; is<NWingSection()-1; is++)
 	{
 		if(YPosition(is)<= y && y <=YPosition(is+1))
@@ -1381,7 +1381,7 @@ double Wing::Twist(double y)
 	else
 	{
 		//left wing
-		y=fabs(y);
+		y=qAbs(y);
 		for (int is=0; is<NWingSection()-1; is++)
 		{
 			if(YPosition(is) <= y && y <=YPosition(is+1))
@@ -1404,7 +1404,7 @@ double Wing::Twist(double y)
  */
 double Wing::Dihedral(double yob)
 {
-	double y= fabs(yob*m_PlanformSpan/2.0);//geometry is symetric
+	double y= qAbs(yob*m_PlanformSpan/2.0);//geometry is symetric
 	for(int is=0; is<NWingSection()-1; is++)
 	{
 		if(YPosition(is)<= y && y <=YPosition(is+1))
@@ -1493,7 +1493,7 @@ void Wing::GetViewYZPos(double xrel, double y, double &yv, double &zv, int pos)
 	double z0, z1, nx, ny;
 	zv = 0.0;
 	yv = 0.0;
-	double fy = fabs(y);
+	double fy = qAbs(y);
 	double sign;
 	if(fy<1.0e-10) sign = 1.0;
 	else sign = y/fy;
@@ -1552,7 +1552,7 @@ void Wing::GetViewYZPos(double xrel, double y, double &yv, double &zv, int pos)
  */
 double Wing::yrel(double SpanPos)
 {
-	double y = fabs(SpanPos);
+	double y = qAbs(SpanPos);
 	for(int is=0; is<NWingSection()-1; is++)
 	{
 		if(YPosition(is)<=y && y <YPosition(is+1))
@@ -1575,7 +1575,7 @@ double Wing::ZPosition(double y)
 	double tau;
 	double ZPos =0.0;
 
-	y= fabs(y);
+	y= qAbs(y);
 	if(y<=0.0) return 0.0;
 	for (int is=0; is<NWingSection()-1; is++)
 	{
@@ -1895,7 +1895,7 @@ void Wing::ScaleSweep(double NewSweep)
 	double NewTipOffset = Chord(0)/4.0
 						 + tan(NewSweep*PI/180.0)*m_PlanformSpan/2.0
 						 - TipChord()/4.0;
-	if(fabs(OldTipOffset)>0.00001)
+	if(qAbs(OldTipOffset)>0.00001)
 	{
 		//scale each panel's offset
 		double ratio = NewTipOffset/OldTipOffset;
@@ -1922,7 +1922,7 @@ void Wing::ScaleSweep(double NewSweep)
 */
 void Wing::ScaleTwist(double NewTwist)
 {
-	if(fabs(TipTwist())>0.0001)
+	if(qAbs(TipTwist())>0.0001)
 	{
 		//scale each panel's twist
 		double ratio = NewTwist/TipTwist();
@@ -2109,7 +2109,7 @@ bool Wing::SerializeWing(QDataStream &ar, bool bIsStoring)
 		for (int is=0; is<=NPanel; is++)
 		{
 			ar >> f; Chord(is)=f;
-			if (fabs(Chord(is)) <0.0)
+			if (qAbs(Chord(is)) <0.0)
 			{
 				m_WingName = "";
 				return false;
@@ -2119,7 +2119,7 @@ bool Wing::SerializeWing(QDataStream &ar, bool bIsStoring)
 		for (int is=0; is<=NPanel; is++)
 		{
 			ar >> f; YPosition(is)=f;
-			if (fabs(YPosition(is)) <0.0)
+			if (qAbs(YPosition(is)) <0.0)
 			{
 				m_WingName = "";
 				return false;
@@ -2297,7 +2297,7 @@ int Wing::VLMPanelTotal(bool bThinSurface)
 	for (int is=0; is<NWingSection()-1; is++)
 	{
 		//do not create a surface if its length is less than the critical size
-		if (fabs(YPosition(is)-YPosition(is+1)) > MinPanelSize)	total += NXPanels(is)*NYPanels(is);
+		if (qAbs(YPosition(is)-YPosition(is+1)) > MinPanelSize)	total += NXPanels(is)*NYPanels(is);
 	}
 	if(!m_bIsFin) total *=2;
 

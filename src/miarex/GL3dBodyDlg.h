@@ -135,7 +135,6 @@ private:
 	void GLCreateBodyPoints();
 	void GLCreateBodyFrames();
 	void GLCreateBodyGrid();
-	void GLCreateBodyOverlay();
 	void GLRenderBody();
 	void GLCallViewLists();
 	void GLDraw3D();
@@ -243,11 +242,9 @@ private:
 	bool m_bglLight;
 	bool m_bCrossPoint;			//true if the control point on the arcball is to be displayed
 	bool m_bPickCenter;			//true if the user is in the process of picking a new center for OpenGL display
-	bool m_bBodyOverlay;		//true if a foil should be overlayed on the body cross-section
 	bool m_bResetglBody;
 	bool m_bResetglBodyMesh;
 	bool m_bResetglBody2D;
-	bool m_bResetglBodyOverlay;
 	bool m_bResetglBodyPoints;
 	bool m_bIs3DScaleSet;		// true if the 3D scale has been set, false if needs to be reset
 	bool m_bShowLight;			// true if the virtual light is to be displayed

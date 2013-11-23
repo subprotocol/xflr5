@@ -468,9 +468,10 @@ public:
 
 	static bool s_bOutline;                   /**< true if the surface outlines are to be displayed in the 3D view*/
 	static bool s_bSurfaces;                  /**< true if the surfaces are to be displayed in the 3D view*/
-	static bool s_bShowMasses;                /**< true if the point masses are to be displayed on the openGL 3D view */
 	static bool s_bVLMPanels;                 /**< true if the panels are to be displayed in the 3D view*/
 	static bool s_bAxes;                      /**< true if the axes are to be displayed in the 3D view*/
+    static bool s_bShowMasses;                /**< true if the point masses are to be displayed on the openGL 3D view */
+    static bool s_bFoilNames;                 /**< true if the foil names are to be displayed on the openGL 3D view */
 
 
 	// Class variables
@@ -491,7 +492,6 @@ public:
 	bool m_bCurveVisible;              /**< true if the active curve is to be displayed */
 	bool m_bDirichlet;                 /**< true if Dirichlet BC are applied in 3D panel analysis, false if Neumann */
 	bool m_bDownwash;                  /**< true if the arrows represeting downwash are to be displayed on the 3D openGl view */
-	bool m_bFoilNames;                 /**< true if the foil names are to be displayed on the openGL 3D view */
 	bool m_bHalfWing;                  /**< true if only a half-wing should be displayed of the in the OpPoint view */
 	bool m_bHighlightOpp;              /**< true if the currently selected operating point is to be highlighted on the polar graph */
 	bool m_bICd;                       /**< true if the induced drag forces should be displayed in the operating point or 3D view*/

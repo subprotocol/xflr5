@@ -33,7 +33,7 @@
 #include <QDir>
 
 
-bool DisplaySettingsDlg::s_bStyleSheets;
+bool DisplaySettingsDlg::s_bStyleSheets = true;
 QString DisplaySettingsDlg::s_StyleName;
 QString DisplaySettingsDlg::s_StyleSheetName;
 
@@ -46,7 +46,6 @@ DisplaySettingsDlg::DisplaySettingsDlg(QWidget *pParent) : QDialog(pParent)
 	m_bIsGraphModified = false;
 	m_bReverseZoom = false;
 	m_bAlphaChannel = true;
-	s_bStyleSheets = false;
 	SetupLayout();
 
 	connect(m_pctrlStyles, SIGNAL(activated(const QString &)),this, SLOT(OnStyleChanged(const QString &)));

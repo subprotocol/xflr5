@@ -65,7 +65,7 @@ public:
 
 
 signals:
-	void clicked();
+    void clickedLB();
 
 public:
 	void mouseReleaseEvent(QMouseEvent *event);

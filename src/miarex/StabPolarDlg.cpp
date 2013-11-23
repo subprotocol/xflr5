@@ -237,7 +237,7 @@ void StabPolarDlg::SetViscous()
 
 	for(int i=nCtrl; i<s_StabPolar.m_nControls; i++)
 	{
-		if(s_StabPolar.m_bThinSurfaces && fabs(s_StabPolar.m_ControlGain[i])>PRECISION)
+        if(s_StabPolar.m_bThinSurfaces && qAbs(s_StabPolar.m_ControlGain[i])>PRECISION)
 		{
 			bViscous = false;
 			break;
@@ -495,7 +495,7 @@ void StabPolarDlg::OnOK()
 	ReadCtrlData();
 	ReadParams();
 
-	if(fabs(s_StabPolar.m_Mass)<PRECISION)
+    if(qAbs(s_StabPolar.m_Mass)<PRECISION)
 	{
 		QMessageBox::warning(this, tr("Warning"),tr("Mass must be non-zero for type 7 polars"));
 		m_pctrlMass->setFocus();
@@ -930,7 +930,7 @@ void StabPolarDlg::SetWPolarName()
 	{
 		if(m_pPlane)
 		{
-			if(fabs(s_StabPolar.m_ControlGain[0]>PRECISION) && m_pPlane)
+            if(qAbs(s_StabPolar.m_ControlGain[0]>PRECISION) && m_pPlane)
 			{
 				strong = QString(QString::fromUtf8("-Wing(%g1)"))
 								   .arg(s_StabPolar.m_ControlGain[0],0,'f',1);
@@ -940,7 +940,7 @@ void StabPolarDlg::SetWPolarName()
 		}
 		if(m_pPlane && m_pWingList[2])
 		{
-			if(fabs(s_StabPolar.m_ControlGain[1]>PRECISION))
+            if(qAbs(s_StabPolar.m_ControlGain[1]>PRECISION))
 			{
 				strong = QString(QString::fromUtf8("-Elev(g%1)")).arg(s_StabPolar.m_ControlGain[1],0,'f',1);
 				WPolarName += strong;
@@ -950,7 +950,7 @@ void StabPolarDlg::SetWPolarName()
 
 		for(i=0; i<m_pWingList[0]->m_nFlaps; i++)
 		{
-			if(fabs(s_StabPolar.m_ControlGain[i+nCtrl]>PRECISION))
+            if(qAbs(s_StabPolar.m_ControlGain[i+nCtrl]>PRECISION))
 			{
 				strong = QString(QString::fromUtf8("-WF%1(g%2)"))
 						 .arg(i+1)
@@ -964,7 +964,7 @@ void StabPolarDlg::SetWPolarName()
 		{
 			for(i=0; i<m_pWingList[2]->m_nFlaps; i++)
 			{
-				if(fabs(s_StabPolar.m_ControlGain[i+nCtrl]>PRECISION))
+                if(qAbs(s_StabPolar.m_ControlGain[i+nCtrl]>PRECISION))
 				{
 					strong = QString(QString::fromUtf8("-EF%1(g%2)"))
 							 .arg(i+1).arg(s_StabPolar.m_ControlGain[i+nCtrl]);
@@ -978,7 +978,7 @@ void StabPolarDlg::SetWPolarName()
 		{
 			for(i=0; i<m_pWingList[3]->m_nFlaps; i++)
 			{
-				if(fabs(s_StabPolar.m_ControlGain[i+nCtrl])>PRECISION)
+                if(qAbs(s_StabPolar.m_ControlGain[i+nCtrl])>PRECISION)
 				{
 					strong = QString(QString::fromUtf8("-FF%1(g%2)"))
 							 .arg(i+1).arg(s_StabPolar.m_ControlGain[i+nCtrl]);
@@ -991,7 +991,7 @@ void StabPolarDlg::SetWPolarName()
 	{
 		if(m_pPlane)
 		{
-			if(fabs(s_StabPolar.m_ControlGain[0])>PRECISION)
+            if(qAbs(s_StabPolar.m_ControlGain[0])>PRECISION)
 			{
 				strong = QString(QString::fromUtf8("-Wing(g%1)"))
 								   .arg(s_StabPolar.m_ControlGain[0],0,'f',2);
@@ -1001,7 +1001,7 @@ void StabPolarDlg::SetWPolarName()
 		}
 		if(m_pPlane && m_pWingList[2])
 		{
-			if(fabs(s_StabPolar.m_ControlGain[1])>PRECISION)
+            if(qAbs(s_StabPolar.m_ControlGain[1])>PRECISION)
 			{
 				strong = QString(QString::fromUtf8("-Elev(g%1)"))
 								   .arg(s_StabPolar.m_ControlGain[1],0,'f',2);
@@ -1012,7 +1012,7 @@ void StabPolarDlg::SetWPolarName()
 
 		for(i=0; i<m_pWingList[0]->m_nFlaps; i++)
 		{
-			if(fabs(s_StabPolar.m_ControlGain[i+nCtrl])>PRECISION)
+            if(qAbs(s_StabPolar.m_ControlGain[i+nCtrl])>PRECISION)
 			{
 				strong = QString(QString::fromUtf8("-WF%1(g%2)"))
 							 .arg(i+1)
@@ -1026,7 +1026,7 @@ void StabPolarDlg::SetWPolarName()
 		{
 			for(i=0; i<m_pWingList[2]->m_nFlaps; i++)
 			{
-				if(fabs(s_StabPolar.m_ControlGain[i+nCtrl])>PRECISION)
+                if(qAbs(s_StabPolar.m_ControlGain[i+nCtrl])>PRECISION)
 				{
 					strong = QString(QString::fromUtf8("-EF%1(g%2)"))
 							 .arg(i+1)
@@ -1041,7 +1041,7 @@ void StabPolarDlg::SetWPolarName()
 		{
 			for(i=0; i<m_pWingList[3]->m_nFlaps; i++)
 			{
-				if(fabs(s_StabPolar.m_ControlGain[i+nCtrl])>PRECISION)
+                if(qAbs(s_StabPolar.m_ControlGain[i+nCtrl])>PRECISION)
 				{
 					strong = QString(QString::fromUtf8("-FF%1(g%2)"))
 							 .arg(i+1)
@@ -1053,13 +1053,13 @@ void StabPolarDlg::SetWPolarName()
 	}
 
 
-	if(fabs(s_StabPolar.m_Beta) > .001)
+    if(qAbs(s_StabPolar.m_Beta) > .001)
 	{
 		strong = QString(QString::fromUtf8("-b%1°")).arg(s_StabPolar.m_Beta,0,'f',1);
 		WPolarName += strong;
 	}
 	
-	if(fabs(s_StabPolar.m_BankAngle) > .001)
+    if(qAbs(s_StabPolar.m_BankAngle) > .001)
 	{
 		strong = QString(QString::fromUtf8("-B%1°")).arg(s_StabPolar.m_BankAngle,0,'f',1);
 		WPolarName += strong;
@@ -1074,7 +1074,7 @@ void StabPolarDlg::SetWPolarName()
 		strong = QString("-x%1").arg(s_StabPolar.m_CoG.x*MainFrame::s_mtoUnit,0,'f',3);
 		WPolarName += strong + str;
 
-		if(fabs(s_StabPolar.m_CoG.z)>=.000001)
+        if(qAbs(s_StabPolar.m_CoG.z)>=.000001)
 		{
 			strong = QString("-z%1").arg(s_StabPolar.m_CoG.z*MainFrame::s_mtoUnit,0,'f',3);
 			WPolarName += strong + str;

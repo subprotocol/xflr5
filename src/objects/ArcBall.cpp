@@ -278,7 +278,7 @@ void ArcBall::RotateCrossPoint()
 
 void ArcBall::SetQuat(Quaternion Qt)
 {
-	if(fabs(Qt.a)<=1.0) angle = 2.0*acos(Qt.a) *  180.0/PI;
+	if(qAbs(Qt.a)<=1.0) angle = 2.0*acos(Qt.a) *  180.0/PI;
 	Quat.a  = Qt.a;
 
 	Quat.qx = Qt.qx;
@@ -291,7 +291,7 @@ void ArcBall::SetQuat(Quaternion Qt)
 
 void ArcBall::SetQuat(double r, double qx, double qy, double qz)
 {
-	if(fabs(r)<=1.0) angle = 2.0*acos(r) *  180.0/PI;
+	if(qAbs(r)<=1.0) angle = 2.0*acos(r) *  180.0/PI;
 	Quat.a  = r;
 
 	Quat.qx = qx;

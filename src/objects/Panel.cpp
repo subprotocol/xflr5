@@ -130,7 +130,7 @@ void Panel::SetFrame(CVector const &LA, CVector const &LB, CVector const &TA, CV
 	VortexPos.y = (VA.y+VB.y)/2.0;
 	VortexPos.z = (VA.z+VB.z)/2.0;
 
-    if(fabs(LA.y)<1.e-5 && fabs(TA.y)<1.e-5 && fabs(LB.y)<1.e-5 && fabs(TB.y)<1.e-5) m_bIsInSymPlane = true;
+    if(qAbs(LA.y)<1.e-5 && qAbs(TA.y)<1.e-5 && qAbs(LB.y)<1.e-5 && qAbs(TB.y)<1.e-5) m_bIsInSymPlane = true;
 	else m_bIsInSymPlane = false;
 
 	MidA.x = LA.x*(1.0-s_CtrlPos)+TA.x*s_CtrlPos;
@@ -331,7 +331,7 @@ bool Panel::Intersect(CVector const &A, CVector const &U, CVector &I, double &di
 
 	dist = 10000.0;
 
-	if(fabs(s)>0.0)
+	if(qAbs(s)>0.0)
 	{
 		dist = r/s;
 

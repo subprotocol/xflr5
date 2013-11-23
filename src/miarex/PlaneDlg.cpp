@@ -569,13 +569,13 @@ void PlaneDlg::OnOK()
 	int nSurfaces = 0;
 	for (j=0; j<m_pPlane->wing()->NWingSection()-1; j++)
 	{
-		if(fabs(m_pPlane->wing()->YPosition(j)-m_pPlane->wing()->YPosition(j+1)) > QMiarex::s_MinPanelSize) nSurfaces+=2;
+		if(qAbs(m_pPlane->wing()->YPosition(j)-m_pPlane->wing()->YPosition(j+1)) > QMiarex::s_MinPanelSize) nSurfaces+=2;
 	}
 	if(m_pPlane->stab())
 	{
 		for (j=0; j<m_pPlane->stab()->NWingSection()-1; j++)
 		{
-			if(fabs(m_pPlane->stab()->YPosition(j)-m_pPlane->stab()->YPosition(j+1)) > QMiarex::s_MinPanelSize) nSurfaces+=2;
+			if(qAbs(m_pPlane->stab()->YPosition(j)-m_pPlane->stab()->YPosition(j+1)) > QMiarex::s_MinPanelSize) nSurfaces+=2;
 		}
 	}
 
@@ -583,7 +583,7 @@ void PlaneDlg::OnOK()
 	{
 		for (j=0; j<m_pPlane->fin()->NWingSection()-1; j++)
 		{
-			if(fabs(m_pPlane->fin()->YPosition(j)-m_pPlane->fin()->YPosition(j+1)) > QMiarex::s_MinPanelSize)
+			if(qAbs(m_pPlane->fin()->YPosition(j)-m_pPlane->fin()->YPosition(j+1)) > QMiarex::s_MinPanelSize)
 			{
 				if((m_pPlane->m_bSymFin) || (m_pPlane->m_bDoubleFin && m_pPlane->m_bDoubleSymFin))
 					nSurfaces += 2;

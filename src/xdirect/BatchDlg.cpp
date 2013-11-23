@@ -351,7 +351,7 @@ void BatchDlg::AlphaLoop()
 	double alphadeg;
 	QPoint Place(m_pctrlGraphOutput->rect().left()+m_RmsGraph.GetMargin()*2, m_pctrlGraphOutput->rect().top()+m_RmsGraph.GetMargin()/2);
 
-	nAlpha = (int)(fabs((m_SpMax-m_SpMin)*1.000/m_SpInc));//*1.0001 to make sure upper limit is included
+	nAlpha = (int)(qAbs((m_SpMax-m_SpMin)*1.000/m_SpInc));//*1.0001 to make sure upper limit is included
 
 	for (iAlpha=0; iAlpha<=nAlpha; iAlpha++)
 	{
@@ -364,7 +364,7 @@ void BatchDlg::AlphaLoop()
 		strong+= str;
 		UpdateOutput(str);
 
-		int total = (int)(fabs((m_ReMax-m_ReMin)*1.0001/m_ReInc));
+		int total = (int)(qAbs((m_ReMax-m_ReMin)*1.0001/m_ReInc));
 		m_pCurPolar = CreatePolar(alphadeg, pXFoil->minf1, pXFoil->acrit);// Do something
 		if(!m_pCurPolar) return;
 
@@ -408,9 +408,9 @@ void BatchDlg::AlphaLoop()
 					return;
 				}
 
-				if (fabs(pXFoil->alfa-pXFoil->awake) > 0.00001) pXFoil->lwake  = false;
-				if (fabs(pXFoil->alfa-pXFoil->avisc) > 0.00001) pXFoil->lvconv = false;
-				if (fabs(pXFoil->minf-pXFoil->mvisc) > 0.00001) pXFoil->lvconv = false;
+				if (qAbs(pXFoil->alfa-pXFoil->awake) > 0.00001) pXFoil->lwake  = false;
+				if (qAbs(pXFoil->alfa-pXFoil->avisc) > 0.00001) pXFoil->lvconv = false;
+				if (qAbs(pXFoil->minf-pXFoil->mvisc) > 0.00001) pXFoil->lvconv = false;
 
 				pXFoil->lwake  = false;
 				pXFoil->lvconv = false;
@@ -465,19 +465,19 @@ void BatchDlg::Analysis2()
 		m_AlphaMin = m_SpMin;
 		m_AlphaMax = m_SpMax;
 
-		if(m_AlphaMin< m_AlphaMax) m_AlphaInc =  fabs(m_SpInc);
-		else                       m_AlphaInc = -fabs(m_SpInc);
+		if(m_AlphaMin< m_AlphaMax) m_AlphaInc =  qAbs(m_SpInc);
+		else                       m_AlphaInc = -qAbs(m_SpInc);
 	}
 	else
 	{
 		m_ClMin = m_SpMin ;
 		m_ClMax = m_SpMax ;
-		if(m_ClMin< m_ClMax) m_ClInc =  fabs(m_ClInc);
-		else                 m_ClInc = -fabs(m_ClInc);
+		if(m_ClMin< m_ClMax) m_ClInc =  qAbs(m_ClInc);
+		else                 m_ClInc = -qAbs(m_ClInc);
 	}
 
-	if(m_ReMin < m_ReMax)  m_ReInc =  fabs(m_ReInc);
-	else                   m_ReInc = -fabs(m_ReInc);
+	if(m_ReMin < m_ReMax)  m_ReInc =  qAbs(m_ReInc);
+	else                   m_ReInc = -qAbs(m_ReInc);
 }
 
 
@@ -488,12 +488,12 @@ void BatchDlg::Analysis3()
 
 	m_AlphaMin = m_SpMin ;
 	m_AlphaMax = m_SpMax ;
-	if(m_SpMin< m_SpMax) m_AlphaInc =  fabs(m_SpInc);
-	else                 m_AlphaInc = -fabs(m_SpInc);
+	if(m_SpMin< m_SpMax) m_AlphaInc =  qAbs(m_SpInc);
+	else                 m_AlphaInc = -qAbs(m_SpInc);
 
 
-	if(m_ReMin < m_ReMax) m_ReInc =  fabs(m_ReInc);
-	else                  m_ReInc = -fabs(m_ReInc);
+	if(m_ReMin < m_ReMax) m_ReInc =  qAbs(m_ReInc);
+	else                  m_ReInc = -qAbs(m_ReInc);
 }
 
 
@@ -660,7 +660,7 @@ void BatchDlg::InitDialog()
 		m_pctrlSpecDelta->SetPrecision(0);
 	}
 
-	if(m_ReMin<=0.0) m_ReMin = fabs(m_ReInc);
+	if(m_ReMin<=0.0) m_ReMin = qAbs(m_ReInc);
 	if(m_PolarType!=FIXEDAOAPOLAR)
 	{
 		m_pctrlReMin->SetValue(m_ReMin);
@@ -1113,9 +1113,9 @@ void BatchDlg::ReadParams()
 		m_ReMin = m_pctrlSpecMin->Value();
 	}
 
-	if(m_ReMin<=0.0) m_ReMin = fabs(m_ReInc);
-	if(m_ReMax<=0.0) m_ReMax = fabs(m_ReMax);
-	m_SpInc = fabs(m_SpInc);
+	if(m_ReMin<=0.0) m_ReMin = qAbs(m_ReInc);
+	if(m_ReMax<=0.0) m_ReMax = qAbs(m_ReMax);
+	m_SpInc = qAbs(m_SpInc);
 
 	m_Mach     = m_pctrlMach->Value();
 	if(m_Mach<=0.0) m_Mach = 0.0;
@@ -1139,7 +1139,7 @@ void BatchDlg::ReLoop()
 
 	QPoint Place(m_pctrlGraphOutput->rect().left()+20, m_pctrlGraphOutput->rect().top()+m_RmsGraph.GetMargin()/2);
 
-	if(!m_bFromList) nRe = (int)fabs((m_ReMax-m_ReMin)/m_ReInc);
+	if(!m_bFromList) nRe = (int)qAbs((m_ReMax-m_ReMin)/m_ReInc);
 	else             nRe = m_NRe-1;
 
 	for (iRe=0; iRe<=nRe; iRe++)
@@ -1172,9 +1172,9 @@ void BatchDlg::ReLoop()
 			SpMin = m_SpMin;
 			SpMax = m_SpMax;
 		}
-		SpInc = fabs(m_SpInc);
+		SpInc = qAbs(m_SpInc);
 
-		if(SpMin > SpMax) SpInc = -fabs(SpInc);
+		if(SpMin > SpMax) SpInc = -qAbs(SpInc);
 
 		m_bSkipPolar = false;
 
@@ -1183,7 +1183,7 @@ void BatchDlg::ReLoop()
 			qApp->processEvents();
 			if(m_bCancel) break;
 
-			total = (int)fabs((SpMax*1.0001-SpMin)/SpInc);//*1.0001 to make sure upper limit is included
+			total = (int)qAbs((SpMax*1.0001-SpMin)/SpInc);//*1.0001 to make sure upper limit is included
 
 			m_pCurPolar = CreatePolar(pXFoil->reinf1, pXFoil->minf1, pXFoil->acrit);
 			if(!m_pCurPolar) return;

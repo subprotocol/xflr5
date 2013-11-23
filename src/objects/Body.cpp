@@ -378,11 +378,11 @@ bool Body::Gauss(double *A, int n, double *B, int m)
 	{
 		//  find the pivot row
 		A_pivot_row = pa;
-		max = fabs(*(pa + row));
+		max = qAbs(*(pa + row));
 		pA = pa + n;
 		pivot_row = row;
 		for (i=row+1; i < n; pA+=n, i++)
-			if ((dum = fabs(*(pA+row))) > max)
+			if ((dum = qAbs(*(pA+row))) > max)
 			{
 				max = dum;
 				A_pivot_row = pA;
@@ -441,7 +441,7 @@ bool Body::Gauss(double *A, int n, double *B, int m)
 
 double Body::Length()
 {
-	return fabs(m_SplineSurface.m_pFrame.last()->m_Position.x - m_SplineSurface.m_pFrame.first()->m_Position.x);
+	return qAbs(m_SplineSurface.m_pFrame.last()->m_Position.x - m_SplineSurface.m_pFrame.first()->m_Position.x);
 }
 
 
@@ -504,7 +504,7 @@ double Body::Getv(double u, CVector r, bool bRight)
 	r.Normalize();
 	v1 = 0.0; v2 = 1.0;
 
-	while(fabs(sine)>1.0e-4 && iter<200)
+	while(qAbs(sine)>1.0e-4 && iter<200)
 	{
 		v=(v1+v2)/2.0;
 		GetPoint(u, v, bRight, t_R);
@@ -817,7 +817,7 @@ bool Body::IntersectNURBS(CVector A, CVector B, CVector &I, bool bRight)
 		I.z = M0.z + t * (M1.z-M0.z);
 
 //		dist = sqrt((t_N.x-I.x)*(t_N.x-I.x) + (t_N.y-I.y)*(t_N.y-I.y) + (t_N.z-I.z)*(t_N.z-I.z));
-		dist = fabs(t-tp);
+		dist = qAbs(t-tp);
 		iter++; 
 	}
 
@@ -868,7 +868,7 @@ bool Body::IntersectPanels(CVector A, CVector B, CVector &I)
 			
 			r = (C.x-A.x)*N.x + (C.y-A.y)*N.y + (C.z-A.z)*N.z ;
 			s = (U.x*N.x + U.y*N.y + U.z*N.z);
-            if(fabs(s)>0.0)
+            if(qAbs(s)>0.0)
 			{
 				t = r/s;
 				P = A + U * t;
@@ -923,7 +923,7 @@ bool Body::IntersectPanels(CVector A, CVector B, CVector &I)
 			r = (C.x-A.x)*N.x + (C.y-A.y)*N.y + (C.z-A.z)*N.z ;
 			s = (U.x*N.x + U.y*N.y + U.z*N.z);
 
-			if(fabs(s)>0.0)
+			if(qAbs(s)>0.0)
 			{
 				t = r/s;
 				P = A + U * t;
@@ -973,8 +973,8 @@ int Body::IsFramePos(CVector Real, double ZoomFactor)
 	int k;
 	for (k=0; k<FrameSize(); k++)
 	{
-		if (fabs(Real.x-m_SplineSurface.m_pFrame[k]->m_Position.x) < 0.01 *Length()/ZoomFactor &&
-			fabs(Real.y-m_SplineSurface.m_pFrame[k]->zPos())       < 0.01 *Length()/ZoomFactor)
+		if (qAbs(Real.x-m_SplineSurface.m_pFrame[k]->m_Position.x) < 0.01 *Length()/ZoomFactor &&
+			qAbs(Real.y-m_SplineSurface.m_pFrame[k]->zPos())       < 0.01 *Length()/ZoomFactor)
 			return k;
 	}
 	return -10;
@@ -987,9 +987,13 @@ bool Body::IsInNURBSBody(CVector Pt)
 	bool bRight;
 
 	u = Getu(Pt.x);
+
+    /** @todo check in different cases of fin/body connection */
+    if (u <= 0.0 || u >= 1.0) return false;
+
 	t_r.Set(0.0, Pt.y, Pt.z);
 
-	if(Pt.y>=0.0) bRight = true;	else bRight = false;
+    if(Pt.y>=0.0) bRight = true;	else bRight = false;
 
 	v = Getv(u, t_r, bRight);
 	GetPoint(u, v, bRight, t_N);

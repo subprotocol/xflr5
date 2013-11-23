@@ -284,6 +284,7 @@ void GLCreateBody3DFlatPanels(int iList, Body *pBody)
 		}
 
 		glDisable(GL_POLYGON_OFFSET_FILL);
+        glDisable(GL_DEPTH_TEST);
 		glDisable(GL_BLEND);
 	}
 	glEndList();
@@ -292,7 +293,6 @@ void GLCreateBody3DFlatPanels(int iList, Body *pBody)
 	{
 		glEnable(GL_DEPTH_TEST);
 		glEnable (GL_LINE_STIPPLE);
-		glPolygonMode(GL_FRONT_AND_BACK,GL_LINE);
 
 		color = W3dPrefsDlg::s_OutlineColor;
 		style = W3dPrefsDlg::s_OutlineStyle;
@@ -354,441 +354,443 @@ void GLCreateBody3DFlatPanels(int iList, Body *pBody)
 			}
 		}
 		glDisable (GL_LINE_STIPPLE);
+        glDisable(GL_DEPTH_TEST);
 	}
 	glEndList();
 }
 
-
-
 void GLCreateBodyMesh(int iList, Body *pBody)
 {
-	if(!pBody) return;
+    if(!pBody) return;
 
-	int i,j,k,l;
-	int p, nx, nh;
-	double uk, v, dj, dj1, dl1;
-	CVector N, LATB, TALB, LA, LB, TA, TB;
-	CVector PLA, PLB, PTA, PTB;
-	QColor color;
+    int i,j,k,l;
+    int p, nx, nh;
+    double uk, v, dj, dj1, dl1;
+    CVector N, LATB, TALB, LA, LB, TA, TB;
+    CVector PLA, PLB, PTA, PTB;
+    QColor color;
 
+    nx = pBody->m_nxPanels;
+    nh = pBody->m_nhPanels;
 
-	nx = pBody->m_nxPanels;
-	nh = pBody->m_nhPanels;
+    if(pBody->m_LineType==BODYPANELTYPE) //LINES
+    {
+        glNewList(iList,GL_COMPILE);
+        {
+            glDisable(GL_LINE_STIPPLE);
+            glEnable(GL_DEPTH_TEST);
+            glEnable(GL_POLYGON_OFFSET_LINE);
+            glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+            glPolygonOffset(-1.0, -1.0);
 
-	if(pBody->m_LineType==BODYPANELTYPE) //LINES
-	{
-		glNewList(iList,GL_COMPILE);
-		{
-			glEnable(GL_DEPTH_TEST);
-			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-			glDisable (GL_LINE_STIPPLE);
+            color = W3dPrefsDlg::s_VLMColor;
 
-			color = W3dPrefsDlg::s_VLMColor;
+            glColor3d(color.redF(),color.greenF(),color.blueF());
+
+            glLineWidth(1.0);
+
+            for (i=0; i<pBody->FrameSize()-1; i++)
+            {
+                for (j=0; j<pBody->m_xPanels[i]; j++)
+                {
+                    dj  = (double) j   /(double)(pBody->m_xPanels[i]);
+                    dj1 = (double)(j+1)/(double)(pBody->m_xPanels[i]);
+
+                    //body left side
+                    for (k=0; k<pBody->SideLineCount()-1; k++)
+                    {
+                        //build the four corner points of the strips
+                        PLB.x =  (1.0- dj) * pBody->getFrame(i)->m_Position.x       +  dj * pBody->getFrame(i+1)->m_Position.x;
+                        PLB.y = -(1.0- dj) * pBody->getFrame(i)->m_CtrlPoint[k].y   -  dj * pBody->getFrame(i+1)->m_CtrlPoint[k].y;
+                        PLB.z =  (1.0- dj) * pBody->getFrame(i)->m_CtrlPoint[k].z   +  dj * pBody->getFrame(i+1)->m_CtrlPoint[k].z;
+
+                        PTB.x =  (1.0-dj1) * pBody->getFrame(i)->m_Position.x       + dj1 * pBody->getFrame(i+1)->m_Position.x;
+                        PTB.y = -(1.0-dj1) * pBody->getFrame(i)->m_CtrlPoint[k].y   - dj1 * pBody->getFrame(i+1)->m_CtrlPoint[k].y;
+                        PTB.z =  (1.0-dj1) * pBody->getFrame(i)->m_CtrlPoint[k].z   + dj1 * pBody->getFrame(i+1)->m_CtrlPoint[k].z;
+
+                        PLA.x =  (1.0- dj) * pBody->getFrame(i)->m_Position.x       +  dj * pBody->getFrame(i+1)->m_Position.x;
+                        PLA.y = -(1.0- dj) * pBody->getFrame(i)->m_CtrlPoint[k+1].y -  dj * pBody->getFrame(i+1)->m_CtrlPoint[k+1].y;
+                        PLA.z =  (1.0- dj) * pBody->getFrame(i)->m_CtrlPoint[k+1].z +  dj * pBody->getFrame(i+1)->m_CtrlPoint[k+1].z;
+
+                        PTA.x =  (1.0-dj1) * pBody->getFrame(i)->m_Position.x       + dj1 * pBody->getFrame(i+1)->m_Position.x;
+                        PTA.y = -(1.0-dj1) * pBody->getFrame(i)->m_CtrlPoint[k+1].y - dj1 * pBody->getFrame(i+1)->m_CtrlPoint[k+1].y;
+                        PTA.z =  (1.0-dj1) * pBody->getFrame(i)->m_CtrlPoint[k+1].z + dj1 * pBody->getFrame(i+1)->m_CtrlPoint[k+1].z;
+
+                        glBegin(GL_QUAD_STRIP);
+                        {
+                            N.Set(0.0, 0.0, 1.0);//top line normal is vertical
+
+                            LB = PLB;
+                            TB = PTB;
+                            glVertex3d(LB.x, LB.y, LB.z);
+                            glVertex3d(TB.x, TB.y, TB.z);
+
+                            for (l=0; l<pBody->m_hPanels[k]; l++)
+                            {
+                                dl1  = (double) (l+1)   /(double)(pBody->m_hPanels[k]);
+                                LA = PLB * (1.0- dl1) + PLA * dl1;
+                                TA = PTB * (1.0- dl1) + PTA * dl1;
+
+                                LATB = TB - LA;
+                                TALB = LB - TA;
+                                N = TALB * LATB;
+                                N.Normalize();
+
+                                glNormal3d(N.x, N.y, N.z);
+                                glVertex3d(LA.x, LA.y, LA.z);
+                                glVertex3d(TA.x, TA.y, TA.z);
+                                TB = TA;
+                                LB = LA;
+                            }
+                        }
+                        glEnd();
+                    }
+                    //body right side
+                    for (k=pBody->SideLineCount()-2; k>=0; k--)
+                    {
+                        //build the four corner points of the strips
+                        PLA.x = (1.0- dj) * pBody->getFrame(i)->m_Position.x     +  dj * pBody->getFrame(i+1)->m_Position.x;
+                        PLA.y = (1.0- dj) * pBody->getFrame(i)->m_CtrlPoint[k].y   +  dj * pBody->getFrame(i+1)->m_CtrlPoint[k].y;
+                        PLA.z = (1.0- dj) * pBody->getFrame(i)->m_CtrlPoint[k].z   +  dj * pBody->getFrame(i+1)->m_CtrlPoint[k].z;
+
+                        PTA.x = (1.0-dj1) * pBody->getFrame(i)->m_Position.x     + dj1 * pBody->getFrame(i+1)->m_Position.x;
+                        PTA.y = (1.0-dj1) * pBody->getFrame(i)->m_CtrlPoint[k].y   + dj1 * pBody->getFrame(i+1)->m_CtrlPoint[k].y;
+                        PTA.z = (1.0-dj1) * pBody->getFrame(i)->m_CtrlPoint[k].z   + dj1 * pBody->getFrame(i+1)->m_CtrlPoint[k].z;
+
+                        PLB.x = (1.0- dj) * pBody->getFrame(i)->m_Position.x     +  dj * pBody->getFrame(i+1)->m_Position.x;
+                        PLB.y = (1.0- dj) * pBody->getFrame(i)->m_CtrlPoint[k+1].y +  dj * pBody->getFrame(i+1)->m_CtrlPoint[k+1].y;
+                        PLB.z = (1.0- dj) * pBody->getFrame(i)->m_CtrlPoint[k+1].z +  dj * pBody->getFrame(i+1)->m_CtrlPoint[k+1].z;
+
+                        PTB.x = (1.0-dj1) * pBody->getFrame(i)->m_Position.x     + dj1 * pBody->getFrame(i+1)->m_Position.x;
+                        PTB.y = (1.0-dj1) * pBody->getFrame(i)->m_CtrlPoint[k+1].y + dj1 * pBody->getFrame(i+1)->m_CtrlPoint[k+1].y;
+                        PTB.z = (1.0-dj1) * pBody->getFrame(i)->m_CtrlPoint[k+1].z + dj1 * pBody->getFrame(i+1)->m_CtrlPoint[k+1].z;
+
+                        glBegin(GL_QUAD_STRIP);
+                        {
+                            N.Set(0.0, 0.0, 1.0);//top line normal is vertical
+
+                            LB = PLB;
+                            TB = PTB;
+                            glVertex3d(LB.x, LB.y, LB.z);
+                            glVertex3d(TB.x, TB.y, TB.z);
+
+                            for (l=0; l<pBody->m_hPanels[k]; l++)
+                            {
+                                dl1  = (double) (l+1)   /(double)(pBody->m_hPanels[k]);
+                                LA = PLB * (1.0- dl1) + PLA * dl1;
+                                TA = PTB * (1.0- dl1) + PTA * dl1;
+
+                                LATB = TB - LA;
+                                TALB = LB - TA;
+                                N = TALB * LATB;
+                                N.Normalize();
+
+                                glNormal3d(N.x, N.y, N.z);
+                                glVertex3d(LA.x, LA.y, LA.z);
+                                glVertex3d(TA.x, TA.y, TA.z);
+                                TB = TA;
+                                LB = LA;
+                            }
+                        }
+                        glEnd();
+                    }
+                }
+            }
+            glDisable(GL_DEPTH_TEST);
+            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+            glDisable(GL_POLYGON_OFFSET_LINE);
+        }
+        glEndList();
+        glNewList(iList+MAXBODIES,GL_COMPILE);
+        {
+            glDisable (GL_LINE_STIPPLE);
+            glEnable(GL_DEPTH_TEST);
+            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+            glEnable(GL_POLYGON_OFFSET_FILL);
+            glPolygonOffset(1.0, 1.0);
+
+            color = MainFrame::s_BackgroundColor;
 //			style = W3dPrefsDlg::s_VLMStyle;
 //			width = W3dPrefsDlg::s_VLMWidth;
 
-			glColor3d(color.redF(),color.greenF(),color.blueF());
+            glColor3d(color.redF(), color.greenF(), color.blueF());
 
-			glLineWidth(1.0);
+            glLineWidth(1.0);
 
-			for (i=0; i<pBody->FrameSize()-1; i++)
-			{
-				for (j=0; j<pBody->m_xPanels[i]; j++)
-				{
-					dj  = (double) j   /(double)(pBody->m_xPanels[i]);
-					dj1 = (double)(j+1)/(double)(pBody->m_xPanels[i]);
+            for (i=0; i<pBody->FrameSize()-1; i++)
+            {
+                for (j=0; j<pBody->m_xPanels[i]; j++)
+                {
+                    dj  = (double) j   /(double)(pBody->m_xPanels[i]);
+                    dj1 = (double)(j+1)/(double)(pBody->m_xPanels[i]);
 
-					//body left side
-					for (k=0; k<pBody->SideLineCount()-1; k++)
-					{
-						//build the four corner points of the strips
-						PLB.x =  (1.0- dj) * pBody->getFrame(i)->m_Position.x       +  dj * pBody->getFrame(i+1)->m_Position.x;
-						PLB.y = -(1.0- dj) * pBody->getFrame(i)->m_CtrlPoint[k].y   -  dj * pBody->getFrame(i+1)->m_CtrlPoint[k].y;
-						PLB.z =  (1.0- dj) * pBody->getFrame(i)->m_CtrlPoint[k].z   +  dj * pBody->getFrame(i+1)->m_CtrlPoint[k].z;
+                    //body left side
+                    for (k=0; k<pBody->SideLineCount()-1; k++)
+                    {
+                        //build the four corner points of the strips
+                        PLB.x =  (1.0- dj) * pBody->getFrame(i)->m_Position.x        +  dj * pBody->getFrame(i+1)->m_Position.x;
+                        PLB.y = -(1.0- dj) * pBody->getFrame(i)->m_CtrlPoint[k].y   -  dj * pBody->getFrame(i+1)->m_CtrlPoint[k].y;
+                        PLB.z =  (1.0- dj) * pBody->getFrame(i)->m_CtrlPoint[k].z   +  dj * pBody->getFrame(i+1)->m_CtrlPoint[k].z;
 
-						PTB.x =  (1.0-dj1) * pBody->getFrame(i)->m_Position.x       + dj1 * pBody->getFrame(i+1)->m_Position.x;
-						PTB.y = -(1.0-dj1) * pBody->getFrame(i)->m_CtrlPoint[k].y   - dj1 * pBody->getFrame(i+1)->m_CtrlPoint[k].y;
-						PTB.z =  (1.0-dj1) * pBody->getFrame(i)->m_CtrlPoint[k].z   + dj1 * pBody->getFrame(i+1)->m_CtrlPoint[k].z;
+                        PTB.x =  (1.0-dj1) * pBody->getFrame(i)->m_Position.x        + dj1 * pBody->getFrame(i+1)->m_Position.x;
+                        PTB.y = -(1.0-dj1) * pBody->getFrame(i)->m_CtrlPoint[k].y   - dj1 * pBody->getFrame(i+1)->m_CtrlPoint[k].y;
+                        PTB.z =  (1.0-dj1) * pBody->getFrame(i)->m_CtrlPoint[k].z   + dj1 * pBody->getFrame(i+1)->m_CtrlPoint[k].z;
 
-						PLA.x =  (1.0- dj) * pBody->getFrame(i)->m_Position.x       +  dj * pBody->getFrame(i+1)->m_Position.x;
-						PLA.y = -(1.0- dj) * pBody->getFrame(i)->m_CtrlPoint[k+1].y -  dj * pBody->getFrame(i+1)->m_CtrlPoint[k+1].y;
-						PLA.z =  (1.0- dj) * pBody->getFrame(i)->m_CtrlPoint[k+1].z +  dj * pBody->getFrame(i+1)->m_CtrlPoint[k+1].z;
+                        PLA.x =  (1.0- dj) * pBody->getFrame(i)->m_Position.x        +  dj * pBody->getFrame(i+1)->m_Position.x;
+                        PLA.y = -(1.0- dj) * pBody->getFrame(i)->m_CtrlPoint[k+1].y -  dj * pBody->getFrame(i+1)->m_CtrlPoint[k+1].y;
+                        PLA.z =  (1.0- dj) * pBody->getFrame(i)->m_CtrlPoint[k+1].z +  dj * pBody->getFrame(i+1)->m_CtrlPoint[k+1].z;
 
-						PTA.x =  (1.0-dj1) * pBody->getFrame(i)->m_Position.x       + dj1 * pBody->getFrame(i+1)->m_Position.x;
-						PTA.y = -(1.0-dj1) * pBody->getFrame(i)->m_CtrlPoint[k+1].y - dj1 * pBody->getFrame(i+1)->m_CtrlPoint[k+1].y;
-						PTA.z =  (1.0-dj1) * pBody->getFrame(i)->m_CtrlPoint[k+1].z + dj1 * pBody->getFrame(i+1)->m_CtrlPoint[k+1].z;
+                        PTA.x =  (1.0-dj1) * pBody->getFrame(i)->m_Position.x        + dj1 * pBody->getFrame(i+1)->m_Position.x;
+                        PTA.y = -(1.0-dj1) * pBody->getFrame(i)->m_CtrlPoint[k+1].y - dj1 * pBody->getFrame(i+1)->m_CtrlPoint[k+1].y;
+                        PTA.z =  (1.0-dj1) * pBody->getFrame(i)->m_CtrlPoint[k+1].z + dj1 * pBody->getFrame(i+1)->m_CtrlPoint[k+1].z;
 
-						glBegin(GL_QUAD_STRIP);
-						{
-							N.Set(0.0, 0.0, 1.0);//top line normal is vertical
+                        glBegin(GL_QUAD_STRIP);
+                        {
+                            N.Set(0.0, 0.0, 1.0);//top line normal is vertical
 
-							LB = PLB;
-							TB = PTB;
-							glVertex3d(LB.x, LB.y, LB.z);
-							glVertex3d(TB.x, TB.y, TB.z);
+                            LB = PLB;
+                            TB = PTB;
+                            glVertex3d(LB.x, LB.y, LB.z);
+                            glVertex3d(TB.x, TB.y, TB.z);
 
-							for (l=0; l<pBody->m_hPanels[k]; l++)
-							{
-								dl1  = (double) (l+1)   /(double)(pBody->m_hPanels[k]);
-								LA = PLB * (1.0- dl1) + PLA * dl1;
-								TA = PTB * (1.0- dl1) + PTA * dl1;
+                            for (l=0; l<pBody->m_hPanels[k]; l++)
+                            {
+                                dl1  = (double) (l+1)   /(double)(pBody->m_hPanels[k]);
+                                LA = PLB * (1.0- dl1) + PLA * dl1;
+                                TA = PTB * (1.0- dl1) + PTA * dl1;
 
-								LATB = TB - LA;
-								TALB = LB - TA;
-								N = TALB * LATB;
-								N.Normalize();
+                                LATB = TB - LA;
+                                TALB = LB - TA;
+                                N = TALB * LATB;
+                                N.Normalize();
 
-								glNormal3d(N.x, N.y, N.z);
-								glVertex3d(LA.x, LA.y, LA.z);
-								glVertex3d(TA.x, TA.y, TA.z);
-								TB = TA;
-								LB = LA;
-							}
-						}
-						glEnd();
-					}
-					//body right side
-					for (k=pBody->SideLineCount()-2; k>=0; k--)
-					{
-						//build the four corner points of the strips
-						PLA.x = (1.0- dj) * pBody->getFrame(i)->m_Position.x     +  dj * pBody->getFrame(i+1)->m_Position.x;
-						PLA.y = (1.0- dj) * pBody->getFrame(i)->m_CtrlPoint[k].y   +  dj * pBody->getFrame(i+1)->m_CtrlPoint[k].y;
-						PLA.z = (1.0- dj) * pBody->getFrame(i)->m_CtrlPoint[k].z   +  dj * pBody->getFrame(i+1)->m_CtrlPoint[k].z;
+                                glNormal3d(N.x, N.y, N.z);
+                                glVertex3d(LA.x, LA.y, LA.z);
+                                glVertex3d(TA.x, TA.y, TA.z);
+                                TB = TA;
+                                LB = LA;
+                            }
+                        }
+                        glEnd();
+                    }
+                    //body right side
+                    for (k=pBody->SideLineCount()-2; k>=0; k--)
+                    {
+                        //build the four corner points of the strips
+                        PLA.x = (1.0- dj) * pBody->getFrame(i)->m_Position.x        +  dj * pBody->getFrame(i+1)->m_Position.x;
+                        PLA.y = (1.0- dj) * pBody->getFrame(i)->m_CtrlPoint[k].y   +  dj * pBody->getFrame(i+1)->m_CtrlPoint[k].y;
+                        PLA.z = (1.0- dj) * pBody->getFrame(i)->m_CtrlPoint[k].z   +  dj * pBody->getFrame(i+1)->m_CtrlPoint[k].z;
 
-						PTA.x = (1.0-dj1) * pBody->getFrame(i)->m_Position.x     + dj1 * pBody->getFrame(i+1)->m_Position.x;
-						PTA.y = (1.0-dj1) * pBody->getFrame(i)->m_CtrlPoint[k].y   + dj1 * pBody->getFrame(i+1)->m_CtrlPoint[k].y;
-						PTA.z = (1.0-dj1) * pBody->getFrame(i)->m_CtrlPoint[k].z   + dj1 * pBody->getFrame(i+1)->m_CtrlPoint[k].z;
+                        PTA.x = (1.0-dj1) * pBody->getFrame(i)->m_Position.x        + dj1 * pBody->getFrame(i+1)->m_Position.x;
+                        PTA.y = (1.0-dj1) * pBody->getFrame(i)->m_CtrlPoint[k].y   + dj1 * pBody->getFrame(i+1)->m_CtrlPoint[k].y;
+                        PTA.z = (1.0-dj1) * pBody->getFrame(i)->m_CtrlPoint[k].z   + dj1 * pBody->getFrame(i+1)->m_CtrlPoint[k].z;
 
-						PLB.x = (1.0- dj) * pBody->getFrame(i)->m_Position.x     +  dj * pBody->getFrame(i+1)->m_Position.x;
-						PLB.y = (1.0- dj) * pBody->getFrame(i)->m_CtrlPoint[k+1].y +  dj * pBody->getFrame(i+1)->m_CtrlPoint[k+1].y;
-						PLB.z = (1.0- dj) * pBody->getFrame(i)->m_CtrlPoint[k+1].z +  dj * pBody->getFrame(i+1)->m_CtrlPoint[k+1].z;
+                        PLB.x = (1.0- dj) * pBody->getFrame(i)->m_Position.x        +  dj * pBody->getFrame(i+1)->m_Position.x;
+                        PLB.y = (1.0- dj) * pBody->getFrame(i)->m_CtrlPoint[k+1].y +  dj * pBody->getFrame(i+1)->m_CtrlPoint[k+1].y;
+                        PLB.z = (1.0- dj) * pBody->getFrame(i)->m_CtrlPoint[k+1].z +  dj * pBody->getFrame(i+1)->m_CtrlPoint[k+1].z;
 
-						PTB.x = (1.0-dj1) * pBody->getFrame(i)->m_Position.x     + dj1 * pBody->getFrame(i+1)->m_Position.x;
-						PTB.y = (1.0-dj1) * pBody->getFrame(i)->m_CtrlPoint[k+1].y + dj1 * pBody->getFrame(i+1)->m_CtrlPoint[k+1].y;
-						PTB.z = (1.0-dj1) * pBody->getFrame(i)->m_CtrlPoint[k+1].z + dj1 * pBody->getFrame(i+1)->m_CtrlPoint[k+1].z;
+                        PTB.x = (1.0-dj1) * pBody->getFrame(i)->m_Position.x        + dj1 * pBody->getFrame(i+1)->m_Position.x;
+                        PTB.y = (1.0-dj1) * pBody->getFrame(i)->m_CtrlPoint[k+1].y + dj1 * pBody->getFrame(i+1)->m_CtrlPoint[k+1].y;
+                        PTB.z = (1.0-dj1) * pBody->getFrame(i)->m_CtrlPoint[k+1].z + dj1 * pBody->getFrame(i+1)->m_CtrlPoint[k+1].z;
 
-						glBegin(GL_QUAD_STRIP);
-						{
-							N.Set(0.0, 0.0, 1.0);//top line normal is vertical
+                        glBegin(GL_QUAD_STRIP);
+                        {
+                            N.Set(0.0, 0.0, 1.0);//top line normal is vertical
 
-							LB = PLB;
-							TB = PTB;
-							glVertex3d(LB.x, LB.y, LB.z);
-							glVertex3d(TB.x, TB.y, TB.z);
+                            LB = PLB;
+                            TB = PTB;
+                            glVertex3d(LB.x, LB.y, LB.z);
+                            glVertex3d(TB.x, TB.y, TB.z);
 
-							for (l=0; l<pBody->m_hPanels[k]; l++)
-							{
-								dl1  = (double) (l+1)   /(double)(pBody->m_hPanels[k]);
-								LA = PLB * (1.0- dl1) + PLA * dl1;
-								TA = PTB * (1.0- dl1) + PTA * dl1;
+                            for (l=0; l<pBody->m_hPanels[k]; l++)
+                            {
+                                dl1  = (double) (l+1)   /(double)(pBody->m_hPanels[k]);
+                                LA = PLB * (1.0- dl1) + PLA * dl1;
+                                TA = PTB * (1.0- dl1) + PTA * dl1;
 
-								LATB = TB - LA;
-								TALB = LB - TA;
-								N = TALB * LATB;
-								N.Normalize();
+                                LATB = TB - LA;
+                                TALB = LB - TA;
+                                N = TALB * LATB;
+                                N.Normalize();
 
-								glNormal3d(N.x, N.y, N.z);
-								glVertex3d(LA.x, LA.y, LA.z);
-								glVertex3d(TA.x, TA.y, TA.z);
-								TB = TA;
-								LB = LA;
-							}
-						}
-						glEnd();
-					}
-				}
-			}
-			glDisable (GL_LINE_STIPPLE);
-		}
-		glEndList();
-		glNewList(iList+MAXBODIES,GL_COMPILE);
-		{
-			glDisable (GL_LINE_STIPPLE);
-			glEnable(GL_DEPTH_TEST);
-			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-			glEnable(GL_POLYGON_OFFSET_FILL);
-			glPolygonOffset(1.0, 1.0);
-
-			color = MainFrame::s_BackgroundColor;
+                                glNormal3d(N.x, N.y, N.z);
+                                glVertex3d(LA.x, LA.y, LA.z);
+                                glVertex3d(TA.x, TA.y, TA.z);
+                                TB = TA;
+                                LB = LA;
+                            }
+                        }
+                        glEnd();
+                    }
+                }
+            }
+            glDisable (GL_LINE_STIPPLE);
+        }
+        glEndList();
+    }
+    else if(pBody->m_LineType==BODYSPLINETYPE) //NURBS
+    {
+        pBody->SetPanelPos();
+        p = 0;
+        for (k=0; k<=nx; k++)
+        {
+            uk  = pBody->s_XPanelPos[k];
+            for (l=0; l<=nh; l++)
+            {
+                v = (double)l / (double)(nh);
+                pBody->GetPoint(uk,  v, true, m_T[p]);
+                p++;
+            }
+        }
+        glNewList(iList,GL_COMPILE);
+        {
+            glDisable (GL_LINE_STIPPLE);
+            glEnable(GL_DEPTH_TEST);
+            glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+            color = W3dPrefsDlg::s_VLMColor;
 //			style = W3dPrefsDlg::s_VLMStyle;
 //			width = W3dPrefsDlg::s_VLMWidth;
 
-			glColor3d(color.redF(), color.greenF(), color.blueF());
+            glColor3d(color.redF(), color.greenF(), color.blueF());
 
-			glLineWidth(1.0);
+            glLineWidth(1.0);
 
-			for (i=0; i<pBody->FrameSize()-1; i++)
-			{
-				for (j=0; j<pBody->m_xPanels[i]; j++)
-				{
-					dj  = (double) j   /(double)(pBody->m_xPanels[i]);
-					dj1 = (double)(j+1)/(double)(pBody->m_xPanels[i]);
+            //left side first;
+            p=0;
 
-					//body left side
-					for (k=0; k<pBody->SideLineCount()-1; k++)
-					{
-						//build the four corner points of the strips
-						PLB.x =  (1.0- dj) * pBody->getFrame(i)->m_Position.x        +  dj * pBody->getFrame(i+1)->m_Position.x;
-						PLB.y = -(1.0- dj) * pBody->getFrame(i)->m_CtrlPoint[k].y   -  dj * pBody->getFrame(i+1)->m_CtrlPoint[k].y;
-						PLB.z =  (1.0- dj) * pBody->getFrame(i)->m_CtrlPoint[k].z   +  dj * pBody->getFrame(i+1)->m_CtrlPoint[k].z;
+            for (k=0; k<nx; k++)
+            {
+                glBegin(GL_QUAD_STRIP);
+                {
+                    N.Set(0.0, 0.0, 1.0);//top line normal is vertical
 
-						PTB.x =  (1.0-dj1) * pBody->getFrame(i)->m_Position.x        + dj1 * pBody->getFrame(i+1)->m_Position.x;
-						PTB.y = -(1.0-dj1) * pBody->getFrame(i)->m_CtrlPoint[k].y   - dj1 * pBody->getFrame(i+1)->m_CtrlPoint[k].y;
-						PTB.z =  (1.0-dj1) * pBody->getFrame(i)->m_CtrlPoint[k].z   + dj1 * pBody->getFrame(i+1)->m_CtrlPoint[k].z;
+                    glVertex3d(m_T[p].x, m_T[p].y, m_T[p].z);
+                    glVertex3d(m_T[p+nh+1].x, m_T[p+nh+1].y, m_T[p+nh+1].z);
 
-						PLA.x =  (1.0- dj) * pBody->getFrame(i)->m_Position.x        +  dj * pBody->getFrame(i+1)->m_Position.x;
-						PLA.y = -(1.0- dj) * pBody->getFrame(i)->m_CtrlPoint[k+1].y -  dj * pBody->getFrame(i+1)->m_CtrlPoint[k+1].y;
-						PLA.z =  (1.0- dj) * pBody->getFrame(i)->m_CtrlPoint[k+1].z +  dj * pBody->getFrame(i+1)->m_CtrlPoint[k+1].z;
+                    p++;
 
-						PTA.x =  (1.0-dj1) * pBody->getFrame(i)->m_Position.x        + dj1 * pBody->getFrame(i+1)->m_Position.x;
-						PTA.y = -(1.0-dj1) * pBody->getFrame(i)->m_CtrlPoint[k+1].y - dj1 * pBody->getFrame(i+1)->m_CtrlPoint[k+1].y;
-						PTA.z =  (1.0-dj1) * pBody->getFrame(i)->m_CtrlPoint[k+1].z + dj1 * pBody->getFrame(i+1)->m_CtrlPoint[k+1].z;
+                    for (l=1; l<=nh; l++)
+                    {
+                        glVertex3d(m_T[p].x,      m_T[p].y,      m_T[p].z);
+                        glVertex3d(m_T[p+nh+1].x, m_T[p+nh+1].y, m_T[p+nh+1].z);
+                        TB = TA;
+                        LB = LA;
+                        p++;
+                    }
+                }
+                glEnd();
+            }
 
-						glBegin(GL_QUAD_STRIP);
-						{
-							N.Set(0.0, 0.0, 1.0);//top line normal is vertical
+            //right side next;
+            p=0;
+            for (k=0; k<nx; k++)
+            {
+                glBegin(GL_QUAD_STRIP);
+                {
+                    N.Set(0.0, 0.0, 1.0);//top line normal is vertical
 
-							LB = PLB;
-							TB = PTB;
-							glVertex3d(LB.x, LB.y, LB.z);
-							glVertex3d(TB.x, TB.y, TB.z);
+                    glVertex3d(m_T[p].x,      -m_T[p].y, m_T[p].z);
+                    glVertex3d(m_T[p+nh+1].x, -m_T[p+nh+1].y, m_T[p+nh+1].z);
 
-							for (l=0; l<pBody->m_hPanels[k]; l++)
-							{
-								dl1  = (double) (l+1)   /(double)(pBody->m_hPanels[k]);
-								LA = PLB * (1.0- dl1) + PLA * dl1;
-								TA = PTB * (1.0- dl1) + PTA * dl1;
+                    p++;
 
-								LATB = TB - LA;
-								TALB = LB - TA;
-								N = TALB * LATB;
-								N.Normalize();
+                    for (l=1; l<=nh; l++)
+                    {
+                        glVertex3d(m_T[p].x,      -m_T[p].y,      m_T[p].z);
+                        glVertex3d(m_T[p+nh+1].x, -m_T[p+nh+1].y, m_T[p+nh+1].z);
+                        TB = TA;
+                        LB = LA;
+                        p++;
+                    }
+                }
+                glEnd();
+            }
+        }
+        glEndList();
 
-								glNormal3d(N.x, N.y, N.z);
-								glVertex3d(LA.x, LA.y, LA.z);
-								glVertex3d(TA.x, TA.y, TA.z);
-								TB = TA;
-								LB = LA;
-							}
-						}
-						glEnd();
-					}
-					//body right side
-					for (k=pBody->SideLineCount()-2; k>=0; k--)
-					{
-						//build the four corner points of the strips
-						PLA.x = (1.0- dj) * pBody->getFrame(i)->m_Position.x        +  dj * pBody->getFrame(i+1)->m_Position.x;
-						PLA.y = (1.0- dj) * pBody->getFrame(i)->m_CtrlPoint[k].y   +  dj * pBody->getFrame(i+1)->m_CtrlPoint[k].y;
-						PLA.z = (1.0- dj) * pBody->getFrame(i)->m_CtrlPoint[k].z   +  dj * pBody->getFrame(i+1)->m_CtrlPoint[k].z;
+        glNewList(iList+MAXBODIES,GL_COMPILE);
+        {
+            glEnable(GL_DEPTH_TEST);
+            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+            glEnable(GL_POLYGON_OFFSET_FILL);
+            glPolygonOffset(1.0, 1.0);
+            glDisable (GL_LINE_STIPPLE);
 
-						PTA.x = (1.0-dj1) * pBody->getFrame(i)->m_Position.x        + dj1 * pBody->getFrame(i+1)->m_Position.x;
-						PTA.y = (1.0-dj1) * pBody->getFrame(i)->m_CtrlPoint[k].y   + dj1 * pBody->getFrame(i+1)->m_CtrlPoint[k].y;
-						PTA.z = (1.0-dj1) * pBody->getFrame(i)->m_CtrlPoint[k].z   + dj1 * pBody->getFrame(i+1)->m_CtrlPoint[k].z;
-
-						PLB.x = (1.0- dj) * pBody->getFrame(i)->m_Position.x        +  dj * pBody->getFrame(i+1)->m_Position.x;
-						PLB.y = (1.0- dj) * pBody->getFrame(i)->m_CtrlPoint[k+1].y +  dj * pBody->getFrame(i+1)->m_CtrlPoint[k+1].y;
-						PLB.z = (1.0- dj) * pBody->getFrame(i)->m_CtrlPoint[k+1].z +  dj * pBody->getFrame(i+1)->m_CtrlPoint[k+1].z;
-
-						PTB.x = (1.0-dj1) * pBody->getFrame(i)->m_Position.x        + dj1 * pBody->getFrame(i+1)->m_Position.x;
-						PTB.y = (1.0-dj1) * pBody->getFrame(i)->m_CtrlPoint[k+1].y + dj1 * pBody->getFrame(i+1)->m_CtrlPoint[k+1].y;
-						PTB.z = (1.0-dj1) * pBody->getFrame(i)->m_CtrlPoint[k+1].z + dj1 * pBody->getFrame(i+1)->m_CtrlPoint[k+1].z;
-
-						glBegin(GL_QUAD_STRIP);
-						{
-							N.Set(0.0, 0.0, 1.0);//top line normal is vertical
-
-							LB = PLB;
-							TB = PTB;
-							glVertex3d(LB.x, LB.y, LB.z);
-							glVertex3d(TB.x, TB.y, TB.z);
-
-							for (l=0; l<pBody->m_hPanels[k]; l++)
-							{
-								dl1  = (double) (l+1)   /(double)(pBody->m_hPanels[k]);
-								LA = PLB * (1.0- dl1) + PLA * dl1;
-								TA = PTB * (1.0- dl1) + PTA * dl1;
-
-								LATB = TB - LA;
-								TALB = LB - TA;
-								N = TALB * LATB;
-								N.Normalize();
-
-								glNormal3d(N.x, N.y, N.z);
-								glVertex3d(LA.x, LA.y, LA.z);
-								glVertex3d(TA.x, TA.y, TA.z);
-								TB = TA;
-								LB = LA;
-							}
-						}
-						glEnd();
-					}
-				}
-			}
-			glDisable (GL_LINE_STIPPLE);
-		}
-		glEndList();
-	}
-	else if(pBody->m_LineType==BODYSPLINETYPE) //NURBS
-	{
-		pBody->SetPanelPos();
-		p = 0;
-		for (k=0; k<=nx; k++)
-		{
-			uk  = pBody->s_XPanelPos[k];
-			for (l=0; l<=nh; l++)
-			{
-				v = (double)l / (double)(nh);
-				pBody->GetPoint(uk,  v, true, m_T[p]);
-				p++;
-			}
-		}
-		glNewList(iList,GL_COMPILE);
-		{
-			glDisable (GL_LINE_STIPPLE);
-			glEnable(GL_DEPTH_TEST);
-			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-			color = W3dPrefsDlg::s_VLMColor;
+            color = MainFrame::s_BackgroundColor;
 //			style = W3dPrefsDlg::s_VLMStyle;
 //			width = W3dPrefsDlg::s_VLMWidth;
 
-			glColor3d(color.redF(), color.greenF(), color.blueF());
+            glColor3d(color.redF(), color.greenF(), color.blueF());
 
-			glLineWidth(1.0);
-
-			//left side first;
-			p=0;
-
-			for (k=0; k<nx; k++)
-			{
-				glBegin(GL_QUAD_STRIP);
-				{
-					N.Set(0.0, 0.0, 1.0);//top line normal is vertical
-
-					glVertex3d(m_T[p].x, m_T[p].y, m_T[p].z);
-					glVertex3d(m_T[p+nh+1].x, m_T[p+nh+1].y, m_T[p+nh+1].z);
-
-					p++;
-
-					for (l=1; l<=nh; l++)
-					{
-						glVertex3d(m_T[p].x,      m_T[p].y,      m_T[p].z);
-						glVertex3d(m_T[p+nh+1].x, m_T[p+nh+1].y, m_T[p+nh+1].z);
-						TB = TA;
-						LB = LA;
-						p++;
-					}
-				}
-				glEnd();
-			}
-
-			//right side next;
-			p=0;
-			for (k=0; k<nx; k++)
-			{
-				glBegin(GL_QUAD_STRIP);
-				{
-					N.Set(0.0, 0.0, 1.0);//top line normal is vertical
-
-					glVertex3d(m_T[p].x,      -m_T[p].y, m_T[p].z);
-					glVertex3d(m_T[p+nh+1].x, -m_T[p+nh+1].y, m_T[p+nh+1].z);
-
-					p++;
-
-					for (l=1; l<=nh; l++)
-					{
-						glVertex3d(m_T[p].x,      -m_T[p].y,      m_T[p].z);
-						glVertex3d(m_T[p+nh+1].x, -m_T[p+nh+1].y, m_T[p+nh+1].z);
-						TB = TA;
-						LB = LA;
-						p++;
-					}
-				}
-				glEnd();
-			}
-		}
-		glEndList();
-
-		glNewList(iList+MAXBODIES,GL_COMPILE);
-		{
-			glEnable(GL_DEPTH_TEST);
-			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-			glEnable(GL_POLYGON_OFFSET_FILL);
-			glPolygonOffset(1.0, 1.0);
-			glDisable (GL_LINE_STIPPLE);
-
-			color = MainFrame::s_BackgroundColor;
-//			style = W3dPrefsDlg::s_VLMStyle;
-//			width = W3dPrefsDlg::s_VLMWidth;
-
-			glColor3d(color.redF(), color.greenF(), color.blueF());
-
-			glLineWidth(1.0);
+            glLineWidth(1.0);
 
 
-			//left side first;
-			p=0;
-			for (k=0; k<nx; k++)
-			{
-				glBegin(GL_QUAD_STRIP);
-				{
-					N.Set(0.0, 0.0, 1.0);//top line normal is vertical
+            //left side first;
+            p=0;
+            for (k=0; k<nx; k++)
+            {
+                glBegin(GL_QUAD_STRIP);
+                {
+                    N.Set(0.0, 0.0, 1.0);//top line normal is vertical
 
-					glVertex3d(m_T[p].x, m_T[p].y, m_T[p].z);
-					glVertex3d(m_T[p+nh+1].x, m_T[p+nh+1].y, m_T[p+nh+1].z);
+                    glVertex3d(m_T[p].x, m_T[p].y, m_T[p].z);
+                    glVertex3d(m_T[p+nh+1].x, m_T[p+nh+1].y, m_T[p+nh+1].z);
 
-					p++;
+                    p++;
 
-					for (l=1; l<=nh; l++)
-					{
+                    for (l=1; l<=nh; l++)
+                    {
 /*						LATB = m_T[p+nh] - m_T[p];     //					LATB = TB - LA;
-						TALB = m_T[p-1]  - m_T[p+nh+1];//					TALB = LB - TA;
-						N = TALB * LATB;
-						N.Normalize();
+                        TALB = m_T[p-1]  - m_T[p+nh+1];//					TALB = LB - TA;
+                        N = TALB * LATB;
+                        N.Normalize();
 
-						glNormal3d(N.x, N.y, N.z);*/
-						glVertex3d(m_T[p].x,      m_T[p].y,      m_T[p].z);
-						glVertex3d(m_T[p+nh+1].x, m_T[p+nh+1].y, m_T[p+nh+1].z);
-						TB = TA;
-						LB = LA;
-						p++;
-					}
-				}
-				glEnd();
-			}
-			//right side next;
-			p=0;
-			for (k=0; k<nx; k++)
-			{
-				glBegin(GL_QUAD_STRIP);
-				{
-					N.Set(0.0, 0.0, 1.0);//top line normal is vertical
+                        glNormal3d(N.x, N.y, N.z);*/
+                        glVertex3d(m_T[p].x,      m_T[p].y,      m_T[p].z);
+                        glVertex3d(m_T[p+nh+1].x, m_T[p+nh+1].y, m_T[p+nh+1].z);
+                        TB = TA;
+                        LB = LA;
+                        p++;
+                    }
+                }
+                glEnd();
+            }
+            //right side next;
+            p=0;
+            for (k=0; k<nx; k++)
+            {
+                glBegin(GL_QUAD_STRIP);
+                {
+                    N.Set(0.0, 0.0, 1.0);//top line normal is vertical
 
-					glVertex3d(m_T[p].x,      -m_T[p].y, m_T[p].z);
-					glVertex3d(m_T[p+nh+1].x, -m_T[p+nh+1].y, m_T[p+nh+1].z);
+                    glVertex3d(m_T[p].x,      -m_T[p].y, m_T[p].z);
+                    glVertex3d(m_T[p+nh+1].x, -m_T[p+nh+1].y, m_T[p+nh+1].z);
 
-					p++;
+                    p++;
 
-					for (l=1; l<=nh; l++)
-					{
+                    for (l=1; l<=nh; l++)
+                    {
 /*						LATB = m_T[p+nh] - m_T[p];     //					LATB = TB - LA;
-						TALB = m_T[p-1]  - m_T[p+nh+1];//					TALB = LB - TA;
-						N = TALB * LATB;
-						N.Normalize();
+                        TALB = m_T[p-1]  - m_T[p+nh+1];//					TALB = LB - TA;
+                        N = TALB * LATB;
+                        N.Normalize();
 
-						glNormal3d(N.x, -N.y, N.z);*/
-						glVertex3d(m_T[p].x,      -m_T[p].y,      m_T[p].z);
-						glVertex3d(m_T[p+nh+1].x, -m_T[p+nh+1].y, m_T[p+nh+1].z);
-						TB = TA;
-						LB = LA;
-						p++;
-					}
-				}
-				glEnd();
-			}
-		}
-		glEndList();
-	}
+                        glNormal3d(N.x, -N.y, N.z);*/
+                        glVertex3d(m_T[p].x,      -m_T[p].y,      m_T[p].z);
+                        glVertex3d(m_T[p+nh+1].x, -m_T[p+nh+1].y, m_T[p+nh+1].z);
+                        TB = TA;
+                        LB = LA;
+                        p++;
+                    }
+                }
+                glEnd();
+            }
+        }
+        glEndList();
+    }
 }
+
+
 
 
  

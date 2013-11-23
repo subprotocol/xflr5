@@ -58,44 +58,15 @@
 
 #define VLMSTREAMLINES          1220
 #define SURFACESPEEDS           1221
-
 #define LIFTFORCE               1222
 #define VLMMOMENTS              1223
-
 #define VLMWINGLIFT             1232
-#define VLMWING2LIFT            1233
-#define VLMSTABLIFT             1234
-#define VLMFINLIFT              1235
-
 #define VLMWINGDRAG             1236
-#define VLMWING2DRAG            1237
-#define VLMSTABDRAG             1238
-#define VLMFINDRAG              1239
-
 #define VLMWINGWASH             1241
-#define VLMWING2WASH            1242
-#define VLMSTABWASH             1243
-#define VLMFINWASH              1244
-
 #define VLMWINGTOPTRANS         1245
-#define VLMWING2TOPTRANS        1246
-#define VLMSTABTOPTRANS         1247
-#define VLMFINTOPTRANS          1248
-
 #define VLMWINGBOTTRANS         1249
-#define VLMWING2BOTTRANS        1250
-#define VLMSTABBOTTRANS         1251
-#define VLMFINBOTTRANS          1252
-
 #define WINGSURFACES            1300
-#define WING2SURFACES           1301
-#define STABSURFACES            1302
-#define FINSURFACES             1303
-
 #define WINGOUTLINE             1304
-#define WING2OUTLINE            1305
-#define STABOUTLINE             1306
-#define FINOUTLINE              1307
 
 #define MESHPANELS              1372
 #define MESHBACK                1373

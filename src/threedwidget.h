@@ -64,7 +64,8 @@ public:
 	void GLRenderSphere(QColor cr, double radius, int NumLongitudes, int NumLatitudes);
 	void GLSetupLight(GLLightDlg *pglLightParams, double Offset_y, double LightFactor);
 	void GLToClient(CVector const &real, QPoint &point);
-	void NormalVector(GLdouble p1[3], GLdouble p2[3],  GLdouble p3[3], GLdouble n[3]);
+    void GLToClient(double const &x, double const &y, QPoint &point);
+    void NormalVector(GLdouble p1[3], GLdouble p2[3],  GLdouble p3[3], GLdouble n[3]);
 
 private:
 	void contextMenuEvent (QContextMenuEvent * event);

@@ -83,18 +83,18 @@ W3dPrefsDlg::W3dPrefsDlg(QWidget *pParent) : QDialog(pParent)
 
 	SetupLayout();
 
-	connect(m_pctrlAxis, SIGNAL(clicked()), SLOT(On3DAxis()));
-	connect(m_pctrlOutline, SIGNAL(clicked()), SLOT(OnWingColor()));
-	connect(m_pctrlVLMMesh, SIGNAL(clicked()), SLOT(OnVLMMesh()));
-	connect(m_pctrlTopTrans, SIGNAL(clicked()), SLOT(OnTopTrans()));
-	connect(m_pctrlBotTrans, SIGNAL(clicked()), SLOT(OnBotTrans()));
-	connect(m_pctrlLift, SIGNAL(clicked()), SLOT(OnXCP()));
-	connect(m_pctrlMoments, SIGNAL(clicked()), SLOT(OnMoments()));
-	connect(m_pctrlInducedDrag, SIGNAL(clicked()), SLOT(OnIDrag()));
-	connect(m_pctrlViscousDrag, SIGNAL(clicked()), SLOT(OnVDrag()));
-	connect(m_pctrlDownwash, SIGNAL(clicked()), SLOT(OnDownwash()));
-	connect(m_pctrlStreamLines, SIGNAL(clicked()), SLOT(OnStreamLines()));
-	connect(m_pctrlWakePanels, SIGNAL(clicked()), SLOT(OnWakePanels()));
+    connect(m_pctrlAxis, SIGNAL(clickedLB()), SLOT(On3DAxis()));
+    connect(m_pctrlOutline, SIGNAL(clickedLB()), SLOT(OnWingColor()));
+    connect(m_pctrlVLMMesh, SIGNAL(clickedLB()), SLOT(OnVLMMesh()));
+    connect(m_pctrlTopTrans, SIGNAL(clickedLB()), SLOT(OnTopTrans()));
+    connect(m_pctrlBotTrans, SIGNAL(clickedLB()), SLOT(OnBotTrans()));
+    connect(m_pctrlLift, SIGNAL(clickedLB()), SLOT(OnXCP()));
+    connect(m_pctrlMoments, SIGNAL(clickedLB()), SLOT(OnMoments()));
+    connect(m_pctrlInducedDrag, SIGNAL(clickedLB()), SLOT(OnIDrag()));
+    connect(m_pctrlViscousDrag, SIGNAL(clickedLB()), SLOT(OnVDrag()));
+    connect(m_pctrlDownwash, SIGNAL(clickedLB()), SLOT(OnDownwash()));
+    connect(m_pctrlStreamLines, SIGNAL(clickedLB()), SLOT(OnStreamLines()));
+    connect(m_pctrlWakePanels, SIGNAL(clickedLB()), SLOT(OnWakePanels()));
 	connect(m_pctrlShowWake, SIGNAL(clicked()), SLOT(OnShowWake()));
 	connect(m_pctrlMassColor, SIGNAL(clicked()), SLOT(OnMasses()));
 }

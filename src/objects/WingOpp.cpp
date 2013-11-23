@@ -723,7 +723,7 @@ void WingOpp::GetWingOppProperties(QString &WingOppProperties)
 	strong  = QString(QObject::tr("Mass")+"  = %1 ").arg(m_Weight*MainFrame::s_kgtoUnit,7,'f',3);
 	WingOppProperties += strong + massunit + "\n";
 
-	if(fabs(m_Beta)>PRECISION)
+	if(qAbs(m_Beta)>PRECISION)
 	{
 		strong  = QString(QObject::tr("Beta")+"  = %1").arg(m_Beta,7,'f',2);
 		WingOppProperties += strong +QString::fromUtf8("°")+"\n\n";
@@ -858,7 +858,7 @@ void WingOpp::GetWingOppProperties(QString &WingOppProperties)
 			c = m_EigenValue[im];
 			sum  = c.real() * 2.0;                         // is a real number
 			prod = c.real()*c.real() + c.imag()*c.imag();  // is a positive real number
-			OmegaN = fabs(c.imag());
+			OmegaN = qAbs(c.imag());
 			if(OmegaN>PRECISION)	Omega1 = sqrt(prod);
 			else                    Omega1 = 0.0;
 			Sigma1 = sum /2.0;
@@ -866,7 +866,7 @@ void WingOpp::GetWingOppProperties(QString &WingOppProperties)
 			else                 Dsi = 0.0;
 
 			if(c.imag()>=0.0) strange = QString("  Eigenvalue    = %1+%2i").arg(c.real(),10,'f',5).arg(c.imag(),10,'f',5);
-			else              strange = QString("  Eigenvalue    = %1-%2i").arg(c.real(),10,'f',5).arg(fabs(c.imag()),10,'f',5);
+			else              strange = QString("  Eigenvalue    = %1-%2i").arg(c.real(),10,'f',5).arg(qAbs(c.imag()),10,'f',5);
 			WingOppProperties += strange +"\n";
 
 			strange = QString("  Undamped Natural Frequency = %1 Hz").arg(OmegaN/2.0/PI, 8,'f',3);
@@ -883,22 +883,22 @@ void WingOpp::GetWingOppProperties(QString &WingOppProperties)
 			angle = m_EigenVector[im][3];
 			c = m_EigenVector[im][0]/u0;
 			if(c.imag()>=0.0) strange = QString("    u/u0          = %1+%2i").arg(c.real(),10,'f',5).arg(c.imag(),10,'f',5);
-			else              strange = QString("    u/u0          = %1-%2i").arg(c.real(),10,'f',5).arg(fabs(c.imag()),10,'f',5);
+			else              strange = QString("    u/u0          = %1-%2i").arg(c.real(),10,'f',5).arg(qAbs(c.imag()),10,'f',5);
 			WingOppProperties += strange +"\n";
 
 			c = m_EigenVector[im][1]/u0;
 			if(c.imag()>=0.0) strange = QString("    w/u0          = %1+%2i").arg(c.real(),10,'f',5).arg(c.imag(),10,'f',5);
-			else              strange = QString("    w/u0          = %1-%2i").arg(c.real(),10,'f',5).arg(fabs(c.imag()),10,'f',5);
+			else              strange = QString("    w/u0          = %1-%2i").arg(c.real(),10,'f',5).arg(qAbs(c.imag()),10,'f',5);
 			WingOppProperties += strange +"\n";
 
 			c = m_EigenVector[im][2]/(2.0*u0/mac);
 			if(c.imag()>=0.0) strange = QString("    q/(2.u0.MAC)  = %1+%2i").arg(c.real(),10,'f',5).arg(c.imag(),10,'f',5);
-			else              strange = QString("    q/(2.u0.MAC)  = %1-%2i").arg(c.real(),10,'f',5).arg(fabs(c.imag()),10,'f',5);
+			else              strange = QString("    q/(2.u0.MAC)  = %1-%2i").arg(c.real(),10,'f',5).arg(qAbs(c.imag()),10,'f',5);
 			WingOppProperties += strange +"\n";
 
 			c = m_EigenVector[im][3]/angle;
 			if(c.imag()>=0.0) strange = QString("    theta(rad)    = %1+%2i").arg(c.real(),10,'f',5).arg(c.imag(),10,'f',5);
-			else              strange = QString("    theta(rad)    = %1-%2i").arg(c.real(),10,'f',5).arg(fabs(c.imag()),10,'f',5);
+			else              strange = QString("    theta(rad)    = %1-%2i").arg(c.real(),10,'f',5).arg(qAbs(c.imag()),10,'f',5);
 			WingOppProperties += strange +"\n\n";
 		}
 
@@ -908,7 +908,7 @@ void WingOpp::GetWingOppProperties(QString &WingOppProperties)
 			c = m_EigenValue[im];
 			sum  = c.real() * 2.0;                         // is a real number
 			prod = c.real()*c.real() + c.imag()*c.imag();  // is a positive real number
-			OmegaN = fabs(c.imag());
+			OmegaN = qAbs(c.imag());
 			if(OmegaN>PRECISION)	Omega1 = sqrt(prod);
 			else                    Omega1 = 0.0;
 			Sigma1 = sum /2.0;
@@ -916,7 +916,7 @@ void WingOpp::GetWingOppProperties(QString &WingOppProperties)
 			else                 Dsi = 0.0;
 
 			if(c.imag()>=0.0) strange = QString("  Eigenvalue    = %1+%2i").arg(c.real(),10,'f',5).arg(c.imag(),10,'f',5);
-			else              strange = QString("  Eigenvalue    = %1-%2i").arg(c.real(),10,'f',5).arg(fabs(c.imag()),10,'f',5);
+			else              strange = QString("  Eigenvalue    = %1-%2i").arg(c.real(),10,'f',5).arg(qAbs(c.imag()),10,'f',5);
 			WingOppProperties += strange +"\n";
 
 			strange = QString("  Undamped Natural Frequency = %1 Hz").arg(OmegaN/2.0/PI, 8,'f',3);
@@ -935,22 +935,22 @@ void WingOpp::GetWingOppProperties(QString &WingOppProperties)
 
 			c = m_EigenVector[im][0]/u0;
 			if(c.imag()>=0.0) strange = QString("    v/u0          = %1+%2i").arg(c.real(),10,'f',5).arg(c.imag(),10,'f',5);
-			else              strange = QString("    v/u0          = %1-%2i").arg(c.real(),10,'f',5).arg(fabs(c.imag()),10,'f',5);
+			else              strange = QString("    v/u0          = %1-%2i").arg(c.real(),10,'f',5).arg(qAbs(c.imag()),10,'f',5);
 			WingOppProperties += strange +"\n";
 
 			c = m_EigenVector[im][1]/(2.0*u0/span);
 			if(c.imag()>=0.0) strange = QString("    p/(2.u0.Span) = %1+%2i").arg(c.real(),10,'f',5).arg(c.imag(),10,'f',5);
-			else              strange = QString("    p/(2.u0.Span) = %1-%2i").arg(c.real(),10,'f',5).arg(fabs(c.imag()),10,'f',5);
+			else              strange = QString("    p/(2.u0.Span) = %1-%2i").arg(c.real(),10,'f',5).arg(qAbs(c.imag()),10,'f',5);
 			WingOppProperties += strange +"\n";
 
 			c = m_EigenVector[im][2]/(2.0*u0/span);
 			if(c.imag()>=0.0) strange = QString("    r/(2.u0.Span) = %1+%2i").arg(c.real(),10,'f',5).arg(c.imag(),10,'f',5);
-			else              strange = QString("    r/(2.u0.Span) = %1-%2i").arg(c.real(),10,'f',5).arg(fabs(c.imag()),10,'f',5);
+			else              strange = QString("    r/(2.u0.Span) = %1-%2i").arg(c.real(),10,'f',5).arg(qAbs(c.imag()),10,'f',5);
 			WingOppProperties += strange +"\n";
 
 			c = m_EigenVector[im][3]/angle;
 			if(c.imag()>=0.0) strange = QString("    phi(rad)      = %1+%2i").arg(c.real(),10,'f',5).arg(c.imag(),10,'f',5);
-			else              strange = QString("    phi(rad)      = %1-%2i").arg(c.real(),10,'f',5).arg(fabs(c.imag()),10,'f',5);
+			else              strange = QString("    phi(rad)      = %1-%2i").arg(c.real(),10,'f',5).arg(qAbs(c.imag()),10,'f',5);
 			WingOppProperties += strange +"\n\n";
 		}
 

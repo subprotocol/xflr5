@@ -206,7 +206,6 @@ MainFrame::MainFrame(QWidget * parent, Qt::WindowFlags flags)
 	SetUnits(s_LengthUnit, s_AreaUnit, s_SpeedUnit, s_WeightUnit, s_ForceUnit, s_MomentUnit,
 			 s_mtoUnit, s_m2toUnit, s_mstoUnit, s_kgtoUnit, s_NtoUnit, s_NmtoUnit);
 
-
 	pXDirect->SetAnalysisParams();
 	CreateActions();
 	CreateMenus();
@@ -258,18 +257,18 @@ MainFrame::MainFrame(QWidget * parent, Qt::WindowFlags flags)
 	SetMenus();
 
 	QString styleSheet;
-	if(DisplaySettingsDlg::s_bStyleSheets)
-	{
-		ReadStyleSheet(DisplaySettingsDlg::s_StyleSheetName, styleSheet);
-		qApp->setStyleSheet(styleSheet);
-		ensurePolished();
-	}
+    if(DisplaySettingsDlg::s_bStyleSheets)
+    {
+        ReadStyleSheet(DisplaySettingsDlg::s_StyleSheetName, styleSheet);
+        if(DisplaySettingsDlg::s_bStyleSheets) qApp->setStyleSheet(styleSheet);
+        ensurePolished();
+    }
 }
 
 
 void MainFrame::ReadStyleSheet(QString styleSheetName, QString &styleSheet)
 {
-	QFile file("qss/"+styleSheetName+".qss");
+    QFile file("qss/"+styleSheetName+".qss");
 	if(file.open(QFile::ReadOnly))
 	{
 		styleSheet = QLatin1String(file.readAll());
@@ -975,7 +974,7 @@ void MainFrame::CreateDockWindows()
 	GraphDlg::s_pMainFrame         = this;
 	ManageBodiesDlg::s_pMainFrame  = this;
 
-	m_pctrlXDirectWidget = new QDockWidget("XDirect", this);
+    m_pctrlXDirectWidget = new QDockWidget("XDirect", this);
 	m_pctrlXDirectWidget->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
 	addDockWidget(Qt::RightDockWidgetArea, m_pctrlXDirectWidget);
 
@@ -990,9 +989,9 @@ void MainFrame::CreateDockWindows()
 	m_pctrlAFoilWidget = new QDockWidget("AFoil", this);
 	m_pctrlAFoilWidget->setAllowedAreas(Qt::BottomDockWidgetArea | Qt::TopDockWidgetArea);
 	addDockWidget(Qt::BottomDockWidgetArea, m_pctrlAFoilWidget);
-	
+
 	m_p2DWidget = new TwoDWidget(this);
-	m_pGLWidget = new ThreeDWidget(this);
+    m_pGLWidget = new ThreeDWidget(this);
 
 	m_pXDirect = new QXDirect(this);
 	QXDirect *pXDirect = (QXDirect*)m_pXDirect;
@@ -1010,13 +1009,13 @@ void MainFrame::CreateDockWindows()
 	m_pctrlXInverseWidget->setFloating(true);
 	m_pctrlXInverseWidget->move(960,60);
 
-	m_pMiarex = new QMiarex;
-	QMiarex * pMiarex = (QMiarex*)m_pMiarex;
-	pMiarex->setAttribute(Qt::WA_DeleteOnClose, false);
-	m_pctrlMiarexWidget->setWidget(pMiarex);
-	m_pctrlMiarexWidget->setVisible(false);
-	m_pctrlMiarexWidget->setFloating(true);
-	m_pctrlMiarexWidget->move(960,60);
+    m_pMiarex = new QMiarex;
+    QMiarex * pMiarex = (QMiarex*)m_pMiarex;
+    pMiarex->setAttribute(Qt::WA_DeleteOnClose, false);
+    m_pctrlMiarexWidget->setWidget(pMiarex);
+    m_pctrlMiarexWidget->setVisible(false);
+    m_pctrlMiarexWidget->setFloating(true);
+    m_pctrlMiarexWidget->move(960,60);
 
 
 	m_pGL3DScales = new GL3DScales(this);
@@ -1095,7 +1094,6 @@ void MainFrame::CreateDockWindows()
 	pXInverse->m_pXFoil           = pXDirect->m_pXFoil;
 	pXInverse->s_p2DWidget        = m_p2DWidget;
 	pXInverse->m_poaFoil          = &m_oaFoil;
-
 
 	GL3dBodyDlg::s_poaBody = &m_oaBody;
 	GL3dWingDlg::s_poaFoil = &m_oaFoil;
@@ -3087,14 +3085,14 @@ OpPoint *MainFrame::GetOpp(double Alpha)
 			{
 				if(pCurPolar->m_PolarType != FIXEDAOAPOLAR)
 				{
-					if(fabs(pOpPoint->Alpha - Alpha) <0.001)
+					if(qAbs(pOpPoint->Alpha - Alpha) <0.001)
 					{
 						return pOpPoint;
 					}
 				}
 				else
 				{
-					if(fabs(pOpPoint->Reynolds - Alpha) <0.1)
+					if(qAbs(pOpPoint->Reynolds - Alpha) <0.1)
 					{
 						return pOpPoint;
 					}
@@ -3328,7 +3326,7 @@ bool MainFrame::LoadPolarFileV3(QDataStream &ar, bool bIsStoring, int ArchiveFor
 				pOldOpp = (OpPoint*)m_oaOpp.at(l);
 				if (pOldOpp->m_strFoilName == pOpp->m_strFoilName &&
 					pOldOpp->m_strPlrName  == pOpp->m_strPlrName &&
-					fabs(pOldOpp->Alpha-pOpp->Alpha)<0.001)
+					qAbs(pOldOpp->Alpha-pOpp->Alpha)<0.001)
 				{
 					//just overwrite...
 					m_oaOpp.removeAt(l);
@@ -5274,7 +5272,7 @@ void MainFrame::SelectOpPoint(OpPoint *pOpp)
 		if(pCurPlr->m_PolarType != FIXEDAOAPOLAR)
 		{
 			alpha = m_pctrlOpPoint->itemText(i).toDouble();
-			if(fabs(alpha-pOpp->Alpha)<0.001)
+			if(qAbs(alpha-pOpp->Alpha)<0.001)
 			{
 				m_pctrlOpPoint->setCurrentIndex(i);
 			}
@@ -5282,7 +5280,7 @@ void MainFrame::SelectOpPoint(OpPoint *pOpp)
 		else
 		{
 			Re = m_pctrlOpPoint->itemText(i).toDouble();
-			if(fabs(Re-pOpp->Reynolds)<1.0)
+			if(qAbs(Re-pOpp->Reynolds)<1.0)
 			{
 				m_pctrlOpPoint->setCurrentIndex(i);
 			}
@@ -5305,7 +5303,7 @@ void MainFrame::SelectWOpp(double x)
 		if(pCurWPlr->m_WPolarType<FIXEDAOAPOLAR)
 		{
 			alpha = m_pctrlWOpp->itemText(i).toDouble();
-			if(fabs(alpha-x)<0.001)
+			if(qAbs(alpha-x)<0.001)
 			{
 				m_pctrlWOpp->setCurrentIndex(i);
 			}
@@ -5313,7 +5311,7 @@ void MainFrame::SelectWOpp(double x)
 		else if(pCurWPlr->m_WPolarType==FIXEDAOAPOLAR)
 		{
 			double QInf = m_pctrlWOpp->itemText(i).toDouble();
-			if(fabs(QInf-x)<1.0)
+			if(qAbs(QInf-x)<1.0)
 			{
 				m_pctrlWOpp->setCurrentIndex(i);
 			}
@@ -5321,7 +5319,7 @@ void MainFrame::SelectWOpp(double x)
 		else if(pCurWPlr->m_WPolarType==STABILITYPOLAR)
 		{
 			double Ctrl = m_pctrlWOpp->itemText(i).toDouble();
-			if(fabs(Ctrl-x)<.001)
+			if(qAbs(Ctrl-x)<.001)
 			{
 				m_pctrlWOpp->setCurrentIndex(i);
 			}
@@ -6820,7 +6818,7 @@ void MainFrame::UpdateOpps()
 			{
 				if (pCurPlr->m_PolarType !=FIXEDAOAPOLAR)
 				{
-//					if(fabs(pOpp->Alpha)<0.0001) pOpp->Alpha = 0.0001;
+//					if(qAbs(pOpp->Alpha)<0.0001) pOpp->Alpha = 0.0001;
 					str = QString("%1").arg(pOpp->Alpha,8,'f',2);
 					m_pctrlOpPoint->addItem(str);
 				}

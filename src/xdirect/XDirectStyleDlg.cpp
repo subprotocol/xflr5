@@ -54,9 +54,9 @@ void XDirectStyleDlg::SetupLayout()
 		StyleLayout->addWidget(m_pctrlNeutral,1,2);
 		StyleLayout->addWidget(m_pctrlBL,2,2);
 		StyleLayout->addWidget(m_pctrlPressure,3,2);
-		connect(m_pctrlNeutral, SIGNAL(clicked()),this, SLOT(OnNeutralStyle()));
-		connect(m_pctrlBL, SIGNAL(clicked()),this, SLOT(OnBLStyle()));
-		connect(m_pctrlPressure, SIGNAL(clicked()),this, SLOT(OnPressureStyle()));
+        connect(m_pctrlNeutral,  SIGNAL(clickedLB()),this, SLOT(OnNeutralStyle()));
+        connect(m_pctrlBL,       SIGNAL(clickedLB()),this, SLOT(OnBLStyle()));
+        connect(m_pctrlPressure, SIGNAL(clickedLB()),this, SLOT(OnPressureStyle()));
 	}
 
 	QHBoxLayout *CommandButtons = new QHBoxLayout;

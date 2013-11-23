@@ -248,8 +248,8 @@ void QGraph::DrawXTicks(QPainter &painter)
 
 	exp=0;
 
-	if(fabs(xunit)<0.00000001) return;
-	if(fabs(xmax-xmin)/xunit>30.0) return;
+	if(qAbs(xunit)<0.00000001) return;
+	if(qAbs(xmax-xmin)/xunit>30.0) return;
 
 	scaley = m_scaley;
 	painter.save();
@@ -327,8 +327,8 @@ void QGraph::DrawYTicks(QPainter &painter)
 {
 	static double scaley, xp, main, yt;
 	static int TickSize, xExpOff, fmheight, fmheight2, fmheight4, exp;
-	if(fabs(xunit)<0.00000001) return;
-	if(fabs(ymax-ymin)/yunit>30.0) return;
+	if(qAbs(xunit)<0.00000001) return;
+	if(qAbs(ymax-ymin)/yunit>30.0) return;
 	scaley = m_scaley;
 	painter.save();
 	QString strLabel, strLabelExp;
@@ -370,7 +370,7 @@ void QGraph::DrawYTicks(QPainter &painter)
 				main = yt;
 				ExpFormat(main, exp);
 
-/*				if(fabs(yt)<1.e-7)
+/*				if(qAbs(yt)<1.e-7)
 				{
 					main = 0.0;
 					exp  = 0;
@@ -419,8 +419,8 @@ void QGraph::DrawYTicks(QPainter &painter)
 void QGraph::DrawXMajGrid(QPainter &painter)
 {
 	double scaley = m_scaley;
-	if(fabs(xunit)<0.00000001)     return;
-	if(fabs(xmax-xmin)/xunit>30.0) return;
+	if(qAbs(xunit)<0.00000001)     return;
+	if(qAbs(xmax-xmin)/xunit>30.0) return;
 
 	painter.save();
 	int YMin, YMax;
@@ -451,8 +451,8 @@ void QGraph::DrawXMajGrid(QPainter &painter)
 void QGraph::DrawYMajGrid(QPainter &painter)
 {
 	double scaley = m_scaley;
-	if(fabs(yunit)<0.00000001) return;
-	if(fabs(ymax-ymin)/yunit>30.0) return;
+	if(qAbs(yunit)<0.00000001) return;
+	if(qAbs(ymax-ymin)/yunit>30.0) return;
 
 	painter.save();
 	int width;
@@ -483,10 +483,10 @@ void QGraph::DrawYMajGrid(QPainter &painter)
 void QGraph::DrawXMinGrid(QPainter &painter)
 {
 	double scaley = m_scaley;
-	if(fabs(xunit)<0.00000001) return;
-	if(fabs(m_XMinorUnit)<0.00000001) return;
-	if(fabs(xmax-xmin)/xunit>30.0) return;
-	if(fabs(xmax-xmin)/m_XMinorUnit>100.0) return;
+	if(qAbs(xunit)<0.00000001) return;
+	if(qAbs(m_XMinorUnit)<0.00000001) return;
+	if(qAbs(xmax-xmin)/xunit>30.0) return;
+	if(qAbs(xmax-xmin)/m_XMinorUnit>100.0) return;
 	int YMin, YMax;
 
 	painter.save();
@@ -517,10 +517,10 @@ void QGraph::DrawXMinGrid(QPainter &painter)
 void QGraph::DrawYMinGrid(QPainter &painter)
 {
 	double scaley = m_scaley;
-	if(fabs(yunit)<0.00000001) return;
-	if(fabs(m_YMinorUnit)<0.00000001) return;
-	if(fabs(ymax-ymin)/yunit>30.0) return;
-	if(fabs(ymax-ymin)/m_YMinorUnit>100.0) return;
+	if(qAbs(yunit)<0.00000001) return;
+	if(qAbs(m_YMinorUnit)<0.00000001) return;
+	if(qAbs(ymax-ymin)/yunit>30.0) return;
+	if(qAbs(ymax-ymin)/m_YMinorUnit>100.0) return;
 
 	painter.save();
 	QPen GridPen(m_YMinClr);
@@ -602,7 +602,7 @@ void QGraph::ExpFormat(double &f, int &exp)
 		f = 0.0;
 		return;
 	}
-	double f1 = fabs(f);
+	double f1 = qAbs(f);
 	if(f1<1)
 		exp = (int)log10(f1)-1;
 	else

@@ -194,7 +194,7 @@ void LLTAnalysis::LLTComputeWing(double QInf, double Alpha, QString &ErrorMessag
 
 		m_XCPSpanRel[m] = GetXCp(m_poaPolar, pFoil0, pFoil1, m_Re[m], Alpha+m_Ai[m]+m_Twist[m], tau, bOutRe, bError);
 
-		if(fabs(m_XCPSpanRel[m])<0.000001)
+		if(qAbs(m_XCPSpanRel[m])<0.000001)
 		{
 			//plr mesh was generated prior to v3.15, i.e., without XCp calculations
 			Cm0 = GetCm0(m_poaPolar, pFoil0, pFoil1, m_Re[m],tau, bOutRe, bError);
@@ -457,7 +457,7 @@ int LLTAnalysis::LLTIterate(double &QInf, double Alpha)
 			a        = m_Ai[k];
 			anext    = -AlphaInduced(k);
 			m_Ai[k]  = a +(anext-a)/s_RelaxMax;
-			m_Maxa   = qMax(m_Maxa, fabs(a-anext));
+			m_Maxa   = qMax(m_Maxa, qAbs(a-anext));
 		}
 
 		double Lift=0.0;// required for Type 2

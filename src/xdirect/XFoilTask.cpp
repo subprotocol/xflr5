@@ -112,7 +112,7 @@ bool XFoilTask::AlphaSequence()
 	{
 		SpMin = pBatch->m_AlphaMin;
 		SpMax = pBatch->m_AlphaMax;
-		SpInc = fabs(pBatch->m_AlphaInc);
+		SpInc = qAbs(pBatch->m_AlphaInc);
 		if (pBatch->m_bFromZero && SpMin*SpMax<0)
 		{
 			MaxSeries = 2;
@@ -124,17 +124,17 @@ bool XFoilTask::AlphaSequence()
 	{
 		SpMin = pBatch->m_ClMin;
 		SpMax = pBatch->m_ClMax;
-		SpInc = fabs(pBatch->m_ClInc);
+		SpInc = qAbs(pBatch->m_ClInc);
 	}
 
-	if(SpMin > SpMax) SpInc = -fabs(SpInc);
+	if(SpMin > SpMax) SpInc = -qAbs(SpInc);
 
 	for (series=0; series<MaxSeries;series++)
 	{
 		qApp->processEvents();
 		if(s_bCancel) break;
 
-		total = (int)fabs((SpMax*1.0001-SpMin)/SpInc);//*1.0001 to make sure upper limit is included
+		total = (int)qAbs((SpMax*1.0001-SpMin)/SpInc);//*1.0001 to make sure upper limit is included
 
 		XFoilInstance.InitXFoilAnalysis(m_pPolar);
 

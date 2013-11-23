@@ -247,7 +247,7 @@ void Polar::AddPoint(double Alpha, double Cd, double Cdp, double Cl, double Cm, 
 		{
 			if(m_PolarType!=FIXEDAOAPOLAR)
 			{
-                if (fabs(Alpha - m_Alpha[i]) < 0.001)
+                if (qAbs(Alpha - m_Alpha[i]) < 0.001)
 				{
 					// then erase former result
 					m_Alpha[i] =  Alpha;
@@ -323,7 +323,7 @@ void Polar::AddPoint(double Alpha, double Cd, double Cdp, double Cl, double Cm, 
 			else
 			{
 				//m_PolarType 4 polar, sort by Reynolds numbers
-                if (fabs(Reynolds - m_Re[i]) < 0.1)
+                if (qAbs(Reynolds - m_Re[i]) < 0.1)
 				{
 					// then erase former result
 					m_Alpha[i] =  Alpha;
@@ -584,7 +584,7 @@ bool Polar::Serialize(QDataStream &ar, bool bIsStoring)
 			{
                 for (j=0; j<m_Alpha.size(); j++)
 				{
-                    if(fabs(Alpha-m_Alpha[j])<0.001)
+                    if(qAbs(Alpha-m_Alpha[j])<0.001)
 					{
 						bExists = true;
 						break;
@@ -595,7 +595,7 @@ bool Polar::Serialize(QDataStream &ar, bool bIsStoring)
 			{
                 for (j=0; j<m_Re.size(); j++)
 				{
-                    if(fabs(Re-m_Re[j])<0.1)
+                    if(qAbs(Re-m_Re[j])<0.1)
 					{
 						bExists = true;
 						break;

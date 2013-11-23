@@ -1032,9 +1032,9 @@ bool Graph::SetXScale()
 		}
 		xo=0.0;
 
-		if(fabs((xmin-xmax)/xmin)<0.001)
+		if(qAbs((xmin-xmax)/xmin)<0.001)
 		{
-			if(fabs(xmin)<0.00001) xmax = 1.0;
+			if(qAbs(xmin)<0.00001) xmax = 1.0;
 			else
 			{
 				xmax = 2.0 * xmin;
@@ -1197,9 +1197,9 @@ bool Graph::SetYScale()
 		}
 		yo=0.0;
 
-		if (fabs((ymin-ymax)/ymin)<0.001)
+		if (qAbs((ymin-ymax)/ymin)<0.001)
 		{
-			if(fabs(ymin)<0.00001) ymax = 1.0;
+			if(qAbs(ymin)<0.00001) ymax = 1.0;
 			else
 			{
 				ymax = 2.0 * ymin;

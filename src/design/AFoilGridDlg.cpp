@@ -73,11 +73,11 @@ AFoilGridDlg::AFoilGridDlg(QWidget *pParent): QDialog(pParent)
 	connect(m_pctrlYMajShow, SIGNAL(clicked(bool)), this, SLOT(OnYMajShow(bool)));
 	connect(m_pctrlXMinShow, SIGNAL(clicked(bool)), this, SLOT(OnXMinShow(bool)));
 	connect(m_pctrlYMinShow, SIGNAL(clicked(bool)), this, SLOT(OnYMinShow(bool)));
-	connect(m_pctrlNeutralStyle, SIGNAL(clicked()), this, SLOT(OnNeutralStyle()));
-	connect(m_pctrlXMajStyle, SIGNAL(clicked()), this, SLOT(OnXMajStyle()));
-	connect(m_pctrlYMajStyle, SIGNAL(clicked()), this, SLOT(OnYMajStyle()));
-	connect(m_pctrlXMinStyle, SIGNAL(clicked()), this, SLOT(OnXMinStyle()));
-	connect(m_pctrlYMinStyle, SIGNAL(clicked()), this, SLOT(OnYMinStyle()));
+    connect(m_pctrlNeutralStyle, SIGNAL(clickedLB()), this, SLOT(OnNeutralStyle()));
+    connect(m_pctrlXMajStyle, SIGNAL(clickedLB()), this, SLOT(OnXMajStyle()));
+    connect(m_pctrlYMajStyle, SIGNAL(clickedLB()), this, SLOT(OnYMajStyle()));
+    connect(m_pctrlXMinStyle, SIGNAL(clickedLB()), this, SLOT(OnXMinStyle()));
+    connect(m_pctrlYMinStyle, SIGNAL(clickedLB()), this, SLOT(OnYMinStyle()));
 
 }
 

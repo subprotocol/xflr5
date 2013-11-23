@@ -334,9 +334,9 @@ bool PanelAnalysisDlg::AlphaLoop()
 {
 	QString str;
 
-    if(m_AlphaMax<m_Alpha) m_AlphaDelta = -fabs(m_AlphaDelta);
+    if(m_AlphaMax<m_Alpha) m_AlphaDelta = -qAbs(m_AlphaDelta);
 
-//    nrhs  = (int)fabs((m_AlphaMax-m_Alpha)*1.0001/m_AlphaDelta) + 1;
+//    nrhs  = (int)qAbs((m_AlphaMax-m_Alpha)*1.0001/m_AlphaDelta) + 1;
 
     if(!m_bSequence) m_nRHS = 1;
 
@@ -1259,7 +1259,7 @@ void PanelAnalysisDlg::ComputePlane(double Alpha, double QInf, int qrhs)
 		m_InducedDrag =  1.0*IDrag/m_pWPolar->m_WArea;
 		m_ViscousDrag =  1.0*VDrag/m_pWPolar->m_WArea;
 
-		if(fabs(Force.dot(WindNormal))>0.0)
+		if(qAbs(Force.dot(WindNormal))>0.0)
 		{
 			m_CP.x         = XCP/Force.dot(WindNormal);
 			m_CP.y         = YCP/Force.dot(WindNormal);
@@ -1600,7 +1600,7 @@ void PanelAnalysisDlg::DoubletNASA4023(CVector const &C, Panel *pPanel, CVector 
 {
 	int i;
 	double CoreSize = 0.00000;
-	if(fabs(*m_pCoreSize)>1.e-10) CoreSize = *m_pCoreSize;
+	if(qAbs(*m_pCoreSize)>1.e-10) CoreSize = *m_pCoreSize;
 	CVector *pNode;
 	if(bWake)	pNode = m_pWakeNode;
 	else		pNode = m_pNode;
@@ -1687,7 +1687,7 @@ void PanelAnalysisDlg::DoubletNASA4023(CVector const &C, Panel *pPanel, CVector 
 		{
 			RNUM = SM*PN * (B*PA-A*PB);
 			DNOM = PA*PB + PN*PN*A*B*SM*SM;
-			if(fabs(PN)<eps)
+			if(qAbs(PN)<eps)
 			{
 				// side is >0 if on the panel's right side
 				side = pPanel->Normal.x*h.x +pPanel->Normal.y*h.y +pPanel->Normal.z*h.z;
@@ -1906,9 +1906,9 @@ bool PanelAnalysisDlg::InitDialog()
 
 
     m_nRHS = 0;
-    if(m_pWPolar->polarType()==FIXEDAOAPOLAR)       m_nRHS = (int)fabs((m_QInfMax-m_QInf)*1.0001/m_QInfDelta) +1;
-    else if(m_pWPolar->polarType()==STABILITYPOLAR) m_nRHS = (int)fabs((m_ControlMax-m_ControlMin)*1.0001/m_ControlDelta) +1;
-    else                                            m_nRHS = (int)fabs((m_AlphaMax-m_Alpha)*1.0001/m_AlphaDelta) +1;
+    if(m_pWPolar->polarType()==FIXEDAOAPOLAR)       m_nRHS = (int)qAbs((m_QInfMax-m_QInf)*1.0001/m_QInfDelta) +1;
+    else if(m_pWPolar->polarType()==STABILITYPOLAR) m_nRHS = (int)qAbs((m_ControlMax-m_ControlMin)*1.0001/m_ControlDelta) +1;
+    else                                            m_nRHS = (int)qAbs((m_AlphaMax-m_Alpha)*1.0001/m_AlphaDelta) +1;
 
     if(!m_bSequence) m_nRHS = 1;
     else if(m_nRHS>=VLMMAXRHS)
@@ -1938,7 +1938,7 @@ bool PanelAnalysisDlg::InitDialog()
 	}
 
 	if(m_pWPolar->m_WPolarType==STABILITYPOLAR ) m_b3DSymetric=false;
-	if(fabs(m_pWPolar->m_Beta)>0)                m_b3DSymetric=false;
+	if(qAbs(m_pWPolar->m_Beta)>0)                m_b3DSymetric=false;
 
 	if (m_b3DSymetric) AddString(tr("Performing symmetric calculation")+"\n");
 	else
@@ -2005,7 +2005,7 @@ bool PanelAnalysisDlg::QInfLoop()
 
 	QMiarex *pMiarex = (QMiarex*)s_pMiarex;
 
-	if(m_QInfMax<m_QInf) m_QInfDelta = -fabs(m_QInfDelta);
+	if(m_QInfMax<m_QInf) m_QInfDelta = -qAbs(m_QInfDelta);
 
     if(!m_bSequence) m_nRHS = 1;
 
@@ -2132,7 +2132,7 @@ void PanelAnalysisDlg::SourceNASA4023(CVector const &C, Panel *pPanel, CVector &
 {
 	int i;
 	double CoreSize = 0.00000;
-	if(fabs(*m_pCoreSize)>1.e-10) CoreSize = *m_pCoreSize;
+	if(qAbs(*m_pCoreSize)>1.e-10) CoreSize = *m_pCoreSize;
 
 	phi = 0.0;
 	V.x=0.0; V.y=0.0; V.z=0.0;
@@ -2221,7 +2221,7 @@ void PanelAnalysisDlg::SourceNASA4023(CVector const &C, Panel *pPanel, CVector &
 			RNUM = SM*PN * (B*PA-A*PB);
 			DNOM = PA*PB + PN*PN*A*B*SM*SM;
 
-			if(fabs(PN)<eps)
+			if(qAbs(PN)<eps)
 			{
 				// side is >0 if the point is on the panel's right side
 				side = pPanel->Normal.x*h.x + pPanel->Normal.y*h.y + pPanel->Normal.z*h.z;
@@ -2497,7 +2497,7 @@ void PanelAnalysisDlg::StartAnalysis()
 	{
 		QString len, str;
 		GetLengthUnit(len, MainFrame::s_LengthUnit);
-		if(fabs(m_pPlane->WingLE(0).z-m_pPlane->WingLE(2).z)<.0001)
+		if(qAbs(m_pPlane->WingLE(0).z-m_pPlane->WingLE(2).z)<.0001)
 		{	
 			str = QString("%1 ").arg(m_pPlane->WingLE(0).z*MainFrame::s_mtoUnit, 7, 'g', 3);
 			strong = tr("Warning: The wing and elevator lie in the same plane z=")+str+len+"\n";
@@ -2609,7 +2609,7 @@ bool PanelAnalysisDlg::UnitLoop()
 	QMiarex *pMiarex = (QMiarex*)s_pMiarex;
     int n, nWakeIter, MaxWakeIter;
 
-	if(m_AlphaMax<m_Alpha) m_AlphaDelta = -fabs(m_AlphaDelta);
+	if(m_AlphaMax<m_Alpha) m_AlphaDelta = -qAbs(m_AlphaDelta);
 
     if(!m_bSequence) m_nRHS = 1;
 
@@ -2915,7 +2915,7 @@ bool PanelAnalysisDlg::ControlLoop()
 	str = QString("    Ibxz=%1 ").arg(m_Ib[0][2]*MainFrame::s_mtoUnit*MainFrame::s_mtoUnit*MainFrame::s_kgtoUnit, 12,'g',4);
 	AddString(str+strInertia+"\n\n");
 
-	if(m_ControlMax<m_ControlMin) m_ControlDelta = -fabs(m_ControlDelta);
+	if(m_ControlMax<m_ControlMin) m_ControlDelta = -qAbs(m_ControlDelta);
 
     if(!m_bSequence) m_nRHS = 1;
     else if(m_nRHS==0) m_nRHS = 1;//compute at least nominal control positions, even if none is active nor defined
@@ -3518,7 +3518,7 @@ bool PanelAnalysisDlg::GetZeroMomentAngle()
 		a1  = tmp;
 	}
 
-	while (fabs(Cm)>eps && iter<=CM_ITER_MAX)
+	while (qAbs(Cm)>eps && iter<=CM_ITER_MAX)
 	{
 		a = a0 - (a1-a0) * Cm0/(Cm1-Cm0);
 		Cm = ComputeCm(a*180.0/PI);
@@ -3818,7 +3818,7 @@ bool PanelAnalysisDlg::ComputeTrimmedConditions()
 		strong+= strange + "\n";
 		if(m_bTrace) AddString(strong);
 
-		if(fabs(m_pWPolar->m_BankAngle)>PRECISION)
+		if(qAbs(m_pWPolar->m_BankAngle)>PRECISION)
 		{
 			m_radius = u0*u0/9.81/tan(phi);
 			m_W      = u0/m_radius;
@@ -4157,7 +4157,7 @@ void PanelAnalysisDlg::ComputeControlDerivatives()
 	bool bActive = false;
 	for(int c=0; c<m_NCtrls; c++)
 	{
-		if(fabs(m_pWPolar->m_ControlGain[c])>PRECISION)
+		if(qAbs(m_pWPolar->m_ControlGain[c])>PRECISION)
 		{
 			bActive = true;
 			break;
@@ -4194,12 +4194,12 @@ void PanelAnalysisDlg::ComputeControlDerivatives()
 	if(m_pPlane)
 	{
 		//Wing tilt
-		if(fabs(m_pWPolar->m_ControlGain[0])>PRECISION)
+		if(qAbs(m_pWPolar->m_ControlGain[0])>PRECISION)
 		{
 			//rotate the normals and control point positions
 			H.Set(0.0, 1.0, 0.0);
-			if(fabs(m_pWPolar->m_ControlGain[0])>PRECISION)
-				SignedDeltaAngle = DeltaAngle * m_pWPolar->m_ControlGain[0]/fabs(m_pWPolar->m_ControlGain[0]);
+			if(qAbs(m_pWPolar->m_ControlGain[0])>PRECISION)
+				SignedDeltaAngle = DeltaAngle * m_pWPolar->m_ControlGain[0]/qAbs(m_pWPolar->m_ControlGain[0]);
 			else SignedDeltaAngle = DeltaAngle;
 
 			Quat.Set(SignedDeltaAngle*180.0/PI, H);
@@ -4217,12 +4217,12 @@ void PanelAnalysisDlg::ComputeControlDerivatives()
 	if(m_pPlane && m_pWingList[2])
 	{
 		//Elevator tilt
-		if (fabs(m_pWPolar->m_ControlGain[1])>PRECISION)
+		if (qAbs(m_pWPolar->m_ControlGain[1])>PRECISION)
 		{
 			H.Set(0.0, 1.0, 0.0);
 
-			if(fabs(m_pWPolar->m_ControlGain[1])>PRECISION)
-			   SignedDeltaAngle = DeltaAngle * m_pWPolar->m_ControlGain[1]/fabs(m_pWPolar->m_ControlGain[1]);
+			if(qAbs(m_pWPolar->m_ControlGain[1])>PRECISION)
+			   SignedDeltaAngle = DeltaAngle * m_pWPolar->m_ControlGain[1]/qAbs(m_pWPolar->m_ControlGain[1]);
 			else SignedDeltaAngle = DeltaAngle;
 
 			Quat.Set(SignedDeltaAngle*180.0/PI, H);
@@ -4242,11 +4242,11 @@ void PanelAnalysisDlg::ComputeControlDerivatives()
 	{
 		if(m_ppSurface[j]->m_bTEFlap)
 		{
-			if (fabs(m_pWPolar->m_ControlGain[NCtrls])>PRECISION)
+			if (qAbs(m_pWPolar->m_ControlGain[NCtrls])>PRECISION)
 			{
 				//Add delta rotations to initial control setting and to wing or flap delta rotation
-				if(fabs(m_pWPolar->m_ControlGain[NCtrls])>PRECISION)
-				   SignedDeltaAngle = DeltaAngle * m_pWPolar->m_ControlGain[NCtrls]/fabs(m_pWPolar->m_ControlGain[NCtrls]);
+				if(qAbs(m_pWPolar->m_ControlGain[NCtrls])>PRECISION)
+				   SignedDeltaAngle = DeltaAngle * m_pWPolar->m_ControlGain[NCtrls]/qAbs(m_pWPolar->m_ControlGain[NCtrls]);
 				else SignedDeltaAngle = DeltaAngle;
 
 				Quat.Set(SignedDeltaAngle*180.0/PI, m_ppSurface[j]->m_HingeVector);
@@ -4398,7 +4398,7 @@ void PanelAnalysisDlg::VLMQmn(CVector const &LA, CVector const &LB, CVector cons
 	// Vectorial operations are written explicitly to save computing times (4x more efficient)
 	//
 	double CoreSize = 0.0001;
-	if(fabs(*m_pCoreSize)>1.e-10) CoreSize = *m_pCoreSize;
+	if(qAbs(*m_pCoreSize)>1.e-10) CoreSize = *m_pCoreSize;
 
 
 	V.x = 0.0;
@@ -4489,7 +4489,7 @@ void PanelAnalysisDlg::VLMQmn(CVector const &LA, CVector const &LB, CVector cons
 void PanelAnalysisDlg::VLMCmn(CVector const &A, CVector const &B, CVector const &C, CVector &V, bool const &bAll)
 {
 	double CoreSize = 0.0001;
-	if(fabs(*m_pCoreSize)>1.e-10) CoreSize = *m_pCoreSize;
+	if(qAbs(*m_pCoreSize)>1.e-10) CoreSize = *m_pCoreSize;
 
 	V.x = 0.0;
 	V.y = 0.0;

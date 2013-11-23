@@ -113,8 +113,8 @@ bool LLTAnalysisDlg::AlphaLoop()
 	str = QString(tr("Number of stations = %1")+"\n\n").arg(LLTAnalysis::s_NLLTStations);
 	UpdateOutput(str);
 	
-	if(m_AlphaMax<m_AlphaMin) m_AlphaDelta = -fabs(m_AlphaDelta);
-	int ia  = (int)fabs((m_AlphaMax-m_AlphaMin)*1.001/m_AlphaDelta);
+	if(m_AlphaMax<m_AlphaMin) m_AlphaDelta = -qAbs(m_AlphaDelta);
+	int ia  = (int)qAbs((m_AlphaMax-m_AlphaMin)*1.001/m_AlphaDelta);
 
 	if(!m_bSequence) ia = 0;
 
@@ -221,8 +221,8 @@ bool LLTAnalysisDlg::QInfLoop()
 	str = QString(tr("Number of stations = %1")+"\n\n").arg(LLTAnalysis::s_NLLTStations);
 	UpdateOutput(str);
 	
-	if(m_AlphaMax<m_AlphaMin) m_AlphaDelta = -(double)fabs(m_AlphaDelta);
-	int ia  = (int)fabs((m_AlphaMax-m_AlphaMin)*1.001/m_AlphaDelta);
+	if(m_AlphaMax<m_AlphaMin) m_AlphaDelta = -(double)qAbs(m_AlphaDelta);
+	int ia  = (int)qAbs((m_AlphaMax-m_AlphaMin)*1.001/m_AlphaDelta);
 
 	if(!m_bSequence) ia = 0;
 

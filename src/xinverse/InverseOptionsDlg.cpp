@@ -74,10 +74,10 @@ void InverseOptionsDlg::SetupLayout()
 
 	setLayout(MainLayout);
 
-	connect(m_pctrlRefFoil,   SIGNAL(clicked()),this, SLOT(OnRefStyle()));
-	connect(m_pctrlModFoil,   SIGNAL(clicked()),this, SLOT(OnModStyle()));
-	connect(m_pctrlSpline,    SIGNAL(clicked()),this, SLOT(OnSplineStyle()));
-	connect(m_pctrlReflected, SIGNAL(clicked()),this, SLOT(OnReflectedStyle()));
+    connect(m_pctrlRefFoil,   SIGNAL(clickedLB()),this, SLOT(OnRefStyle()));
+    connect(m_pctrlModFoil,   SIGNAL(clickedLB()),this, SLOT(OnModStyle()));
+    connect(m_pctrlSpline,    SIGNAL(clickedLB()),this, SLOT(OnSplineStyle()));
+    connect(m_pctrlReflected, SIGNAL(clickedLB()),this, SLOT(OnReflectedStyle()));
 
 	connect(OKButton, SIGNAL(clicked()),this, SLOT(accept()));
 	connect(CancelButton, SIGNAL(clicked()), this, SLOT(reject()));

@@ -627,7 +627,7 @@ void QXDirect::Connect()
 	connect(m_pctrlAlphaDelta, SIGNAL(editingFinished()), this, SLOT(OnInputChanged()));
 	connect(m_pctrlCurveStyle, SIGNAL(activated(int)), this, SLOT(OnCurveStyle(int)));
 	connect(m_pctrlCurveWidth, SIGNAL(activated(int)), this, SLOT(OnCurveWidth(int)));
-	connect(m_pctrlCurveColor, SIGNAL(clicked()), this, SLOT(OnCurveColor()));
+    connect(m_pctrlCurveColor, SIGNAL(clickedLB()), this, SLOT(OnCurveColor()));
 	connect(m_pctrlSequence, SIGNAL(clicked()), this, SLOT(OnSequence()));
 	connect(m_pctrlViscous, SIGNAL(clicked()), this, SLOT(OnViscous()));
 	connect(m_pctrlInitBL, SIGNAL(clicked()), this, SLOT(OnInitBL()));
@@ -1044,7 +1044,7 @@ void QXDirect::FillPolarCurve(Curve *pCurve, Polar *pPolar, int XVar, int YVar)
 		}
 		if(m_pCurOpp && m_bHighlightOpp)
 		{
-			if(fabs(pPolar->m_Alpha[i]-m_pCurOpp->Alpha)<0.0001)
+			if(qAbs(pPolar->m_Alpha[i]-m_pCurOpp->Alpha)<0.0001)
 			{
 				if(pPolar->m_PlrName==m_pCurOpp->m_strPlrName  && MainFrame::s_pCurFoil->m_FoilName==pPolar->m_FoilName)
 				{
@@ -1077,14 +1077,14 @@ OpPoint* QXDirect::GetOpPoint(double Alpha)
 			{
 				if(m_pCurPolar->m_PolarType!=FIXEDAOAPOLAR)
 				{
-					if(fabs(pOpPoint->Alpha - Alpha) <0.01)
+					if(qAbs(pOpPoint->Alpha - Alpha) <0.01)
 					{
 						return pOpPoint;
 					}
 				}
 				else
 				{
-					if(fabs(pOpPoint->Reynolds - Alpha) <0.1)
+					if(qAbs(pOpPoint->Reynolds - Alpha) <0.1)
 					{
 						return pOpPoint;
 					}
@@ -1246,9 +1246,9 @@ void QXDirect::InsertOpPoint(OpPoint *pNewPoint)
 				bIsInserted = true;
 				i = m_poaOpp->size();// to break
 			}
-			else if (fabs(pNewPoint->Reynolds-pOpPoint->Reynolds)<1.0)
+			else if (qAbs(pNewPoint->Reynolds-pOpPoint->Reynolds)<1.0)
 			{
-				if(fabs(pNewPoint->Alpha - pOpPoint->Alpha)<0.005)
+				if(qAbs(pNewPoint->Alpha - pOpPoint->Alpha)<0.005)
 				{
 					//replace existing point
 					m_poaOpp->removeAt(i);
@@ -1849,7 +1849,7 @@ void QXDirect::OnAnimate(bool bChecked)
 				pOpPoint->m_strPlrName  == m_pCurPolar->m_PlrName &&
 				pOpPoint->m_strFoilName == MainFrame::s_pCurFoil->m_FoilName)
 			{
-					if(fabs(m_pCurOpp->Alpha - pOpPoint->Alpha)<0.0001)
+					if(qAbs(m_pCurOpp->Alpha - pOpPoint->Alpha)<0.0001)
 						m_posAnimate = l-1;
 			}
 		}
@@ -5625,7 +5625,7 @@ void QXDirect::PaintOpPoint(QPainter &painter)
 		Back = 12;
 		if(m_pCurOpp->m_bTEFlap) Back++;
 		if(m_pCurOpp->m_bLEFlap) Back++;
-		if(m_pCurOpp->m_bViscResults && fabs(m_pCurOpp->Cd)>0.0) Back++;
+		if(m_pCurOpp->m_bViscResults && qAbs(m_pCurOpp->Cd)>0.0) Back++;
 		if(m_pCurPolar->m_PolarType==FIXEDLIFTPOLAR) Back++;
 		if(m_pCurPolar->m_PolarType!=FIXEDSPEEDPOLAR && m_pCurPolar->m_PolarType!=FIXEDAOAPOLAR) Back++;
 	}
@@ -5728,7 +5728,7 @@ void QXDirect::PaintOpPoint(QPainter &painter)
 			painter.drawText(XPos,ZPos+D, dwidth, dD, Qt::AlignRight | Qt::AlignTop, Result);
 			D += dD;
 
-			if(m_pCurOpp->m_bViscResults && fabs(m_pCurOpp->Cd)>0.0)
+			if(m_pCurOpp->m_bViscResults && qAbs(m_pCurOpp->Cd)>0.0)
 			{
 				Result = QString(tr("         L/D = %1")).arg(m_pCurOpp->Cl/m_pCurOpp->Cd, 9, 'f', 3);
 				painter.drawText(XPos,ZPos+D, dwidth, dD, Qt::AlignRight | Qt::AlignTop, Result);
@@ -6620,7 +6620,7 @@ Polar * QXDirect::SetPolar(QString PlrName)
 				if (pOpp->m_strFoilName == MainFrame::s_pCurFoil->m_FoilName &&
 					pOpp->m_strPlrName  == PlrName)
 				{
-					if(fabs(pOpp->Alpha-m_pCurOpp->Alpha)<0.0001)
+					if(qAbs(pOpp->Alpha-m_pCurOpp->Alpha)<0.0001)
 					{
 						m_pCurOpp = pOpp;
 						bFound = true;

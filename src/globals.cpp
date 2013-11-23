@@ -51,7 +51,7 @@ void ExpFormat(double &f, int &exp)
 		f = 0.0;
 		return;
 	}
-	double f1 = fabs(f);
+	double f1 = qAbs(f);
 //	int sgn = int(f/f1);
 	if(f1<1)
 		exp = (int)log10(f1)-1;
@@ -84,12 +84,12 @@ bool Gauss(double *A, int n, double *B, int m, bool *pbCancel)
 		if(*pbCancel) return false;
 		//  find the pivot row
 		A_pivot_row = pa;
-		max = fabs(*(pa + row));
+		max = qAbs(*(pa + row));
 		pA = pa + n;
 		pivot_row = row;
 		for (i=row+1; i < n; pA+=n, i++)
 		{
-			if ((dum = fabs(*(pA+row))) > max)
+			if ((dum = qAbs(*(pA+row))) > max)
 			{
 				max = dum;
 				A_pivot_row = pA;
@@ -899,7 +899,7 @@ double IntegralC2(double y1, double y2, double c1, double c2)
 {
 	double res = 0.0;
 
-	if (fabs(y2-y1)<1.e-5) return 0.0;
+	if (qAbs(y2-y1)<1.e-5) return 0.0;
 	double g = (c2-c1)/(y2-y1);
 
 	res = (c1-g*y1)*(c1-g*y1)*(y2-y1) +
@@ -916,7 +916,7 @@ double IntegralC2(double y1, double y2, double c1, double c2)
 double IntegralCy(double y1, double y2, double c1, double c2)
 {
 	double res = 0.0;
-	if (fabs(y2-y1)<1.e-5) return (y1+y2)/2.0 * (c1+c2)/2.0;
+	if (qAbs(y2-y1)<1.e-5) return (y1+y2)/2.0 * (c1+c2)/2.0;
 
 	double g = (c2-c1)/(y2-y1);
 	res = (c1-g*y1)/2.0 *(y2*y2 - y1*y1) + g/3.0 * (y2*y2*y2-y1*y1*y1);
@@ -1045,12 +1045,12 @@ bool Crout_LU_Decomposition_with_Pivoting(double *A, int pivot[], int n, bool *p
 	//  find the pivot row
 		pivot[k] = k;
 		p_col = p_k+k;
-		max = fabs( *(p_k + k) );
+		max = qAbs( *(p_k + k) );
 		for (j=k+1, p_row=p_k+n; j<n; j++, p_row+=n)
 		{
-			if (max<fabs(*(p_row+k)))
+			if (max<qAbs(*(p_row+k)))
 			{
-				max = fabs(*(p_row+k));
+				max = qAbs(*(p_row+k));
 				pivot[k] = j;
 				p_col = p_row;
 			}
@@ -1631,8 +1631,8 @@ bool LinBairstow(double *p, complex<double> *root, int n)
 		if(Delta<0.0)
 		{
 			//complex roots
-			root[nn-1] = complex<double>(r/2.0,  sqrt(fabs(Delta))/2.0);
-			root[nn-2] = complex<double>(r/2.0, -sqrt(fabs(Delta))/2.0);
+			root[nn-1] = complex<double>(r/2.0,  sqrt(qAbs(Delta))/2.0);
+			root[nn-2] = complex<double>(r/2.0, -sqrt(qAbs(Delta))/2.0);
 		}
 		else
 		{
@@ -1650,10 +1650,10 @@ bool LinBairstow(double *p, complex<double> *root, int n)
 		if(nn==2)
 		{
 			//last two roots, solve directly
-			if(fabs(p[2])<PRECISION)
+			if(qAbs(p[2])<PRECISION)
 			{
 				// one last root, but we should never get here
-				if(fabs(p[1])>PRECISION)
+				if(qAbs(p[1])>PRECISION)
 				{
 					//last single root, real
 					root[0] = -p[0]/p[1];
@@ -1666,8 +1666,8 @@ bool LinBairstow(double *p, complex<double> *root, int n)
 				if(Delta<0)
 				{
 					//complex roots
-					root[nn-1] = complex<double>(-p[1]/2.0/p[2],  sqrt(fabs(Delta))/2.0/p[2]);
-					root[nn-2] = complex<double>(-p[1]/2.0/p[2], -sqrt(fabs(Delta))/2.0/p[2]);
+					root[nn-1] = complex<double>(-p[1]/2.0/p[2],  sqrt(qAbs(Delta))/2.0/p[2]);
+					root[nn-2] = complex<double>(-p[1]/2.0/p[2], -sqrt(qAbs(Delta))/2.0/p[2]);
 				}
 				else
 				{
@@ -1680,7 +1680,7 @@ bool LinBairstow(double *p, complex<double> *root, int n)
 		}
 		if(nn==1)
 		{
-			if(fabs(p[1])>PRECISION)
+			if(qAbs(p[1])>PRECISION)
 			{
 				//last single root, real
 				root[0] = -p[0]/p[1];
@@ -2265,12 +2265,12 @@ double GetPlrPointFromCl(QList<void*>*m_poaPolar, Foil *pFoil, double Re, double
 		{
 			//first Find the point closest to Cl=0
 			pt = 0;
-			dist = fabs(pPolar1->m_Cl[0]);
+			dist = qAbs(pPolar1->m_Cl[0]);
 			for (i=1; i<size;i++)
 			{
-				if (fabs(pPolar1->m_Cl[i])< dist)
+				if (qAbs(pPolar1->m_Cl[i])< dist)
 				{
-					dist = fabs(pPolar1->m_Cl[i]);
+					dist = qAbs(pPolar1->m_Cl[i]);
 					pt = i;
 				}
 			}
@@ -2281,7 +2281,7 @@ double GetPlrPointFromCl(QList<void*>*m_poaPolar, Foil *pFoil, double Re, double
 					if(Cl<= pPolar1->m_Cl[i] && Cl > pPolar1->m_Cl[i-1])
 					{
 						//interpolate
-						if(fabs(pPolar1->m_Cl[i]-pPolar1->m_Cl[i-1]) < 0.00001)
+						if(qAbs(pPolar1->m_Cl[i]-pPolar1->m_Cl[i-1]) < 0.00001)
 						{
 							//do not divide by zero
 							Var1 = (*pX)[i];
@@ -2304,7 +2304,7 @@ double GetPlrPointFromCl(QList<void*>*m_poaPolar, Foil *pFoil, double Re, double
 					if(pPolar1->m_Cl[i] <=Cl && Cl < pPolar1->m_Cl[i+1])
 					{
 						//interpolate
-						if(fabs(pPolar1->m_Cl[i+1]-pPolar1->m_Cl[i]) < 0.00001){//do not divide by zero
+						if(qAbs(pPolar1->m_Cl[i+1]-pPolar1->m_Cl[i]) < 0.00001){//do not divide by zero
 							Var1 = (*pX)[i];
 							break;
 						}
@@ -2344,12 +2344,12 @@ double GetPlrPointFromCl(QList<void*>*m_poaPolar, Foil *pFoil, double Re, double
 		{
 			//first Find the point closest to Cl=0
 			pt = 0;
-			dist = fabs(pPolar2->m_Cl[0]);
+			dist = qAbs(pPolar2->m_Cl[0]);
 			for (i=1; i<size;i++)
 			{
-				if (fabs(pPolar2->m_Cl[i])< dist)
+				if (qAbs(pPolar2->m_Cl[i])< dist)
 				{
-					dist = fabs(pPolar2->m_Cl[i]);
+					dist = qAbs(pPolar2->m_Cl[i]);
 					pt = i;
 				}
 			}
@@ -2360,7 +2360,7 @@ double GetPlrPointFromCl(QList<void*>*m_poaPolar, Foil *pFoil, double Re, double
 					if(Cl<= pPolar2->m_Cl[i] && Cl > pPolar2->m_Cl[i-1])
 					{
 						//interpolate
-						if(fabs(pPolar2->m_Cl[i]-pPolar2->m_Cl[i-1]) < 0.00001)
+						if(qAbs(pPolar2->m_Cl[i]-pPolar2->m_Cl[i-1]) < 0.00001)
 						{//do not divide by zero
 							Var2 = (*pX)[i];
 							break;
@@ -2382,7 +2382,7 @@ double GetPlrPointFromCl(QList<void*>*m_poaPolar, Foil *pFoil, double Re, double
 					if(pPolar2->m_Cl[i] <=Cl && Cl < pPolar2->m_Cl[i+1])
 					{
 						//interpolate
-						if(fabs(pPolar2->m_Cl[i+1]-pPolar2->m_Cl[i]) < 0.00001)
+						if(qAbs(pPolar2->m_Cl[i+1]-pPolar2->m_Cl[i]) < 0.00001)
 						{
 							//do not divide by zero
 							Var2 = (*pX)[i];
@@ -3115,7 +3115,7 @@ bool Intersect(CVector const &LA, CVector const &LB, CVector const &TA, CVector 
 
 	dist = 10000.0;
 
-	if(fabs(s)>0.0)
+	if(qAbs(s)>0.0)
 	{
 		dist = r/s;
 
@@ -3200,11 +3200,11 @@ double SplineBlend(int const &index, int const &p, double const &t, double *knot
 	}
 	else
 	{
-		if (fabs(knots[index+p] - knots[index])<eps && fabs(knots[index+p+1] - knots[index+1])<eps)
+		if (qAbs(knots[index+p] - knots[index])<eps && qAbs(knots[index+p+1] - knots[index+1])<eps)
 			value = 0.0;
-		else if (fabs(knots[index+p] - knots[index])<eps)
+		else if (qAbs(knots[index+p] - knots[index])<eps)
 			value = (knots[index+p+1]-t) / (knots[index+p+1]-knots[index+1])  * SplineBlend(index+1, p-1, t, knots);
-		else if (fabs(knots[index+p+1] - knots[index+1])<eps)
+		else if (qAbs(knots[index+p+1] - knots[index+1])<eps)
 			value = (t-knots[index])     / (knots[index+p] - knots[index])    * SplineBlend(index,   p-1, t, knots);
 		else
 			value = (t-knots[index])     / (knots[index+p]  -knots[index])    * SplineBlend(index,   p-1, t, knots) +

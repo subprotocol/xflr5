@@ -125,12 +125,12 @@ void SplineFoil::CompMidLine()
 		yin = m_Intrados.GetY(x);
 		m_rpMid[k].x = x;
 		m_rpMid[k].y = (yex+yin)/2.0;
-		if(fabs(yex-yin)>m_fThickness)
+		if(qAbs(yex-yin)>m_fThickness)
 		{
-			m_fThickness = fabs(yex-yin);
+			m_fThickness = qAbs(yex-yin);
 			m_fxThickMax = x;
 		}
-		if(fabs(m_rpMid[k].y)>fabs(m_fCamber))
+		if(qAbs(m_rpMid[k].y)>qAbs(m_fCamber))
 		{
 			m_fCamber = m_rpMid[k].y;
 			m_fxCambMax = x;

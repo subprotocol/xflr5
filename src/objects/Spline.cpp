@@ -336,7 +336,7 @@ int Spline::IsControlPoint(CVector const &Real)
 	static int k;
 	for (k=0; k<m_CtrlPoint.size(); k++)
 	{
-		if(fabs(Real.x-m_CtrlPoint[k].x)<0.005 && fabs(Real.y-m_CtrlPoint[k].y)<0.005) return k;
+		if(qAbs(Real.x-m_CtrlPoint[k].x)<0.005 && qAbs(Real.y-m_CtrlPoint[k].y)<0.005) return k;
 	}
 	return -10;
 }
@@ -353,7 +353,7 @@ int Spline::IsControlPoint(CVector const &Real, double const &ZoomFactor)
 	static int k;
 	for (k=0; k<m_CtrlPoint.size(); k++)
 	{
-		if (fabs(Real.x-m_CtrlPoint[k].x)<0.006/ZoomFactor && fabs(Real.y-m_CtrlPoint[k].y)<0.006/ZoomFactor) return k;
+		if (qAbs(Real.x-m_CtrlPoint[k].x)<0.006/ZoomFactor && qAbs(Real.y-m_CtrlPoint[k].y)<0.006/ZoomFactor) return k;
 	}
 	return -10;
 }
@@ -372,7 +372,7 @@ int Spline::IsControlPoint(double const &x, double const &y, double const &zx, d
 	static int k;
 	for (k=0; k<m_CtrlPoint.size(); k++)
 	{
-		if(fabs((x-m_CtrlPoint[k].x)/zx)<4.0 && fabs((y-m_CtrlPoint[k].y)/zy)<4.0) return k;
+		if(qAbs((x-m_CtrlPoint[k].x)/zx)<4.0 && qAbs((y-m_CtrlPoint[k].y)/zy)<4.0) return k;
 	}
 	return -10;
 }
@@ -462,18 +462,18 @@ double Spline::SplineBlend(int const &i,  int const &p, double const &t)
 	if (p == 0) 
 	{
 		if ((m_knot[i] <= t) && (t < m_knot[i+1]) )  return  1.0;
-//		else if (fabs(m_knot[i]-m_knot[i+1])<pres)   return  0.0;
+//		else if (qAbs(m_knot[i]-m_knot[i+1])<pres)   return  0.0;
 		else                                         return  0.0;
 	} 
 	else
 	{
-		if (fabs(m_knot[i+p] - m_knot[i])<pres && fabs(m_knot[i+p+1] - m_knot[i+1])<pres)
+		if (qAbs(m_knot[i+p] - m_knot[i])<pres && qAbs(m_knot[i+p+1] - m_knot[i+1])<pres)
 			return  0.0;
 
-		else if (fabs(m_knot[i+p] - m_knot[i])<pres)
+		else if (qAbs(m_knot[i+p] - m_knot[i])<pres)
 			return  (m_knot[i+p+1]-t) / (m_knot[i+p+1]-m_knot[i+1]) * SplineBlend(i+1, p-1, t);
 
-		else if (fabs(m_knot[i+p+1]-m_knot[i+1])<pres)
+		else if (qAbs(m_knot[i+p+1]-m_knot[i+1])<pres)
 			return  (t - m_knot[i])   / (m_knot[i+p] - m_knot[i])   * SplineBlend(i,   p-1, t);
 
 		else
@@ -542,7 +542,7 @@ void Spline::SplineKnots()
 			{
 				a = (double)(j-iDegree);
 				b = (double)(nKnots-2*iDegree-1);
-				if(fabs(b)>0.0) m_knot.append(a/b);
+				if(qAbs(b)>0.0) m_knot.append(a/b);
 				else            m_knot.append(1.0);
 			}
 			else m_knot.append(1.0);

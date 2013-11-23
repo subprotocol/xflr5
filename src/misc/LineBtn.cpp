@@ -2,7 +2,6 @@
 #include <QMouseEvent>
 #include <QPen>
 #include <QPainter>
-#include <QDebug>
 
 #include "../mainframe.h"
 #include "LineBtn.h"
@@ -27,7 +26,7 @@ void LineBtn::mouseReleaseEvent(QMouseEvent *event)
 {
 	if (event->button() == Qt::LeftButton)
 	{
-			emit clicked();
+            emit clickedLB();
 	}
 	else
 		QWidget::mouseReleaseEvent(event);

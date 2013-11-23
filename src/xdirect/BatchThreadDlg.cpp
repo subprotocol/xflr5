@@ -456,7 +456,7 @@ void BatchThreadDlg::InitDialog()
 	m_pctrlSpecMax->SetPrecision(1);
 	m_pctrlSpecDelta->SetPrecision(1);
 
-	if(m_ReMin<=0.0) m_ReMin = fabs(m_ReInc);
+	if(m_ReMin<=0.0) m_ReMin = qAbs(m_ReInc);
 	m_pctrlReMin->SetValue(m_ReMin);
 	m_pctrlReMax->SetValue(m_ReMax);
 	m_pctrlReDelta->SetValue(m_ReInc);
@@ -696,20 +696,20 @@ void BatchThreadDlg::ReadParams()
 
 		if(m_bAlpha)
 		{
-			m_AlphaInc = fabs(m_pctrlSpecDelta->Value());
+			m_AlphaInc = qAbs(m_pctrlSpecDelta->Value());
 			m_AlphaMax = m_pctrlSpecMax->Value();
 			m_AlphaMin = m_pctrlSpecMin->Value();
 		}
 		else
 		{
-			m_ClInc = fabs(m_pctrlSpecDelta->Value());
+			m_ClInc = qAbs(m_pctrlSpecDelta->Value());
 			m_ClMin = m_pctrlSpecMin->Value();
 			m_ClMax = m_pctrlSpecMax->Value();
 		}
 	}
 
-	if(m_ReMin<=0.0) m_ReMin = fabs(m_ReInc);
-	if(m_ReMax<=0.0) m_ReMax = fabs(m_ReMax);
+	if(m_ReMin<=0.0) m_ReMin = qAbs(m_ReInc);
+	if(m_ReMax<=0.0) m_ReMax = qAbs(m_ReMax);
 
 	m_Mach     = m_pctrlMach->Value();
 	if(m_Mach<=0.0) m_Mach = 0.0;
@@ -724,8 +724,6 @@ void BatchThreadDlg::ReadParams()
  */
 void BatchThreadDlg::SetFileHeader()
 {
-	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
-
 	QTextStream out(m_pXFile);
 
 	out << "\n";
@@ -733,7 +731,7 @@ void BatchThreadDlg::SetFileHeader()
 	out << "\n";
 	if(s_bCurrentFoil)
 	{
-		out << pMainFrame->curFoil()->m_FoilName;
+        out << MainFrame::curFoil()->m_FoilName;
 		out << "\n";
 	}
 
@@ -822,7 +820,7 @@ void BatchThreadDlg::StartAnalysis()
 		m_FoilList.append(MainFrame::curFoil()->m_FoilName);
 	}
 
-	if(!m_bFromList) nRe = (int)fabs((m_ReMax-m_ReMin)/m_ReInc);
+	if(!m_bFromList) nRe = (int)qAbs((m_ReMax-m_ReMin)/m_ReInc);
 	else             nRe = m_NRe-1;
 
 //	QThreadPool::globalInstance()->setExpiryTimeout(60000);//ms

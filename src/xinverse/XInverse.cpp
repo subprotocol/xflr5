@@ -1085,8 +1085,8 @@ void QXInverse::mouseReleaseEvent(QMouseEvent *event)
 			width  = abs(m_PointDown.x()-point.x());
 			height = abs(m_PointDown.y()-point.y());
 			//preserve ratio
-			w = fabs(xu-xd);
-			h = fabs(yu-yd);
+			w = qAbs(xu-xd);
+			h = qAbs(yu-yd);
 			xw = 	m_QGraph.GetXMax() - m_QGraph.GetXMin();
 			yh = 	m_QGraph.GetYMax() - m_QGraph.GetYMin();
 			xm = (xu+xd)/2.0;
@@ -1148,7 +1148,7 @@ void QXInverse::mouseReleaseEvent(QMouseEvent *event)
 			{
 				x1 = m_pMCurve->x[m_Pos1];
 				x2 = m_pMCurve->x[m_Pos2];
-				if(fabs(x2-x1)<0.00001) return;
+				if(qAbs(x2-x1)<0.00001) return;
 				if(x2<x1)
 				{
 					tmp    = m_Pos2;
@@ -2017,7 +2017,7 @@ double QXInverse::qincom(double qc, double qinf, double tklam)
 //     karman-tsien compressible speed
 //-------------------------------------
 
-	if(tklam<1.0e-4 || fabs(qc)<1.0e-4)
+	if(tklam<1.0e-4 || qAbs(qc)<1.0e-4)
 	{
 //----- for nearly incompressible case or very small speed, use asymptotic
 //      expansion of singular quadratic formula to avoid numerical problems

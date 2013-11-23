@@ -55,7 +55,7 @@ int Frame::IsPoint(const CVector &Point, const double &ZoomFactor)
 				+ (Point.y-m_CtrlPoint[l].y)*(Point.y-m_CtrlPoint[l].y)
 				+ (Point.z-m_CtrlPoint[l].z)*(Point.z-m_CtrlPoint[l].z))<0.05*Height()/ZoomFactor)
 			  return l;
-//        if (fabs(Point.x-m_CtrlPoint[l].y)<0.005/ZoomFactor && fabs(Point.y-m_CtrlPoint[l].z)<0.005/ZoomFactor) return l;
+//        if (qAbs(Point.x-m_CtrlPoint[l].y)<0.005/ZoomFactor && qAbs(Point.y-m_CtrlPoint[l].z)<0.005/ZoomFactor) return l;
 	}
 	return -10;
 }
@@ -218,7 +218,7 @@ double Frame::Height()
 		if(m_CtrlPoint[k].z<hmin) hmin = m_CtrlPoint[k].z;
 		if(m_CtrlPoint[k].z>hmax) hmax = m_CtrlPoint[k].z;
 	}
-	return fabs(hmax-hmin);*/
+	return qAbs(hmax-hmin);*/
 }
 
 

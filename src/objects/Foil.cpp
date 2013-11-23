@@ -122,12 +122,12 @@ void Foil::CompMidLine(bool bParams)
 		m_rpMid[l].y = (yex+yin)/2.0;
 		if(bParams)
 		{
-			if(fabs(yex-yin)>m_fThickness)
+			if(qAbs(yex-yin)>m_fThickness)
 			{
-				m_fThickness  = fabs(yex-yin);
+				m_fThickness  = qAbs(yex-yin);
 				m_fXThickness = xt;
 			}
-			if(fabs(m_rpMid[l].y)>fabs(m_fCamber))
+			if(qAbs(m_rpMid[l].y)>qAbs(m_fCamber))
 			{
 				m_fCamber  = m_rpMid[l].y;
 				m_fXCamber = xt;
@@ -444,7 +444,7 @@ double Foil::GetArea()
 	double area = 0.0;
 	for (i=0; i<nb-1; i++)
 	{
-		area +=  fabs((yb[i+1]+yb[i])/2.0 * (xb[i+1]-xb[i]));
+		area +=  qAbs((yb[i+1]+yb[i])/2.0 * (xb[i+1]-xb[i]));
 	}
 	return area;
 }
@@ -879,7 +879,7 @@ int Foil::IsPoint(CVector const &Real)
 	static int k;
 	for (k=0; k<n; k++)
 	{
-		if(fabs(Real.x-x[k])<0.005 && fabs(Real.y-y[k])<0.005) return k;
+		if(qAbs(Real.x-x[k])<0.005 && qAbs(Real.y-y[k])<0.005) return k;
 	}
 	return -10;
 }
@@ -1165,7 +1165,7 @@ void Foil::SetLEFlap()
 	int iLowerh = 0;
 	for (i=0; i<m_iExt; i++)
 	{
-		if(fabs(m_rpExtrados[i].x-xh)<0.001)
+		if(qAbs(m_rpExtrados[i].x-xh)<0.001)
 		{
 			//then no need to add an extra point, just break
 			iUpperh = i;
@@ -1190,7 +1190,7 @@ void Foil::SetLEFlap()
 
 	for (i=0; i<m_iInt; i++)
 	{
-		if(fabs(m_rpIntrados[i].x-xh)<0.001)
+		if(qAbs(m_rpIntrados[i].x-xh)<0.001)
 		{
 			//then no need to add an Intra point, just break
 			iLowerh = i;
@@ -1417,7 +1417,7 @@ void Foil::SetTEFlap()
 	int iLowerh = 0;
 	for (i=0; i<m_iExt; i++)
 	{
-					if(fabs(m_rpExtrados[i].x-xh)<0.001)
+					if(qAbs(m_rpExtrados[i].x-xh)<0.001)
 		{
 			//then no need to add an extra point, just break
 			iUpperh = i;
@@ -1440,7 +1440,7 @@ void Foil::SetTEFlap()
 
 	for (i=0; i<m_iInt; i++)
 	{
-					if(fabs(m_rpIntrados[i].x-xh)<0.001)
+					if(qAbs(m_rpIntrados[i].x-xh)<0.001)
 		{
 			//then no need to add an Intra point, just break
 			iLowerh = i;

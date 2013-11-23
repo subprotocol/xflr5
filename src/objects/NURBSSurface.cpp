@@ -69,14 +69,14 @@ double NURBSSurface::Getu(double pos, double v)
 {
 	if(pos<=m_pFrame.first()->m_Position[m_uAxis]) return 0.0;
 	if(pos>=m_pFrame.last()->m_Position[m_uAxis])  return 1.0;
-	if(fabs(m_pFrame.last()->m_Position[m_uAxis] - m_pFrame.first()->m_Position[m_uAxis])<0.0000001) return 0.0;
+	if(qAbs(m_pFrame.last()->m_Position[m_uAxis] - m_pFrame.first()->m_Position[m_uAxis])<0.0000001) return 0.0;
 
 	int iter=0;
 	double u2, u1, b, c, u,  zz, zh;
 	u1 = 0.0; u2 = 1.0;
 
 //	v = 0.0;//use top line, but doesn't matter
-	while(fabs(u2-u1)>1.0e-6 && iter<200)
+	while(qAbs(u2-u1)>1.0e-6 && iter<200)
 	{
 		u=(u1+u2)/2.0;
 		zz = 0.0;
@@ -121,7 +121,7 @@ double NURBSSurface::Getv(double u, CVector r)
 	r.Normalize();
 	v1 = 0.0; v2 = 1.0;
 
-	while(fabs(sine)>1.0e-4 && iter<200)
+	while(qAbs(sine)>1.0e-4 && iter<200)
 	{
 		v=(v1+v2)/2.0;
 		GetPoint(u, v, t_R);
@@ -195,7 +195,7 @@ void NURBSSurface::GetPoint(double u, double v, CVector &Pt)
 **/
 double NURBSSurface::Weight(double const &d, const int &i, int const &N)
 {
-	if(fabs(d-1.0)<PRECISION) return 1.0;
+	if(qAbs(d-1.0)<PRECISION) return 1.0;
 	if(i<(N+1)/2)             return pow(d, i);
 	else                      return pow(d, N-i-1);
 }
@@ -208,7 +208,7 @@ double NURBSSurface::Weight(int i, int N)
 	// i is the index of the point along the edge
 	// N is total number of points along the edge
 
-	if(fabs(m_EdgeWeight-1.0)<PRECISION) return 1.0;
+	if(qAbs(m_EdgeWeight-1.0)<PRECISION) return 1.0;
 	if(i<N/2)                            return 1./pow(m_EdgeWeight, (int)((N-1)/2-i));
 	else                                 return 1./pow(m_EdgeWeight, i-(int)(N/2));
 }*/
@@ -267,7 +267,7 @@ bool NURBSSurface::IntersectNURBS(CVector A, CVector B, CVector &I)
 		I.z = M0.z + t * (M1.z-M0.z);
 
 //		dist = sqrt((t_N.x-I.x)*(t_N.x-I.x) + (t_N.y-I.y)*(t_N.y-I.y) + (t_N.z-I.z)*(t_N.z-I.z));
-		dist = fabs(t-tp);
+		dist = qAbs(t-tp);
 		iter++;
 	}
 
@@ -296,7 +296,7 @@ void NURBSSurface::SetKnots()
 		{
 			if (j<FrameSize())
 			{
-				if(fabs(b)>0.0) m_uKnots[j] = (double)(j-m_iuDegree)/b;
+				if(qAbs(b)>0.0) m_uKnots[j] = (double)(j-m_iuDegree)/b;
 				else            m_uKnots[j] = 1.0;
 			}
 			else m_uKnots[j] = 1.0;
@@ -315,7 +315,7 @@ void NURBSSurface::SetKnots()
 		{
 			if (j<FramePointCount())
 			{
-				if(fabs(b)>0.0) m_vKnots[j] = (double)(j-m_ivDegree)/b;
+				if(qAbs(b)>0.0) m_vKnots[j] = (double)(j-m_ivDegree)/b;
 				else            m_vKnots[j] = 1.0;
 			}
 			else m_vKnots[j] = 1.0;

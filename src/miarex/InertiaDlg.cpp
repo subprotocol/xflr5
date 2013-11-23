@@ -527,7 +527,7 @@ void InertiaDlg::OnExportToAVL()
 						.arg(m_CoGIyy/Iunit,  10, 'g', 3)
 						.arg(m_CoGIzz/Iunit,  10, 'g', 3)
 						.arg(0.0,10, 'g', 3)
-						.arg(CoGIxz/Iunit,10, 'g', 3)
+                        .arg(m_CoGIxz/Iunit,10, 'g', 3)
 						.arg(0.0,10, 'g', 3);
 		out << strong+"\n";
 	}
@@ -751,7 +751,7 @@ void InertiaDlg::ReadData()
 		index = m_pMassModel->index(i, 4, QModelIndex());
 		tag = index.data().toString();
 
-		if(fabs(mass)>PRECISION || fabs(x)>PRECISION || fabs(y)>PRECISION || fabs(z)>PRECISION || tag.length())
+		if(qAbs(mass)>PRECISION || qAbs(x)>PRECISION || qAbs(y)>PRECISION || qAbs(z)>PRECISION || tag.length())
 		{
 			m_PointMass.append(new PointMass(mass/MainFrame::s_kgtoUnit,
 											 CVector(x/MainFrame::s_mtoUnit, y/MainFrame::s_mtoUnit, z/MainFrame::s_mtoUnit),

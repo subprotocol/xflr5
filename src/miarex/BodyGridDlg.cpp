@@ -197,10 +197,10 @@ void BodyGridDlg::SetupLayout()
 	connect(m_pctrlGrid2, SIGNAL(clicked()), this, SLOT(OnGrid2()));
 	connect(m_pctrlMinGrid2, SIGNAL(clicked()), this, SLOT(OnMinGrid2()));
 
-	connect(m_pctrlLine, SIGNAL(clicked()), this, SLOT(OnLineStyle()));
-	connect(m_pctrlLine2, SIGNAL(clicked()), this, SLOT(OnLine2Style()));
-	connect(m_pctrlMinLine, SIGNAL(clicked()), this, SLOT(OnMinLineStyle()));
-	connect(m_pctrlMinLine2, SIGNAL(clicked()), this, SLOT(OnMinLine2Style()));
+    connect(m_pctrlLine, SIGNAL(clickedLB()), this, SLOT(OnLineStyle()));
+    connect(m_pctrlLine2, SIGNAL(clickedLB()), this, SLOT(OnLine2Style()));
+    connect(m_pctrlMinLine, SIGNAL(clickedLB()), this, SLOT(OnMinLineStyle()));
+    connect(m_pctrlMinLine2, SIGNAL(clickedLB()), this, SLOT(OnMinLine2Style()));
 }
 
 

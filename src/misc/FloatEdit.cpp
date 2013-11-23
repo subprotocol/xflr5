@@ -189,7 +189,7 @@ void FloatEdit::SetValueNoFormat(double f)
 
 void FloatEdit::FormatValue(double const &f, QString &str)
 {
-	if ((f==0.0 || fabs(f)>=pow(10.0, -m_iPrecision)) && f <10000000.0)
+	if ((f==0.0 || qAbs(f)>=pow(10.0, -m_iPrecision)) && f <10000000.0)
 	{
 		str=QString("%1").arg(f,0,'f', m_iPrecision);
 	}
