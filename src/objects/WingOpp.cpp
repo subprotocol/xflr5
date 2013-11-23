@@ -296,7 +296,7 @@ bool WingOpp::SerializeWingOpp(QDataStream &ar, bool bIsStoring)
 		ar << 0.0f << (float)m_VYm;
 		ar << (float)m_IYm;
 
-		ar << (float)m_CP.x << (float)m_CP.z;
+        ar << (float)m_CP.x << (float)m_CP.y;
 
 		for (k=0; k<m_NStation; k++)
 		{
