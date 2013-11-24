@@ -42,23 +42,20 @@
 class FloatEdit : public QLineEdit
 {
 public:
-
 	FloatEdit(QWidget *pParent=NULL);
 	FloatEdit(double d, int precision=2);
 
-	void DefineValue(double f);
-	double Value();
-	void SetMin(double f);
-	void SetMax(double f);
+    double Value();
+    void SetMin(double min);
+    void SetMax(double max);
 	void SetValue(double f);
-	void SetValueNoFormat(double f);
-	void SetPrecision(int i);
+    void SetValueNoFormat(double f){m_Value = f;}
+    void SetPrecision(int i);
 	
 private:
-	bool IsInBounds();
-	void FormatValue(double const &f, QString &str);
 
-	void focusInEvent ( QFocusEvent * event );
+    void FormatValue(double const &f);
+
 	void focusOutEvent ( QFocusEvent * event );
 	void keyPressEvent(QKeyEvent *event);
 
@@ -67,7 +64,7 @@ private:
 	QDoubleValidator *v;
 
 	double m_Value;
-	int m_iPrecision;
+
 };
 
 #endif // FLOATEDIT_H

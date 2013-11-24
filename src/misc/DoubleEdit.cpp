@@ -4,8 +4,6 @@
 
 
 
-
-
 DoubleEdit::DoubleEdit(QWidget *pParent)
 {
     setParent(pParent);
@@ -42,7 +40,8 @@ void DoubleEdit::focusOutEvent (QFocusEvent *event)
 {
 	ReadValue();
     FormatValue();
-	QLineEdit::focusOutEvent(event);
+    emit(editingFinished());
+    QLineEdit::focusOutEvent(event);
 }
 
 

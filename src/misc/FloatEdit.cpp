@@ -27,9 +27,10 @@ FloatEdit::FloatEdit(QWidget *pParent)
 {
 	setParent(pParent);
 	m_Value = 0.0;
-	m_iPrecision = 2;
+
 	v = new QDoubleValidator(this);
 	v->setRange(-1.e10, 1.e10, 1000);
+    v->setDecimals(2);
 	setValidator(v);
 	setAlignment(Qt::AlignRight);
 }
@@ -40,23 +41,11 @@ FloatEdit::FloatEdit(double d, int precision)
 {
 	m_Value = d;
 
-	m_iPrecision = precision;
-
 	v = new QDoubleValidator(this);
 	v->setRange(-1.e10, 1.e10, 1000);
+    v->setDecimals(3);
 	setValidator(v);
 	setAlignment(Qt::AlignRight);
-}
-
-
-bool FloatEdit::IsInBounds()
-{
-	int pos = 0;
-	QString strange = text();
-	strange.replace(" ", "");
-
-	if (v->validate(strange, pos)==QValidator::Acceptable) return true;
-	else                                                   return false;
 }
 
 
@@ -64,139 +53,72 @@ bool FloatEdit::IsInBounds()
 void FloatEdit::focusOutEvent (QFocusEvent *event)
 {
 	QString str;
-	double f = ReadValue();
+    m_Value = ReadValue();
+    FormatValue(m_Value);
+    emit(editingFinished());
 
-	if(IsInBounds())
-	{
-		m_Value = f;
-		FormatValue(m_Value, str);
-		setText(str);
-		emit(editingFinished());
-	}
-	else
-	{
-		FormatValue(m_Value, str);
-		setText(str);
-	}
-	QLineEdit::focusOutEvent(event);
+    QLineEdit::focusOutEvent(event);
 }
 
-
-void FloatEdit::focusInEvent(QFocusEvent *event)
-{
-/*	QString str;
-	str = QString("%1").arg(m_Value,'g');
-	str = str.trimmed();
-	int ind = str.indexOf('.');
-	if(ind<0 || str.right(str.length()-ind-1).length() < 2)
-	{
-		FormatValue(m_Value, str);
-	}
-	setText(str);*/
-
-	QLineEdit::focusInEvent(event);
-}
 
 
 double FloatEdit::ReadValue()
 {
 	bool bOK;
-	QString strange = text();
-	strange.replace(" ", "");
-	double f = strange.toDouble(&bOK);
+    double f = locale().toDouble(text(),&bOK);
 
 	if(bOK) return f;
 	else    return m_Value;
 }
 
+void FloatEdit::SetPrecision(int i){v->setDecimals(i);}
 
-double FloatEdit::Value()
-{
-	return m_Value;
-}
-
-
+void FloatEdit::SetMin(double min){v->setBottom(min); }
+void FloatEdit::SetMax(double max){v->setTop(max); }
+double FloatEdit::Value(){ return m_Value;}
 
 void FloatEdit::keyPressEvent(QKeyEvent *event)
 {
-	QString str;
 	switch (event->key())
 	{
 		case Qt::Key_Return:
 		{
-			double f = ReadValue();
-			if(IsInBounds()) m_Value = f;
-
-			FormatValue(m_Value, str);
-			setText(str);
-
+            m_Value = ReadValue();
+            FormatValue(m_Value);
 			QLineEdit::keyPressEvent(event);
 
 			break;
 		}
 		case Qt::Key_Escape:
 		{
-			FormatValue(m_Value, str);
-			setText(str);
+            FormatValue(m_Value);
 			QLineEdit::keyPressEvent(event);
 			break;
 		}
 		default:
 		{
 			QLineEdit::keyPressEvent(event);
-			double f = ReadValue();
-			if(IsInBounds()) m_Value = f;
+            m_Value = ReadValue();
 			break;
 		}
 	}
 }
 
 
-void FloatEdit::SetPrecision(int i)
-{
-	m_iPrecision = i;
-}
-
-
-void FloatEdit::SetMin(double f)
-{
-	v->setBottom(f);
-}
-
-
-void FloatEdit::SetMax(double f)
-{
-	v->setTop(f);
-}
-
-void FloatEdit::DefineValue(double f)
-{
-	m_Value = f;
-}
 
 void FloatEdit::SetValue(double f)
 {
 	QString str;
 	m_Value = f;
-	FormatValue(m_Value,str);
-	setText(str);
+    FormatValue(m_Value);
 }
 
-void FloatEdit::SetValueNoFormat(double f)
-{
-	m_Value = f;
-}
 
-void FloatEdit::FormatValue(double const &f, QString &str)
+
+void FloatEdit::FormatValue(double const &f)
 {
-	if ((f==0.0 || qAbs(f)>=pow(10.0, -m_iPrecision)) && f <10000000.0)
-	{
-		str=QString("%1").arg(f,0,'f', m_iPrecision);
-	}
-	else
-	{
-		str=QString("%1").arg(f,0,'g',m_iPrecision+1);
-	}
+    QString str=QString("%L1").arg(f,0,'f', v->decimals());
+    setText(str);
 }
 
 

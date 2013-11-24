@@ -34,7 +34,7 @@ public:
     void FormatValue();
 	double ReadValue();
     void SetMin(double min) {m_pDV->setBottom(min);}
-    void SetMax(double max) {m_pDV->setBottom(max);}
+	void SetMax(double max) {m_pDV->setTop(max);}
 
 
 	void SetPrecision(int decimals) {m_pDV->setDecimals(decimals);}

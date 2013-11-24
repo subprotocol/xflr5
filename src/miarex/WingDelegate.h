@@ -24,7 +24,6 @@
 
 #include <QList>
 #include <QItemDelegate>
-#include "../misc/DoubleEdit.h"
 #include "../objects/WingSection.h"
 
 class WingDelegate : public QItemDelegate
