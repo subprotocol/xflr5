@@ -32,7 +32,7 @@
 
 #include "../params.h"
 #include "../misc/FloatEditDelegate.h"
-#include "../misc/FloatEdit.h"
+#include "../misc/DoubleEdit.h"
 #include "../objects/CVector.h"
 #include "../objects/Plane.h"
 
@@ -86,13 +86,13 @@ private:
 	QTableView *m_pctrlMassTable;
 	QStandardItemModel *m_pMassModel;
 	FloatEditDelegate *m_pFloatDelegate;
-	FloatEdit *m_pctrlCoGIxx, *m_pctrlCoGIyy, *m_pctrlCoGIzz, *m_pctrlCoGIxz;
-	FloatEdit *m_pctrlXCoG,*m_pctrlYCoG,*m_pctrlZCoG;
-	FloatEdit *m_pctrlVolumeMass;
+	DoubleEdit *m_pctrlCoGIxx, *m_pctrlCoGIyy, *m_pctrlCoGIzz, *m_pctrlCoGIxz;
+	DoubleEdit *m_pctrlXCoG,*m_pctrlYCoG,*m_pctrlZCoG;
+	DoubleEdit *m_pctrlVolumeMass;
 	
-	FloatEdit *m_pctrlTotalIxx, *m_pctrlTotalIyy, *m_pctrlTotalIzz, *m_pctrlTotalIxz;
-	FloatEdit *m_pctrlXTotalCoG,*m_pctrlYTotalCoG,*m_pctrlZTotalCoG;
-	FloatEdit *m_pctrlTotalMass;
+	DoubleEdit *m_pctrlTotalIxx, *m_pctrlTotalIyy, *m_pctrlTotalIzz, *m_pctrlTotalIxz;
+	DoubleEdit *m_pctrlXTotalCoG,*m_pctrlYTotalCoG,*m_pctrlZTotalCoG;
+	DoubleEdit *m_pctrlTotalMass;
 
 	QMenu *m_pContextMenu;
 	QAction *m_pInsertMassRow, *m_pDeleteMassRow;

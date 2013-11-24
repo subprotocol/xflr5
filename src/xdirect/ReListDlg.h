@@ -45,7 +45,7 @@ private slots:
 	void OnDelete();
 	void OnInsert();
 	void OnOK();
-	void OnCellChanged(QWidget *FloatEdit);
+	void OnCellChanged(QWidget *DoubleEdit);
 
 private:
 	void FillReModel();

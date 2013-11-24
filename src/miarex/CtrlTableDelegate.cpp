@@ -41,7 +41,7 @@ QWidget *CtrlTableDelegate::createEditor(QWidget *parent, const QStyleOptionView
 	}
 	else
 	{
-		FloatEdit *editor = new FloatEdit(parent);
+		DoubleEdit *editor = new DoubleEdit(parent);
 		editor->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
 		editor->SetPrecision(m_Precision[index.column()]);
 		return editor;
@@ -62,7 +62,7 @@ void CtrlTableDelegate::setEditorData(QWidget *editor, const QModelIndex &index)
 	else
 	{
 		double value = index.model()->data(index, Qt::EditRole).toDouble();
-		FloatEdit *floatEdit = static_cast<FloatEdit*>(editor);
+		DoubleEdit *floatEdit = static_cast<DoubleEdit*>(editor);
 		floatEdit->SetValue(value);
 	}
 }
@@ -79,7 +79,7 @@ void CtrlTableDelegate::setModelData(QWidget *editor, QAbstractItemModel *model,
 	}
 	else
 	{
-		FloatEdit *floatEdit = static_cast<FloatEdit*>(editor);
+		DoubleEdit *floatEdit = static_cast<DoubleEdit*>(editor);
 		double value = floatEdit->Value();
 		model->setData(index, value, Qt::EditRole);
 	}

@@ -57,7 +57,7 @@ void LEDlg::SetupLayout()
 	lab1->setAlignment(Qt::AlignRight);
 	QLabel *lab2 = new QLabel(tr("ratio"));
 	lab2->setMinimumWidth(80);
-	m_pctrlLE = new FloatEdit;
+	m_pctrlLE = new DoubleEdit;
 	LEValue->addWidget(lab1);
 	LEValue->addWidget(m_pctrlLE);
 	LEValue->addWidget(lab2);
@@ -68,7 +68,7 @@ void LEDlg::SetupLayout()
 	lab3->setAlignment(Qt::AlignRight);
 	QLabel *lab4 = new QLabel(tr("% chord"));
 	lab4->setMinimumWidth(80);
-	m_pctrlBlend = new FloatEdit;
+	m_pctrlBlend = new DoubleEdit;
 	BlendValue->addWidget(lab3);
 	BlendValue->addWidget(m_pctrlBlend);
 	BlendValue->addWidget(lab4);

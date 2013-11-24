@@ -47,7 +47,7 @@ private slots:
 	void OnInsertPoint();
 	void OnRestore();
 	void OnApply();
-	void OnCellChanged(QWidget *FloatEdit);
+	void OnCellChanged(QWidget *DoubleEdit);
 	void OnItemClicked(QModelIndex index);
 
 

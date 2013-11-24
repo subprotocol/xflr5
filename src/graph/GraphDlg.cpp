@@ -1001,10 +1001,10 @@ void GraphDlg::SetupLayout()
 		ScalePageLayout->addWidget(UnitLabel,7,1);
 
 		m_pctrlXAuto    = new QCheckBox(tr("Auto Scale"));
-		m_pctrlXMin     = new FloatEdit;
-		m_pctrlXMax     = new FloatEdit;
-		m_pctrlXOrigin  = new FloatEdit;
-		m_pctrlXUnit    = new FloatEdit;
+		m_pctrlXMin     = new DoubleEdit;
+		m_pctrlXMax     = new DoubleEdit;
+		m_pctrlXOrigin  = new DoubleEdit;
+		m_pctrlXUnit    = new DoubleEdit;
 
 		ScalePageLayout->addWidget(XAxis2,1,2);
 		ScalePageLayout->addWidget(m_pctrlXAuto,3,2);
@@ -1015,10 +1015,10 @@ void GraphDlg::SetupLayout()
 
 		m_pctrlYInverted = new QCheckBox(tr("Inverted Axis"));
 		m_pctrlYAuto     = new QCheckBox(tr("Auto Scale"));
-		m_pctrlYMin      = new FloatEdit;
-		m_pctrlYMax      = new FloatEdit;
-		m_pctrlYOrigin   = new FloatEdit;
-		m_pctrlYUnit     = new FloatEdit;
+		m_pctrlYMin      = new DoubleEdit;
+		m_pctrlYMax      = new DoubleEdit;
+		m_pctrlYOrigin   = new DoubleEdit;
+		m_pctrlYUnit     = new DoubleEdit;
 
 		ScalePageLayout->addWidget(YAxis2,1,3);
 		ScalePageLayout->addWidget(m_pctrlYInverted,2,3);
@@ -1050,8 +1050,8 @@ void GraphDlg::SetupLayout()
 		m_pctrlXMinGridStyle = new LineBtn(this);
 		m_pctrlYMinGridStyle = new LineBtn(this);
 
-		m_pctrlXMinorUnit = new FloatEdit;
-		m_pctrlYMinorUnit = new FloatEdit;
+		m_pctrlXMinorUnit = new DoubleEdit;
+		m_pctrlYMinorUnit = new DoubleEdit;
 
 		AxisDataLayout->addWidget(AxisStyleLabel,1,1);
 		AxisDataLayout->addWidget(m_pctrlXMajGridShow,2,1);

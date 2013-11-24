@@ -26,7 +26,7 @@
 #include <QStringList>
 #include "XDirect.h"
 #include "ReListDlg.h"
-#include "../misc/FloatEdit.h"
+#include "../misc/DoubleEdit.h"
 
 ReListDlg::ReListDlg(QWidget *pParent) : QDialog(pParent)
 {

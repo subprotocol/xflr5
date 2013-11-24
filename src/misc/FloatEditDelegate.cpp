@@ -33,7 +33,7 @@ QWidget *FloatEditDelegate::createEditor(QWidget *parent, const QStyleOptionView
 	if(m_Precision[index.column()]>=0)
 	{
 		//we have a number
-		FloatEdit *editor = new FloatEdit(parent);
+		DoubleEdit *editor = new DoubleEdit(parent);
 		editor->SetPrecision(m_Precision[index.column()]);
 		double value = index.model()->data(index, Qt::EditRole).toDouble();
 		editor->SetValue(value);
@@ -54,8 +54,8 @@ void FloatEditDelegate::setEditorData(QWidget *editor, const QModelIndex &index)
 	if(m_Precision[index.column()]>=0)
 	{
 		double value = index.model()->data(index, Qt::EditRole).toDouble();
-		FloatEdit *floatEdit = static_cast<FloatEdit*>(editor);
-		floatEdit->DefineValue(value);
+		DoubleEdit *floatEdit = static_cast<DoubleEdit*>(editor);
+		floatEdit->SetValueNoFormat(value);
 	}
 	else
 	{
@@ -71,7 +71,7 @@ void FloatEditDelegate::setModelData(QWidget *editor, QAbstractItemModel *model,
 {
 	if(m_Precision[index.column()]>=0)
 	{
-		FloatEdit *floatEdit = static_cast<FloatEdit*>(editor);
+		DoubleEdit *floatEdit = static_cast<DoubleEdit*>(editor);
 		double value = floatEdit->Value();
 		model->setData(index, value, Qt::EditRole);
 	}

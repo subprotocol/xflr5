@@ -24,7 +24,7 @@
 
 #include <QList>
 #include <QItemDelegate>
-#include "../misc/FloatEdit.h"
+#include "../misc/DoubleEdit.h"
 
 class BodyTableDelegate : public QItemDelegate
 {

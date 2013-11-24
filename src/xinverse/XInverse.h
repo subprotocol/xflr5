@@ -37,7 +37,7 @@
 #include <QStackedWidget>
 #include <QVBoxLayout>
 #include <QSettings>
-#include "../misc/FloatEdit.h"
+#include "../misc/DoubleEdit.h"
 #include "../graph/QGraph.h"
 #include "../objects/Foil.h"
 #include "../objects/Spline.h"
@@ -142,20 +142,16 @@ private:
 
 private:
 
-//	GraphDlg *m_pGraphDlg;
-//	InverseOptionsDlg *m_pXInverseStyleDlg;
-//	PertDlg *m_pPertDlg;
-
 	QTextEdit *m_pctrlOutput;
 	QLabel *m_pctrlSpecif;
 	QRadioButton *m_pctrlSpecAlpha, *m_pctrlSpecCl;
 	QPushButton *m_pctrlExec, *m_pctrlFilter, *m_pctrlPert, *m_pctrlApplySpline, *m_pctrlNewSpline, *m_pctrlResetQSpec, *m_pctrlSmooth;
 	QCheckBox *m_pctrlShowSpline, *m_pctrlTangentSpline, *m_pctrlSymm;
-	FloatEdit *m_pctrlSpec, *m_pctrlFilterParam, *m_pctrlTGapy, *m_pctrlTGapx, *m_pctrlTAngle;
+	DoubleEdit *m_pctrlSpec, *m_pctrlFilterParam, *m_pctrlTGapy, *m_pctrlTGapx, *m_pctrlTAngle;
 
 	QLineEdit *m_pctrlMAlphaSpec, *m_pctrlMClSpec;
 	QTextEdit *m_pctrlMOutput;
-	FloatEdit *m_pctrlIter;
+	DoubleEdit *m_pctrlIter;
 	QPushButton *m_pctrlMark;
 	QCheckBox *m_pctrlCpxx;
 

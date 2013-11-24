@@ -23,7 +23,7 @@
 #define LEDLG_H
 
 #include <QDialog>
-#include "../misc/FloatEdit.h"
+#include "../misc/DoubleEdit.h"
 #include "../objects/Foil.h"
 
 
@@ -51,7 +51,7 @@ public:
 
 private:
 	QPushButton *OKButton, *CancelButton, *ApplyButton;
-	FloatEdit	*m_pctrlBlend, *m_pctrlLE;
+	DoubleEdit	*m_pctrlBlend, *m_pctrlLE;
 	bool m_bApplied, m_bModified;
 	double m_LErfac, m_Blend;
 

@@ -29,7 +29,7 @@
 #include <QStandardItem>
 #include "../misc/FloatEditDelegate.h"
 #include "../objects/Foil.h"
-#include "../misc/FloatEdit.h"
+#include "../misc/DoubleEdit.h"
 #include "../params.h"
 
 class PertDlg : public QDialog

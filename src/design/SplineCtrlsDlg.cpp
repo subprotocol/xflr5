@@ -138,7 +138,7 @@ void SplineCtrlsDlg::SetupLayout()
 				QLabel *labupper1 = new QLabel(tr("Spline degree"));
 				QLabel *labupper2 = new QLabel(tr("Output"));
 				m_pctrlDegExtrados = new QComboBox;
-				m_pctrlOutExtrados = new FloatEdit;
+				m_pctrlOutExtrados = new DoubleEdit;
 				m_pctrlOutExtrados->SetPrecision(0);
 				UpperLayout->addWidget(labupper1, 1,1);
 				UpperLayout->addWidget(labupper2, 2,1);
@@ -168,7 +168,7 @@ void SplineCtrlsDlg::SetupLayout()
 				QLabel *lablower1 = new QLabel(tr("Spline degree"));
 				QLabel *lablower2 = new QLabel(tr("Output"));
 				m_pctrlDegIntrados = new QComboBox;
-				m_pctrlOutIntrados = new FloatEdit;
+				m_pctrlOutIntrados = new DoubleEdit;
 				m_pctrlOutIntrados->SetPrecision(0);
 				LowerLayout->addWidget(lablower1, 1,1);
 				LowerLayout->addWidget(lablower2, 2,1);

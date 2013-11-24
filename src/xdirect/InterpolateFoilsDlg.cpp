@@ -84,7 +84,7 @@ void InterpolateFoilsDlg::SetupLayout()
 
 	QVBoxLayout *Foil3Layout = new QVBoxLayout;
 	{
-		m_pctrlFrac = new FloatEdit;
+		m_pctrlFrac = new DoubleEdit;
 		m_pctrlCamb3 = new QLabel(tr("Camb3"));
 		m_pctrlCamb3->setMinimumWidth(250);
 		m_pctrlThick3 = new QLabel(tr("Thick3"));

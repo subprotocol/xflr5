@@ -51,8 +51,8 @@ void NacaFoilDlg::SetupLayout()
 		QLabel *NacaNumber   = new QLabel(tr("4 or 5 digits"));
 		QLabel *PanelNumber  = new QLabel(tr("Number of Panels"));
 
-		m_pctrlNumber = new FloatEdit(0,0);
-		m_pctrlPanels = new FloatEdit(100,0);
+		m_pctrlNumber = new DoubleEdit(0,0);
+		m_pctrlPanels = new DoubleEdit(100,0);
 		m_pctrlMessage = new QLabel();
 		m_pctrlMessage->setMinimumWidth(120);
 

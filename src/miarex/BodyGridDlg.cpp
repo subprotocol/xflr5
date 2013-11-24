@@ -117,10 +117,10 @@ void BodyGridDlg::SetupLayout()
 	m_pctrlMinLine  = new LineBtn(this);
 	m_pctrlMinLine2 = new LineBtn(this);
 
-	m_pctrlUnit  = new FloatEdit(100.00);
-	m_pctrlUnit2 = new FloatEdit(101.00);
-	m_pctrlMinUnit  = new FloatEdit(102.00);
-	m_pctrlMinUnit2 = new FloatEdit(103.00);
+	m_pctrlUnit  = new DoubleEdit(100.00);
+	m_pctrlUnit2 = new DoubleEdit(101.00);
+	m_pctrlMinUnit  = new DoubleEdit(102.00);
+	m_pctrlMinUnit2 = new DoubleEdit(103.00);
 	m_pctrlUnit->SetPrecision(3);
 	m_pctrlUnit2->SetPrecision(3);
 	m_pctrlMinUnit->SetPrecision(3);

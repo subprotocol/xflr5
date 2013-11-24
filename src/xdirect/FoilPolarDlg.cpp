@@ -20,7 +20,7 @@
 *****************************************************************************/
 
 #include <QGroupBox>
-
+#include <QtDebug>
 #include "FoilPolarDlg.h"
 #include "../globals.h"
 #include "../mainframe.h"
@@ -81,9 +81,9 @@ void FoilPolarDlg::SetupLayout()
 	QGroupBox *PlaneDataGroup = new QGroupBox(tr("Plane Data"));
 	{
 		QGridLayout *PlaneDataLayout = new QGridLayout;
-		m_pctrlChord = new FloatEdit(0,3);
-		m_pctrlMass = new FloatEdit(0,3);
-		m_pctrlSpan = new FloatEdit(0,3);
+        m_pctrlChord = new DoubleEdit(0,3);
+        m_pctrlMass = new DoubleEdit(0,3);
+        m_pctrlSpan = new DoubleEdit(0,3);
 		QLabel *ChordLab = new QLabel(tr("Chord"));
 		QLabel *MassLab = new QLabel(tr("Mass"));
 		QLabel *SpanLab = new QLabel(tr("Span"));
@@ -108,12 +108,12 @@ void FoilPolarDlg::SetupLayout()
 		m_pctrlUnit1 = new QRadioButton(tr("International"));
 		m_pctrlUnit2 = new QRadioButton(tr("Imperial"));
 		m_pctrlRho = new QLabel("r =");
-		m_pctrlDensity = new FloatEdit(1.225,3);
+        m_pctrlDensity = new DoubleEdit(1.225,3);
 		m_pctrlDensityUnit = new QLabel("kg/m3");
 		m_pctrlNu = new QLabel("n =");
 		m_pctrlRho->setAlignment(Qt::AlignRight | Qt::AlignCenter);
 		m_pctrlNu->setAlignment(Qt::AlignRight | Qt::AlignCenter);
-		m_pctrlViscosity = new FloatEdit(1.500e-5,3);
+        m_pctrlViscosity = new DoubleEdit(1.500e-5,3);
 		m_pctrlViscosityUnit = new QLabel("m2/s");
 		m_pctrlRho->setFont(SymbolFont);
 		m_pctrlNu->setFont(SymbolFont);
@@ -141,9 +141,9 @@ void FoilPolarDlg::SetupLayout()
 	m_pctrlReLabel->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
 	m_pctrlMachLabel = new QLabel(tr("Mach ="));
 	m_pctrlMachLabel->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
-	m_pctrlReynolds = new FloatEdit();
+    m_pctrlReynolds = new DoubleEdit(100000.0,0);
 	m_pctrlReynolds->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
-	m_pctrlMach = new FloatEdit(0.0, 3);
+    m_pctrlMach = new DoubleEdit(0.0, 3);
 	m_pctrlMach->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
 	ReMachResultsLayout->addWidget(m_pctrlReLabel);
 	ReMachResultsLayout->addWidget(m_pctrlReynolds);
@@ -178,9 +178,9 @@ void FoilPolarDlg::SetupLayout()
 	QLabel	*NCritLabel      = new QLabel(tr("NCrit="));
 	QLabel *TopTripLabel     = new QLabel(tr("TripLocation (top)"));
 	QLabel *BotTripLabel     = new QLabel(tr("TripLocation (bot)"));
-	m_pctrlNCrit    = new FloatEdit();
-	m_pctrlTopTrans = new FloatEdit();
-	m_pctrlBotTrans = new FloatEdit();
+    m_pctrlNCrit    = new DoubleEdit();
+    m_pctrlTopTrans = new DoubleEdit();
+    m_pctrlBotTrans = new DoubleEdit();
 
 	m_pctrlNCrit->setAlignment(   Qt::AlignRight);
 	m_pctrlTopTrans->setAlignment(Qt::AlignRight);
@@ -529,16 +529,14 @@ void FoilPolarDlg::ReadParams()
     QString str;
     str = m_pctrlReynolds->text();
     str.replace(" ","");
-	if(m_PolarType==FIXEDAOAPOLAR) m_ASpec    = str.toDouble();
-    else          m_Reynolds = str.toDouble();
+    if(m_PolarType==FIXEDAOAPOLAR) m_ASpec    = m_pctrlReynolds->Value();
+    else                           m_Reynolds = m_pctrlReynolds->Value();
 
-    m_Mach     = m_pctrlMach->text().toDouble();
-    m_pctrlMach->clear();
-	m_pctrlMach->insert(str.setNum(m_Mach,'f',3));
+    m_Mach     = m_pctrlMach->Value();
 
-    m_NCrit  = m_pctrlNCrit->text().toDouble();
-    m_XTopTr = m_pctrlTopTrans->text().toDouble();
-    m_XBotTr = m_pctrlBotTrans->text().toDouble();
+    m_NCrit  = m_pctrlNCrit->Value();
+    m_XTopTr = m_pctrlTopTrans->Value();
+    m_XBotTr = m_pctrlBotTrans->Value();
 
     m_Mass = m_pctrlMass->Value();
     m_Chord = m_pctrlChord->Value();

@@ -30,7 +30,7 @@
 #include <QPushButton>
 
 
-#include "../misc/FloatEdit.h"
+#include "../misc/DoubleEdit.h"
 
 
 class XFoilAdvancedDlg : public QDialog
@@ -52,7 +52,7 @@ private:
 	void SetupLayout();
 	QCheckBox *m_pctrlInitBL, *m_pctrlFullReport;
 	QLineEdit *m_pctrlIterLimit;
-	FloatEdit * m_pctrlVAccel;
+	DoubleEdit * m_pctrlVAccel;
 	QPushButton *OKButton, *CancelButton;
 
 	int m_IterLimit;

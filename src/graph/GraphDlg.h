@@ -29,7 +29,7 @@
 #include <QCheckBox>
 
 #include "../graph/Graph.h"
-#include "../misc/FloatEdit.h"
+#include "../misc/DoubleEdit.h"
 #include "../misc/ColorButton.h"
 #include "../misc/LineBtn.h"
 
@@ -91,13 +91,13 @@ private:
 	QLabel *m_pctrlTitleLabel, *m_pctrlLabelLabel;
 
 	QCheckBox *m_pctrlXAuto, *m_pctrlYAuto, *m_pctrlYInverted;
-	FloatEdit *m_pctrlXMin, *m_pctrlXMax, *m_pctrlXOrigin,*m_pctrlXUnit;
-	FloatEdit *m_pctrlYMin, *m_pctrlYMax, *m_pctrlYOrigin,*m_pctrlYUnit;
+	DoubleEdit *m_pctrlXMin, *m_pctrlXMax, *m_pctrlXOrigin,*m_pctrlXUnit;
+	DoubleEdit *m_pctrlYMin, *m_pctrlYMax, *m_pctrlYOrigin,*m_pctrlYUnit;
 
 	QCheckBox *m_pctrlXMajGridShow, *m_pctrlYMajGridShow, *m_pctrlXMinGridShow, *m_pctrlYMinGridShow;
 	QCheckBox *m_pctrlAutoXMinUnit, *m_pctrlAutoYMinUnit;
 	LineBtn *m_pctrlAxisStyle, *m_pctrlXMajGridStyle, *m_pctrlYMajGridStyle, *m_pctrlXMinGridStyle, *m_pctrlYMinGridStyle;
-	FloatEdit *m_pctrlXMinorUnit, *m_pctrlYMinorUnit;
+	DoubleEdit *m_pctrlXMinorUnit, *m_pctrlYMinorUnit;
 
 	QCheckBox *m_pctrlGraphBorder;
 	ColorButton *m_pctrlGraphBack;

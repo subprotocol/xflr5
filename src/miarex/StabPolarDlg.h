@@ -32,7 +32,7 @@
 #include <QTableView>
 #include <QStandardItemModel>
 #include "CtrlTableDelegate.h"
-#include "../misc/FloatEdit.h"
+#include "../misc/DoubleEdit.h"
 #include "../objects/Plane.h"
 
 
@@ -81,10 +81,10 @@ private:
 	QStandardItemModel *m_pControlModel;
 	CtrlTableDelegate *m_pCtrlDelegate;
 
-	FloatEdit *m_pctrlDensity;
-	FloatEdit *m_pctrlViscosity;
-	FloatEdit *m_pctrlBeta;
-	FloatEdit *m_pctrlPhi;
+	DoubleEdit *m_pctrlDensity;
+	DoubleEdit *m_pctrlViscosity;
+	DoubleEdit *m_pctrlBeta;
+	DoubleEdit *m_pctrlPhi;
 	QLineEdit *m_pctrlWPolarName;
 
 	QCheckBox *m_pctrlViscous;
@@ -106,7 +106,7 @@ private:
 	QLabel *m_pctrlDensityUnit, *m_pctrlViscosityUnit;
 	QLabel *m_pctrlLab299,*m_pctrlLab300,*m_pctrlLab301,*m_pctrlLab302,*m_pctrlLab303,*m_pctrlLab304,*m_pctrlLab305;
 
-	FloatEdit *m_pctrlMass, *m_pctrlCoGx,*m_pctrlCoGz, *m_pctrlIxx, *m_pctrlIyy, *m_pctrlIzz, *m_pctrlIxz;
+	DoubleEdit *m_pctrlMass, *m_pctrlCoGx,*m_pctrlCoGz, *m_pctrlIxx, *m_pctrlIyy, *m_pctrlIzz, *m_pctrlIxz;
 
 	QPushButton *OKButton, *CancelButton;
 

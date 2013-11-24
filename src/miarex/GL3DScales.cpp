@@ -71,8 +71,8 @@ void GL3DScales::SetupLayout()
 	{
 		QGridLayout *CpScaleLayout = new QGridLayout;
 		m_pctrlAutoCpScale = new QCheckBox(tr("Auto Scales"));
-		m_pctrlLegendMin = new FloatEdit(61.234);
-		m_pctrlLegendMax = new FloatEdit(3.5555);
+		m_pctrlLegendMin = new DoubleEdit(61.234);
+		m_pctrlLegendMax = new DoubleEdit(3.5555);
 		m_pctrlLegendMin->SetPrecision(2);
 		m_pctrlLegendMax->SetPrecision(2);
 		QLabel *lab0 = new QLabel(tr("Min"));
@@ -132,10 +132,10 @@ void GL3DScales::SetupLayout()
 
 	QGroupBox *LengthBox = new QGroupBox(tr("Streamline length"));
 	{
-		m_pctrlNXPoint = new FloatEdit(33,0);
+		m_pctrlNXPoint = new DoubleEdit(33,0);
 		m_pctrlNXPoint->SetPrecision(0);
-		m_pctrlDeltaL = new FloatEdit(12.34,2);
-		m_pctrlXFactor       = new FloatEdit(1.23,2);
+		m_pctrlDeltaL = new DoubleEdit(12.34,2);
+		m_pctrlXFactor       = new DoubleEdit(1.23,2);
 		m_pctrlLengthUnit1 = new QLabel("miles");
 		QLabel *lab5 = new QLabel(tr("X-axis points"));
 		QLabel *lab6 = new QLabel(tr("1st segment"));
@@ -156,8 +156,8 @@ void GL3DScales::SetupLayout()
 
 	QGroupBox *StartBox = new QGroupBox(tr("Start Streamline at"));
 	{
-		m_pctrlXOffset       = new FloatEdit(4.56,3);
-		m_pctrlZOffset       = new FloatEdit(7.89,3);
+		m_pctrlXOffset       = new DoubleEdit(4.56,3);
+		m_pctrlZOffset       = new DoubleEdit(7.89,3);
 		m_pctrlLengthUnit2 = new QLabel("km");
 		m_pctrlLengthUnit3 = new QLabel("m");
 		m_pctrlLE = new QRadioButton(tr("L.E."));

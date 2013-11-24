@@ -37,7 +37,7 @@ LECircleDlg::LECircleDlg(QWidget *pParent): QDialog(pParent)
 void LECircleDlg::SetupLayout()
 {
 	QHBoxLayout *LERadius = new QHBoxLayout;
-	m_pctrlRadius = new FloatEdit(0.0,3);
+	m_pctrlRadius = new DoubleEdit(0.0,3);
 	QLabel *lab0 = new QLabel(tr("r="));
 	QLabel *lab1 = new QLabel(tr("% Chord"));
 	lab0->setAlignment(Qt::AlignRight | Qt::AlignVCenter);

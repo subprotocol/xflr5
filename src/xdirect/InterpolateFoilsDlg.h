@@ -30,7 +30,7 @@
 #include <QLabel>
 #include <QSlider>
 #include "../objects/Foil.h"
-#include "../misc/FloatEdit.h"
+#include "../misc/DoubleEdit.h"
 
 class InterpolateFoilsDlg : public QDialog
 {
@@ -60,7 +60,7 @@ public:
 	QLabel *m_pctrlCamb1, *m_pctrlCamb2, *m_pctrlThick1, *m_pctrlThick2;
 	QLabel *m_pctrlCamb3, *m_pctrlThick3;
 	QSlider *m_pctrlSlider;
-	FloatEdit *m_pctrlFrac;
+	DoubleEdit *m_pctrlFrac;
 	QPushButton *OKButton, *CancelButton;
 
 	void *m_pXDirect;

@@ -73,12 +73,12 @@ void FlapDlg::SetupLayout()
 	{
 		m_pctrlLEFlapCheck = new QCheckBox(tr("L.E. Flap"));
 		m_pctrlTEFlapCheck = new QCheckBox(tr("T.E. Flap"));
-		m_pctrlLEXHinge    = new FloatEdit;
-		m_pctrlLEYHinge    = new FloatEdit;
-		m_pctrlTEXHinge    = new FloatEdit;
-		m_pctrlTEYHinge    = new FloatEdit;
-		m_pctrlTEFlapAngle = new FloatEdit;
-		m_pctrlLEFlapAngle = new FloatEdit;
+		m_pctrlLEXHinge    = new DoubleEdit;
+		m_pctrlLEYHinge    = new DoubleEdit;
+		m_pctrlTEXHinge    = new DoubleEdit;
+		m_pctrlTEYHinge    = new DoubleEdit;
+		m_pctrlTEFlapAngle = new DoubleEdit;
+		m_pctrlLEFlapAngle = new DoubleEdit;
 
 		QLabel *lab1 = new QLabel(tr("Flap Angle"));
 		QLabel *lab2 = new QLabel(QString::fromUtf8("° (")+tr("+ is down") +")");

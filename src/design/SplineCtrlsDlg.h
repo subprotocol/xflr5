@@ -22,7 +22,7 @@
 #ifndef SPLINECTRLSDLG_H
 #define SPLINECTRLSDLG_H
 
-#include "../misc/FloatEdit.h"
+#include "../misc/DoubleEdit.h"
 #include "../objects/SplineFoil.h"
 #include "../misc/FloatEditDelegate.h"
 
@@ -59,8 +59,8 @@ private:
 	void UpdateSplines();
 
 
-	FloatEdit	*m_pctrlOutExtrados;
-	FloatEdit	*m_pctrlOutIntrados;
+	DoubleEdit	*m_pctrlOutExtrados;
+	DoubleEdit	*m_pctrlOutIntrados;
 	QComboBox	*m_pctrlDegExtrados;
 	QComboBox	*m_pctrlDegIntrados;
 	QPushButton *OKButton, *CancelButton;

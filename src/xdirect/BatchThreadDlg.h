@@ -36,7 +36,7 @@
 #include "../graph/GraphWidget.h"
 #include "../objects/Foil.h"
 #include "../objects/Polar.h"
-#include "../misc/FloatEdit.h"
+#include "../misc/DoubleEdit.h"
 #include "XFoilTask.h"
 
 /**
@@ -98,9 +98,9 @@ protected:
 	QRadioButton *m_rbRange1, *m_rbRange2;
 	QRadioButton *m_pctrlAlpha, *m_pctrlCl;
 	QPushButton *m_pctrlEditList;
-	FloatEdit *m_pctrlReMin, *m_pctrlReMax, *m_pctrlReDelta, *m_pctrlMach;
-	FloatEdit *m_pctrlSpecMin, *m_pctrlSpecMax, *m_pctrlSpecDelta;
-	FloatEdit *m_pctrlNCrit, *m_pctrlXTopTr, *m_pctrlXBotTr;
+	DoubleEdit *m_pctrlReMin, *m_pctrlReMax, *m_pctrlReDelta, *m_pctrlMach;
+	DoubleEdit *m_pctrlSpecMin, *m_pctrlSpecMax, *m_pctrlSpecDelta;
+	DoubleEdit *m_pctrlNCrit, *m_pctrlXTopTr, *m_pctrlXBotTr;
 	QLabel *m_pctrlSpecVar;
 	QLabel *m_pctrlMaType, *m_pctrlReType;
 	QCheckBox *m_pctrlInitBL, *m_pctrlFromZero, *m_pctrlUpdatePolarView;

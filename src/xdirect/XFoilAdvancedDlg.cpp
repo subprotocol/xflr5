@@ -44,7 +44,7 @@ void XFoilAdvancedDlg::SetupLayout()
 	{
 		QLabel *lab1 = new QLabel(tr("VAccel"));
 		lab1->setAlignment(Qt::AlignRight);
-		m_pctrlVAccel = new FloatEdit;
+		m_pctrlVAccel = new DoubleEdit;
 		m_pctrlVAccel->setAlignment(Qt::AlignRight);
 		VAccelBoxLayout->addStretch(1);
 		VAccelBoxLayout->addWidget(lab1);

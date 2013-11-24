@@ -29,11 +29,8 @@
 #ifndef QMIAREX_H
 #define QMIAREX_H
 
-
-
 #include "../params.h"
 #include <QWidget>
-#include "WAdvancedDlg.h"
 #include <QPixmap>
 #include <QCheckBox>
 #include <QSlider>
@@ -42,34 +39,15 @@
 #include <QPushButton>
 #include <QRadioButton>
 #include <QList>
+#include <QLabel>
 #include <QDialog>
 #include <QDataStream>
 #include <QSettings>
 #include "../objects/ArcBall.h"
-#include "GL3dWingDlg.h"
-#include "GL3dBodyDlg.h"
-#include "GL3DScales.h"
-#include "StabViewDlg.h"
-#include "PlaneDlg.h"
-#include "WingScaleDlg.h"
-#include "InertiaDlg.h"
-#include "WPolarDlg.h"
-#include "StabPolarDlg.h"
 #include "PanelAnalysisDlg.h"
 #include "LLTAnalysisDlg.h"
-#include "ManageBodiesDlg.h"
-#include "ManageUFOsDlg.h"
-#include "../misc/UnitsDlg.h"
-#include "../misc/ModDlg.h"
-#include "../misc/RenameDlg.h"
-#include "../misc/ProgressDlg.h"
-#include "../misc/ObjectPropsDlg.h"
-#include "../misc/PolarFilterDlg.h"
-#include "../misc/W3dPrefsDlg.h"
-#include "../misc/GLLightDlg.h"
 #include "../misc/LineBtn.h"
-#include "../graph/GraphDlg.h"
-#include "../misc/FloatEdit.h"
+#include "../misc/DoubleEdit.h"
 #include "../misc/LineCbBox.h"
 #include "../misc/LineDelegate.h"
 #include "../objects/Body.h"
@@ -82,6 +60,7 @@
 #include "../objects/Foil.h"
 #include "../objects/OpPoint.h"
 #include "../graph/QGraph.h"
+
 
 /** This enumeration defines the options for the active view.
  *May be the operaring point view, the polar view, the 3D view, the Cp view, or the stability view*/
@@ -401,24 +380,9 @@ public:
 
 private:
 	//  the dialog boxes are declared as member variables to enable translations... seems to be a Qt bug
-    WAdvancedDlg *m_pWAdvancedDlg;
-    ManageBodiesDlg *m_pManageBodiesDlg;
-    ManageUFOsDlg *m_pManageUFOsDlg;
-    PolarFilterDlg *m_pPolarFilterDlg;
-	InertiaDlg     *m_pInertiaDlg;
-	PlaneDlg       *m_pPlaneDlg;
-	ModDlg         *m_pModDlg;
-	RenameDlg      *m_pRenameDlg;
-	GraphDlg       *m_pGraphDlg;
-	WingScaleDlg   *m_pWingScaleDlg;
-	W3dPrefsDlg    *m_pW3dPrefsDlg;
-	WPolarDlg      *m_pWPolarDlg;
-	StabPolarDlg   *m_pStabPolarDlg;
-	UnitsDlg       *m_pUnitsDlg;
-	ObjectPropsDlg *m_pObjectPropsDlg;
-	GL3dBodyDlg    *m_pGL3dBody;
-	GLLightDlg     *m_pGLLightDlg;
-	void    *m_pWingDlg;
+    void *m_pWingDlg;
+    void *m_pGL3dBody;
+    void *m_pGLLightDlg;
 
 public:
 	LLTAnalysisDlg *m_pLLTDlg;                  /**< the dialog class which manages the LLT calculations */
@@ -428,11 +392,11 @@ public:
 	// Widget variables ... self explicit, not documented
 	QPushButton *m_pctrlKeepCpSection, *m_pctrlResetCpSection;
 	QSlider *m_pctrlCpSectionSlider;
-	FloatEdit *m_pctrlSpanPos;
+	DoubleEdit *m_pctrlSpanPos;
 	QCheckBox *m_pctrlSequence;
-	FloatEdit *m_pctrlAlphaMin;
-	FloatEdit *m_pctrlAlphaMax;
-	FloatEdit *m_pctrlAlphaDelta;
+	DoubleEdit *m_pctrlAlphaMin;
+	DoubleEdit *m_pctrlAlphaMax;
+	DoubleEdit *m_pctrlAlphaDelta;
 	QCheckBox *m_pctrlInitLLTCalc;
 	QCheckBox *m_pctrlStoreWOpp;
 	QPushButton *m_pctrlAnalyze;

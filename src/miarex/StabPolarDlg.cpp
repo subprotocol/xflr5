@@ -657,8 +657,8 @@ void StabPolarDlg::SetupLayout()
 				lab3->setAlignment(Qt::AlignVCenter|Qt::AlignRight);
 				QLabel *lab4 = new QLabel(QString::fromUtf8("°"));
 				QLabel *lab5 = new QLabel(QString::fromUtf8("°"));
-				m_pctrlBeta  = new FloatEdit(0.818,2);
-				m_pctrlPhi   = new FloatEdit(0.414,2);
+				m_pctrlBeta  = new DoubleEdit(0.818,2);
+				m_pctrlPhi   = new DoubleEdit(0.414,2);
 
 				PlaneLayout->addWidget(lab2,1,1);
 				PlaneLayout->addWidget(m_pctrlBeta,1,2);
@@ -689,13 +689,13 @@ void StabPolarDlg::SetupLayout()
 			m_pctrlUnit1 = new QRadioButton(tr("International"));
 			m_pctrlUnit2 = new QRadioButton(tr("Imperial"));
 			m_pctrlRho           = new QLabel("r =");
-			m_pctrlDensity       = new FloatEdit(1.500e-5,3);
+			m_pctrlDensity       = new DoubleEdit(1.500e-5,3);
 			m_pctrlDensityUnit   = new QLabel("kg/m3");
 			m_pctrlNu            = new QLabel("n =");
 			m_pctrlRho->setFont(QFont("Symbol"));
 			m_pctrlNu->setFont(QFont("Symbol"));
 
-			m_pctrlViscosity     = new FloatEdit(1.225,3);
+			m_pctrlViscosity     = new DoubleEdit(1.225,3);
 			m_pctrlViscosityUnit = new QLabel("m2/s");
 			AeroDataLayout->addWidget(lab9,1,1);
 			AeroDataLayout->addWidget(m_pctrlUnit1,1,2);
@@ -763,13 +763,13 @@ void StabPolarDlg::SetupLayout()
 				m_pctrlLab304 = new QLabel;
 				m_pctrlLab305 = new QLabel;
 
-				m_pctrlMass = new FloatEdit(0.0,3);
-				m_pctrlCoGx = new FloatEdit(0.0,3);
-				m_pctrlCoGz = new FloatEdit(0.0,3);
-				m_pctrlIxx  = new FloatEdit(0.0);
-				m_pctrlIyy  = new FloatEdit(0.0);
-				m_pctrlIzz  = new FloatEdit(0.0);
-				m_pctrlIxz  = new FloatEdit(0.0);
+				m_pctrlMass = new DoubleEdit(0.0,3);
+				m_pctrlCoGx = new DoubleEdit(0.0,3);
+				m_pctrlCoGz = new DoubleEdit(0.0,3);
+				m_pctrlIxx  = new DoubleEdit(0.0);
+				m_pctrlIyy  = new DoubleEdit(0.0);
+				m_pctrlIzz  = new DoubleEdit(0.0);
+				m_pctrlIxz  = new DoubleEdit(0.0);
 				InertiaDataLayout->addWidget(Lab099,1,1);
 				InertiaDataLayout->addWidget(Lab100,2,1);
 				InertiaDataLayout->addWidget(Lab101,3,1);
@@ -930,7 +930,7 @@ void StabPolarDlg::SetWPolarName()
 	{
 		if(m_pPlane)
 		{
-            if(qAbs(s_StabPolar.m_ControlGain[0]>PRECISION) && m_pPlane)
+            if(qAbs(s_StabPolar.m_ControlGain[0])>PRECISION && m_pPlane)
 			{
 				strong = QString(QString::fromUtf8("-Wing(%g1)"))
 								   .arg(s_StabPolar.m_ControlGain[0],0,'f',1);
@@ -940,7 +940,7 @@ void StabPolarDlg::SetWPolarName()
 		}
 		if(m_pPlane && m_pWingList[2])
 		{
-            if(qAbs(s_StabPolar.m_ControlGain[1]>PRECISION))
+            if(qAbs(s_StabPolar.m_ControlGain[1])>PRECISION)
 			{
 				strong = QString(QString::fromUtf8("-Elev(g%1)")).arg(s_StabPolar.m_ControlGain[1],0,'f',1);
 				WPolarName += strong;
@@ -950,7 +950,7 @@ void StabPolarDlg::SetWPolarName()
 
 		for(i=0; i<m_pWingList[0]->m_nFlaps; i++)
 		{
-            if(qAbs(s_StabPolar.m_ControlGain[i+nCtrl]>PRECISION))
+            if(qAbs(s_StabPolar.m_ControlGain[i+nCtrl])>PRECISION)
 			{
 				strong = QString(QString::fromUtf8("-WF%1(g%2)"))
 						 .arg(i+1)
@@ -964,7 +964,7 @@ void StabPolarDlg::SetWPolarName()
 		{
 			for(i=0; i<m_pWingList[2]->m_nFlaps; i++)
 			{
-                if(qAbs(s_StabPolar.m_ControlGain[i+nCtrl]>PRECISION))
+                if(qAbs(s_StabPolar.m_ControlGain[i+nCtrl])>PRECISION)
 				{
 					strong = QString(QString::fromUtf8("-EF%1(g%2)"))
 							 .arg(i+1).arg(s_StabPolar.m_ControlGain[i+nCtrl]);

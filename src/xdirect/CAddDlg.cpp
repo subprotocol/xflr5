@@ -56,9 +56,9 @@ void CAddDlg::SetupLayout()
 	QLabel *lab5 = new QLabel(tr("To"));
 	lab4->setAlignment(Qt::AlignCenter);
 	lab5->setAlignment(Qt::AlignCenter);
-	m_pctrlAngTol = new FloatEdit;
-	m_pctrlFrom   = new FloatEdit;
-	m_pctrlTo     = new FloatEdit;
+	m_pctrlAngTol = new DoubleEdit;
+	m_pctrlFrom   = new DoubleEdit;
+	m_pctrlTo     = new DoubleEdit;
 
 	m_pctrlrb1 = new QRadioButton(tr("Uniform"));
 	m_pctrlrb2 = new QRadioButton(tr("Arc Length"));

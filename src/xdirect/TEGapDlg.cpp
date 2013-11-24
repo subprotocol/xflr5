@@ -56,7 +56,7 @@ void TEGapDlg::SetupLayout()
 	lab1->setAlignment(Qt::AlignRight);
 	lab1->setMinimumWidth(150);
 	QLabel *lab2 = new QLabel(tr("% chord"));
-	m_pctrlGap = new FloatEdit;
+	m_pctrlGap = new DoubleEdit;
 	GapValue->addWidget(lab1);
 	GapValue->addWidget(m_pctrlGap);
 	GapValue->addWidget(lab2);
@@ -66,7 +66,7 @@ void TEGapDlg::SetupLayout()
 	lab3->setAlignment(Qt::AlignRight);
 	lab3->setMinimumWidth(150);
 	QLabel *lab4 = new QLabel(tr("% chord"));
-	m_pctrlBlend = new FloatEdit;
+	m_pctrlBlend = new DoubleEdit;
 	BlendValue->addWidget(lab3);
 	BlendValue->addWidget(m_pctrlBlend);
 	BlendValue->addWidget(lab4);

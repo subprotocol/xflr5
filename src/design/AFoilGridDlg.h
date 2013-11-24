@@ -26,7 +26,7 @@
 #include <QPushButton>
 #include <QCheckBox>
 #include "../misc/LineBtn.h"
-#include "../misc/FloatEdit.h"
+#include "../misc/DoubleEdit.h"
 
 
 class AFoilGridDlg : public QDialog
@@ -61,7 +61,7 @@ private:
 	void *m_pAFoil;
 	QCheckBox  *m_pctrlNeutralShow, *m_pctrlScale, *m_pctrlXMajShow, *m_pctrlYMajShow, *m_pctrlXMinShow, *m_pctrlYMinShow;
 	LineBtn *m_pctrlNeutralStyle, *m_pctrlXMajStyle, *m_pctrlYMajStyle, *m_pctrlXMinStyle, *m_pctrlYMinStyle;
-	FloatEdit *m_pctrlXUnit, *m_pctrlYUnit,*m_pctrlXMinUnit, *m_pctrlYMinUnit;
+	DoubleEdit *m_pctrlXUnit, *m_pctrlYUnit,*m_pctrlXMinUnit, *m_pctrlYMinUnit;
 	QPushButton	*ApplyButton, *OKButton, *CancelButton;
 
 	bool m_bNeutralLine, m_bScale;

@@ -26,7 +26,7 @@
 #include <QDialog>
 #include <QCheckBox>
 #include <QPushButton>
-#include "../misc/FloatEdit.h"
+#include "../misc/DoubleEdit.h"
 
 
 class LECircleDlg : public QDialog
@@ -51,7 +51,7 @@ private:
 
 private:
 	QCheckBox *m_pctrlShow;
-	FloatEdit *m_pctrlRadius;
+	DoubleEdit *m_pctrlRadius;
 	QPushButton *OKButton, *CancelButton;
 
 	double m_Radius;

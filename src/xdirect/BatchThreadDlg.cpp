@@ -151,12 +151,12 @@ void BatchThreadDlg::SetupLayout()
 			m_pctrlReType->setAlignment(Qt::AlignVCenter|Qt::AlignRight);
 			NCritLabel->setAlignment(Qt::AlignVCenter|Qt::AlignRight);
 			m_pctrlMaType->setAlignment(Qt::AlignVCenter|Qt::AlignRight);
-			m_pctrlNCrit   = new FloatEdit(9.00);
+			m_pctrlNCrit   = new DoubleEdit(9.00);
 
-			m_pctrlReMin   = new FloatEdit(100000,0);
-			m_pctrlReMax   = new FloatEdit(150000,0);
-			m_pctrlReDelta = new FloatEdit(50000,0);
-			m_pctrlMach    = new FloatEdit(0.00, 3);
+			m_pctrlReMin   = new DoubleEdit(100000,0);
+			m_pctrlReMax   = new DoubleEdit(150000,0);
+			m_pctrlReDelta = new DoubleEdit(50000,0);
+			m_pctrlMach    = new DoubleEdit(0.00, 3);
 
 			BatchVarsLayout->addWidget(MinVal, 2, 2);
 			BatchVarsLayout->addWidget(MaxVal, 2, 3);
@@ -214,9 +214,9 @@ void BatchThreadDlg::SetupLayout()
 			SpecMax->setAlignment(Qt::AlignCenter | Qt::AlignVCenter);
 			SpecDelta->setAlignment(Qt::AlignCenter | Qt::AlignVCenter);
 			m_pctrlSpecVar    = new QLabel(tr("Spec ="));
-			m_pctrlSpecMin    = new FloatEdit(0.00);
-			m_pctrlSpecMax    = new FloatEdit(1.00);
-			m_pctrlSpecDelta  = new FloatEdit(0.50);
+			m_pctrlSpecMin    = new DoubleEdit(0.00);
+			m_pctrlSpecMax    = new DoubleEdit(1.00);
+			m_pctrlSpecDelta  = new DoubleEdit(0.50);
 			RangeVarsLayout->addWidget(SpecMin, 1, 2);
 			RangeVarsLayout->addWidget(SpecMax, 1, 3);
 			RangeVarsLayout->addWidget(SpecDelta, 1, 4);
@@ -244,8 +244,8 @@ void BatchThreadDlg::SetupLayout()
 			QLabel *BotTransLabel = new QLabel(tr("Bottom transition location (x/c)"));
 			TopTransLabel->setAlignment(Qt::AlignVCenter|Qt::AlignRight);
 			BotTransLabel->setAlignment(Qt::AlignVCenter|Qt::AlignRight);
-			m_pctrlXTopTr = new FloatEdit(1.00);
-			m_pctrlXBotTr = new FloatEdit(1.00);
+			m_pctrlXTopTr = new DoubleEdit(1.00);
+			m_pctrlXBotTr = new DoubleEdit(1.00);
 
 			TransVars->addWidget(TopTransLabel, 2, 1);
 			TransVars->addWidget(m_pctrlXTopTr, 2, 2);

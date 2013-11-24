@@ -31,7 +31,7 @@
 
 
 #include "../objects/Foil.h"
-#include "../misc/FloatEdit.h"
+#include "../misc/DoubleEdit.h"
 
 /**
 * @class CAddDlg
@@ -72,9 +72,9 @@ private:
 	QLabel *m_pctrlMaxAngle;
 	QRadioButton	*m_pctrlrb1;
 	QRadioButton	*m_pctrlrb2;
-	FloatEdit	*m_pctrlTo;
-	FloatEdit	*m_pctrlFrom;
-	FloatEdit	*m_pctrlAngTol;
+	DoubleEdit	*m_pctrlTo;
+	DoubleEdit	*m_pctrlFrom;
+	DoubleEdit	*m_pctrlAngTol;
 
 	Foil* m_pMemFoil;
 	Foil* m_pBufferFoil;

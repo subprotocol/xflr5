@@ -36,7 +36,7 @@ QWidget *WingDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem 
 {
 	if(index.column()!=5 && index.column()!=7 && index.column()!=9)
 	{
-		FloatEdit *editor = new FloatEdit(parent);
+		DoubleEdit *editor = new DoubleEdit(parent);
 		editor->setAlignment(Qt::AlignRight);
 
 		editor->SetPrecision(m_Precision[index.column()]);
@@ -82,7 +82,7 @@ void WingDelegate::setEditorData(QWidget *editor, const QModelIndex &index) cons
 	if(index.column()!=5 && index.column()!=7 && index.column()!=9)
 	{
 		double value = index.model()->data(index, Qt::EditRole).toDouble();
-		FloatEdit *floatEdit = static_cast<FloatEdit*>(editor);
+		DoubleEdit *floatEdit = static_cast<DoubleEdit*>(editor);
 		floatEdit->SetValue(value);
 	}
 	else
@@ -100,7 +100,7 @@ void WingDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, cons
 {
 	if(index.column()!=5 && index.column()!=7 && index.column()!=9)
 	{
-		FloatEdit *floatEdit = static_cast<FloatEdit*>(editor);
+		DoubleEdit *floatEdit = static_cast<DoubleEdit*>(editor);
 		double value = floatEdit->Value();
 		model->setData(index, value, Qt::EditRole);
 	}

@@ -29,7 +29,7 @@
 #include <QSlider>
 #include <QLabel>
 #include <QSettings>
-#include "../misc/FloatEdit.h"
+#include "../misc/DoubleEdit.h"
 
 class GL3DScales : public QWidget
 {
@@ -62,9 +62,9 @@ private:
 	QSlider *m_pctrlLiftScaleSlider, *m_pctrlDragScaleSlider, *m_pctrlVelocityScaleSlider;
 	QPushButton *ApplyButton;
 	QCheckBox *m_pctrlAutoCpScale;
-	FloatEdit	*m_pctrlLegendMin, *m_pctrlLegendMax;
+	DoubleEdit	*m_pctrlLegendMin, *m_pctrlLegendMax;
 
-	FloatEdit *m_pctrlNXPoint, *m_pctrlDeltaL, *m_pctrlXFactor, *m_pctrlXOffset, *m_pctrlZOffset;
+	DoubleEdit *m_pctrlNXPoint, *m_pctrlDeltaL, *m_pctrlXFactor, *m_pctrlXOffset, *m_pctrlZOffset;
 	QRadioButton *m_pctrlLE, *m_pctrlTE, *m_pctrlLine;
 
 	QLabel *m_pctrlLengthUnit1, *m_pctrlLengthUnit2, *m_pctrlLengthUnit3;

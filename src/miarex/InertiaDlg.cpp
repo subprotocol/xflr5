@@ -808,7 +808,7 @@ void InertiaDlg::SetupLayout()
 		QHBoxLayout *ObjectMassLayout = new QHBoxLayout;
 		m_pctrlVolumeMassLabel  = new QLabel(tr("Wing Mass="));
 		m_pctrlMassUnit   = new QLabel("kg");
-		m_pctrlVolumeMass = new FloatEdit(1.00,3);
+		m_pctrlVolumeMass = new DoubleEdit(1.00,3);
 
 		QGroupBox *CoGBox = new QGroupBox(tr("Center of gravity"));
 		{
@@ -818,9 +818,9 @@ void InertiaDlg::SetupLayout()
 			QLabel *XCoGLab = new QLabel("X_CoG=");
 			QLabel *YCoGLab = new QLabel("Y_CoG=");
 			QLabel *ZCoGLab = new QLabel("Z_CoG=");
-			m_pctrlXCoG = new FloatEdit(0.00,3);
-			m_pctrlYCoG = new FloatEdit(0.00,3);
-			m_pctrlZCoG = new FloatEdit(0.00,3);
+			m_pctrlXCoG = new DoubleEdit(0.00,3);
+			m_pctrlYCoG = new DoubleEdit(0.00,3);
+			m_pctrlZCoG = new DoubleEdit(0.00,3);
 			m_pctrlXCoG->setEnabled(false);
 			m_pctrlYCoG->setEnabled(false);
 			m_pctrlZCoG->setEnabled(false);
@@ -852,10 +852,10 @@ void InertiaDlg::SetupLayout()
 		QGroupBox *ResultsBox = new QGroupBox(tr("Inertia in CoG Frame"));
 		{
 			QGridLayout *ResultsLayout = new QGridLayout;
-			m_pctrlCoGIxx = new FloatEdit(1.0,3);
-			m_pctrlCoGIyy = new FloatEdit(1.2,3);
-			m_pctrlCoGIzz = new FloatEdit(-1.5,3);
-			m_pctrlCoGIxz = new FloatEdit(4.2,3);
+			m_pctrlCoGIxx = new DoubleEdit(1.0,3);
+			m_pctrlCoGIyy = new DoubleEdit(1.2,3);
+			m_pctrlCoGIzz = new DoubleEdit(-1.5,3);
+			m_pctrlCoGIxz = new DoubleEdit(4.2,3);
 			m_pctrlCoGIxx->setEnabled(false);
 			m_pctrlCoGIyy->setEnabled(false);
 			m_pctrlCoGIzz->setEnabled(false);
@@ -973,7 +973,7 @@ void InertiaDlg::SetupLayout()
 		QHBoxLayout *TotalMassLayout = new QHBoxLayout;
 		m_pctrlTotalMassLabel   = new QLabel(tr("Total Mass="));
 		m_pctrlMassUnit2        = new QLabel("kg");
-		m_pctrlTotalMass        = new FloatEdit(1.00,3);
+		m_pctrlTotalMass        = new DoubleEdit(1.00,3);
 		m_pctrlTotalMass->setEnabled(false);
 
 		QGroupBox *TotalCoGBox = new QGroupBox(tr("Center of gravity"));
@@ -984,9 +984,9 @@ void InertiaDlg::SetupLayout()
 			QLabel *XTotalLab = new QLabel("X_CoG=");
 			QLabel *YTotalLab = new QLabel("Y_CoG=");
 			QLabel *ZTotalLab = new QLabel("Z_CoG=");
-			m_pctrlXTotalCoG = new FloatEdit(0.00,3);
-			m_pctrlYTotalCoG = new FloatEdit(0.00,3);
-			m_pctrlZTotalCoG = new FloatEdit(0.00,3);
+			m_pctrlXTotalCoG = new DoubleEdit(0.00,3);
+			m_pctrlYTotalCoG = new DoubleEdit(0.00,3);
+			m_pctrlZTotalCoG = new DoubleEdit(0.00,3);
 			m_pctrlXTotalCoG->setEnabled(false);
 			m_pctrlYTotalCoG->setEnabled(false);
 			m_pctrlZTotalCoG->setEnabled(false);
@@ -1018,10 +1018,10 @@ void InertiaDlg::SetupLayout()
 		QGroupBox *TotalInertiaBox = new QGroupBox(tr("Inertia in CoG Frame"));
 		{
 			QGridLayout *TotalInertiaLayout = new QGridLayout;
-			m_pctrlTotalIxx = new FloatEdit(1.0,3);
-			m_pctrlTotalIyy = new FloatEdit(1.2,3);
-			m_pctrlTotalIzz = new FloatEdit(-1.5,3);
-			m_pctrlTotalIxz = new FloatEdit(4.2,3);
+			m_pctrlTotalIxx = new DoubleEdit(1.0,3);
+			m_pctrlTotalIyy = new DoubleEdit(1.2,3);
+			m_pctrlTotalIzz = new DoubleEdit(-1.5,3);
+			m_pctrlTotalIxz = new DoubleEdit(4.2,3);
 			m_pctrlTotalIxx->setEnabled(false);
 			m_pctrlTotalIyy->setEnabled(false);
 			m_pctrlTotalIzz->setEnabled(false);

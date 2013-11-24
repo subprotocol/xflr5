@@ -160,10 +160,10 @@ void AFoilGridDlg::SetupLayout()
 		m_pctrlXMinStyle = new LineBtn(this);
 		m_pctrlYMinStyle = new LineBtn(this);
 
-		m_pctrlXUnit = new FloatEdit;
-		m_pctrlYUnit = new FloatEdit;
-		m_pctrlXMinUnit = new FloatEdit;
-		m_pctrlYMinUnit = new FloatEdit;
+		m_pctrlXUnit = new DoubleEdit;
+		m_pctrlYUnit = new DoubleEdit;
+		m_pctrlXMinUnit = new DoubleEdit;
+		m_pctrlYMinUnit = new DoubleEdit;
 		m_pctrlXUnit->SetPrecision(3);
 		m_pctrlYUnit->SetPrecision(3);
 		m_pctrlXMinUnit->SetPrecision(3);

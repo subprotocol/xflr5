@@ -35,7 +35,7 @@
 #include <QGroupBox>
 #include <QTableView>
 #include <QStandardItemModel>
-#include "../misc/FloatEdit.h"
+#include "../misc/DoubleEdit.h"
 #include "../graph/Curve.h"
 #include "../misc/FloatEditDelegate.h"
 
@@ -92,17 +92,17 @@ private:
 //	QSlider *m_pctrlAnimationSpeed, *m_pctrlAnimationAmplitude;
 	QDial *m_pctrlAnimationSpeed, *m_pctrlAnimationAmplitude;
 	QPushButton *m_pctrlAnimate, *m_pctrlAnimateRestart;
-	FloatEdit *m_pctrlModeStep;
+	DoubleEdit *m_pctrlModeStep;
 	
 	QLabel *m_pctrlStabLabel1, *m_pctrlStabLabel2, *m_pctrlStabLabel3;
-	FloatEdit  *m_pctrlStabVar1, *m_pctrlStabVar2, *m_pctrlStabVar3;
-	FloatEdit *m_pctrlTotalTime, *m_pctrlDeltat;
+	DoubleEdit  *m_pctrlStabVar1, *m_pctrlStabVar2, *m_pctrlStabVar3;
+	DoubleEdit *m_pctrlTotalTime, *m_pctrlDeltat;
 	QPushButton *m_pctrlPlotStabGraph;
 	QPushButton *m_pctrlAddCurve, *m_pctrlDeleteCurve, *m_pctrlRenameCurve;
 	QComboBox *m_pctrlCurveList;
 
 	QLabel *m_pctrlUnit1, *m_pctrlUnit2, *m_pctrlUnit3;
-	FloatEdit *m_pctrlFreqN, *m_pctrlFreq1, *m_pctrlDsi;
+	DoubleEdit *m_pctrlFreqN, *m_pctrlFreq1, *m_pctrlDsi;
 	QStackedWidget *m_pctrlStackWidget, *m_pctrlInitialConditionsWidget, *m_pctrlModeViewType;
 
 

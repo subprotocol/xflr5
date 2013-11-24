@@ -36,7 +36,7 @@
 #include <QSettings>
 #include "BodyGridDlg.h"
 #include "BodyTableDelegate.h"
-#include "../misc/FloatEdit.h"
+#include "../misc/DoubleEdit.h"
 #include "../misc/LineBtn.h"
 #include "../objects/ArcBall.h"
 #include "../objects/Body.h"
@@ -153,8 +153,8 @@ private:
 	void UpdateView();
 
 	bool InitDialog(Body *pBody);
-	bool LoadSettings(QSettings *pSettings);
-	bool SaveSettings(QSettings *pSettings);
+    static bool LoadSettings(QSettings *pSettings);
+    static bool SaveSettings(QSettings *pSettings);
 
 	void ResizeTables();
 
@@ -196,7 +196,7 @@ private:
 
 	QRadioButton *m_pctrlFlatPanels, *m_pctrlBSplines;
 	LineBtn *m_pctrlBodyStyle;
-	FloatEdit *m_pctrlNXPanels, *m_pctrlNHoopPanels;
+	DoubleEdit *m_pctrlNXPanels, *m_pctrlNHoopPanels;
 	QComboBox *m_pctrlXDegree, *m_pctrlHoopDegree;
 	QPushButton *m_pctrlMenuButton;
 	QMenu *BodyMenu;
@@ -228,7 +228,7 @@ private:
 	Panel *m_pPanel;
 	CVector *m_pNode;
 
-    BodyGridDlg *m_BodyGridDlg;
+    static BodyGridDlg *s_BodyGridDlg;
 
 	static QList<void*> *s_poaBody;
 

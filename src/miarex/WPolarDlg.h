@@ -31,7 +31,7 @@
 #include <QLabel>
 #include <QStackedWidget>
 #include <QRadioButton>
-#include "../misc/FloatEdit.h"
+#include "../misc/DoubleEdit.h"
 #include "../objects/Plane.h"
 
 /**
@@ -94,14 +94,14 @@ private:
 
 	QStackedWidget *m_pctrlAnalysisControls;
 
-	FloatEdit *m_pctrlXCmRef, *m_pctrlZCmRef;
-	FloatEdit *m_pctrlDensity;
-	FloatEdit *m_pctrlViscosity;
-	FloatEdit *m_pctrlAlpha;
-	FloatEdit *m_pctrlBeta;
-	FloatEdit *m_pctrlWeight;
-	FloatEdit *m_pctrlQInf;
-	FloatEdit *m_pctrlHeight;
+	DoubleEdit *m_pctrlXCmRef, *m_pctrlZCmRef;
+	DoubleEdit *m_pctrlDensity;
+	DoubleEdit *m_pctrlViscosity;
+	DoubleEdit *m_pctrlAlpha;
+	DoubleEdit *m_pctrlBeta;
+	DoubleEdit *m_pctrlWeight;
+	DoubleEdit *m_pctrlQInf;
+	DoubleEdit *m_pctrlHeight;
 	QLineEdit *m_pctrlWPolarName;
 
 	QCheckBox *m_pctrlPlaneInertia;

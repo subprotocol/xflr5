@@ -16,15 +16,15 @@
 
 
 xflr5 v6.09.06, November xxx, 2013
-	- removed the limit on the maximum number of panels
 	- improved the default stylesheet
-	- mesh resizing is now enabled without any limit other than the one set by the compiler and the system.
+	- fixed translation issues
+	- introduced number input/ouput using system locale settings.
+	- mesh resizing is now enabled without any limit other than the one set by the compiler and the system
 	- fixed the issues with the animation of foil operating points
 	- removed the option to save as a file for xflr5 v5 or v4 - no point and source of bugs
 	- corrected the automatic polar name of foils in multithreaded analysis
 	- added import/export of the wing geometry via plain-text files
 	- fixed the bug which caused the pitching moment to be zero
-	- defined the main dialog boxes as member variables rather than on the heap to enable their translation
 	- solved most (all?) of the issues with OpenGL text rendering
 	- made the code compatible with msvc nmake
 	- deep code cleaning

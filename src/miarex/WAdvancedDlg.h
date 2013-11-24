@@ -27,7 +27,7 @@
 #include <QRadioButton>
 #include <QPushButton>
 #include <QLabel>
-#include "../misc/FloatEdit.h"
+#include "../misc/DoubleEdit.h"
 
 class WAdvancedDlg : public QDialog
 {
@@ -56,16 +56,16 @@ private:
 	QCheckBox *m_pctrlKeepOutOpps;
 	QRadioButton *m_pctrlDirichlet, *m_pCtrlNeumann;
 	QRadioButton *m_pctrlVLM1, *m_pctrlVLM2;
-	FloatEdit *m_pctrlInterNodes;
-	FloatEdit *m_pctrlRelax;
-	FloatEdit *m_pctrlAlphaPrec;
-	FloatEdit *m_pctrlMinPanelSize;
-	FloatEdit *m_pctrlNStation;
-	FloatEdit *m_pctrlIterMax;
-	FloatEdit *m_pctrlMaxWakeIter;
-	FloatEdit *m_pctrlCoreSize;
-	FloatEdit *m_pctrlVortexPos;
-	FloatEdit *m_pctrlControlPos;
+	DoubleEdit *m_pctrlInterNodes;
+	DoubleEdit *m_pctrlRelax;
+	DoubleEdit *m_pctrlAlphaPrec;
+	DoubleEdit *m_pctrlMinPanelSize;
+	DoubleEdit *m_pctrlNStation;
+	DoubleEdit *m_pctrlIterMax;
+	DoubleEdit *m_pctrlMaxWakeIter;
+	DoubleEdit *m_pctrlCoreSize;
+	DoubleEdit *m_pctrlVortexPos;
+	DoubleEdit *m_pctrlControlPos;
 
 	bool m_bLogFile;
 	bool m_bDirichlet;

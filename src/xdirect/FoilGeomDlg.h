@@ -25,7 +25,7 @@
 
 #include <QDialog>
 #include <QSlider>
-#include "../misc/FloatEdit.h"
+#include "../misc/DoubleEdit.h"
 #include "../objects/Foil.h"
 
 class FoilGeomDlg : public QDialog
@@ -60,10 +60,10 @@ private:
 
 private:
 	QSlider	*m_pctrlCamberSlide, *m_pctrlThickSlide, *m_pctrlXThickSlide, *m_pctrlXCamberSlide;
-	FloatEdit *m_pctrlXCamber;
-	FloatEdit	*m_pctrlXThickness;
-	FloatEdit	*m_pctrlThickness;
-	FloatEdit	*m_pctrlCamber;
+	DoubleEdit *m_pctrlXCamber;
+	DoubleEdit	*m_pctrlXThickness;
+	DoubleEdit	*m_pctrlThickness;
+	DoubleEdit	*m_pctrlCamber;
 
 	QPushButton *OKButton, *CancelButton, *RestoreButton;
 

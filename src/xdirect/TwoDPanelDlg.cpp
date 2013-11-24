@@ -65,13 +65,13 @@ void TwoDPanelDlg::SetupLayout()
 		m_pctrlNPanels->setAlignment(Qt::AlignRight);
 		QValidator *PanelValid = new QIntValidator(0, 1000000, this);
 		m_pctrlNPanels->setValidator(PanelValid);
-		m_pctrlCVpar  = new FloatEdit;
-		m_pctrlCTErat = new FloatEdit;
-		m_pctrlCTRrat = new FloatEdit;
-		m_pctrlXsRef1 = new FloatEdit;
-		m_pctrlXsRef2 = new FloatEdit;
-		m_pctrlXpRef1 = new FloatEdit;
-		m_pctrlXpRef2 = new FloatEdit;
+		m_pctrlCVpar  = new DoubleEdit;
+		m_pctrlCTErat = new DoubleEdit;
+		m_pctrlCTRrat = new DoubleEdit;
+		m_pctrlXsRef1 = new DoubleEdit;
+		m_pctrlXsRef2 = new DoubleEdit;
+		m_pctrlXpRef1 = new DoubleEdit;
+		m_pctrlXpRef2 = new DoubleEdit;
 
 		InputDataLayout->addWidget(m_pctrlNPanels, 1, 2);
 		InputDataLayout->addWidget(m_pctrlCVpar,   2, 2);

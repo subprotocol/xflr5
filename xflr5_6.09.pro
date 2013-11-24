@@ -86,7 +86,7 @@ SOURCES += \
 	src/misc/FloatEditDelegate.cpp \
 	src/misc/DisplaySettingsDlg.cpp \
 	src/misc/ColorButton.cpp \
-	src/misc/FloatEdit.cpp \
+	src/misc/DoubleEdit.cpp \
 	src/misc/GLLightDlg.cpp \
 	src/misc/AboutQ5.cpp \
 	src/misc/NewNameDlg.cpp \
@@ -203,7 +203,7 @@ HEADERS += \
 	src/misc/ColorButton.h \
 	src/misc/LineCbBox.h \
 	src/misc/AboutQ5.h \
-	src/misc/FloatEdit.h \
+	src/misc/DoubleEdit.h \
 	src/misc/GLLightDlg.h \
 	src/misc/ProgressDlg.h \
 	src/misc/NewNameDlg.h \
@@ -282,7 +282,7 @@ OTHER_FILES += doc/ReleaseNotes.txt \
     qss/default.qss
 
 
-
+#win32 compiler
 QMAKE_LFLAGS_WINDOWS += -Wl,--large-address-aware
 
 

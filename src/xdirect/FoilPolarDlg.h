@@ -27,7 +27,7 @@
 #include <QRadioButton>
 #include <QLabel>
 #include <QString>
-#include "../misc/FloatEdit.h"
+#include "../misc/DoubleEdit.h"
 #include "../objects/Polar.h"
 
 
@@ -60,22 +60,22 @@ public:
 	QRadioButton *m_rbtype3;
 	QRadioButton *m_rbtype4;
 
-	FloatEdit *m_pctrlReynolds;
-	FloatEdit *m_pctrlMach;
+    DoubleEdit *m_pctrlReynolds;
+    DoubleEdit *m_pctrlMach;
 
-	FloatEdit *m_pctrlChord, *m_pctrlMass, *m_pctrlSpan;
+    DoubleEdit *m_pctrlChord, *m_pctrlMass, *m_pctrlSpan;
 	QLabel *m_pctrlLengthUnit1, *m_pctrlLengthUnit2, *m_pctrlMassUnit;
 
 	QRadioButton *m_pctrlUnit1, *m_pctrlUnit2;
 	QLabel *m_pctrlRho, *m_pctrlNu, *m_pctrlViscosityUnit, *m_pctrlDensityUnit;
-	FloatEdit *m_pctrlDensity, *m_pctrlViscosity;
+    DoubleEdit *m_pctrlDensity, *m_pctrlViscosity;
 
 	QPushButton *OKButton;
 	QPushButton *CancelButton;
 
-	FloatEdit *m_pctrlNCrit;
-	FloatEdit *m_pctrlTopTrans;
-	FloatEdit *m_pctrlBotTrans;
+    DoubleEdit *m_pctrlNCrit;
+    DoubleEdit *m_pctrlTopTrans;
+    DoubleEdit *m_pctrlBotTrans;
 
 	bool  m_bAutoName;
 	enumPolarType m_PolarType;

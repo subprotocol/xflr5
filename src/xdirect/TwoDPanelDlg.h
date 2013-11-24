@@ -24,7 +24,7 @@
 #define TWODPANELDLG_H
 
 #include <QDialog>
-#include "../misc/FloatEdit.h"
+#include "../misc/DoubleEdit.h"
 
 
 class TwoDPanelDlg : public QDialog
@@ -53,8 +53,8 @@ private:
 	QPushButton *OKButton, *CancelButton, *ApplyButton;
 
 	QLineEdit  *m_pctrlNPanels;
-	FloatEdit *m_pctrlCVpar,  *m_pctrlCTErat, *m_pctrlCTRrat;
-	FloatEdit *m_pctrlXsRef1, *m_pctrlXsRef2, *m_pctrlXpRef1, *m_pctrlXpRef2;
+	DoubleEdit *m_pctrlCVpar,  *m_pctrlCTErat, *m_pctrlCTRrat;
+	DoubleEdit *m_pctrlXsRef1, *m_pctrlXsRef2, *m_pctrlXpRef1, *m_pctrlXpRef2;
 
 	bool m_bApplied;
 	bool m_bModified;

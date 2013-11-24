@@ -28,7 +28,7 @@
 #include <QPushButton>
 #include <QRadioButton>
 #include <QLabel>
-#include "../misc/FloatEdit.h"
+#include "../misc/DoubleEdit.h"
 
 
 class BodyScaleDlg : public QDialog
@@ -58,10 +58,10 @@ private:
 
 	QPushButton *OKButton, *CancelButton;
 	QRadioButton *m_pctrlBody, *m_pctrlFrame;
-	FloatEdit *m_pctrlXScaleFactor;
-	FloatEdit *m_pctrlYScaleFactor;
-	FloatEdit *m_pctrlZScaleFactor;
-	FloatEdit *m_pctrlFrameID;
+	DoubleEdit *m_pctrlXScaleFactor;
+	DoubleEdit *m_pctrlYScaleFactor;
+	DoubleEdit *m_pctrlZScaleFactor;
+	DoubleEdit *m_pctrlFrameID;
 
 
 private:

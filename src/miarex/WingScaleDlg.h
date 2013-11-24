@@ -25,7 +25,7 @@
 #include <QDialog>
 #include <QCheckBox>
 #include <QLabel>
-#include "../misc/FloatEdit.h"
+#include "../misc/DoubleEdit.h"
 
 
 class WingScaleDlg : public QDialog
@@ -51,7 +51,7 @@ private slots:
 public:
 
 	QCheckBox *m_pctrlSpan, *m_pctrlChord, *m_pctrlSweep, *m_pctrlTwist;
-	FloatEdit  *m_pctrlNewSpan, *m_pctrlNewChord, *m_pctrlNewSweep, *m_pctrlNewTwist;
+	DoubleEdit  *m_pctrlNewSpan, *m_pctrlNewChord, *m_pctrlNewSweep, *m_pctrlNewTwist;
 	QLabel *m_pctrlRefSpan, *m_pctrlRefChord, *m_pctrlRefSweep, *m_pctrlRefTwist;
 	QLabel *m_pctrlSpanRatio, *m_pctrlChordRatio, *m_pctrlSweepRatio, *m_pctrlTwistRatio;
 	QLabel *m_pctrlUnit20, *m_pctrlUnit21;

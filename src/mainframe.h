@@ -243,6 +243,9 @@ private:
 	
 	static QPointer<MainFrame> _self;  /**< @todo need to discuss this one with Francesco */
 
+	QTranslator m_Translator;
+
+
 	QStackedWidget *m_pctrlCentralWidget;  /** The stacked widget which is loaded at the center of the display area. The stack holds one TwoDWidget and one ThreeDWidget and sxwitches between the two depending on the user's request. */
 	TwoDWidget *m_p2DWidget;        /** A pointer to the instance of the TwoDWidget which is used to perform 2d drawings */
 	ThreeDWidget   *m_pGLWidget;  /** A pointer to the instance of the ThreeDWidget which is used to perform all 3D drawings */

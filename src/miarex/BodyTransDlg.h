@@ -27,7 +27,7 @@
 #include <QCheckBox>
 #include <QLabel>
 
-#include "../misc/FloatEdit.h"
+#include "../misc/DoubleEdit.h"
 
 class BodyTransDlg : public QDialog
 {
@@ -49,10 +49,10 @@ private:
 	void keyPressEvent(QKeyEvent *event);
 	void SetupLayout();
 
-	FloatEdit *m_pctrlXTransFactor;
-	FloatEdit *m_pctrlYTransFactor;
-	FloatEdit *m_pctrlZTransFactor;
-	FloatEdit *m_pctrlFrameID;
+	DoubleEdit *m_pctrlXTransFactor;
+	DoubleEdit *m_pctrlYTransFactor;
+	DoubleEdit *m_pctrlZTransFactor;
+	DoubleEdit *m_pctrlFrameID;
 	QCheckBox *m_pctrlFrameOnly;
 	QLabel *m_pctrlLength1;
 	QLabel *m_pctrlLength2;

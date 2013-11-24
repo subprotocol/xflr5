@@ -26,7 +26,7 @@
 #include <QCheckBox>
 #include <QPushButton>
 #include "../objects/Foil.h"
-#include "../misc/FloatEdit.h"
+#include "../misc/DoubleEdit.h"
 
 
 class FlapDlg : public QDialog
@@ -46,12 +46,12 @@ private:
 	void ReadParams();
 	void SetupLayout();
 
-	FloatEdit	*m_pctrlLEYHinge;
-	FloatEdit	*m_pctrlLEXHinge;
-	FloatEdit	*m_pctrlLEFlapAngle;
-	FloatEdit	*m_pctrlTEYHinge;
-	FloatEdit	*m_pctrlTEXHinge;
-	FloatEdit	*m_pctrlTEFlapAngle;
+	DoubleEdit	*m_pctrlLEYHinge;
+	DoubleEdit	*m_pctrlLEXHinge;
+	DoubleEdit	*m_pctrlLEFlapAngle;
+	DoubleEdit	*m_pctrlTEYHinge;
+	DoubleEdit	*m_pctrlTEXHinge;
+	DoubleEdit	*m_pctrlTEFlapAngle;
 
 	QCheckBox *m_pctrlLEFlapCheck;
 	QCheckBox *m_pctrlTEFlapCheck;

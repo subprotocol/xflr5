@@ -22,6 +22,7 @@
 #include "mainframe.h"
 #include "globals.h"
 #include "design/AFoil.h"
+#include "objects/SplineFoil.h"
 #include "miarex/Miarex.h"
 #include "miarex/InertiaDlg.h"
 #include "miarex/BodyTransDlg.h"
@@ -183,6 +184,29 @@ MainFrame::MainFrame(QWidget * parent, Qt::WindowFlags flags)
 	QXDirect *pXDirect   = (QXDirect*)m_pXDirect;
 	QXInverse *pXInverse = (QXInverse*)m_pXInverse;
 	QMiarex *pMiarex     = (QMiarex*)m_pMiarex;
+
+
+#ifdef Q_WS_MAC
+		QSettings settings(QSettings::NativeFormat,QSettings::UserScope,"sourceforge.net","xflr5");
+#else
+		QSettings settings(QSettings::IniFormat,QSettings::UserScope,"XFLR5");
+#endif
+	QString str;
+	settings.beginGroup("MainFrame");
+	{
+		str = settings.value("LanguageFilePath").toString();
+		if(str.length()) m_LanguageFilePath = str;
+	}
+	settings.endGroup();
+
+	if(m_LanguageFilePath.length())
+	{
+		qApp->removeTranslator(&m_Translator);
+		if(m_Translator.load(m_LanguageFilePath))
+		{
+			qApp->installTranslator(&m_Translator);
+		}
+	}
 
 	if(LoadSettings())
 	{
@@ -972,7 +996,6 @@ void MainFrame::CreateDockWindows()
 	BatchDlg::s_pMainFrame         = this;
 	BatchThreadDlg::s_pMainFrame   = this;
 	GraphDlg::s_pMainFrame         = this;
-	ManageBodiesDlg::s_pMainFrame  = this;
 
     m_pctrlXDirectWidget = new QDockWidget("XDirect", this);
 	m_pctrlXDirectWidget->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
@@ -1111,8 +1134,6 @@ void MainFrame::CreateDockWindows()
 	StabPolarDlg::s_pMiarex     = m_pMiarex;
 	UFOTableDelegate::s_pMiarex = m_pMiarex;
 	WPolarDlg::s_pMiarex        = m_pMiarex;
-	ManageBodiesDlg::s_pMiarex  = m_pMiarex;
-
 
 	Plane::SetParents(this, m_pMiarex);
 
@@ -3478,7 +3499,7 @@ bool MainFrame::LoadSettings()
 
 MainFrame* MainFrame::self() {
     if (!_self) {
-        _self = new MainFrame(0L, 0L);
+		_self = new MainFrame;
     }
     return _self;
 }
@@ -3823,8 +3844,6 @@ void MainFrame::OnLanguage()
 		m_LanguageFilePath = m_pTranslatorDlg->m_LanguageFilePath;
 	}
 }
-
-
 
 
 void MainFrame::OnLoadFile()
@@ -4374,7 +4393,9 @@ void MainFrame::OnSelChangeWOpp(int i)
 	if(strong.length())
 	{
 		bool bOK;
-		double x = strong.toDouble(&bOK);
+
+		QLocale locale;
+		double x = locale.toDouble(strong.trimmed(), &bOK);
 		if(bOK)
 		{
 			m_iApp = MIAREX;
@@ -4444,9 +4465,11 @@ void MainFrame::OnSelChangeOpp(int i)
 	if (i>=0) strong = m_pctrlOpPoint->itemText(i);
 	m_iApp = XFOILANALYSIS;
 
-	double Alpha;
 	bool bOK;
-	Alpha = strong.toFloat(&bOK);
+
+	QLocale locale;
+	double Alpha = locale.toDouble(strong.trimmed(), &bOK);
+
 	if(bOK)
 	{
 		pXDirect->SetOpp(Alpha);
@@ -6517,6 +6540,8 @@ void MainFrame::UpdateWPolars()
 	}
 }
 
+
+
 void MainFrame::UpdateWOpps()
 {
 	// fills combobox with WOpp names associated to Miarex' current WPLr
@@ -6562,18 +6587,18 @@ void MainFrame::UpdateWOpps()
 				pPOpp = (PlaneOpp*)m_oaPOpp[i];
 				if (pPOpp->m_PlaneName == pCurPlane->PlaneName() && pPOpp->m_PlrName == pCurWPlr->m_PlrName)
 				{
-					if(pCurWPlr->m_WPolarType<FIXEDAOAPOLAR)        str = QString("%1").arg(pPOpp->m_Alpha,8,'f',2);
-					else if(pCurWPlr->m_WPolarType==FIXEDAOAPOLAR)  str = QString("%1").arg(pPOpp->m_QInf,8,'f',2);
-					else if(pCurWPlr->m_WPolarType==STABILITYPOLAR) str = QString("%1").arg(pPOpp->m_Ctrl,8,'f',2);
+					if(pCurWPlr->m_WPolarType<FIXEDAOAPOLAR)        str = QString("%L1").arg(pPOpp->m_Alpha,8,'f',2);
+					else if(pCurWPlr->m_WPolarType==FIXEDAOAPOLAR)  str = QString("%L1").arg(pPOpp->m_QInf,8,'f',2);
+					else if(pCurWPlr->m_WPolarType==STABILITYPOLAR) str = QString("%L1").arg(pPOpp->m_Ctrl,8,'f',2);
 					m_pctrlWOpp->addItem(str);
 				}
 			}
 
 			if(pMiarex->m_pCurPOpp)
 			{
-					if(pCurWPlr->m_WPolarType<FIXEDAOAPOLAR)        str = QString("%1").arg(pPOpp->m_Alpha,8,'f',2);
-					else if(pCurWPlr->m_WPolarType==FIXEDAOAPOLAR)  str = QString("%1").arg(pPOpp->m_QInf,8,'f',2);
-					else if(pCurWPlr->m_WPolarType==STABILITYPOLAR) str = QString("%1").arg(pPOpp->m_Ctrl,8,'f',2);
+					if(pCurWPlr->m_WPolarType<FIXEDAOAPOLAR)        str = QString("%L1").arg(pPOpp->m_Alpha,8,'f',2);
+					else if(pCurWPlr->m_WPolarType==FIXEDAOAPOLAR)  str = QString("%L1").arg(pPOpp->m_QInf,8,'f',2);
+					else if(pCurWPlr->m_WPolarType==STABILITYPOLAR) str = QString("%L1").arg(pPOpp->m_Ctrl,8,'f',2);
 
 				int pos = m_pctrlWOpp->findText(str);
 				if(pos >=0) m_pctrlWOpp->setCurrentIndex(pos);
@@ -6598,6 +6623,7 @@ void MainFrame::UpdateWOpps()
 			if (pWOpp->m_WingName == pCurWing->m_WingName && pWOpp->m_PlrName  == pCurWPlr->m_PlrName)
 			{
 				size++;
+                break;
 			}
 		}
 		if (size)
@@ -6610,9 +6636,9 @@ void MainFrame::UpdateWOpps()
 				if (pWOpp->m_WingName == pCurWing->m_WingName && pWOpp->m_PlrName == pCurWPlr->m_PlrName)
 				{
 
-					if(pCurWPlr->m_WPolarType<FIXEDAOAPOLAR)         str = QString("%1").arg(pWOpp->m_Alpha,8,'f',2);
-					else  if(pCurWPlr->m_WPolarType==FIXEDAOAPOLAR)  str = QString("%1").arg(pWOpp->m_QInf,8,'f',2);
-					else  if(pCurWPlr->m_WPolarType==STABILITYPOLAR) str = QString("%1").arg(pWOpp->m_Ctrl,8,'f',2);
+                    if(pCurWPlr->m_WPolarType<FIXEDAOAPOLAR)         str = QString("%L1").arg(pWOpp->m_Alpha,8,'f',2);
+                    else  if(pCurWPlr->m_WPolarType==FIXEDAOAPOLAR)  str = QString("%L1").arg(pWOpp->m_QInf,8,'f',2);
+                    else  if(pCurWPlr->m_WPolarType==STABILITYPOLAR) str = QString("%L1").arg(pWOpp->m_Ctrl,8,'f',2);
 
 					m_pctrlWOpp->addItem(str);
 				}
@@ -6620,9 +6646,9 @@ void MainFrame::UpdateWOpps()
 
 			if(pMiarex->m_pCurWOpp)
 			{
-				if(pCurWPlr->m_WPolarType<FIXEDAOAPOLAR)        str = QString("%1").arg(pWOpp->m_Alpha,8,'f',2);
-				else if(pCurWPlr->m_WPolarType==FIXEDAOAPOLAR)  str = QString("%1").arg(pWOpp->m_QInf,8,'f',2);
-				else if(pCurWPlr->m_WPolarType==STABILITYPOLAR) str = QString("%1").arg(pWOpp->m_Ctrl,8,'f',2);
+                if(pCurWPlr->m_WPolarType<FIXEDAOAPOLAR)        str = QString("%L1").arg(pWOpp->m_Alpha,8,'f',2);
+                else if(pCurWPlr->m_WPolarType==FIXEDAOAPOLAR)  str = QString("%L1").arg(pWOpp->m_QInf,8,'f',2);
+                else if(pCurWPlr->m_WPolarType==STABILITYPOLAR) str = QString("%L1").arg(pWOpp->m_Ctrl,8,'f',2);
 
 				int pos = m_pctrlWOpp->findText(str);
 				if(pos >=0) m_pctrlWOpp->setCurrentIndex(pos);
@@ -6819,12 +6845,12 @@ void MainFrame::UpdateOpps()
 				if (pCurPlr->m_PolarType !=FIXEDAOAPOLAR)
 				{
 //					if(qAbs(pOpp->Alpha)<0.0001) pOpp->Alpha = 0.0001;
-					str = QString("%1").arg(pOpp->Alpha,8,'f',2);
+					str = QString("%L1").arg(pOpp->Alpha,8,'f',2);
 					m_pctrlOpPoint->addItem(str);
 				}
 				else
 				{
-					str = QString("%1").arg(pOpp->Reynolds,8,'f',0);
+					str = QString("%L1").arg(pOpp->Reynolds,8,'f',0);
 					m_pctrlOpPoint->addItem(str);
 				}
 			}
@@ -6834,11 +6860,11 @@ void MainFrame::UpdateOpps()
 			//select it
 			if (pCurPlr->m_PolarType !=FIXEDAOAPOLAR)
 			{
-				str = QString("%8.2f").arg(pXDirect->m_pCurOpp->Alpha);
+				str = QString("%L1").arg(pXDirect->m_pCurOpp->Alpha,8,'f',2);
 			}
 			else
 			{
-				str = QString("%8.0f").arg(pXDirect->m_pCurOpp->Reynolds);
+				str = QString("%L1").arg(pXDirect->m_pCurOpp->Reynolds,8,'f',0);
 			}
 			pos = m_pctrlOpPoint->findText(str);
 
@@ -6847,17 +6873,13 @@ void MainFrame::UpdateOpps()
 		else
 		{
 			//select the first
+			bool bOK;
 			m_pctrlOpPoint->setCurrentIndex(0);
-			str = m_pctrlOpPoint->itemText(0);
-			QByteArray textline;
-			const char *text;
-			double x;
-			textline = str.toLatin1();
-			text = textline.constData();
-			int res = sscanf(text, "%lf", &x);
+			str = m_pctrlOpPoint->itemText(0).trimmed();
+			double x = str.toDouble(&bOK);
 
-			if(res==1) pXDirect->SetOpp(x);
-			else       pXDirect->SetOpp();
+			if(bOK) pXDirect->SetOpp(x);
+			else    pXDirect->SetOpp();
 
 			if(!pXDirect->m_pCurOpp)
 			{

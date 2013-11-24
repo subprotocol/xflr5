@@ -115,7 +115,7 @@ void BodyTransDlg::SetupLayout()
 {
 	QHBoxLayout *FrameID = new QHBoxLayout;
 	m_pctrlFrameOnly = new QCheckBox(tr("Frame Only"));
-	m_pctrlFrameID = new FloatEdit(0.0,0);
+	m_pctrlFrameID = new DoubleEdit(0.0,0);
 	FrameID->addWidget(m_pctrlFrameOnly);
 	FrameID->addWidget(m_pctrlFrameID);
 
@@ -123,9 +123,9 @@ void BodyTransDlg::SetupLayout()
 	QLabel * XTrans = new QLabel(tr("X Translation"));
 	QLabel * YTrans = new QLabel(tr("Y Translation"));
 	QLabel * ZTrans = new QLabel(tr("Z Translation"));
-	m_pctrlXTransFactor = new FloatEdit(0.0,3);
-	m_pctrlYTransFactor = new FloatEdit(0.0,3);
-	m_pctrlZTransFactor = new FloatEdit(0.0,3);
+	m_pctrlXTransFactor = new DoubleEdit(0.0,3);
+	m_pctrlYTransFactor = new DoubleEdit(0.0,3);
+	m_pctrlZTransFactor = new DoubleEdit(0.0,3);
 	m_pctrlLength1 = new QLabel("m");
 	m_pctrlLength2 = new QLabel("m");
 	m_pctrlLength3 = new QLabel("m");

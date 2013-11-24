@@ -24,7 +24,7 @@
 #define TEGAPDlg_H
 
 #include <QDialog>
-#include "../misc/FloatEdit.h"
+#include "../misc/DoubleEdit.h"
 #include "../objects/Foil.h"
 
 
@@ -49,7 +49,7 @@ private:
 
 public:
 	QPushButton *OKButton, *CancelButton, *ApplyButton;
-	FloatEdit *m_pctrlBlend, *m_pctrlGap;
+	DoubleEdit *m_pctrlBlend, *m_pctrlGap;
 
 	bool m_bApplied, m_bModified;
 	double m_Gap, m_Blend;

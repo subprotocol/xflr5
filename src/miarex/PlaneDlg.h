@@ -30,7 +30,7 @@
 #include <QCheckBox>
 #include <QComboBox>
 #include "../objects/Plane.h"
-#include "../misc/FloatEdit.h"
+#include "../misc/DoubleEdit.h"
 
 
 /** The class to define and edit planes. SUes */
@@ -118,21 +118,21 @@ private:
 	QLabel *m_pctrlStabSurface;
 	QLabel *m_pctrlPlaneVolume;
 	QLabel *m_pctrlVLMTotalPanels;
-	FloatEdit  *m_pctrlXBody;
-	FloatEdit  *m_pctrlZBody;
-	FloatEdit  *m_pctrlXLEFin;
-	FloatEdit  *m_pctrlYLEFin;
-	FloatEdit  *m_pctrlZLEFin;
-	FloatEdit  *m_pctrlZLEStab;
-	FloatEdit  *m_pctrlXLEStab;
-	FloatEdit  *m_pctrlXLEWing;
-	FloatEdit  *m_pctrlZLEWing;
-	FloatEdit  *m_pctrlXLEWing2;
-	FloatEdit  *m_pctrlZLEWing2;
-	FloatEdit  *m_pctrlStabTilt;
-	FloatEdit  *m_pctrlFinTilt;
-	FloatEdit  *m_pctrlWingTilt;
-	FloatEdit  *m_pctrlWingTilt2;
+	DoubleEdit  *m_pctrlXBody;
+	DoubleEdit  *m_pctrlZBody;
+	DoubleEdit  *m_pctrlXLEFin;
+	DoubleEdit  *m_pctrlYLEFin;
+	DoubleEdit  *m_pctrlZLEFin;
+	DoubleEdit  *m_pctrlZLEStab;
+	DoubleEdit  *m_pctrlXLEStab;
+	DoubleEdit  *m_pctrlXLEWing;
+	DoubleEdit  *m_pctrlZLEWing;
+	DoubleEdit  *m_pctrlXLEWing2;
+	DoubleEdit  *m_pctrlZLEWing2;
+	DoubleEdit  *m_pctrlStabTilt;
+	DoubleEdit  *m_pctrlFinTilt;
+	DoubleEdit  *m_pctrlWingTilt;
+	DoubleEdit  *m_pctrlWingTilt2;
 	QLineEdit *m_pctrlPlaneName;
 	QTextEdit *m_pctrlPlaneDescription;
 	QComboBox *m_pctrlBodyList;
