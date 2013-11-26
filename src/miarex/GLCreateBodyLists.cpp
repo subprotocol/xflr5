@@ -140,14 +140,16 @@ void GLCreateBody3DSplines( int iList, Body *pBody, int nx, int nh)
 
 	glNewList(iList+MAXBODIES,GL_COMPILE);
 	{
-		glLineWidth(W3dPrefsDlg::s_OutlineWidth);
-
+		glEnable(GL_DEPTH_TEST);
 		glEnable(GL_LINE_STIPPLE);
+
 		if     (W3dPrefsDlg::s_OutlineStyle == Qt::DashLine)       glLineStipple (1, 0xCFCF);
 		else if(W3dPrefsDlg::s_OutlineStyle == Qt::DotLine)        glLineStipple (1, 0x6666);
 		else if(W3dPrefsDlg::s_OutlineStyle == Qt::DashDotLine)    glLineStipple (1, 0xFF18);
 		else if(W3dPrefsDlg::s_OutlineStyle == Qt::DashDotDotLine) glLineStipple (1, 0x7E66);
 		else                                                       glLineStipple (1, 0xFFFF);
+
+		glLineWidth(W3dPrefsDlg::s_OutlineWidth);
 
 		glColor3d(W3dPrefsDlg::s_OutlineColor.redF(), W3dPrefsDlg::s_OutlineColor.greenF(), W3dPrefsDlg::s_OutlineColor.blueF());
 
@@ -207,6 +209,7 @@ void GLCreateBody3DSplines( int iList, Body *pBody, int nx, int nh)
 		}
 		glEnd();
 		glDisable(GL_LINE_STIPPLE);
+		glDisable(GL_DEPTH_TEST);
 	}
 	glEndList();
 }

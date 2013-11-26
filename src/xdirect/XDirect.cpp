@@ -5206,9 +5206,27 @@ void QXDirect::OnSinglePolarGraph()
  */
 void QXDirect::OnSpec()
 {
-	if      (m_pctrlSpec1->isChecked()) m_bAlpha = true;
-	else if (m_pctrlSpec2->isChecked()) m_bAlpha = false;
-	else if (m_pctrlSpec3->isChecked()) m_bAlpha = false;
+	if (m_pctrlSpec1->isChecked())
+	{
+		m_bAlpha = true;
+		m_pctrlAlphaMin->SetValue(m_Alpha);
+		m_pctrlAlphaMax->SetValue(m_AlphaMax);
+		m_pctrlAlphaDelta->SetValue(m_AlphaDelta);
+	}
+	else if (m_pctrlSpec2->isChecked())
+	{
+		m_bAlpha = false;
+		m_pctrlAlphaMin->SetValue(m_Cl);
+		m_pctrlAlphaMax->SetValue(m_ClMax);
+		m_pctrlAlphaDelta->SetValue(m_ClDelta);
+	}
+	else if (m_pctrlSpec3->isChecked())
+	{
+		m_bAlpha = false;
+		m_pctrlAlphaMin->SetValue(m_Reynolds);
+		m_pctrlAlphaMax->SetValue(m_ReynoldsMax);
+		m_pctrlAlphaDelta->SetValue(m_ReynoldsDelta);
+	}
 }
 
 
@@ -6872,9 +6890,9 @@ void QXDirect::SetupLayout()
 				m_pctrlUnit2 = new QLabel(QString::fromUtf8("°"));
 				m_pctrlUnit3 = new QLabel(QString::fromUtf8("°"));
 
-				m_pctrlAlphaMin   = new DoubleEdit(2);
-                m_pctrlAlphaMax   = new DoubleEdit(2);
-                m_pctrlAlphaDelta = new DoubleEdit(2);
+				m_pctrlAlphaMin   = new DoubleEdit(0.0);
+				m_pctrlAlphaMax   = new DoubleEdit(0.0);
+				m_pctrlAlphaDelta = new DoubleEdit(0.0);
 
                 SequenceGroupLayout->addWidget(AlphaMinLab,1,1);
 				SequenceGroupLayout->addWidget(AlphaMaxLab,2,1);

@@ -208,7 +208,7 @@ void GLCreateGeom(void *pQMiarex, Wing *pWing, int List, Body *pBody)
 	{
 		pMiarex->m_GLList++;
 
-//		glPolygonMode(GL_FRONT,GL_LINE);
+		glEnable(GL_DEPTH_TEST);
 		glEnable (GL_LINE_STIPPLE);
 
 		if     (pMiarex->m_OutlineStyle == 1) glLineStipple (1, 0xCFCF);
@@ -429,6 +429,7 @@ void GLCreateGeom(void *pQMiarex, Wing *pWing, int List, Body *pBody)
 			}
 		}
 		glDisable (GL_LINE_STIPPLE);
+		glDisable(GL_DEPTH_TEST);
 	}
 	glEndList();
 }
@@ -459,9 +460,11 @@ void GLCreateCp(void *pQMiarex, CVector *pNode, Panel *pPanel, WingOpp *pWOpp, P
 	glNewList(PANELCP, GL_COMPILE);
 	{
 		pMiarex->m_GLList++;
-		glEnable(GL_POLYGON_OFFSET_FILL);
+        glEnable(GL_DEPTH_TEST);
+        glEnable(GL_POLYGON_OFFSET_FILL);
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 		glPolygonOffset(1.0, 1.0);
+
 
 		if(pPOpp)
 		{
@@ -573,6 +576,7 @@ void GLCreateCp(void *pQMiarex, CVector *pNode, Panel *pPanel, WingOpp *pWOpp, P
 			}
 			glEnd();
 		}
+        glDisable(GL_DEPTH_TEST);
 		glDisable(GL_POLYGON_OFFSET_FILL);
 	}
 	glEndList();
@@ -1127,10 +1131,10 @@ void GLCreateMesh(int iList, int size, Panel *pPanel, CVector *pNode, QColor Pan
     glNewList(iList, GL_COMPILE);
     {
         glDisable(GL_LINE_STIPPLE);
-        glEnable(GL_DEPTH_TEST);
-        glEnable(GL_POLYGON_OFFSET_LINE);
-        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-        glPolygonOffset(1.0, 1.0);
+		glEnable(GL_DEPTH_TEST);
+//        glEnable(GL_POLYGON_OFFSET_LINE);
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+//        glPolygonOffset(1.0, 1.0);
 
         glLineWidth(1.0);
 

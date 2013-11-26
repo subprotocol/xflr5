@@ -379,7 +379,6 @@ public:
 //
 
 private:
-	//  the dialog boxes are declared as member variables to enable translations... seems to be a Qt bug
     void *m_pWingDlg;
     void *m_pGL3dBody;
     void *m_pGLLightDlg;

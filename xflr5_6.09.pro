@@ -112,8 +112,7 @@ SOURCES += \
     src/mainframe.cpp \
     src/threedwidget.cpp \
 	src/twodwidget.cpp \
-    src/misc/LineBtn.cpp \
-    src/misc/FloatEdit.cpp
+	src/misc/LineBtn.cpp
 
 HEADERS += \
 	src/XFLR5Application.h \
@@ -225,8 +224,7 @@ HEADERS += \
     src/mainframe.h \
     src/twodwidget.h \
 	src/threedwidget.h \
-    src/misc/LineBtn.h \
-    src/misc/FloatEdit.h
+	src/misc/LineBtn.h
 
 
 TRANSLATIONS = translations/xflr5v6.ts \

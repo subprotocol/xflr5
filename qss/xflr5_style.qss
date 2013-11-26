@@ -93,7 +93,7 @@ QMenuBar::item
 
 QMenuBar::item:selected
 {
-	background: darkslategray;
+	background-color: #1f2c2a;
 }
 
 
@@ -192,7 +192,7 @@ QHeaderView::section
 	color: ghostwhite;
 	padding-left: 4px;
 	border: 1px solid black;
-	min-height: 1.5 ex;
+	text-align: center;
 }
 
 
@@ -238,7 +238,7 @@ QPlainTextEdit
 QPushButton
 {
 	color: #FFFFFF;
-	background-color: QLinearGradient( x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #131313, stop: 0.5 #2f2f2f, stop: 1 #131313);
+	background-color: QLinearGradient( x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #101010, stop: 0.5 #202020, stop: 1 #101010);
 	border-width: 1px;
 	border-color: #1e1e1e;
 	border-style: solid;
@@ -270,7 +270,7 @@ LineBtn
 	background-color: #101010;
 	border: 1px solid #7f7f7f;
 	border-radius: 5px;
-	min-height: 3ex;
+	min-height: 5ex;
 }
 
 LineBtn:hover
@@ -293,7 +293,7 @@ QComboBox
 	background-color: #101010;
 	border: 1px solid #7f7f7f;
 	border-radius: 5px;
-	min-height: 3ex;
+	min-height: 5ex;
 	color: ghostwhite;
 }
 

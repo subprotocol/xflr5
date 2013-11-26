@@ -277,43 +277,43 @@ private:
 
 	LineDelegate *m_pStyleDelegate, *m_pWidthDelegate;
 
-	bool m_bAlpha;             /**< true if performing an analysis based on aoa, false if based on Cl */
-	bool m_bStoreOpp;          /**< true if operating points should be stored after an analysis */
-	bool m_bViscous;           /**< true if performing a viscous calculation, false if inviscid */
-	bool m_bInitBL;            /**< true if the boundary layer should be initialized for the next xfoil calculation */
-	bool m_bBL;                /**< true if the Boundary layer shoud be displayed */
-	bool m_bPressure;          /**< true if the pressure distirbution should be displayed */
-	bool m_bPolarView;         /**< true if the polar view is selected, false if the operating point view is selected */
-	bool m_bShowUserGraph;     /**< true if the 5th polar graph should be displayed */
-	bool m_bAnimate;           /**< true if a result animation is underway */
-	bool m_bAnimatePlus;       /**< true if the animation is going from lower to higher alpha, false if decreasing */
-	bool m_bShowPanels;        /**< true if the panels should be displayed on the foil surface */
-	bool m_bType1;             /**< true if the type 1 polars are to be displayed in the graphs */
-	bool m_bType2;             /**< true if the type 2 polars are to be displayed in the graphs */
-	bool m_bType3;             /**< true if the type 3 polars are to be displayed in the graphs */
-	bool m_bType4;             /**< true if the type 4 polars are to be displayed in the graphs */
-	bool m_bAutoInitBL;        /**< true if the BL initialization is left to the code's decision */
-	bool m_bTrans;             /**< true if the user is dragging a view */
-	bool m_bTransGraph;        /**< true if the user is dragging a graph */
-	bool m_bFromList;          /**< true if the batch analysis is based on a list of Re values */
-	bool m_bFromZero;          /**< true if the batch analysis should start from Alpha=0 */
-	bool m_bShowTextOutput;    /**< true if the batch analysis should display text result output */
-	bool m_bNeutralLine;       /**< true if the neutral line should be displayed */
-	bool m_bCurOppOnly;        /**< true if only the current operating point should be displayed */
-	bool m_bShowInviscid;      /**< true if the inviscid results should be displayed */
-	bool m_bCpGraph;           /**< true if the Cp graph should be displayed */
-	bool m_bSequence;          /**< true if a sequential analysis is to be performed */
-	bool m_bXPressed;          /**< true if the 'X' key is pressed */
-	bool m_bYPressed;          /**< true if the 'Y' key is pressed */
-	bool m_bHighlightOpp;      /**< true if the active operating point should be highlighted on the curves of the polar graphs */
+	bool m_bAlpha;              /**< true if performing an analysis based on aoa, false if based on Cl */
+	bool m_bStoreOpp;           /**< true if operating points should be stored after an analysis */
+	bool m_bViscous;            /**< true if performing a viscous calculation, false if inviscid */
+	bool m_bInitBL;             /**< true if the boundary layer should be initialized for the next xfoil calculation */
+	bool m_bBL;                 /**< true if the Boundary layer shoud be displayed */
+	bool m_bPressure;           /**< true if the pressure distirbution should be displayed */
+	bool m_bPolarView;          /**< true if the polar view is selected, false if the operating point view is selected */
+    bool m_bShowUserGraph;      /**< true if the 5th polar graph should be displayed */
+	bool m_bAnimate;            /**< true if a result animation is underway */
+	bool m_bAnimatePlus;        /**< true if the animation is going from lower to higher alpha, false if decreasing */
+	bool m_bShowPanels;         /**< true if the panels should be displayed on the foil surface */
+	bool m_bType1;              /**< true if the type 1 polars are to be displayed in the graphs */
+	bool m_bType2;              /**< true if the type 2 polars are to be displayed in the graphs */
+	bool m_bType3;              /**< true if the type 3 polars are to be displayed in the graphs */
+	bool m_bType4;              /**< true if the type 4 polars are to be displayed in the graphs */
+	bool m_bAutoInitBL;         /**< true if the BL initialization is left to the code's decision */
+	bool m_bTrans;              /**< true if the user is dragging a view */
+	bool m_bTransGraph;         /**< true if the user is dragging a graph */
+	bool m_bFromList;           /**< true if the batch analysis is based on a list of Re values */
+	bool m_bFromZero;           /**< true if the batch analysis should start from Alpha=0 */
+	bool m_bShowTextOutput;     /**< true if the batch analysis should display text result output */
+	bool m_bNeutralLine;        /**< true if the neutral line should be displayed */
+	bool m_bCurOppOnly;         /**< true if only the current operating point should be displayed */
+	bool m_bShowInviscid;       /**< true if the inviscid results should be displayed */
+	bool m_bCpGraph;            /**< true if the Cp graph should be displayed */
+	bool m_bSequence;           /**< true if a sequential analysis is to be performed */
+	bool m_bXPressed;           /**< true if the 'X' key is pressed */
+	bool m_bYPressed;           /**< true if the 'Y' key is pressed */
+	bool m_bHighlightOpp;       /**< true if the active operating point should be highlighted on the curves of the polar graphs */
 
-	int m_posAnimate;          /**< the current aoa in the animation */
-	int m_XFoilVar;            /**< defines the variable for current XFoil results */
-	int m_IterLim;             /**< max iteratio limit for XFoil */
+	int m_posAnimate;           /**< the current aoa in the animation */
+	int m_XFoilVar;             /**< defines the variable for current XFoil results */
+	int m_IterLim;              /**< max iteratio limit for XFoil */
 
-	int m_iPlrGraph;           /**< defines whch polar graph is selected if m_iPlrView=1 */
+	int m_iPlrGraph;            /**< defines whch polar graph is selected if m_iPlrView=1 */
 	enumPolarGraphView m_iPlrView;  /**< defines the number of graphs to be displayed in the polar view */
-	int m_FoilYPos;            /**< y position for the foil display, in pixels from the bottom of the screen */
+	int m_FoilYPos;             /**< y position for the foil display, in pixels from the bottom of the screen */
 
 	double m_fFoilScale;        /**< the scale for foil display*/
 	double m_ReList[30];        /**< the user-defined list of Re numbers, used for batch analysis */
@@ -341,9 +341,9 @@ private:
 	Polar* m_pCurPolar;         /**< pointer to the currently selected foil polar */
 	OpPoint* m_pCurOpp;         /**< pointer to the currently selected foil operating point */
 
-	QList<void*> *m_poaFoil;	/**< pointer to the foil object array */
-	QList<void*> *m_poaPolar;	/**< pointer to the polar object array */
-	QList<void*> *m_poaOpp;		/**< pointer to the OpPoint object array */
+	QList<void*> *m_poaFoil;    /**< pointer to the foil object array */
+	QList<void*> *m_poaPolar;   /**< pointer to the polar object array */
+	QList<void*> *m_poaOpp;     /**< pointer to the OpPoint object array */
 
 	QGraph* m_pCpGraph;         /**< a pointer to the Cp graph for the OpPoint view */
 	QGraph m_PlrGraph[MAXPOLARGRAPHS];          /**< the 5 Polar graphs */
@@ -351,7 +351,7 @@ private:
 
 	QGraph* m_pCurGraph;        /**< a pointer to the graph over which the mouse is hovering */
 
-	QFile m_XFile;		        /**< The instance of the log file to which the text output of the analysis is directed */
+	QFile m_XFile;              /**< The instance of the log file to which the text output of the analysis is directed */
 
 	static void *s_pMainFrame;  /**< a static pointer to the instance of the application's MainFrame object */
 	static void *s_p2DWidget;   /**< a static pointer to the instance of the application's central widget used for 2D drawings */
@@ -371,12 +371,12 @@ private:
 	int m_CurveStyle;           /**< the index of the style of the lines displayed in the comboboxes for the selection of curve styles*/
 	int m_CurveWidth;           /**< the width of the lines displayed in the comboboxes for the selection of curve styles*/
 	
-	QRect m_rCltRect;		    /**< the client rectangle of the central TwoDWidget */
-	QPoint m_PointDown;		    /**< the client coordinated of the last mouse left-click */
-	QPoint m_FoilOffset;		/**< the offset position for the foil display in the client area */
+	QRect m_rCltRect;           /**< the client rectangle of the central TwoDWidget */
+	QPoint m_PointDown;         /**< the client coordinated of the last mouse left-click */
+	QPoint m_FoilOffset;        /**< the offset position for the foil display in the client area */
 	QPoint m_PolarLegendOffset; /**< the offset position for the legend display in the client area */
 
-	XFoil *m_pXFoil;		    /**< a pointer to the unique instance of the XFoil object */
+	XFoil *m_pXFoil;            /**< a pointer to the unique instance of the XFoil object */
 };
 
 

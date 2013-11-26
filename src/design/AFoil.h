@@ -178,6 +178,7 @@ private:
 	bool m_bZoomYOnly;          /**< true if only the y-axis should be scaled */
 	bool m_bNeutralLine;        /**< true if the neutral line should be displayed */
 	bool m_bTrans;              /**< true if the view is being dragged by the user */
+    bool m_bSplinePoint;        /**< true if the ser is adding or removing a spline control point */
 	bool m_bLECircle;           /**< true if the leading edge circle should be displayed */
 	bool m_bStored;             /**< true if the current Picture has been stored on the Undo stack */
 	bool m_bShowLegend;         /**< true is the legend should be shown */
@@ -240,8 +241,8 @@ private:
 
 	int m_StackPos;                   /**< the current position on the Undo stack */
 	QList<SplineFoil> m_UndoStack;    /**< the stack of incremental modifications to the SplineFoil;
-										 we can't use the QStack though, because we need to access
-										 any point in the case of multiple undo operations */
+	                                       we can't use the QStack though, because we need to access
+	                                       any point in the case of multiple undo operations */
 
 	bool m_bIsImageLoaded;      /**< true if a backgruond image is loaded */
 	QPixmap m_BackImage;        /**< the QPixmap object with the background image */

@@ -1,7 +1,7 @@
 /****************************************************************************
 
-    CBody Class
-	Copyright (C) 2007-2012 Andre Deperrois adeperrois@xflr5.com
+        Body Class
+	Copyright (C) 2007-20132 Andre Deperrois adeperrois@xflr5.com
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -31,6 +31,9 @@ void *Body::s_pMainFrame;
 double Body::s_XPanelPos[300];
 
 
+/**
+*The public constructor.
+*/
 Body::Body()
 {
 	int i;
@@ -182,16 +185,28 @@ Body::Body()
 
 
 
-
+/** Creates the knot array of the spline surface */
 void Body::SetKnots()
 {
 	m_SplineSurface.SetKnots();
 }
 
 
-
+/**
+* Calculates the aerodynamic coefficients using the Cp coefficients resulting from a 3d panel analysis. 
+* @todo this function might as well be located in PanelAnalysisDlg; pros & cons are unclear.
+* @param Cp a pointer to the array of Cp coefficients
+* @param XCP the calculated x-position of the centre of pressure on the body @todo replace with a Vector
+* @param YCP the calculated y-position of the centre of pressure on the body
+* @param ZCP the calculated z-position of the centre of pressure on the body
+* @param GCm the pitching moment in N.m/q; since there is no viscous model for the body, this is just the moment of panel forces calcualted at the CoG
+* @param GRm the rolling moment in N.m/q; since there is no viscous model for the body, this is just the moment of panel forces calcualted at the CoG
+* @param GYm the yawing moment in N.m/q; since there is no viscous model for the body, this is just the moment of panel forces calcualted at the CoG
+* @param the angle of attack
+* @param the CoG position
+*/
 void Body::ComputeAero(double *Cp, double &XCP, double &YCP, double &ZCP,
-						double &GCm, double &GRm, double &GYm, double &Alpha, CVector &CoG)
+                       double &GCm, double &GRm, double &GYm, double &Alpha, CVector &CoG)
 {
 	int p;
 	double cosa, sina, PanelLift;
@@ -215,7 +230,7 @@ void Body::ComputeAero(double *Cp, double &XCP, double &YCP, double &ZCP,
 		PanelLift = PanelForce.dot(WindNormal);
 		XCP   += m_pBodyPanel[p].CollPt.x * PanelLift;
 		YCP   += m_pBodyPanel[p].CollPt.y * PanelLift;
-        ZCP   += m_pBodyPanel[p].CollPt.z * PanelLift;
+		ZCP   += m_pBodyPanel[p].CollPt.z * PanelLift;
 
 		LeverArm.Set(m_pBodyPanel[p].CollPt.x - CoG.x, m_pBodyPanel[p].CollPt.y, m_pBodyPanel[p].CollPt.z-CoG.z);
 		GeomMoment = LeverArm * PanelForce; // N.m/q
@@ -226,7 +241,10 @@ void Body::ComputeAero(double *Cp, double &XCP, double &YCP, double &ZCP,
 	}
 }
 
-
+/**
+* Copies the geometrical data from an existing Body object
+* @param pBody a pointer to the instance of the source Body object
+*/
 void Body::Duplicate(Body *pBody)
 {
 	if(!pBody) return;
@@ -252,11 +270,11 @@ void Body::Duplicate(Body *pBody)
 		m_hPanels[i] = pBody->m_hPanels[i];
 	}
 
-//	m_BodyLEPosition = pBody->m_BodyLEPosition;
-//	SetKnots();
 }
 
-
+/**
+* Exports the definition of the body to a text file. @todo replace the home-invented format by xml
+*/
 bool Body::ExportDefinition()
 {
 	MainFrame* pMainFrame = (MainFrame*)s_pMainFrame;
@@ -323,7 +341,9 @@ bool Body::ExportDefinition()
 
 }
 
-
+/**
+* Exports the surface points of the NURBS surface to a text file @todo replace the home-invented format by xml, cf. the NURBSDomDoc class.
+*/
 void Body::ExportGeometry(QTextStream &outStream, int type, double mtoUnit, int nx, int nh)
 {
 	QString strong, LengthUnit,str;
@@ -368,92 +388,31 @@ void Body::ExportGeometry(QTextStream &outStream, int type, double mtoUnit, int 
 }
 
 
-bool Body::Gauss(double *A, int n, double *B, int m)
-{
-	int row, i, j, pivot_row, k;
-	double max, dum, *pa, *pA, *A_pivot_row;
-	// for each variable find pivot row and perform forward substitution
-	pa = A;
-	for (row = 0; row < (n - 1); row++, pa += n)
-	{
-		//  find the pivot row
-		A_pivot_row = pa;
-		max = qAbs(*(pa + row));
-		pA = pa + n;
-		pivot_row = row;
-		for (i=row+1; i < n; pA+=n, i++)
-			if ((dum = qAbs(*(pA+row))) > max)
-			{
-				max = dum;
-				A_pivot_row = pA;
-				pivot_row = i;
-			}
-		if (max <= 0.0)
-			return false;                // the matrix A is singular
-
-			// and if it differs from the current row, interchange the two rows.
-
-		if (pivot_row != row) {
-			for (i = row; i < n; i++) {
-				dum = *(pa + i);
-				*(pa + i) = *(A_pivot_row + i);
-				*(A_pivot_row + i) = dum;
-			}
-			for(k=0; k<=m; k++){
-				dum = B[row+k*n];
-				B[row+k*n] = B[pivot_row+k*n];
-				B[pivot_row+k*n] = dum;
-			}
-		}
-
-		// Perform forward substitution
-		for (i = row+1; i<n; i++) {
-			pA = A + i * n;
-			dum = - *(pA + row) / *(pa + row);
-			*(pA + row) = 0.0;
-			for (j=row+1; j<n; j++) *(pA+j) += dum * *(pa + j);
-			for (k=0; k<=m; k++)
-				B[i+k*n] += dum * B[row+k*n];
-		}
-	}
-
-	// Perform backward substitution
-
-	pa = A + (n - 1) * n;
-	for (row = n - 1; row >= 0; pa -= n, row--) {
-		if ( *(pa + row) == 0.0 )
-			return false;           // matrix is singular
-		dum = 1.0 / *(pa + row);
-		for ( i = row + 1; i < n; i++) *(pa + i) *= dum;
-		for(k=0; k<=m; k++) B[row+k*n] *= dum;
-		for ( i = 0, pA = A; i < row; pA += n, i++) {
-			dum = *(pA + row);
-			for ( j = row + 1; j < n; j++) *(pA + j) -= dum * *(pa + j);
-			for(k=0; k<=m; k++)
-				B[i+k*n] -= dum * B[row+k*n];
-		}
-	}
-	return true;
-}
-
-
-
-
+/** Returns the length of the Body from nose to tail
+* @return the Body length from nose to tail
+*/
 double Body::Length()
 {
 	return qAbs(m_SplineSurface.m_pFrame.last()->m_Position.x - m_SplineSurface.m_pFrame.first()->m_Position.x);
 }
 
 
+/** Returns the position of the Body's nose
+* @return the position of the Body's nose
+*/
 CVector Body::LeadingPoint()
 {
 	return CVector(m_SplineSurface.m_pFrame[0]->m_Position.x,
-				   0.0,
-				   (m_SplineSurface.m_pFrame[0]->m_CtrlPoint.first().z + m_SplineSurface.m_pFrame[0]->m_CtrlPoint.last().z)/2.0 );
+                       0.0,
+	              (m_SplineSurface.m_pFrame[0]->m_CtrlPoint.first().z + m_SplineSurface.m_pFrame[0]->m_CtrlPoint.last().z)/2.0 );
 }
 
 
-
+/**
+* For the NURBS surface only, returns the developed length of the perimeter of a cross section
+* @param x the x-position of the cross-section for which the length is requested
+* @return the length of the cross section's perimeter
+*/
 double Body::GetSectionArcLength(double x)
 {
 	//NURBS only
@@ -475,7 +434,9 @@ double Body::GetSectionArcLength(double x)
 	return length*2.0; //to account for left side.
 }
 
-
+/**
+* Returns the position on the NURBS surface of a point defined by its u and v parameters
+*/
 void Body::GetPoint(double u, double v, bool bRight, CVector &Pt)
 {
 	m_SplineSurface.GetPoint(u, v, Pt);

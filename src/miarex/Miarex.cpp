@@ -4057,7 +4057,6 @@ void QMiarex::EditCurPlane()
 		m_bIs2DScaleSet = false;
 		SetScale();
 		OnAdjustToWing();
-        SetControls();
 
 		UpdateView();
 	}
@@ -9083,7 +9082,6 @@ void QMiarex::OnEditCurBody()
 		MainFrame::SetSaveState(false);
 		m_bIs2DScaleSet = false;
 		SetScale();
-        SetControls();
 		UpdateView();
 	}
 	else m_pCurBody->Duplicate(&memBody);
@@ -9209,7 +9207,6 @@ void QMiarex::OnEditUFO()
 		SetScale();
 		SetWGraphScale();
 		OnAdjustToWing();
-        SetControls();
 		UpdateView();
 	}
 	else
@@ -10413,7 +10410,6 @@ void QMiarex::OnNewBody()
 	{
 		AddBody(pBody);
 		MainFrame::SetSaveState(false);
-        SetControls();
 
 	}
 	else delete pBody;
@@ -10478,7 +10474,6 @@ void QMiarex::OnNewWing()
 	{
 		delete pWing;
 	}
-	SetControls();
 }
 
 
@@ -10533,7 +10528,6 @@ void QMiarex::OnNewPlane()
 	{
 		delete pPlane;
 	}
-	SetControls();
 	UpdateView();
 }
 
@@ -14724,9 +14718,9 @@ void QMiarex::SetupLayout()
 				AlphaDeltaLab->setAlignment(Qt::AlignRight);
 				AlphaMinLab->setAlignment(Qt::AlignRight);
 				AlphaMaxLab->setAlignment(Qt::AlignRight);
-				m_pctrlAlphaMin     = new DoubleEdit(0.0, 3);
-				m_pctrlAlphaMax     = new DoubleEdit(1., 3);
-				m_pctrlAlphaDelta   = new DoubleEdit(0.5, 3);
+				m_pctrlAlphaMin     = new DoubleEdit(0.0, 2);
+				m_pctrlAlphaMax     = new DoubleEdit(1., 2);
+				m_pctrlAlphaDelta   = new DoubleEdit(0.5, 2);
 
 				m_pctrlUnit1 = new QLabel(QString::fromUtf8("°"));
 				m_pctrlUnit2 = new QLabel(QString::fromUtf8("°"));

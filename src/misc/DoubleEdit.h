@@ -10,8 +10,7 @@ class DoubleEdit : public QLineEdit
 {
 public:
     DoubleEdit(QWidget *pParent=NULL);
-    DoubleEdit(double val, int decimals);
-    DoubleEdit(int decimals);
+	DoubleEdit(double val, int decimals=2);
 
 	~DoubleEdit() {delete m_pDV;}
 
@@ -20,20 +19,14 @@ public:
 
 
 	double Value(){return m_Value;}
-    void SetValue(double val)
-    {
-        m_Value = val;
-        FormatValue();
-    }
+	void SetValue(double val);
 
-    void SetValueNoFormat(double val)
-    {
-        m_Value = val;
-    }
 
-    void FormatValue();
+	void SetValueNoFormat(double val);
+
+	void FormatValue();
 	double ReadValue();
-    void SetMin(double min) {m_pDV->setBottom(min);}
+	void SetMin(double min) {m_pDV->setBottom(min);}
 	void SetMax(double max) {m_pDV->setTop(max);}
 
 

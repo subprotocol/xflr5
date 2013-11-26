@@ -810,14 +810,11 @@ void Polar::GetPolarProperties(QString &PolarProperties, bool bData)
 //	strong = QString(QObject::tr("Analysis Type")+" = %1\n").arg(m_PolarType);
 	PolarProperties.clear();
 
-	strong = QString(QObject::tr("Type")+" = %1").arg(m_PolarType);
-	if(m_PolarType==FIXEDSPEEDPOLAR)      strong += " ("+QObject::tr("Fixed speed") +")\n";
-	else if(m_PolarType==FIXEDLIFTPOLAR) strong += " ("+QObject::tr("Fixed lift") +")\n";
-	else if(m_PolarType==FIXEDAOAPOLAR) strong += " ("+QObject::tr("Fixed angle of attack") +")\n";
-	PolarProperties += strong;
 
 	if(m_PolarType==FIXEDSPEEDPOLAR)
 	{
+		strong = QObject::tr("Type")+ " 1 (" +  QObject::tr("Fixed speed") +")\n";
+		PolarProperties += strong;
 		strong = QString(QObject::tr("Reynolds number")+" = %1\n").arg(m_Reynolds,0,'f',0);
 		PolarProperties += strong;
 		strong = QString(QObject::tr("Mach number") + " = %1\n").arg(m_Mach,5,'f',2);
@@ -825,6 +822,8 @@ void Polar::GetPolarProperties(QString &PolarProperties, bool bData)
 	}
 	else if(m_PolarType==FIXEDLIFTPOLAR)
 	{
+		strong = QObject::tr("Type")+ " 2 (" +  QObject::tr("Fixed lift") +")\n";
+		PolarProperties += strong;
 		strong = QString("Re.sqrt(Cl) = %1\n").arg(m_Reynolds,0,'f',0);
 		PolarProperties += strong;
 		strong = QString("Ma.sqrt(Cl) = %1\n").arg(m_Mach,5,'f',2);
@@ -832,6 +831,8 @@ void Polar::GetPolarProperties(QString &PolarProperties, bool bData)
 	}
 	else if(m_PolarType==RUBBERCHORDPOLAR)
 	{
+		strong = QObject::tr("Type")+ " 3\n";
+		PolarProperties += strong;
 		strong = QString(QObject::tr("Re.Cl")+" = %1\n").arg(m_Reynolds,0,'f',0);
 		PolarProperties += strong;
 		strong = QString(QObject::tr("Mach number") + " = %1\n").arg(m_Mach,5,'f',2);
@@ -839,6 +840,8 @@ void Polar::GetPolarProperties(QString &PolarProperties, bool bData)
 	}
 	else if(m_PolarType==FIXEDAOAPOLAR)
 	{
+		strong = QObject::tr("Type")+ " 4 (" +  QObject::tr("Fixed angle of attack") +")\n";
+		PolarProperties += strong;
 		strong = QString(QObject::tr("Alpha")+" = %1"+QString::fromUtf8("°")+"\n").arg(m_ASpec,7,'f',2);
 		PolarProperties += strong;
 		strong = QString(QObject::tr("Mach number") + " = %1\n").arg(m_Mach,5,'f',2);

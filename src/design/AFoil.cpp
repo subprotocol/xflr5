@@ -82,9 +82,10 @@ QAFoil::QAFoil(QWidget *parent)
 	m_bZoomPlus    = false;
 	m_bZoomYOnly   = false;
 	m_bTrans       = false;
+    m_bSplinePoint = false;
 	m_bNeutralLine = true;
 	m_bScale       = true;
-	m_bLECircle      = false;
+    m_bLECircle    = false;
 	m_bShowLegend  = true;
 	m_bStored      = false;
 	m_bXDown = m_bYDown = m_bZDown = false;
@@ -1101,11 +1102,15 @@ void QAFoil::mouseReleaseEvent(QMouseEvent *event)
 	{
 		ReleaseZoom();
 	}
-	else if(m_bTrans)
-	{
-		// nothing to do
-	}
-	else 
+    else if(m_bTrans)
+    {
+        // nothing to do
+    }
+    else if(m_bSplinePoint)
+    {
+        // nothing to do
+    }
+    else
 	{
 		//we're releasing a point drag
 	   if(event->button()==Qt::LeftButton)
@@ -1117,6 +1122,7 @@ void QAFoil::mouseReleaseEvent(QMouseEvent *event)
 
 	p2DWidget->setCursor(m_hcCross);
 	m_bTrans = false;
+    m_bSplinePoint = false;
 	UpdateView();
 }
 
@@ -3064,6 +3070,7 @@ void QAFoil::OnInsertCtrlPt()
 	if(MainFrame::s_pCurFoil) return; // Action can be performed only if the spline foil is selected
 
 	CVector Real = MousetoReal(m_PointDown);
+    m_bSplinePoint = true;
 
 	if(Real.y>=0)
 	{
@@ -3095,6 +3102,8 @@ void QAFoil::OnRemoveCtrlPt()
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 
 	CVector Real = MousetoReal(m_PointDown);
+
+    m_bSplinePoint = true;
 
 	int n =  m_pSF->m_Extrados.IsControlPoint(Real, m_fScale/m_fRefScale);
 	if (n>=0)

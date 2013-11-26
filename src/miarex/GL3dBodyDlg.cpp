@@ -77,6 +77,13 @@ bool GL3dBodyDlg::s_bWindowMaximized=false;
 
 QList <void*> *GL3dBodyDlg::s_poaBody;
 
+bool GL3dBodyDlg::s_bAxes = true;
+bool GL3dBodyDlg::s_bOutline = true;
+bool GL3dBodyDlg::s_bSurfaces = true;
+bool GL3dBodyDlg::s_bShowMasses = false;
+bool GL3dBodyDlg::s_bVLMPanels = false;
+
+
 GL3dBodyDlg::GL3dBodyDlg(QWidget *pParent): QDialog(pParent)
 {
 	setWindowTitle(tr("Body Edition"));
@@ -828,12 +835,6 @@ void GL3dBodyDlg::GLDrawBodyFrameScale()
 
     double unit = s_BodyGridDlg->m_Unit2 * MainFrame::s_mtoUnit;
 
-	QFontMetrics fm(MainFrame::s_TextFont);
-	double LabelWidth;
-	double h2 = (double)m_3dWidget.geometry().height() /2.0;
-	double w2 = (double)m_3dWidget.geometry().width()  /2.0;
-	if(w2>h2) LabelWidth = (double)fm.width("-12.34") / w2;
-	else      LabelWidth = (double)fm.width("-12.34") /h2;
 
 	glEnable(GL_DEPTH_TEST);
 	glDisable (GL_LINE_STIPPLE);
@@ -929,13 +930,6 @@ void GL3dBodyDlg::GLDrawBodyLineScale()
 
     double unit = s_BodyGridDlg->m_Unit * MainFrame::s_mtoUnit;
 
-	QFontMetrics fm(MainFrame::s_TextFont);
-	double LabelWidth;
-	double h2 = (double)m_3dWidget.geometry().height() /2.0;
-	double w2 = (double)m_3dWidget.geometry().width()  /2.0;
-	if(w2>h2) LabelWidth = (double)fm.width("-12.34") / w2;
-	else      LabelWidth = (double)fm.width("-12.34") /h2;
-
 	glEnable(GL_DEPTH_TEST);
 	glDisable (GL_LINE_STIPPLE);
 
@@ -1028,7 +1022,7 @@ void GL3dBodyDlg::GLCreateBodyGrid()
 	int style = W3dPrefsDlg::s_3DAxisStyle;
 	int MaxLines = 150;
 	int start = 0;
-	if(QMiarex::s_bAxes) start = 1;
+	if(GL3dBodyDlg::s_bAxes) start = 1;
 
 	glNewList(BODYFRAMEGRID,GL_COMPILE);
 	{
@@ -1037,7 +1031,7 @@ void GL3dBodyDlg::GLCreateBodyGrid()
 		glEnable(GL_DEPTH_TEST);
 		glEnable (GL_LINE_STIPPLE);
 
-		if(QMiarex::s_bAxes)
+		if(GL3dBodyDlg::s_bAxes)
 		{
 			// Frame axis____________
 			glColor3d(W3dPrefsDlg::s_3DAxisColor.redF(), W3dPrefsDlg::s_3DAxisColor.greenF(), W3dPrefsDlg::s_3DAxisColor.blueF());
@@ -1192,7 +1186,7 @@ void GL3dBodyDlg::GLCreateBodyGrid()
 		glEnable(GL_DEPTH_TEST);
 		glEnable (GL_LINE_STIPPLE);
 
-		if(QMiarex::s_bAxes)
+		if(GL3dBodyDlg::s_bAxes)
 		{
 			// Frame axis____________
 			glColor3d(W3dPrefsDlg::s_3DAxisColor.redF(), W3dPrefsDlg::s_3DAxisColor.greenF(), W3dPrefsDlg::s_3DAxisColor.blueF());
@@ -1643,7 +1637,7 @@ void GL3dBodyDlg::GLRenderBody()
 			glScaled(m_glScaled, m_glScaled, m_glScaled);
 			glTranslated(m_glRotCenter.x, m_glRotCenter.y, m_glRotCenter.z);
 
-			if(QMiarex::s_bAxes)  m_3dWidget.GLDrawAxes(1.0, W3dPrefsDlg::s_3DAxisColor, W3dPrefsDlg::s_3DAxisStyle, W3dPrefsDlg::s_3DAxisWidth);
+			if(GL3dBodyDlg::s_bAxes)  m_3dWidget.GLDrawAxes(1.0, W3dPrefsDlg::s_3DAxisColor, W3dPrefsDlg::s_3DAxisStyle, W3dPrefsDlg::s_3DAxisWidth);
 
 
 			if(m_bglLight)
@@ -1656,14 +1650,14 @@ void GL3dBodyDlg::GLRenderBody()
 				glDisable(GL_LIGHT0);
 			}
 
-			if(QMiarex::s_bSurfaces && m_pBody)	glCallList(BODYGEOMBASE);
+			if(GL3dBodyDlg::s_bSurfaces && m_pBody)	glCallList(BODYGEOMBASE);
 
 			glDisable(GL_LIGHTING);
 			glDisable(GL_LIGHT0);
 
-            if(m_pBody && m_pFrame && (QMiarex::s_bOutline||QMiarex::s_bSurfaces)) glCallList(BODYFRAME3D);
-            if(QMiarex::s_bOutline && m_pBody)	glCallList(BODYGEOMBASE+MAXBODIES);
-			if(QMiarex::s_bVLMPanels && m_pBody)
+			if(m_pBody && m_pFrame && (GL3dBodyDlg::s_bOutline||GL3dBodyDlg::s_bSurfaces)) glCallList(BODYFRAME3D);
+			if(GL3dBodyDlg::s_bOutline && m_pBody)	glCallList(BODYGEOMBASE+MAXBODIES);
+			if(GL3dBodyDlg::s_bVLMPanels && m_pBody)
             {
                 glCallList(BODYMESHBASE);
                 glCallList(BODYMESHBASE+MAXBODIES);
@@ -1674,7 +1668,7 @@ void GL3dBodyDlg::GLRenderBody()
 			glDisable(GL_CLIP_PLANE3);
 			glDisable(GL_CLIP_PLANE4);
 
-            if(QMiarex::s_bShowMasses) GLDrawMasses();
+			if(GL3dBodyDlg::s_bShowMasses) GLDrawMasses();
 		}
 		glPopMatrix();
 
@@ -2299,7 +2293,7 @@ void GL3dBodyDlg::On3DPickCenter()
 
 void GL3dBodyDlg::OnAxes()
 {
-	QMiarex::s_bAxes = m_pctrlAxes->isChecked();
+	GL3dBodyDlg::s_bAxes = m_pctrlAxes->isChecked();
 //	m_bResetglBody2D = true;
 	UpdateView();
 }
@@ -2628,7 +2622,7 @@ void GL3dBodyDlg::OnLight()
 
 void GL3dBodyDlg::OnShowMasses()
 {
-	QMiarex::s_bShowMasses = m_pctrlShowMasses->isChecked();
+	GL3dBodyDlg::s_bShowMasses = m_pctrlShowMasses->isChecked();
 	UpdateView();
 }
 
@@ -2676,14 +2670,14 @@ void GL3dBodyDlg::OnOK()
 
 void GL3dBodyDlg::OnOutline()
 {
-	QMiarex::s_bOutline = m_pctrlOutline->isChecked();
+	GL3dBodyDlg::s_bOutline = m_pctrlOutline->isChecked();
 	UpdateView();
 }
 
 
 void GL3dBodyDlg::OnPanels()
 {
-	QMiarex::s_bVLMPanels = m_pctrlPanels->isChecked();
+	GL3dBodyDlg::s_bVLMPanels = m_pctrlPanels->isChecked();
 	UpdateView();
 }
 
@@ -2943,7 +2937,7 @@ void GL3dBodyDlg::OnShowCurFrameOnly()
 
 void GL3dBodyDlg::OnSurfaces()
 {
-	QMiarex::s_bSurfaces = m_pctrlSurfaces->isChecked();
+	GL3dBodyDlg::s_bSurfaces = m_pctrlSurfaces->isChecked();
 	UpdateView();
 }
 
@@ -3171,15 +3165,15 @@ void GL3dBodyDlg::SetControls()
 {
 	m_pctrlBodyName->setEnabled(m_bEnableName);
 
-	m_pctrlOutline->setChecked(QMiarex::s_bOutline);
-	m_pctrlPanels->setChecked(QMiarex::s_bVLMPanels);
-	m_pctrlAxes->setChecked(QMiarex::s_bAxes);
+	m_pctrlOutline->setChecked(GL3dBodyDlg::s_bOutline);
+	m_pctrlPanels->setChecked(GL3dBodyDlg::s_bVLMPanels);
+	m_pctrlAxes->setChecked(GL3dBodyDlg::s_bAxes);
 	m_pctrlLight->setChecked(m_bglLight);
-	m_pctrlShowMasses->setChecked(QMiarex::s_bShowMasses);
-	m_pctrlSurfaces->setChecked(QMiarex::s_bSurfaces);
-	m_pctrlOutline->setChecked(QMiarex::s_bOutline);
+	m_pctrlShowMasses->setChecked(GL3dBodyDlg::s_bShowMasses);
+	m_pctrlSurfaces->setChecked(GL3dBodyDlg::s_bSurfaces);
+	m_pctrlOutline->setChecked(GL3dBodyDlg::s_bOutline);
 	m_pctrlClipPlanePos->setValue((int)(m_ClipPlanePos*100.0));
-	m_pctrlSurfaces->setChecked(QMiarex::s_bSurfaces);
+	m_pctrlSurfaces->setChecked(GL3dBodyDlg::s_bSurfaces);
 
 	m_pctrlPanelBunch->setSliderPosition((int)(m_pBody->m_Bunch*100.0));
 

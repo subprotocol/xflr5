@@ -178,7 +178,7 @@ MainFrame::MainFrame(QWidget * parent, Qt::WindowFlags flags)
 
 	m_GraphExportFilter = "Comma Separated Values (*.csv)";
 
-	s_LastDirName = QDir::homePath();
+	s_LastDirName = QDir::homePath();  /**@todo set by default to user directory */
 
 	QAFoil *pAFoil       = (QAFoil*)m_pAFoil;
 	QXDirect *pXDirect   = (QXDirect*)m_pXDirect;
@@ -997,19 +997,19 @@ void MainFrame::CreateDockWindows()
 	BatchThreadDlg::s_pMainFrame   = this;
 	GraphDlg::s_pMainFrame         = this;
 
-    m_pctrlXDirectWidget = new QDockWidget("XDirect", this);
+    m_pctrlXDirectWidget = new QDockWidget(tr("Foil analysis"), this);
 	m_pctrlXDirectWidget->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
 	addDockWidget(Qt::RightDockWidgetArea, m_pctrlXDirectWidget);
 
-	m_pctrlXInverseWidget = new QDockWidget("XInverse", this);
+    m_pctrlXInverseWidget = new QDockWidget(tr("Inverse design"), this);
 	m_pctrlXInverseWidget->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
 	addDockWidget(Qt::RightDockWidgetArea, m_pctrlXInverseWidget);
 
-	m_pctrlMiarexWidget = new QDockWidget("Miarex", this);
+	m_pctrlMiarexWidget = new QDockWidget(tr("Plane analysis"), this);
 	m_pctrlMiarexWidget->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
 	addDockWidget(Qt::RightDockWidgetArea, m_pctrlMiarexWidget);
 
-	m_pctrlAFoilWidget = new QDockWidget("AFoil", this);
+    m_pctrlAFoilWidget = new QDockWidget(tr("Direct design"), this);
 	m_pctrlAFoilWidget->setAllowedAreas(Qt::BottomDockWidgetArea | Qt::TopDockWidgetArea);
 	addDockWidget(Qt::BottomDockWidgetArea, m_pctrlAFoilWidget);
 
@@ -3713,8 +3713,8 @@ void MainFrame::OnExportCurGraph()
 	pGraph->GetGraphName(FileName);
 	FileName.replace("/", " ");
 	FileName = QFileDialog::getSaveFileName(this, tr("Export Graph"), m_ExportLastDirName,
-											tr("Text File (*.txt);;Comma Separated Values (*.csv)"),
-											&m_GraphExportFilter);
+	                                        tr("Text File (*.txt);;Comma Separated Values (*.csv)"),
+	                                        &m_GraphExportFilter);
 	if(!FileName.length()) return;
 
 	int pos;
@@ -3772,9 +3772,9 @@ void MainFrame::OnInsertProject()
 	pMiarex->m_bArcball = false;
 
 	PathName = QFileDialog::getOpenFileName(this, tr("Open File"),
-											s_LastDirName,
-											tr("Project file (*.wpa)"));
-	if(!PathName.length())		return;
+	                                        s_LastDirName,
+	                                        tr("Project file (*.wpa)"));
+	if(!PathName.length()) return;
 	int pos = PathName.lastIndexOf("/");
 	if(pos>0) s_LastDirName = PathName.left(pos);
 

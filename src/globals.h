@@ -56,7 +56,7 @@ void ReadValues(QString line, int &res, double &x, double &y, double &z);
 void ExpFormat(double &f, int &exp);
 void ReynoldsFormat(QString &str, double f);
 
-bool Gauss(double *A, int n, double *B, int m, bool *pbCancel);
+bool Gauss(double *A, int n, double *B, int m, bool *pbCancel=NULL);
 
 void GetSpeedUnit(QString &str, int unit);
 void GetWeightUnit(QString &str, int unit);

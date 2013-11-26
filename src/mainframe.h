@@ -228,27 +228,26 @@ public:
 /*___________________________________________Variables_______________________________*/
 
 private:
-	//the dialog boxes are declared as member variables to enable translations... seems to be a Qt bug
-//	DisplaySettingsDlg *m_pDisplaySettingsDlg;
+	/**  the dialog boxes are declared as member variables to enable translations... seems to be a Qt bug @todo restore on the stack */
 	SaveOptionsDlg *m_pSaveOptionsDlg;
 	TranslatorDlg *m_pTranslatorDlg;
-    RenameDlg *m_pRenameDlg;
-    UnitsDlg *m_pUnitsDlg;
+	RenameDlg *m_pRenameDlg;
+	UnitsDlg *m_pUnitsDlg;
 
-	void *m_pAFoil;     /**< A void pointer to the instance of the QAFoil application. The pointer will be cast to the QAFoil type at runtime. This is necessary to prevent loop includes of header files. */
-	void *m_pMiarex;    /**< A void pointer to the instance of the QMiarex application. The pointer will be cast to the QMiarex type at runtime. This is necessary to prevent loop includes of header files. */
-	void *m_pXInverse;  /**< A void pointer to the instance of the QXInverse application. The pointer will be cast to the QXInverse type at runtime. This is necessary to prevent loop includes of header files. */
-	void *m_pXDirect;   /**< A void pointer to the instance of the QXDirect application. The pointer will be cast to the QXDirect type at runtime. This is necessary to prevent loop includes of header files. */
-	void *m_pStabView;  /** < A void pointer to the instance of the StabViewDlg window. */
-	
-	static QPointer<MainFrame> _self;  /**< @todo need to discuss this one with Francesco */
+	void *m_pAFoil;            /**< A void pointer to the instance of the QAFoil application. The pointer will be cast to the QAFoil type at runtime. This is necessary to prevent loop includes of header files. */
+	void *m_pMiarex;           /**< A void pointer to the instance of the QMiarex application. The pointer will be cast to the QMiarex type at runtime. This is necessary to prevent loop includes of header files. */
+	void *m_pXInverse;         /**< A void pointer to the instance of the QXInverse application. The pointer will be cast to the QXInverse type at runtime. This is necessary to prevent loop includes of header files. */
+	void *m_pXDirect;          /**< A void pointer to the instance of the QXDirect application. The pointer will be cast to the QXDirect type at runtime. This is necessary to prevent loop includes of header files. */
+	void *m_pStabView;         /**< A void pointer to the instance of the StabViewDlg window. */
 
-	QTranslator m_Translator;
+	static QPointer<MainFrame> _self;  /**< required for the construction of the macOS application */
+
+    QTranslator m_Translator;  /**< the translator object; due to a Qt bug, need to load twice: once from the main function, once from the mainframe */
 
 
 	QStackedWidget *m_pctrlCentralWidget;  /** The stacked widget which is loaded at the center of the display area. The stack holds one TwoDWidget and one ThreeDWidget and sxwitches between the two depending on the user's request. */
-	TwoDWidget *m_p2DWidget;        /** A pointer to the instance of the TwoDWidget which is used to perform 2d drawings */
-	ThreeDWidget   *m_pGLWidget;  /** A pointer to the instance of the ThreeDWidget which is used to perform all 3D drawings */
+	TwoDWidget *m_p2DWidget;               /** A pointer to the instance of the TwoDWidget which is used to perform 2d drawings */
+	ThreeDWidget *m_pGLWidget;             /** A pointer to the instance of the ThreeDWidget which is used to perform all 3D drawings */
 
 	QDockWidget *m_pctrlXDirectWidget, *m_pctrlMiarexWidget, *m_pctrlAFoilWidget, *m_pctrlXInverseWidget;
 	QDockWidget *m_pctrl3DScalesWidget, *m_pctrlStabViewWidget;
@@ -343,8 +342,6 @@ private:
 	QAction *exporttoAVL, *resetWingScale, *scaleWingAct;
 	QAction *ManageUFOs;
 	QAction *m_pImportWPolar, *m_pUFOInertia;
-//	QToolButton *m_pctrl3dView, *m_pctrlWPolarView, *m_pctrlWOppView, *m_pctrlCpView;
-//	QToolButton *m_pctrlStabilityButton, *m_pctrlRootLocusButton;//, *m_pctrlModalViewButton;
 
 
 	//XDirect Actions
@@ -386,7 +383,7 @@ private:
 
 
 	static QList <void *> m_oaFoil;    /**< The array of void pointers to the Foil objects. */
-	QList <void *> m_oaPolar;   /**< The array of void pointers to the foil Polar objects. */
+	QList <void *> m_oaPolar;   /**< The array of void pointers to the foil Polar objects. @todo make static*/
 	QList <void *> m_oaOpp;     /**< The array of void pointers to the foil operating point objects. */
 	QList <void *> m_oaPlane;   /**< The array of void pointers to the Plane objects. */
 	QList <void *> m_oaWing;    /**< The array of void pointers to the Wing objects. */
@@ -396,57 +393,58 @@ private:
 	QList <void *> m_oaBody;    /**< The array of void pointers to the Body objects. */
 
 
-	enumApp m_iApp;                 /**< The identification number of the active app. */
+	enumApp m_iApp;                            /**< the identification number of the active app. */
 
-	static bool s_bSaved;       /**< true if the project has not been modified since the last save operation. */
-	bool m_bSaveOpps;           /**< true if foil operating points should be serialized in the project file */
-	bool m_bSaveWOpps;          /**< true if wing operating points should be serialized in the project file */
-	bool m_bSaveSettings;       /**< true if user-defined settings should be saved on exit. */
-	bool m_bHighlightOpp;       /**< true if the active OpPoint should be highlighted on the polar curve. */
-	bool m_bHighlightWOpp;      /**< true if the active WingOpp should be highlighted on the polar curve. */
+	static bool s_bSaved;                      /**< true if the project has not been modified since the last save operation. */
+	bool m_bSaveOpps;                          /**< true if foil operating points should be serialized in the project file @todo make static */
+	bool m_bSaveWOpps;                         /**< true if wing operating points should be serialized in the project file @todo make static */
+	bool m_bSaveSettings;                      /**< true if user-defined settings should be saved on exit. */
+	bool m_bHighlightOpp;                      /**< true if the active OpPoint should be highlighted on the polar curve. @todo make static */
+	bool m_bHighlightWOpp;                     /**< true if the active WingOpp should be highlighted on the polar curve. @todo make static */
 
 
-	QString m_LanguageFilePath;
-	QString m_ExportLastDirName, m_ImageDirName;
-	QString m_FileName;         /**< The absolute path to the file of the current project. */
+	QString m_LanguageFilePath;                /**< the absolute path to the directory containing the translated strings @todo make static */
+	QString m_ExportLastDirName;               /**< the absolute path to the directory where the last object was exported. @todo make static */
+    QString m_ImageDirName;                    /**< the absolute path to the directory where the last screenshot was exported. @todo make static */
+	QString m_FileName;                        /**< the absolute path to the file of the current project. @todo make static */
 
-	QList <QColor> m_ColorList;
+	QList <QColor> m_ColorList;                /**< the default list of colors for graph display @todo read from file, or store to settings */
 
-	QGraph m_RefGraph;//Reference setttings
-	QString m_GraphExportFilter;
+	QGraph m_RefGraph;                         /**< a virtual graph, used to store default graph settings for all applications @todo make static */
+	QString m_GraphExportFilter;               /**< a Qstring which holds the extension of the type of file used for the export of graph data; can be either .csv or .txt @todo make static, and use enumeration */
 
-	enumImageFormat m_ImageFormat;   /**< The index of the type of image file which should be used. */
+	enumImageFormat m_ImageFormat;             /**< the index of the type of image file which should be used. */
 
 public:
-	static Foil *s_pCurFoil;
+	static Foil *s_pCurFoil;                   /**< a static pointer to the active foil object; is declared as a member of the MainFrame instance to enable common selection across inverse design, direct design and foil analysis*/
 
-	static bool s_bTrace;
-	static bool s_bReverseZoom;        /**< true if the rolling forward zooms in rather than out. */
-	static QFile *s_pTraceFile;
-	static QString s_ProjectName;      /**< The Project's name. */
-	static QString s_LastDirName;
+	static QFile *s_pTraceFile;                /**< a static pointer to the QFile object to which messages from the Trace command are output; the file is located in the user's temporary directory */
+	static bool s_bTrace;                      /**< set to true to enable output to text file of debug messages; use the Trace() functions for output; used for the debugging of release versions running outside the debugger*/
+	static bool s_bReverseZoom;                /**< true if the rolling forward zooms in rather than out. */
+	static QString s_ProjectName;              /**< the Project's name. */
+	static QString s_LastDirName;              /**< the path to the directory from which the last file was loaded or saved */
 
-	static QFont s_TextFont;
-	static QColor s_TextColor;
-	static QColor s_BackgroundColor;
-	static bool s_bAlphaChannel;  /**< true if transparency is enabled for 3D displays. */
-	static QString s_VersionName;
+	static QFont s_TextFont;                   /**< the QFont object used throughout the program for display */
+	static QColor s_TextColor;                 /**< the text color used throughout the progra */
+	static QColor s_BackgroundColor;           /**< the background color of the 2d and 3d widgets */
+	static bool s_bAlphaChannel;               /**< true if transparency is enabled for 3D displays. */
+	static QString s_VersionName;              /**< the version name of the program */
 	static enumTextFileType s_ExportFileType;  /**< Defines if the list separator for the output text files should be a space or a comma. */
 
-	static double s_mtoUnit;    /**< Conversion factor from meters to the user selected length unit. */
-	static double s_mstoUnit;   /**< Conversion factor from m/s to the user selected speed unit. */
-	static double s_m2toUnit;   /**< Conversion factor from square meters to the user selected area unit. */
-	static double s_kgtoUnit;   /**< Conversion factor from kg to the user selected mass unit. */
-	static double s_NtoUnit;    /**< Conversion factor from Newtons to the user selected force unit. */
-	static double s_NmtoUnit;   /**< Conversion factor from N.m to the user selected unit for moments. */
-	static int s_LengthUnit;    /**< The index of the user selected unit in the array of length units. @todo use an enumeration instead. */
-	static int s_AreaUnit;      /**< The index of the user selected unit in the array of area units. */
-	static int s_WeightUnit;    /**< The index of the user selected unit in the array of mass units. */
-	static int s_SpeedUnit;     /**< The index of the user selected unit in the array of speed units. */
-	static int s_ForceUnit;     /**< The index of the user selected unit in the array of force units. */
-	static int s_MomentUnit;    /**< The index of the user selected unit in the array of moment units. */
+	static double s_mtoUnit;                   /**< Conversion factor from meters to the user selected length unit. */
+	static double s_mstoUnit;                  /**< Conversion factor from m/s to the user selected speed unit. */
+	static double s_m2toUnit;                  /**< Conversion factor from square meters to the user selected area unit. */
+	static double s_kgtoUnit;                  /**< Conversion factor from kg to the user selected mass unit. */
+	static double s_NtoUnit;                   /**< Conversion factor from Newtons to the user selected force unit. */
+	static double s_NmtoUnit;                  /**< Conversion factor from N.m to the user selected unit for moments. */
+	static int s_LengthUnit;                   /**< the index of the user selected unit in the array of length units. @todo use an enumeration instead. */
+	static int s_AreaUnit;                     /**< the index of the user selected unit in the array of area units. */
+	static int s_WeightUnit;                   /**< the index of the user selected unit in the array of mass units. */
+	static int s_SpeedUnit;                    /**< the index of the user selected unit in the array of speed units. */
+	static int s_ForceUnit;                    /**< the index of the user selected unit in the array of force units. */
+	static int s_MomentUnit;                   /**< the index of the user selected unit in the array of moment units. */
 
-	void *m_pGL3DScales;
+    void *m_pGL3DScales;       /**< A void pointer to the 3Dscales widget @todo check usage, check if static is an option */
 
 };
 
