@@ -1029,8 +1029,8 @@ void Wing::ComputeChords(int NStation, double *chord, double *offset, double *tw
 
 
 /**
-* Copies the geometrical data from an existing Wing
-* @param pWing a pointer to the instance of the source Wing object
+* Copies the gemetrical data from an existing Wing
+*@param pWing a pointer to the instance of the source Wing object
 */
 void Wing::Duplicate(Wing *pWing)
 {
@@ -2509,8 +2509,6 @@ void Wing::PanelComputeViscous(double QInf, double Alpha, WPolar *pWPolar, doubl
 
 	WingVDrag = 0.0;
 
-	QMiarex *pMiarex = (QMiarex*)s_pMiarex;
-
 	bOutRe = bError = bPointOutRe = bPointOutCl = false;
 
 	GetLengthUnit(strLength, MainFrame::s_LengthUnit);
@@ -2537,13 +2535,13 @@ void Wing::PanelComputeViscous(double QInf, double Alpha, WPolar *pWPolar, doubl
 			bPointOutCl = false;
 			m_Surface[j].GetC4(k, PtC4, tau);
 
-			m_PCd[m]    = GetVar(pMiarex->m_poaPolar, 2, m_Surface[j].m_pFoilA, m_Surface[j].m_pFoilB, m_Re[m], m_Cl[m], tau, bOutRe, bError);
+            m_PCd[m]    = GetVar(2, m_Surface[j].m_pFoilA, m_Surface[j].m_pFoilB, m_Re[m], m_Cl[m], tau, bOutRe, bError);
 			bPointOutRe = bOutRe || bPointOutRe;
 			if(bError) bPointOutCl = true;
-			m_XTrTop[m] = GetVar(pMiarex->m_poaPolar, 5, m_Surface[j].m_pFoilA, m_Surface[j].m_pFoilB, m_Re[m], m_Cl[m], tau, bOutRe, bError);
+            m_XTrTop[m] = GetVar(5, m_Surface[j].m_pFoilA, m_Surface[j].m_pFoilB, m_Re[m], m_Cl[m], tau, bOutRe, bError);
 			bPointOutRe = bOutRe || bPointOutRe;
 			if(bError) bPointOutCl = true;
-			m_XTrBot[m] = GetVar(pMiarex->m_poaPolar, 6, m_Surface[j].m_pFoilA, m_Surface[j].m_pFoilB, m_Re[m], m_Cl[m], tau, bOutRe, bError);
+            m_XTrBot[m] = GetVar(6, m_Surface[j].m_pFoilA, m_Surface[j].m_pFoilB, m_Re[m], m_Cl[m], tau, bOutRe, bError);
 			bPointOutRe = bOutRe || bPointOutRe;
 			if(bError) bPointOutCl = true;
 			if(bPointOutCl)

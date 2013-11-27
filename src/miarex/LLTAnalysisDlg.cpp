@@ -506,7 +506,7 @@ void LLTAnalysisDlg::StartAnalysis()
 
 	m_pctrlTextOutput->clear();
 
-	m_LLT.m_poaPolar = &pMainFrame->m_oaPolar;
+	m_LLT.m_poaPolar = &pMainFrame->s_oaPolar;
 	m_LLT.m_pWing = m_pWing;
 	m_LLT.m_pWPolar = m_pWPolar;
 	m_LLT.LLTInitialize(m_pWPolar->m_QInf);

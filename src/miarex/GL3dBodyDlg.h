@@ -153,8 +153,8 @@ private:
 	void UpdateView();
 
 	bool InitDialog(Body *pBody);
-    static bool LoadSettings(QSettings *pSettings);
-    static bool SaveSettings(QSettings *pSettings);
+	bool LoadSettings(QSettings *pSettings);
+	bool SaveSettings(QSettings *pSettings);
 
 	void ResizeTables();
 
@@ -177,11 +177,6 @@ private:
 	static QSize  s_WindowSize;
 	static bool s_bWindowMaximized;
 
-	static bool s_bOutline;                   /**< true if the surface outlines are to be displayed in the 3D view*/
-	static bool s_bSurfaces;                  /**< true if the surfaces are to be displayed in the 3D view*/
-	static bool s_bVLMPanels;                 /**< true if the panels are to be displayed in the 3D view*/
-	static bool s_bAxes;                      /**< true if the axes are to be displayed in the 3D view*/
-	static bool s_bShowMasses;                /**< true if the point masses are to be displayed on the openGL 3D view */
 
 	QWidget *m_pctrlControlsWidget;
 
@@ -201,7 +196,7 @@ private:
 
 	QRadioButton *m_pctrlFlatPanels, *m_pctrlBSplines;
 	LineBtn *m_pctrlBodyStyle;
-	DoubleEdit *m_pctrlNXPanels, *m_pctrlNHoopPanels;
+    DoubleEdit *m_pctrlNXPanels, *m_pctrlNHoopPanels;
 	QComboBox *m_pctrlXDegree, *m_pctrlHoopDegree;
 	QPushButton *m_pctrlMenuButton;
 	QMenu *BodyMenu;
@@ -233,7 +228,7 @@ private:
 	Panel *m_pPanel;
 	CVector *m_pNode;
 
-    static BodyGridDlg *s_BodyGridDlg;
+    BodyGridDlg *m_BodyGridDlg;
 
 	static QList<void*> *s_poaBody;
 

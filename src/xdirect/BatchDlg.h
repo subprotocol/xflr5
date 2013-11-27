@@ -90,9 +90,9 @@ protected:
 	QRadioButton *m_rbtype1, *m_rbtype2, *m_rbtype3, *m_rbtype4, *m_rbRange1, *m_rbRange2;
 	QRadioButton *m_rbspec1, *m_rbspec2;
 	QPushButton *m_pctrlEditList;
-	DoubleEdit *m_pctrlReMin, *m_pctrlReMax, *m_pctrlReDelta, *m_pctrlMach;
-	DoubleEdit *m_pctrlSpecMin, *m_pctrlSpecMax, *m_pctrlSpecDelta;
-	DoubleEdit *m_pctrlNCrit, *m_pctrlXTopTr, *m_pctrlXBotTr;
+    DoubleEdit *m_pctrlReMin, *m_pctrlReMax, *m_pctrlReDelta, *m_pctrlMach;
+    DoubleEdit *m_pctrlSpecMin, *m_pctrlSpecMax, *m_pctrlSpecDelta;
+    DoubleEdit *m_pctrlNCrit, *m_pctrlXTopTr, *m_pctrlXBotTr;
 	QLabel *m_pctrlSpecVar;
 	QLabel *m_pctrlMaType, *m_pctrlReType;
 	QCheckBox *m_pctrlInitBL, *m_pctrlFromZero, *m_pctrlStoreOpp;

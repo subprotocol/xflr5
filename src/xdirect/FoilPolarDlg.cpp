@@ -20,7 +20,7 @@
 *****************************************************************************/
 
 #include <QGroupBox>
-#include <QtDebug>
+#include <QVBoxLayout>
 #include "FoilPolarDlg.h"
 #include "../globals.h"
 #include "../mainframe.h"
@@ -49,41 +49,51 @@ void FoilPolarDlg::SetupLayout()
 {
 	QFont SymbolFont("Symbol");
 
-	QVBoxLayout *Analysis = new QVBoxLayout;
-	QHBoxLayout *autoname = new QHBoxLayout;
-	m_pctrlAuto1 = new QRadioButton(tr("Automatic"));
-	m_pctrlAuto2 = new QRadioButton(tr("User Defined"));
-	m_pctrlAnalysisName = new QLineEdit(tr("Analysis Name"));
-	autoname->addStretch(1);
-	autoname->addWidget(m_pctrlAuto1);
-	autoname->addStretch(1);
-	autoname->addWidget(m_pctrlAuto2);
-	autoname->addStretch(1);
-	Analysis->addLayout(autoname);
-	Analysis->addWidget(m_pctrlAnalysisName);
-	QGroupBox *NameGroup = new QGroupBox(tr("Analysis Name"));
-	NameGroup->setLayout(Analysis);
+    QGroupBox *NameGroupBox = new QGroupBox(tr("Analysis Name"));
+    {
+        QVBoxLayout *AnalysisLayout = new QVBoxLayout;
+        {
+            QHBoxLayout *autoname = new QHBoxLayout;
+            {
+                m_pctrlAuto1 = new QRadioButton(tr("Automatic"));
+                m_pctrlAuto2 = new QRadioButton(tr("User Defined"));
+                m_pctrlAnalysisName = new QLineEdit(tr("Analysis Name"));
+                autoname->addStretch(1);
+                autoname->addWidget(m_pctrlAuto1);
+                autoname->addStretch(1);
+                autoname->addWidget(m_pctrlAuto2);
+                autoname->addStretch(1);
+            }
+            AnalysisLayout->addLayout(autoname);
+            AnalysisLayout->addWidget(m_pctrlAnalysisName);
+        }
+        NameGroupBox->setLayout(AnalysisLayout);
+    }
 
-	QHBoxLayout *AnalysisType = new QHBoxLayout;
-	m_rbtype1 = new		QRadioButton(tr("Type 1"));
-	m_rbtype2 = new QRadioButton(tr("Type 2"));
-	m_rbtype3 = new QRadioButton(tr("Type 3"));
-	m_rbtype4 = new QRadioButton(tr("Type 4"));
-	AnalysisType->addWidget(m_rbtype1);
-	AnalysisType->addWidget(m_rbtype2);
-	AnalysisType->addWidget(m_rbtype3);
-	AnalysisType->addWidget(m_rbtype4);
-	QGroupBox *TypeGroup = new QGroupBox(tr("Analysis Type"));
-	TypeGroup->setLayout(AnalysisType);
+    QGroupBox *TypeGroup = new QGroupBox(tr("Analysis Type"));
+    {
+        QHBoxLayout *AnalysisType = new QHBoxLayout;
+        {
+            m_rbtype1 = new		QRadioButton(tr("Type 1"));
+            m_rbtype2 = new QRadioButton(tr("Type 2"));
+            m_rbtype3 = new QRadioButton(tr("Type 3"));
+            m_rbtype4 = new QRadioButton(tr("Type 4"));
+            AnalysisType->addWidget(m_rbtype1);
+            AnalysisType->addWidget(m_rbtype2);
+            AnalysisType->addWidget(m_rbtype3);
+            AnalysisType->addWidget(m_rbtype4);
+            TypeGroup->setLayout(AnalysisType);
+        }
+    }
 
 
 	//type 2 input data
 	QGroupBox *PlaneDataGroup = new QGroupBox(tr("Plane Data"));
 	{
 		QGridLayout *PlaneDataLayout = new QGridLayout;
-        m_pctrlChord = new DoubleEdit(0,3);
-        m_pctrlMass = new DoubleEdit(0,3);
-        m_pctrlSpan = new DoubleEdit(0,3);
+		m_pctrlChord = new DoubleEdit(0,3);
+		m_pctrlMass = new DoubleEdit(0,3);
+		m_pctrlSpan = new DoubleEdit(0,3);
 		QLabel *ChordLab = new QLabel(tr("Chord"));
 		QLabel *MassLab = new QLabel(tr("Mass"));
 		QLabel *SpanLab = new QLabel(tr("Span"));
@@ -108,12 +118,12 @@ void FoilPolarDlg::SetupLayout()
 		m_pctrlUnit1 = new QRadioButton(tr("International"));
 		m_pctrlUnit2 = new QRadioButton(tr("Imperial"));
 		m_pctrlRho = new QLabel("r =");
-        m_pctrlDensity = new DoubleEdit(1.225,3);
+		m_pctrlDensity = new DoubleEdit(1.225,3);
 		m_pctrlDensityUnit = new QLabel("kg/m3");
 		m_pctrlNu = new QLabel("n =");
 		m_pctrlRho->setAlignment(Qt::AlignRight | Qt::AlignCenter);
 		m_pctrlNu->setAlignment(Qt::AlignRight | Qt::AlignCenter);
-        m_pctrlViscosity = new DoubleEdit(1.500e-5,3);
+		m_pctrlViscosity = new DoubleEdit(1.500e-5,3);
 		m_pctrlViscosityUnit = new QLabel("m2/s");
 		m_pctrlRho->setFont(SymbolFont);
 		m_pctrlNu->setFont(SymbolFont);
@@ -136,74 +146,86 @@ void FoilPolarDlg::SetupLayout()
 	Type2DataLayout->addWidget(PlaneDataGroup);
 	Type2DataLayout->addWidget(AeroDataGroup);
 
-	QHBoxLayout *ReMachResultsLayout = new QHBoxLayout;
-	m_pctrlReLabel   = new QLabel(tr("  Re ="));
-	m_pctrlReLabel->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
-	m_pctrlMachLabel = new QLabel(tr("Mach ="));
-	m_pctrlMachLabel->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
-    m_pctrlReynolds = new DoubleEdit(100000.0,0);
-	m_pctrlReynolds->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
-    m_pctrlMach = new DoubleEdit(0.0, 3);
-	m_pctrlMach->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
-	ReMachResultsLayout->addWidget(m_pctrlReLabel);
-	ReMachResultsLayout->addWidget(m_pctrlReynolds);
-	ReMachResultsLayout->addStretch(1);
-	ReMachResultsLayout->addWidget(m_pctrlMachLabel);
-	ReMachResultsLayout->addWidget(m_pctrlMach);
+    QGroupBox *AeroGroup = new QGroupBox(tr("Reynolds and Mach Numbers"));
+    {
+        QVBoxLayout *ReMachLayout = new QVBoxLayout;
+        {
+            QHBoxLayout *ReMachResultsLayout = new QHBoxLayout;
+            {
+                m_pctrlReLabel   = new QLabel(tr("  Re ="));
+                m_pctrlReLabel->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+                m_pctrlMachLabel = new QLabel(tr("Mach ="));
+                m_pctrlMachLabel->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+                m_pctrlReynolds = new DoubleEdit();
+                m_pctrlReynolds->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+                m_pctrlMach = new DoubleEdit(0.0, 3);
+                m_pctrlMach->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+                ReMachResultsLayout->addWidget(m_pctrlReLabel);
+                ReMachResultsLayout->addWidget(m_pctrlReynolds);
+                ReMachResultsLayout->addStretch(1);
+                ReMachResultsLayout->addWidget(m_pctrlMachLabel);
+                ReMachResultsLayout->addWidget(m_pctrlMach);
+            }
 
-	QVBoxLayout *ReMachLayout = new QVBoxLayout;
-	ReMachLayout->addLayout(Type2DataLayout);
-	ReMachLayout->addSpacing(15);
-	ReMachLayout->addLayout(ReMachResultsLayout);
-
-	QGroupBox *AeroGroup = new QGroupBox(tr("Reynolds and Mach Numbers"));
-	AeroGroup->setLayout(ReMachLayout);
+            ReMachLayout->addLayout(Type2DataLayout);
+            ReMachLayout->addSpacing(15);
+            ReMachLayout->addLayout(ReMachResultsLayout);
+        }
+    }
 
 	QHBoxLayout *CommandButtons = new QHBoxLayout;
-	OKButton = new QPushButton(tr("OK"));
-	OKButton->setAutoDefault(false);
-	CancelButton = new QPushButton(tr("Cancel"));
-	CancelButton->setAutoDefault(false);
-	CommandButtons->addStretch(1);
-	CommandButtons->addWidget(OKButton);
-	CommandButtons->addStretch(1);
-	CommandButtons->addWidget(CancelButton);
-	CommandButtons->addStretch(1);
-	connect(OKButton, SIGNAL(clicked()),this, SLOT(OnOK()));
-	connect(CancelButton, SIGNAL(clicked()), this, SLOT(reject()));
+    {
+        OKButton = new QPushButton(tr("OK"));
+        OKButton->setAutoDefault(false);
+        CancelButton = new QPushButton(tr("Cancel"));
+        CancelButton->setAutoDefault(false);
+        CommandButtons->addStretch(1);
+        CommandButtons->addWidget(OKButton);
+        CommandButtons->addStretch(1);
+        CommandButtons->addWidget(CancelButton);
+        CommandButtons->addStretch(1);
+        connect(OKButton, SIGNAL(clicked()),this, SLOT(OnOK()));
+        connect(CancelButton, SIGNAL(clicked()), this, SLOT(reject()));
+    }
 
-	QGridLayout *Transitions = new QGridLayout;
-	QLabel *FreeTransLabel   = new QLabel(tr("Free transitions (e^n) method"));
-	QLabel *ForceTransLabel  = new QLabel(tr("Forced transition:"));
-	QLabel	*NCritLabel      = new QLabel(tr("NCrit="));
-	QLabel *TopTripLabel     = new QLabel(tr("TripLocation (top)"));
-	QLabel *BotTripLabel     = new QLabel(tr("TripLocation (bot)"));
-    m_pctrlNCrit    = new DoubleEdit();
-    m_pctrlTopTrans = new DoubleEdit();
-    m_pctrlBotTrans = new DoubleEdit();
+    QGroupBox *TransGroup = new QGroupBox(tr("Transition settings"));
+    {
+        QGridLayout *Transitions = new QGridLayout;
+        {
+            QLabel *FreeTransLabel   = new QLabel(tr("Free transitions (e^n) method"));
+            QLabel *ForceTransLabel  = new QLabel(tr("Forced transition:"));
+            QLabel	*NCritLabel      = new QLabel(tr("NCrit="));
+            QLabel *TopTripLabel     = new QLabel(tr("TripLocation (top)"));
+            QLabel *BotTripLabel     = new QLabel(tr("TripLocation (bot)"));
+            m_pctrlNCrit    = new DoubleEdit();
+            m_pctrlTopTrans = new DoubleEdit();
+            m_pctrlBotTrans = new DoubleEdit();
 
-	m_pctrlNCrit->setAlignment(   Qt::AlignRight);
-	m_pctrlTopTrans->setAlignment(Qt::AlignRight);
-	m_pctrlBotTrans->setAlignment(Qt::AlignRight);
-	Transitions->addWidget(FreeTransLabel,   1,1, 1,1, Qt::AlignLeft| Qt::AlignVCenter);
-	Transitions->addWidget(ForceTransLabel,  2,1, 1,1, Qt::AlignLeft| Qt::AlignVCenter);
-	Transitions->addWidget(NCritLabel,       1,2, 1,1, Qt::AlignRight| Qt::AlignVCenter);
-	Transitions->addWidget(TopTripLabel,     2,2, 1,1, Qt::AlignRight| Qt::AlignVCenter);
-	Transitions->addWidget(BotTripLabel,     3,2, 1,1, Qt::AlignRight| Qt::AlignVCenter);
-	Transitions->addWidget(m_pctrlNCrit,     1,3, 1,1, Qt::AlignRight| Qt::AlignVCenter);
-	Transitions->addWidget(m_pctrlTopTrans,  2,3, 1,1, Qt::AlignRight| Qt::AlignVCenter);
-	Transitions->addWidget(m_pctrlBotTrans,  3,3, 1,1, Qt::AlignRight| Qt::AlignVCenter);
-	QGroupBox *TransGroup = new QGroupBox(tr("Transition settings"));
-	TransGroup->setLayout(Transitions);
+            m_pctrlNCrit->setAlignment(   Qt::AlignRight);
+            m_pctrlTopTrans->setAlignment(Qt::AlignRight);
+            m_pctrlBotTrans->setAlignment(Qt::AlignRight);
+            Transitions->addWidget(FreeTransLabel,   1,1, 1,1, Qt::AlignLeft| Qt::AlignVCenter);
+            Transitions->addWidget(ForceTransLabel,  2,1, 1,1, Qt::AlignLeft| Qt::AlignVCenter);
+            Transitions->addWidget(NCritLabel,       1,2, 1,1, Qt::AlignRight| Qt::AlignVCenter);
+            Transitions->addWidget(TopTripLabel,     2,2, 1,1, Qt::AlignRight| Qt::AlignVCenter);
+            Transitions->addWidget(BotTripLabel,     3,2, 1,1, Qt::AlignRight| Qt::AlignVCenter);
+            Transitions->addWidget(m_pctrlNCrit,     1,3, 1,1, Qt::AlignRight| Qt::AlignVCenter);
+            Transitions->addWidget(m_pctrlTopTrans,  2,3, 1,1, Qt::AlignRight| Qt::AlignVCenter);
+            Transitions->addWidget(m_pctrlBotTrans,  3,3, 1,1, Qt::AlignRight| Qt::AlignVCenter);
+            TransGroup->setLayout(Transitions);
+        }
+    }
 
 	QVBoxLayout *mainLayout = new QVBoxLayout;
-	mainLayout->setSpacing(10);
-	mainLayout->addWidget(NameGroup);
+    {
+        mainLayout->setSpacing(10);
+        mainLayout->addWidget(NameGroupBox);
 
-	mainLayout->addWidget(TypeGroup);
-	mainLayout->addWidget(AeroGroup);
-	mainLayout->addWidget(TransGroup);
-	mainLayout->addLayout(CommandButtons);
+        mainLayout->addWidget(TypeGroup);
+        mainLayout->addWidget(AeroGroup);
+        mainLayout->addWidget(TransGroup);
+        mainLayout->addLayout(CommandButtons);
+    }
 
 	setLayout(mainLayout);
 
@@ -529,14 +551,16 @@ void FoilPolarDlg::ReadParams()
     QString str;
     str = m_pctrlReynolds->text();
     str.replace(" ","");
-    if(m_PolarType==FIXEDAOAPOLAR) m_ASpec    = m_pctrlReynolds->Value();
-    else                           m_Reynolds = m_pctrlReynolds->Value();
+	if(m_PolarType==FIXEDAOAPOLAR) m_ASpec    = str.toDouble();
+    else          m_Reynolds = str.toDouble();
 
-    m_Mach     = m_pctrlMach->Value();
+    m_Mach     = m_pctrlMach->text().toDouble();
+    m_pctrlMach->clear();
+	m_pctrlMach->insert(str.setNum(m_Mach,'f',3));
 
-    m_NCrit  = m_pctrlNCrit->Value();
-    m_XTopTr = m_pctrlTopTrans->Value();
-    m_XBotTr = m_pctrlBotTrans->Value();
+    m_NCrit  = m_pctrlNCrit->text().toDouble();
+    m_XTopTr = m_pctrlTopTrans->text().toDouble();
+    m_XBotTr = m_pctrlBotTrans->text().toDouble();
 
     m_Mass = m_pctrlMass->Value();
     m_Chord = m_pctrlChord->Value();

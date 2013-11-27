@@ -22,7 +22,7 @@
 #include "AboutQ5.h"
 #include "../mainframe.h"
 #include <QBitmap>
-
+#include <QGridLayout>
 
 AboutQ5::AboutQ5(QWidget *parent) : QDialog(parent)
 {
@@ -35,22 +35,24 @@ AboutQ5::AboutQ5(QWidget *parent) : QDialog(parent)
 void AboutQ5::SetupLayout()
 {
 	QGridLayout *LogoLayout = new QGridLayout;
-	QLabel *LabIconQ5 = new QLabel;
-	LabIconQ5->setObjectName("iconXFLR5"); 
-	LabIconQ5->setPixmap(QPixmap(QString::fromUtf8(":/images/xflr5_64.png")));
-	QLabel *lab1  = new QLabel(MainFrame::versionName());
-	lab1->setAlignment(Qt::AlignVCenter| Qt::AlignLeft);
-	QLabel *XFLR5Link = new QLabel;
-	XFLR5Link->setText("<a href=http://www.xflr5.com>http://www.xflr5.com</a>");
-	XFLR5Link->setOpenExternalLinks(true);
-	XFLR5Link->setTextInteractionFlags(Qt::LinksAccessibleByKeyboard|Qt::LinksAccessibleByMouse);
-	XFLR5Link->setAlignment(Qt::AlignVCenter| Qt::AlignLeft);
+    {
+        QLabel *LabIconQ5 = new QLabel;
+        LabIconQ5->setObjectName("iconXFLR5");
+        LabIconQ5->setPixmap(QPixmap(QString::fromUtf8(":/images/xflr5_64.png")));
+        QLabel *lab1  = new QLabel(MainFrame::versionName());
+        lab1->setAlignment(Qt::AlignVCenter| Qt::AlignLeft);
+        QLabel *XFLR5Link = new QLabel;
+        XFLR5Link->setText("<a href=http://www.xflr5.com>http://www.xflr5.com</a>");
+        XFLR5Link->setOpenExternalLinks(true);
+        XFLR5Link->setTextInteractionFlags(Qt::LinksAccessibleByKeyboard|Qt::LinksAccessibleByMouse);
+        XFLR5Link->setAlignment(Qt::AlignVCenter| Qt::AlignLeft);
 
-	LogoLayout->setColumnStretch(1,1);
-	LogoLayout->setColumnStretch(2,2);
-	LogoLayout->addWidget(LabIconQ5,1,1,2,1);
-	LogoLayout->addWidget(lab1,1,2);
-	LogoLayout->addWidget(XFLR5Link,2,2);
+        LogoLayout->setColumnStretch(1,1);
+        LogoLayout->setColumnStretch(2,2);
+        LogoLayout->addWidget(LabIconQ5,1,1,2,1);
+        LogoLayout->addWidget(lab1,1,2);
+        LogoLayout->addWidget(XFLR5Link,2,2);
+    }
 
 	QLabel *lab2  = new QLabel(tr("Copyright (C) M. Drela and H. Youngren 2000 - XFoil v6.94"));
 	QLabel *lab3  = new QLabel(tr("Copyright (C) Matthieu Scherrer 2004 - Miarex v1.00"));
@@ -69,33 +71,37 @@ void AboutQ5::SetupLayout()
 	QPushButton *OKButton = new QPushButton(tr("OK"));
 	connect(OKButton, SIGNAL(clicked()),this, SLOT(accept()));
 	QHBoxLayout *OKLayout = new QHBoxLayout;
-	OKLayout->addStretch(1);
-	OKLayout->addWidget(OKButton);
-	OKLayout->addStretch(1);
+    {
+        OKLayout->addStretch(1);
+        OKLayout->addWidget(OKButton);
+        OKLayout->addStretch(1);
+    }
 
 	QVBoxLayout *MainLayout = new QVBoxLayout;
-	MainLayout->addLayout(LogoLayout);
-	MainLayout->addStretch(1);
-	MainLayout->addWidget(lab2);
-	MainLayout->addWidget(lab3);
-	MainLayout->addWidget(lab4);
-	MainLayout->addStretch(1);
-	MainLayout->addWidget(lab11);
-	MainLayout->addWidget(lab12);
-	MainLayout->addWidget(lab13);
-	MainLayout->addWidget(lab14);
-	MainLayout->addSpacing(20);
-	MainLayout->addStretch(1);
-	MainLayout->addWidget(lab5);
-	MainLayout->addWidget(lab6);
-	MainLayout->addWidget(lab7);
-	MainLayout->addStretch(1);
-	MainLayout->addWidget(lab8);
-	MainLayout->addWidget(lab9);
-	MainLayout->addStretch(1);
-	MainLayout->addWidget(lab10);
-	MainLayout->addStretch(1);
-	MainLayout->addLayout(OKLayout);
+    {
+        MainLayout->addLayout(LogoLayout);
+        MainLayout->addStretch(1);
+        MainLayout->addWidget(lab2);
+        MainLayout->addWidget(lab3);
+        MainLayout->addWidget(lab4);
+        MainLayout->addStretch(1);
+        MainLayout->addWidget(lab11);
+        MainLayout->addWidget(lab12);
+        MainLayout->addWidget(lab13);
+        MainLayout->addWidget(lab14);
+        MainLayout->addSpacing(20);
+        MainLayout->addStretch(1);
+        MainLayout->addWidget(lab5);
+        MainLayout->addWidget(lab6);
+        MainLayout->addWidget(lab7);
+        MainLayout->addStretch(1);
+        MainLayout->addWidget(lab8);
+        MainLayout->addWidget(lab9);
+        MainLayout->addStretch(1);
+        MainLayout->addWidget(lab10);
+        MainLayout->addStretch(1);
+        MainLayout->addLayout(OKLayout);
+    }
 	setLayout(MainLayout);
 	setMinimumHeight(400);
 }

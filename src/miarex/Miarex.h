@@ -29,8 +29,11 @@
 #ifndef QMIAREX_H
 #define QMIAREX_H
 
+
+
 #include "../params.h"
 #include <QWidget>
+#include "WAdvancedDlg.h"
 #include <QPixmap>
 #include <QCheckBox>
 #include <QSlider>
@@ -39,14 +42,33 @@
 #include <QPushButton>
 #include <QRadioButton>
 #include <QList>
-#include <QLabel>
 #include <QDialog>
 #include <QDataStream>
 #include <QSettings>
 #include "../objects/ArcBall.h"
+#include "GL3dWingDlg.h"
+#include "GL3dBodyDlg.h"
+#include "GL3DScales.h"
+#include "StabViewDlg.h"
+#include "PlaneDlg.h"
+#include "WingScaleDlg.h"
+#include "InertiaDlg.h"
+#include "WPolarDlg.h"
+#include "StabPolarDlg.h"
 #include "PanelAnalysisDlg.h"
 #include "LLTAnalysisDlg.h"
+#include "ManageBodiesDlg.h"
+#include "ManageUFOsDlg.h"
+#include "../misc/UnitsDlg.h"
+#include "../misc/ModDlg.h"
+#include "../misc/RenameDlg.h"
+#include "../misc/ProgressDlg.h"
+#include "../misc/ObjectPropsDlg.h"
+#include "../misc/PolarFilterDlg.h"
+#include "../misc/W3dPrefsDlg.h"
+#include "../misc/GLLightDlg.h"
 #include "../misc/LineBtn.h"
+#include "../graph/GraphDlg.h"
 #include "../misc/DoubleEdit.h"
 #include "../misc/LineCbBox.h"
 #include "../misc/LineDelegate.h"
@@ -60,7 +82,6 @@
 #include "../objects/Foil.h"
 #include "../objects/OpPoint.h"
 #include "../graph/QGraph.h"
-
 
 /** This enumeration defines the options for the active view.
  *May be the operaring point view, the polar view, the 3D view, the Cp view, or the stability view*/
@@ -379,9 +400,25 @@ public:
 //
 
 private:
-    void *m_pWingDlg;
-    void *m_pGL3dBody;
-    void *m_pGLLightDlg;
+	//  the dialog boxes are declared as member variables to enable translations... seems to be a Qt bug
+    WAdvancedDlg *m_pWAdvancedDlg;
+    ManageBodiesDlg *m_pManageBodiesDlg;
+    ManageUFOsDlg *m_pManageUFOsDlg;
+    PolarFilterDlg *m_pPolarFilterDlg;
+	InertiaDlg     *m_pInertiaDlg;
+	PlaneDlg       *m_pPlaneDlg;
+	ModDlg         *m_pModDlg;
+	RenameDlg      *m_pRenameDlg;
+	GraphDlg       *m_pGraphDlg;
+	WingScaleDlg   *m_pWingScaleDlg;
+	W3dPrefsDlg    *m_pW3dPrefsDlg;
+	WPolarDlg      *m_pWPolarDlg;
+	StabPolarDlg   *m_pStabPolarDlg;
+	UnitsDlg       *m_pUnitsDlg;
+	ObjectPropsDlg *m_pObjectPropsDlg;
+	GL3dBodyDlg    *m_pGL3dBody;
+	GLLightDlg     *m_pGLLightDlg;
+	void    *m_pWingDlg;
 
 public:
 	LLTAnalysisDlg *m_pLLTDlg;                  /**< the dialog class which manages the LLT calculations */
@@ -391,11 +428,11 @@ public:
 	// Widget variables ... self explicit, not documented
 	QPushButton *m_pctrlKeepCpSection, *m_pctrlResetCpSection;
 	QSlider *m_pctrlCpSectionSlider;
-	DoubleEdit *m_pctrlSpanPos;
+    DoubleEdit *m_pctrlSpanPos;
 	QCheckBox *m_pctrlSequence;
-	DoubleEdit *m_pctrlAlphaMin;
-	DoubleEdit *m_pctrlAlphaMax;
-	DoubleEdit *m_pctrlAlphaDelta;
+    DoubleEdit *m_pctrlAlphaMin;
+    DoubleEdit *m_pctrlAlphaMax;
+    DoubleEdit *m_pctrlAlphaDelta;
 	QCheckBox *m_pctrlInitLLTCalc;
 	QCheckBox *m_pctrlStoreWOpp;
 	QPushButton *m_pctrlAnalyze;
@@ -446,9 +483,8 @@ public:
 	bool m_bAnimateMode;               /**< true if there is an animation going on for a Mode */
 	bool m_bAnimateWOppPlus;           /**< true if the animation is going in aoa crescending order */
 	bool m_bArcball;                   /**< true if the arcball is to be displayed */
-	bool m_bAutoCpScale;		       /**< true if the Cp scale should be set automatically */
-	bool m_bAutoScales;                /**< true if automatic scales are requested for the graphs */
-	bool m_bCrossPoint;                /**< true if the control point on the arcball is to be displayed */
+    bool m_bAutoScales;                /**< true if automatic scales are requested for the graphs */
+    bool m_bCrossPoint;                /**< true if the control point on the arcball is to be displayed */
 	bool m_bCurWOppOnly;               /**< true if only the current WOpp is to be displayed */
 	bool m_bCurFrameOnly;              /**< true if only the currently selected body frame is to be displayed */
 	bool m_bCurvePoints;               /**< true if the points of the active curve are to be displayed */
@@ -517,9 +553,11 @@ public:
 	int m_nNodes;                      /**< the number of nodes corresponding to the panel array */
 	int m_nWakeNodes;                  /**< the number of nodes in the wake */
 
-	double m_LegendMin;                /**< minimum value of the Cp scale in 3D view */
-	double m_LegendMax;                /**< maximum value of the Cp scale in 3D view */
-	double m_LiftScale;                /**< scaling factor for the lift display in 3D view */
+    static bool s_bAutoCpScale;		       /**< true if the Cp scale should be set automatically */
+    static double s_LegendMin;                /**< minimum value of the Cp scale in 3D view */
+    static double s_LegendMax;                /**< maximum value of the Cp scale in 3D view */
+
+    double m_LiftScale;                /**< scaling factor for the lift display in 3D view */
 	double m_VelocityScale;            /**< scaling factor for the velocity display in 3D view */
 	double m_DragScale;                /**< scaling factor for the drag display in 3D view */
 	double m_glScaled;                 /**< scaling factor for the object in the 3D view */
@@ -564,8 +602,6 @@ public:
 
 	Surface *m_pSurface[8*MAXSPANSECTIONS];	/**< An array holding the pointers to the wings surfaces */
 
-	QList<void *> *m_poaFoil;			/**< a pointer to the array of foil objects */
-	QList<void *> *m_poaPolar;			/**< a pointer to the array of foil polar objects */
 	QList<void *> *m_poaWing;			/**< a pointer to the array of wing objects */
 	QList<void *> *m_poaPlane;			/**< a pointer to the array of plane objects */
 	QList<void *> *m_poaWPolar;			/**< a pointer to the array of UFO polar objects */
@@ -685,45 +721,6 @@ public:
 	static int s_MaxRHSSize;
 
 public:
-	// style variables... didn't bother to document
-	int m_3DAxisStyle, m_3DAxisWidth;
-	QColor m_3DAxisColor;
-
-	int m_VLMStyle, m_VLMWidth;
-	QColor m_VLMColor;
-
-	int m_OutlineStyle, m_OutlineWidth;
-	QColor m_OutlineColor;
-
-	int m_XCPStyle, m_XCPWidth;
-	QColor m_XCPColor;
-
-	int m_MomentStyle, m_MomentWidth;
-	QColor m_MomentColor;
-
-	int m_IDragStyle, m_IDragWidth;
-	QColor m_IDragColor;
-
-	int m_VDragStyle, m_VDragWidth;
-	QColor m_VDragColor;
-
-	int m_XTopStyle, m_XTopWidth;
-	QColor m_XTopColor;
-
-	int m_XBotStyle, m_XBotWidth;
-	QColor m_XBotColor;
-
-	int m_DownwashStyle, m_DownwashWidth;
-	QColor m_DownwashColor;
-
-	int m_WakeStyle, m_WakeWidth;
-	QColor m_WakeColor;
-
-	int m_StreamLinesStyle, m_StreamLinesWidth;
-	QColor m_StreamLinesColor;
-
-	QColor m_MassColor;
-
 	QColor m_CpColor;
 	int m_CpStyle, m_CpWidth;
 };

@@ -3307,7 +3307,6 @@ void PanelAnalysisDlg::Forces(double *Mu, double *Sigma, double alpha, double *V
 	static double QInf, QInfStrip, qdyn, GammaStrip;
 	static CVector  C, PtC4, LeverArm, WindDirection, WindNormal, PanelLeverArm, Wg;
 	static CVector Velocity, StripForce, ViscousMoment, dF, PanelForce, PanelForcep1;
-	QMiarex *pMiarex= (QMiarex*)s_pMiarex;
 
 	bOut = bOutCl = bError = false;
 
@@ -3422,7 +3421,7 @@ void PanelAnalysisDlg::Forces(double *Mu, double *Sigma, double alpha, double *V
 				m_ppSurface[j]->GetC4(k, PtC4, tau);
 				Re = m_ppSurface[j]->GetChord(tau) * QInfStrip /m_pWPolar->m_Viscosity;
 				Cl = StripForce.dot(WindNormal)*m_pWPolar->m_Density/qdyn/StripArea;
-				PCd    = GetVar(pMiarex->m_poaPolar, 2, m_ppSurface[j]->m_pFoilA, m_ppSurface[j]->m_pFoilB, Re, Cl, tau, bOutRe, bError);
+                PCd    = GetVar(2, m_ppSurface[j]->m_pFoilA, m_ppSurface[j]->m_pFoilB, Re, Cl, tau, bOutRe, bError);
 				PCd   *= StripArea * 1/2*QInfStrip*QInfStrip;                // Newtons/rho
 				bOut = bOut || bOutRe || bError;
 				ViscousDrag += PCd ;                                         // Newtons/rho

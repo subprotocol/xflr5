@@ -39,8 +39,11 @@ WPolarDlg::WPolarDlg(QWidget *pParent) : QDialog(pParent)
 	setWindowTitle(tr("Analysis Definition"));
 
 	m_pPlane     = NULL;
+
 	m_bAutoName = true;
+
 	m_WingLoad   = 0.0;
+
 	m_UnitType  = 1;
 
 	SetupLayout();
@@ -637,10 +640,10 @@ void WPolarDlg::SetupLayout()
 			PlaneLayout->addWidget(lab1,1,1);
 			PlaneLayout->addWidget(lab5,2,1);
 			PlaneLayout->addWidget(lab6,3,1);
-            m_pctrlQInf    = new DoubleEdit(10.05,2);
+            m_pctrlQInf    = new DoubleEdit(10.05);
 			m_pctrlQInf->SetMin(0.0);
-			m_pctrlAlpha   = new DoubleEdit(1.00,2);
-			m_pctrlBeta    = new DoubleEdit(0.00,2);
+            m_pctrlAlpha   = new DoubleEdit(1.00,2);
+            m_pctrlBeta    = new DoubleEdit(0.00,2);
 			PlaneLayout->addWidget(m_pctrlQInf,1,2);
 			PlaneLayout->addWidget(m_pctrlAlpha,2,2);
 			PlaneLayout->addWidget(m_pctrlBeta,3,2);
@@ -672,11 +675,11 @@ void WPolarDlg::SetupLayout()
 				InertiaDataLayout->addWidget(lab2,1,1);
 				InertiaDataLayout->addWidget(lab3,2,1);
 				InertiaDataLayout->addWidget(lab4,3,1);
-				m_pctrlWeight  = new DoubleEdit(1.234);
+                m_pctrlWeight  = new DoubleEdit(1.234);
 				m_pctrlWeight->SetPrecision(3);
 				m_pctrlWeight->SetMin(0.0);
-				m_pctrlXCmRef  = new DoubleEdit(100.00,3);
-				m_pctrlZCmRef  = new DoubleEdit(100.00,3);
+                m_pctrlXCmRef  = new DoubleEdit(100.00,3);
+                m_pctrlZCmRef  = new DoubleEdit(100.00,3);
 				InertiaDataLayout->addWidget(m_pctrlWeight,1,2);
 				InertiaDataLayout->addWidget(m_pctrlXCmRef,2,2);
 				InertiaDataLayout->addWidget(m_pctrlZCmRef,3,2);
@@ -753,12 +756,12 @@ void WPolarDlg::SetupLayout()
 			m_pctrlUnit1 = new QRadioButton(tr("International"));
 			m_pctrlUnit2 = new QRadioButton(tr("Imperial"));
 			m_pctrlRho = new QLabel("r =");
-			m_pctrlDensity = new DoubleEdit(1.225,3);
+            m_pctrlDensity = new DoubleEdit(1.225,3);
 			m_pctrlDensityUnit = new QLabel("kg/m3");
 			m_pctrlNu = new QLabel("n =");
 			m_pctrlRho->setAlignment(Qt::AlignRight | Qt::AlignCenter);
 			m_pctrlNu->setAlignment(Qt::AlignRight | Qt::AlignCenter);
-			m_pctrlViscosity = new DoubleEdit(1.500e-5,3);
+            m_pctrlViscosity = new DoubleEdit(1.500e-5,3);
 			m_pctrlViscosityUnit = new QLabel("m2/s");
 			m_pctrlRho->setFont(SymbolFont);
 			m_pctrlNu->setFont(SymbolFont);
@@ -800,7 +803,7 @@ void WPolarDlg::SetupLayout()
 		{
 			m_pctrlGroundEffect = new QCheckBox(tr("Ground Effect"));
 			QLabel *lab10 = new QLabel(tr("Height ="));
-			m_pctrlHeight = new DoubleEdit(0.00,2);
+            m_pctrlHeight = new DoubleEdit(0.00,2);
 			m_pctrlLengthUnit2 = new QLabel("mm");
 			GroundLayout->addWidget(m_pctrlGroundEffect,1,1);
 			GroundLayout->addWidget(lab10,2,1);

@@ -58,10 +58,10 @@ private:
 
 	QPushButton *OKButton, *CancelButton;
 	QRadioButton *m_pctrlBody, *m_pctrlFrame;
-	DoubleEdit *m_pctrlXScaleFactor;
-	DoubleEdit *m_pctrlYScaleFactor;
-	DoubleEdit *m_pctrlZScaleFactor;
-	DoubleEdit *m_pctrlFrameID;
+    DoubleEdit *m_pctrlXScaleFactor;
+    DoubleEdit *m_pctrlYScaleFactor;
+    DoubleEdit *m_pctrlZScaleFactor;
+    DoubleEdit *m_pctrlFrameID;
 
 
 private:

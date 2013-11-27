@@ -32,7 +32,7 @@ BodyTableDelegate::BodyTableDelegate(QObject *parent)
 
 QWidget *BodyTableDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex & index ) const
 {
-	DoubleEdit *editor = new DoubleEdit(parent);
+    DoubleEdit *editor = new DoubleEdit(parent);
 	editor->setAlignment(Qt::AlignRight);
 
 	editor->SetPrecision(m_Precision[index.column()]);
@@ -43,15 +43,15 @@ QWidget *BodyTableDelegate::createEditor(QWidget *parent, const QStyleOptionView
 void BodyTableDelegate::setEditorData(QWidget *editor, const QModelIndex &index) const
 {
 	double value = index.model()->data(index, Qt::EditRole).toDouble();
-	DoubleEdit *floatEdit = static_cast<DoubleEdit*>(editor);
-	floatEdit->SetValue(value);
+    DoubleEdit *pDE = static_cast<DoubleEdit*>(editor);
+    pDE->SetValue(value);
 }
 
 
 void BodyTableDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const
 {
-	DoubleEdit *floatEdit = static_cast<DoubleEdit*>(editor);
-	double value = floatEdit->Value();
+    DoubleEdit *pDE = static_cast<DoubleEdit*>(editor);
+    double value = pDE->Value();
 	model->setData(index, value, Qt::EditRole);
 }
 

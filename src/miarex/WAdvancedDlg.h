@@ -56,16 +56,16 @@ private:
 	QCheckBox *m_pctrlKeepOutOpps;
 	QRadioButton *m_pctrlDirichlet, *m_pCtrlNeumann;
 	QRadioButton *m_pctrlVLM1, *m_pctrlVLM2;
-	DoubleEdit *m_pctrlInterNodes;
-	DoubleEdit *m_pctrlRelax;
-	DoubleEdit *m_pctrlAlphaPrec;
-	DoubleEdit *m_pctrlMinPanelSize;
-	DoubleEdit *m_pctrlNStation;
-	DoubleEdit *m_pctrlIterMax;
-	DoubleEdit *m_pctrlMaxWakeIter;
-	DoubleEdit *m_pctrlCoreSize;
-	DoubleEdit *m_pctrlVortexPos;
-	DoubleEdit *m_pctrlControlPos;
+    DoubleEdit *m_pctrlInterNodes;
+    DoubleEdit *m_pctrlRelax;
+    DoubleEdit *m_pctrlAlphaPrec;
+    DoubleEdit *m_pctrlMinPanelSize;
+    DoubleEdit *m_pctrlNStation;
+    DoubleEdit *m_pctrlIterMax;
+    DoubleEdit *m_pctrlMaxWakeIter;
+    DoubleEdit *m_pctrlCoreSize;
+    DoubleEdit *m_pctrlVortexPos;
+    DoubleEdit *m_pctrlControlPos;
 
 	bool m_bLogFile;
 	bool m_bDirichlet;

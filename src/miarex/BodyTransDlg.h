@@ -49,10 +49,10 @@ private:
 	void keyPressEvent(QKeyEvent *event);
 	void SetupLayout();
 
-	DoubleEdit *m_pctrlXTransFactor;
-	DoubleEdit *m_pctrlYTransFactor;
-	DoubleEdit *m_pctrlZTransFactor;
-	DoubleEdit *m_pctrlFrameID;
+    DoubleEdit *m_pctrlXTransFactor;
+    DoubleEdit *m_pctrlYTransFactor;
+    DoubleEdit *m_pctrlZTransFactor;
+    DoubleEdit *m_pctrlFrameID;
 	QCheckBox *m_pctrlFrameOnly;
 	QLabel *m_pctrlLength1;
 	QLabel *m_pctrlLength2;

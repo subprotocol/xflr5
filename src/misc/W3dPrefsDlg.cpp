@@ -1,7 +1,7 @@
 /****************************************************************************
 
 	W3dPrefsDlg Class
-	Copyright (C) 2009 Andre Deperrois XFLR5@yahoo.com
+    Copyright (C) 2009-2013 Andre Deperrois XFLR5@yahoo.com
 
 	This program is free software; you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -76,6 +76,7 @@ int W3dPrefsDlg::s_BotStyle = 1;
 int W3dPrefsDlg::s_BotWidth = 1;
 QColor W3dPrefsDlg::s_BotColor = QColor(150, 240, 50);
 
+
 W3dPrefsDlg::W3dPrefsDlg(QWidget *pParent) : QDialog(pParent)
 {
 	setWindowTitle(tr("3D Styles"));
@@ -84,7 +85,7 @@ W3dPrefsDlg::W3dPrefsDlg(QWidget *pParent) : QDialog(pParent)
 	SetupLayout();
 
     connect(m_pctrlAxis, SIGNAL(clickedLB()), SLOT(On3DAxis()));
-    connect(m_pctrlOutline, SIGNAL(clickedLB()), SLOT(OnWingColor()));
+    connect(m_pctrlOutline, SIGNAL(clickedLB()), SLOT(OnOutline()));
     connect(m_pctrlVLMMesh, SIGNAL(clickedLB()), SLOT(OnVLMMesh()));
     connect(m_pctrlTopTrans, SIGNAL(clickedLB()), SLOT(OnTopTrans()));
     connect(m_pctrlBotTrans, SIGNAL(clickedLB()), SLOT(OnBotTrans()));
@@ -108,12 +109,16 @@ void W3dPrefsDlg::InitDialog()
 	m_pctrlLift->SetStyle(s_XCPStyle, s_XCPWidth, s_XCPColor);
 	m_pctrlMoments->SetStyle(s_MomentStyle, s_MomentWidth, s_MomentColor);
 	m_pctrlInducedDrag->SetStyle(s_IDragStyle, s_IDragWidth, s_IDragColor);
-	m_pctrlDownwash->SetStyle(s_DownwashStyle, s_DownwashWidth, s_DownwashColor);
+    m_pctrlViscousDrag->SetStyle(s_VDragStyle, s_VDragWidth, s_VDragColor);
+    m_pctrlDownwash->SetStyle(s_DownwashStyle, s_DownwashWidth, s_DownwashColor);
 	m_pctrlWakePanels->SetStyle(s_WakeStyle, s_WakeWidth, s_WakeColor);
 	m_pctrlStreamLines->SetStyle(s_StreamLinesStyle, s_StreamLinesWidth, s_StreamLinesColor);
-	m_pctrlShowWake->setChecked(s_bWakePanels);
-}
+    m_pctrlTopTrans->SetStyle(s_TopStyle, s_TopWidth, s_TopColor);
+    m_pctrlBotTrans->SetStyle(s_BotStyle, s_BotWidth, s_BotColor);
 
+    m_pctrlShowWake->setChecked(s_bWakePanels);
+    m_pctrlMassColor->SetColor(s_MassColor);
+}
 
 void W3dPrefsDlg::SetupLayout()
 {
@@ -161,63 +166,67 @@ void W3dPrefsDlg::SetupLayout()
 	m_pctrlShowWake = new QCheckBox(tr("Show Wake Panels"));
 
 	QGridLayout *PrefsLayout = new QGridLayout;
-	PrefsLayout->setColumnStretch(1,1);
-	PrefsLayout->setColumnStretch(2,2);
-	PrefsLayout->setColumnStretch(3,1);
-	PrefsLayout->setColumnStretch(4,2);
-	PrefsLayout->addWidget(lab1,1,1);
-	PrefsLayout->addWidget(lab2,2,1);
-	PrefsLayout->addWidget(lab3,3,1);
-	PrefsLayout->addWidget(lab4,4,1);
-	PrefsLayout->addWidget(lab5,5,1);
-	PrefsLayout->addWidget(lab6,6,1);
-	PrefsLayout->addWidget(lab7,1,3);
-	PrefsLayout->addWidget(lab8,2,3);
-	PrefsLayout->addWidget(lab9,3,3);
-	PrefsLayout->addWidget(lab10,4,3);
-	PrefsLayout->addWidget(lab11,5,3);
-	PrefsLayout->addWidget(lab12,6,3);
-	PrefsLayout->addWidget(lab13,7,3);
+    {
+        PrefsLayout->setColumnStretch(1,1);
+        PrefsLayout->setColumnStretch(2,2);
+        PrefsLayout->setColumnStretch(3,1);
+        PrefsLayout->setColumnStretch(4,2);
+        PrefsLayout->addWidget(lab1,1,1);
+        PrefsLayout->addWidget(lab2,2,1);
+        PrefsLayout->addWidget(lab3,3,1);
+        PrefsLayout->addWidget(lab4,4,1);
+        PrefsLayout->addWidget(lab5,5,1);
+        PrefsLayout->addWidget(lab6,6,1);
+        PrefsLayout->addWidget(lab7,1,3);
+        PrefsLayout->addWidget(lab8,2,3);
+        PrefsLayout->addWidget(lab9,3,3);
+        PrefsLayout->addWidget(lab10,4,3);
+        PrefsLayout->addWidget(lab11,5,3);
+        PrefsLayout->addWidget(lab12,6,3);
+        PrefsLayout->addWidget(lab13,7,3);
 
-	PrefsLayout->addWidget(m_pctrlAxis,1,2);
-	PrefsLayout->addWidget(m_pctrlOutline,2,2);
-	PrefsLayout->addWidget(m_pctrlVLMMesh,3,2);
-	PrefsLayout->addWidget(m_pctrlTopTrans,4,2);
-	PrefsLayout->addWidget(m_pctrlBotTrans,5,2);
-	PrefsLayout->addWidget(m_pctrlLift,6,2);
-	PrefsLayout->addWidget(m_pctrlShowWake,7,1,1,2);
-	PrefsLayout->addWidget(m_pctrlMoments,1,4);
-	PrefsLayout->addWidget(m_pctrlInducedDrag,2,4);
-	PrefsLayout->addWidget(m_pctrlViscousDrag,3,4);
-	PrefsLayout->addWidget(m_pctrlDownwash,4,4);
-	PrefsLayout->addWidget(m_pctrlWakePanels,5,4);
-	PrefsLayout->addWidget(m_pctrlStreamLines,6,4);
-	PrefsLayout->addWidget(m_pctrlMassColor,7,4);
+        PrefsLayout->addWidget(m_pctrlAxis,1,2);
+        PrefsLayout->addWidget(m_pctrlOutline,2,2);
+        PrefsLayout->addWidget(m_pctrlVLMMesh,3,2);
+        PrefsLayout->addWidget(m_pctrlTopTrans,4,2);
+        PrefsLayout->addWidget(m_pctrlBotTrans,5,2);
+        PrefsLayout->addWidget(m_pctrlLift,6,2);
+        PrefsLayout->addWidget(m_pctrlShowWake,7,1,1,2);
+        PrefsLayout->addWidget(m_pctrlMoments,1,4);
+        PrefsLayout->addWidget(m_pctrlInducedDrag,2,4);
+        PrefsLayout->addWidget(m_pctrlViscousDrag,3,4);
+        PrefsLayout->addWidget(m_pctrlDownwash,4,4);
+        PrefsLayout->addWidget(m_pctrlWakePanels,5,4);
+        PrefsLayout->addWidget(m_pctrlStreamLines,6,4);
+        PrefsLayout->addWidget(m_pctrlMassColor,7,4);
+    }
 
 	QHBoxLayout *CommandButtons = new QHBoxLayout;
-	QPushButton *OKButton = new QPushButton(tr("OK"));
-	QPushButton *CancelButton = new QPushButton(tr("Cancel"));
-	CommandButtons->addStretch(1);
-	CommandButtons->addWidget(OKButton);
-	CommandButtons->addStretch(1);
-	CommandButtons->addWidget(CancelButton);
-	CommandButtons->addStretch(1);
-	connect(OKButton, SIGNAL(clicked()),this, SLOT(accept()));
-	connect(CancelButton, SIGNAL(clicked()), this, SLOT(reject()));
+    {
+        QPushButton *OKButton = new QPushButton(tr("Close"));
+        QPushButton *ResetButton = new QPushButton(tr("Reset Defaults"));
+        CommandButtons->addStretch(1);
+        CommandButtons->addWidget(ResetButton);
+        CommandButtons->addStretch(1);
+        CommandButtons->addWidget(OKButton);
+        CommandButtons->addStretch(1);
+        connect(ResetButton, SIGNAL(clicked()),this, SLOT(OnResetDefaults()));
+        connect(OKButton, SIGNAL(clicked()),this, SLOT(accept()));
+    }
 
 	QVBoxLayout *MainLayout = new QVBoxLayout;
-	MainLayout->addStretch(1);
-	MainLayout->addLayout(PrefsLayout);
-	MainLayout->addStretch(1);
-	MainLayout->addSpacing(20);
-	MainLayout->addLayout(CommandButtons);
-	MainLayout->addStretch(1);
-
+    {
+        MainLayout->addStretch(1);
+        MainLayout->addLayout(PrefsLayout);
+        MainLayout->addStretch(1);
+        MainLayout->addSpacing(20);
+        MainLayout->addLayout(CommandButtons);
+        MainLayout->addStretch(1);
+    }
 	setLayout(MainLayout);
 }
 
-
-void W3dPrefsDlg::OnWingColor()
+void W3dPrefsDlg::OnOutline()
 {
     LinePickerDlg LPdlg(this);
 	LPdlg.SetColor(s_OutlineColor);
@@ -229,11 +238,9 @@ void W3dPrefsDlg::OnWingColor()
 		s_OutlineColor = LPdlg.GetColor();
 		s_OutlineStyle = LPdlg.GetStyle();
 		s_OutlineWidth = LPdlg.GetWidth();
+        m_pctrlOutline->SetStyle(s_OutlineStyle, s_OutlineWidth, s_OutlineColor);
 	}
-	repaint();
 }
-
-
 
 void W3dPrefsDlg::On3DAxis()
 {
@@ -248,11 +255,9 @@ void W3dPrefsDlg::On3DAxis()
 		s_3DAxisColor = LPdlg.GetColor();
 		s_3DAxisStyle = LPdlg.GetStyle();
 		s_3DAxisWidth = LPdlg.GetWidth();
+        m_pctrlAxis->SetStyle(s_3DAxisStyle, s_3DAxisWidth, s_3DAxisColor);
 	}
-	repaint();
 }
-
-
 
 void W3dPrefsDlg::OnTopTrans()
 {
@@ -335,9 +340,10 @@ void W3dPrefsDlg::OnXCP()
 		s_XCPColor = LPdlg.GetColor();
 		s_XCPStyle = LPdlg.GetStyle();
 		s_XCPWidth = LPdlg.GetWidth();
-	}
-	repaint();
+        m_pctrlLift->SetStyle(s_XCPStyle, s_XCPWidth, s_XCPColor);
+    }
 }
+
 void W3dPrefsDlg::OnMoments()
 {
     LinePickerDlg LPdlg(this);
@@ -351,8 +357,8 @@ void W3dPrefsDlg::OnMoments()
 		s_MomentColor = LPdlg.GetColor();
 		s_MomentStyle = LPdlg.GetStyle();
 		s_MomentWidth = LPdlg.GetWidth();
-	}
-	repaint();
+        m_pctrlMoments->SetStyle(s_MomentStyle, s_MomentWidth, s_MomentColor);
+    }
 }
 
 void W3dPrefsDlg::OnDownwash()
@@ -368,8 +374,8 @@ void W3dPrefsDlg::OnDownwash()
 		s_DownwashColor = LPdlg.GetColor();
 		s_DownwashStyle = LPdlg.GetStyle();
 		s_DownwashWidth = LPdlg.GetWidth();
+        m_pctrlDownwash->SetStyle(s_DownwashStyle, s_DownwashWidth,s_DownwashColor);
 	}
-	repaint();
 }
 
 void W3dPrefsDlg::OnStreamLines()
@@ -385,8 +391,8 @@ void W3dPrefsDlg::OnStreamLines()
 		s_StreamLinesColor = LPdlg.GetColor();
 		s_StreamLinesStyle = LPdlg.GetStyle();
 		s_StreamLinesWidth = LPdlg.GetWidth();
+        m_pctrlStreamLines->SetStyle(s_StreamLinesStyle, s_StreamLinesWidth, s_StreamLinesColor);
 	}
-	repaint();
 }
 
 void W3dPrefsDlg::OnWakePanels()
@@ -402,10 +408,9 @@ void W3dPrefsDlg::OnWakePanels()
 		s_WakeColor = LPdlg.GetColor();
 		s_WakeStyle = LPdlg.GetStyle();
 		s_WakeWidth = LPdlg.GetWidth();
+        m_pctrlWakePanels->SetStyle(s_WakeStyle, s_WakeWidth, s_WakeColor);
 	}
-	repaint();
 }
-
 
 void W3dPrefsDlg::OnVLMMesh()
 {
@@ -420,6 +425,7 @@ void W3dPrefsDlg::OnVLMMesh()
 		s_VLMColor = LPdlg.GetColor();
 		s_VLMStyle = LPdlg.GetStyle();
 		s_VLMWidth = LPdlg.GetWidth();
+        m_pctrlVLMMesh->SetStyle(s_VLMStyle, s_VLMWidth, s_VLMColor);
 	}
 	repaint();
 }
@@ -589,6 +595,58 @@ void W3dPrefsDlg::LoadSettings(QSettings *pSettings)
 	pSettings->endGroup();
 }
 
+
+void W3dPrefsDlg::OnResetDefaults()
+{
+
+    s_bWakePanels = false;
+
+    s_MassColor = QColor(130, 170, 130);
+
+    s_VLMStyle       = 0;
+    s_VLMWidth       = 1;
+    s_VLMColor       = QColor(180,180,180);
+    s_3DAxisStyle    = 3;
+    s_3DAxisWidth    = 1;
+    s_3DAxisColor    = QColor(150,150,150);
+    s_OutlineStyle   = 0;
+    s_OutlineWidth   = 1;
+    s_OutlineColor   = QColor(255,255,255);
+    s_XCPStyle       = 0;
+    s_XCPWidth       = 1;
+    s_XCPColor       = QColor(50, 150, 50);
+    s_MomentStyle    = 0;
+    s_MomentWidth    = 1;
+    s_MomentColor    = QColor(200, 100, 100);
+    s_IDragStyle     = 0;
+    s_IDragWidth     = 1;
+    s_IDragColor     = QColor(255,200,0);
+
+    s_DownwashStyle  = 0;
+    s_DownwashWidth  = 1;
+    s_DownwashColor  = QColor(255, 100, 100);
+    s_WakeStyle      = 0;
+    s_WakeWidth      = 1;
+    s_WakeColor      = QColor(0, 150, 200);
+    s_CpStyle        = 0;
+    s_CpWidth        = 1;
+    s_CpColor        = QColor(255,0,0);
+    s_StreamLinesStyle  = 0;
+    s_StreamLinesWidth  = 1;
+    s_StreamLinesColor  = QColor(200, 150, 255);
+
+    s_VDragStyle     = 0;
+    s_VDragWidth     = 1;
+    s_VDragColor     = QColor(200,100,220);
+    s_TopStyle = 0;
+    s_TopWidth = 1;
+    s_TopColor = QColor(150, 240, 50);
+    s_BotStyle = 1;
+    s_BotWidth = 1;
+    s_BotColor = QColor(150, 240, 50);
+
+    InitDialog();
+}
 
 
 

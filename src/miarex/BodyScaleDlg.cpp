@@ -85,16 +85,16 @@ void BodyScaleDlg::SetupLayout()
 	QGridLayout *TopLayout = new QGridLayout;
 	m_pctrlBody  = new QRadioButton(tr("Whole Body"));
 	m_pctrlFrame = new QRadioButton(tr("Frame Only"));
-	m_pctrlFrameID = new DoubleEdit(10);
+    m_pctrlFrameID = new DoubleEdit(10);
 	m_pctrlFrameID->SetPrecision(0);
 	TopLayout->addWidget(m_pctrlBody,1,1);
 	TopLayout->addWidget(m_pctrlFrame,2,1);
 	TopLayout->addWidget(m_pctrlFrameID,2,2);
 
 	QGridLayout *ScaleLayout = new QGridLayout;
-	m_pctrlXScaleFactor = new DoubleEdit(1.0);
-	m_pctrlYScaleFactor = new DoubleEdit(2.000);
-	m_pctrlZScaleFactor = new DoubleEdit(3.);
+    m_pctrlXScaleFactor = new DoubleEdit(1.0);
+    m_pctrlYScaleFactor = new DoubleEdit(2.000);
+    m_pctrlZScaleFactor = new DoubleEdit(3.);
 	m_pctrlXScaleFactor->SetPrecision(3);
 	m_pctrlYScaleFactor->SetPrecision(3);
 	m_pctrlZScaleFactor->SetPrecision(3);

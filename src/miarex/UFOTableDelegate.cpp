@@ -44,7 +44,7 @@ QWidget *UFOTableDelegate::createEditor(QWidget *parent, const QStyleOptionViewI
 	}
 	else
 	{
-		DoubleEdit *editor = new DoubleEdit(parent);
+        DoubleEdit *editor = new DoubleEdit(parent);
 		editor->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
 		editor->SetPrecision(m_Precision[index.column()]);
 		return editor;
@@ -106,8 +106,8 @@ void UFOTableDelegate::setEditorData(QWidget *editor, const QModelIndex &index) 
 	else
 	{
 		double value = index.model()->data(index, Qt::EditRole).toDouble();
-		DoubleEdit *floatEdit = static_cast<DoubleEdit*>(editor);
-		floatEdit->SetValue(value);
+        DoubleEdit *pDE = static_cast<DoubleEdit*>(editor);
+        pDE->SetValue(value);
 	}
 }
 
@@ -123,8 +123,8 @@ void UFOTableDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, 
 	}
 	else
 	{
-		DoubleEdit *floatEdit = static_cast<DoubleEdit*>(editor);
-		double value = floatEdit->Value();
+        DoubleEdit *pDE = static_cast<DoubleEdit*>(editor);
+        double value = pDE->Value();
 		model->setData(index, value, Qt::EditRole);
 	}
 }

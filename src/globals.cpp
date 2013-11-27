@@ -1707,7 +1707,7 @@ bool LinBairstow(double *p, complex<double> *root, int n)
 *@param bError if Re is outside the min or max Reynolds number of the polar mesh.
 *@return the interpolated value.
 */
-double GetVar(QList<void*>*m_poaPolar, int nVar, Foil *pFoil0, Foil *pFoil1, double Re, double Cl, double Tau, bool &bOutRe, bool &bError)
+double GetVar(int nVar, Foil *pFoil0, Foil *pFoil1, double Re, double Cl, double Tau, bool &bOutRe, bool &bError)
 {
 	bool IsOutRe = false;
 	bool IsError  = false;
@@ -1719,7 +1719,7 @@ double GetVar(QList<void*>*m_poaPolar, int nVar, Foil *pFoil0, Foil *pFoil1, dou
 		Cl = 0.0;
 		Var0 = 0.0;
 	}
-	else Var0 = GetPlrPointFromCl(m_poaPolar, pFoil0, Re, Cl,nVar, IsOutRe, IsError);
+	else Var0 = GetPlrPointFromCl(pFoil0, Re, Cl,nVar, IsOutRe, IsError);
 	if(IsOutRe) bOutRe = true;
 	if(IsError) bError = true;
 
@@ -1729,7 +1729,7 @@ double GetVar(QList<void*>*m_poaPolar, int nVar, Foil *pFoil0, Foil *pFoil1, dou
 		Cl = 0.0;
 		Var1 = 0.0;
 	}
-	else Var1 = GetPlrPointFromCl(m_poaPolar, pFoil1, Re, Cl,nVar, IsOutRe, IsError);
+	else Var1 = GetPlrPointFromCl(pFoil1, Re, Cl,nVar, IsOutRe, IsError);
 	if(IsOutRe) bOutRe = true;
 	if(IsError) bError = true;
 
@@ -1807,7 +1807,7 @@ void * GetPlrVariable(Polar *pPolar, int iVar)
 *@param bError if Re is outside the min or max Reynolds number of the polar mesh.
 *@return the interpolated value.
 */
-double GetPlrPointFromAlpha(QList<void*>*m_poaPolar, Foil *pFoil, double Re, double Alpha, int PlrVar, bool &bOutRe, bool &bError)
+double GetPlrPointFromAlpha(Foil *pFoil, double Re, double Alpha, int PlrVar, bool &bOutRe, bool &bError)
 {
 /*	Var
 	0 =	m_Alpha;
@@ -1842,10 +1842,10 @@ double GetPlrPointFromAlpha(QList<void*>*m_poaPolar, Foil *pFoil, double Re, dou
 	int size;
 	int n = 0;
 
-	// Are there any Type 1 polars available for this foil ?
-	for (i = 0; i< m_poaPolar->size(); i++)
+		// Are there any Type 1 polars available for this foil ?
+	for (i=0; i<MainFrame::s_oaPolar.size(); i++)
 	{
-		pPolar = (Polar*)m_poaPolar->at(i);
+		pPolar = (Polar*)MainFrame::s_oaPolar.at(i);
 		if((pPolar->m_PolarType==FIXEDSPEEDPOLAR) && (pPolar->m_FoilName == pFoil->m_FoilName))
 		{
 			n++;
@@ -1858,13 +1858,13 @@ double GetPlrPointFromAlpha(QList<void*>*m_poaPolar, Foil *pFoil, double Re, dou
 	//First Find the two polars with Reynolds number surrounding wanted Re
 	Polar * pPolar1 = NULL;
 	Polar * pPolar2 = NULL;
-	int nPolars = m_poaPolar->size();
+	int nPolars = MainFrame::s_oaPolar.size();
 	//Type 1 Polars are sorted by crescending Re Number
 
 	//if Re is less than that of the first polar, use this one
 	for (i=0; i< nPolars; i++)
 	{
-		pPolar = (Polar*)m_poaPolar->at(i);
+		pPolar = (Polar*)MainFrame::s_oaPolar.at(i);
 		if((pPolar->m_PolarType==FIXEDSPEEDPOLAR) && (pPolar->m_FoilName == pFoil->m_FoilName) && pPolar->m_Alpha.size()>0)
 		{
 			// we have found the first type 1 polar for this foil
@@ -1906,7 +1906,7 @@ double GetPlrPointFromAlpha(QList<void*>*m_poaPolar, Foil *pFoil, double Re, dou
 	// if not Find the two polars
 	for (i=0; i< nPolars; i++)
 	{
-		pPolar = (Polar*)m_poaPolar->at(i);
+		pPolar = (Polar*)MainFrame::s_oaPolar.at(i);
 		if((pPolar->m_PolarType==FIXEDSPEEDPOLAR) && (pPolar->m_FoilName == pFoil->m_FoilName)  && pPolar->m_Alpha.size()>0)
 		{
 			// we have found the first type 1 polar for this foil
@@ -2071,7 +2071,7 @@ double GetPlrPointFromAlpha(QList<void*>*m_poaPolar, Foil *pFoil, double Re, dou
 *@param bError if Re is outside the min or max Reynolds number of the polar mesh.
 *@return the interpolated value.
 */
-double GetPlrPointFromCl(QList<void*>*m_poaPolar, Foil *pFoil, double Re, double Cl, int PlrVar, bool &bOutRe, bool &bError)
+double GetPlrPointFromCl(Foil *pFoil, double Re, double Cl, int PlrVar, bool &bOutRe, bool &bError)
 {
 /*	Var
 	0 =	m_Alpha;
@@ -2104,9 +2104,9 @@ double GetPlrPointFromCl(QList<void*>*m_poaPolar, Foil *pFoil, double Re, double
 
 		n=0;
 	// Are there any Type 1 polars available for this foil ?
-	for (i = 0; i< m_poaPolar->size(); i++)
+	for (i = 0; i< MainFrame::s_oaPolar.size(); i++)
 	{
-		pPolar = (Polar*)m_poaPolar->at(i);
+		pPolar = (Polar*)MainFrame::s_oaPolar.at(i);
 		if((pPolar->m_PolarType==FIXEDSPEEDPOLAR) && (pPolar->m_FoilName == pFoil->m_FoilName))
 		{
 			n++;
@@ -2119,13 +2119,13 @@ double GetPlrPointFromCl(QList<void*>*m_poaPolar, Foil *pFoil, double Re, double
 	//First Find the two polars with Reynolds number surrounding wanted Re
 	Polar * pPolar1 = NULL;
 	Polar * pPolar2 = NULL;
-	int nPolars = m_poaPolar->size();
+	int nPolars = MainFrame::s_oaPolar.size();
 	//Type 1 Polars are sorted by crescending Re Number
 
 	//if Re is less than that of the first polar, use this one
 	for (i=0; i< nPolars; i++)
 	{
-		pPolar = (Polar*)m_poaPolar->at(i);
+		pPolar = (Polar*)MainFrame::s_oaPolar.at(i);
 		if((pPolar->m_PolarType==FIXEDSPEEDPOLAR) && (pPolar->m_FoilName == pFoil->m_FoilName) && pPolar->m_Cl.size()>0)
 		{
 			// we have found the first type 1 polar for this foil
@@ -2166,7 +2166,7 @@ double GetPlrPointFromCl(QList<void*>*m_poaPolar, Foil *pFoil, double Re, double
 	// if not Find the two polars
 	for (i=0; i< nPolars; i++)
 	{
-		pPolar = (Polar*)m_poaPolar->at(i);
+		pPolar = (Polar*)MainFrame::s_oaPolar.at(i);
 		if((pPolar->m_PolarType==FIXEDSPEEDPOLAR) && (pPolar->m_FoilName == pFoil->m_FoilName)  && pPolar->m_Cl.size()>0)
 		{
 			// we have found the first type 1 polar for this foil
@@ -2421,7 +2421,7 @@ double GetPlrPointFromCl(QList<void*>*m_poaPolar, Foil *pFoil, double Re, double
 *@param bError if Re is outside the min or max Reynolds number of the polar mesh.
 *@return the interpolated value.
 */
-double GetCl(QList<void*>*m_poaPolar, Foil *pFoil0, Foil *pFoil1, double Re, double Alpha, double Tau, bool &bOutRe, bool &bError)
+double GetCl(Foil *pFoil0, Foil *pFoil1, double Re, double Alpha, double Tau, bool &bOutRe, bool &bError)
 {
 	double Cl0, Cl1;
 	bool IsOutRe = false;
@@ -2432,13 +2432,13 @@ double GetCl(QList<void*>*m_poaPolar, Foil *pFoil0, Foil *pFoil1, double Re, dou
 	if(!pFoil0)
 		Cl0 = 2.0*PI*(Alpha*PI/180.0);
 	else
-		Cl0 = GetPlrPointFromAlpha(m_poaPolar, pFoil0, Re, Alpha, 1, IsOutRe, IsError);
+		Cl0 = GetPlrPointFromAlpha(pFoil0, Re, Alpha, 1, IsOutRe, IsError);
 	if(IsOutRe) bOutRe = true;
 	if(IsError) bError = true;
 	if(!pFoil1)
 		Cl1 = 2.0*PI*(Alpha*PI/180.0);
 	else
-		Cl1 = GetPlrPointFromAlpha(m_poaPolar, pFoil1, Re, Alpha, 1, IsOutRe, IsError);
+		Cl1 = GetPlrPointFromAlpha(pFoil1, Re, Alpha, 1, IsOutRe, IsError);
 	if(IsOutRe) bOutRe = true;
 	if(IsError) bError = true;
 
@@ -2459,7 +2459,7 @@ double GetCl(QList<void*>*m_poaPolar, Foil *pFoil0, Foil *pFoil1, double Re, dou
 *@param bError if Re is outside the min or max Reynolds number of the polar mesh.
 *@return the interpolated value for the zero-moment lift coefficient.
 */
-double GetCm0(QList<void*>*m_poaPolar, Foil *pFoil0, Foil *pFoil1, double Re, double Tau, bool &bOutRe, bool &bError)
+double GetCm0(Foil *pFoil0, Foil *pFoil1, double Re, double Tau, bool &bOutRe, bool &bError)
 {
 	//Find 0-lift angle for local foil
 	double Alpha;
@@ -2475,7 +2475,7 @@ double GetCm0(QList<void*>*m_poaPolar, Foil *pFoil0, Foil *pFoil1, double Re, do
 	for (int i=-10; i<10; i++)
 	{
 		Alpha = (double)i;
-		Cl1 = GetCl(m_poaPolar, pFoil0, pFoil1, Re, Alpha, Tau, IsOutRe, IsError);
+		Cl1 = GetCl(pFoil0, pFoil1, Re, Alpha, Tau, IsOutRe, IsError);
 		if(Cl1>0.0)
 		{
 			if(IsOutRe) bOutRe = true;
@@ -2488,10 +2488,10 @@ double GetCm0(QList<void*>*m_poaPolar, Foil *pFoil0, Foil *pFoil1, double Re, do
 	{
 		return 0.0;
 	}
-	Cm0 = GetCm(m_poaPolar, pFoil0, pFoil1, Re, Alpha-1.0, Tau, IsOutRe, IsError);
+	Cm0 = GetCm(pFoil0, pFoil1, Re, Alpha-1.0, Tau, IsOutRe, IsError);
 	if(IsOutRe) bOutRe = true;
 	if(IsError) bError = true;
-	Cm1 = GetCm(m_poaPolar, pFoil0, pFoil1, Re, Alpha, Tau, IsOutRe, IsError);
+	Cm1 = GetCm(pFoil0, pFoil1, Re, Alpha, Tau, IsOutRe, IsError);
 	if(IsOutRe) bOutRe = true;
 	if(IsError) bError = true;
 
@@ -2516,7 +2516,7 @@ double GetCm0(QList<void*>*m_poaPolar, Foil *pFoil0, Foil *pFoil1, double Re, do
 *@param bError if Re is outside the min or max Reynolds number of the polar mesh.
 *@return the interpolated value.
 */
-double GetCm(QList<void*>*m_poaPolar, Foil *pFoil0, Foil *pFoil1, double Re, double Alpha, double Tau, bool &bOutRe, bool &bError)
+double GetCm(Foil *pFoil0, Foil *pFoil1, double Re, double Alpha, double Tau, bool &bOutRe, bool &bError)
 {
 	double Cm0, Cm1;
 	bool IsOutRe = false;
@@ -2527,14 +2527,14 @@ double GetCm(QList<void*>*m_poaPolar, Foil *pFoil0, Foil *pFoil1, double Re, dou
 	if(!pFoil0)
 		Cm0 = 0.0;
 	else
-		Cm0 = GetPlrPointFromAlpha(m_poaPolar, pFoil0, Re, Alpha, 4, IsOutRe, IsError);
+		Cm0 = GetPlrPointFromAlpha(pFoil0, Re, Alpha, 4, IsOutRe, IsError);
 	if(IsOutRe) bOutRe = true;
 	if(IsError) bError = true;
 
 	if(!pFoil1)
 		Cm1 = 0.0;
 	else
-		Cm1 = GetPlrPointFromAlpha(m_poaPolar, pFoil1, Re, Alpha, 4, IsOutRe, IsError);
+		Cm1 = GetPlrPointFromAlpha(pFoil1, Re, Alpha, 4, IsOutRe, IsError);
 	if(IsOutRe) bOutRe = true;
 	if(IsError) bError = true;
 
@@ -2557,7 +2557,7 @@ double GetCm(QList<void*>*m_poaPolar, Foil *pFoil0, Foil *pFoil1, double Re, dou
 *@param bError if Re is outside the min or max Reynolds number of the polar mesh.
 *@return the interpolated value.
 */
-double GetCd(QList<void*>*m_poaPolar, Foil *pFoil0, Foil *pFoil1, double Re, double Alpha, double Tau, double AR, bool &bOutRe, bool &bError)
+double GetCd(Foil *pFoil0, Foil *pFoil1, double Re, double Alpha, double Tau, double AR, bool &bOutRe, bool &bError)
 {
 	//For LLT calculations
 	//returns the interpolated viscous drag
@@ -2573,7 +2573,7 @@ double GetCd(QList<void*>*m_poaPolar, Foil *pFoil0, Foil *pFoil1, double Re, dou
 		Cl = 2.0*PI*(Alpha*PI/180.0);
 		Cd0 = Cl*Cl/PI/AR;
 	}
-	else Cd0 = GetPlrPointFromAlpha(m_poaPolar, pFoil0, Re, Alpha,2, IsOutRe, IsError);
+	else Cd0 = GetPlrPointFromAlpha(pFoil0, Re, Alpha,2, IsOutRe, IsError);
 	if(IsOutRe) bOutRe = true;
 	if(IsError) bError = true;
 	if(!pFoil1)
@@ -2581,7 +2581,7 @@ double GetCd(QList<void*>*m_poaPolar, Foil *pFoil0, Foil *pFoil1, double Re, dou
 		Cl = 2.0*PI*(Alpha*PI/180.0);
 		Cd1 = Cl*Cl/PI/AR;
 	}
-	else Cd1 = GetPlrPointFromAlpha(m_poaPolar, pFoil1, Re, Alpha,2, IsOutRe, IsError);
+	else Cd1 = GetPlrPointFromAlpha(pFoil1, Re, Alpha,2, IsOutRe, IsError);
 	if(IsOutRe) bOutRe = true;
 	if(IsError) bError = true;
 
@@ -2603,7 +2603,7 @@ double GetCd(QList<void*>*m_poaPolar, Foil *pFoil0, Foil *pFoil1, double Re, dou
 *@param bError if Re is outside the min or max Reynolds number of the polar mesh.
 *@return the interpolated value.
 */
-double GetXCp(QList<void*>*m_poaPolar, Foil *pFoil0, Foil *pFoil1, double Re, double Alpha, double Tau, bool &bOutRe, bool &bError)
+double GetXCp(Foil *pFoil0, Foil *pFoil1, double Re, double Alpha, double Tau, bool &bOutRe, bool &bError)
 {
 	//For LLT calculations
 	//returns the interpolated center of pressure position
@@ -2617,12 +2617,12 @@ double GetXCp(QList<void*>*m_poaPolar, Foil *pFoil0, Foil *pFoil1, double Re, do
 	double XCp0, XCp1;
 
 	if(!pFoil0) return 0.0;
-	else XCp0 = GetPlrPointFromAlpha(m_poaPolar, pFoil0, Re, Alpha, 11, IsOutRe, IsError);
+	else XCp0 = GetPlrPointFromAlpha(pFoil0, Re, Alpha, 11, IsOutRe, IsError);
 	if(IsOutRe) bOutRe = true;
 	if(IsError) bError = true;
 
 	if(!pFoil1) return 0.0;
-	else XCp1 = GetPlrPointFromAlpha(m_poaPolar, pFoil1, Re, Alpha, 11, IsOutRe, IsError);
+	else XCp1 = GetPlrPointFromAlpha(pFoil1, Re, Alpha, 11, IsOutRe, IsError);
 	if(IsOutRe) bOutRe = true;
 	if(IsError) bError = true;
 
@@ -2646,7 +2646,7 @@ double GetXCp(QList<void*>*m_poaPolar, Foil *pFoil0, Foil *pFoil1, double Re, do
 *@param bError if Re is outside the min or max Reynolds number of the polar mesh.
 *@return the interpolated value.
 */
-double GetXTr(QList<void*>*m_poaPolar, Foil *pFoil0, Foil *pFoil1, double Re, double Alpha, double Tau, bool bTop, bool &bOutRe, bool &bError)
+double GetXTr(Foil *pFoil0, Foil *pFoil1, double Re, double Alpha, double Tau, bool bTop, bool &bOutRe, bool &bError)
 {
 	//For LLT calculations
 	//returns the interpolated position of the transition on the  surface specified by bTop
@@ -2665,8 +2665,8 @@ double GetXTr(QList<void*>*m_poaPolar, Foil *pFoil0, Foil *pFoil1, double Re, do
 	}
 	else
 	{
-		if(bTop) Tr0 = GetPlrPointFromAlpha(m_poaPolar, pFoil0, Re, Alpha, 5, IsOutRe, IsError);
-		else     Tr0 = GetPlrPointFromAlpha(m_poaPolar, pFoil0, Re, Alpha, 6, IsOutRe, IsError);
+		if(bTop) Tr0 = GetPlrPointFromAlpha(pFoil0, Re, Alpha, 5, IsOutRe, IsError);
+		else     Tr0 = GetPlrPointFromAlpha(pFoil0, Re, Alpha, 6, IsOutRe, IsError);
 	}
 	if(IsOutRe) bOutRe = true;
 	if(IsError) bError = true;
@@ -2676,8 +2676,8 @@ double GetXTr(QList<void*>*m_poaPolar, Foil *pFoil0, Foil *pFoil1, double Re, do
 	}
 	else
 	{
-		if(bTop) Tr1 = GetPlrPointFromAlpha(m_poaPolar, pFoil1, Re, Alpha, 5, IsOutRe, IsError);
-		else     Tr1 = GetPlrPointFromAlpha(m_poaPolar, pFoil1, Re, Alpha, 6, IsOutRe, IsError);
+		if(bTop) Tr1 = GetPlrPointFromAlpha(pFoil1, Re, Alpha, 5, IsOutRe, IsError);
+		else     Tr1 = GetPlrPointFromAlpha(pFoil1, Re, Alpha, 6, IsOutRe, IsError);
 	}
 	if(IsOutRe) bOutRe = true;
 	if(IsError) bError = true;
@@ -2697,7 +2697,7 @@ double GetXTr(QList<void*>*m_poaPolar, Foil *pFoil0, Foil *pFoil1, double Re, do
 *@param Tau the relative position of the point between the two foils.
 *@return the interpolated value.
 */
-double GetZeroLiftAngle(QList<void*>*m_poaPolar, Foil *pFoil0, Foil *pFoil1, double Re, double Tau)
+double GetZeroLiftAngle(Foil *pFoil0, Foil *pFoil1, double Re, double Tau)
 {
 	//returns the 0-lift angle of the foil, at Reynolds=Re
 	//if the polar doesn't reach to 0-lift, returns Alpha0 = 0;
@@ -2713,24 +2713,24 @@ double GetZeroLiftAngle(QList<void*>*m_poaPolar, Foil *pFoil0, Foil *pFoil1, dou
 	{
 		pPolar1 = NULL;
 		pPolar2 = NULL;
-		for (i=0; i<m_poaPolar->size(); i++)
+		for (i=0; i<MainFrame::s_oaPolar.size(); i++)
 		{
-			pPolar = (Polar*)m_poaPolar->at(i);
+			pPolar = (Polar*)MainFrame::s_oaPolar.at(i);
 			if(pPolar->m_FoilName == pFoil0->m_FoilName) size++;
 		}
 		if(size)
 		{
-			for (i=0; i<m_poaPolar->size(); i++)
+			for (i=0; i<MainFrame::s_oaPolar.size(); i++)
 			{
-				pPolar = (Polar*)m_poaPolar->at(i);
+				pPolar = (Polar*)MainFrame::s_oaPolar.at(i);
 				if(pPolar->m_FoilName == pFoil0->m_FoilName)
 				{
 					if(pPolar->m_Reynolds < Re) pPolar1 = pPolar;
 				}
 			}
-			for (i=0; i<m_poaPolar->size(); i++)
+			for (i=0; i<MainFrame::s_oaPolar.size(); i++)
 			{
-				pPolar = (Polar*)m_poaPolar->at(i);
+				pPolar = (Polar*)MainFrame::s_oaPolar.at(i);
 				if(pPolar->m_FoilName == pFoil0->m_FoilName)
 				{
 					if(pPolar->m_Reynolds > Re)
@@ -2755,24 +2755,24 @@ double GetZeroLiftAngle(QList<void*>*m_poaPolar, Foil *pFoil0, Foil *pFoil1, dou
 	{
 		pPolar1 = NULL;
 		pPolar2 = NULL;
-		for (i=0; i<m_poaPolar->size(); i++)
+		for (i=0; i<MainFrame::s_oaPolar.size(); i++)
 		{
-			pPolar = (Polar*)m_poaPolar->at(i);
+			pPolar = (Polar*)MainFrame::s_oaPolar.at(i);
 			if(pPolar->m_FoilName == pFoil1->m_FoilName) size++;
 		}
 		if(size)
 		{
-			for (i=0; i<m_poaPolar->size(); i++)
+			for (i=0; i<MainFrame::s_oaPolar.size(); i++)
 			{
-				pPolar = (Polar*)m_poaPolar->at(i);
+				pPolar = (Polar*)MainFrame::s_oaPolar.at(i);
 				if(pPolar->m_FoilName == pFoil1->m_FoilName)
 				{
 					if(pPolar->m_Reynolds < Re) pPolar1 = pPolar;
 				}
 			}
-			for (i=0; i<m_poaPolar->size(); i++)
+			for (i=0; i<MainFrame::s_oaPolar.size(); i++)
 			{
-				pPolar = (Polar*)m_poaPolar->at(i);
+				pPolar = (Polar*)MainFrame::s_oaPolar.at(i);
 				if(pPolar->m_FoilName == pFoil1->m_FoilName)
 				{
 					if(pPolar->m_Reynolds > Re)
@@ -2806,7 +2806,7 @@ double GetZeroLiftAngle(QList<void*>*m_poaPolar, Foil *pFoil0, Foil *pFoil1, dou
 *@param Alpha0 the zero-lift angle; if the interpolation fails, returns Alpha0 = 0
 *@param Slope the slope of the lift curve; if the interpolation fails, returns Slope = 2 PI
 */
-void GetLinearizedPolar(QList<void*>*m_poaPolar, Foil *pFoil0, Foil *pFoil1, double Re, double Tau, double &Alpha0, double &Slope)
+void GetLinearizedPolar(Foil *pFoil0, Foil *pFoil1, double Re, double Tau, double &Alpha0, double &Slope)
 {
 	double Alpha00, Alpha01;
 	double Slope0, Slope1;
@@ -2826,24 +2826,24 @@ void GetLinearizedPolar(QList<void*>*m_poaPolar, Foil *pFoil0, Foil *pFoil1, dou
 	{
 		pPolar1 = NULL;
 		pPolar2 = NULL;
-		for (i=0; i<m_poaPolar->size(); i++)
+		for (i=0; i<MainFrame::s_oaPolar.size(); i++)
 		{
-			pPolar = (Polar*)m_poaPolar->at(i);
+			pPolar = (Polar*)MainFrame::s_oaPolar.at(i);
 			if(pPolar->m_FoilName == pFoil0->m_FoilName) size++;
 		}
 		if(size)
 		{
-			for (i=0; i<m_poaPolar->size(); i++)
+			for (i=0; i<MainFrame::s_oaPolar.size(); i++)
 			{
-				pPolar = (Polar*)m_poaPolar->at(i);
+				pPolar = (Polar*)MainFrame::s_oaPolar.at(i);
 				if(pPolar->m_FoilName == pFoil0->m_FoilName)
 				{
 					if(pPolar->m_Reynolds < Re) pPolar1 = pPolar;
 				}
 			}
-			for (i=0; i<m_poaPolar->size(); i++)
+			for (i=0; i<MainFrame::s_oaPolar.size(); i++)
 			{
-				pPolar = (Polar*)m_poaPolar->at(i);
+				pPolar = (Polar*)MainFrame::s_oaPolar.at(i);
 				if(pPolar->m_FoilName == pFoil0->m_FoilName)
 				{
 					if(pPolar->m_Reynolds > Re)
@@ -2879,24 +2879,24 @@ void GetLinearizedPolar(QList<void*>*m_poaPolar, Foil *pFoil0, Foil *pFoil1, dou
 	{
 		pPolar1 = NULL;
 		pPolar2 = NULL;
-		for (i=0; i<m_poaPolar->size(); i++)
+		for (i=0; i<MainFrame::s_oaPolar.size(); i++)
 		{
-			pPolar = (Polar*)m_poaPolar->at(i);
+			pPolar = (Polar*)MainFrame::s_oaPolar.at(i);
 			if(pPolar->m_FoilName == pFoil1->m_FoilName) size++;
 		}
 		if(size)
 		{
-			for (i=0; i<m_poaPolar->size(); i++)
+			for (i=0; i<MainFrame::s_oaPolar.size(); i++)
 			{
-				pPolar = (Polar*)m_poaPolar->at(i);
+				pPolar = (Polar*)MainFrame::s_oaPolar.at(i);
 				if(pPolar->m_FoilName == pFoil1->m_FoilName)
 				{
 					if(pPolar->m_Reynolds < Re) pPolar1 = pPolar;
 				}
 			}
-			for (i=0; i<m_poaPolar->size(); i++)
+			for (i=0; i<MainFrame::s_oaPolar.size(); i++)
 			{
-				pPolar = (Polar*)m_poaPolar->at(i);
+				pPolar = (Polar*)MainFrame::s_oaPolar.at(i);
 				if(pPolar->m_FoilName == pFoil1->m_FoilName)
 				{
 					if(pPolar->m_Reynolds > Re)

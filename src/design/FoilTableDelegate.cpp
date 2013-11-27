@@ -24,8 +24,6 @@
 #include "FoilTableDelegate.h"
 #include "AFoil.h"
 #include "../globals.h"
-#include "../objects/SplineFoil.h"
-
 
 void *FoilTableDelegate::s_pAFoil;
 
@@ -236,8 +234,8 @@ void FoilTableDelegate::setEditorData(QWidget *editor, const QModelIndex &index)
 	else
 	{
 		double value = index.model()->data(index, Qt::EditRole).toDouble();
-		DoubleEdit *floatEdit = static_cast<DoubleEdit*>(editor);
-		floatEdit->SetValue(value);
+        DoubleEdit *pDE = static_cast<DoubleEdit*>(editor);
+        pDE->SetValue(value);
 	}
 }
 
@@ -253,8 +251,8 @@ void FoilTableDelegate::setModelData(QWidget *editor, QAbstractItemModel *model,
 	}
 	else
 	{
-		DoubleEdit *floatEdit = static_cast<DoubleEdit*>(editor);
-		double value = floatEdit->Value()/100.0;
+        DoubleEdit *pDE = static_cast<DoubleEdit*>(editor);
+        double value = pDE->Value()/100.0;
 		model->setData(index, value, Qt::EditRole);
 	}
 }

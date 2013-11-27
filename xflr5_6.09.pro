@@ -92,6 +92,7 @@ SOURCES += \
 	src/misc/NewNameDlg.cpp \
 	src/misc/ObjectPropsDlg.cpp \
 	src/misc/W3dPrefsDlg.cpp \
+	src/misc/LineBtn.cpp \
 	src/graph/QGraph.cpp \
 	src/graph/GraphWidget.cpp \
 	src/graph/GraphDlg.cpp \
@@ -107,12 +108,11 @@ SOURCES += \
 	src/design/AFoil.cpp \
 	src/design/SplineCtrlsDlg.cpp \
 	src/design/AFoilTableDlg.cpp \
-    src/globals.cpp \
-    src/main.cpp \
-    src/mainframe.cpp \
-    src/threedwidget.cpp \
-	src/twodwidget.cpp \
-	src/misc/LineBtn.cpp
+	src/globals.cpp \
+	src/main.cpp \
+	src/mainframe.cpp \
+	src/threedwidget.cpp \
+	src/twodwidget.cpp
 
 HEADERS += \
 	src/XFLR5Application.h \
@@ -208,6 +208,7 @@ HEADERS += \
 	src/misc/ProgressDlg.h \
 	src/misc/NewNameDlg.h \
 	src/misc/ObjectPropsDlg.h \
+	src/misc/LineBtn.h \
 	src/graph/GraphWidget.h \
 	src/graph/Graph.h \
 	src/graph/GraphDlg.h \
@@ -219,12 +220,11 @@ HEADERS += \
 	src/design/SplineCtrlsDlg.h \
 	src/design/FoilTableDelegate.h \
 	src/design/AFoilTableDlg.h \
-    src/params.h \
-    src/globals.h \
-    src/mainframe.h \
-    src/twodwidget.h \
-	src/threedwidget.h \
-	src/misc/LineBtn.h
+	src/params.h \
+	src/globals.h \
+	src/mainframe.h \
+	src/twodwidget.h \
+	src/threedwidget.h
 
 
 TRANSLATIONS = translations/xflr5v6.ts \

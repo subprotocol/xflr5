@@ -1,7 +1,7 @@
 /****************************************************************************
 
-	FloatEdit Class
-	Copyright (C) 2008-2013 Andre Deperrois adeperrois@xflr5.com
+    DoubleEdit Class
+    Copyright (C) 2013 Andre Deperrois adeperrois@xflr5.com
 
 	This program is free software; you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -64,16 +64,16 @@ double DoubleEdit::ReadValue()
 {
 	bool bOK;
 	double f = locale().toDouble(text().trimmed(), &bOK);
-	if(bOK) m_Value = f; /**@todo */
+	if(bOK) m_Value = f;
 	return m_Value;
-//	FloatEdit orig
+//	DoubleEdit orig
 //	if(bOK) return f;
 //	else    return m_Value;
 }
 
 void DoubleEdit::SetValue(double val)
 {
-        m_Value = val;
+	m_Value = val;
 	FormatValue();
 }
 

@@ -56,8 +56,8 @@ private:
 	void SetupLayout();
 	void ReadStreamParams();
 
-	bool LoadSettings(QSettings *pSettings);
-	bool SaveSettings(QSettings *pSettings);
+	static bool LoadSettings(QSettings *pSettings);
+	static bool SaveSettings(QSettings *pSettings);
 
 	QSlider *m_pctrlLiftScaleSlider, *m_pctrlDragScaleSlider, *m_pctrlVelocityScaleSlider;
 	QPushButton *ApplyButton;
@@ -75,11 +75,11 @@ private:
 
 	
 public:
-	int m_pos;
-	int m_NX;
-	double m_DeltaL;
-	double m_XFactor;
-	double m_XOffset, m_ZOffset;
+	static int s_pos;
+	static int s_NX;
+	static double s_DeltaL;
+	static double s_XFactor;
+	static double s_XOffset, s_ZOffset;
 };
 
 #endif // GL3DSCALES_H

@@ -85,14 +85,14 @@ private:
 	QLabel *m_pctrlInertiaUnit1, *m_pctrlInertiaUnit2;
 	QTableView *m_pctrlMassTable;
 	QStandardItemModel *m_pMassModel;
-	FloatEditDelegate *m_pFloatDelegate;
-	DoubleEdit *m_pctrlCoGIxx, *m_pctrlCoGIyy, *m_pctrlCoGIzz, *m_pctrlCoGIxz;
-	DoubleEdit *m_pctrlXCoG,*m_pctrlYCoG,*m_pctrlZCoG;
-	DoubleEdit *m_pctrlVolumeMass;
+    FloatEditDelegate *m_pFloatDelegate;
+    DoubleEdit *m_pctrlCoGIxx, *m_pctrlCoGIyy, *m_pctrlCoGIzz, *m_pctrlCoGIxz;
+    DoubleEdit *m_pctrlXCoG,*m_pctrlYCoG,*m_pctrlZCoG;
+    DoubleEdit *m_pctrlVolumeMass;
 	
-	DoubleEdit *m_pctrlTotalIxx, *m_pctrlTotalIyy, *m_pctrlTotalIzz, *m_pctrlTotalIxz;
-	DoubleEdit *m_pctrlXTotalCoG,*m_pctrlYTotalCoG,*m_pctrlZTotalCoG;
-	DoubleEdit *m_pctrlTotalMass;
+    DoubleEdit *m_pctrlTotalIxx, *m_pctrlTotalIyy, *m_pctrlTotalIzz, *m_pctrlTotalIxz;
+    DoubleEdit *m_pctrlXTotalCoG,*m_pctrlYTotalCoG,*m_pctrlZTotalCoG;
+    DoubleEdit *m_pctrlTotalMass;
 
 	QMenu *m_pContextMenu;
 	QAction *m_pInsertMassRow, *m_pDeleteMassRow;

@@ -43,6 +43,10 @@ void *QXInverse::s_p2DWidget;
 QXInverse::QXInverse(QWidget *parent)
 	: QWidget(parent)
 {
+//	m_pGraphDlg        = new GraphDlg(pMainFrame);
+//	m_pXInverseStyleDlg = new InverseOptionsDlg(pMainFrame);
+//	m_pPertDlg         = new PertDlg(pMainFrame);
+
 	m_bFullInverse = false;
 
 	m_pXFoil = NULL;
@@ -132,6 +136,9 @@ QXInverse::QXInverse(QWidget *parent)
  */
 QXInverse::~QXInverse()
 {
+//	delete m_pPertDlg;
+//	delete m_pGraphDlg;
+//	delete m_pXInverseStyleDlg;
 }
 
 /**
@@ -1390,20 +1397,20 @@ void QXInverse::OnFilter()
 void QXInverse::OnGraphSettings()
 {
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
-	GraphDlg gDlg(pMainFrame);
+	GraphDlg *m_pGraphDlg = new GraphDlg(pMainFrame);
 
-	gDlg.m_iGraphType = 31;
-	gDlg.m_XSel = 0;
-	gDlg.m_YSel = 0;
-	gDlg.m_pGraph = &m_QGraph;
+	m_pGraphDlg->m_iGraphType = 31;
+	m_pGraphDlg->m_XSel = 0;
+	m_pGraphDlg->m_YSel = 0;
+	m_pGraphDlg->m_pGraph = &m_QGraph;
 
 	QGraph graph;
 	graph.CopySettings(&m_QGraph);
-	gDlg.m_pMemGraph = &m_QGraph;
-	gDlg.m_pGraph = &m_QGraph;
-	gDlg.SetParams();
+	m_pGraphDlg->m_pMemGraph = &m_QGraph;
+	m_pGraphDlg->m_pGraph = &m_QGraph;
+	m_pGraphDlg->SetParams();
 
-	if(gDlg.exec() == QDialog::Accepted)
+	if(m_pGraphDlg->exec() == QDialog::Accepted)
 	{
 	}
 	else
@@ -1459,10 +1466,10 @@ void QXInverse::OnInverseApp()
  */
 void QXInverse::OnInverseStyles()
 {
-	InverseOptionsDlg xisDlg((MainFrame*)s_pMainFrame);
-	xisDlg.m_pXInverse = this;
-	xisDlg.InitDialog();
-	xisDlg.exec();
+	InverseOptionsDlg *m_pXInverseStyleDlg = new InverseOptionsDlg((MainFrame*)s_pMainFrame);
+	m_pXInverseStyleDlg->m_pXInverse = this;
+	m_pXInverseStyleDlg->InitDialog();
+	m_pXInverseStyleDlg->exec();
 }
 
 
@@ -2043,7 +2050,7 @@ void QXInverse::ReleaseZoom()
 void QXInverse::ResetMixedQ()
 {
 	m_pMCurve->clear();
-	for (int i=0; i<m_pQCurve->size(); i++)
+	for (int i=0; i<=m_pQCurve->size(); i++)
 	{
 		m_pMCurve->AppendPoint(m_pQCurve->x[i], m_pQCurve->y[i]);
 	}
@@ -2345,6 +2352,11 @@ void QXInverse::SetTGap(double tr, double ti)
  */
 void QXInverse::SetupLayout()
 {
+//	QDesktopWidget desktop;
+//	QRect r = desktop.geometry();
+//	setMinimumHeight(r.height()/3);
+//	move(r.width()/3, r.height()/6);
+
 	QSizePolicy szPolicyExpanding;
 	szPolicyExpanding.setHorizontalPolicy(QSizePolicy::Expanding);
 	szPolicyExpanding.setVerticalPolicy(QSizePolicy::Expanding);
@@ -2359,188 +2371,152 @@ void QXInverse::SetupLayout()
 
 	setSizePolicy(szPolicyMaximum);
 
+	QGridLayout *SpecLayout = new QGridLayout;
+	m_pctrlSpecAlpha = new QRadioButton(tr("Alpha"));
+	m_pctrlSpecCl = new QRadioButton(tr("Cl"));
+	m_pctrlSpecif = new QLabel(tr("Alpha = "));
+	m_pctrlSpecif->setAlignment(Qt::AlignVCenter | Qt::AlignRight);
+	m_pctrlSpec   = new DoubleEdit(1.23);
+	SpecLayout->addWidget(m_pctrlSpecAlpha,1,1);
+	SpecLayout->addWidget(m_pctrlSpecCl,1,2);
+	SpecLayout->addWidget(m_pctrlSpecif,2,1);
+	SpecLayout->addWidget(m_pctrlSpec,2,2);
 	QGroupBox *SpecBox = new QGroupBox(tr("Specification"));
-	{
-		QGridLayout *SpecLayout = new QGridLayout;
-		{
-			m_pctrlSpecAlpha = new QRadioButton(tr("Alpha"));
-			m_pctrlSpecCl = new QRadioButton(tr("Cl"));
-			m_pctrlSpecif = new QLabel(tr("Alpha = "));
-			m_pctrlSpecif->setAlignment(Qt::AlignVCenter | Qt::AlignRight);
-			m_pctrlSpec   = new DoubleEdit(1.23);
-			SpecLayout->addWidget(m_pctrlSpecAlpha,1,1);
-			SpecLayout->addWidget(m_pctrlSpecCl,1,2);
-			SpecLayout->addWidget(m_pctrlSpecif,2,1);
-			SpecLayout->addWidget(m_pctrlSpec,2,2);
-		}
-		SpecBox->setLayout(SpecLayout);
-	}
+	SpecBox->setLayout(SpecLayout);
 
+	QGridLayout *ModLayout = new QGridLayout;
+	m_pctrlShowSpline    = new QCheckBox(tr("ShowSpline"));
+	m_pctrlTangentSpline = new QCheckBox(tr("Tangent Spline"));
+	m_pctrlNewSpline     = new QPushButton(tr("New Spline"));
+	m_pctrlApplySpline   = new QPushButton(tr("Apply Spline"));
+	m_pctrlResetQSpec    = new QPushButton(tr("Reset QSpec"));
+	m_pctrlPert          = new QPushButton(tr("Pert"));
+	m_pctrlNewSpline->setCheckable(true);
+	ModLayout->addWidget(m_pctrlShowSpline,1,1);
+	ModLayout->addWidget(m_pctrlTangentSpline,1,2);
+	ModLayout->addWidget(m_pctrlNewSpline,2,1);
+	ModLayout->addWidget(m_pctrlApplySpline,2,2);
+	ModLayout->addWidget(m_pctrlResetQSpec,3,1);
+	ModLayout->addWidget(m_pctrlPert,3,2);
 	QGroupBox *ModBox = new QGroupBox(tr("Modification"));
-	{
-		QGridLayout *ModLayout = new QGridLayout;
-		{
-			m_pctrlShowSpline    = new QCheckBox(tr("ShowSpline"));
-			m_pctrlTangentSpline = new QCheckBox(tr("Tangent Spline"));
-			m_pctrlNewSpline     = new QPushButton(tr("New Spline"));
-			m_pctrlApplySpline   = new QPushButton(tr("Apply Spline"));
-			m_pctrlResetQSpec    = new QPushButton(tr("Reset QSpec"));
-			m_pctrlPert          = new QPushButton(tr("Pert"));
-			m_pctrlNewSpline->setCheckable(true);
-			ModLayout->addWidget(m_pctrlShowSpline,1,1);
-			ModLayout->addWidget(m_pctrlTangentSpline,1,2);
-			ModLayout->addWidget(m_pctrlNewSpline,2,1);
-			ModLayout->addWidget(m_pctrlApplySpline,2,2);
-			ModLayout->addWidget(m_pctrlResetQSpec,3,1);
-			ModLayout->addWidget(m_pctrlPert,3,2);
-		}
-		ModBox->setLayout(ModLayout);
-	}
+	ModBox->setLayout(ModLayout);
 
+	QGridLayout *SmoothLayout = new QGridLayout;
+	m_pctrlSmooth = new QPushButton(tr("Smooth QSpec"));
+	m_pctrlFilter = new QPushButton(tr("Hannig Filter"));
+	QLabel *lab0 = new QLabel(tr("Filter parameter"));
+	lab0->setAlignment(Qt::AlignVCenter | Qt::AlignRight);
+	m_pctrlFilterParam = new DoubleEdit(2.34);
+	SmoothLayout->addWidget(m_pctrlSmooth,1,1);
+	SmoothLayout->addWidget(m_pctrlFilter,1,2);
+	SmoothLayout->addWidget(lab0,2,1);
+	SmoothLayout->addWidget(m_pctrlFilterParam,2,2);
 	QGroupBox *SmoothBox = new QGroupBox(tr("Smoothing"));
-	{
-		QGridLayout *SmoothLayout = new QGridLayout;
-		{
-			m_pctrlSmooth = new QPushButton(tr("Smooth QSpec"));
-			m_pctrlFilter = new QPushButton(tr("Hannig Filter"));
-			QLabel *lab0 = new QLabel(tr("Filter parameter"));
-			lab0->setAlignment(Qt::AlignVCenter | Qt::AlignRight);
-			m_pctrlFilterParam = new DoubleEdit(2.34);
-			SmoothLayout->addWidget(m_pctrlSmooth,1,1);
-			SmoothLayout->addWidget(m_pctrlFilter,1,2);
-			SmoothLayout->addWidget(lab0,2,1);
-			SmoothLayout->addWidget(m_pctrlFilterParam,2,2);
-		}
-		SmoothBox->setLayout(SmoothLayout);
-	}
+	SmoothBox->setLayout(SmoothLayout);
 
+	QGridLayout *TELayout = new QGridLayout;
+	QLabel *lab1 = new QLabel(tr("T.E. Angle"));
+	QLabel *lab2 = new QLabel(tr("T.E. Gap dx/c"));
+	QLabel *lab3 = new QLabel(tr("T.E. Gap dy/c"));
+	lab1->setAlignment(Qt::AlignVCenter | Qt::AlignRight);
+	lab2->setAlignment(Qt::AlignVCenter | Qt::AlignRight);
+	lab3->setAlignment(Qt::AlignVCenter | Qt::AlignRight);
+	m_pctrlTAngle = new DoubleEdit(3.681);
+	m_pctrlTGapx  = new DoubleEdit(0.001);
+	m_pctrlTGapy  = new DoubleEdit(0.002);
+	m_pctrlTAngle->SetPrecision(3);
+	m_pctrlTGapx->SetPrecision(3);
+	m_pctrlTGapy->SetPrecision(3);
+	TELayout->addWidget(lab1,1,1);
+	TELayout->addWidget(lab2,2,1);
+	TELayout->addWidget(lab3,3,1);
+	TELayout->addWidget(m_pctrlTAngle,1,2);
+	TELayout->addWidget(m_pctrlTGapx,2,2);
+	TELayout->addWidget(m_pctrlTGapy,3,2);
+	m_pctrlSymm = new QCheckBox(tr("Symmetric foil"));
+	QVBoxLayout *ConstraintsLayout = new QVBoxLayout;
+	ConstraintsLayout->addLayout(TELayout);
+	ConstraintsLayout->addWidget(m_pctrlSymm);
 	QGroupBox *ConstraintsBox = new QGroupBox(tr("Constraints"));
-	{
-		QGridLayout *TELayout = new QGridLayout;
-		{
-			QLabel *lab1 = new QLabel(tr("T.E. Angle"));
-			QLabel *lab2 = new QLabel(tr("T.E. Gap dx/c"));
-			QLabel *lab3 = new QLabel(tr("T.E. Gap dy/c"));
-			lab1->setAlignment(Qt::AlignVCenter | Qt::AlignRight);
-			lab2->setAlignment(Qt::AlignVCenter | Qt::AlignRight);
-			lab3->setAlignment(Qt::AlignVCenter | Qt::AlignRight);
-			m_pctrlTAngle = new DoubleEdit(3.681);
-			m_pctrlTGapx  = new DoubleEdit(0.001);
-			m_pctrlTGapy  = new DoubleEdit(0.002);
-			m_pctrlTAngle->SetPrecision(3);
-			m_pctrlTGapx->SetPrecision(3);
-			m_pctrlTGapy->SetPrecision(3);
-			TELayout->addWidget(lab1,1,1);
-			TELayout->addWidget(lab2,2,1);
-			TELayout->addWidget(lab3,3,1);
-			TELayout->addWidget(m_pctrlTAngle,1,2);
-			TELayout->addWidget(m_pctrlTGapx,2,2);
-			TELayout->addWidget(m_pctrlTGapy,3,2);
-		}
-		m_pctrlSymm = new QCheckBox(tr("Symmetric foil"));
-		QVBoxLayout *ConstraintsLayout = new QVBoxLayout;
-		{
-			ConstraintsLayout->addLayout(TELayout);
-			ConstraintsLayout->addWidget(m_pctrlSymm);
-		}
-		ConstraintsBox->setLayout(ConstraintsLayout);
-	}
+	ConstraintsBox->setLayout(ConstraintsLayout);
 
+	m_pctrlExec = new QPushButton(tr("Execute"));
+	m_pctrlOutput = new QTextEdit(" ");
+	m_pctrlOutput->setEnabled(false);
 
-	m_pctrlFInvWidget = new QWidget(this);
 	QVBoxLayout *FInvLayout = new QVBoxLayout;
-	{
-		m_pctrlExec = new QPushButton(tr("Execute"));
-		m_pctrlOutput = new QTextEdit(" ");
-		m_pctrlOutput->setEnabled(false);
-		FInvLayout->addWidget(SpecBox);
-		FInvLayout->addWidget(ModBox);
-		FInvLayout->addWidget(SmoothBox);
-		FInvLayout->addWidget(ConstraintsBox);
-		FInvLayout->addWidget(m_pctrlExec);
-		FInvLayout->addWidget(m_pctrlOutput);
-		FInvLayout->addStretch(1);
-		m_pctrlFInvWidget->setLayout(FInvLayout);
-	}
+	FInvLayout->addWidget(SpecBox);
+	FInvLayout->addWidget(ModBox);
+	FInvLayout->addWidget(SmoothBox);
+	FInvLayout->addWidget(ConstraintsBox);
+	FInvLayout->addWidget(m_pctrlExec);
+	FInvLayout->addWidget(m_pctrlOutput);
+	FInvLayout->addStretch(1);
+	m_pctrlFInvWidget = new QWidget(this);
+	m_pctrlFInvWidget->setLayout(FInvLayout);
 
 	//specific MInv Controls
+	m_pctrlMAlphaSpec     = new QLineEdit(tr("Alpha = "));
+	m_pctrlMClSpec        = new QLineEdit(tr("Cl ="));
+	m_pctrlMAlphaSpec->setEnabled(false);
+	m_pctrlMClSpec->setEnabled(false);
 	QHBoxLayout *MSpecLayout = new QHBoxLayout;
-	{
-		m_pctrlMAlphaSpec     = new QLineEdit(tr("Alpha = "));
-		m_pctrlMClSpec        = new QLineEdit(tr("Cl ="));
-		m_pctrlMAlphaSpec->setEnabled(false);
-		m_pctrlMClSpec->setEnabled(false);
-		MSpecLayout->addWidget(m_pctrlMAlphaSpec);
-		MSpecLayout->addWidget(m_pctrlMClSpec);
-	}
+	MSpecLayout->addWidget(m_pctrlMAlphaSpec);
+	MSpecLayout->addWidget(m_pctrlMClSpec);
 
+	m_pctrlIter           = new DoubleEdit(11);
+	m_pctrlMark           = new QPushButton(tr("Mark for modification"));
+	m_pctrlCpxx           = new QCheckBox(tr("End Point Constraint"));
+	m_pctrlMExec          = new QPushButton(tr("Execute"));
+	m_pctrlMOutput        = new QTextEdit(tr(" "));
+	m_pctrlMShowSpline    = new QCheckBox(tr("ShowSpline"));
+	m_pctrlMTangentSpline = new QCheckBox(tr("Tangent Spline"));
+	m_pctrlMNewSpline     = new QPushButton(tr("New Spline"));
+	m_pctrlMApplySpline   = new QPushButton(tr("Apply Spline"));
+	m_pctrlMSmooth        = new QPushButton(tr("Smooth"));
+	m_pctrlMResetQSpec    = new QPushButton(tr("Reset QSpec"));
+	m_pctrlMNewSpline->setCheckable(true);
+	m_pctrlMark->setCheckable(true);
+	m_pctrlMOutput->setEnabled(false);
 
+	QGridLayout *MSplineslayout = new QGridLayout;
+	MSplineslayout->addWidget(m_pctrlMShowSpline,1,1);
+	MSplineslayout->addWidget(m_pctrlMTangentSpline,1,2);
+	MSplineslayout->addWidget(m_pctrlMNewSpline,2,1);
+	MSplineslayout->addWidget(m_pctrlMApplySpline,2,2);
+	MSplineslayout->addWidget(m_pctrlMark,3,1,1,2);
+	MSplineslayout->addWidget(m_pctrlMSmooth,4,1);
+	MSplineslayout->addWidget(m_pctrlMResetQSpec,4,2);
 	QGroupBox *MSplinesBox = new QGroupBox(tr("Modification"));
-	{
-		QGridLayout *MSplineslayout = new QGridLayout;
-		{
-			m_pctrlMShowSpline    = new QCheckBox(tr("ShowSpline"));
-			m_pctrlMTangentSpline = new QCheckBox(tr("Tangent Spline"));
-			m_pctrlMNewSpline     = new QPushButton(tr("New Spline"));
-			m_pctrlMApplySpline   = new QPushButton(tr("Apply Spline"));
-			m_pctrlMark           = new QPushButton(tr("Mark for modification"));
-			m_pctrlMSmooth        = new QPushButton(tr("Smooth"));
-			m_pctrlMResetQSpec    = new QPushButton(tr("Reset QSpec"));
-			m_pctrlMNewSpline->setCheckable(true);
-			m_pctrlMark->setCheckable(true);
-			MSplineslayout->addWidget(m_pctrlMShowSpline,1,1);
-			MSplineslayout->addWidget(m_pctrlMTangentSpline,1,2);
-			MSplineslayout->addWidget(m_pctrlMNewSpline,2,1);
-			MSplineslayout->addWidget(m_pctrlMApplySpline,2,2);
-			MSplineslayout->addWidget(m_pctrlMark,3,1,1,2);
-			MSplineslayout->addWidget(m_pctrlMSmooth,4,1);
-			MSplineslayout->addWidget(m_pctrlMResetQSpec,4,2);
-		}
-		MSplinesBox->setLayout(MSplineslayout);
-	}
+	MSplinesBox->setLayout(MSplineslayout);
 
+	QVBoxLayout *FoilLayout = new QVBoxLayout;
+	FoilLayout->addWidget(m_pctrlCpxx);
+	FoilLayout->addWidget(m_pctrlMExec);
+	QHBoxLayout *MaxIter = new QHBoxLayout;
+	QLabel *lab10 = new QLabel(tr("Max Iterations"));
+	MaxIter->addWidget(lab10);
+	MaxIter->addWidget(m_pctrlIter);
+	FoilLayout->addLayout(MaxIter);
 	QGroupBox *FoilBox = new QGroupBox(tr("Foil"));
-	{
-		QVBoxLayout *FoilLayout = new QVBoxLayout;
-		{
-			m_pctrlIter           = new DoubleEdit(11);
-			m_pctrlCpxx           = new QCheckBox(tr("End Point Constraint"));
-			m_pctrlMExec          = new QPushButton(tr("Execute"));
-			FoilLayout->addWidget(m_pctrlCpxx);
-			FoilLayout->addWidget(m_pctrlMExec);
-			QHBoxLayout *MaxIter = new QHBoxLayout;
-			QLabel *lab10 = new QLabel(tr("Max Iterations"));
-			MaxIter->addWidget(lab10);
-			MaxIter->addWidget(m_pctrlIter);
-			FoilLayout->addLayout(MaxIter);
-		}
-		FoilBox->setLayout(FoilLayout);
-	}
+	FoilBox->setLayout(FoilLayout);
 
-	m_pctrlMInvWidget = new QWidget(this);
 	QVBoxLayout *MInvLayout = new QVBoxLayout;
-	{
-		m_pctrlMOutput        = new QTextEdit(tr(" "));
-		m_pctrlMOutput->setEnabled(false);
-		MInvLayout->addLayout(MSpecLayout);
-		MInvLayout->addWidget(MSplinesBox);
-		MInvLayout->addWidget(FoilBox);
-		MInvLayout->addWidget(m_pctrlMOutput);
-		MInvLayout->addStretch(1);
-		m_pctrlMInvWidget->setLayout(MInvLayout);
-	}
+	MInvLayout->addLayout(MSpecLayout);
+	MInvLayout->addWidget(MSplinesBox);
+	MInvLayout->addWidget(FoilBox);
+	MInvLayout->addWidget(m_pctrlMOutput);
+	MInvLayout->addStretch(1);
+	m_pctrlMInvWidget = new QWidget(this);
+	m_pctrlMInvWidget->setLayout(MInvLayout);
 
 	m_pctrlStackedInv = new QStackedWidget;
-	{
-		m_pctrlStackedInv->addWidget(m_pctrlFInvWidget);
-		m_pctrlStackedInv->addWidget(m_pctrlMInvWidget);
-	}
+	m_pctrlStackedInv->addWidget(m_pctrlFInvWidget);
+	m_pctrlStackedInv->addWidget(m_pctrlMInvWidget);
 
 	QVBoxLayout *MainLayout = new QVBoxLayout;
-	{
-		MainLayout->addWidget(m_pctrlStackedInv);
-		MainLayout->addStretch(1);
-	}
+	MainLayout->addWidget(m_pctrlStackedInv);
+	MainLayout->addStretch(1);
 	setLayout(MainLayout);
 	Connect();
 }

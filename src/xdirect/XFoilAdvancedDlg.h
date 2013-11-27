@@ -52,7 +52,7 @@ private:
 	void SetupLayout();
 	QCheckBox *m_pctrlInitBL, *m_pctrlFullReport;
 	QLineEdit *m_pctrlIterLimit;
-	DoubleEdit * m_pctrlVAccel;
+    DoubleEdit * m_pctrlVAccel;
 	QPushButton *OKButton, *CancelButton;
 
 	int m_IterLimit;

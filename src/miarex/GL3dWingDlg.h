@@ -148,13 +148,6 @@ private:
 	static QSize  s_WindowSize;
 	static bool s_bWindowMaximized;
 
-	static bool s_bOutline;                   /**< true if the surface outlines are to be displayed in the 3D view*/
-	static bool s_bSurfaces;                  /**< true if the surfaces are to be displayed in the 3D view*/
-	static bool s_bVLMPanels;                 /**< true if the panels are to be displayed in the 3D view*/
-	static bool s_bAxes;                      /**< true if the axes are to be displayed in the 3D view*/
-	static bool s_bShowMasses;                /**< true if the point masses are to be displayed on the openGL 3D view */
-	static bool s_bFoilNames;                 /**< true if the foil names are to be displayed on the openGL 3D view */
-
 
 	ThreeDWidget *m_pGLWidget;
 

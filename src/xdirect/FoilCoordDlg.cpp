@@ -222,7 +222,7 @@ void FoilCoordDlg::OnInsertPoint()
 
 
 
-void FoilCoordDlg::OnCellChanged(QWidget *FloatEdit)
+void FoilCoordDlg::OnCellChanged(QWidget *DoubleEdit)
 {
 	double X,Y;
 

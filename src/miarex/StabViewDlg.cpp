@@ -590,9 +590,9 @@ void StabViewDlg::SetupLayout()
 			m_pctrlUnit1->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
 			m_pctrlUnit2->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
 			m_pctrlUnit3->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
-			m_pctrlStabVar1 = new DoubleEdit(0.00,3);
-			m_pctrlStabVar2 = new DoubleEdit(0.00,3);
-			m_pctrlStabVar3 = new DoubleEdit(1.00,3);
+            m_pctrlStabVar1 = new DoubleEdit(0.00,3);
+            m_pctrlStabVar2 = new DoubleEdit(0.00,3);
+            m_pctrlStabVar3 = new DoubleEdit(1.00,3);
 			QGridLayout *VarParams = new QGridLayout;
 			VarParams->addWidget(m_pctrlStabLabel1,1,1);
 			VarParams->addWidget(m_pctrlStabLabel2,2,1);
@@ -618,7 +618,7 @@ void StabViewDlg::SetupLayout()
 			m_pctrlControlTable->setMinimumHeight(150);
 			m_pctrlControlTable->setSelectionMode(QAbstractItemView::SingleSelection);
 			m_pctrlControlTable->setSelectionBehavior(QAbstractItemView::SelectRows);
-			m_pCtrlDelegate = new FloatEditDelegate;
+            m_pCtrlDelegate = new FloatEditDelegate;
 			int  *precision = new int[3];
 			precision[0]  = 3;
 			precision[1]  = 3;
@@ -657,9 +657,9 @@ void StabViewDlg::SetupLayout()
 		m_pctrlInitialConditionsWidget->addWidget(ModalTimeBox);
 		m_pctrlInitialConditionsWidget->setCurrentIndex(0);
 
-		m_pctrlTotalTime = new DoubleEdit(5,3);
+        m_pctrlTotalTime = new DoubleEdit(5,3);
 		m_pctrlTotalTime->setToolTip(tr("Define the total time range for the graphs"));
-		m_pctrlDeltat    = new DoubleEdit(.01,3);
+        m_pctrlDeltat    = new DoubleEdit(.01,3);
 		m_pctrlDeltat->setToolTip(tr("Define the time step for the resolution of the differential equations"));
 
 		QGridLayout *DtLayout  = new QGridLayout;
@@ -745,9 +745,9 @@ void StabViewDlg::SetupLayout()
 			DsiLab->setAlignment(Qt::AlignVCenter | Qt::AlignRight);
 			DsiLab->setFont(SymbolFont);
 
-			m_pctrlFreqN  = new DoubleEdit(0.0,3);
-			m_pctrlFreq1  = new DoubleEdit(0.0,3);
-			m_pctrlDsi    = new DoubleEdit(0.0,3);
+            m_pctrlFreqN  = new DoubleEdit(0.0,3);
+            m_pctrlFreq1  = new DoubleEdit(0.0,3);
+            m_pctrlDsi    = new DoubleEdit(0.0,3);
 			m_pctrlFreqN->setEnabled(false);
 			m_pctrlFreq1->setEnabled(false);
 			m_pctrlDsi->setEnabled(false);
@@ -849,7 +849,7 @@ void StabViewDlg::SetupLayout()
 
 			QHBoxLayout *StepLayout = new  QHBoxLayout;
 			{
-				m_pctrlModeStep = new DoubleEdit(0.01,3);
+                m_pctrlModeStep = new DoubleEdit(0.01,3);
 				QLabel *StepLabel = new QLabel(tr("Time Step ="));
 				QLabel *StepUnit  = new QLabel(tr("s"));
 				StepLayout->addWidget(StepLabel);

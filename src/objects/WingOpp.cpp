@@ -239,7 +239,8 @@ bool WingOpp::SerializeWingOpp(QDataStream &ar, bool bIsStoring)
 
 	if(bIsStoring)
 	{
-		ar << 1022;
+		ar << 1023;
+		//1023 : condidional gamma and Cp save on !LLTMethod
 		//1022 : reduced the number of controls to 1
         //1021 : added ZCP
         //1020 : added CXa/CXu/CZu/Cmu + changed the provisions to zero
@@ -311,8 +312,11 @@ bool WingOpp::SerializeWingOpp(QDataStream &ar, bool bIsStoring)
 		}
 		for (k=0; k<=m_NStation; k++) ar << (float)m_SpanPos[k] << (float)m_StripArea[k];
 		ar << m_NVLMPanels;
-		for (p=0; p<m_NVLMPanels;p++) ar << m_Cp[p];
-		for (p=0; p<m_NVLMPanels;p++) ar << m_G[p];
+		if(m_AnalysisMethod !=LLTMETHOD)
+		{
+			for (p=0; p<m_NVLMPanels;p++) ar << m_Cp[p];
+			for (p=0; p<m_NVLMPanels;p++) ar << m_G[p];
+		}
 
 		if(m_AnalysisMethod==PANELMETHOD)
 		{
@@ -524,18 +528,24 @@ bool WingOpp::SerializeWingOpp(QDataStream &ar, bool bIsStoring)
 			m_Sigma = new float[m_NVLMPanels];
 			m_Cp    = new float[m_NVLMPanels];
 
-			for (p=0; p<m_NVLMPanels;p++)
+			if(ArchiveFormat<1023 || m_AnalysisMethod !=LLTMETHOD)
 			{
-				ar >> f; m_Cp[p] =f;
+				for (p=0; p<m_NVLMPanels;p++)
+				{
+					ar >> f; m_Cp[p] =f;
+				}
 			}
 		}
 
 		if(ArchiveFormat>=1009)
 		{
-			for (p=0; p<m_NVLMPanels;p++)
+			if(ArchiveFormat<1023 || m_AnalysisMethod !=LLTMETHOD)
 			{
-				ar >> f; m_G[p] =f;
-				if(ArchiveFormat<1010) m_G[p] =  f/1000.0;
+				for (p=0; p<m_NVLMPanels;p++)
+				{
+					ar >> f; m_G[p] =f;
+					if(ArchiveFormat<1010) m_G[p] =  f/1000.0;
+				}
 			}
 		}
 		if(ArchiveFormat>1010)

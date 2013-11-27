@@ -23,7 +23,6 @@
 #include "../objects/Foil.h"
 #include "WingDelegate.h"
 #include "GL3dWingDlg.h"
-#include "../misc/DoubleEdit.h"
 
 
 WingDelegate::WingDelegate(QObject *parent)
@@ -37,14 +36,22 @@ QWidget *WingDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem 
 {
 	if(index.column()!=5 && index.column()!=7 && index.column()!=9)
 	{
-		DoubleEdit *editor = new DoubleEdit(parent);
+        DoubleEdit *editor = new DoubleEdit(parent);
 		editor->setAlignment(Qt::AlignRight);
-        editor->SetMin(1);
+
 		editor->SetPrecision(m_Precision[index.column()]);
-		if(index.column()==6) editor->SetMax(MAXCHORDPANELS-1);
-		if(index.column()==8) editor->SetMax(MAXSPANSTATIONS-1);
+        if(index.column()==6)
+        {
+            editor->SetMin(1);
+            editor->SetMax(MAXCHORDPANELS-1);
+        }
+        if(index.column()==8)
+        {
+            editor->SetMin(1);
+            editor->SetMax(MAXSPANSTATIONS-1);
+        }
 		return editor;
-    }
+	}
 	else
 	{
 		QString strong;
@@ -83,8 +90,8 @@ void WingDelegate::setEditorData(QWidget *editor, const QModelIndex &index) cons
 	if(index.column()!=5 && index.column()!=7 && index.column()!=9)
 	{
 		double value = index.model()->data(index, Qt::EditRole).toDouble();
-		DoubleEdit *pFE = static_cast<DoubleEdit*>(editor);
-        pFE->SetValue(value);
+        DoubleEdit *pDE = static_cast<DoubleEdit*>(editor);
+        pDE->SetValue(value);
 	}
 	else
 	{
@@ -101,8 +108,8 @@ void WingDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, cons
 {
 	if(index.column()!=5 && index.column()!=7 && index.column()!=9)
 	{
-		DoubleEdit *pFE = static_cast<DoubleEdit*>(editor);
-        double value = pFE->Value();
+        DoubleEdit *pDE = static_cast<DoubleEdit*>(editor);
+        double value = pDE->Value();
 		model->setData(index, value, Qt::EditRole);
 	}
 	else

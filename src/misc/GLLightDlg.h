@@ -42,11 +42,11 @@ public:
 	void ReadParams(void);
 	void SetDefaults(double size);
 	void SetParams(void);
-    static bool LoadSettings(QSettings *pSettings);
-    static bool SaveSettings(QSettings *pSettings);
+	bool LoadSettings(QSettings *pSettings);
+	bool SaveSettings(QSettings *pSettings);
 
-    static bool IsLightOn() {return s_bLight;}
-    static void SetLightOn(bool bLight) {s_bLight = bLight;}
+	static bool IsLightOn() {return s_bLight;};
+	static void SetLightOn(bool bLight) {s_bLight = bLight;};
 
 private:
 	void SetupLayout();

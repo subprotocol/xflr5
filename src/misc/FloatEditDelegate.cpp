@@ -1,6 +1,6 @@
 /****************************************************************************
 
-	FloatEditDelegate Class
+    FloatEditDelegate Class
 	Copyright (C) 2009 Andre Deperrois adeperrois@xflr5.com
 
 	This program is free software; you can redistribute it and/or modify
@@ -54,8 +54,8 @@ void FloatEditDelegate::setEditorData(QWidget *editor, const QModelIndex &index)
 	if(m_Precision[index.column()]>=0)
 	{
 		double value = index.model()->data(index, Qt::EditRole).toDouble();
-		DoubleEdit *floatEdit = static_cast<DoubleEdit*>(editor);
-		floatEdit->SetValueNoFormat(value);
+        DoubleEdit *pDE = static_cast<DoubleEdit*>(editor);
+        pDE->SetValueNoFormat(value);
 	}
 	else
 	{
@@ -71,8 +71,8 @@ void FloatEditDelegate::setModelData(QWidget *editor, QAbstractItemModel *model,
 {
 	if(m_Precision[index.column()]>=0)
 	{
-		DoubleEdit *floatEdit = static_cast<DoubleEdit*>(editor);
-		double value = floatEdit->Value();
+        DoubleEdit *pDE = static_cast<DoubleEdit*>(editor);
+        double value = pDE->Value();
 		model->setData(index, value, Qt::EditRole);
 	}
 	else

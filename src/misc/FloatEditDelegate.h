@@ -1,6 +1,6 @@
 /****************************************************************************
 
-	FloatEditDelegate Class
+	DoubleEditDelegate Class
 	Copyright (C) 2009 Andre Deperrois adeperrois@xflr5.com
 
 	This program is free software; you can redistribute it and/or modify
@@ -19,8 +19,8 @@
 
 *****************************************************************************/
 
-#ifndef FLOATEDITDELEGATE_H
-#define FLOATEDITDELEGATE_H
+#ifndef DoubleEditDELEGATE_H
+#define DoubleEditDELEGATE_H
 
 #include <QItemDelegate>
 #include "DoubleEdit.h"
@@ -31,7 +31,7 @@ class FloatEditDelegate : public QItemDelegate
 	Q_OBJECT
 
 public:
-	FloatEditDelegate(QObject *parent = 0);
+    FloatEditDelegate(QObject *parent = 0);
 
 	QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const;
 
@@ -46,4 +46,4 @@ private:
 	int *m_Precision; ///table of float precisions for each column
 };
 
-#endif // QFLOATEDITDELEGATE_H
+#endif // QDoubleEditDELEGATE_H

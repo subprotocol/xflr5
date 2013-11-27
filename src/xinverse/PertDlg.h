@@ -61,8 +61,8 @@ private:
 	QStandardItemModel *m_pCnModel;
 	FloatEditDelegate *m_pFloatDelegate;
 
-//	FloatEdit *m_pctrlCnr;
-//	FloatEdit *m_pctrlCni;
+//	DoubleEdit *m_pctrlCnr;
+//	DoubleEdit *m_pctrlCni;
 //	QListBox *m_pctrlCnList;
 
 protected:

@@ -50,20 +50,11 @@ void *GL3dWingDlg::s_pGLLightDlg;
 
 QList <void*> *GL3dWingDlg::s_poaWing;
 QList <void*> *GL3dWingDlg::s_poaFoil;
-	
+
 
 QPoint GL3dWingDlg::s_WindowPos=QPoint(20,20);
 QSize  GL3dWingDlg::s_WindowSize=QSize(900, 700);
 bool GL3dWingDlg::s_bWindowMaximized=false;
-
-bool GL3dWingDlg::s_bAxes = true;
-bool GL3dWingDlg::s_bOutline = true;
-bool GL3dWingDlg::s_bSurfaces = true;
-bool GL3dWingDlg::s_bShowMasses = false;
-bool GL3dWingDlg::s_bFoilNames = false;
-bool GL3dWingDlg::s_bVLMPanels = false;
-
-
 
 
 GL3dWingDlg::GL3dWingDlg(QWidget *pParent) : QDialog(pParent)
@@ -393,8 +384,6 @@ void GL3dWingDlg::FillTableRow(int row)
 
 void GL3dWingDlg::GLCreateMesh()
 {
-	QMiarex *pMiarex = (QMiarex*)s_pMiarex;
-
 	QColor color;
 	int width, j,l,k;
 	CVector A, B, C, D, N, LATB, TALB;
@@ -405,9 +394,9 @@ void GL3dWingDlg::GLCreateMesh()
 		glEnable(GL_DEPTH_TEST);
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
-		color = pMiarex->m_VLMColor;
-//		style = pMiarex->m_VLMStyle;
-		width = pMiarex->m_VLMWidth;
+        color = W3dPrefsDlg::s_VLMColor;
+//		style = W3dPrefsDlg::s_VLMStyle;
+        width = W3dPrefsDlg::s_VLMWidth;
 
 		glLineWidth(width);
 
@@ -539,8 +528,8 @@ void GL3dWingDlg::GLCreateMesh()
 		glPolygonOffset(1.0, 1.0);
 
 		color = MainFrame::s_BackgroundColor;
-//		style = pMiarex->m_VLMStyle;
-		width = pMiarex->m_VLMWidth;
+//		style = W3dPrefsDlg::s_VLMStyle;
+        width = W3dPrefsDlg::s_VLMWidth;
 
 		glColor3d(color.redF(),color.greenF(),color.blueF());
 
@@ -913,8 +902,6 @@ void GL3dWingDlg::GLInverseMatrix()
 
 void GL3dWingDlg::GLRenderView()
 {
-	QMiarex *pMiarex = (QMiarex*)s_pMiarex;
-
     QString MassUnit;
     GetWeightUnit(MassUnit, MainFrame::s_WeightUnit);
 
@@ -964,12 +951,12 @@ void GL3dWingDlg::GLRenderView()
 		glScaled(m_glScaled, m_glScaled, m_glScaled);
 		glTranslated(m_glRotCenter.x, m_glRotCenter.y, m_glRotCenter.z);
 
-		if(GL3dWingDlg::s_bAxes)  m_pGLWidget->GLDrawAxes(1, pMiarex->m_3DAxisColor, pMiarex->m_3DAxisStyle, pMiarex->m_3DAxisWidth);
+        if(QMiarex::s_bAxes)  m_pGLWidget->GLDrawAxes(1, W3dPrefsDlg::s_3DAxisColor, W3dPrefsDlg::s_3DAxisStyle, W3dPrefsDlg::s_3DAxisWidth);
 
 		glDisable(GL_LIGHTING);
 		glDisable(GL_LIGHT0);
 
-		if(GL3dWingDlg::s_bOutline)
+		if(QMiarex::s_bOutline)
 		{
 			glCallList(WINGGEOMETRY+4);
 		}
@@ -990,7 +977,7 @@ void GL3dWingDlg::GLRenderView()
 			glDisable(GL_LIGHT0);
 		}
 
-		if(GL3dWingDlg::s_bSurfaces)
+		if(QMiarex::s_bSurfaces)
 		{
 			glCallList(WINGGEOMETRY);
 		}
@@ -998,9 +985,9 @@ void GL3dWingDlg::GLRenderView()
 		glDisable(GL_LIGHTING);
 		glDisable(GL_LIGHT0);
 
-		if(GL3dWingDlg::s_bVLMPanels)
+		if(QMiarex::s_bVLMPanels)
 		{
-			if(!GL3dWingDlg::s_bSurfaces) glCallList(MESHBACK);
+			if(!QMiarex::s_bSurfaces) glCallList(MESHBACK);
 			glCallList(MESHPANELS);
 		}
 	}
@@ -1010,7 +997,7 @@ void GL3dWingDlg::GLRenderView()
 	}
 	if(m_bShowMasses)
 	{
-		glColor3d(pMiarex->m_MassColor.redF(),pMiarex->m_MassColor.greenF(),pMiarex->m_MassColor.blueF());
+        glColor3d(W3dPrefsDlg::s_MassColor.redF(),W3dPrefsDlg::s_MassColor.greenF(),W3dPrefsDlg::s_MassColor.blueF());
 		for(int im=0; im<m_pWing->m_PointMass.size(); im++)
 		{
 			glPushMatrix();
@@ -1019,7 +1006,7 @@ void GL3dWingDlg::GLRenderView()
 							 m_pWing->m_PointMass[im]->position().y,
 							 m_pWing->m_PointMass[im]->position().z);
 				double radius = .02;//2cm
-				m_pGLWidget->GLRenderSphere(pMiarex->m_MassColor,radius,18,18);
+                m_pGLWidget->GLRenderSphere(W3dPrefsDlg::s_MassColor,radius,18,18);
                 m_pGLWidget->renderText( 0.0, 0.0, 0.0 +.02,
                                          m_pWing->m_PointMass[im]->tag()
                                         +QString(" %1").arg(m_pWing->m_PointMass[im]->mass()*MainFrame::s_kgtoUnit, 7,'g',3)
@@ -1077,10 +1064,10 @@ bool GL3dWingDlg::InitDialog(Wing *pWing)
 	m_pctrlLeftSide->setChecked(!m_bRightSide);
 
 
-	m_pctrlSurfaces->setChecked(GL3dWingDlg::s_bSurfaces);
-	m_pctrlOutline->setChecked(GL3dWingDlg::s_bOutline);
-	m_pctrlAxes->setChecked(GL3dWingDlg::s_bAxes);
-	m_pctrlPanels->setChecked(GL3dWingDlg::s_bVLMPanels);
+	m_pctrlSurfaces->setChecked(QMiarex::s_bSurfaces);
+	m_pctrlOutline->setChecked(QMiarex::s_bOutline);
+	m_pctrlAxes->setChecked(QMiarex::s_bAxes);
+	m_pctrlPanels->setChecked(QMiarex::s_bVLMPanels);
 	m_pctrlLight->setChecked(GLLightDlg::IsLightOn());
 	m_pctrlFoilNames->setChecked(m_bFoilNames);
 	m_pctrlShowMasses->setChecked(m_bShowMasses);
@@ -1421,7 +1408,7 @@ void GL3dWingDlg::On3DPickCenter()
 
 void GL3dWingDlg::OnAxes()
 {
-	GL3dWingDlg::s_bAxes = m_pctrlAxes->isChecked();
+	QMiarex::s_bAxes = m_pctrlAxes->isChecked();
 	UpdateView();
 }
 
@@ -1737,14 +1724,14 @@ void GL3dWingDlg::OnOK()
 
 void GL3dWingDlg::OnOutline()
 {
-	GL3dWingDlg::s_bOutline = m_pctrlOutline->isChecked();
+	QMiarex::s_bOutline = m_pctrlOutline->isChecked();
 	UpdateView();
 }
 
 
 void GL3dWingDlg::OnPanels()
 {
-	GL3dWingDlg::s_bVLMPanels = m_pctrlPanels->isChecked();
+	QMiarex::s_bVLMPanels = m_pctrlPanels->isChecked();
 	UpdateView();
 }
 
@@ -1802,7 +1789,7 @@ void GL3dWingDlg::OnSide()
 
 void GL3dWingDlg::OnSurfaces()
 {
-	GL3dWingDlg::s_bSurfaces = m_pctrlSurfaces->isChecked();
+	QMiarex::s_bSurfaces = m_pctrlSurfaces->isChecked();
 	UpdateView();
 }
 

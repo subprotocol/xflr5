@@ -36,26 +36,6 @@
 #include "../mainframe.h"
 #include "XDirect.h"
 #include "BatchThreadDlg.h"
-#include "EditPlrDlg.h"
-#include "XFoilAnalysisDlg.h"
-#include "XFoilAdvancedDlg.h"
-#include "FoilPolarDlg.h"
-#include "BatchDlg.h"
-#include "TwoDPanelDlg.h"
-#include "InterpolateFoilsDlg.h"
-#include "NacaFoilDlg.h"
-#include "ManageFoilsDlg.h"
-
-#include "FoilCoordDlg.h"
-#include "FoilGeomDlg.h"
-#include "TEGapDlg.h"
-#include "LEDlg.h"
-#include "FlapDlg.h"
-#include "CAddDlg.h"
-#include "XDirectStyleDlg.h"
-#include "../misc/PolarFilterDlg.h"
-#include "../misc/ObjectPropsDlg.h"
-#include "../graph/GraphDlg.h"
 
 
 
@@ -67,10 +47,36 @@ void *QXDirect::s_p2DWidget;
 */
 QXDirect::QXDirect(QWidget *parent) : QWidget(parent)
 {
+	MainFrame*pMainFrame = (MainFrame*)s_pMainFrame;
+
 	SetupLayout();
 
 	m_pXFoil = NULL;
 	m_pXFoil = new XFoil();
+
+	m_pPolarFilterDlg   = new PolarFilterDlg(pMainFrame);
+	m_pObjectPropsDlg   = new ObjectPropsDlg(pMainFrame);
+	m_pGraphDlg         = new GraphDlg(pMainFrame);
+	m_pRenameDlg        = new RenameDlg(pMainFrame);
+	m_pEditPlrDlg       = new EditPlrDlg(pMainFrame);
+	m_pXFoilAnalysisDlg = new XFoilAnalysisDlg(pMainFrame);
+	m_pFPDlg            = new FoilPolarDlg(pMainFrame);
+	m_pBDlg             = new BatchDlg(pMainFrame);
+//	m_pBatchThreadDlg   = new BatchThreadDlg(pMainFrame);
+	m_pXFoilAdvancedDlg = new XFoilAdvancedDlg(pMainFrame);
+	m_pXDirectStyleDlg  = new XDirectStyleDlg(pMainFrame);
+	m_pManageFoilsDlg   = new ManageFoilsDlg(pMainFrame);
+
+	m_pTwoDPanelDlg     = new TwoDPanelDlg(pMainFrame);
+	m_pIFDlg            = new InterpolateFoilsDlg(pMainFrame);
+	m_pNacaFoilDlg      = new NacaFoilDlg(pMainFrame);
+	m_pFoilCoordDlg     = new FoilCoordDlg(pMainFrame);
+	m_pFoilGeomDlg      = new FoilGeomDlg(pMainFrame);
+	m_pTEGapDlg         = new TEGapDlg(pMainFrame);
+	m_pLEDlg            = new LEDlg(pMainFrame);
+	m_pFlapDlg          = new FlapDlg(pMainFrame);
+	m_pCAddDlg          = new CAddDlg(pMainFrame);
+
 
 	m_CurveStyle = 0;
 	m_CurveWidth = 1;
@@ -293,6 +299,27 @@ QXDirect::QXDirect(QWidget *parent) : QWidget(parent)
 {
 	delete m_pCpGraph;
 
+	delete m_pPolarFilterDlg;
+	delete m_pObjectPropsDlg;
+	delete m_pGraphDlg;
+	delete m_pRenameDlg;
+	delete m_pEditPlrDlg;
+	delete m_pXFoilAnalysisDlg;
+	delete m_pFPDlg;
+	delete m_pBDlg;
+//	delete m_pBatchThreadDlg;
+	delete m_pXFoilAdvancedDlg;
+	delete m_pTwoDPanelDlg;
+	delete m_pIFDlg;
+	delete m_pManageFoilsDlg;
+	delete m_pNacaFoilDlg;
+	delete m_pFoilCoordDlg;
+	delete m_pFoilGeomDlg;
+	delete m_pTEGapDlg;
+	delete m_pLEDlg;
+	delete m_pFlapDlg;
+	delete m_pCAddDlg;
+	delete m_pXDirectStyleDlg;
 }
 
 /**
@@ -548,8 +575,6 @@ void QXDirect::SetControls()
 	m_pctrlAnimate->setEnabled(!m_bPolarView && m_pCurOpp);
 	m_pctrlAnimateSpeed->setEnabled(!m_bPolarView && m_pCurOpp);
 //	m_pctrlHighlightOpp->setEnabled(m_bPolar);
-
-    m_pctrlAnalyze->setEnabled(m_pCurPolar);
 
 	pMainFrame->currentFoilMenu->setEnabled(MainFrame::s_pCurFoil);
 	pMainFrame->currentPolarMenu->setEnabled(m_pCurPolar);
@@ -1763,20 +1788,19 @@ void QXDirect::OnAllPolarGraphs()
  */
 void QXDirect::OnAllPolarGraphsSetting()
 {
-	GraphDlg gDlg((MainFrame*)s_pMainFrame);
 	QGraph graph;
 	graph.CopySettings(m_PlrGraph);
-	gDlg.m_pMemGraph = &graph;
-	gDlg.m_pGraph    = m_PlrGraph;
-	gDlg.m_GraphArray[0] = m_PlrGraph;
-	gDlg.m_GraphArray[1] = m_PlrGraph+1;
-	gDlg.m_GraphArray[2] = m_PlrGraph+2;
-	gDlg.m_GraphArray[3] = m_PlrGraph+3;
-	gDlg.m_GraphArray[4] = m_PlrGraph+4;
-	gDlg.m_NGraph = 5;
-	gDlg.SetParams();
+	m_pGraphDlg->m_pMemGraph = &graph;
+	m_pGraphDlg->m_pGraph    = m_PlrGraph;
+	m_pGraphDlg->m_GraphArray[0] = m_PlrGraph;
+	m_pGraphDlg->m_GraphArray[1] = m_PlrGraph+1;
+	m_pGraphDlg->m_GraphArray[2] = m_PlrGraph+2;
+	m_pGraphDlg->m_GraphArray[3] = m_PlrGraph+3;
+	m_pGraphDlg->m_GraphArray[4] = m_PlrGraph+4;
+	m_pGraphDlg->m_NGraph = 5;
+	m_pGraphDlg->SetParams();
 
-	if(gDlg.exec() == QDialog::Accepted)
+	if(m_pGraphDlg->exec() == QDialog::Accepted)
 	{
 	}
 	else
@@ -1931,8 +1955,6 @@ void QXDirect::OnAnalyze()
 
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 
-    m_pctrlAnalyze->setEnabled(false);
-
 	m_pXFoil->lvisc = m_bViscous;
 
 	ReadParams();
@@ -1940,23 +1962,22 @@ void QXDirect::OnAnalyze()
 	bool bHigh = m_bHighlightOpp;
 	m_bHighlightOpp = false;
 
-	XFoilAnalysisDlg xfDlg(pMainFrame);
-	xfDlg.SetAlpha(m_Alpha, m_AlphaMax, m_AlphaDelta);
-	xfDlg.SetCl(m_Cl, m_ClMax, m_ClDelta);
-	xfDlg.SetRe(m_Reynolds, m_ReynoldsMax, m_ReynoldsDelta);
+	m_pXFoilAnalysisDlg->SetAlpha(m_Alpha, m_AlphaMax, m_AlphaDelta);
+	m_pXFoilAnalysisDlg->SetCl(m_Cl, m_ClMax, m_ClDelta);
+	m_pXFoilAnalysisDlg->SetRe(m_Reynolds, m_ReynoldsMax, m_ReynoldsDelta);
 
-	xfDlg.m_bSequence = m_bSequence;
-	xfDlg.m_bAlpha = m_bAlpha;
-	xfDlg.m_bType4 = (m_pCurPolar->m_PolarType==FIXEDAOAPOLAR);
+	m_pXFoilAnalysisDlg->m_bSequence = m_bSequence;
+	m_pXFoilAnalysisDlg->m_bAlpha = m_bAlpha;
+	m_pXFoilAnalysisDlg->m_bType4 = (m_pCurPolar->m_PolarType==FIXEDAOAPOLAR);
 
-	xfDlg.m_FoilName = MainFrame::s_pCurFoil->m_FoilName;
-	xfDlg.m_IterLim = m_IterLim;
-	xfDlg.m_pXFoil = m_pXFoil;
-	xfDlg.InitDialog();
-	xfDlg.show();
-	xfDlg.StartAnalysis();
-	xfDlg.hide();
-	xfDlg.move(xfDlg.x(), xfDlg.y());
+	m_pXFoilAnalysisDlg->m_FoilName = MainFrame::s_pCurFoil->m_FoilName;
+	m_pXFoilAnalysisDlg->m_IterLim = m_IterLim;
+	m_pXFoilAnalysisDlg->m_pXFoil = m_pXFoil;
+	m_pXFoilAnalysisDlg->InitDialog();
+	m_pXFoilAnalysisDlg->show();
+	m_pXFoilAnalysisDlg->StartAnalysis();
+	m_pXFoilAnalysisDlg->hide();
+	m_pXFoilAnalysisDlg->move(m_pXFoilAnalysisDlg->x(), m_pXFoilAnalysisDlg->y());
 // and update window
 
 	m_bInitBL = !m_pXFoil->lblini;
@@ -1972,10 +1993,9 @@ void QXDirect::OnAnalyze()
 
 	if(m_bPolarView) CreatePolarCurves();
 
-    SetControls();
+	SetControls();
 	UpdateView();
 }
-
 
 /**
  * Launches a single-threaded batch analysis
@@ -1985,68 +2005,65 @@ void QXDirect::OnBatchAnalysis()
 	MainFrame* pMainFrame = (MainFrame*)s_pMainFrame;
 	if(!MainFrame::s_pCurFoil) 		return;
 
-    m_pctrlAnalyze->setEnabled(false);
-
 	m_bPolarView = true;
 	OnPolars();
 	UpdateView();
 
-	BatchDlg BDlg(pMainFrame);
-	BDlg.m_pFoil     = MainFrame::s_pCurFoil;
-	BDlg.m_Mach      = 0.0;
-	BDlg.m_ReMin     = m_Reynolds;
-	BDlg.m_ReMax     = m_ReynoldsMax;
-	BDlg.m_ReInc     = m_ReynoldsDelta;
-	BDlg.m_PolarType = m_PolarType;
-	BDlg.m_IterLim   = m_IterLim;
-	BDlg.m_bAlpha    = true;
-	BDlg.m_SpMin     = m_Alpha;
-	BDlg.m_SpMax     = m_AlphaMax;
-	BDlg.m_SpInc     = m_AlphaDelta;
-	BDlg.m_AlphaMin  = m_Alpha;
-	BDlg.m_AlphaMax  = m_AlphaMax;
-	BDlg.m_AlphaInc  = m_AlphaDelta;
-	BDlg.m_ClMin     = m_Cl;
-	BDlg.m_ClMax     = m_ClMax;
-	BDlg.m_ClInc     = m_ClDelta;
-	BDlg.m_NCrit     = m_NCrit;
-	BDlg.m_XTopTr    = m_XTopTr;
-	BDlg.m_XBotTr    = m_XBotTr;
-	BDlg.m_ReList    = m_ReList;
-	BDlg.m_MachList  = m_MachList;
-	BDlg.m_NCritList = m_NCritList;
-	BDlg.m_NRe       = m_NRe;
-	BDlg.m_bFromList = m_bFromList;
-	BDlg.m_bFromZero = m_bFromZero;
-	BDlg.InitDialog();
+	m_pBDlg->m_pFoil     = MainFrame::s_pCurFoil;
+	m_pBDlg->m_Mach      = 0.0;
+	m_pBDlg->m_ReMin     = m_Reynolds;
+	m_pBDlg->m_ReMax     = m_ReynoldsMax;
+	m_pBDlg->m_ReInc     = m_ReynoldsDelta;
+	m_pBDlg->m_PolarType = m_PolarType;
+	m_pBDlg->m_IterLim   = m_IterLim;
+	m_pBDlg->m_bAlpha    = true;
+	m_pBDlg->m_SpMin     = m_Alpha;
+	m_pBDlg->m_SpMax     = m_AlphaMax;
+	m_pBDlg->m_SpInc     = m_AlphaDelta;
+	m_pBDlg->m_AlphaMin  = m_Alpha;
+	m_pBDlg->m_AlphaMax  = m_AlphaMax;
+	m_pBDlg->m_AlphaInc  = m_AlphaDelta;
+	m_pBDlg->m_ClMin     = m_Cl;
+	m_pBDlg->m_ClMax     = m_ClMax;
+	m_pBDlg->m_ClInc     = m_ClDelta;
+	m_pBDlg->m_NCrit     = m_NCrit;
+	m_pBDlg->m_XTopTr    = m_XTopTr;
+	m_pBDlg->m_XBotTr    = m_XBotTr;
+	m_pBDlg->m_ReList    = m_ReList;
+	m_pBDlg->m_MachList  = m_MachList;
+	m_pBDlg->m_NCritList = m_NCritList;
+	m_pBDlg->m_NRe       = m_NRe;
+	m_pBDlg->m_bFromList = m_bFromList;
+	m_pBDlg->m_bFromZero = m_bFromZero;
+	m_pBDlg->InitDialog();
 
-	if(BDlg.exec()==QDialog::Accepted) MainFrame::SetSaveState(false);
+	if(m_pBDlg->exec()==QDialog::Accepted) MainFrame::SetSaveState(false);
 
-	m_Reynolds         = BDlg.m_ReMin;
-	m_ReynoldsMax      = BDlg.m_ReMax;
-	m_ReynoldsDelta    = BDlg.m_ReInc;
-	m_Alpha            = BDlg.m_AlphaMin;
-	m_AlphaMax         = BDlg.m_AlphaMax;
-	m_AlphaDelta       = BDlg.m_AlphaInc;
-	m_Cl               = BDlg.m_ClMin;
-	m_ClMax            = BDlg.m_ClMax;
-	m_ClDelta          = BDlg.m_ClInc;
-	m_Mach             = BDlg.m_Mach;
-	m_PolarType        = BDlg.m_PolarType;
-	m_NCrit            = BDlg.m_NCrit;
-	m_XTopTr           = BDlg.m_XTopTr;
-	m_XBotTr           = BDlg.m_XBotTr;
-	m_NRe              = BDlg.m_NRe;
-	m_bAlpha           = BDlg.m_bAlpha;
-	m_bFromList        = BDlg.m_bFromList;
-	m_bFromZero        = BDlg.m_bFromZero;
+	m_Reynolds         = m_pBDlg->m_ReMin;
+	m_ReynoldsMax      = m_pBDlg->m_ReMax;
+	m_ReynoldsDelta    = m_pBDlg->m_ReInc;
+	m_Alpha            = m_pBDlg->m_AlphaMin;
+	m_AlphaMax         = m_pBDlg->m_AlphaMax;
+	m_AlphaDelta       = m_pBDlg->m_AlphaInc;
+	m_Cl               = m_pBDlg->m_ClMin;
+	m_ClMax            = m_pBDlg->m_ClMax;
+	m_ClDelta          = m_pBDlg->m_ClInc;
+	m_Mach             = m_pBDlg->m_Mach;
+	m_PolarType        = m_pBDlg->m_PolarType;
+	m_NCrit            = m_pBDlg->m_NCrit;
+	m_XTopTr           = m_pBDlg->m_XTopTr;
+	m_XBotTr           = m_pBDlg->m_XBotTr;
+	m_NRe              = m_pBDlg->m_NRe;
+	m_bAlpha           = m_pBDlg->m_bAlpha;
+	m_bFromList        = m_pBDlg->m_bFromList;
+	m_bFromZero        = m_pBDlg->m_bFromZero;
 
 	SetPolar();
 	pMainFrame->UpdatePolars();
 
 	m_pCurOpp = NULL;
 
-    SetControls();
+	SetControls();
 	UpdateView();
 }
 
@@ -2059,9 +2076,6 @@ void QXDirect::OnMultiThreadedBatchAnalysis()
 {
 	MainFrame* pMainFrame = (MainFrame*)s_pMainFrame;
 	if(!MainFrame::s_pCurFoil) 		return;
-
-    m_pctrlAnalyze->setEnabled(false);
-
 
 	if(QThread::idealThreadCount()<2)
 	{
@@ -2574,14 +2588,13 @@ void QXDirect::OnCpGraph()
  */
 void QXDirect::OnCpGraphSettings()
 {
-	GraphDlg gDlg((MainFrame*)s_pMainFrame);
 	QGraph graph;
 	graph.CopySettings(m_pCpGraph);
-	gDlg.m_pMemGraph = m_pCurGraph;
-	gDlg.m_pGraph = &graph;
-	gDlg.SetParams();
+	m_pGraphDlg->m_pMemGraph = m_pCurGraph;
+	m_pGraphDlg->m_pGraph = &graph;
+	m_pGraphDlg->SetParams();
 
-	if(gDlg.exec() == QDialog::Accepted)
+	if(m_pGraphDlg->exec() == QDialog::Accepted)
 	{
 		m_pCpGraph->CopySettings(&graph);
 	}
@@ -2661,26 +2674,25 @@ void QXDirect::OnDefinePolar()
 	MainFrame* pMainFrame = (MainFrame*)s_pMainFrame;
 	if(!MainFrame::s_pCurFoil) return;
 
-	FoilPolarDlg FPDlg(pMainFrame);
-	FPDlg.m_NCrit     = m_NCrit;
-	FPDlg.m_XBotTr    = m_XBotTr;
-	FPDlg.m_XTopTr    = m_XTopTr;
-	FPDlg.m_Mach      = m_Mach;
-	FPDlg.m_Reynolds  = m_Reynolds;
-	FPDlg.m_PolarType = m_PolarType;
-	FPDlg.m_ASpec     = m_ASpec;
+	m_pFPDlg->m_NCrit     = m_NCrit;
+	m_pFPDlg->m_XBotTr    = m_XBotTr;
+	m_pFPDlg->m_XTopTr    = m_XTopTr;
+	m_pFPDlg->m_Mach      = m_Mach;
+	m_pFPDlg->m_Reynolds  = m_Reynolds;
+	m_pFPDlg->m_PolarType = m_PolarType;
+	m_pFPDlg->m_ASpec     = m_ASpec;
 
-	FPDlg.InitDialog();
+	m_pFPDlg->InitDialog();
 
-	int res = FPDlg.exec();
+	int res = m_pFPDlg->exec();
 	if (res == QDialog::Accepted)
 	{
 		m_pCurPolar = new Polar();
 
 		m_pCurPolar->m_FoilName = MainFrame::s_pCurFoil->m_FoilName;
-		m_pCurPolar->m_PlrName = FPDlg.m_PlrName;
+		m_pCurPolar->m_PlrName = m_pFPDlg->m_PlrName;
 		m_pCurPolar->m_bIsVisible = true;
-		m_pCurPolar->m_PolarType = FPDlg.m_PolarType;
+		m_pCurPolar->m_PolarType = m_pFPDlg->m_PolarType;
 
 		switch (m_pCurPolar->m_PolarType)
 		{
@@ -2706,20 +2718,20 @@ void QXDirect::OnDefinePolar()
 				break;
 		}
 
-		m_PolarType = FPDlg.m_PolarType;
-		m_NCrit     = FPDlg.m_NCrit;
-		m_XBotTr    = FPDlg.m_XBotTr;
-		m_XTopTr    = FPDlg.m_XTopTr;
-		m_Mach      = FPDlg.m_Mach;
-		m_Reynolds  = FPDlg.m_Reynolds;
-		m_ASpec     = FPDlg.m_ASpec;
+		m_PolarType = m_pFPDlg->m_PolarType;
+		m_NCrit     = m_pFPDlg->m_NCrit;
+		m_XBotTr    = m_pFPDlg->m_XBotTr;
+		m_XTopTr    = m_pFPDlg->m_XTopTr;
+		m_Mach      = m_pFPDlg->m_Mach;
+		m_Reynolds  = m_pFPDlg->m_Reynolds;
+		m_ASpec     = m_pFPDlg->m_ASpec;
 
-		m_pCurPolar->m_Reynolds = FPDlg.m_Reynolds;
-		m_pCurPolar->m_Mach     = FPDlg.m_Mach;
-		m_pCurPolar->m_ASpec    = FPDlg.m_ASpec;
-		m_pCurPolar->m_ACrit    = FPDlg.m_NCrit;
-		m_pCurPolar->m_XTop     = FPDlg.m_XTopTr;
-		m_pCurPolar->m_XBot     = FPDlg.m_XBotTr;
+		m_pCurPolar->m_Reynolds = m_pFPDlg->m_Reynolds;
+		m_pCurPolar->m_Mach     = m_pFPDlg->m_Mach;
+		m_pCurPolar->m_ASpec    = m_pFPDlg->m_ASpec;
+		m_pCurPolar->m_ACrit    = m_pFPDlg->m_NCrit;
+		m_pCurPolar->m_XTop     = m_pFPDlg->m_XTopTr;
+		m_pCurPolar->m_XBot     = m_pFPDlg->m_XBotTr;
 		m_pCurPolar->m_Color = pMainFrame->GetColor(1);
 
 		m_pCurPolar = pMainFrame->AddPolar(m_pCurPolar);
@@ -2967,17 +2979,19 @@ void QXDirect::OnCadd()
 	m_bBL       = false;
 	OnOpPoints();
 
-	CAddDlg CaddDlg(pMainFrame);
-	CaddDlg.m_pBufferFoil = &m_BufferFoil;
-	CaddDlg.m_pMemFoil    = MainFrame::s_pCurFoil;
-	CaddDlg.m_pXDirect    = this;
-	CaddDlg.m_pAFoil      = NULL;
-	CaddDlg.InitDialog();
+
+	m_pCAddDlg->m_pBufferFoil = &m_BufferFoil;
+	m_pCAddDlg->m_pMemFoil    = MainFrame::s_pCurFoil;
+	m_pCAddDlg->m_pXDirect    = this;
+	m_pCAddDlg->m_pAFoil      = NULL;
+	m_pCAddDlg->InitDialog();
+
+
 
 	m_bShowPanels = true;
 	UpdateView();
 
-	if(QDialog::Accepted == CaddDlg.exec())
+	if(QDialog::Accepted == m_pCAddDlg->exec())
 	{
 		Foil *pNewFoil = new Foil();
 		pNewFoil->CopyFoil(&m_BufferFoil);
@@ -3044,14 +3058,13 @@ void QXDirect::OnEditCurPolar()
 	Polar MemPolar;
 	MemPolar.Copy(m_pCurPolar);
 
-	EditPlrDlg EPDlg((MainFrame*)s_pMainFrame);
-	EPDlg.m_pPolar = m_pCurPolar;
-	EPDlg.m_pXDirect = this;
-	EPDlg.move(EditPlrDlg::s_WindowPos);
-	EPDlg.resize(EditPlrDlg::s_WindowSize);
-	if(EditPlrDlg::s_bWindowMaximized) EPDlg.setWindowState(Qt::WindowMaximized);
+	m_pEditPlrDlg->m_pPolar = m_pCurPolar;
+	m_pEditPlrDlg->m_pXDirect = this;
+	m_pEditPlrDlg->move(EditPlrDlg::s_WindowPos);
+	m_pEditPlrDlg->resize(EditPlrDlg::s_WindowSize);
+	if(EditPlrDlg::s_bWindowMaximized) m_pEditPlrDlg->setWindowState(Qt::WindowMaximized);
 
-	EPDlg.InitDialog();
+	m_pEditPlrDlg->InitDialog();
 
 	bool bPoints = m_pCurPolar->m_bShowPoints;
 	m_pCurPolar->m_bShowPoints = true;
@@ -3059,7 +3072,7 @@ void QXDirect::OnEditCurPolar()
 	CreatePolarCurves();
 	UpdateView();
 
-	if(EPDlg.exec() == QDialog::Accepted)
+	if(m_pEditPlrDlg->exec() == QDialog::Accepted)
 	{
 		MainFrame::SetSaveState(false);
 	}
@@ -3513,17 +3526,16 @@ void QXDirect::OnFoilCoordinates()
 	m_BufferFoil.m_bTEFlap = false;
 //	SetFoilFlap(&m_BufferFoil);
 
-	FoilCoordDlg FCDlg(pMainFrame);
-	FCDlg.m_pXDirect = this;
-	FCDlg.m_pAFoil = NULL;
-	FCDlg.m_pMemFoil    = MainFrame::s_pCurFoil;
-	FCDlg.m_pBufferFoil = &m_BufferFoil;
-	FCDlg.InitDialog();
+	m_pFoilCoordDlg->m_pXDirect = this;
+	m_pFoilCoordDlg->m_pAFoil = NULL;
+	m_pFoilCoordDlg->m_pMemFoil    = MainFrame::s_pCurFoil;
+	m_pFoilCoordDlg->m_pBufferFoil = &m_BufferFoil;
+	m_pFoilCoordDlg->InitDialog();
 
 	m_bShowPanels = true;
 	UpdateView();
 
-	int res = FCDlg.exec();
+	int res = m_pFoilCoordDlg->exec();
 
 	if(QDialog::Accepted == res)
 	{
@@ -3580,14 +3592,13 @@ void QXDirect::OnFoilGeom()
 	CreateOppCurves();
 	UpdateView();
 
-	FoilGeomDlg FGDlg(pMainFrame);
-	FGDlg.m_pMemFoil = MainFrame::s_pCurFoil;
-	FGDlg.m_pBufferFoil = &m_BufferFoil;
-	FGDlg.m_pXDirect = this;
-	FGDlg.m_pAFoil   = NULL;
-	FGDlg.InitDialog();
+	m_pFoilGeomDlg->m_pMemFoil = MainFrame::s_pCurFoil;
+	m_pFoilGeomDlg->m_pBufferFoil = &m_BufferFoil;
+	m_pFoilGeomDlg->m_pXDirect = this;
+	m_pFoilGeomDlg->m_pAFoil   = NULL;
+	m_pFoilGeomDlg->InitDialog();
 
-	if(FGDlg.exec() == QDialog::Accepted)
+	if(m_pFoilGeomDlg->exec() == QDialog::Accepted)
 	{
 		Foil *pNewFoil = new Foil();
 		pNewFoil->CopyFoil(&m_BufferFoil);
@@ -3616,27 +3627,26 @@ void QXDirect::OnFoilGeom()
 void QXDirect::OnGraphSettings()
 {
 	QGraph *pGraph = NULL;
-	GraphDlg gDlg((MainFrame*)s_pMainFrame);
 
 	pGraph = m_pCurGraph;
 	if(!pGraph) return;
 
 	if(!m_bPolarView)
 	{
-		gDlg.m_iGraphType = 51;
+		m_pGraphDlg->m_iGraphType = 51;
 	}
 	else
 	{
-		gDlg.m_iGraphType = 52;
+		m_pGraphDlg->m_iGraphType = 52;
 	}
 
 	QGraph graph;
 	graph.CopySettings(pGraph);
-	gDlg.m_pMemGraph = &graph;
-	gDlg.m_pGraph = pGraph;
+	m_pGraphDlg->m_pMemGraph = &graph;
+	m_pGraphDlg->m_pGraph = pGraph;
 
-	gDlg.SetParams();
-	int res = gDlg.exec();
+	m_pGraphDlg->SetParams();
+	int res = m_pGraphDlg->exec();
 
 	if(res == QDialog::Accepted)
 	{
@@ -3677,7 +3687,7 @@ void QXDirect::OnGraphSettings()
 			{
 				SetGraphTitles(m_PlrGraph+4);
 			}
-			if(gDlg.m_bVariableChanged)
+			if(m_pGraphDlg->m_bVariableChanged)
 			{
 				pGraph->SetAuto(true);
 				pGraph->SetAutoYMinUnit(true);
@@ -4149,14 +4159,13 @@ void QXDirect::OnInterpolateFoils()
 	m_bBL       = false;
 	OnOpPoints();
 
-	InterpolateFoilsDlg IFDlg(pMainFrame);
-	IFDlg.m_poaFoil     = m_poaFoil;
-	IFDlg.m_pBufferFoil = &m_BufferFoil;// work on the buffer foil
-	IFDlg.m_pXDirect = this;
-	IFDlg.m_pAFoil   = NULL;
-	IFDlg.InitDialog();
+	m_pIFDlg->m_poaFoil     = m_poaFoil;
+	m_pIFDlg->m_pBufferFoil = &m_BufferFoil;// work on the buffer foil
+	m_pIFDlg->m_pXDirect = this;
+	m_pIFDlg->m_pAFoil   = NULL;
+	m_pIFDlg->InitDialog();
 
-	if(IFDlg.exec() == QDialog::Accepted)
+	if(m_pIFDlg->exec() == QDialog::Accepted)
 	{
 		Foil *pNewFoil = new Foil();
 		pNewFoil->CopyFoil(&m_BufferFoil);
@@ -4164,7 +4173,7 @@ void QXDirect::OnInterpolateFoils()
 		pNewFoil->m_nFoilStyle = 0;
 		pNewFoil->m_nFoilWidth = 1;
 		pNewFoil->m_bPoints = false;
-		pNewFoil->m_FoilName = IFDlg.m_NewFoilName;
+		pNewFoil->m_FoilName = m_pIFDlg->m_NewFoilName;
 		pMainFrame->SetModFoil(pNewFoil);
 		pMainFrame->UpdateFoils();
 	}
@@ -4186,16 +4195,14 @@ void QXDirect::OnInterpolateFoils()
 void QXDirect::OnManageFoils()
 {
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
-
-	ManageFoilsDlg MFDlg(pMainFrame);
-	MFDlg.m_pMainFrame  = s_pMainFrame;
+	m_pManageFoilsDlg->m_pMainFrame  = s_pMainFrame;
 
 	QString FoilName = "";
 	if(MainFrame::s_pCurFoil) FoilName = MainFrame::s_pCurFoil->m_FoilName;
-	MFDlg.InitDialog(FoilName);
-	MFDlg.exec();
+	m_pManageFoilsDlg->InitDialog(FoilName);
+	m_pManageFoilsDlg->exec();
 
-	if(MFDlg.m_pFoil) SetFoil(MFDlg.m_pFoil);
+	if(m_pManageFoilsDlg->m_pFoil) SetFoil(m_pManageFoilsDlg->m_pFoil);
 	else                           SetFoil();
 
 	pMainFrame->UpdateFoils();
@@ -4222,18 +4229,17 @@ void QXDirect::OnNacaFoils()
 	CreateOppCurves();
 	UpdateView();
 
-	NacaFoilDlg NacaDlg(pMainFrame);
-	NacaDlg.m_pBufferFoil = &m_BufferFoil;
-	NacaDlg.m_pXDirect    = this;
-	NacaDlg.m_pAFoil      = NULL;
+	m_pNacaFoilDlg->m_pBufferFoil = &m_BufferFoil;
+	m_pNacaFoilDlg->m_pXDirect    = this;
+	m_pNacaFoilDlg->m_pAFoil      = NULL;
 
-	if (NacaDlg.exec() == QDialog::Accepted)
+	if (m_pNacaFoilDlg->exec() == QDialog::Accepted)
 	{
 		QString str;
-		if(NacaDlg.s_Digits>0 && log10((double)NacaDlg.s_Digits)<4)
-			str = QString("%1").arg(NacaDlg.s_Digits,4,10,QChar('0'));
+		if(m_pNacaFoilDlg->s_Digits>0 && log10((double)m_pNacaFoilDlg->s_Digits)<4)
+			str = QString("%1").arg(m_pNacaFoilDlg->s_Digits,4,10,QChar('0'));
 		else
-			str = QString("%1").arg(NacaDlg.s_Digits);
+			str = QString("%1").arg(m_pNacaFoilDlg->s_Digits);
 		str = "NACA "+ str;
 
 		Foil *pNewFoil = new Foil;
@@ -4369,20 +4375,19 @@ void QXDirect::OnPolars()
  */
 void QXDirect::OnPolarFilter()
 {
-	PolarFilterDlg PFiltDlg((MainFrame*)s_pMainFrame);
-	PFiltDlg.m_bMiarex = false;
-	PFiltDlg.m_bType1 = m_bType1;
-	PFiltDlg.m_bType2 = m_bType2;
-	PFiltDlg.m_bType3 = m_bType3;
-	PFiltDlg.m_bType4 = m_bType4;
-	PFiltDlg.InitDialog();
+	m_pPolarFilterDlg->m_bMiarex = false;
+	m_pPolarFilterDlg->m_bType1 = m_bType1;
+	m_pPolarFilterDlg->m_bType2 = m_bType2;
+	m_pPolarFilterDlg->m_bType3 = m_bType3;
+	m_pPolarFilterDlg->m_bType4 = m_bType4;
+	m_pPolarFilterDlg->InitDialog();
 
-	if(PFiltDlg.exec()==QDialog::Accepted)
+	if(m_pPolarFilterDlg->exec()==QDialog::Accepted)
 	{
-		m_bType1 = PFiltDlg.m_bType1;
-		m_bType2 = PFiltDlg.m_bType2;
-		m_bType3 = PFiltDlg.m_bType3;
-		m_bType4 = PFiltDlg.m_bType4;
+		m_bType1 = m_pPolarFilterDlg->m_bType1;
+		m_bType2 = m_pPolarFilterDlg->m_bType2;
+		m_bType3 = m_pPolarFilterDlg->m_bType3;
+		m_bType4 = m_pPolarFilterDlg->m_bType4;
 		if(m_bPolarView)
 		{
 			CreatePolarCurves();
@@ -4413,18 +4418,17 @@ void QXDirect::OnRefinePanelsGlobally()
 	m_bBL       = false;
 	OnOpPoints();
 
-	TwoDPanelDlg TwodDlg(pMainFrame);
-	TwodDlg.m_pXDirect = this;
-	TwodDlg.m_pAFoil   = NULL;
-	TwodDlg.m_pBufferFoil = &m_BufferFoil;
-	TwodDlg.m_pMemFoil    = MainFrame::s_pCurFoil;
+	m_pTwoDPanelDlg->m_pXDirect = this;
+	m_pTwoDPanelDlg->m_pAFoil   = NULL;
+	m_pTwoDPanelDlg->m_pBufferFoil = &m_BufferFoil;
+	m_pTwoDPanelDlg->m_pMemFoil    = MainFrame::s_pCurFoil;
 
 	m_bShowPanels = true;
 	UpdateView();
 
-	TwodDlg.InitDialog();
+	m_pTwoDPanelDlg->InitDialog();
 
-	if(QDialog::Accepted == TwodDlg.exec())
+	if(QDialog::Accepted == m_pTwoDPanelDlg->exec())
 	{
 		Foil *pNewFoil = new Foil();
 		pNewFoil->CopyFoil(&m_BufferFoil);
@@ -4496,27 +4500,25 @@ void QXDirect::OnRenamePolar()
 		if(pPolar->m_FoilName == MainFrame::s_pCurFoil->m_FoilName)
 			NameList.append(pPolar->m_PlrName);
 	}
-
-	RenameDlg renDlg(pMainFrame);
-	renDlg.m_pstrArray = & NameList;
-	renDlg.m_strQuestion = tr("Enter the new name for the foil polar :");
-	renDlg.m_strName     = m_pCurPolar->m_PlrName;
-	renDlg.InitDialog();
+	m_pRenameDlg->m_pstrArray = & NameList;
+	m_pRenameDlg->m_strQuestion = tr("Enter the new name for the foil polar :");
+	m_pRenameDlg->m_strName     = m_pCurPolar->m_PlrName;
+	m_pRenameDlg->InitDialog();
 
 	bool bExists = true;
 
 	while (bExists)
 	{
-		resp = renDlg.exec();
+		resp = m_pRenameDlg->exec();
 		if(resp==QDialog::Accepted)
 		{
-			if (OldName == renDlg.m_strName) return;
+			if (OldName == m_pRenameDlg->m_strName) return;
 			//Is the new name already used ?
 			bExists = false;
 			for (k=0; k<m_poaPolar->size(); k++)
 			{
 				pPolar = (Polar*)m_poaPolar->at(k);
-				if ((pPolar->m_FoilName==MainFrame::s_pCurFoil->m_FoilName) && (pPolar->m_PlrName == renDlg.m_strName))
+				if ((pPolar->m_FoilName==MainFrame::s_pCurFoil->m_FoilName) && (pPolar->m_PlrName == m_pRenameDlg->m_strName))
 				{
 					bExists = true;
 					break;
@@ -4524,14 +4526,14 @@ void QXDirect::OnRenamePolar()
 			}
 			if(!bExists)
 			{
-				m_pCurPolar->m_PlrName = renDlg.m_strName;
+				m_pCurPolar->m_PlrName = m_pRenameDlg->m_strName;
 				for (l=(int)m_poaOpp->size()-1;l>=0; l--)
 				{
 					pOpp = (OpPoint*)m_poaOpp->at(l);
 					if (pOpp->m_strPlrName == OldName &&
 						pOpp->m_strFoilName == MainFrame::s_pCurFoil->m_FoilName)
 					{
-						pOpp->m_strPlrName = renDlg.m_strName;
+						pOpp->m_strPlrName = m_pRenameDlg->m_strName;
 					}
 				}
 			}
@@ -4539,11 +4541,11 @@ void QXDirect::OnRenamePolar()
 		}
 		else if(resp ==10)
 		{//user wants to overwrite
-			if (OldName == renDlg.m_strName) return;
+			if (OldName == m_pRenameDlg->m_strName) return;
 			for (k=0; k<m_poaPolar->size(); k++)
 			{
 				pPolar = (Polar*)m_poaPolar->at(k);
-				if (pPolar->m_PlrName == renDlg.m_strName)
+				if (pPolar->m_PlrName == m_pRenameDlg->m_strName)
 				{
 					bExists = true;
 					break;
@@ -4564,7 +4566,7 @@ void QXDirect::OnRenamePolar()
 			delete pPolar;
 
 			//and rename everything
-			m_pCurPolar->m_PlrName = renDlg.m_strName;
+			m_pCurPolar->m_PlrName = m_pRenameDlg->m_strName;
 
 			for (l=m_poaOpp->size()-1;l>=0; l--)
 			{
@@ -4572,7 +4574,7 @@ void QXDirect::OnRenamePolar()
 				if (pOpp->m_strPlrName == OldName &&
 					pOpp->m_strFoilName == MainFrame::s_pCurFoil->m_FoilName)
 				{
-					pOpp->m_strPlrName = renDlg.m_strName;
+					pOpp->m_strPlrName = m_pRenameDlg->m_strName;
 				}
 			}
 
@@ -4598,16 +4600,17 @@ void QXDirect::OnRenamePolar()
 void QXDirect::OnOpPointProps()
 {
 	if(!m_pCurPolar) return;
-	ObjectPropsDlg opDlg((MainFrame*)s_pMainFrame);
-	opDlg.m_pXDirect = this;
-	opDlg.m_pOpp = m_pCurOpp;
-	opDlg.m_pPolar = NULL;
-	opDlg.m_pMiarex = NULL;
-	opDlg.m_pWOpp = NULL;
-	opDlg.m_pWPolar = NULL;
-	opDlg.InitDialog();
-	opDlg.exec();
+	m_pObjectPropsDlg->m_pXDirect = this;
+	m_pObjectPropsDlg->m_pOpp = m_pCurOpp;
+	m_pObjectPropsDlg->m_pPolar = NULL;
+	m_pObjectPropsDlg->m_pMiarex = NULL;
+	m_pObjectPropsDlg->m_pWOpp = NULL;
+	m_pObjectPropsDlg->m_pWPolar = NULL;
+	m_pObjectPropsDlg->InitDialog();
+	m_pObjectPropsDlg->exec();
 }
+
+
 
 
 /**
@@ -4616,15 +4619,14 @@ void QXDirect::OnOpPointProps()
 void QXDirect::OnPolarProps()
 {
 	if(!m_pCurPolar) return;
-	ObjectPropsDlg opDlg((MainFrame*)s_pMainFrame);
-	opDlg.m_pXDirect = this;
-	opDlg.m_pOpp = NULL;
-	opDlg.m_pPolar = m_pCurPolar;
-	opDlg.m_pMiarex = NULL;
-	opDlg.m_pWOpp = NULL;
-	opDlg.m_pWPolar = NULL;
-	opDlg.InitDialog();
-	opDlg.exec();
+	m_pObjectPropsDlg->m_pXDirect = this;
+	m_pObjectPropsDlg->m_pOpp = NULL;
+	m_pObjectPropsDlg->m_pPolar = m_pCurPolar;
+	m_pObjectPropsDlg->m_pMiarex = NULL;
+	m_pObjectPropsDlg->m_pWOpp = NULL;
+	m_pObjectPropsDlg->m_pWPolar = NULL;
+	m_pObjectPropsDlg->InitDialog();
+	m_pObjectPropsDlg->exec();
 }
 
 
@@ -4798,15 +4800,14 @@ void QXDirect::OnSetFlap()
 	m_bBL       = false;
 	OnOpPoints();
 
-	FlapDlg flapDlg(pMainFrame);
-	flapDlg.m_pBufferFoil  = &m_BufferFoil;
-	flapDlg.m_pMemFoil     = MainFrame::s_pCurFoil;
-	flapDlg.m_pXFoil       = m_pXFoil;
-	flapDlg.m_pXDirect     = this;
-	flapDlg.m_pAFoil       = NULL;
-	flapDlg.InitDialog();
+	m_pFlapDlg->m_pBufferFoil  = &m_BufferFoil;
+	m_pFlapDlg->m_pMemFoil     = MainFrame::s_pCurFoil;
+	m_pFlapDlg->m_pXFoil       = m_pXFoil;
+	m_pFlapDlg->m_pXDirect     = this;
+	m_pFlapDlg->m_pAFoil       = NULL;
+	m_pFlapDlg->InitDialog();
 
-	if(QDialog::Accepted == flapDlg.exec())
+	if(QDialog::Accepted == m_pFlapDlg->exec())
 	{
 		Foil *pNewFoil = new Foil();
 		pNewFoil->CopyFoil(&m_BufferFoil);
@@ -4850,14 +4851,13 @@ void QXDirect::OnSetLERadius()
 	m_bBL       = false;
 	OnOpPoints();
 
-	LEDlg leDlg(pMainFrame);
-	leDlg.m_pBufferFoil = &m_BufferFoil;
-	leDlg.m_pMemFoil    = MainFrame::s_pCurFoil;
-	leDlg.m_pXDirect   = this;
-	leDlg.m_pAFoil     = NULL;
-	leDlg.InitDialog();
+	m_pLEDlg->m_pBufferFoil = &m_BufferFoil;
+	m_pLEDlg->m_pMemFoil    = MainFrame::s_pCurFoil;
+	m_pLEDlg->m_pXDirect   = this;
+	m_pLEDlg->m_pAFoil     = NULL;
+	m_pLEDlg->InitDialog();
 
-	if(QDialog::Accepted == leDlg.exec())
+	if(QDialog::Accepted == m_pLEDlg->exec())
 	{
 		Foil *pNewFoil = new Foil();
 		pNewFoil->CopyFoil(&m_BufferFoil);
@@ -4902,15 +4902,15 @@ void QXDirect::OnSetTEGap()
 	m_bBL       = false;
 	OnOpPoints();
 
-	TEGapDlg gapDlg(pMainFrame);
-	gapDlg.m_pXDirect   = this;
-	gapDlg.m_pAFoil     = NULL;
-	gapDlg.m_pBufferFoil = &m_BufferFoil;
-	gapDlg.m_pMemFoil    = MainFrame::s_pCurFoil;
-	gapDlg.m_Gap         = MainFrame::s_pCurFoil->m_Gap;
-	gapDlg.InitDialog();
 
-	if(QDialog::Accepted == gapDlg.exec())
+	m_pTEGapDlg->m_pXDirect   = this;
+	m_pTEGapDlg->m_pAFoil     = NULL;
+	m_pTEGapDlg->m_pBufferFoil = &m_BufferFoil;
+	m_pTEGapDlg->m_pMemFoil    = MainFrame::s_pCurFoil;
+	m_pTEGapDlg->m_Gap         = MainFrame::s_pCurFoil->m_Gap;
+	m_pTEGapDlg->InitDialog();
+
+	if(QDialog::Accepted == m_pTEGapDlg->exec())
 	{
 		Foil *pNewFoil = new Foil();
 		pNewFoil->CopyFoil(&m_BufferFoil);
@@ -5206,27 +5206,9 @@ void QXDirect::OnSinglePolarGraph()
  */
 void QXDirect::OnSpec()
 {
-	if (m_pctrlSpec1->isChecked())
-	{
-		m_bAlpha = true;
-		m_pctrlAlphaMin->SetValue(m_Alpha);
-		m_pctrlAlphaMax->SetValue(m_AlphaMax);
-		m_pctrlAlphaDelta->SetValue(m_AlphaDelta);
-	}
-	else if (m_pctrlSpec2->isChecked())
-	{
-		m_bAlpha = false;
-		m_pctrlAlphaMin->SetValue(m_Cl);
-		m_pctrlAlphaMax->SetValue(m_ClMax);
-		m_pctrlAlphaDelta->SetValue(m_ClDelta);
-	}
-	else if (m_pctrlSpec3->isChecked())
-	{
-		m_bAlpha = false;
-		m_pctrlAlphaMin->SetValue(m_Reynolds);
-		m_pctrlAlphaMax->SetValue(m_ReynoldsMax);
-		m_pctrlAlphaDelta->SetValue(m_ReynoldsDelta);
-	}
+	if      (m_pctrlSpec1->isChecked()) m_bAlpha = true;
+	else if (m_pctrlSpec2->isChecked()) m_bAlpha = false;
+	else if (m_pctrlSpec3->isChecked()) m_bAlpha = false;
 }
 
 
@@ -5253,29 +5235,28 @@ void QXDirect::OnViscous()
  */
 void QXDirect::OnXDirectStyle()
 {
-	XDirectStyleDlg xsDlg((MainFrame*)s_pMainFrame);
-	xsDlg.m_pXDirect = this;
-	xsDlg.m_iBLStyle         = m_iBLStyle;
-	xsDlg.m_iBLWidth         = m_iBLWidth;
-	xsDlg.m_crBLColor        = m_crBLColor;
-	xsDlg.m_iPressureStyle   = m_iPressureStyle;
-	xsDlg.m_iPressureWidth   = m_iPressureWidth;
-	xsDlg.m_crPressureColor  = m_crPressureColor;
-	xsDlg.m_iNeutralStyle    = m_iNeutralStyle;
-	xsDlg.m_iNeutralWidth    = m_iNeutralWidth;
-	xsDlg.m_crNeutralColor   = m_crNeutralColor;
-	xsDlg.InitDialog();
-	if(xsDlg.exec() == QDialog::Accepted)
+	m_pXDirectStyleDlg->m_pXDirect = this;
+	m_pXDirectStyleDlg->m_iBLStyle         = m_iBLStyle;
+	m_pXDirectStyleDlg->m_iBLWidth         = m_iBLWidth;
+	m_pXDirectStyleDlg->m_crBLColor        = m_crBLColor;
+	m_pXDirectStyleDlg->m_iPressureStyle   = m_iPressureStyle;
+	m_pXDirectStyleDlg->m_iPressureWidth   = m_iPressureWidth;
+	m_pXDirectStyleDlg->m_crPressureColor  = m_crPressureColor;
+	m_pXDirectStyleDlg->m_iNeutralStyle    = m_iNeutralStyle;
+	m_pXDirectStyleDlg->m_iNeutralWidth    = m_iNeutralWidth;
+	m_pXDirectStyleDlg->m_crNeutralColor   = m_crNeutralColor;
+	m_pXDirectStyleDlg->InitDialog();
+	if(m_pXDirectStyleDlg->exec() == QDialog::Accepted)
 	{
-		m_iBLStyle         = xsDlg.m_iBLStyle;
-		m_iBLWidth         = xsDlg.m_iBLWidth;
-		m_crBLColor        = xsDlg.m_crBLColor;
-		m_iPressureStyle   = xsDlg.m_iPressureStyle;
-		m_iPressureWidth   = xsDlg.m_iPressureWidth;
-		m_crPressureColor  = xsDlg.m_crPressureColor;
-		m_iNeutralStyle    = xsDlg.m_iNeutralStyle;
-		m_iNeutralWidth    = xsDlg.m_iNeutralWidth;
-		m_crNeutralColor   = xsDlg.m_crNeutralColor;
+		m_iBLStyle         = m_pXDirectStyleDlg->m_iBLStyle;
+		m_iBLWidth         = m_pXDirectStyleDlg->m_iBLWidth;
+		m_crBLColor        = m_pXDirectStyleDlg->m_crBLColor;
+		m_iPressureStyle   = m_pXDirectStyleDlg->m_iPressureStyle;
+		m_iPressureWidth   = m_pXDirectStyleDlg->m_iPressureWidth;
+		m_crPressureColor  = m_pXDirectStyleDlg->m_crPressureColor;
+		m_iNeutralStyle    = m_pXDirectStyleDlg->m_iNeutralStyle;
+		m_iNeutralWidth    = m_pXDirectStyleDlg->m_iNeutralWidth;
+		m_crNeutralColor   = m_pXDirectStyleDlg->m_crNeutralColor;
 	}
 	UpdateView();
 }
@@ -5287,19 +5268,18 @@ void QXDirect::OnXDirectStyle()
  */
 void QXDirect::OnXFoilAdvanced()
 {
-	XFoilAdvancedDlg xfaDlg((MainFrame*)s_pMainFrame);
-	xfaDlg.m_IterLimit = m_IterLim;
-	xfaDlg.m_VAccel  = m_pXFoil->vaccel;
-	xfaDlg.m_bInitBL = m_bAutoInitBL;
-	xfaDlg.m_bFullReport    = m_pXFoil->m_bFullReport;
-	xfaDlg.InitDialog();
+	m_pXFoilAdvancedDlg->m_IterLimit = m_IterLim;
+	m_pXFoilAdvancedDlg->m_VAccel  = m_pXFoil->vaccel;
+	m_pXFoilAdvancedDlg->m_bInitBL = m_bAutoInitBL;
+	m_pXFoilAdvancedDlg->m_bFullReport    = m_pXFoil->m_bFullReport;
+	m_pXFoilAdvancedDlg->InitDialog();
 
-	if (QDialog::Accepted == xfaDlg.exec())
+	if (QDialog::Accepted == m_pXFoilAdvancedDlg->exec())
 	{
-		m_pXFoil->vaccel = xfaDlg.m_VAccel;
-		m_IterLim        = xfaDlg.m_IterLimit;
-		m_bAutoInitBL    = xfaDlg.m_bInitBL;
-		m_pXFoil->m_bFullReport    = xfaDlg.m_bFullReport;
+		m_pXFoil->vaccel = m_pXFoilAdvancedDlg->m_VAccel;
+		m_IterLim        = m_pXFoilAdvancedDlg->m_IterLimit;
+		m_bAutoInitBL    = m_pXFoilAdvancedDlg->m_bInitBL;
+		m_pXFoil->m_bFullReport    = m_pXFoilAdvancedDlg->m_bFullReport;
 	}
 }
 
@@ -6000,22 +5980,22 @@ void QXDirect::ReadParams()
 	{
 		if(m_bAlpha)
 		{
-            m_Alpha      = m_pctrlAlphaMin->Value();
-            m_AlphaMax   = m_pctrlAlphaMax->Value();
-            m_AlphaDelta = m_pctrlAlphaDelta->Value();
+			m_Alpha      = m_pctrlAlphaMin->Value();
+			m_AlphaMax   = m_pctrlAlphaMax->Value();
+			m_AlphaDelta = m_pctrlAlphaDelta->Value();
 		}
 		else
 		{
-            m_Cl      = m_pctrlAlphaMin->Value();
-            m_ClMax   = m_pctrlAlphaMax->Value();
-            m_ClDelta = m_pctrlAlphaDelta->Value();
+			m_Cl      = m_pctrlAlphaMin->Value();
+			m_ClMax   = m_pctrlAlphaMax->Value();
+			m_ClDelta = m_pctrlAlphaDelta->Value();
 		}
 	}
 	else
 	{
-        m_Reynolds      = m_pctrlAlphaMin->Value();
-        m_ReynoldsMax   = m_pctrlAlphaMax->Value();
-        m_ReynoldsDelta = m_pctrlAlphaDelta->Value();
+		m_Reynolds      = m_pctrlAlphaMin->Value();
+		m_ReynoldsMax   = m_pctrlAlphaMax->Value();
+		m_ReynoldsDelta = m_pctrlAlphaDelta->Value();
 	}
 	m_bSequence = m_pctrlSequence->isChecked();
 	m_bInitBL   = m_pctrlInitBL->isChecked();
@@ -6147,7 +6127,7 @@ void QXDirect::SetAnalysisParams()
 	{
 		if(m_pCurPolar->m_PolarType!=FIXEDAOAPOLAR)
 		{
-            m_pctrlAlphaMin->SetPrecision(2);
+			m_pctrlAlphaMin->SetPrecision(2);
 			m_pctrlAlphaMax->SetPrecision(2);
 			m_pctrlAlphaDelta->SetPrecision(2);
 			if(m_bAlpha) m_pctrlSpec1->setChecked(true);
@@ -6158,7 +6138,7 @@ void QXDirect::SetAnalysisParams()
 		{
 			m_pctrlSpec3->setChecked(true);
 			m_pctrlSpec3->setEnabled(true);
-            m_pctrlAlphaMin->SetPrecision(0);
+			m_pctrlAlphaMin->SetPrecision(0);
 			m_pctrlAlphaMax->SetPrecision(0);
 			m_pctrlAlphaDelta->SetPrecision(0);
 		}
@@ -6767,13 +6747,13 @@ void QXDirect::SetOpPointSequence()
 
 		if(m_bAlpha)
 		{
-            m_pctrlAlphaMin->SetValue(m_Alpha);
+			m_pctrlAlphaMin->SetValue(m_Alpha);
 			m_pctrlAlphaMax->SetValue(m_AlphaMax);
 			m_pctrlAlphaDelta->SetValue(m_AlphaDelta);
 		}
 		else
 		{
-            m_pctrlAlphaMin->SetValue(m_Cl);
+			m_pctrlAlphaMin->SetValue(m_Cl);
 			m_pctrlAlphaMax->SetValue(m_ClMax);
 			m_pctrlAlphaDelta->SetValue(m_ClDelta);
 		}
@@ -6785,7 +6765,7 @@ void QXDirect::SetOpPointSequence()
 	{
 		m_pctrlSpec3->setChecked(true);
 		m_bAlpha = true;		// no choice with type 4 polars
-        m_pctrlAlphaMin->SetValue(m_Reynolds);
+		m_pctrlAlphaMin->SetValue(m_Reynolds);
 		m_pctrlAlphaMax->SetValue(m_ReynoldsMax);
 		m_pctrlAlphaDelta->SetValue(m_ReynoldsDelta);
 		m_pctrlSpec1->setEnabled(false);
@@ -6857,7 +6837,8 @@ void QXDirect::SetupLayout()
 {
 	setAttribute(Qt::WA_AlwaysShowToolTips);
 
-    QGroupBox *AnalysisBox = new QGroupBox(tr("Analysis settings"));
+
+	QGroupBox *AnalysisBox = new QGroupBox(tr("Analysis settings"));
 	{
 		QVBoxLayout *AnalysisGroup = new QVBoxLayout;
 		{
@@ -6890,11 +6871,16 @@ void QXDirect::SetupLayout()
 				m_pctrlUnit2 = new QLabel(QString::fromUtf8("°"));
 				m_pctrlUnit3 = new QLabel(QString::fromUtf8("°"));
 
-				m_pctrlAlphaMin   = new DoubleEdit(0.0);
-				m_pctrlAlphaMax   = new DoubleEdit(0.0);
-				m_pctrlAlphaDelta = new DoubleEdit(0.0);
-
-                SequenceGroupLayout->addWidget(AlphaMinLab,1,1);
+				m_pctrlAlphaMin   = new DoubleEdit();
+				m_pctrlAlphaMax   = new DoubleEdit();
+				m_pctrlAlphaDelta = new DoubleEdit();
+				m_pctrlAlphaMin->setMinimumHeight(20);
+				m_pctrlAlphaMax->setMinimumHeight(20);
+				m_pctrlAlphaDelta->setMinimumHeight(20);
+				m_pctrlAlphaMin->setAlignment(Qt::AlignRight);
+				m_pctrlAlphaMax->setAlignment(Qt::AlignRight);
+				m_pctrlAlphaDelta->setAlignment(Qt::AlignRight);
+				SequenceGroupLayout->addWidget(AlphaMinLab,1,1);
 				SequenceGroupLayout->addWidget(AlphaMaxLab,2,1);
 				SequenceGroupLayout->addWidget(DeltaAlphaLab,3,1);
 				SequenceGroupLayout->addWidget(m_pctrlAlphaMin,1,2);

@@ -27,6 +27,13 @@
 #include <QGroupBox>
 #include <QDockWidget>
 
+int GL3DScales::s_pos = 1;
+int GL3DScales::s_NX = 30;
+double GL3DScales::s_DeltaL = 0.01;
+double GL3DScales::s_XFactor = 1.10;
+double GL3DScales::s_XOffset = 0.0;
+double GL3DScales::s_ZOffset = 0.0;
+
 
 GL3DScales::GL3DScales(QWidget *parent)
 {
@@ -34,12 +41,12 @@ GL3DScales::GL3DScales(QWidget *parent)
 	m_pMainFrame = NULL;
 	m_pMiarex = NULL;
 
-	m_pos       = 1;
-	m_NX        =   30;
-	m_XFactor   = 1.10;
-	m_DeltaL    =  0.01;
-	m_XOffset   =  0.0;
-	m_ZOffset   =  0.0;
+	s_pos       = 1;
+	s_NX        =   30;
+	s_XFactor   = 1.10;
+	s_DeltaL    =  0.01;
+	s_XOffset   =  0.0;
+	s_ZOffset   =  0.0;
 
 	SetupLayout();
 
@@ -223,11 +230,11 @@ void GL3DScales::InitDialog()
 	m_pctrlLengthUnit2->setText(str);
 	m_pctrlLengthUnit3->setText(str);
 
-	m_pctrlAutoCpScale->setChecked(pMiarex->m_bAutoCpScale);
-	m_pctrlLegendMin->SetValue(pMiarex->m_LegendMin);
-	m_pctrlLegendMax->SetValue(pMiarex->m_LegendMax);
-	m_pctrlLegendMin->setEnabled(!pMiarex->m_bAutoCpScale);
-	m_pctrlLegendMax->setEnabled(!pMiarex->m_bAutoCpScale);
+	m_pctrlAutoCpScale->setChecked(pMiarex->s_bAutoCpScale);
+	m_pctrlLegendMin->SetValue(pMiarex->s_LegendMin);
+	m_pctrlLegendMax->SetValue(pMiarex->s_LegendMax);
+	m_pctrlLegendMin->setEnabled(!pMiarex->s_bAutoCpScale);
+	m_pctrlLegendMax->setEnabled(!pMiarex->s_bAutoCpScale);
 
 	double pos;
 	pos = -pMiarex->m_LiftScale*pMiarex->m_LiftScale + pMiarex->m_LiftScale*sqrt(pMiarex->m_LiftScale*pMiarex->m_LiftScale+4.0*1.01);
@@ -242,26 +249,26 @@ void GL3DScales::InitDialog()
 	pos = pos/2.0/1.01;
 	m_pctrlVelocityScaleSlider->setSliderPosition((int)(pos*100.0));
 
-	if(m_pos==0)	    m_pctrlLE->setChecked(true);
-	else if(m_pos==1)	m_pctrlTE->setChecked(true);
-	else if(m_pos==2)	m_pctrlLine->setChecked(true);
+	if(s_pos==0)	    m_pctrlLE->setChecked(true);
+	else if(s_pos==1)	m_pctrlTE->setChecked(true);
+	else if(s_pos==2)	m_pctrlLine->setChecked(true);
 
-	m_pctrlDeltaL->SetValue(m_DeltaL* MainFrame::s_mtoUnit);
-	m_pctrlXOffset->SetValue(m_XOffset* MainFrame::s_mtoUnit);
-	m_pctrlZOffset->SetValue(m_ZOffset* MainFrame::s_mtoUnit);
-	m_pctrlXFactor->SetValue(m_XFactor);
-	m_pctrlNXPoint->SetValue(m_NX);
+	m_pctrlDeltaL->SetValue(s_DeltaL* MainFrame::s_mtoUnit);
+	m_pctrlXOffset->SetValue(s_XOffset* MainFrame::s_mtoUnit);
+	m_pctrlZOffset->SetValue(s_ZOffset* MainFrame::s_mtoUnit);
+	m_pctrlXFactor->SetValue(s_XFactor);
+	m_pctrlNXPoint->SetValue(s_NX);
 }
 
 
 void GL3DScales::OnCpScale()
 {
 	QMiarex * pMiarex = (QMiarex*)m_pMiarex;
-	pMiarex->m_bAutoCpScale = m_pctrlAutoCpScale->isChecked();
-	pMiarex->m_LegendMax = m_pctrlLegendMax->Value();
-	pMiarex->m_LegendMin = m_pctrlLegendMin->Value();
-	m_pctrlLegendMin->setEnabled(!pMiarex->m_bAutoCpScale);
-	m_pctrlLegendMax->setEnabled(!pMiarex->m_bAutoCpScale);
+	pMiarex->s_bAutoCpScale = m_pctrlAutoCpScale->isChecked();
+	pMiarex->s_LegendMax = m_pctrlLegendMax->Value();
+	pMiarex->s_LegendMin = m_pctrlLegendMin->Value();
+	m_pctrlLegendMin->setEnabled(!pMiarex->s_bAutoCpScale);
+	m_pctrlLegendMax->setEnabled(!pMiarex->s_bAutoCpScale);
 
 	pMiarex->m_bResetglPanelCp = true;
 	pMiarex->m_bResetglLegend = true;
@@ -272,9 +279,9 @@ void GL3DScales::OnCpScale()
 void GL3DScales::OnApply()
 {
 	QMiarex * pMiarex = (QMiarex*)m_pMiarex;
-	pMiarex->m_LegendMax = m_pctrlLegendMax->Value();
-	pMiarex->m_LegendMin = m_pctrlLegendMin->Value();
-	pMiarex->m_bAutoCpScale = m_pctrlAutoCpScale->isChecked();
+	pMiarex->s_LegendMax = m_pctrlLegendMax->Value();
+	pMiarex->s_LegendMin = m_pctrlLegendMin->Value();
+	pMiarex->s_bAutoCpScale = m_pctrlAutoCpScale->isChecked();
 	ReadStreamParams();
 	pMiarex->m_bResetglStream = true;
 	pMiarex->UpdateView();
@@ -317,33 +324,32 @@ void GL3DScales::showEvent(QShowEvent *event)
 
 void GL3DScales::ReadStreamParams()
 {
-	m_NX = m_pctrlNXPoint->Value();
-	m_XOffset = m_pctrlXOffset->Value() / MainFrame::s_mtoUnit;
-	m_ZOffset = m_pctrlZOffset->Value() / MainFrame::s_mtoUnit;
-	m_DeltaL  = m_pctrlDeltaL->Value()  / MainFrame::s_mtoUnit;
-	m_XFactor = m_pctrlXFactor->Value();
+	s_NX = m_pctrlNXPoint->Value();
+	s_XOffset = m_pctrlXOffset->Value() / MainFrame::s_mtoUnit;
+	s_ZOffset = m_pctrlZOffset->Value() / MainFrame::s_mtoUnit;
+	s_DeltaL  = m_pctrlDeltaL->Value()  / MainFrame::s_mtoUnit;
+	s_XFactor = m_pctrlXFactor->Value();
 
-	if(m_pctrlLE->isChecked())	        m_pos=0;
-	else if(m_pctrlTE->isChecked())     m_pos=1;
-	else if(m_pctrlLine->isChecked())   m_pos=2;
+	if(m_pctrlLE->isChecked())	        s_pos=0;
+	else if(m_pctrlTE->isChecked())     s_pos=1;
+	else if(m_pctrlLine->isChecked())   s_pos=2;
 }
 
 
 
 bool GL3DScales::LoadSettings(QSettings *pSettings)
 {
-	QMiarex * pMiarex = (QMiarex*)m_pMiarex;
 	pSettings->beginGroup("GL3DScales");
 	{
-		pMiarex->m_bAutoCpScale = pSettings->value("AutoCpScale").toBool();
-		pMiarex->m_LegendMin    = pSettings->value("LegendMin").toDouble();
-		pMiarex->m_LegendMax    = pSettings->value("LegendMax").toDouble();
-		m_pos     = pSettings->value("Position").toInt();
-		m_NX      = pSettings->value("NX").toInt();
-		m_DeltaL  = pSettings->value("DeltaL").toDouble();
-		m_XFactor = pSettings->value("XFactor").toDouble();
-		m_XOffset = pSettings->value("XOffset").toDouble();
-		m_ZOffset = pSettings->value("ZOffset").toDouble();
+		QMiarex::s_bAutoCpScale = pSettings->value("AutoCpScale").toBool();
+		QMiarex::s_LegendMin    = pSettings->value("LegendMin").toDouble();
+		QMiarex::s_LegendMax    = pSettings->value("LegendMax").toDouble();
+		s_pos     = pSettings->value("Position").toInt();
+		s_NX      = pSettings->value("NX").toInt();
+		s_DeltaL  = pSettings->value("DeltaL").toDouble();
+		s_XFactor = pSettings->value("XFactor").toDouble();
+		s_XOffset = pSettings->value("XOffset").toDouble();
+		s_ZOffset = pSettings->value("ZOffset").toDouble();
 	}
 	pSettings->endGroup();
 
@@ -353,18 +359,17 @@ bool GL3DScales::LoadSettings(QSettings *pSettings)
 
 bool GL3DScales::SaveSettings(QSettings *pSettings)
 {
-	QMiarex * pMiarex = (QMiarex*)m_pMiarex;
 	pSettings->beginGroup("GL3DScales");
 	{
-		pSettings->setValue("AutoCpScale", pMiarex->m_bAutoCpScale);
-		pSettings->setValue("LegendMin", pMiarex->m_LegendMin);
-		pSettings->setValue("LegendMax", pMiarex->m_LegendMax);
-		pSettings->setValue("Position", m_pos);
-		pSettings->setValue("NX", m_NX);
-		pSettings->setValue("DeltaL", m_DeltaL);
-		pSettings->setValue("XFactor", m_XFactor);
-		pSettings->setValue("XOffset", m_XOffset);
-		pSettings->setValue("ZOffset", m_ZOffset);
+		pSettings->setValue("AutoCpScale", QMiarex::s_bAutoCpScale);
+		pSettings->setValue("LegendMin", QMiarex::s_LegendMin);
+		pSettings->setValue("LegendMax", QMiarex::s_LegendMax);
+		pSettings->setValue("Position", s_pos);
+		pSettings->setValue("NX", s_NX);
+		pSettings->setValue("DeltaL", s_DeltaL);
+		pSettings->setValue("XFactor", s_XFactor);
+		pSettings->setValue("XOffset", s_XOffset);
+		pSettings->setValue("ZOffset", s_ZOffset);
 	}
 	pSettings->endGroup();
 	return true;

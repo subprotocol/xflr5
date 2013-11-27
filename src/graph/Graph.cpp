@@ -25,8 +25,8 @@
 #include <math.h>
 
 
+//static variables must be initialized in C++
 QColor Graph::m_CurveColors[10];
-
 
 
 Graph::Graph()

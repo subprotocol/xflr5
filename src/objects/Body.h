@@ -49,6 +49,7 @@ class Body
 public:
 	Body();
 
+	bool Gauss(double *A, int n, double *B, int m);
 	bool IsInNURBSBody(CVector Pt);
 	bool Intersect(CVector A, CVector B, CVector &I, bool bRight);
 	bool IntersectPanels(CVector A, CVector B, CVector &I);

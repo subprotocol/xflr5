@@ -94,14 +94,14 @@ private:
 
 	QStackedWidget *m_pctrlAnalysisControls;
 
-	DoubleEdit *m_pctrlXCmRef, *m_pctrlZCmRef;
-	DoubleEdit *m_pctrlDensity;
-	DoubleEdit *m_pctrlViscosity;
-	DoubleEdit *m_pctrlAlpha;
-	DoubleEdit *m_pctrlBeta;
-	DoubleEdit *m_pctrlWeight;
-	DoubleEdit *m_pctrlQInf;
-	DoubleEdit *m_pctrlHeight;
+    DoubleEdit *m_pctrlXCmRef, *m_pctrlZCmRef;
+    DoubleEdit *m_pctrlDensity;
+    DoubleEdit *m_pctrlViscosity;
+    DoubleEdit *m_pctrlAlpha;
+    DoubleEdit *m_pctrlBeta;
+    DoubleEdit *m_pctrlWeight;
+    DoubleEdit *m_pctrlQInf;
+    DoubleEdit *m_pctrlHeight;
 	QLineEdit *m_pctrlWPolarName;
 
 	QCheckBox *m_pctrlPlaneInertia;

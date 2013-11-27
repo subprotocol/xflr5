@@ -1,7 +1,7 @@
 /****************************************************************************
 
 	W3dPrefsDlg Class
-	Copyright (C) 2009 Andre Deperrois XFLR5@yahoo.com
+    Copyright (C) 2009-2013 Andre Deperrois XFLR5@yahoo.com
 
 	This program is free software; you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -35,11 +35,9 @@ class W3dPrefsDlg : public QDialog
 {
 	Q_OBJECT
 
-	friend class QSail7;
 	friend class QMiarex;
 	friend class MainFrame;
 	friend class GL3dBodyDlg;
-	friend class GLWindow;
 
 public:
     W3dPrefsDlg(QWidget *pParent);
@@ -47,7 +45,7 @@ public:
 
 private slots:
 	void On3DAxis();
-	void OnWingColor();
+	void OnOutline();
 	void OnTopTrans();
 	void OnBotTrans();
 	void OnXCP();
@@ -60,11 +58,12 @@ private slots:
 	void OnVLMMesh();
 	void OnShowWake();
 	void OnMasses();
+    void OnResetDefaults();
 
 private:
 	void SetupLayout();
-	void SaveSettings(QSettings *pSettings);
-	void LoadSettings(QSettings *pSettings);
+    static void SaveSettings(QSettings *pSettings);
+    static void LoadSettings(QSettings *pSettings);
 
 	LineBtn *m_pctrlAxis, *m_pctrlOutline, *m_pctrlVLMMesh, *m_pctrlTopTrans, *m_pctrlBotTrans;
 	LineBtn *m_pctrlLift, *m_pctrlMoments, *m_pctrlInducedDrag, *m_pctrlViscousDrag, *m_pctrlDownwash;

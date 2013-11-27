@@ -25,6 +25,7 @@
 #include "GLCreateLists.h"
 #include "Miarex.h"
 #include "GL3DScales.h"
+#include "../misc/W3dPrefsDlg.h"
 #include "StabViewDlg.h"
 #include "../objects/Wing.h"
 #include <QProgressDialog>
@@ -211,16 +212,16 @@ void GLCreateGeom(void *pQMiarex, Wing *pWing, int List, Body *pBody)
 		glEnable(GL_DEPTH_TEST);
 		glEnable (GL_LINE_STIPPLE);
 
-		if     (pMiarex->m_OutlineStyle == 1) glLineStipple (1, 0xCFCF);
-		else if(pMiarex->m_OutlineStyle == 2) glLineStipple (1, 0x6666);
-		else if(pMiarex->m_OutlineStyle == 3) glLineStipple (1, 0xFF18);
-		else if(pMiarex->m_OutlineStyle == 4) glLineStipple (1, 0x7E66);
+        if     (W3dPrefsDlg::s_OutlineStyle == 1) glLineStipple (1, 0xCFCF);
+        else if(W3dPrefsDlg::s_OutlineStyle == 2) glLineStipple (1, 0x6666);
+        else if(W3dPrefsDlg::s_OutlineStyle == 3) glLineStipple (1, 0xFF18);
+        else if(W3dPrefsDlg::s_OutlineStyle == 4) glLineStipple (1, 0x7E66);
 		else                                  glLineStipple (1, 0xFFFF);
 
-		glColor3d(pMiarex->m_OutlineColor.redF(),pMiarex->m_OutlineColor.greenF(),pMiarex->m_OutlineColor.blueF());
-		glLineWidth((GLfloat)pMiarex->m_OutlineWidth);
+        glColor3d(W3dPrefsDlg::s_OutlineColor.redF(),W3dPrefsDlg::s_OutlineColor.greenF(),W3dPrefsDlg::s_OutlineColor.blueF());
+        glLineWidth((GLfloat)W3dPrefsDlg::s_OutlineWidth);
 
-		//TOP outline
+        //TOP outline
 		for (j=0; j<pWing->m_NSurfaces; j++)
 		{
 			glBegin(GL_LINE_STRIP);
@@ -526,15 +527,15 @@ void GLCreateCp(void *pQMiarex, CVector *pNode, Panel *pPanel, WingOpp *pWOpp, P
 			}
 		}
 
-		if(pMiarex->m_bAutoCpScale)
+		if(pMiarex->s_bAutoCpScale)
 		{
-			pMiarex->m_LegendMin = lmin;
-			pMiarex->m_LegendMax = lmax;
+			pMiarex->s_LegendMin = lmin;
+			pMiarex->s_LegendMax = lmax;
 		}
 		else
 		{
-			lmin = pMiarex->m_LegendMin;
-			lmax = pMiarex->m_LegendMax;
+			lmin = pMiarex->s_LegendMin;
+			lmax = pMiarex->s_LegendMax;
 		}
 
 		range = lmax - lmin;
@@ -549,27 +550,27 @@ void GLCreateCp(void *pQMiarex, CVector *pNode, Panel *pPanel, WingOpp *pWOpp, P
 				LA.Copy(pNode[pPanel[p].m_iLA]);
 				LB.Copy(pNode[pPanel[p].m_iLB]);
 
-				if(pPanel[p].m_Pos==TOPSURFACE) color = (CpSup[pPanel[p].m_iLA]-lmin)/range;
+                if(pPanel[p].m_Pos==TOPSURFACE)      color = (CpSup[pPanel[p].m_iLA]-lmin)/range;
 				else if(pPanel[p].m_Pos<=MIDSURFACE) color = (CpInf[pPanel[p].m_iLA]-lmin)/range;
-				else                           color = (Cp100[pPanel[p].m_iLA]-lmin)/range;
+                else                                 color = (Cp100[pPanel[p].m_iLA]-lmin)/range;
 				glColor3d(GLGetRed(color),GLGetGreen(color),GLGetBlue(color));
 				glVertex3d(LA.x, LA.y, LA.z);
 
-				if(pPanel[p].m_Pos==TOPSURFACE) color = (CpSup[pPanel[p].m_iTA]-lmin)/range;
+                if(pPanel[p].m_Pos==TOPSURFACE)      color = (CpSup[pPanel[p].m_iTA]-lmin)/range;
 				else if(pPanel[p].m_Pos<=MIDSURFACE) color = (CpInf[pPanel[p].m_iTA]-lmin)/range;
-				else                           color = (Cp100[pPanel[p].m_iTA]-lmin)/range;
+                else                                 color = (Cp100[pPanel[p].m_iTA]-lmin)/range;
 				glColor3d(GLGetRed(color),GLGetGreen(color),GLGetBlue(color));
 				glVertex3d(TA.x, TA.y, TA.z);
 
-				if(pPanel[p].m_Pos==TOPSURFACE) color = (CpSup[pPanel[p].m_iTB]-lmin)/range;
+                if(pPanel[p].m_Pos==TOPSURFACE)      color = (CpSup[pPanel[p].m_iTB]-lmin)/range;
 				else if(pPanel[p].m_Pos<=MIDSURFACE) color = (CpInf[pPanel[p].m_iTB]-lmin)/range;
-				else                           color = (Cp100[pPanel[p].m_iTB]-lmin)/range;
+                else                                 color = (Cp100[pPanel[p].m_iTB]-lmin)/range;
 				glColor3d(GLGetRed(color),GLGetGreen(color),GLGetBlue(color));
 				glVertex3d(TB.x, TB.y, TB.z);
 
-				if(pPanel[p].m_Pos==TOPSURFACE) color = (CpSup[pPanel[p].m_iLB]-lmin)/range;
+                if(pPanel[p].m_Pos==TOPSURFACE)      color = (CpSup[pPanel[p].m_iLB]-lmin)/range;
 				else if(pPanel[p].m_Pos<=MIDSURFACE) color = (CpInf[pPanel[p].m_iLB]-lmin)/range;
-				else                           color = (Cp100[pPanel[p].m_iLB]-lmin)/range;
+                else                                 color = (Cp100[pPanel[p].m_iLB]-lmin)/range;
 				glColor3d(GLGetRed(color),GLGetGreen(color),GLGetBlue(color));
 				glVertex3d(LB.x, LB.y, LB.z);
 
@@ -580,6 +581,10 @@ void GLCreateCp(void *pQMiarex, CVector *pNode, Panel *pPanel, WingOpp *pWOpp, P
 		glDisable(GL_POLYGON_OFFSET_FILL);
 	}
 	glEndList();
+
+	delete [] CpInf;
+	delete [] CpSup;
+	delete [] Cp100;
 }
 
 
@@ -668,9 +673,9 @@ void GLCreateDownwash(void *pQMiarex, Wing *pWing, WingOpp *pWOpp, int List)
 
 		glEnable (GL_LINE_STIPPLE);
 
-		color = pMiarex->m_DownwashColor;
-		style = pMiarex->m_DownwashStyle;
-		width = pMiarex->m_DownwashWidth;
+        color = W3dPrefsDlg::s_DownwashColor;
+        style = W3dPrefsDlg::s_DownwashStyle;
+        width = W3dPrefsDlg::s_DownwashWidth;
 
 		glColor3d(color.redF(), color.greenF(), color.blueF());
 
@@ -797,13 +802,13 @@ void GLCreateDrag(void *pQMiarex, Wing *pWing, WPolar* pWPolar, WingOpp *pWOpp, 
 	cosb =  cos(pWPolar->sideSlip()*PI/180.0);
 	sinb =  sin(pWPolar->sideSlip()*PI/180.0);
 
-	Icolor = pMiarex->m_IDragColor;
-	Istyle = pMiarex->m_IDragStyle;
-	Iwidth = pMiarex->m_IDragWidth;
+    Icolor = W3dPrefsDlg::s_IDragColor;
+    Istyle = W3dPrefsDlg::s_IDragStyle;
+    Iwidth = W3dPrefsDlg::s_IDragWidth;
 
-	Vcolor = pMiarex->m_VDragColor;
-	Vstyle = pMiarex->m_VDragStyle;
-	Vwidth = pMiarex->m_VDragWidth;
+    Vcolor = W3dPrefsDlg::s_VDragColor;
+    Vstyle = W3dPrefsDlg::s_VDragStyle;
+    Vwidth = W3dPrefsDlg::s_VDragWidth;
 
 	if     (Istyle == 1) 	IDash = 0xCFCF;
 	else if(Istyle == 2) 	IDash = 0x6666;
@@ -846,7 +851,7 @@ void GLCreateDrag(void *pQMiarex, Wing *pWing, WPolar* pWPolar, WingOpp *pWOpp, 
 					xt = pWing->Offset(yob) + pWOpp->m_Chord[i];
 					pWing->GetViewYZPos(1.0, pWOpp->m_SpanPos[i],yt,zt,0);
 					dih = pWing->Dihedral(yob)*PI/180.0;
-					amp1 = q0*pWOpp->m_ICd[i]*pWOpp->m_Chord[i]/pWOpp->m_MAChord*pMiarex->m_DragScale/coef;
+                    amp1 = q0*pWOpp->m_ICd[i]*pWOpp->m_Chord[i]/pWOpp->m_MAChord*pMiarex->m_DragScale/coef;
 					amp2 = q0*pWOpp->m_PCd[i]*pWOpp->m_Chord[i]/pWOpp->m_MAChord*pMiarex->m_DragScale/coef;
 					if(pMiarex->m_bICd)
 					{
@@ -1360,17 +1365,17 @@ void GLCreateLiftForce(void *pQMiarex, WPolar *pWPolar, WingOpp *pWOpp)
 		pMiarex->m_GLList++;
 		glEnable (GL_LINE_STIPPLE);
 
-		style = pMiarex->m_XCPStyle;
+        style = W3dPrefsDlg::s_XCPStyle;
 		if     (style == 1) 	glLineStipple (1, 0xCFCF);
 		else if(style == 2) 	glLineStipple (1, 0x6666);
 		else if(style == 3) 	glLineStipple (1, 0xFF18);
 		else if(style == 4) 	glLineStipple (1, 0x7E66);
 		else					glLineStipple (1, 0xFFFF);
 
-        glColor3d(pMiarex->m_XCPColor.redF(),pMiarex->m_XCPColor.greenF(),pMiarex->m_XCPColor.blueF());
+        glColor3d(W3dPrefsDlg::s_XCPColor.redF(),W3dPrefsDlg::s_XCPColor.greenF(),W3dPrefsDlg::s_XCPColor.blueF());
 
 		//Resulting force vector
-        glLineWidth((GLfloat)(pMiarex->m_XCPWidth * 2.0));
+        glLineWidth((GLfloat)(W3dPrefsDlg::s_XCPWidth * 2.0));
 
 		double force = 0.5*pWPolar->m_Density * pWPolar->m_WArea
 						  *pWOpp->m_QInf*pWOpp->m_QInf
@@ -1440,9 +1445,9 @@ void GLCreateMoments(void *pQMiarex, Wing *pWing, WPolar *pWPolar, WingOpp *pWOp
 		pMiarex->m_GLList++;
 		glEnable (GL_LINE_STIPPLE);
 
-		color = pMiarex->m_MomentColor;
-		style = pMiarex->m_MomentStyle;
-		width = pMiarex->m_MomentWidth;
+        color = W3dPrefsDlg::s_MomentColor;
+        style = W3dPrefsDlg::s_MomentStyle;
+        width = W3dPrefsDlg::s_MomentWidth;
 
 		if     (style == 1) 	glLineStipple (1, 0xCFCF);
 		else if(style == 2) 	glLineStipple (1, 0x6666);
@@ -1606,9 +1611,9 @@ void GLCreateLiftStrip(void *pQMiarex, Wing *pWing, WPolar *pWPolar, WingOpp *pW
 		pMiarex->m_GLList++;
         glEnable (GL_LINE_STIPPLE);
 
-		color = pMiarex->m_XCPColor;
-		style = pMiarex->m_XCPStyle;
-		width = pMiarex->m_XCPWidth;
+        color = W3dPrefsDlg::s_XCPColor;
+        style = W3dPrefsDlg::s_XCPStyle;
+        width = W3dPrefsDlg::s_XCPWidth;
 
 		if     (style == 1) 	glLineStipple (1, 0xCFCF);
 		else if(style == 2) 	glLineStipple (1, 0x6666);
@@ -1747,18 +1752,17 @@ void GLCreateTrans(void *pQMiarex, Wing *pWing, WingOpp *pWOpp, int List)
         pMiarex->m_GLList++;
 
         glEnable (GL_LINE_STIPPLE);
-        glLineWidth((GLfloat)pMiarex->m_XTopWidth);
 
-        style = pMiarex->m_XTopStyle;
+        style = W3dPrefsDlg::s_TopStyle;
         if     (style == 1) 	glLineStipple (1, 0xCFCF);
         else if(style == 2) 	glLineStipple (1, 0x6666);
         else if(style == 3) 	glLineStipple (1, 0xFF18);
         else if(style == 4) 	glLineStipple (1, 0x7E66);
         else					glLineStipple (1, 0xFFFF);
 
-        glColor3d(pMiarex->m_XTopColor.redF(),pMiarex->m_XTopColor.greenF(),pMiarex->m_XTopColor.blueF());
+        glColor3d(W3dPrefsDlg::s_TopColor.redF(),W3dPrefsDlg::s_TopColor.greenF(),W3dPrefsDlg::s_TopColor.blueF());
 
-        glLineWidth((GLfloat)pMiarex->m_XTopWidth);
+        glLineWidth((GLfloat)W3dPrefsDlg::s_TopWidth);
         if(pWOpp)
         {
             if(pWOpp->m_AnalysisMethod==LLTMETHOD)
@@ -1826,18 +1830,17 @@ void GLCreateTrans(void *pQMiarex, Wing *pWing, WingOpp *pWOpp, int List)
     {
         pMiarex->m_GLList++;
         glEnable (GL_LINE_STIPPLE);
-        glLineWidth((GLfloat)pMiarex->m_XBotWidth);
 
-        style = pMiarex->m_XBotStyle;
+        style = W3dPrefsDlg::s_BotStyle;
         if     (style == 1) 	glLineStipple (1, 0xCFCF);
         else if(style == 2) 	glLineStipple (1, 0x6666);
         else if(style == 3) 	glLineStipple (1, 0xFF18);
         else if(style == 4) 	glLineStipple (1, 0x7E66);
         else					glLineStipple (1, 0xFFFF);
 
-        glColor3d(pMiarex->m_XBotColor.redF(),pMiarex->m_XBotColor.greenF(),pMiarex->m_XBotColor.blueF());
+        glColor3d(W3dPrefsDlg::s_BotColor.redF(),W3dPrefsDlg::s_BotColor.greenF(),W3dPrefsDlg::s_BotColor.blueF());
 
-        glLineWidth((GLfloat)pMiarex->m_XBotWidth);
+        glLineWidth((GLfloat)W3dPrefsDlg::s_BotWidth);
         if(pWOpp)
         {
             if(pWOpp->m_AnalysisMethod==LLTMETHOD)
@@ -1927,7 +1930,6 @@ void GLCreateStreamLines(void *pQMiarex, Wing *PlaneWing[MAXWINGS], CVector *pNo
 	int m, p, style,  iWing;
 	double ds;
 	float *Mu, *Sigma;
-	QColor color;
 
 	CVector C, D, D1, VA, VAT, VB, VBT, VT, VInf, TC, TD;
 	CVector RefPoint(0.0,0.0,0.0);
@@ -1960,21 +1962,15 @@ void GLCreateStreamLines(void *pQMiarex, Wing *PlaneWing[MAXWINGS], CVector *pNo
 
 		glEnable (GL_LINE_STIPPLE);
 
-		color = pMiarex->m_StreamLinesColor;
-		style = pMiarex->m_StreamLinesStyle;
-//		width = pMiarex->m_StreamLinesWidth;
+        style = W3dPrefsDlg::s_StreamLinesStyle;
+        if     (style == 1) 	glLineStipple (1, 0xCFCF);
+        else if(style == 2) 	glLineStipple (1, 0x6666);
+        else if(style == 3) 	glLineStipple (1, 0xFF18);
+        else if(style == 4) 	glLineStipple (1, 0x7E66);
+        else					glLineStipple (1, 0xFFFF);
 
-		glLineWidth(pMiarex->m_WakeWidth);
-
-		style = pMiarex->m_WakeStyle;
-
-		if     (style == Qt::DashLine)       glLineStipple (1, 0xCFCF);
-		else if(style == Qt::DotLine)        glLineStipple (1, 0x6666);
-		else if(style == Qt::DashDotLine)    glLineStipple (1, 0xFF18);
-		else if(style == Qt::DashDotDotLine) glLineStipple (1, 0x7E66);
-		else                                 glLineStipple (1, 0xFFFF);
-
-		glColor3d(color.redF(), color.greenF(), color.blueF());
+        glLineWidth(W3dPrefsDlg::s_StreamLinesWidth);
+        glColor3d(W3dPrefsDlg::s_StreamLinesColor.redF(), W3dPrefsDlg::s_StreamLinesColor.greenF(), W3dPrefsDlg::s_StreamLinesColor.blueF());
 
 		VInf.Set(pWOpp->m_QInf,0.0,0.0);
 
@@ -1990,19 +1986,19 @@ void GLCreateStreamLines(void *pQMiarex, Wing *PlaneWing[MAXWINGS], CVector *pNo
 				{
 					bFound = false;
 
-					if(p3DScales->m_pos==0 && pWing->m_pWingPanel[p].m_bIsLeading && pWing->m_pWingPanel[p].m_Pos<=MIDSURFACE)
+					if(p3DScales->s_pos==0 && pWing->m_pWingPanel[p].m_bIsLeading && pWing->m_pWingPanel[p].m_Pos<=MIDSURFACE)
 					{
 						C.Set(pNode[pWing->m_pWingPanel[p].m_iLA]);
 						D.Set(pNode[pWing->m_pWingPanel[p].m_iLB]);
 						bFound = true;
 					}
-					else if(p3DScales->m_pos==1 && pWing->m_pWingPanel[p].m_bIsTrailing && pWing->m_pWingPanel[p].m_Pos<=MIDSURFACE)
+					else if(p3DScales->s_pos==1 && pWing->m_pWingPanel[p].m_bIsTrailing && pWing->m_pWingPanel[p].m_Pos<=MIDSURFACE)
 					{
 						C.Set(pNode[pWing->m_pWingPanel[p].m_iTA]);
 						D.Set(pNode[pWing->m_pWingPanel[p].m_iTB]);
 						bFound = true;
 					}
-					else if(p3DScales->m_pos==2 && pWing->m_pWingPanel[p].m_bIsLeading && pWing->m_pWingPanel[p].m_Pos<=MIDSURFACE)
+					else if(p3DScales->s_pos==2 && pWing->m_pWingPanel[p].m_bIsLeading && pWing->m_pWingPanel[p].m_Pos<=MIDSURFACE)
 					{
 						C.Set(0.0, pNode[pWing->m_pWingPanel[p].m_iLA].y, 0.0);
 						D.Set(0.0, pNode[pWing->m_pWingPanel[p].m_iLB].y, 0.0);
@@ -2017,7 +2013,7 @@ void GLCreateStreamLines(void *pQMiarex, Wing *PlaneWing[MAXWINGS], CVector *pNo
 						TD.RotateY(RefPoint, pWOpp->m_Alpha);
 						TC -= C;
 						TD -= D;
-                        if(p3DScales->m_pos==1 && qAbs(p3DScales->m_XOffset)<0.001 && qAbs(p3DScales->m_ZOffset)<0.001)
+                        if(p3DScales->s_pos==1 && qAbs(p3DScales->s_XOffset)<0.001 && qAbs(p3DScales->s_ZOffset)<0.001)
 						{
 							//apply Kutta's condition : initial speed vector is parallel to the T.E. bisector angle
 							VA.Set(pNode[pWing->m_pWingPanel[p].m_iTA] - pNode[pWing->m_pWingPanel[p].m_iLA]);
@@ -2044,10 +2040,10 @@ void GLCreateStreamLines(void *pQMiarex, Wing *PlaneWing[MAXWINGS], CVector *pNo
 						}
 						if(!C.IsSame(D1))
 						{
-							C.x += p3DScales->m_XOffset;
-							C.z += p3DScales->m_ZOffset;
+							C.x += p3DScales->s_XOffset;
+							C.z += p3DScales->s_ZOffset;
 
-							ds = p3DScales->m_DeltaL;
+							ds = p3DScales->s_DeltaL;
 
 							// One very special case is where we initiate the streamlines exactly at the T.E.
 							// without offset either in X ou Z directions
@@ -2057,9 +2053,9 @@ void GLCreateStreamLines(void *pQMiarex, Wing *PlaneWing[MAXWINGS], CVector *pNo
 								glVertex3d(C.x+TC.x, C.y+TC.y, C.z+TC.z);
 								C   += VA *ds;
 								glVertex3d(C.x+TC.x, C.y+TC.y, C.z+TC.z);
-								ds *= p3DScales->m_XFactor;
+								ds *= p3DScales->s_XFactor;
 
-								for (i=1; i< p3DScales->m_NX ;i++)
+								for (i=1; i< p3DScales->s_NX ;i++)
 								{
 									pMiarex->m_pPanelDlg->GetSpeedVector(C, Mu, Sigma, VT);
 
@@ -2067,17 +2063,17 @@ void GLCreateStreamLines(void *pQMiarex, Wing *PlaneWing[MAXWINGS], CVector *pNo
 									VT.Normalize();
 									C   += VT* ds;
 									glVertex3d(C.x+TC.x, C.y+TC.y, C.z+TC.z);
-									ds *= p3DScales->m_XFactor;
+									ds *= p3DScales->s_XFactor;
 								}
 							}
 							glEnd();
 						}
 
 						D1 = D;
-						D.x += p3DScales->m_XOffset;
-						D.z += p3DScales->m_ZOffset;
+						D.x += p3DScales->s_XOffset;
+						D.z += p3DScales->s_ZOffset;
 
-						ds = p3DScales->m_DeltaL;
+						ds = p3DScales->s_DeltaL;
 
 //						V1.Set(0.0,0.0,0.0);
 
@@ -2086,9 +2082,9 @@ void GLCreateStreamLines(void *pQMiarex, Wing *PlaneWing[MAXWINGS], CVector *pNo
 							glVertex3d(D.x+TD.x, D.y+TD.y, D.z+TD.z);
 							D   += VB *ds;
 							glVertex3d(D.x+TD.x, D.y+TD.y, D.z+TD.z);
-							ds *= p3DScales->m_XFactor;
+							ds *= p3DScales->s_XFactor;
 
-							for (i=1; i< p3DScales->m_NX ;i++)
+							for (i=1; i< p3DScales->s_NX ;i++)
 							{
 								pMiarex->m_pPanelDlg->GetSpeedVector(D, Mu, Sigma, VT);
 
@@ -2096,7 +2092,7 @@ void GLCreateStreamLines(void *pQMiarex, Wing *PlaneWing[MAXWINGS], CVector *pNo
 								VT.Normalize();
 								D   += VT* ds;
 								glVertex3d(D.x+TD.x, D.y+TD.y, D.z+TD.z);
-								ds *= p3DScales->m_XFactor;
+								ds *= p3DScales->s_XFactor;
 							}
 						}
 						glEnd();
@@ -2170,8 +2166,8 @@ void GLCreateSurfSpeeds(void *pQMiarex, Panel *pPanel, WPolar *pWPolar, WingOpp 
 
 		glEnable (GL_LINE_STIPPLE);
 
-		glLineWidth(pMiarex->m_WakeWidth);
-		style = pMiarex->m_WakeStyle;
+        glLineWidth(W3dPrefsDlg::s_WakeWidth);
+        style = W3dPrefsDlg::s_WakeStyle;
 		
 		if     (style == 1) 	glLineStipple (1, 0xCFCF);
 		else if(style == 2) 	glLineStipple (1, 0x6666);
@@ -2179,9 +2175,9 @@ void GLCreateSurfSpeeds(void *pQMiarex, Panel *pPanel, WPolar *pWPolar, WingOpp 
 		else if(style == 4) 	glLineStipple (1, 0x7E66);
 		else					glLineStipple (1, 0xFFFF);
 
-		glColor3d(pMiarex->m_WakeColor.redF(), pMiarex->m_WakeColor.greenF(), pMiarex->m_WakeColor.blueF());
+        glColor3d(W3dPrefsDlg::s_WakeColor.redF(), W3dPrefsDlg::s_WakeColor.greenF(), W3dPrefsDlg::s_WakeColor.blueF());
 
-		for (p=0; p<pMiarex->m_MatSize; p++)
+        for (p=0; p<pMiarex->m_MatSize; p++)
 		{
 			VT.Set(pWOpp->m_QInf,0.0,0.0);
 
@@ -2477,7 +2473,7 @@ void GLDrawCpLegend(void *pQMiarex)
     iyPos  = (int) (y0 - 12.0*dy);
 
 
-    range = (pMiarex->m_LegendMax - pMiarex->m_LegendMin);
+    range = (pMiarex->s_LegendMax - pMiarex->s_LegendMin);
     delta = range / 20;
 
 
@@ -2495,7 +2491,7 @@ void GLDrawCpLegend(void *pQMiarex)
 
         for (i=0; i<=20; i ++)
         {
-            f = pMiarex->m_LegendMax - (double)i * delta;
+            f = pMiarex->s_LegendMax - (double)i * delta;
             strong = QString("%1").arg(f, 5,'f',2);
             labellength = (fm.width(strong)+5);
             pGLWidget->renderText(ixPos-labellength, iyPos+i*dy, strong, MainFrame::s_TextFont);

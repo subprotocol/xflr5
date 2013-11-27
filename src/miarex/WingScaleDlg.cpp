@@ -47,10 +47,10 @@ void WingScaleDlg::SetupLayout()
 	m_pctrlSweep = new QCheckBox(tr("Sweep Scaling"));
 	m_pctrlTwist = new QCheckBox(tr("Twist Scaling"));
 
-	m_pctrlNewSpan  = new DoubleEdit(0,3);
-	m_pctrlNewChord = new DoubleEdit(0,3);
-	m_pctrlNewTwist = new DoubleEdit(0,3);
-	m_pctrlNewSweep = new DoubleEdit(0,3);
+    m_pctrlNewSpan  = new DoubleEdit(0,3);
+    m_pctrlNewChord = new DoubleEdit(0,3);
+    m_pctrlNewTwist = new DoubleEdit(0,3);
+    m_pctrlNewSweep = new DoubleEdit(0,3);
 
 	m_pctrlRefSpan  = new QLabel("0.000");
 	m_pctrlRefChord = new QLabel("0.000");

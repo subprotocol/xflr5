@@ -22,7 +22,6 @@
 #include "mainframe.h"
 #include "globals.h"
 #include "design/AFoil.h"
-#include "objects/SplineFoil.h"
 #include "miarex/Miarex.h"
 #include "miarex/InertiaDlg.h"
 #include "miarex/BodyTransDlg.h"
@@ -41,6 +40,10 @@
 #include "misc/ObjectPropsDlg.h"
 #include "misc/LinePickerDlg.h"
 #include "misc/DisplaySettingsDlg.h"
+#include "misc/SaveOptionsDlg.h"
+#include "misc/TranslatorDlg.h"
+#include "misc/RenameDlg.h"
+#include "misc/UnitsDlg.h"
 #include "graph/GraphDlg.h"
 #include "xdirect/XDirect.h"
 #include "xdirect/BatchDlg.h"
@@ -104,6 +107,7 @@ int MainFrame::s_ForceUnit  = 0;
 int MainFrame::s_MomentUnit = 0;
 
 QList <void *> MainFrame::m_oaFoil;
+QList <void *> MainFrame::s_oaPolar;
 QLabel *MainFrame::m_pctrlProjectName = NULL;
 
 
@@ -138,23 +142,18 @@ MainFrame::MainFrame(QWidget * parent, Qt::WindowFlags flags)
 
 	if (dir.exists(jpegPluginPath))
 	{
-		QPluginLoader jpegPluginLoad(jpegPluginPath);
+/*		QPluginLoader jpegPluginLoad(jpegPluginPath);
 		jpegPluginLoad.load();
 		if (!jpegPluginLoad.isLoaded())
 		{
 			QString errorMessage = jpegPluginLoad.errorString() + " : " +jpegPluginPath;
 			QMessageBox::information(window(), tr("Info"), errorMessage);
-		}
+        }*/
 	}
 
 	setWindowTitle(s_VersionName);
 	setWindowIcon(QIcon(":/images/xflr5_64.png"));
 
-
-	m_pUnitsDlg = new UnitsDlg(this);
-	m_pRenameDlg = new RenameDlg(this);
-	m_pTranslatorDlg = new TranslatorDlg(this);
-	m_pSaveOptionsDlg = new SaveOptionsDlg(this);
 
 	if(!QGLFormat::hasOpenGL())
 	{
@@ -178,35 +177,12 @@ MainFrame::MainFrame(QWidget * parent, Qt::WindowFlags flags)
 
 	m_GraphExportFilter = "Comma Separated Values (*.csv)";
 
-	s_LastDirName = QDir::homePath();  /**@todo set by default to user directory */
+	s_LastDirName = QDir::homePath();
 
 	QAFoil *pAFoil       = (QAFoil*)m_pAFoil;
 	QXDirect *pXDirect   = (QXDirect*)m_pXDirect;
 	QXInverse *pXInverse = (QXInverse*)m_pXInverse;
 	QMiarex *pMiarex     = (QMiarex*)m_pMiarex;
-
-
-#ifdef Q_WS_MAC
-		QSettings settings(QSettings::NativeFormat,QSettings::UserScope,"sourceforge.net","xflr5");
-#else
-		QSettings settings(QSettings::IniFormat,QSettings::UserScope,"XFLR5");
-#endif
-	QString str;
-	settings.beginGroup("MainFrame");
-	{
-		str = settings.value("LanguageFilePath").toString();
-		if(str.length()) m_LanguageFilePath = str;
-	}
-	settings.endGroup();
-
-	if(m_LanguageFilePath.length())
-	{
-		qApp->removeTranslator(&m_Translator);
-		if(m_Translator.load(m_LanguageFilePath))
-		{
-			qApp->installTranslator(&m_Translator);
-		}
-	}
 
 	if(LoadSettings())
 	{
@@ -223,8 +199,8 @@ MainFrame::MainFrame(QWidget * parent, Qt::WindowFlags flags)
 		pMiarex->LoadSettings(&settings);
 		pXInverse->LoadSettings(&settings);
 
-		GL3DScales *p3DScales = (GL3DScales *)m_pGL3DScales;
-		p3DScales->LoadSettings(&settings);
+        GL3DScales::LoadSettings(&settings);
+        W3dPrefsDlg::LoadSettings(&settings);
 	}
 
 	SetUnits(s_LengthUnit, s_AreaUnit, s_SpeedUnit, s_WeightUnit, s_ForceUnit, s_MomentUnit,
@@ -302,10 +278,6 @@ void MainFrame::ReadStyleSheet(QString styleSheetName, QString &styleSheet)
 
 MainFrame::~MainFrame()
 {
-	delete m_pUnitsDlg;
-	delete m_pRenameDlg;
-	delete m_pTranslatorDlg;
-	delete m_pSaveOptionsDlg;
 	if(s_pTraceFile) s_pTraceFile->close();
 
 	for(int ioa=m_oaFoil.size()-1; ioa>=0; ioa--)
@@ -314,10 +286,10 @@ MainFrame::~MainFrame()
 		m_oaFoil.removeAt(ioa);
 	}
 
-	for(int ioa=m_oaPolar.size()-1; ioa>=0; ioa--)
+    for(int ioa=s_oaPolar.size()-1; ioa>=0; ioa--)
 	{
-		delete (Polar*)m_oaPolar.at(ioa);
-		m_oaPolar.removeAt(ioa);
+        delete (Polar*)s_oaPolar.at(ioa);
+        s_oaPolar.removeAt(ioa);
 	}
 
 	for(int ioa=m_oaOpp.size()-1; ioa>=0; ioa--)
@@ -426,9 +398,9 @@ Polar* MainFrame::AddPolar(Polar *pPolar)
 	QString strong;
 	int i,j,k,l,p;
 
-	for (i=0; i<m_oaPolar.size(); i++)
+    for (i=0; i<s_oaPolar.size(); i++)
 	{
-	pOldPlr = (Polar*)m_oaPolar.at(i);
+    pOldPlr = (Polar*)s_oaPolar.at(i);
 	if (pOldPlr->m_PlrName  == pPolar->m_PlrName &&
 		pOldPlr->m_FoilName == pPolar->m_FoilName) bExists = true;
 	}
@@ -436,13 +408,13 @@ Polar* MainFrame::AddPolar(Polar *pPolar)
 	{
 		if(!bExists)
 		{
-			for (j=0; j<m_oaPolar.size(); j++)
+            for (j=0; j<s_oaPolar.size(); j++)
 			{
-				pOldPlr = (Polar*)m_oaPolar.at(j);
+                pOldPlr = (Polar*)s_oaPolar.at(j);
 
 				if (pPolar->m_FoilName.compare(pOldPlr->m_FoilName, Qt::CaseInsensitive)<0)
 				{
-					m_oaPolar.insert(j, pPolar);
+                    s_oaPolar.insert(j, pPolar);
 					bInserted = true;
 					break;
 				}
@@ -451,7 +423,7 @@ Polar* MainFrame::AddPolar(Polar *pPolar)
 				{
 					if(pPolar->m_PolarType < pOldPlr->m_PolarType)
 					{
-						m_oaPolar.insert(j, pPolar);
+                        s_oaPolar.insert(j, pPolar);
 						bInserted = true;
 						break;
 					}
@@ -462,7 +434,7 @@ Polar* MainFrame::AddPolar(Polar *pPolar)
 							//sort by re Nbr
 							if(pPolar->m_Reynolds < pOldPlr->m_Reynolds)
 							{
-								m_oaPolar.insert(j, pPolar);
+                                s_oaPolar.insert(j, pPolar);
 								bInserted = true;
 								break;
 							}
@@ -472,7 +444,7 @@ Polar* MainFrame::AddPolar(Polar *pPolar)
 							//Type 4, sort by Alphas
 							if(pPolar->m_ASpec < pOldPlr->m_ASpec)
 							{
-								m_oaPolar.insert(j, pPolar);
+                                s_oaPolar.insert(j, pPolar);
 								bInserted = true;
 								break;
 							}
@@ -482,16 +454,16 @@ Polar* MainFrame::AddPolar(Polar *pPolar)
 			}
 			if(!bInserted)
 			{
-				m_oaPolar.append(pPolar);
+                s_oaPolar.append(pPolar);
 				bInserted = true;
 			}
 			return pPolar;
 		}
 		else
 		{
-			for (l=0; l<m_oaPolar.size(); l++)
+            for (l=0; l<s_oaPolar.size(); l++)
 			{
-				pOldPlr = (Polar*)m_oaPolar.at(l);
+                pOldPlr = (Polar*)s_oaPolar.at(l);
 				if (pOldPlr->m_FoilName == pPolar->m_FoilName &&
 					pOldPlr->m_PlrName  == pPolar->m_PlrName)
 				{
@@ -501,10 +473,10 @@ Polar* MainFrame::AddPolar(Polar *pPolar)
 					{
 						strong = QString(" (%1)").arg( p);
 						strong = pPolar->m_PlrName + strong;
-						for (k=0; k<m_oaPolar.size(); k++)
+                        for (k=0; k<s_oaPolar.size(); k++)
 						{
 							bFound = false;
-							pOld2Plr = (Polar*)m_oaPolar.at(k);
+                            pOld2Plr = (Polar*)s_oaPolar.at(k);
 							if (pOld2Plr->m_FoilName == pPolar->m_FoilName &&
 								pOld2Plr->m_PlrName  == strong)
 							{
@@ -996,20 +968,21 @@ void MainFrame::CreateDockWindows()
 	BatchDlg::s_pMainFrame         = this;
 	BatchThreadDlg::s_pMainFrame   = this;
 	GraphDlg::s_pMainFrame         = this;
+	ManageBodiesDlg::s_pMainFrame  = this;
 
-    m_pctrlXDirectWidget = new QDockWidget(tr("Foil analysis"), this);
+    m_pctrlXDirectWidget = new QDockWidget("XDirect", this);
 	m_pctrlXDirectWidget->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
 	addDockWidget(Qt::RightDockWidgetArea, m_pctrlXDirectWidget);
 
-    m_pctrlXInverseWidget = new QDockWidget(tr("Inverse design"), this);
+	m_pctrlXInverseWidget = new QDockWidget("XInverse", this);
 	m_pctrlXInverseWidget->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
 	addDockWidget(Qt::RightDockWidgetArea, m_pctrlXInverseWidget);
 
-	m_pctrlMiarexWidget = new QDockWidget(tr("Plane analysis"), this);
+	m_pctrlMiarexWidget = new QDockWidget("Miarex", this);
 	m_pctrlMiarexWidget->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
 	addDockWidget(Qt::RightDockWidgetArea, m_pctrlMiarexWidget);
 
-    m_pctrlAFoilWidget = new QDockWidget(tr("Direct design"), this);
+	m_pctrlAFoilWidget = new QDockWidget("AFoil", this);
 	m_pctrlAFoilWidget->setAllowedAreas(Qt::BottomDockWidgetArea | Qt::TopDockWidgetArea);
 	addDockWidget(Qt::BottomDockWidgetArea, m_pctrlAFoilWidget);
 
@@ -1098,14 +1071,13 @@ void MainFrame::CreateDockWindows()
 	pMiarex->m_poaWPolar = &m_oaWPolar;
 	pMiarex->m_poaWOpp   = &m_oaWOpp;
 	pMiarex->m_poaPOpp   = &m_oaPOpp;
-	pMiarex->m_poaFoil   = &m_oaFoil;
-	pMiarex->m_poaPolar  = &m_oaPolar;
+
 
 	QXDirect::s_p2DWidget              = m_p2DWidget;
 	pXDirect->m_pCpGraph->m_pParent    = m_p2DWidget;
 	for(int ig=0; ig<MAXPOLARGRAPHS; ig++) pXDirect->m_PlrGraph[ig].m_pParent = m_p2DWidget;
 	pXDirect->m_poaFoil  = &m_oaFoil;
-	pXDirect->m_poaPolar = &m_oaPolar;
+    pXDirect->m_poaPolar = &s_oaPolar;
 	pXDirect->m_poaOpp   = &m_oaOpp;
 
 	QAFoil::s_p2DWidget  = m_p2DWidget;
@@ -1134,6 +1106,8 @@ void MainFrame::CreateDockWindows()
 	StabPolarDlg::s_pMiarex     = m_pMiarex;
 	UFOTableDelegate::s_pMiarex = m_pMiarex;
 	WPolarDlg::s_pMiarex        = m_pMiarex;
+	ManageBodiesDlg::s_pMiarex  = m_pMiarex;
+
 
 	Plane::SetParents(this, m_pMiarex);
 
@@ -2597,12 +2571,12 @@ Foil* MainFrame::DeleteFoil(Foil *pFoil, bool bAsk)
 			delete pOpPoint;
 		}
 	}
-	for (j= m_oaPolar.size()-1;j>=0; j--)
+    for (j= s_oaPolar.size()-1;j>=0; j--)
 	{
-		pPolar = (Polar*)m_oaPolar.at(j);
+        pPolar = (Polar*)s_oaPolar.at(j);
 		if(pPolar->m_FoilName == pFoil->m_FoilName)
 		{
-			m_oaPolar.removeAt(j);
+            s_oaPolar.removeAt(j);
 			delete pPolar;
 		}
 	}
@@ -2757,10 +2731,10 @@ void MainFrame::DeleteProject()
 		m_oaFoil.removeAt(i);
 		delete (Foil*)pObj;
 	}
-	for (i=m_oaPolar.size()-1; i>=0; i--)
+    for (i=s_oaPolar.size()-1; i>=0; i--)
 	{
-		pObj = m_oaPolar.at(i);
-		m_oaPolar.removeAt(i);
+        pObj = s_oaPolar.at(i);
+        s_oaPolar.removeAt(i);
 		delete (Polar*)pObj;
 	}
 	for (i=m_oaOpp.size()-1; i>=0; i--)
@@ -2935,9 +2909,9 @@ QColor MainFrame::GetColor(int type)
 			Polar *pPolar;
 			for (j=0; j<m_ColorList.size(); j++)
 			{
-				for (i=0; i<m_oaPolar.size(); i++)
+                for (i=0; i<s_oaPolar.size(); i++)
 				{
-					pPolar = (Polar*)m_oaPolar.at(i);
+                    pPolar = (Polar*)s_oaPolar.at(i);
 					bFound = false;
 					if(pPolar->m_Color == m_ColorList.at(j))
 					{
@@ -3077,9 +3051,9 @@ Polar *MainFrame::GetPolar(QString m_FoilName, QString PolarName)
 	}
 
 	Polar *pPolar;
-	for (int i=0; i<m_oaPolar.size(); i++)
+    for (int i=0; i<s_oaPolar.size(); i++)
 	{
-		pPolar = (Polar*) m_oaPolar.at(i);
+        pPolar = (Polar*) s_oaPolar.at(i);
 		if (pPolar->m_FoilName == m_FoilName &&  pPolar->m_PlrName == PolarName)
 		{
 			return pPolar;
@@ -3271,14 +3245,14 @@ bool MainFrame::LoadPolarFileV3(QDataStream &ar, bool bIsStoring, int ArchiveFor
 			delete pPolar;
 			return false;
 		}
-		for (l=0; l<m_oaPolar.size(); l++)
+        for (l=0; l<s_oaPolar.size(); l++)
 		{
-			pOldPlr = (Polar*)m_oaPolar[l];
+            pOldPlr = (Polar*)s_oaPolar[l];
 			if (pOldPlr->m_FoilName == pPolar->m_FoilName &&
 				pOldPlr->m_PlrName  == pPolar->m_PlrName)
 			{
 				//just overwrite...
-				m_oaPolar.removeAt(l);
+                s_oaPolar.removeAt(l);
 				delete pOldPlr;
 				//... and continue to add
 			}
@@ -3499,7 +3473,7 @@ bool MainFrame::LoadSettings()
 
 MainFrame* MainFrame::self() {
     if (!_self) {
-		_self = new MainFrame;
+        _self = new MainFrame(0L, 0L);
     }
     return _self;
 }
@@ -3713,8 +3687,8 @@ void MainFrame::OnExportCurGraph()
 	pGraph->GetGraphName(FileName);
 	FileName.replace("/", " ");
 	FileName = QFileDialog::getSaveFileName(this, tr("Export Graph"), m_ExportLastDirName,
-	                                        tr("Text File (*.txt);;Comma Separated Values (*.csv)"),
-	                                        &m_GraphExportFilter);
+											tr("Text File (*.txt);;Comma Separated Values (*.csv)"),
+											&m_GraphExportFilter);
 	if(!FileName.length()) return;
 
 	int pos;
@@ -3772,9 +3746,9 @@ void MainFrame::OnInsertProject()
 	pMiarex->m_bArcball = false;
 
 	PathName = QFileDialog::getOpenFileName(this, tr("Open File"),
-	                                        s_LastDirName,
-	                                        tr("Project file (*.wpa)"));
-	if(!PathName.length()) return;
+											s_LastDirName,
+											tr("Project file (*.wpa)"));
+	if(!PathName.length())		return;
 	int pos = PathName.lastIndexOf("/");
 	if(pos>0) s_LastDirName = PathName.left(pos);
 
@@ -3836,14 +3810,17 @@ void MainFrame::OnLanguage()
 	TranslationsDir.setPath(".");/** @todo remove - debug only */
 #endif
 
-	m_pTranslatorDlg->m_TranslationDirPath = TranslationsDir.canonicalPath() + "/translations" ;
-	m_pTranslatorDlg->m_LanguageFilePath = m_LanguageFilePath;
-	m_pTranslatorDlg->InitDialog();
-	if(m_pTranslatorDlg->exec()==QDialog::Accepted)
+    TranslatorDlg tDlg(this);
+    tDlg.m_TranslationDirPath = TranslationsDir.canonicalPath() + "/translations" ;
+    tDlg.m_LanguageFilePath = m_LanguageFilePath;
+    tDlg.InitDialog();
+    if(tDlg.exec()==QDialog::Accepted)
 	{
-		m_LanguageFilePath = m_pTranslatorDlg->m_LanguageFilePath;
+        m_LanguageFilePath = tDlg.m_LanguageFilePath;
 	}
 }
+
+
 
 
 void MainFrame::OnLoadFile()
@@ -3898,7 +3875,7 @@ void MainFrame::OnLoadFile()
 	}
 	else if(m_iApp==XFOILANALYSIS)
 	{
-		if(m_oaPolar.size())
+        if(s_oaPolar.size())
 		{
 			if(pXDirect->m_bPolarView) pXDirect->CreatePolarCurves();
 			else                   pXDirect->CreateOppCurves();
@@ -4140,12 +4117,12 @@ void MainFrame::OnRestoreToolbars()
 
 void MainFrame::OnSaveOptions()
 {
-
-	m_pSaveOptionsDlg->InitDialog(m_bSaveOpps, m_bSaveWOpps);
-	if(m_pSaveOptionsDlg->exec()==QDialog::Accepted)
+    SaveOptionsDlg soDlg(this);
+    soDlg.InitDialog(m_bSaveOpps, m_bSaveWOpps);
+    if(soDlg.exec()==QDialog::Accepted)
 	{
-		m_bSaveOpps  = m_pSaveOptionsDlg->m_bOpps;
-		m_bSaveWOpps = m_pSaveOptionsDlg->m_bWOpps;
+        m_bSaveOpps  = soDlg.m_bOpps;
+        m_bSaveWOpps = soDlg.m_bWOpps;
 	}
 }
 
@@ -4393,9 +4370,7 @@ void MainFrame::OnSelChangeWOpp(int i)
 	if(strong.length())
 	{
 		bool bOK;
-
-		QLocale locale;
-		double x = locale.toDouble(strong.trimmed(), &bOK);
+		double x = strong.toDouble(&bOK);
 		if(bOK)
 		{
 			m_iApp = MIAREX;
@@ -4465,11 +4440,9 @@ void MainFrame::OnSelChangeOpp(int i)
 	if (i>=0) strong = m_pctrlOpPoint->itemText(i);
 	m_iApp = XFOILANALYSIS;
 
+	double Alpha;
 	bool bOK;
-
-	QLocale locale;
-	double Alpha = locale.toDouble(strong.trimmed(), &bOK);
-
+	Alpha = strong.toFloat(&bOK);
 	if(bOK)
 	{
 		pXDirect->SetOpp(Alpha);
@@ -4527,23 +4500,23 @@ void MainFrame::OnStyle()
 
 void MainFrame::OnUnits()
 {
-//    m_UnitsDlg->move(m_DlgPos);
-	m_pUnitsDlg->m_Length = s_LengthUnit;
-	m_pUnitsDlg->m_Area   = s_AreaUnit;
-	m_pUnitsDlg->m_Weight = s_WeightUnit;
-	m_pUnitsDlg->m_Speed  = s_SpeedUnit;
-	m_pUnitsDlg->m_Force  = s_ForceUnit;
-	m_pUnitsDlg->m_Moment = s_MomentUnit;
-	m_pUnitsDlg->InitDialog();
+    UnitsDlg uDlg(this);
+    uDlg.m_Length = s_LengthUnit;
+    uDlg.m_Area   = s_AreaUnit;
+    uDlg.m_Weight = s_WeightUnit;
+    uDlg.m_Speed  = s_SpeedUnit;
+    uDlg.m_Force  = s_ForceUnit;
+    uDlg.m_Moment = s_MomentUnit;
+    uDlg.InitDialog();
 
-	if(m_pUnitsDlg->exec()==QDialog::Accepted)
+    if(uDlg.exec()==QDialog::Accepted)
 	{
-		s_LengthUnit = m_pUnitsDlg->m_Length;
-		s_AreaUnit   = m_pUnitsDlg->m_Area;
-		s_WeightUnit = m_pUnitsDlg->m_Weight;
-		s_SpeedUnit  = m_pUnitsDlg->m_Speed;
-		s_ForceUnit  = m_pUnitsDlg->m_Force;
-		s_MomentUnit = m_pUnitsDlg->m_Moment;
+        s_LengthUnit = uDlg.m_Length;
+        s_AreaUnit   = uDlg.m_Area;
+        s_WeightUnit = uDlg.m_Weight;
+        s_SpeedUnit  = uDlg.m_Speed;
+        s_ForceUnit  = uDlg.m_Force;
+        s_MomentUnit = uDlg.m_Moment;
 
 		SetUnits(s_LengthUnit, s_AreaUnit, s_SpeedUnit, s_WeightUnit, s_ForceUnit, s_MomentUnit,
 		s_mtoUnit, s_m2toUnit, s_mstoUnit, s_kgtoUnit, s_NtoUnit, s_NmtoUnit);
@@ -4668,7 +4641,7 @@ void MainFrame::openRecentFile()
 
 	else if(m_iApp==XFOILANALYSIS)
 	{
-		if(m_oaPolar.size())
+        if(s_oaPolar.size())
 		{
 			if(pXDirect->m_bPolarView) pXDirect->CreatePolarCurves();
 			else                   pXDirect->CreateOppCurves();
@@ -4859,14 +4832,14 @@ Foil * MainFrame::ReadPolarFile(QDataStream &ar)
 				delete pPolar;
 				return pFoil;
 			}
-			for (l=0; l<m_oaPolar.size(); l++)
+            for (l=0; l<s_oaPolar.size(); l++)
 			{
-				pOldPolar = (Polar*)m_oaPolar[l];
+                pOldPolar = (Polar*)s_oaPolar[l];
 				if (pOldPolar->m_FoilName == pPolar->m_FoilName &&
 					pOldPolar->m_PlrName  == pPolar->m_PlrName)
 				{
 					//just overwrite...
-					m_oaPolar.removeAt(l);
+                    s_oaPolar.removeAt(l);
 					delete pOldPolar;
 					//... and continue to add
 				}
@@ -4946,14 +4919,15 @@ void MainFrame::RenameFoil(Foil *pFoil)
 			NameList.append(pOldFoil->m_FoilName);
 		}
 
-		m_pRenameDlg->m_pstrArray = & NameList;
-		m_pRenameDlg->m_strQuestion = tr("Enter the foil's new name");
-		m_pRenameDlg->m_strName = OldName;
+        RenameDlg renDlg(this);
+        renDlg.m_pstrArray = & NameList;
+        renDlg.m_strQuestion = tr("Enter the foil's new name");
+        renDlg.m_strName = OldName;
 		bool bExists = false;
-		m_pRenameDlg->InitDialog();
-		int resp = m_pRenameDlg->exec();
+        renDlg.InitDialog();
+        int resp = renDlg.exec();
 
-		strong = m_pRenameDlg->m_strName;
+        strong = renDlg.m_strName;
 
 		if(QDialog::Accepted == resp)
 		{
@@ -5001,9 +4975,9 @@ void MainFrame::RenameFoil(Foil *pFoil)
 							break;
 						}
 					}
-					for (i=0; i<m_oaPolar.size(); i++)
+                    for (i=0; i<s_oaPolar.size(); i++)
 					{
-						pPolar = (Polar*)m_oaPolar.at(i);
+                        pPolar = (Polar*)s_oaPolar.at(i);
 						if(pPolar->m_FoilName == OldName)
 						{
 							pPolar->m_FoilName = strong;
@@ -5057,21 +5031,21 @@ void MainFrame::RenameFoil(Foil *pFoil)
 				}
 				// delete all Polar results for that airfoil
 				Polar * pPolar;
-				for (l=m_oaPolar.size()-1;l>=0;l--)
+                for (l=s_oaPolar.size()-1;l>=0;l--)
 				{
-					pPolar = (Polar*) m_oaPolar.at(l);
+                    pPolar = (Polar*) s_oaPolar.at(l);
 					if (pPolar->m_FoilName == strong)
 					{
 						if(pXDirect->m_pCurPolar == pPolar) pXDirect->m_pCurPolar = NULL;
-						m_oaPolar.removeAt(l);
+                        s_oaPolar.removeAt(l);
 						delete pPolar;
 					}
 				}
 				// finally add to array
 				pFoil->m_FoilName = strong;
-				for (i=0; i<m_oaPolar.size(); i++)
+                for (i=0; i<s_oaPolar.size(); i++)
 				{
-					pPolar = (Polar*)m_oaPolar.at(i);
+                    pPolar = (Polar*)s_oaPolar.at(i);
 					if(pPolar->m_FoilName == OldName)
 					{
 						pPolar->m_FoilName = strong;
@@ -5245,11 +5219,9 @@ void MainFrame::SaveSettings()
 	pXDirect->SaveSettings(&settings);
 	pMiarex->SaveSettings(&settings);
 	pXInverse->SaveSettings(&settings);
-	GL3DScales *p3DScales = (GL3DScales *)m_pGL3DScales;
-	p3DScales->SaveSettings(&settings);
+    GL3DScales::SaveSettings(&settings);
+    W3dPrefsDlg::SaveSettings(&settings);
 	m_RefGraph.SaveSettings(&settings);
-
-
 }
 
 
@@ -5572,9 +5544,9 @@ bool MainFrame::SerializeUFOProject(QDataStream &ar)
 	{
 		pFoil = foil(FoilList[i]);
 		//count polars associated to the foil
-		for (int i=0; i<m_oaPolar.size();i++)
+        for (int i=0; i<s_oaPolar.size();i++)
 		{
-			pPolar = (Polar*)m_oaPolar.at(i);
+            pPolar = (Polar*)s_oaPolar.at(i);
 			if (pPolar->m_FoilName == pFoil->m_FoilName)
 				n++;
 		}
@@ -5584,9 +5556,9 @@ bool MainFrame::SerializeUFOProject(QDataStream &ar)
 	for (i=0; i<FoilList.size(); i++)
 	{
 		pFoil = foil(FoilList[i]);
-		for (j=0; j<m_oaPolar.size();j++)
+        for (j=0; j<s_oaPolar.size();j++)
 		{
-			pPolar = (Polar*)m_oaPolar.at(j);
+            pPolar = (Polar*)s_oaPolar.at(j);
 			if (pPolar->m_FoilName == pFoil->m_FoilName)
 			{
 				pPolar->Serialize(ar, true);
@@ -5959,9 +5931,9 @@ bool MainFrame::SerializeProject(QDataStream &ar, bool bIsStoring)
 		}
 		if(n==100000)
 		{
-			for (j=0; j<m_oaPolar.size(); j++)
+            for (j=0; j<s_oaPolar.size(); j++)
 			{
-				pPolar = (Polar*)m_oaPolar.at(j);
+                pPolar = (Polar*)s_oaPolar.at(j);
 				for (k=0; k<m_oaFoil.size(); k++)
 				{
 					pFoil = (Foil*)m_oaFoil.at(k);
@@ -6193,19 +6165,20 @@ Foil* MainFrame::SetModFoil(Foil* pNewFoil, bool bKeepExistingFoil)
 				NameList.append(pFoil->m_FoilName);
 			}
 
-			m_pRenameDlg->m_pstrArray = & NameList;
-			m_pRenameDlg->m_strQuestion = tr("A foil of that name already exists\nPlease enter a new name");
-			m_pRenameDlg->m_strName = pNewFoil->m_FoilName;
-			m_pRenameDlg->InitDialog();
+            RenameDlg renDlg(this);
+            renDlg.m_pstrArray = & NameList;
+            renDlg.m_strQuestion = tr("A foil of that name already exists\nPlease enter a new name");
+            renDlg.m_strName = pNewFoil->m_FoilName;
+            renDlg.InitDialog();
 
 			bool exists = false;
 			QString strong;
-			int resp = m_pRenameDlg->exec();
-			strong = m_pRenameDlg->m_strName;
+            int resp = renDlg.exec();
+            strong = renDlg.m_strName;
 
 			if(QDialog::Accepted == resp)
 			{
-				strong = m_pRenameDlg->m_strName;
+                strong = renDlg.m_strName;
 				for (l=0; l<m_oaFoil.size(); l++)
 				{
 					pOldFoil = (Foil*)m_oaFoil.at(l);
@@ -6253,9 +6226,9 @@ Foil* MainFrame::SetModFoil(Foil* pNewFoil, bool bKeepExistingFoil)
 				}
 				// delete all Polar results for that airfoil, but keep polar for analysis
 				Polar * pPolar;
-				for (l=0; l <m_oaPolar.size();l++)
+                for (l=0; l <s_oaPolar.size();l++)
 				{
-					pPolar = (Polar*) m_oaPolar.at(l);
+                    pPolar = (Polar*) s_oaPolar.at(l);
 					if (pPolar->m_FoilName == strong)
 					{
 						pPolar->ResetPolar();
@@ -6540,8 +6513,6 @@ void MainFrame::UpdateWPolars()
 	}
 }
 
-
-
 void MainFrame::UpdateWOpps()
 {
 	// fills combobox with WOpp names associated to Miarex' current WPLr
@@ -6587,18 +6558,18 @@ void MainFrame::UpdateWOpps()
 				pPOpp = (PlaneOpp*)m_oaPOpp[i];
 				if (pPOpp->m_PlaneName == pCurPlane->PlaneName() && pPOpp->m_PlrName == pCurWPlr->m_PlrName)
 				{
-					if(pCurWPlr->m_WPolarType<FIXEDAOAPOLAR)        str = QString("%L1").arg(pPOpp->m_Alpha,8,'f',2);
-					else if(pCurWPlr->m_WPolarType==FIXEDAOAPOLAR)  str = QString("%L1").arg(pPOpp->m_QInf,8,'f',2);
-					else if(pCurWPlr->m_WPolarType==STABILITYPOLAR) str = QString("%L1").arg(pPOpp->m_Ctrl,8,'f',2);
+					if(pCurWPlr->m_WPolarType<FIXEDAOAPOLAR)        str = QString("%1").arg(pPOpp->m_Alpha,8,'f',2);
+					else if(pCurWPlr->m_WPolarType==FIXEDAOAPOLAR)  str = QString("%1").arg(pPOpp->m_QInf,8,'f',2);
+					else if(pCurWPlr->m_WPolarType==STABILITYPOLAR) str = QString("%1").arg(pPOpp->m_Ctrl,8,'f',2);
 					m_pctrlWOpp->addItem(str);
 				}
 			}
 
 			if(pMiarex->m_pCurPOpp)
 			{
-					if(pCurWPlr->m_WPolarType<FIXEDAOAPOLAR)        str = QString("%L1").arg(pPOpp->m_Alpha,8,'f',2);
-					else if(pCurWPlr->m_WPolarType==FIXEDAOAPOLAR)  str = QString("%L1").arg(pPOpp->m_QInf,8,'f',2);
-					else if(pCurWPlr->m_WPolarType==STABILITYPOLAR) str = QString("%L1").arg(pPOpp->m_Ctrl,8,'f',2);
+					if(pCurWPlr->m_WPolarType<FIXEDAOAPOLAR)        str = QString("%1").arg(pPOpp->m_Alpha,8,'f',2);
+					else if(pCurWPlr->m_WPolarType==FIXEDAOAPOLAR)  str = QString("%1").arg(pPOpp->m_QInf,8,'f',2);
+					else if(pCurWPlr->m_WPolarType==STABILITYPOLAR) str = QString("%1").arg(pPOpp->m_Ctrl,8,'f',2);
 
 				int pos = m_pctrlWOpp->findText(str);
 				if(pos >=0) m_pctrlWOpp->setCurrentIndex(pos);
@@ -6623,7 +6594,6 @@ void MainFrame::UpdateWOpps()
 			if (pWOpp->m_WingName == pCurWing->m_WingName && pWOpp->m_PlrName  == pCurWPlr->m_PlrName)
 			{
 				size++;
-                break;
 			}
 		}
 		if (size)
@@ -6636,9 +6606,9 @@ void MainFrame::UpdateWOpps()
 				if (pWOpp->m_WingName == pCurWing->m_WingName && pWOpp->m_PlrName == pCurWPlr->m_PlrName)
 				{
 
-                    if(pCurWPlr->m_WPolarType<FIXEDAOAPOLAR)         str = QString("%L1").arg(pWOpp->m_Alpha,8,'f',2);
-                    else  if(pCurWPlr->m_WPolarType==FIXEDAOAPOLAR)  str = QString("%L1").arg(pWOpp->m_QInf,8,'f',2);
-                    else  if(pCurWPlr->m_WPolarType==STABILITYPOLAR) str = QString("%L1").arg(pWOpp->m_Ctrl,8,'f',2);
+					if(pCurWPlr->m_WPolarType<FIXEDAOAPOLAR)         str = QString("%1").arg(pWOpp->m_Alpha,8,'f',2);
+					else  if(pCurWPlr->m_WPolarType==FIXEDAOAPOLAR)  str = QString("%1").arg(pWOpp->m_QInf,8,'f',2);
+					else  if(pCurWPlr->m_WPolarType==STABILITYPOLAR) str = QString("%1").arg(pWOpp->m_Ctrl,8,'f',2);
 
 					m_pctrlWOpp->addItem(str);
 				}
@@ -6646,9 +6616,9 @@ void MainFrame::UpdateWOpps()
 
 			if(pMiarex->m_pCurWOpp)
 			{
-                if(pCurWPlr->m_WPolarType<FIXEDAOAPOLAR)        str = QString("%L1").arg(pWOpp->m_Alpha,8,'f',2);
-                else if(pCurWPlr->m_WPolarType==FIXEDAOAPOLAR)  str = QString("%L1").arg(pWOpp->m_QInf,8,'f',2);
-                else if(pCurWPlr->m_WPolarType==STABILITYPOLAR) str = QString("%L1").arg(pWOpp->m_Ctrl,8,'f',2);
+				if(pCurWPlr->m_WPolarType<FIXEDAOAPOLAR)        str = QString("%1").arg(pWOpp->m_Alpha,8,'f',2);
+				else if(pCurWPlr->m_WPolarType==FIXEDAOAPOLAR)  str = QString("%1").arg(pWOpp->m_QInf,8,'f',2);
+				else if(pCurWPlr->m_WPolarType==STABILITYPOLAR) str = QString("%1").arg(pWOpp->m_Ctrl,8,'f',2);
 
 				int pos = m_pctrlWOpp->findText(str);
 				if(pos >=0) m_pctrlWOpp->setCurrentIndex(pos);
@@ -6752,9 +6722,9 @@ void MainFrame::UpdatePolars()
 
 	size = 0;
 	//count the number of polars associated to the current foil
-	for (i=0; i<m_oaPolar.size(); i++)
+    for (i=0; i<s_oaPolar.size(); i++)
 	{
-		pPolar = (Polar*)m_oaPolar[i];
+        pPolar = (Polar*)s_oaPolar[i];
 		if(pPolar->m_FoilName == s_pCurFoil->m_FoilName)
 		{
 			size++;
@@ -6766,9 +6736,9 @@ void MainFrame::UpdatePolars()
 		// if any
 		m_pctrlPolar->setEnabled(true);
 
-		for (i=0; i<m_oaPolar.size(); i++)
+        for (i=0; i<s_oaPolar.size(); i++)
 		{
-			pPolar = (Polar*)m_oaPolar[i];
+            pPolar = (Polar*)s_oaPolar[i];
 			if(pPolar->m_FoilName == s_pCurFoil->m_FoilName)
 			{
 				m_pctrlPolar->addItem(pPolar->m_PlrName);
@@ -6845,12 +6815,12 @@ void MainFrame::UpdateOpps()
 				if (pCurPlr->m_PolarType !=FIXEDAOAPOLAR)
 				{
 //					if(qAbs(pOpp->Alpha)<0.0001) pOpp->Alpha = 0.0001;
-					str = QString("%L1").arg(pOpp->Alpha,8,'f',2);
+					str = QString("%1").arg(pOpp->Alpha,8,'f',2);
 					m_pctrlOpPoint->addItem(str);
 				}
 				else
 				{
-					str = QString("%L1").arg(pOpp->Reynolds,8,'f',0);
+					str = QString("%1").arg(pOpp->Reynolds,8,'f',0);
 					m_pctrlOpPoint->addItem(str);
 				}
 			}
@@ -6860,11 +6830,11 @@ void MainFrame::UpdateOpps()
 			//select it
 			if (pCurPlr->m_PolarType !=FIXEDAOAPOLAR)
 			{
-				str = QString("%L1").arg(pXDirect->m_pCurOpp->Alpha,8,'f',2);
+				str = QString("%8.2f").arg(pXDirect->m_pCurOpp->Alpha);
 			}
 			else
 			{
-				str = QString("%L1").arg(pXDirect->m_pCurOpp->Reynolds,8,'f',0);
+				str = QString("%8.0f").arg(pXDirect->m_pCurOpp->Reynolds);
 			}
 			pos = m_pctrlOpPoint->findText(str);
 
@@ -6873,13 +6843,17 @@ void MainFrame::UpdateOpps()
 		else
 		{
 			//select the first
-			bool bOK;
 			m_pctrlOpPoint->setCurrentIndex(0);
-			str = m_pctrlOpPoint->itemText(0).trimmed();
-			double x = str.toDouble(&bOK);
+			str = m_pctrlOpPoint->itemText(0);
+			QByteArray textline;
+			const char *text;
+			double x;
+			textline = str.toLatin1();
+			text = textline.constData();
+			int res = sscanf(text, "%lf", &x);
 
-			if(bOK) pXDirect->SetOpp(x);
-			else    pXDirect->SetOpp();
+			if(res==1) pXDirect->SetOpp(x);
+			else       pXDirect->SetOpp();
 
 			if(!pXDirect->m_pCurOpp)
 			{
@@ -6974,11 +6948,11 @@ void MainFrame::WritePolars(QDataStream &ar, Foil *pFoil)
 		}
 
 		//then write polars
-		ar << m_oaPolar.size();
+        ar << s_oaPolar.size();
 		Polar * pPolar ;
-		for (i=0; i<m_oaPolar.size();i++)
+        for (i=0; i<s_oaPolar.size();i++)
 		{
-			pPolar = (Polar*)m_oaPolar.at(i);
+            pPolar = (Polar*)s_oaPolar.at(i);
 			pPolar->Serialize(ar, true);
 		}
 	}
@@ -6994,16 +6968,16 @@ void MainFrame::WritePolars(QDataStream &ar, Foil *pFoil)
 		//count polars associated to the foil
 		Polar * pPolar ;
 		int n=0;
-		for (i=0; i<m_oaPolar.size();i++)
+        for (i=0; i<s_oaPolar.size();i++)
 		{
-			pPolar = (Polar*)m_oaPolar.at(i);
+            pPolar = (Polar*)s_oaPolar.at(i);
 			if (pPolar->m_FoilName == pFoil->m_FoilName) n++;
 		}
 		//then write polars
 		ar << n;
-		for (i=0; i<m_oaPolar.size();i++)
+        for (i=0; i<s_oaPolar.size();i++)
 		{
-			pPolar = (Polar*)m_oaPolar.at(i);
+            pPolar = (Polar*)s_oaPolar.at(i);
 			if (pPolar->m_FoilName == pFoil->m_FoilName) pPolar->Serialize(ar, true);
 		}		
 	}

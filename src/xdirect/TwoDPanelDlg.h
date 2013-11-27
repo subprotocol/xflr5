@@ -53,8 +53,8 @@ private:
 	QPushButton *OKButton, *CancelButton, *ApplyButton;
 
 	QLineEdit  *m_pctrlNPanels;
-	DoubleEdit *m_pctrlCVpar,  *m_pctrlCTErat, *m_pctrlCTRrat;
-	DoubleEdit *m_pctrlXsRef1, *m_pctrlXsRef2, *m_pctrlXpRef1, *m_pctrlXpRef2;
+    DoubleEdit *m_pctrlCVpar,  *m_pctrlCTErat, *m_pctrlCTRrat;
+    DoubleEdit *m_pctrlXsRef1, *m_pctrlXsRef2, *m_pctrlXpRef1, *m_pctrlXpRef2;
 
 	bool m_bApplied;
 	bool m_bModified;

@@ -32,8 +32,6 @@
 #include "../mainframe.h" 
 #include "Miarex.h"
 #include "PlaneDlg.h"
-#include "GL3dWingDlg.h"
-#include "GL3dBodyDlg.h"
 #include "ImportWingDlg.h"
 #include "InertiaDlg.h"
 
@@ -385,13 +383,11 @@ void PlaneDlg::OnEditBody()
 
 	Body memBody;
 	memBody.Duplicate(m_pPlane->m_pBody);
+	pMiarex->m_pGL3dBody->m_bEnableName = false;
+	pMiarex->m_pGL3dBody->InitDialog(m_pPlane->m_pBody);
+	pMiarex->m_pGL3dBody->setWindowState(Qt::WindowMaximized);
 
-    GL3dBodyDlg *pGL3dBody = (GL3dBodyDlg*)pMiarex->m_pGL3dBody;
-    pGL3dBody->m_bEnableName = false;
-    pGL3dBody->InitDialog(m_pPlane->m_pBody);
-    pGL3dBody->setWindowState(Qt::WindowMaximized);
-
-    if(pGL3dBody->exec() == QDialog::Accepted)
+	if(pMiarex->m_pGL3dBody->exec() == QDialog::Accepted)
 	{
 		pMiarex->m_bResetglBody = true;
 		pMiarex->m_bResetglBodyMesh = true;
@@ -873,9 +869,9 @@ void PlaneDlg::SetupLayout()
 			lab1->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
 			lab2->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
 			lab3->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
-			m_pctrlXLEWing = new DoubleEdit(0.00);
-			m_pctrlZLEWing = new DoubleEdit(0.00);
-			m_pctrlWingTilt = new DoubleEdit(0.0,2);
+            m_pctrlXLEWing = new DoubleEdit(0.00);
+            m_pctrlZLEWing = new DoubleEdit(0.00);
+            m_pctrlWingTilt = new DoubleEdit(0.0,2);
 			m_pctrlLen1 = new QLabel("mm");
 			m_pctrlLen2 = new QLabel("mm");
 			QLabel *lab4 = new QLabel(QString::fromUtf8("°"));
@@ -910,9 +906,9 @@ void PlaneDlg::SetupLayout()
 			lab11->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
 			lab12->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
 			lab13->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
-			m_pctrlXLEWing2 = new DoubleEdit(0.00);
-			m_pctrlZLEWing2 = new DoubleEdit(0.00);
-			m_pctrlWingTilt2 = new DoubleEdit(0.0,2);
+            m_pctrlXLEWing2 = new DoubleEdit(0.00);
+            m_pctrlZLEWing2 = new DoubleEdit(0.00);
+            m_pctrlWingTilt2 = new DoubleEdit(0.0,2);
 			m_pctrlLen3 = new QLabel("mm");
 			m_pctrlLen4 = new QLabel("mm");
 			QLabel *lab14 = new QLabel(QString::fromUtf8("°"));
@@ -944,9 +940,9 @@ void PlaneDlg::SetupLayout()
 			lab21->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
 			lab22->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
 			lab23->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
-			m_pctrlXLEStab = new DoubleEdit(550.00);
-			m_pctrlZLEStab = new DoubleEdit(550.00);
-			m_pctrlStabTilt = new DoubleEdit(0.0,2);
+            m_pctrlXLEStab = new DoubleEdit(550.00);
+            m_pctrlZLEStab = new DoubleEdit(550.00);
+            m_pctrlStabTilt = new DoubleEdit(0.0,2);
 			m_pctrlLen5 = new QLabel("mm");
 			m_pctrlLen6 = new QLabel("mm");
 			QLabel *lab24 = new QLabel(QString::fromUtf8("°"));
@@ -981,10 +977,10 @@ void PlaneDlg::SetupLayout()
 			lab32->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
 			lab33->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
 			lab34->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
-			m_pctrlXLEFin = new DoubleEdit(600.00);
-			m_pctrlYLEFin = new DoubleEdit(0.00);
-			m_pctrlZLEFin = new DoubleEdit(50.00);
-			m_pctrlFinTilt = new DoubleEdit(0.0,2);
+            m_pctrlXLEFin = new DoubleEdit(600.00);
+            m_pctrlYLEFin = new DoubleEdit(0.00);
+            m_pctrlZLEFin = new DoubleEdit(50.00);
+            m_pctrlFinTilt = new DoubleEdit(0.0,2);
 			m_pctrlLen7= new QLabel("mm");
 			m_pctrlLen8 = new QLabel("mm");
 			m_pctrlLen9 = new QLabel("mm");
@@ -1027,8 +1023,8 @@ void PlaneDlg::SetupLayout()
 			BodyPos->setColumnStretch(0,3);
 			BodyPos->setColumnStretch(1,0);
 			BodyPos->setColumnStretch(2,0);
-			m_pctrlXBody = new DoubleEdit(0.00);
-			m_pctrlZBody = new DoubleEdit(0.00);
+            m_pctrlXBody = new DoubleEdit(0.00);
+            m_pctrlZBody = new DoubleEdit(0.00);
 			QLabel *lab41 = new QLabel(tr("x="));
 			QLabel *lab42 = new QLabel(tr("z="));
 			m_pctrlLen10 = new QLabel("mm");

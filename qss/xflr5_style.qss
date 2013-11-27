@@ -5,8 +5,9 @@
 
 QWidget
 {
-	color: #FFFFFF;
+	color: white;
 	background-color: #414141;
+	selection-background-color: darkslategray;
 }
 
 QWidget:focus
@@ -23,7 +24,8 @@ QWidget:item:hover
 QWidget:item:selected
 {
 	color: white;
-	background-color: QLinearGradient( x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 darkgray, stop: 1 lightgray);
+	selection-color: blue;
+	background-color: QLinearGradient( x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 darkgray, stop: 1 black);
 }
 
 QWidget:disabled
@@ -181,7 +183,7 @@ QTableView QTableCornerButton::section
 {
 	border: 0px solid LightSlateGray;
 	border-radius: 3px;
-    background-color: LightSlateGray;
+	background-color: LightSlateGray;
 	margin: 2px;
 }
 
@@ -192,13 +194,13 @@ QHeaderView::section
 	color: ghostwhite;
 	padding-left: 4px;
 	border: 1px solid black;
-	text-align: center;
+	min-height: 5ex;
 }
 
 
 /*_____________________ QLineEdit & QTextEdit ______________________*/
 
-QLineEdit
+QLineEdit, QTextEdit
 {
 	color: ghostwhite;
 	background-color: #101010;
@@ -206,30 +208,14 @@ QLineEdit
 	border-style: solid;
 	border: 1px solid #1e1e1e;
 	border-radius: 5;
+	selection-background-color: darkslategray;
 }
 
-QLineEdit:disabled
+QLineEdit:disabled, QTextEdit:disabled
 {
 	background-color: #474747;
 	color: #878787;
 	font: italic;
-}
-
-
-QTextEdit:focus
-{
-    border: 2px solid darkkhaki;
-}
-
-
-QTextEdit
-{
-	background-color: #242424;
-}
-
-QPlainTextEdit
-{
-    background-color: #242424;
 }
 
 
@@ -262,7 +248,20 @@ QPushButton:hover
 	border: 2px solid darkkhaki;
 }
 
-/*_____________________ LineButton ______________________*/
+
+/*_____________________ ColorButton ______________________*/
+
+ColorButton
+{
+	background-color: transparent;
+	border-radius: 5px;
+	min-width: 5em;
+	min-height: 3ex;
+}
+
+
+
+/*_____________________ LineBtn ______________________*/
 
 
 LineBtn
@@ -270,7 +269,7 @@ LineBtn
 	background-color: #101010;
 	border: 1px solid #7f7f7f;
 	border-radius: 5px;
-	min-height: 5ex;
+	min-height: 3.5ex;
 }
 
 LineBtn:hover
@@ -293,7 +292,7 @@ QComboBox
 	background-color: #101010;
 	border: 1px solid #7f7f7f;
 	border-radius: 5px;
-	min-height: 5ex;
+	min-height: 3.5ex;
 	color: ghostwhite;
 }
 
@@ -328,7 +327,6 @@ QComboBox:on
 QComboBox::drop-down
 {
 	/* defines the side drop-down arrow */
-	
 	subcontrol-origin: padding;
 	subcontrol-position: top right;
 	border-left-width: 1px;
@@ -343,9 +341,33 @@ QComboBox::down-arrow
      image: url(./qss/images/down_arrow.png);
 }
 
+
+
+/*______________________ QListView ___________________*/
+
+QListView
+{
+	color: ghostwhite;
+}
+
+ 
+QListView::item:selected
+{
+	background: darkslategray;
+}
+ 
+
+QListView::item:hover
+{ 
+	background-color: dimgray;
+	color: black;
+}
+
 /*______________________ QListWidget ___________________*/
 
-QListWidget  {
+QListWidget
+{
+	show-decoration-selected: 1;  /* make the selection span the entire width of the view */
 	background-color: #232323;
 	border: 1px solid #7f7f7f;
 	border-radius: 5px;
@@ -354,27 +376,29 @@ QListWidget  {
 }
 
  
-QListWidget::item:alternate  {
+QListWidget::item:alternate
+  {
     background: black;
 }
  
-QListWidget::item:selected  
+QListWidget::item:selected
 {
 }
  
-QListWidget::item:selected:!active  
+QListWidget::item:selected:!active
 {
     background: dimgray;
 }
  
-QListWidget::item:selected:active  
+QListWidget::item:selected:active
 {
 	background-color: #171717;
 	border: 1px solid darkkhaki;
 	color: ghostwhite;
 }
  
-QListWidget::item:hover  { 
+QListWidget::item:hover
+{ 
 	background-color: lightgray;
 	color: black;
 }
@@ -614,58 +638,6 @@ QTabBar::tab:!selected:hover
     background-color: QLinearGradient(x1:0, y1:0, x2:0, y2:1, stop:1 #212121, stop:0.4 #343434, stop:0.2 #343434, stop:0.1 darkkhaki);
 }
 
-/*_____________________ QRadioButton ______________________*/
-
-
-QRadioButton:disabled
-{
-	color: #BBBBBB;
-	background-color: #414141;
-} 
-
-QRadioButton::indicator:checked, QRadioButton::indicator:unchecked{
-    color: #b1b1b1;
-    background-color: #323232;
-    border: 1px solid #b1b1b1;
-    border-radius: 6px;
-}
-
-QRadioButton::indicator:checked
-{
-    background-color: qradialgradient(
-        cx: 0.5, cy: 0.5,
-        fx: 0.5, fy: 0.5,
-        radius: 1.0,
-        stop: 0.0 white,
-        stop: 0.25 darkkhaki,
-        stop: 0.3 #323232
-    );
-}
-
-QRadioButton::indicator
-{
-    border-radius: 6px;
-}
-
-QRadioButton::indicator:hover
-{
-    border: 1px solid darkkhaki;
-}
-
-QRadioButton::indicator:disabled:checked
-{
-	border: 1px solid #444;
-	background-color: qradialgradient(
-        cx: 0.5, cy: 0.5,
-        fx: 0.5, fy: 0.5,
-        radius: 1.0,
-        stop: 0.0 lightgray,
-        stop: 0.25 darkgray,
-        stop: 0.3 black
-    ); 
-}
-
-
 /*_____________________ QCheckBox ______________________*/
 
 QCheckBox
@@ -713,6 +685,29 @@ QCheckBox::indicator:hover
     border: 2px solid darkkhaki;
 }
 
+/*_______________________ radiobutton ________________*/
+
+
+
+QRadioButton::indicator
+{
+    background: qradialgradient(cx:0.5, cy:0.5, radius: 0.7, fx:0.5, fy:0.5, stop:0 dimgray, stop:1 black) ;
+    width: 9px;
+    height: 9px;
+    border: 1px solid gray;
+    padding: 1px;
+    border-radius: 5px;
+}
+
+QRadioButton::indicator:checked
+{
+    background: qradialgradient(cx:0.5, cy:0.5, radius: 0.7, fx:0.5, fy:0.5, stop:0 white, stop:1 black) ;
+    width: 9px;
+    height: 9px;
+    border: 1px solid gray;
+    padding: 1px;
+    border-radius: 5px;
+}
 
 /*_____________________ QToolTip ______________________*/
 

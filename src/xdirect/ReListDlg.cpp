@@ -104,7 +104,7 @@ void ReListDlg::keyPressEvent(QKeyEvent *event)
 }
 
 
-void ReListDlg::OnCellChanged(QWidget *FloatEdit)
+void ReListDlg::OnCellChanged(QWidget *DoubleEdit)
 {
 //sort the data in case the Re Number was changed
 	SortData();

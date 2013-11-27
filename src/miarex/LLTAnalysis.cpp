@@ -102,7 +102,7 @@ void LLTAnalysis::LLTInitCl(double &QInf, double const Alpha)
 		yob   = cos(k*PI/s_NLLTStations);
 		m_pWing->GetFoils(&pFoil0, &pFoil1, yob*m_pWing->m_PlanformSpan/2.0, tau);
 		m_Re[k] = m_Chord[k] * QInf /m_pWPolar->m_Viscosity;
-		m_Cl[k] = GetCl(m_poaPolar, pFoil0, pFoil1, m_Re[k], Alpha + m_Ai[k] + m_Twist[k], tau, bOutRe, bError);
+        m_Cl[k] = GetCl(pFoil0, pFoil1, m_Re[k], Alpha + m_Ai[k] + m_Twist[k], tau, bOutRe, bError);
 	}
 
 	if(m_pWPolar->m_WPolarType==FIXEDLIFTPOLAR)
@@ -170,34 +170,34 @@ void LLTAnalysis::LLTComputeWing(double QInf, double Alpha, QString &ErrorMessag
 		yob   = cos((double)m*PI/(double)s_NLLTStations);
 		m_pWing->GetFoils(&pFoil0, &pFoil1, yob*m_pWing->m_PlanformSpan/2.0, tau);
 
-		m_Cl[m]     = GetCl(m_poaPolar, pFoil0, pFoil1, m_Re[m], Alpha+m_Ai[m]+m_Twist[m], tau, bOutRe, bError);
+        m_Cl[m]     = GetCl(pFoil0, pFoil1, m_Re[m], Alpha+m_Ai[m]+m_Twist[m], tau, bOutRe, bError);
 		if(bOutRe) bPointOutRe = true;
 		if(bError) bPointOutAlpha = true;
 
-		m_PCd[m]    = GetCd(m_poaPolar, pFoil0, pFoil1, m_Re[m], Alpha+m_Ai[m]+m_Twist[m], tau, m_pWing->m_AR, bOutRe, bError);
+        m_PCd[m]    = GetCd(pFoil0, pFoil1, m_Re[m], Alpha+m_Ai[m]+m_Twist[m], tau, m_pWing->m_AR, bOutRe, bError);
 		if(bOutRe) bPointOutRe = true;
 		if(bError) bPointOutAlpha = true;
 
 		m_ICd[m]    = -m_Cl[m] * (m_Ai[m]* PI/180.0);
 
-		m_XTrTop[m] = GetXTr(m_poaPolar, pFoil0, pFoil1, m_Re[m], Alpha+m_Ai[m] + m_Twist[m], tau, true, bOutRe, bError);
+        m_XTrTop[m] = GetXTr(pFoil0, pFoil1, m_Re[m], Alpha+m_Ai[m] + m_Twist[m], tau, true, bOutRe, bError);
 		if(bOutRe) bPointOutRe = true;
 		if(bError) bPointOutAlpha = true;
 
-		m_XTrBot[m] = GetXTr(m_poaPolar, pFoil0, pFoil1, m_Re[m], Alpha+m_Ai[m]+m_Twist[m], tau, false, bOutRe, bError);
+        m_XTrBot[m] = GetXTr(pFoil0, pFoil1, m_Re[m], Alpha+m_Ai[m]+m_Twist[m], tau, false, bOutRe, bError);
 		if(bOutRe) bPointOutRe = true;
 		if(bError) bPointOutAlpha = true;
 
-		m_CmAirf[m] = GetCm(m_poaPolar, pFoil0, pFoil1, m_Re[m], Alpha+m_Ai[m]+m_Twist[m], tau, bOutRe, bError);
+        m_CmAirf[m] = GetCm(pFoil0, pFoil1, m_Re[m], Alpha+m_Ai[m]+m_Twist[m], tau, bOutRe, bError);
 		if(bOutRe) bPointOutRe = true;
 		if(bError) bPointOutAlpha = true;
 
-		m_XCPSpanRel[m] = GetXCp(m_poaPolar, pFoil0, pFoil1, m_Re[m], Alpha+m_Ai[m]+m_Twist[m], tau, bOutRe, bError);
+        m_XCPSpanRel[m] = GetXCp(pFoil0, pFoil1, m_Re[m], Alpha+m_Ai[m]+m_Twist[m], tau, bOutRe, bError);
 
 		if(qAbs(m_XCPSpanRel[m])<0.000001)
 		{
 			//plr mesh was generated prior to v3.15, i.e., without XCp calculations
-			Cm0 = GetCm0(m_poaPolar, pFoil0, pFoil1, m_Re[m],tau, bOutRe, bError);
+            Cm0 = GetCm0(pFoil0, pFoil1, m_Re[m],tau, bOutRe, bError);
 			if(m_Cl[m]!=0.0) m_XCPSpanRel[m] = 0.25 - Cm0/m_Cl[m];
 			else             m_XCPSpanRel[m] = 0.25;
 		}
@@ -357,7 +357,7 @@ bool LLTAnalysis::LLTSetLinearSolution(double Alpha)
 		}
 		yob   = cos(i*PI/s_NLLTStations);
 		m_pWing->GetFoils(&pFoil0, &pFoil1, yob*m_pWing->m_PlanformSpan/2.0, tau);
-		a0 = GetZeroLiftAngle(m_poaPolar, pFoil0, pFoil1, m_Re[i], tau);
+        a0 = GetZeroLiftAngle(pFoil0, pFoil1, m_Re[i], tau);
 		rhs[i] = c/cs * (Alpha-a0+m_Twist[i])/180.0*PI;
 	}
 
@@ -377,8 +377,8 @@ bool LLTAnalysis::LLTSetLinearSolution(double Alpha)
 		}
 		yob   = cos(i*PI/s_NLLTStations);
 		m_pWing->GetFoils(&pFoil0, &pFoil1, yob*m_pWing->m_PlanformSpan/2.0, tau);
-		GetLinearizedPolar(m_poaPolar, pFoil0, pFoil1, m_Re[i], tau, a0, slope);
-		a0 = GetZeroLiftAngle(m_poaPolar, pFoil0, pFoil1, m_Re[i], tau);//better approximation ?
+        GetLinearizedPolar(pFoil0, pFoil1, m_Re[i], tau, a0, slope);
+        a0 = GetZeroLiftAngle(pFoil0, pFoil1, m_Re[i], tau);//better approximation ?
 		m_Cl[i] *= slope*180.0/PI*cs/m_Chord[i];
 		m_Ai[i]  = -(Alpha-a0+m_Twist[i]) + m_Cl[i]/slope;
 	}
@@ -465,7 +465,7 @@ int LLTAnalysis::LLTIterate(double &QInf, double Alpha)
 		{
 			yob     = cos(k*PI/s_NLLTStations);
 			m_pWing->GetFoils(&pFoil0, &pFoil1, yob*m_pWing->m_PlanformSpan/2.0, tau);
-			m_Cl[k] = GetCl(m_poaPolar, pFoil0, pFoil1, m_Re[k], Alpha + m_Ai[k]+ m_Twist[k], tau, bOutRe, bError);
+            m_Cl[k] = GetCl( pFoil0, pFoil1, m_Re[k], Alpha + m_Ai[k]+ m_Twist[k], tau, bOutRe, bError);
 			if (m_pWPolar->m_WPolarType==FIXEDLIFTPOLAR)
 			{
 				Lift += Eta(k) * m_Cl[k] * m_Chord[k];
@@ -484,7 +484,7 @@ int LLTAnalysis::LLTIterate(double &QInf, double Alpha)
 				m_Re[k] = m_Chord[k] * QInf /m_pWPolar->m_Viscosity;
 				yob     = cos(k*PI/s_NLLTStations);
 				m_pWing->GetFoils(&pFoil0, &pFoil1, yob*m_pWing->m_PlanformSpan/2.0, tau);
-				m_Cl[k] = GetCl(m_poaPolar, pFoil0, pFoil1, m_Re[k], Alpha + m_Ai[k]+ m_Twist[k], tau, bOutRe, bError);
+                m_Cl[k] = GetCl(pFoil0, pFoil1, m_Re[k], Alpha + m_Ai[k]+ m_Twist[k], tau, bOutRe, bError);
 			}
 		}
 
