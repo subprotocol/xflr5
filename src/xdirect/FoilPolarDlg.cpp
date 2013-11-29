@@ -86,71 +86,73 @@ void FoilPolarDlg::SetupLayout()
         }
     }
 
-
-	//type 2 input data
-	QGroupBox *PlaneDataGroup = new QGroupBox(tr("Plane Data"));
-	{
-		QGridLayout *PlaneDataLayout = new QGridLayout;
-		m_pctrlChord = new DoubleEdit(0,3);
-		m_pctrlMass = new DoubleEdit(0,3);
-		m_pctrlSpan = new DoubleEdit(0,3);
-		QLabel *ChordLab = new QLabel(tr("Chord"));
-		QLabel *MassLab = new QLabel(tr("Mass"));
-		QLabel *SpanLab = new QLabel(tr("Span"));
-		m_pctrlLengthUnit1 = new QLabel("m");
-		m_pctrlLengthUnit2 = new QLabel("m");
-		m_pctrlMassUnit = new QLabel("kg");
-		PlaneDataLayout->addWidget(ChordLab,1,1);
-		PlaneDataLayout->addWidget(m_pctrlChord,1,2);
-		PlaneDataLayout->addWidget(m_pctrlLengthUnit1,1,3);
-		PlaneDataLayout->addWidget(SpanLab,2,1);
-		PlaneDataLayout->addWidget(m_pctrlSpan,2,2);
-		PlaneDataLayout->addWidget(m_pctrlLengthUnit2,2,3);
-		PlaneDataLayout->addWidget(MassLab,3,1);
-		PlaneDataLayout->addWidget(m_pctrlMass,3,2);
-		PlaneDataLayout->addWidget(m_pctrlMassUnit,3,3);
-		PlaneDataGroup->setLayout(PlaneDataLayout);
-	}
-	QGroupBox *AeroDataGroup = new QGroupBox(tr("Aerodynamic Data"));
-	{
-		QGridLayout *AeroDataLayout = new QGridLayout;
-		QLabel *lab9 = new QLabel(tr("Unit"));
-		m_pctrlUnit1 = new QRadioButton(tr("International"));
-		m_pctrlUnit2 = new QRadioButton(tr("Imperial"));
-		m_pctrlRho = new QLabel("r =");
-		m_pctrlDensity = new DoubleEdit(1.225,3);
-		m_pctrlDensityUnit = new QLabel("kg/m3");
-		m_pctrlNu = new QLabel("n =");
-		m_pctrlRho->setAlignment(Qt::AlignRight | Qt::AlignCenter);
-		m_pctrlNu->setAlignment(Qt::AlignRight | Qt::AlignCenter);
-		m_pctrlViscosity = new DoubleEdit(1.500e-5,3);
-		m_pctrlViscosityUnit = new QLabel("m2/s");
-		m_pctrlRho->setFont(SymbolFont);
-		m_pctrlNu->setFont(SymbolFont);
-		m_pctrlDensity->SetPrecision(5);
-		m_pctrlViscosity->SetPrecision(3);
-		m_pctrlDensity->SetMin(0.0);
-		m_pctrlViscosity->SetMin(0.0);
-		AeroDataLayout->addWidget(lab9,1,1);
-		AeroDataLayout->addWidget(m_pctrlUnit1,1,2);
-		AeroDataLayout->addWidget(m_pctrlUnit2,1,3);
-		AeroDataLayout->addWidget(m_pctrlRho,2,1);
-		AeroDataLayout->addWidget(m_pctrlDensity,2,2);
-		AeroDataLayout->addWidget(m_pctrlDensityUnit,2,3);
-		AeroDataLayout->addWidget(m_pctrlNu,3,1);
-		AeroDataLayout->addWidget(m_pctrlViscosity,3,2);
-		AeroDataLayout->addWidget(m_pctrlViscosityUnit,3,3);
-		AeroDataGroup->setLayout(AeroDataLayout);
-	}
-	QHBoxLayout *Type2DataLayout = new QHBoxLayout;
-	Type2DataLayout->addWidget(PlaneDataGroup);
-	Type2DataLayout->addWidget(AeroDataGroup);
-
-    QGroupBox *AeroGroup = new QGroupBox(tr("Reynolds and Mach Numbers"));
+	QGroupBox *AeroGroupBox = new QGroupBox(tr("Reynolds and Mach Numbers"));
     {
         QVBoxLayout *ReMachLayout = new QVBoxLayout;
         {
-            QHBoxLayout *ReMachResultsLayout = new QHBoxLayout;
+			QHBoxLayout *Type2DataLayout = new QHBoxLayout;
+			{
+				//type 2 input data
+				QGroupBox *PlaneDataGroup = new QGroupBox(tr("Plane Data"));
+				{
+					QGridLayout *PlaneDataLayout = new QGridLayout;
+					m_pctrlChord = new DoubleEdit(0,3);
+					m_pctrlMass = new DoubleEdit(0,3);
+					m_pctrlSpan = new DoubleEdit(0,3);
+					QLabel *ChordLab = new QLabel(tr("Chord"));
+					QLabel *MassLab = new QLabel(tr("Mass"));
+					QLabel *SpanLab = new QLabel(tr("Span"));
+					m_pctrlLengthUnit1 = new QLabel("m");
+					m_pctrlLengthUnit2 = new QLabel("m");
+					m_pctrlMassUnit = new QLabel("kg");
+					PlaneDataLayout->addWidget(ChordLab,1,1);
+					PlaneDataLayout->addWidget(m_pctrlChord,1,2);
+					PlaneDataLayout->addWidget(m_pctrlLengthUnit1,1,3);
+					PlaneDataLayout->addWidget(SpanLab,2,1);
+					PlaneDataLayout->addWidget(m_pctrlSpan,2,2);
+					PlaneDataLayout->addWidget(m_pctrlLengthUnit2,2,3);
+					PlaneDataLayout->addWidget(MassLab,3,1);
+					PlaneDataLayout->addWidget(m_pctrlMass,3,2);
+					PlaneDataLayout->addWidget(m_pctrlMassUnit,3,3);
+					PlaneDataGroup->setLayout(PlaneDataLayout);
+				}
+				QGroupBox *AeroDataGroup = new QGroupBox(tr("Aerodynamic Data"));
+				{
+					QGridLayout *AeroDataLayout = new QGridLayout;
+					QLabel *lab9 = new QLabel(tr("Unit"));
+					m_pctrlUnit1 = new QRadioButton(tr("International"));
+					m_pctrlUnit2 = new QRadioButton(tr("Imperial"));
+					m_pctrlRho = new QLabel("r =");
+					m_pctrlDensity = new DoubleEdit(1.225,3);
+					m_pctrlDensityUnit = new QLabel("kg/m3");
+					m_pctrlNu = new QLabel("n =");
+					m_pctrlRho->setAlignment(Qt::AlignRight | Qt::AlignCenter);
+					m_pctrlNu->setAlignment(Qt::AlignRight | Qt::AlignCenter);
+					m_pctrlViscosity = new DoubleEdit(1.500e-5,3);
+					m_pctrlViscosityUnit = new QLabel("m2/s");
+					m_pctrlRho->setFont(SymbolFont);
+					m_pctrlNu->setFont(SymbolFont);
+					m_pctrlDensity->SetPrecision(5);
+					m_pctrlViscosity->SetPrecision(3);
+					m_pctrlDensity->SetMin(0.0);
+					m_pctrlViscosity->SetMin(0.0);
+					AeroDataLayout->addWidget(lab9,1,1);
+					AeroDataLayout->addWidget(m_pctrlUnit1,1,2);
+					AeroDataLayout->addWidget(m_pctrlUnit2,1,3);
+					AeroDataLayout->addWidget(m_pctrlRho,2,1);
+					AeroDataLayout->addWidget(m_pctrlDensity,2,2);
+					AeroDataLayout->addWidget(m_pctrlDensityUnit,2,3);
+					AeroDataLayout->addWidget(m_pctrlNu,3,1);
+					AeroDataLayout->addWidget(m_pctrlViscosity,3,2);
+					AeroDataLayout->addWidget(m_pctrlViscosityUnit,3,3);
+					AeroDataGroup->setLayout(AeroDataLayout);
+				}
+
+				Type2DataLayout->addWidget(PlaneDataGroup);
+				Type2DataLayout->addWidget(AeroDataGroup);
+			}
+
+			QHBoxLayout *ReMachResultsLayout = new QHBoxLayout;
             {
                 m_pctrlReLabel   = new QLabel(tr("  Re ="));
                 m_pctrlReLabel->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
@@ -171,6 +173,7 @@ void FoilPolarDlg::SetupLayout()
             ReMachLayout->addSpacing(15);
             ReMachLayout->addLayout(ReMachResultsLayout);
         }
+		AeroGroupBox->setLayout(ReMachLayout);
     }
 
 	QHBoxLayout *CommandButtons = new QHBoxLayout;
@@ -222,7 +225,7 @@ void FoilPolarDlg::SetupLayout()
         mainLayout->addWidget(NameGroupBox);
 
         mainLayout->addWidget(TypeGroup);
-        mainLayout->addWidget(AeroGroup);
+		mainLayout->addWidget(AeroGroupBox);
         mainLayout->addWidget(TransGroup);
         mainLayout->addLayout(CommandButtons);
     }
@@ -548,19 +551,20 @@ void FoilPolarDlg::OnUnit()
 
 void FoilPolarDlg::ReadParams()
 {
+	bool bOK;
     QString str;
     str = m_pctrlReynolds->text();
     str.replace(" ","");
-	if(m_PolarType==FIXEDAOAPOLAR) m_ASpec    = str.toDouble();
-    else          m_Reynolds = str.toDouble();
+	if(m_PolarType==FIXEDAOAPOLAR) m_ASpec    = locale().toDouble(str, &bOK);
+	else                           m_Reynolds = locale().toDouble(str, &bOK);
 
-    m_Mach     = m_pctrlMach->text().toDouble();
+	m_Mach     = m_pctrlMach->Value();
     m_pctrlMach->clear();
 	m_pctrlMach->insert(str.setNum(m_Mach,'f',3));
 
-    m_NCrit  = m_pctrlNCrit->text().toDouble();
-    m_XTopTr = m_pctrlTopTrans->text().toDouble();
-    m_XBotTr = m_pctrlBotTrans->text().toDouble();
+	m_NCrit  = m_pctrlNCrit->Value();
+	m_XTopTr = m_pctrlTopTrans->Value();
+	m_XBotTr = m_pctrlBotTrans->Value();
 
     m_Mass = m_pctrlMass->Value();
     m_Chord = m_pctrlChord->Value();

@@ -25,12 +25,32 @@
 #include "Miarex.h"
 #include "./GLCreateLists.h"
 #include "./GLCreateBodyLists.h"
-#include "StabPolarDlg.h"
 #include "../mainframe.h"
 #include "../twodwidget.h"
 #include "../globals.h"
 #include <math.h>
 #include "NURBSDomDoc.h"
+#include "PlaneDlg.h"
+#include "GL3dWingDlg.h"
+#include "GL3dBodyDlg.h"
+#include "StabPolarDlg.h"
+#include "ManageUFOsDlg.h"
+#include "InertiaDlg.h"
+#include "WingScaleDlg.h"
+#include "ManageBodiesDlg.h"
+#include "WAdvancedDlg.h"
+#include "WPolarDlg.h"
+#include "StabPolarDlg.h"
+#include "StabViewDlg.h"
+#include "../graph/GraphDlg.h"
+#include "../misc/ProgressDlg.h"
+#include "../misc/ModDlg.h"
+#include "../misc/RenameDlg.h"
+#include "../misc/PolarFilterDlg.h"
+#include "../misc/ObjectPropsDlg.h"
+#include "../misc/UnitsDlg.h"
+#include "../misc/W3dPrefsDlg.h"
+#include "../misc/GLLightDlg.h"
 
 
 void *QMiarex::s_pMainFrame;
@@ -71,29 +91,11 @@ QMiarex::QMiarex(QWidget *parent)
 {
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	//construct and initialize everything
-	m_pWingDlg = new GL3dWingDlg(pMainFrame);
-    m_pPlaneDlg = new PlaneDlg(pMainFrame);
-    m_pGraphDlg = new GraphDlg(pMainFrame);
-    m_pRenameDlg = new RenameDlg(pMainFrame);
-    m_pGL3dBody = new GL3dBodyDlg(pMainFrame);
-    m_pInertiaDlg = new InertiaDlg(pMainFrame);
-    m_pManageBodiesDlg = new ManageBodiesDlg(pMainFrame);
-    m_pManageUFOsDlg = new ManageUFOsDlg(pMainFrame);
-    m_pWAdvancedDlg = new WAdvancedDlg(pMainFrame);
-    m_pWingScaleDlg = new WingScaleDlg(pMainFrame);
-	m_pGLLightDlg = new GLLightDlg(pMainFrame);
-	m_pPolarFilterDlg = new PolarFilterDlg(pMainFrame);
-	m_pW3dPrefsDlg = new W3dPrefsDlg(pMainFrame);
-	m_pModDlg = new ModDlg(pMainFrame);
-	m_pWPolarDlg =  new WPolarDlg(pMainFrame);
-	m_pStabPolarDlg = new StabPolarDlg(pMainFrame);
-	m_pUnitsDlg     = new UnitsDlg(pMainFrame);
-	m_pObjectPropsDlg = new ObjectPropsDlg(pMainFrame);
 
 
 	m_pLLTDlg = new LLTAnalysisDlg(pMainFrame);
 
-	m_pPanelDlg = new PanelAnalysisDlg (this);
+	m_pPanelDlg = new PanelAnalysisDlg (pMainFrame);
 	Wing::s_p3DPanelDlg = m_pPanelDlg;  //pointer to the 3DPanel analysis dialog class
 	m_pPanelDlg->m_pCoreSize     = &s_CoreSize;
 
@@ -124,6 +126,71 @@ QMiarex::QMiarex(QWidget *parent)
 		m_pWingList[iw] = NULL;
 		m_pWOpp[iw]     = NULL;
 	}
+
+
+	m_bXPressed = m_bYPressed = false;
+
+	m_bVLM1              = true;
+	m_bTrefftz           = true;
+
+	m_b3DCp              = false;
+	m_bXCP               = false;
+	m_bDownwash          = false;
+	m_bMoments           = false;
+	m_bICd               = false;
+	m_bVCd               = false;
+	m_bTrans             = false;
+	m_bXTop              = false;
+	m_bXBot              = false;
+	m_bInitLLTCalc       = true;
+	m_bXCmRef            = true;
+	m_bLogFile           = true;
+	m_bHalfWing          = false;
+	m_bTransGraph        = true;
+	s_bFoilNames         = false;
+	m_bPanelForce        = false;
+	m_bLongitudinal      = true;
+	m_bCurWOppOnly       = true;
+	m_bStoreWOpp         = true;
+	m_bKeepOutOpps       = false;
+	m_bCurFrameOnly      = true;
+	m_bType1 = m_bType2 = m_bType4 = m_bType5 = m_bType6 = m_bType7 = true;
+	m_bShowElliptic      = false;
+	m_bShowWingCurve[0] = m_bShowWingCurve[1] = m_bShowWingCurve[2] = m_bShowWingCurve[3] = true;
+	m_bAutoScales        = false;
+	m_bAutoScales        = false;
+	m_bAnimateWOpp       = false;
+	m_bAnimateWOppPlus   = true;
+	m_bAnimateMode       = false;
+
+	m_bResetglBody       = false;
+	m_bResetglBodyMesh   = true;
+
+	m_bResetglGeom       = true;
+	m_bResetglOpp        = true;
+	m_bResetglLift       = true;
+	m_bResetglDrag       = true;
+	m_bResetglDownwash   = true;
+	m_bResetglStream     = true;
+	m_bResetglMesh       = true;
+	m_bResetglWake       = true;
+	m_bResetglLegend     = true;
+	m_bResetglFlow       = true;
+	m_bResetglPanelForce = true;
+	m_bResetglPanelCp    = true;
+
+	m_bArcball           = false;
+	m_bStream            = false;
+	m_bVortices          = false;
+	m_bSpeeds            = false;
+	m_bWakePanels        = false;
+	m_bCrossPoint        = false;
+	m_bPickCenter        = false;
+	m_bShowCpScale       = true;
+	m_bIs2DScaleSet      = false;
+	m_bIs3DScaleSet      = false;
+//	m_bForcedResponse    = true;
+
 
 	m_NSurfaces =   0;
 	m_NStation  =  20;
@@ -237,10 +304,10 @@ QMiarex::QMiarex(QWidget *parent)
 		m_WPlrGraph[ig].SetMargin(50);
 	}
 
-	m_WPlrGraph[0].SetGraphName(tr("Wing Polar Graph 1"));
-	m_WPlrGraph[1].SetGraphName(tr("Wing Polar Graph 2"));
-	m_WPlrGraph[2].SetGraphName(tr("Wing Polar Graph 3"));
-	m_WPlrGraph[3].SetGraphName(tr("Wing Polar Graph 4"));
+	m_WPlrGraph[0].SetGraphName("Wing_Polar_Graph_1");
+	m_WPlrGraph[1].SetGraphName("Wing_Polar_Graph_2");
+	m_WPlrGraph[2].SetGraphName("Wing_Polar_Graph_3");
+	m_WPlrGraph[3].SetGraphName("Wing_Polar_Graph_4");
 	m_WPlrGraph[0].SetVariables(4,1);
 	m_WPlrGraph[1].SetVariables(0,1);
 	m_WPlrGraph[2].SetVariables(0,5);
@@ -276,69 +343,6 @@ QMiarex::QMiarex(QWidget *parent)
 		m_TimeGraph[ig].SetInverted(false);
 		m_TimeGraph[ig].SetGraphName("Time Response");
 	}
-
-	m_bXPressed = m_bYPressed = false;
-
-	m_bVLM1              = true;
-	m_bTrefftz           = true;
-
-	m_b3DCp              = false;
-	m_bXCP               = true;
-	m_bDownwash          = true;
-	m_bMoments           = false;
-	m_bICd               = true;
-	m_bVCd               = true;
-	m_bTrans             = false;
-	m_bXTop              = false;
-	m_bXBot              = false;
-	m_bInitLLTCalc       = true;
-	m_bXCmRef            = true;
-	m_bLogFile           = true;
-	m_bHalfWing          = false;
-	m_bTransGraph        = true;
-    s_bFoilNames         = false;
-	m_bPanelForce        = false;
-	m_bLongitudinal      = true;
-	m_bCurWOppOnly       = true;
-	m_bStoreWOpp         = true;
-	m_bKeepOutOpps       = false;
-	m_bCurFrameOnly      = true;
-	m_bType1 = m_bType2 = m_bType4 = m_bType5 = m_bType6 = m_bType7 = true;
-	m_bShowElliptic      = false;
-	m_bShowWingCurve[0] = m_bShowWingCurve[1] = m_bShowWingCurve[2] = m_bShowWingCurve[3] = true;
-	m_bAutoScales        = false;
-	m_bAutoScales        = false;
-	m_bAnimateWOpp       = false;
-	m_bAnimateWOppPlus   = true;
-	m_bAnimateMode       = false;
-
-	m_bResetglBody       = false;
-	m_bResetglBodyMesh   = true;
-
-	m_bResetglGeom       = true;
-	m_bResetglOpp        = true;
-	m_bResetglLift       = true;
-	m_bResetglDrag       = true;
-	m_bResetglDownwash   = true;
-	m_bResetglStream     = true;
-	m_bResetglMesh       = true;
-	m_bResetglWake       = true;
-	m_bResetglLegend     = true;
-	m_bResetglFlow       = true;
-	m_bResetglPanelForce = true;
-	m_bResetglPanelCp    = true;
-
-	m_bArcball           = false;
-	m_bStream            = false;
-	m_bVortices          = false;
-	m_bSpeeds            = false;
-	m_bWakePanels        = false;
-	m_bCrossPoint        = false;
-	m_bPickCenter        = false;
-	m_bShowCpScale       = true;
-	m_bIs2DScaleSet      = false;
-	m_bIs3DScaleSet      = false;
-//	m_bForcedResponse    = true;
 
 	//set the axis labels for the time graphs
 	if(m_bLongitudinal)
@@ -459,8 +463,6 @@ QMiarex::QMiarex(QWidget *parent)
 	m_ArcBall.m_pTransy   = &m_glViewportTrans.y;
 	m_ArcBall.m_pRect     = &m_r3DCltRect;
 
-    GL3dWingDlg::s_pGLLightDlg = m_pGLLightDlg;
-    GL3dBodyDlg::s_pGLLightDlg = m_pGLLightDlg;
 
 	SetupLayout();
 
@@ -535,26 +537,8 @@ QMiarex::~QMiarex()
 {
 	Release();
 
-	delete m_pPlaneDlg;
-    delete (GL3dWingDlg*)m_pWingDlg;
-    delete m_pGraphDlg;
-    delete m_pRenameDlg;
-    delete m_pGL3dBody;
-    delete m_pInertiaDlg;
-    delete m_pManageBodiesDlg;
-    delete m_pManageUFOsDlg;
-    delete m_pPanelDlg;
-    delete m_pWAdvancedDlg;
-    delete m_pWingScaleDlg;
-    delete m_pGLLightDlg;
-    delete m_pModDlg;
-    delete m_pPolarFilterDlg;
-    delete m_pW3dPrefsDlg;;
-    delete m_pWPolarDlg;
-    delete m_pStabPolarDlg;
-    delete m_pUnitsDlg;
-    delete m_pObjectPropsDlg;
-
+	delete m_pPanelDlg;
+	delete m_pLLTDlg;
 }
 
 
@@ -3515,7 +3499,7 @@ void QMiarex::DrawWOppLegend(QPainter &painter, QPoint place, int bottom)
 
 	painter.setFont(MainFrame::s_TextFont);
 
-	QFontMetrics fm(MainFrame::s_TextFont);
+	QFontMetrics fm(((MainFrame*)s_pMainFrame)->s_TextFont);
 	ypos = fm.height();
 
 	QPen TextPen(MainFrame::s_TextColor);
@@ -3757,10 +3741,12 @@ void QMiarex::DrawWPolarLegend(QPainter &painter, QPoint place, int bottom)
 	LegendSize = 30;
 	LegendWidth = 280;
 
+
+	QFontMetrics fm(((MainFrame*)s_pMainFrame)->s_TextFont);
+	ypos = fm.height();
+
 	painter.setFont(MainFrame::s_TextFont);
 
-	QFontMetrics fm(MainFrame::s_TextFont);
-	ypos = fm.height();
 
 	QPen TextPen(MainFrame::s_TextColor);
 	painter.setPen(TextPen);
@@ -3964,25 +3950,28 @@ void QMiarex::EditCurPlane()
 	Plane* pModPlane= new Plane;
 
 	pModPlane->Duplicate(m_pCurPlane);
-    m_pPlaneDlg->m_pPlane = pModPlane;
 
-    m_pPlaneDlg->m_bAcceptName = false;
-    m_pPlaneDlg->InitDialog();
+	PlaneDlg plDlg(pMainFrame);
+	plDlg.m_pPlane = pModPlane;
+	plDlg.m_bAcceptName = false;
+	plDlg.InitDialog();
 
-    if(QDialog::Accepted == m_pPlaneDlg->exec())
+	ModDlg mdDlg(pMainFrame);
+
+	if(QDialog::Accepted == plDlg.exec())
 	{
-		if(m_pPlaneDlg->m_bDescriptionChanged)
+		if(plDlg.m_bDescriptionChanged)
 		{
 			MainFrame::SetSaveState(false);
 			m_pCurPlane->rPlaneDescription() = pModPlane->PlaneDescription();
 		}
-        if(m_pPlaneDlg->m_bChanged)
+		if(plDlg.m_bChanged)
 		{
 			if(bHasResults)
 			{
-                m_pModDlg->m_Question = tr("The modification will erase all results associated to this Plane.\nContinue ?");
-                m_pModDlg->InitDialog();
-                int Ans = m_pModDlg->exec();
+				mdDlg.m_Question = tr("The modification will erase all results associated to this Plane.\nContinue ?");
+				mdDlg.InitDialog();
+				int Ans = mdDlg.exec();
 
 				if (Ans == QDialog::Rejected)
 				{
@@ -5223,7 +5212,8 @@ void QMiarex::GLDrawWingLegend(Wing *pWing, Plane *pPlane, WPolar *pWPolar)
     QString length, surface;
     QString UFOName;
 
-	QFontMetrics fm(MainFrame::s_TextFont);
+	QFont fnt(MainFrame::s_TextFont); //two steps to shut valgrind up
+	QFontMetrics fm(fnt);
     dD = fm.height();//pixels
 
     total = 13;
@@ -5501,6 +5491,8 @@ void QMiarex::GLInverseMatrix()
 void QMiarex::GLRenderView()
 {
 	ThreeDWidget *p3dWidget = (ThreeDWidget*)s_p3dWidget;
+	GLLightDlg gllDlg((MainFrame*)s_pMainFrame);
+
 	double LightFactor;
 	if(m_pCurWing) LightFactor =  (GLfloat)pow(m_pCurWing->m_PlanformSpan/2.0,.1);
 	else           LightFactor = 1.0;
@@ -5521,7 +5513,7 @@ void QMiarex::GLRenderView()
 		if(m_ClipPlanePos>4.9999) 	glDisable(GL_CLIP_PLANE1);
 		else						glEnable(GL_CLIP_PLANE1);
 
-        p3dWidget->GLSetupLight(m_pGLLightDlg, m_UFOOffset.y,LightFactor);
+		p3dWidget->GLSetupLight(m_UFOOffset.y,LightFactor);
 		glDisable(GL_LIGHTING);
 		glDisable(GL_LIGHT0);
 
@@ -5531,20 +5523,20 @@ void QMiarex::GLRenderView()
 			p3dWidget->renderText(15, 15, strong, MainFrame::s_TextFont);
 		}
 
-        if(m_pGLLightDlg->isVisible())
+		if(gllDlg.isVisible())
 		{
 			glDisable(GL_LIGHTING);
 			glDisable(GL_LIGHT0);
 			glPushMatrix();
 			{
-                glTranslated(( m_pGLLightDlg->s_XLight+ m_UFOOffset.x)*m_GLScale,
-                             ( m_pGLLightDlg->s_YLight+ m_UFOOffset.y)*m_GLScale,
-                               m_pGLLightDlg->s_ZLight*m_GLScale);
-                double radius = (m_pGLLightDlg->s_ZLight+2.0)/40.0*m_GLScale;
+				glTranslated(( gllDlg.s_XLight+ m_UFOOffset.x)*m_GLScale,
+							 ( gllDlg.s_YLight+ m_UFOOffset.y)*m_GLScale,
+							   gllDlg.s_ZLight*m_GLScale);
+				double radius = (gllDlg.s_ZLight+2.0)/40.0*m_GLScale;
 				QColor color;
-                color = QColor((int)(m_pGLLightDlg->s_Red  *255),
-                               (int)(m_pGLLightDlg->s_Green*255),
-                               (int)(m_pGLLightDlg->s_Blue *255));
+				color = QColor((int)(gllDlg.s_Red  *255),
+							   (int)(gllDlg.s_Green*255),
+							   (int)(gllDlg.s_Blue *255));
 				p3dWidget->GLRenderSphere(color,radius,18,18);
 			}
 			glPopMatrix();
@@ -6204,9 +6196,8 @@ void QMiarex::keyPressEvent(QKeyEvent *event)
 
 			StopAnimate();
 			if(m_pCurGraph) m_pCurGraph->DeselectPoint();
-			
-            if(m_pGLLightDlg->isVisible()) m_pGLLightDlg->hide();
-			else if(pMainFrame->m_pctrl3DScalesWidget->isVisible()) pMainFrame->m_pctrl3DScalesWidget->hide();
+
+			if(pMainFrame->m_pctrl3DScalesWidget->isVisible()) pMainFrame->m_pctrl3DScalesWidget->hide();
 			UpdateView();
 			break;
 		}
@@ -6735,14 +6726,16 @@ bool QMiarex::LoadSettings(QSettings *pSettings)
 
 	pSettings->endGroup();
 
-    m_pGL3dBody->LoadSettings(pSettings);
-    m_pGLLightDlg->LoadSettings(pSettings);
+	GL3dBodyDlg::LoadSettings(pSettings);
+
+	GLLightDlg::LoadSettings(pSettings);
 
 	m_CpGraph.LoadSettings(pSettings);
-	for(int ig=0; ig<4; ig++)
+
+	for(int ig=0; ig<MAXGRAPHS; ig++)
 	{
-		m_TimeGraph[ig].LoadSettings(pSettings);
-		m_WingGraph[ig].LoadSettings(pSettings);
+//		m_TimeGraph[ig].LoadSettings(pSettings);
+//		m_WingGraph[ig].LoadSettings(pSettings);
 		m_WPlrGraph[ig].LoadSettings(pSettings);
 		SetWGraphTitles(m_WPlrGraph+ig);
 	}
@@ -7320,9 +7313,10 @@ void QMiarex::On3DReset()
 */
 void QMiarex::On3DPrefs()
 {
-    m_pW3dPrefsDlg->InitDialog();
+	W3dPrefsDlg w3dDlg((MainFrame*)s_pMainFrame);
+	w3dDlg.InitDialog();
 
-    m_pW3dPrefsDlg->exec();
+	w3dDlg.exec();
     m_bResetglWake = true;
     m_bResetglBody = true;
     m_bResetglGeom = true;
@@ -7428,16 +7422,17 @@ void QMiarex::OnAllWingGraphSettings()
 {
 	QGraph graph;
 	graph.CopySettings(m_WingGraph);
-    m_pGraphDlg->m_pMemGraph = &graph;
-    m_pGraphDlg->m_pGraph    = m_WingGraph;
-    m_pGraphDlg->m_GraphArray[0] = m_WingGraph;
-    m_pGraphDlg->m_GraphArray[1] = m_WingGraph+1;
-    m_pGraphDlg->m_GraphArray[2] = m_WingGraph+2;
-    m_pGraphDlg->m_GraphArray[3] = m_WingGraph+3;
-    m_pGraphDlg->m_NGraph = 4;
-    m_pGraphDlg->SetParams();
+	GraphDlg grDlg((MainFrame*)s_pMainFrame);
+	grDlg.m_pMemGraph = &graph;
+	grDlg.m_pGraph    = m_WingGraph;
+	grDlg.m_GraphArray[0] = m_WingGraph;
+	grDlg.m_GraphArray[1] = m_WingGraph+1;
+	grDlg.m_GraphArray[2] = m_WingGraph+2;
+	grDlg.m_GraphArray[3] = m_WingGraph+3;
+	grDlg.m_NGraph = 4;
+	grDlg.SetParams();
 
-    if(m_pGraphDlg->exec() == QDialog::Accepted)
+	if(grDlg.exec() == QDialog::Accepted)
 	{
 	}
 	else
@@ -7456,16 +7451,17 @@ void QMiarex::OnAllWPolarGraphSettings()
 {
 	QGraph graph;
 	graph.CopySettings(m_WPlrGraph);
-    m_pGraphDlg->m_pMemGraph = &graph;
-    m_pGraphDlg->m_pGraph    = m_WPlrGraph;
-    m_pGraphDlg->m_GraphArray[0] = m_WPlrGraph;
-    m_pGraphDlg->m_GraphArray[1] = m_WPlrGraph+1;
-    m_pGraphDlg->m_GraphArray[2] = m_WPlrGraph+2;
-    m_pGraphDlg->m_GraphArray[3] = m_WPlrGraph+3;
-    m_pGraphDlg->m_NGraph = 4;
-    m_pGraphDlg->SetParams();
+	GraphDlg grDlg((MainFrame*)s_pMainFrame);
+	grDlg.m_pMemGraph = &graph;
+	grDlg.m_pGraph    = m_WPlrGraph;
+	grDlg.m_GraphArray[0] = m_WPlrGraph;
+	grDlg.m_GraphArray[1] = m_WPlrGraph+1;
+	grDlg.m_GraphArray[2] = m_WPlrGraph+2;
+	grDlg.m_GraphArray[3] = m_WPlrGraph+3;
+	grDlg.m_NGraph = 4;
+	grDlg.SetParams();
 
-    if(m_pGraphDlg->exec() == QDialog::Accepted)
+	if(grDlg.exec() == QDialog::Accepted)
 	{
 	}
 	else
@@ -7569,6 +7565,7 @@ void QMiarex::OnAnalyze()
 		}
 	}
 
+	m_pctrlAnalyze->setEnabled(false);
 	if(m_pCurWPolar->m_AnalysisMethod==LLTMETHOD)
 	{
 		LLTAnalyze(V0, VMax, VDelta, m_bSequence, m_bInitLLTCalc);
@@ -7594,6 +7591,7 @@ void QMiarex::OnAnalyze()
             PanelAnalyze(V0, VMax, VDelta, m_bSequence);
         }
 	}
+	m_pctrlAnalyze->setEnabled(true);
 
 	//restore things as they were
 	m_bHighlightOpp = bHigh;
@@ -7920,45 +7918,46 @@ void QMiarex::OnAdjustToWing()
 */
 void QMiarex::OnAdvancedSettings()
 {
-    m_pWAdvancedDlg->m_AlphaPrec       = LLTAnalysis::s_CvPrec;
-    m_pWAdvancedDlg->m_Relax           = LLTAnalysis::s_RelaxMax;
-    m_pWAdvancedDlg->m_NStation        = LLTAnalysis::s_NLLTStations;
-    m_pWAdvancedDlg->m_Iter            = m_Iter;
-    m_pWAdvancedDlg->m_MaxWakeIter     = m_MaxWakeIter;
-	m_pWAdvancedDlg->m_CoreSize        = s_CoreSize;
-    m_pWAdvancedDlg->m_bResetWake      = m_bResetWake;
-    m_pWAdvancedDlg->m_bDirichlet      = m_bDirichlet;
-    m_pWAdvancedDlg->m_bTrefftz        = m_bTrefftz;
-    m_pWAdvancedDlg->m_bKeepOutOpps    = m_bKeepOutOpps;
-    m_pWAdvancedDlg->m_bLogFile        = m_bLogFile;
-	m_pWAdvancedDlg->m_MinPanelSize    = s_MinPanelSize;
-    m_pWAdvancedDlg->m_ControlPos      = Panel::s_CtrlPos;
-    m_pWAdvancedDlg->m_VortexPos       = Panel::s_VortexPos;
-    m_pWAdvancedDlg->m_WakeInterNodes  = m_WakeInterNodes;
-    m_pWAdvancedDlg->m_bVLM1           = m_bVLM1;
+	WAdvancedDlg waDlg((MainFrame*)s_pMainFrame);
+	waDlg.m_AlphaPrec       = LLTAnalysis::s_CvPrec;
+	waDlg.m_Relax           = LLTAnalysis::s_RelaxMax;
+	waDlg.m_NStation        = LLTAnalysis::s_NLLTStations;
+	waDlg.m_Iter            = m_Iter;
+	waDlg.m_MaxWakeIter     = m_MaxWakeIter;
+	waDlg.m_CoreSize        = s_CoreSize;
+	waDlg.m_bResetWake      = m_bResetWake;
+	waDlg.m_bDirichlet      = m_bDirichlet;
+	waDlg.m_bTrefftz        = m_bTrefftz;
+	waDlg.m_bKeepOutOpps    = m_bKeepOutOpps;
+	waDlg.m_bLogFile        = m_bLogFile;
+	waDlg.m_MinPanelSize    = s_MinPanelSize;
+	waDlg.m_ControlPos      = Panel::s_CtrlPos;
+	waDlg.m_VortexPos       = Panel::s_VortexPos;
+	waDlg.m_WakeInterNodes  = m_WakeInterNodes;
+	waDlg.m_bVLM1           = m_bVLM1;
 
-    m_pWAdvancedDlg->InitDialog();
-    if(m_pWAdvancedDlg->exec() == QDialog::Accepted)
+	waDlg.InitDialog();
+	if(waDlg.exec() == QDialog::Accepted)
 	{
-        LLTAnalysis::s_CvPrec        = m_pWAdvancedDlg->m_AlphaPrec;
-        LLTAnalysis::s_RelaxMax      = m_pWAdvancedDlg->m_Relax;
-        LLTAnalysis::s_NLLTStations  = m_pWAdvancedDlg->m_NStation;
-        m_Iter                 = m_pWAdvancedDlg->m_Iter;
-        m_MaxWakeIter          = m_pWAdvancedDlg->m_MaxWakeIter;
-		s_CoreSize             = m_pWAdvancedDlg->m_CoreSize;
-        m_bResetWake           = m_pWAdvancedDlg->m_bResetWake;
-        m_bDirichlet           = m_pWAdvancedDlg->m_bDirichlet;
-        m_bTrefftz             = m_pWAdvancedDlg->m_bTrefftz;
-        m_bKeepOutOpps         = m_pWAdvancedDlg->m_bKeepOutOpps;
-        m_WakeInterNodes       = m_pWAdvancedDlg->m_WakeInterNodes;
-		s_MinPanelSize         = m_pWAdvancedDlg->m_MinPanelSize;
-        m_bVLM1                = m_pWAdvancedDlg->m_bVLM1;
-        m_InducedDragPoint     = m_pWAdvancedDlg->m_InducedDragPoint;
+		LLTAnalysis::s_CvPrec        = waDlg.m_AlphaPrec;
+		LLTAnalysis::s_RelaxMax      = waDlg.m_Relax;
+		LLTAnalysis::s_NLLTStations  = waDlg.m_NStation;
+		m_Iter                 = waDlg.m_Iter;
+		m_MaxWakeIter          = waDlg.m_MaxWakeIter;
+		s_CoreSize             = waDlg.m_CoreSize;
+		m_bResetWake           = waDlg.m_bResetWake;
+		m_bDirichlet           = waDlg.m_bDirichlet;
+		m_bTrefftz             = waDlg.m_bTrefftz;
+		m_bKeepOutOpps         = waDlg.m_bKeepOutOpps;
+		m_WakeInterNodes       = waDlg.m_WakeInterNodes;
+		s_MinPanelSize         = waDlg.m_MinPanelSize;
+		m_bVLM1                = waDlg.m_bVLM1;
+		m_InducedDragPoint     = waDlg.m_InducedDragPoint;
 
-        Panel::s_CtrlPos      = m_pWAdvancedDlg->m_ControlPos;
-        Panel::s_VortexPos    = m_pWAdvancedDlg->m_VortexPos;
+		Panel::s_CtrlPos      = waDlg.m_ControlPos;
+		Panel::s_VortexPos    = waDlg.m_VortexPos;
 
-        if(m_pWAdvancedDlg->m_bLogFile) m_bLogFile = true; else m_bLogFile = false;
+		if(waDlg.m_bLogFile) m_bLogFile = true; else m_bLogFile = false;
 		m_bResetglWake    = true;
 		UpdateView();
 	}
@@ -8110,8 +8109,9 @@ void QMiarex::OnDefineStabPolar()
 	StabPolarDlg::s_StabPolar.m_bThinSurfaces = WPolarDlg::s_WPolar.m_bThinSurfaces;
 
 
-	m_pStabPolarDlg->InitDialog(m_pCurPlane, m_pCurWing);
-	int res = m_pStabPolarDlg->exec();
+	StabPolarDlg spDlg(pMainFrame);
+	spDlg.InitDialog(m_pCurPlane, m_pCurWing);
+	int res = spDlg.exec();
 
 	if(res == QDialog::Accepted)
 	{
@@ -8196,10 +8196,10 @@ void QMiarex::OnDefineWPolar()
 
 	WPolar* pNewWPolar  = new WPolar;
 
-	m_pWPolarDlg->InitDialog(m_pCurPlane, m_pCurWing);
+	WPolarDlg wpDlg(pMainFrame);
+	wpDlg.InitDialog(m_pCurPlane, m_pCurWing);
 
-
-	int res = m_pWPolarDlg->exec();
+	int res = wpDlg.exec();
 
 	if (res == QDialog::Accepted)
 	{
@@ -8207,7 +8207,7 @@ void QMiarex::OnDefineWPolar()
 		MainFrame::SetSaveState(false);
 		pNewWPolar->DuplicateSpec(&WPolarDlg::s_WPolar);
 		pNewWPolar->m_UFOName = UFOName();
-		pNewWPolar->m_PlrName = m_pWPolarDlg->s_WPolar.m_PlrName;
+		pNewWPolar->m_PlrName = wpDlg.s_WPolar.m_PlrName;
 
 		pNewWPolar->m_WMAChord = m_pCurWing->m_MAChord;
 
@@ -8817,19 +8817,22 @@ void QMiarex::OnEditCurBody()
 
 	Body memBody;
 	memBody.Duplicate(m_pCurBody);
-    m_pGL3dBody->m_bEnableName = false;
-    m_pGL3dBody->InitDialog(m_pCurBody);
-    m_pGL3dBody->move(GL3dBodyDlg::s_WindowPos);
-    m_pGL3dBody->resize(GL3dBodyDlg::s_WindowSize);
-    if(GL3dBodyDlg::s_bWindowMaximized) m_pGL3dBody->setWindowState(Qt::WindowMaximized);
+	GL3dBodyDlg glbDlg(pMainFrame);
+	glbDlg.m_bEnableName = false;
+	glbDlg.InitDialog(m_pCurBody);
+	glbDlg.move(GL3dBodyDlg::s_WindowPos);
+	glbDlg.resize(GL3dBodyDlg::s_WindowSize);
+	if(GL3dBodyDlg::s_bWindowMaximized) glbDlg.setWindowState(Qt::WindowMaximized);
 
-    if(m_pGL3dBody->exec() == QDialog::Accepted)
+	ModDlg mdDlg(pMainFrame);
+
+	if(glbDlg.exec() == QDialog::Accepted)
 	{
 		if(bUsed)
 		{
-            m_pModDlg->m_Question = tr("The modification will erase all results for the planes using this body.\nContinue ?");
-            m_pModDlg->InitDialog();
-            int Ans = m_pModDlg->exec();
+			mdDlg.m_Question = tr("The modification will erase all results for the planes using this body.\nContinue ?");
+			mdDlg.InitDialog();
+			int Ans = mdDlg.exec();
 			if (Ans == QDialog::Rejected)
 			{
 				//restore geometry
@@ -8926,24 +8929,26 @@ void QMiarex::OnEditUFO()
 	Wing* pModWing= new Wing;
 	pModWing->Duplicate(m_pCurWing);
 
-	GL3dWingDlg *pWingDlg = (GL3dWingDlg*)m_pWingDlg;
-	pWingDlg->m_bAcceptName= false;
-	pWingDlg->InitDialog(pModWing);
+	GL3dWingDlg wingDlg(pMainFrame);
+	wingDlg.m_bAcceptName= false;
+	wingDlg.InitDialog(pModWing);
 
-	if(QDialog::Accepted == pWingDlg->exec())
+	ModDlg mdDlg(pMainFrame);
+
+	if(QDialog::Accepted == wingDlg.exec())
 	{
-		if(pWingDlg->m_bDescriptionChanged)
+		if(wingDlg.m_bDescriptionChanged)
 		{
 			MainFrame::SetSaveState(false);
 			m_pCurWing->rWingDescription() = pModWing->WingDescription();
 		}
-		if(pWingDlg->m_bChanged)
+		if(wingDlg.m_bChanged)
 		{
 			if(bHasResults)
 			{
-                m_pModDlg->m_Question = tr("The modification will erase all results associated to this Wing.\nContinue ?");
-                m_pModDlg->InitDialog();
-                int Ans = m_pModDlg->exec();
+				mdDlg.m_Question = tr("The modification will erase all results associated to this Wing.\nContinue ?");
+				mdDlg.InitDialog();
+				int Ans = mdDlg.exec();
 				if (Ans == QDialog::Rejected)
 				{
 					delete pModWing; // clean up
@@ -9581,33 +9586,34 @@ void QMiarex::OnGL3DScale()
 void QMiarex::OnGraphSettings()
 {
 	QGraph *pGraph = NULL;
+	GraphDlg grDlg((MainFrame*)s_pMainFrame);
 
 	pGraph = m_pCurGraph;
 	if(!pGraph) return;
 	if(m_iView==WOPPVIEW)
 	{
-        m_pGraphDlg->m_iGraphType = 61;
+		grDlg.m_iGraphType = 61;
 	}
 	else if(m_iView==WPOLARVIEW)
 	{
-        m_pGraphDlg->m_iGraphType = 62;
+		grDlg.m_iGraphType = 62;
 	}
-    else if(m_iView==WCPVIEW) m_pGraphDlg->m_iGraphType = 64;
+	else if(m_iView==WCPVIEW) grDlg.m_iGraphType = 64;
 
 	if(!pGraph) return;
 
 	QGraph graph;
 	graph.CopySettings(pGraph);
-    m_pGraphDlg->m_pMemGraph = &graph;
-    m_pGraphDlg->m_pGraph = pGraph;
-    m_pGraphDlg->SetParams();
+	grDlg.m_pMemGraph = &graph;
+	grDlg.m_pGraph = pGraph;
+	grDlg.SetParams();
 
-    if(m_pGraphDlg->exec() == QDialog::Accepted)
+	if(grDlg.exec() == QDialog::Accepted)
 	{
 		if(m_iView==WOPPVIEW)
 		{
 
-            if(m_pGraphDlg->m_bVariableChanged)
+			if(grDlg.m_bVariableChanged)
 			{
 				m_pCurGraph->SetAutoY(true);
 				m_pCurGraph->SetAutoYMinUnit(true);
@@ -9621,7 +9627,7 @@ void QMiarex::OnGraphSettings()
 			else if(pGraph == m_WPlrGraph+2) SetWGraphTitles(m_WPlrGraph+2);
 			else if(pGraph == m_WPlrGraph+3) SetWGraphTitles(m_WPlrGraph+3);
 
-            if(m_pGraphDlg->m_bVariableChanged)
+			if(grDlg.m_bVariableChanged)
 			{
 				m_pCurGraph->SetAuto(true);
 				m_pCurGraph->SetAutoYMinUnit(true);
@@ -9860,19 +9866,20 @@ void QMiarex::OnImportBody()
 
 	double mtoUnit;
 
-	m_pUnitsDlg->m_bLengthOnly = true;
-	m_pUnitsDlg->m_Length    = MainFrame::s_LengthUnit;
-	m_pUnitsDlg->m_Area      = MainFrame::s_AreaUnit;
-	m_pUnitsDlg->m_Speed     = MainFrame::s_SpeedUnit;
-	m_pUnitsDlg->m_Weight    = MainFrame::s_WeightUnit;
-	m_pUnitsDlg->m_Force     = MainFrame::s_ForceUnit;
-	m_pUnitsDlg->m_Moment    = MainFrame::s_MomentUnit;
-	m_pUnitsDlg->m_Question = QObject::tr("Choose the length unit to read this file :");
-	m_pUnitsDlg->InitDialog();
+	UnitsDlg uDlg(pMainFrame);
+	uDlg.m_bLengthOnly = true;
+	uDlg.m_Length    = MainFrame::s_LengthUnit;
+	uDlg.m_Area      = MainFrame::s_AreaUnit;
+	uDlg.m_Speed     = MainFrame::s_SpeedUnit;
+	uDlg.m_Weight    = MainFrame::s_WeightUnit;
+	uDlg.m_Force     = MainFrame::s_ForceUnit;
+	uDlg.m_Moment    = MainFrame::s_MomentUnit;
+	uDlg.m_Question = QObject::tr("Choose the length unit to read this file :");
+	uDlg.InitDialog();
 
-	if(m_pUnitsDlg->exec() == QDialog::Accepted)
+	if(uDlg.exec() == QDialog::Accepted)
 	{
-		switch(m_pUnitsDlg->m_Length)
+		switch(uDlg.m_Length)
 		{
 			case 0:{//mdm
 				mtoUnit  = 1000.0;
@@ -9947,13 +9954,14 @@ void QMiarex::OnImportBody()
 		m_pCurBody = pNewBody;
 		Body memBody;
 		memBody.Duplicate(m_pCurBody);
-        m_pGL3dBody->SetBody(m_pCurBody);
-        m_pGL3dBody->m_bEnableName = false;
-        m_pGL3dBody->move(GL3dBodyDlg::s_WindowPos);
-        m_pGL3dBody->resize(GL3dBodyDlg::s_WindowSize);
-        if(GL3dBodyDlg::s_bWindowMaximized) m_pGL3dBody->setWindowState(Qt::WindowMaximized);
+		GL3dBodyDlg glbDlg(pMainFrame);
+		glbDlg.SetBody(m_pCurBody);
+		glbDlg.m_bEnableName = false;
+		glbDlg.move(GL3dBodyDlg::s_WindowPos);
+		glbDlg.resize(GL3dBodyDlg::s_WindowSize);
+		if(GL3dBodyDlg::s_bWindowMaximized) glbDlg.setWindowState(Qt::WindowMaximized);
 
-        if(m_pGL3dBody->exec() == QDialog::Accepted)
+		if(glbDlg.exec() == QDialog::Accepted)
 		{
 			m_bResetglBody = true;
 			m_bResetglBodyMesh = true;
@@ -10136,11 +10144,11 @@ void QMiarex::OnLight()
  */
 void QMiarex::OnManageBodies()
 {
-    m_pManageBodiesDlg->m_pGL3dBodyDlg = m_pGL3dBody;
-    m_pManageBodiesDlg->m_poaBody = m_poaBody;
-    m_pManageBodiesDlg->m_poaPlane = m_poaPlane;
-    m_pManageBodiesDlg->InitDialog();
-    m_pManageBodiesDlg->exec();
+	ManageBodiesDlg mbDlg((MainFrame*)s_pMainFrame);
+	mbDlg.m_poaBody = m_poaBody;
+	mbDlg.m_poaPlane = m_poaPlane;
+	mbDlg.InitDialog();
+	mbDlg.exec();
 }
 
 
@@ -10155,12 +10163,13 @@ void QMiarex::OnManageUFOs()
 	if(m_pCurPlane)     UFOName = m_pCurPlane->PlaneName();
 	else if(m_pCurWing) UFOName = m_pCurWing->WingName();
 
-    m_pManageUFOsDlg->InitDialog(UFOName);
-    m_pManageUFOsDlg->exec();
+	ManageUFOsDlg uDlg(pMainFrame);
+	uDlg.InitDialog(UFOName);
+	uDlg.exec();
 
-    if(m_pManageUFOsDlg->m_pPlane)     SetUFO(m_pManageUFOsDlg->m_pPlane->PlaneName());
-    else if(m_pManageUFOsDlg->m_pWing) SetUFO(m_pManageUFOsDlg->m_pWing->m_WingName);
-	else                             SetUFO();
+	if(uDlg.m_pPlane)     SetUFO(uDlg.m_pPlane->PlaneName());
+	else if(uDlg.m_pWing) SetUFO(uDlg.m_pWing->m_WingName);
+	else                  SetUFO();
 
 	pMainFrame->UpdateUFOs();
 	SetControls();
@@ -10188,12 +10197,13 @@ void QMiarex::OnNewBody()
 {
 	Body *pBody = new Body;
 
-    m_pGL3dBody->move(GL3dBodyDlg::s_WindowPos);
-    m_pGL3dBody->resize(GL3dBodyDlg::s_WindowSize);
-    if(GL3dBodyDlg::s_bWindowMaximized) m_pGL3dBody->setWindowState(Qt::WindowMaximized);
-    m_pGL3dBody->InitDialog(pBody);
+	GL3dBodyDlg glbDlg((MainFrame*)s_pMainFrame);
+	glbDlg.move(GL3dBodyDlg::s_WindowPos);
+	glbDlg.resize(GL3dBodyDlg::s_WindowSize);
+	if(GL3dBodyDlg::s_bWindowMaximized) glbDlg.setWindowState(Qt::WindowMaximized);
+	glbDlg.InitDialog(pBody);
 
-    if(m_pGL3dBody->exec() == QDialog::Accepted)
+	if(glbDlg.exec() == QDialog::Accepted)
 	{
 		AddBody(pBody);
 		MainFrame::SetSaveState(false);
@@ -10216,12 +10226,12 @@ void QMiarex::OnNewWing()
 	Wing *pOldWing;
 	Wing* pWing = new Wing;
 
-	GL3dWingDlg *pWingDlg = (GL3dWingDlg*)m_pWingDlg;
+	GL3dWingDlg wingDlg(pMainFrame);
 
-	pWingDlg->m_bAcceptName= true;
-	if(!pWingDlg->InitDialog(pWing)) return;
+	wingDlg.m_bAcceptName= true;
+	if(!wingDlg.InitDialog(pWing)) return;
 
-	if(QDialog::Accepted == pWingDlg->exec())
+	if(QDialog::Accepted == wingDlg.exec())
 	{
 		MainFrame::SetSaveState(false);
 		bool bExists = false;
@@ -10275,12 +10285,14 @@ void QMiarex::OnNewPlane()
 	int i;
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	Plane* pPlane = new Plane;
-	m_pPlaneDlg->m_pPlane = pPlane;
 	Plane* pOldPlane = NULL;
-	m_pPlaneDlg->m_bAcceptName = true;
-	m_pPlaneDlg->InitDialog();
 
-	if(QDialog::Accepted == m_pPlaneDlg->exec())
+	PlaneDlg plDlg(pMainFrame);
+	plDlg.m_pPlane = pPlane;
+	plDlg.m_bAcceptName = true;
+	plDlg.InitDialog();
+
+	if(QDialog::Accepted == plDlg.exec())
 	{
 		MainFrame::SetSaveState(false);
 
@@ -10389,22 +10401,25 @@ void QMiarex::OnReadAnalysisData()
  */
 void QMiarex::OnPolarFilter()
 {
-    m_pPolarFilterDlg->m_bMiarex = true;
-    m_pPolarFilterDlg->m_bType1 = m_bType1;
-    m_pPolarFilterDlg->m_bType2 = m_bType2;
-    m_pPolarFilterDlg->m_bType4 = m_bType4;
-    m_pPolarFilterDlg->m_bType5 = m_bType5;
-    m_pPolarFilterDlg->m_bType6 = m_bType6;
-    m_pPolarFilterDlg->m_bType7 = m_bType7;
-    m_pPolarFilterDlg->InitDialog();
-    if(m_pPolarFilterDlg->exec()==QDialog::Accepted)
+	PolarFilterDlg pfDlg((MainFrame*)s_pMainFrame);
+	pfDlg.m_bMiarex = true;
+	pfDlg.m_bType1 = m_bType1;
+	pfDlg.m_bType2 = m_bType2;
+	pfDlg.m_bType4 = m_bType4;
+	pfDlg.m_bType5 = m_bType5;
+	pfDlg.m_bType6 = m_bType6;
+	pfDlg.m_bType7 = m_bType7;
+
+	pfDlg.InitDialog();
+
+	if(pfDlg.exec()==QDialog::Accepted)
 	{
-        m_bType1 = m_pPolarFilterDlg->m_bType1;
-        m_bType2 = m_pPolarFilterDlg->m_bType2;
-        m_bType4 = m_pPolarFilterDlg->m_bType4;
-        m_bType5 = m_pPolarFilterDlg->m_bType5;
-        m_bType6 = m_pPolarFilterDlg->m_bType6;
-        m_bType7 = m_pPolarFilterDlg->m_bType7;
+		m_bType1 = pfDlg.m_bType1;
+		m_bType2 = pfDlg.m_bType2;
+		m_bType4 = pfDlg.m_bType4;
+		m_bType5 = pfDlg.m_bType5;
+		m_bType6 = pfDlg.m_bType6;
+		m_bType7 = pfDlg.m_bType7;
 		if(m_iView==WPOLARVIEW)
 		{
 			CreateWPolarCurves();
@@ -10446,26 +10461,27 @@ void QMiarex::OnRenameCurWPolar()
 	}
 
 
-    m_pRenameDlg->m_pstrArray = & NameList;
+	RenameDlg renDlg(pMainFrame);
+	renDlg.m_pstrArray = & NameList;
 
-    m_pRenameDlg->m_strQuestion = tr("Enter the new name for the wing polar :");
-    m_pRenameDlg->m_strName     = m_pCurWPolar->m_PlrName;
-    m_pRenameDlg->InitDialog();
+	renDlg.m_strQuestion = tr("Enter the new name for the wing polar :");
+	renDlg.m_strName     = m_pCurWPolar->m_PlrName;
+	renDlg.InitDialog();
 
 	bool bExists = true;
 
 	while (bExists)
 	{
-        resp = m_pRenameDlg->exec();
+		resp = renDlg.exec();
 		if(resp==QDialog::Accepted)
 		{
-            if (OldName == m_pRenameDlg->m_strName) return;
+			if (OldName == renDlg.m_strName) return;
 			//Is the new name already used ?
 			bExists = false;
 			for (k=0; k<m_poaWPolar->size(); k++)
 			{
 				pWPolar = (WPolar*)m_poaWPolar->at(k);
-                if (pWPolar->m_PlrName == m_pRenameDlg->m_strName &&	pWPolar->m_UFOName == m_pCurWing->WingName())
+				if (pWPolar->m_PlrName == renDlg.m_strName &&	pWPolar->m_UFOName == m_pCurWing->WingName())
 				{
 					bExists = true;
 					break;
@@ -10473,7 +10489,7 @@ void QMiarex::OnRenameCurWPolar()
 			}
 			if(!bExists)
 			{
-                m_pCurWPolar->m_PlrName = m_pRenameDlg->m_strName;
+				m_pCurWPolar->m_PlrName = renDlg.m_strName;
 				if(m_pCurPlane)
 				{
 					for (l=m_poaPOpp->size()-1;l>=0; l--)
@@ -10481,7 +10497,7 @@ void QMiarex::OnRenameCurWPolar()
 						pPOpp = (PlaneOpp*)m_poaPOpp->at(l);
 						if (pPOpp->m_PlrName == OldName && pPOpp->m_PlaneName == m_pCurPlane->PlaneName())
 						{
-                            pPOpp->m_PlrName = m_pRenameDlg->m_strName;
+							pPOpp->m_PlrName = renDlg.m_strName;
 						}
 					}
 				}
@@ -10490,7 +10506,7 @@ void QMiarex::OnRenameCurWPolar()
 					pWOpp = (WingOpp*)m_poaWOpp->at(l);
 					if (pWOpp->m_PlrName == OldName && pWOpp->m_WingName == m_pCurWing->WingName())
 					{
-                        pWOpp->m_PlrName = m_pRenameDlg->m_strName;
+						pWOpp->m_PlrName = renDlg.m_strName;
 					}
 				}
 			}
@@ -10528,11 +10544,11 @@ void QMiarex::OnRenameCurWPolar()
 		else if(resp ==10)
 		{
 			//user wants to overwrite
-            if (OldName == m_pRenameDlg->m_strName) return;
+			if (OldName == renDlg.m_strName) return;
 			for (k=0; k<m_poaWPolar->size(); k++)
 			{
 				pWPolar = (WPolar*)m_poaWPolar->at(k);
-                if (pWPolar->m_PlrName == m_pRenameDlg->m_strName &&	pWPolar->m_UFOName == m_pCurWing->WingName())
+				if (pWPolar->m_PlrName == renDlg.m_strName &&	pWPolar->m_UFOName == m_pCurWing->WingName())
 				{
 					bExists = true;
 					break;
@@ -10560,14 +10576,14 @@ void QMiarex::OnRenameCurWPolar()
 			delete pWPolar;
 
 			//and rename everything
-            m_pCurWPolar->m_PlrName = m_pRenameDlg->m_strName;
+			m_pCurWPolar->m_PlrName = renDlg.m_strName;
 
 			for (l=m_poaWOpp->size()-1;l>=0; l--)
 			{
 				pWOpp = (WingOpp*)m_poaWOpp->at(l);
 				if (pWOpp->m_PlrName == OldName &&	pWOpp->m_WingName == m_pCurWing->WingName())
 				{
-                    pWOpp->m_PlrName = m_pRenameDlg->m_strName;
+					pWOpp->m_PlrName = renDlg.m_strName;
 				}
 			}
 
@@ -10744,20 +10760,21 @@ void QMiarex::OnScaleWing()
 	if(!m_pCurWing) return;
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 
-	m_pWingScaleDlg->InitDialog(m_pCurWing->m_PlanformSpan, m_pCurWing->Chord(0), m_pCurWing->AverageSweep(), m_pCurWing->TipTwist());
+	WingScaleDlg wsDlg(pMainFrame);
+	wsDlg.InitDialog(m_pCurWing->m_PlanformSpan, m_pCurWing->Chord(0), m_pCurWing->AverageSweep(), m_pCurWing->TipTwist());
 
-    if(QDialog::Accepted == m_pWingScaleDlg->exec())
+	if(QDialog::Accepted == wsDlg.exec())
 	{
-        if (m_pWingScaleDlg->m_bSpan || m_pWingScaleDlg->m_bChord || m_pWingScaleDlg->m_bSweep || m_pWingScaleDlg->m_bTwist)
+		if (wsDlg.m_bSpan || wsDlg.m_bChord || wsDlg.m_bSweep || wsDlg.m_bTwist)
 		{
 			if(m_pCurPlane)
 			{
 				Plane *pNewPlane = new Plane; 
 				pNewPlane->Duplicate(m_pCurPlane);
-				if(m_pWingScaleDlg->m_bSpan)  pNewPlane->wing()->ScaleSpan(m_pWingScaleDlg->m_NewSpan);
-				if(m_pWingScaleDlg->m_bChord) pNewPlane->wing()->ScaleChord(m_pWingScaleDlg->m_NewChord);
-				if(m_pWingScaleDlg->m_bSweep) pNewPlane->wing()->ScaleSweep(m_pWingScaleDlg->m_NewSweep);
-				if(m_pWingScaleDlg->m_bTwist) pNewPlane->wing()->ScaleTwist(m_pWingScaleDlg->m_NewTwist);
+				if(wsDlg.m_bSpan)  pNewPlane->wing()->ScaleSpan(wsDlg.m_NewSpan);
+				if(wsDlg.m_bChord) pNewPlane->wing()->ScaleChord(wsDlg.m_NewChord);
+				if(wsDlg.m_bSweep) pNewPlane->wing()->ScaleSweep(wsDlg.m_NewSweep);
+				if(wsDlg.m_bTwist) pNewPlane->wing()->ScaleTwist(wsDlg.m_NewTwist);
 				pNewPlane->ComputePlane();
 				if(SetModPlane(pNewPlane))
 				{
@@ -10773,10 +10790,10 @@ void QMiarex::OnScaleWing()
 			{
 				Wing* pNewWing = new Wing;
 				pNewWing->Duplicate(m_pCurWing);
-                if(m_pWingScaleDlg->m_bSpan)  pNewWing->ScaleSpan(m_pWingScaleDlg->m_NewSpan);
-                if(m_pWingScaleDlg->m_bChord) pNewWing->ScaleChord(m_pWingScaleDlg->m_NewChord);
-                if(m_pWingScaleDlg->m_bSweep) pNewWing->ScaleSweep(m_pWingScaleDlg->m_NewSweep);
-                if(m_pWingScaleDlg->m_bTwist) pNewWing->ScaleTwist(m_pWingScaleDlg->m_NewTwist);
+				if(wsDlg.m_bSpan)  pNewWing->ScaleSpan(wsDlg.m_NewSpan);
+				if(wsDlg.m_bChord) pNewWing->ScaleChord(wsDlg.m_NewChord);
+				if(wsDlg.m_bSweep) pNewWing->ScaleSweep(wsDlg.m_NewSweep);
+				if(wsDlg.m_bTwist) pNewWing->ScaleTwist(wsDlg.m_NewTwist);
 				if(AddWing(pNewWing))
 				{
 					m_pCurWing = pNewWing;
@@ -11394,17 +11411,18 @@ void QMiarex::OnSetupLight()
 	if(m_iView!=W3DVIEW && m_iView!=WSTABVIEW) return;
 	ThreeDWidget *p3dWidget = (ThreeDWidget*)s_p3dWidget;
 
-    m_pGLLightDlg->m_p3DWidget= s_p3dWidget;
+	GLLightDlg gllDlg((MainFrame*)s_pMainFrame);
+	gllDlg.m_p3DWidget= s_p3dWidget;
 /*    QSize size = QSize(400,400);
     QPoint pos = QPoint(100,50);
-    m_pGLLightDlg->resize(size);
-    m_pGLLightDlg->move(pos); */
-    m_pGLLightDlg->show();
+	gllDlg.resize(size);
+	gllDlg.move(pos); */
+	gllDlg.show();
 
 	double LightFactor;
 	if(m_pCurWing) LightFactor =  (GLfloat)pow(m_pCurWing->m_PlanformSpan/2.0,0.1);
 	else           LightFactor = 1.0;
-    p3dWidget->GLSetupLight(m_pGLLightDlg, m_UFOOffset.y, LightFactor);
+	p3dWidget->GLSetupLight(m_UFOOffset.y, LightFactor);
 	UpdateView();
 }
 
@@ -11533,9 +11551,10 @@ void QMiarex::OnUFOInertia()
 	MainFrame* pMainFrame = (MainFrame*)s_pMainFrame;
 	if(!m_pCurWing) return;
 
-    m_pInertiaDlg->m_pPlane = NULL;
-    m_pInertiaDlg->m_pWing  = NULL;
-    m_pInertiaDlg->m_pBody  = NULL;
+	InertiaDlg iDlg(pMainFrame);
+	iDlg.m_pPlane = NULL;
+	iDlg.m_pWing  = NULL;
+	iDlg.m_pBody  = NULL;
 
 	Plane *pSavePlane = new Plane;
 	Wing *pSaveWing = new Wing;
@@ -11547,13 +11566,13 @@ void QMiarex::OnUFOInertia()
 	{
 		UFOName = m_pCurPlane->PlaneName();
 		pSavePlane->Duplicate(m_pCurPlane);
-        m_pInertiaDlg->m_pPlane = m_pCurPlane;
+		iDlg.m_pPlane = m_pCurPlane;
 	}
 	else if(m_pCurWing)
 	{
 		UFOName = m_pCurWing->WingName();
 		pSaveWing->Duplicate(m_pCurWing);
-        m_pInertiaDlg->m_pWing  = m_pCurWing;
+		iDlg.m_pWing  = m_pCurWing;
 	}
 
 	for (int i=0; i< m_poaWPolar->size(); i++)
@@ -11569,15 +11588,17 @@ void QMiarex::OnUFOInertia()
 		}
 	}
 
-    m_pInertiaDlg->InitDialog();
+	iDlg.InitDialog();
 
-    if(m_pInertiaDlg->exec()==QDialog::Accepted)
+	ModDlg mdDlg(pMainFrame);
+
+	if(iDlg.exec()==QDialog::Accepted)
 	{
 		if(bHasResults)
 		{
-            m_pModDlg->m_Question = tr("The modification will erase all polar results associated to this Plane.\nContinue ?");
-            m_pModDlg->InitDialog();
-            int Ans = m_pModDlg->exec();
+			mdDlg.m_Question = tr("The modification will erase all polar results associated to this Plane.\nContinue ?");
+			mdDlg.InitDialog();
+			int Ans = mdDlg.exec();
 
 			if (Ans == QDialog::Rejected)
 			{
@@ -12514,7 +12535,6 @@ void QMiarex::PanelAnalyze(double V0, double VMax, double VDelta, bool bSequence
 	}
 
 
-
 	if(!m_pPanelDlg->InitDialog()) return;
 	m_pPanelDlg->show();
 	m_pPanelDlg->StartAnalysis();
@@ -12954,15 +12974,15 @@ bool QMiarex::SaveSettings(QSettings *pSettings)
 	m_CpGraph.SaveSettings(pSettings);
 	m_LongRLGraph.SaveSettings(pSettings);
 	m_LatRLGraph.SaveSettings(pSettings);
-	for(int ig=0; ig<4; ig++)
+	for(int ig=0; ig<MAXGRAPHS; ig++)
 	{
 		m_WPlrGraph[ig].SaveSettings(pSettings);			// the WPolar graphs
-		m_WingGraph[ig].SaveSettings(pSettings);			// the WOpp graphs
-		m_TimeGraph[ig].SaveSettings(pSettings);
+//		m_WingGraph[ig].SaveSettings(pSettings);			// the WOpp graphs
+//		m_TimeGraph[ig].SaveSettings(pSettings);
 	}
 
-    m_pGLLightDlg->SaveSettings(pSettings);
-    m_pGL3dBody->SaveSettings(pSettings);
+	GLLightDlg::SaveSettings(pSettings);
+	GL3dBodyDlg::SaveSettings(pSettings);
 
 	return true;
 }
@@ -13383,14 +13403,15 @@ bool QMiarex::SetModBody(Body *pModBody)
 		NameList.append(pBody->m_BodyName);
 	}
 
-    m_pRenameDlg->m_pstrArray = & NameList;
-    m_pRenameDlg->m_strQuestion = tr("Enter the new name for the Body :");
-    m_pRenameDlg->m_strName = pModBody->m_BodyName;
-    m_pRenameDlg->InitDialog();
+	RenameDlg renDlg(pMainFrame);
+	renDlg.m_pstrArray = & NameList;
+	renDlg.m_strQuestion = tr("Enter the new name for the Body :");
+	renDlg.m_strName = pModBody->m_BodyName;
+	renDlg.InitDialog();
 
 	while (bExists)
 	{
-        resp = m_pRenameDlg->exec();
+		resp = renDlg.exec();
 		if(resp==QDialog::Accepted)
 		{
 			//Is the new name already used ?
@@ -13398,7 +13419,7 @@ bool QMiarex::SetModBody(Body *pModBody)
 			for (k=0; k<m_poaBody->size(); k++)
 			{
 				pBody = (Body*)m_poaBody->at(k);
-                if (pBody->m_BodyName == m_pRenameDlg->m_strName)
+				if (pBody->m_BodyName == renDlg.m_strName)
 				{
 					bExists = true;
 					break;
@@ -13406,7 +13427,7 @@ bool QMiarex::SetModBody(Body *pModBody)
 			}
 			if(!bExists)
 			{
-                pModBody->m_BodyName = m_pRenameDlg->m_strName;
+				pModBody->m_BodyName = renDlg.m_strName;
 				//replace the Body in alphabetical order in the array
 				//remove the current Body from the array
 				bool bInserted = false;
@@ -13440,7 +13461,7 @@ bool QMiarex::SetModBody(Body *pModBody)
 		else if(resp ==10)
 		{
 			//user wants to overwrite
-            pOldBody  = GetBody(m_pRenameDlg->m_strName);
+			pOldBody  = GetBody(renDlg.m_strName);
 			if(pOldBody)
 			{
 				//first we check if this old body is used by one or more planes
@@ -13467,7 +13488,7 @@ bool QMiarex::SetModBody(Body *pModBody)
 					for (k=0; k<m_poaBody->size(); k++)
 					{
 						pBody = (Body*)m_poaBody->at(k);
-                        if (pBody->m_BodyName == m_pRenameDlg->m_strName)
+						if (pBody->m_BodyName == renDlg.m_strName)
 						{
 							m_poaBody->removeAt(k);
 							if(pBody==m_pCurBody)
@@ -13492,7 +13513,7 @@ bool QMiarex::SetModBody(Body *pModBody)
 				}
 			}
 
-            pModBody->m_BodyName = m_pRenameDlg->m_strName;
+			pModBody->m_BodyName = renDlg.m_strName;
 			m_pCurBody = pModBody;
 
 			MainFrame::SetSaveState(false);
@@ -13538,23 +13559,24 @@ bool QMiarex::SetModPlane(Plane *pModPlane)
 		NameList.append(pWing->m_WingName);
 	}
 
-    m_pRenameDlg->m_pstrArray = & NameList;
-    m_pRenameDlg->m_strQuestion = tr("Enter the new name for the Plane :");
-    m_pRenameDlg->m_strName     = pModPlane->PlaneName();
-    m_pRenameDlg->InitDialog();
+	RenameDlg renDlg((MainFrame*)s_pMainFrame);
+	renDlg.m_pstrArray = & NameList;
+	renDlg.m_strQuestion = tr("Enter the new name for the Plane :");
+	renDlg.m_strName     = pModPlane->PlaneName();
+	renDlg.InitDialog();
 
 	while (bExists)
 	{
-        resp = m_pRenameDlg->exec();
+		resp = renDlg.exec();
 		if(resp==QDialog::Accepted)
 		{
-            if (OldName == m_pRenameDlg->m_strName) return true;
+			if (OldName == renDlg.m_strName) return true;
 			//Is the new name already used ?
 			bExists = false;
 			for (k=0; k<m_poaPlane->size(); k++)
 			{
 				pPlane = (Plane*)m_poaPlane->at(k);
-                if (pPlane->PlaneName() == m_pRenameDlg->m_strName)
+				if (pPlane->PlaneName() == renDlg.m_strName)
 				{
 					bExists = true;
 					break;
@@ -13563,7 +13585,7 @@ bool QMiarex::SetModPlane(Plane *pModPlane)
 			for (k=0; k<m_poaWing->size(); k++)
 			{
 				pWing = (Wing*)m_poaWing->at(k);
-                if (pWing->m_WingName == m_pRenameDlg->m_strName)
+				if (pWing->m_WingName == renDlg.m_strName)
 				{
 					bExists = true;
 					break;
@@ -13571,7 +13593,7 @@ bool QMiarex::SetModPlane(Plane *pModPlane)
 			}
 			if(!bExists)
 			{
-                pModPlane->rPlaneName() = m_pRenameDlg->m_strName;
+				pModPlane->rPlaneName() = renDlg.m_strName;
 				//replace the Plane in alphabetical order in the array
 				//remove the current Plane from the array
 				bool bInserted = false;
@@ -13606,13 +13628,13 @@ bool QMiarex::SetModPlane(Plane *pModPlane)
 		else if(resp ==10)
 		{
 			//user wants to overwrite the old plane/wing
-            if (OldName == m_pRenameDlg->m_strName) return true;//don't bother to overwrite itself
-            if(GetPlane(m_pRenameDlg->m_strName))
+			if (OldName == renDlg.m_strName) return true;//don't bother to overwrite itself
+			if(GetPlane(renDlg.m_strName))
 			{
 				for (k=0; k<m_poaPlane->size(); k++)
 				{
 					pPlane = (Plane*)m_poaPlane->at(k);
-                    if (pPlane->PlaneName() == m_pRenameDlg->m_strName)
+					if (pPlane->PlaneName() == renDlg.m_strName)
 					{
 						for (l=m_poaWPolar->size()-1;l>=0; l--)
 						{
@@ -13645,13 +13667,13 @@ bool QMiarex::SetModPlane(Plane *pModPlane)
 					}
 				}
 			}
-            else if (GetWing(m_pRenameDlg->m_strName))
+			else if (GetWing(renDlg.m_strName))
 			{
 				//delete the wing the user wants to overwrite
 				for (k=0; k<m_poaWing->size(); k++)
 				{
 					pWing = (Wing*)m_poaWing->at(k);
-                    if (pWing->m_WingName == m_pRenameDlg->m_strName)
+					if (pWing->m_WingName == renDlg.m_strName)
 					{
 						for (l=m_poaWPolar->size()-1;l>=0; l--)
 						{
@@ -13681,7 +13703,7 @@ bool QMiarex::SetModPlane(Plane *pModPlane)
 				}
 			}
 
-            pModPlane->rPlaneName() = m_pRenameDlg->m_strName;
+			pModPlane->rPlaneName() = renDlg.m_strName;
 			pModPlane->wing()->m_WingName = pModPlane->PlaneName()+"_Wing";
 			if(pModPlane->wing2()) pModPlane->wing2()->m_WingName = pModPlane->PlaneName()+"_Wing2";
 			if(pModPlane->stab())  pModPlane->stab()->m_WingName  = pModPlane->PlaneName()+"_Elev";
@@ -13755,14 +13777,16 @@ bool QMiarex::SetModWing(Wing *pModWing)
 		pPlane = (Plane*)m_poaPlane->at(k);
 		NameList.append(pPlane->PlaneName());
 	}
-    m_pRenameDlg->m_pstrArray = & NameList;
-    m_pRenameDlg->m_strQuestion = tr("Enter the new name for the wing :");
-    m_pRenameDlg->m_strName = pModWing->m_WingName;
-    m_pRenameDlg->InitDialog();
+
+	RenameDlg renDlg((MainFrame*)s_pMainFrame);
+	renDlg.m_pstrArray = & NameList;
+	renDlg.m_strQuestion = tr("Enter the new name for the wing :");
+	renDlg.m_strName = pModWing->m_WingName;
+	renDlg.InitDialog();
 
 	while (bExists)
 	{
-        resp = m_pRenameDlg->exec();
+		resp = renDlg.exec();
 		if(resp==QDialog::Accepted)
 		{
 			//Is the new name already used ?
@@ -13770,7 +13794,7 @@ bool QMiarex::SetModWing(Wing *pModWing)
 			for (k=0; k<m_poaWing->size(); k++)
 			{
 				pWing = (Wing*)m_poaWing->at(k);
-                if (pWing->m_WingName == m_pRenameDlg->m_strName)
+				if (pWing->m_WingName == renDlg.m_strName)
 				{
 					bExists = true;
 					break;
@@ -13779,7 +13803,7 @@ bool QMiarex::SetModWing(Wing *pModWing)
 			for (k=0; k<m_poaPlane->size(); k++)
 			{
 				pPlane = (Plane*)m_poaPlane->at(k);
-                if (pPlane->PlaneName() == m_pRenameDlg->m_strName)
+				if (pPlane->PlaneName() == renDlg.m_strName)
 				{
 					bExists = true;
 					break;
@@ -13788,7 +13812,7 @@ bool QMiarex::SetModWing(Wing *pModWing)
 
 			if(!bExists)
 			{
-                pModWing->m_WingName = m_pRenameDlg->m_strName;
+				pModWing->m_WingName = renDlg.m_strName;
 				//replace the Wing in alphabetical order in the array
 				//remove the current Wing from the array
 				bool bInserted = false;
@@ -13822,14 +13846,14 @@ bool QMiarex::SetModWing(Wing *pModWing)
 		else if(resp==10)
 		{
 			//user wants to overwrite
-            pOldWing  = GetWing(m_pRenameDlg->m_strName);
-            pOldPlane = GetPlane(m_pRenameDlg->m_strName);
+			pOldWing  = GetWing(renDlg.m_strName);
+			pOldPlane = GetPlane(renDlg.m_strName);
 			if(pOldWing)
 			{
 				for (k=0; k<m_poaWing->size(); k++)
 				{
 					pWing = (Wing*)m_poaWing->at(k);
-                    if (pWing->m_WingName == m_pRenameDlg->m_strName)
+					if (pWing->m_WingName == renDlg.m_strName)
 					{
 						for (l=m_poaWPolar->size()-1;l>=0; l--)
 						{
@@ -13874,7 +13898,7 @@ bool QMiarex::SetModWing(Wing *pModWing)
 					for (k=0; k<m_poaPlane->size(); k++)
 					{
 						pPlane = (Plane*)m_poaPlane->at(k);
-                        if (pPlane->PlaneName() == m_pRenameDlg->m_strName)
+						if (pPlane->PlaneName() == renDlg.m_strName)
 						{
 							for (l=m_poaWPolar->size()-1;l>=0; l--)
 							{
@@ -13911,7 +13935,7 @@ bool QMiarex::SetModWing(Wing *pModWing)
 					}
 				}
 			}
-            pModWing->m_WingName = m_pRenameDlg->m_strName;
+			pModWing->m_WingName = renDlg.m_strName;
 //			m_pCurWing = pModWing;
 
 			MainFrame::SetSaveState(false);
@@ -15547,14 +15571,16 @@ void QMiarex::wheelEvent(QWheelEvent *event)
 void QMiarex::OnWPolarProps()
 {
 	if(!m_pCurWPolar) return;
-	m_pObjectPropsDlg->m_pXDirect = NULL;
-	m_pObjectPropsDlg->m_pOpp = NULL;
-	m_pObjectPropsDlg->m_pPolar = NULL;
-	m_pObjectPropsDlg->m_pMiarex = this;
-	m_pObjectPropsDlg->m_pWOpp = NULL;
-	m_pObjectPropsDlg->m_pWPolar = m_pCurWPolar;
-	m_pObjectPropsDlg->InitDialog();
-	m_pObjectPropsDlg->exec();
+
+	ObjectPropsDlg opDlg((MainFrame*)s_pMainFrame);
+	opDlg.m_pXDirect = NULL;
+	opDlg.m_pOpp = NULL;
+	opDlg.m_pPolar = NULL;
+	opDlg.m_pMiarex = this;
+	opDlg.m_pWOpp = NULL;
+	opDlg.m_pWPolar = m_pCurWPolar;
+	opDlg.InitDialog();
+	opDlg.exec();
 }
 
 
@@ -15564,14 +15590,15 @@ void QMiarex::OnWPolarProps()
 void QMiarex::OnWOppProps()
 {
 	if(!m_pCurWOpp) return;
-	m_pObjectPropsDlg->m_pXDirect = NULL;
-	m_pObjectPropsDlg->m_pOpp = NULL;
-	m_pObjectPropsDlg->m_pPolar = NULL;
-	m_pObjectPropsDlg->m_pMiarex = this;
-	m_pObjectPropsDlg->m_pWOpp = m_pCurWOpp;
-	m_pObjectPropsDlg->m_pWPolar = NULL;
-	m_pObjectPropsDlg->InitDialog();
-	m_pObjectPropsDlg->exec();
+	ObjectPropsDlg opDlg((MainFrame*)s_pMainFrame);
+	opDlg.m_pXDirect = NULL;
+	opDlg.m_pOpp = NULL;
+	opDlg.m_pPolar = NULL;
+	opDlg.m_pMiarex = this;
+	opDlg.m_pWOpp = m_pCurWOpp;
+	opDlg.m_pWPolar = NULL;
+	opDlg.InitDialog();
+	opDlg.exec();
 }
 
 /**

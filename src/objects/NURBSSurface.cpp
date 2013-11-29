@@ -56,6 +56,14 @@ NURBSSurface::NURBSSurface(int iAxis)
 	eps = 1.0e-06;
 }
 
+NURBSSurface::~NURBSSurface()
+{
+	for(int iFr=m_pFrame.size()-1; iFr>=0; iFr--)
+	{
+		delete m_pFrame.at(iFr);
+		m_pFrame.removeAt(iFr);
+	}
+}
 
 
 /**

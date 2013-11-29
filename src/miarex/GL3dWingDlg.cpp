@@ -28,6 +28,7 @@
 #include "GL3dWingDlg.h"
 #include "WingScaleDlg.h"
 #include "InertiaDlg.h"
+#include "../misc/W3dPrefsDlg.h"
 #include <QDesktopWidget>
 #include <QGridLayout>
 #include <QHBoxLayout>
@@ -46,7 +47,6 @@
 
 
 void* GL3dWingDlg::s_pMiarex;	//pointer to the Miarex Application window
-void *GL3dWingDlg::s_pGLLightDlg;
 
 QList <void*> *GL3dWingDlg::s_poaWing;
 QList <void*> *GL3dWingDlg::s_poaFoil;
@@ -130,6 +130,15 @@ GL3dWingDlg::GL3dWingDlg(QWidget *pParent) : QDialog(pParent)
 
 	setMouseTracking(true);
 }
+
+
+
+GL3dWingDlg::~GL3dWingDlg()
+{
+	delete m_pWingModel;
+	delete m_pWingDelegate;
+}
+
 
 
 bool GL3dWingDlg::CheckWing()
@@ -918,7 +927,7 @@ void GL3dWingDlg::GLRenderView()
 
 	glPushMatrix();
 	{
-		m_pGLWidget->GLSetupLight((GLLightDlg*)s_pGLLightDlg, m_UFOOffset.y, 1.0);
+		m_pGLWidget->GLSetupLight(m_UFOOffset.y, 1.0);
 		glDisable(GL_LIGHTING);
 		glDisable(GL_LIGHT0);
 
@@ -1526,7 +1535,7 @@ void GL3dWingDlg::OnInertia()
 	else
 	{
 		// restore saved inertia
-		m_pWing->m_PointMass.clear();
+		m_pWing->ClearPointMasses();
 		for(int i=0; i< PtMass.size(); i++)
 		{
 			m_pWing->m_PointMass.append(PtMass.at(i));

@@ -59,7 +59,6 @@ LLTAnalysisDlg::LLTAnalysisDlg(QWidget *pParent) : QDialog(pParent)
 	m_IterGraph.SetYMax(1.0);
 	m_IterGraph.SetType(1);
 
-	m_IterGraph.SetXTitle(tr("abs"));
 	m_IterGraph.SetYTitle("|Da|");
 
 	m_IterGraph.SetMargin(10);
@@ -208,8 +207,6 @@ bool LLTAnalysisDlg::QInfLoop()
 	QMiarex* pMiarex = (QMiarex*)s_pMiarex;
 	Curve *pCurve = m_IterGraph.GetCurve(0);
 
-	//Alpha has been set in CMiarex::SetWPlr
-
 	str = tr("Launching analysis....")+"\n\n";
 	UpdateOutput(str);
 	str = QString(tr("Max iterations     = %1")+"\n").arg(m_IterLim);
@@ -230,7 +227,6 @@ bool LLTAnalysisDlg::QInfLoop()
 	UpdateOutput(str);
 
 	m_LLT.LLTInitialize(m_AlphaMin);
-	//	CWing::s_QInfLLT = m_AlphaMin;
 
 	m_IterGraph.ResetLimits();
 	m_IterGraph.SetXMax((double)m_IterLim);
@@ -328,6 +324,8 @@ void LLTAnalysisDlg::InitDialog()
 	m_IterGraph.AddCurve();
 	m_IterGraph.AddCurve();
 	str = "|Da|";
+
+
 	m_IterGraph.GetCurve(0)->SetTitle(str);
 
 	m_IterGraph.SetAutoX(true);
@@ -442,7 +440,7 @@ void LLTAnalysisDlg::SetupLayout()
 	QDesktopWidget desktop;
 	QRect r = desktop.geometry();
 //	setMinimumHeight(r.height()*2/3);
-	setMinimumWidth(r.width()/2);
+	setMinimumWidth(r.width()/3);
 
 	m_pctrlTextOutput = new QTextEdit;
 	m_pctrlTextOutput->setFontFamily("Courier");
@@ -451,12 +449,10 @@ void LLTAnalysisDlg::SetupLayout()
 	m_pctrlTextOutput->setWordWrapMode(QTextOption::NoWrap);
 
 	m_pGraphWidget = new GraphWidget;
-//	m_pGraphWidget->setMinimumHeight(r.height()/4);
+	m_pGraphWidget->setMinimumHeight(r.height()/3);
 //	m_pGraphWidget->setMinimumWidth(r.width()/4);
 	m_pGraphWidget->m_pGraph = &m_IterGraph;
 
-//	QHBoxLayout *GraphLayout = new QHBoxLayout;
-//	GraphLayout->addWidget(m_pGraphWidget,1);
 
 	m_pctrlSkip   = new QPushButton(tr("Skip"));
 	m_pctrlCancel = new QPushButton(tr("Cancel"));

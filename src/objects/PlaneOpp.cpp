@@ -107,9 +107,9 @@ void PlaneOpp::Allocate(int PanelArraySize)
  */
 void PlaneOpp::Release()
 {
-	if(m_Cp)    delete m_Cp;
-	if(m_Sigma) delete m_Sigma;
-	if(m_G)     delete m_G;
+	if(m_Cp)    delete [] m_Cp;
+	if(m_Sigma) delete [] m_Sigma;
+	if(m_G)     delete [] m_G;
 
 	m_Cp = NULL;
 	m_Sigma = NULL;
@@ -336,9 +336,9 @@ bool PlaneOpp::SerializePOpp(QDataStream &ar, bool bIsStoring)
 
 		if(ArchiveFormat>=1009)
 		{
-			if(m_G!=NULL)     delete m_G;
-			if(m_Sigma!=NULL) delete m_Sigma;
-			if(m_Cp!=NULL)    delete m_Cp;
+			if(m_G!=NULL)     delete [] m_G;
+			if(m_Sigma!=NULL) delete [] m_Sigma;
+			if(m_Cp!=NULL)    delete [] m_Cp;
 
 			m_G     = new float[m_NPanels];
 			m_Sigma = new float[m_NPanels];

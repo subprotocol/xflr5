@@ -57,7 +57,7 @@ Body::Body()
 	m_CoG.Set(0.0,0.0,0.0);
 	m_VolumeMass =  m_TotalMass = 0.0;	    //for inertia calculations
 	m_CoGIxx = m_CoGIyy = m_CoGIzz = m_CoGIxz = 0.0;
-	m_PointMass.clear();
+	ClearPointMasses();
 
 	m_Bunch  = 0.0;
 
@@ -179,8 +179,6 @@ Body::Body()
 	for(i=0; i<MAXBODYFRAMES;i++) m_xPanels[i] = 1;
 	for(i=0; i<MAXSIDELINES;i++)  m_hPanels[i] = 1;
 }
-
-
 
 
 void Body::SetKnots()
@@ -1230,7 +1228,7 @@ bool Body::SerializeBody(QDataStream &ar, bool bIsStoring)
 				ReadCString(ar, tag[im]);
 			}
 
-			m_PointMass.clear();
+			ClearPointMasses();
 			for(int im=0; im<nMass; im++)
 			{
 				m_PointMass.append(new PointMass(mass[im], position[im], tag[im]));
@@ -1617,6 +1615,16 @@ void Body::SetEdgeWeight(double uw, double vw)
 }
 
 
+
+/** Destroys the PointMass objects in good order to avoid memory leaks */
+void Body::ClearPointMasses()
+{
+	for(int ipm=m_PointMass.size()-1; ipm>=0; ipm--)
+	{
+		delete m_PointMass.at(ipm);
+		m_PointMass.removeAt(ipm);
+	}
+}
 
 
 

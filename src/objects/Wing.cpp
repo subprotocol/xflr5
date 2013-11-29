@@ -69,7 +69,7 @@ Wing::Wing()
 	m_CoGIxx = m_CoGIyy = m_CoGIzz = m_CoGIxz = 0.0;
 	m_VolumeMass = m_TotalMass = 0.0;
 
-	m_PointMass.clear();
+	ClearPointMasses();
 
 	m_bIsFin        = false;
 	m_bDoubleFin    = false;
@@ -81,7 +81,7 @@ Wing::Wing()
 
 	m_WingName        = QObject::tr("Wing Name");
 	m_WingDescription = "";
-	m_WingColor.setHsv((int)(((double)qrand()/(double)RAND_MAX)*255), 31, 203, 140);
+	m_WingColor.setHsv((int)(((double)qrand()/(double)RAND_MAX)*255), 31, 203, 255);
 
 	m_QInf0    = 0.0;
 
@@ -113,7 +113,7 @@ Wing::Wing()
 	m_ProjectedSpan = 0.0;
 
 	m_nFlaps        =  0;
-	m_WingSection.clear();
+	ClearWingSections();
 	AppendWingSection(.180, .0, 0.0, 1.0, 0.000, 13, 19, COSINE, INVERSESINE, "", "");
 	AppendWingSection(.110, .0, 1.0, 1.0, 0.070, 13, 5,  COSINE, UNIFORM, "", "");
 
@@ -128,15 +128,26 @@ Wing::Wing()
 	}
 }
 
-
+/** The public destructor */
 Wing::~Wing()
+{
+	ClearWingSections();
+	ClearPointMasses();
+}
+
+/** Destroys the WingSection objects in good order to avoid memory leaks */
+void Wing::ClearWingSections()
 {
 	for(int iws=m_WingSection.size()-1; iws>=0; iws--)
 	{
 		delete m_WingSection.at(iws);
 		m_WingSection.removeAt(iws);
 	}
+}
 
+/** Destroys the PointMass objects in good order to avoid memory leaks */
+void Wing::ClearPointMasses()
+{
 	for(int ipm=m_PointMass.size()-1; ipm>=0; ipm--)
 	{
 		delete m_PointMass.at(ipm);
@@ -174,7 +185,7 @@ void Wing::ImportDefinition(QString path_to_file)
 			return;
 		} else {
 			QTextStream infile(&fp);
-			m_WingSection.clear();
+			ClearWingSections();
 			this->m_WingName = infile.readLine();
 			while (true)
 			{
@@ -1050,7 +1061,7 @@ void Wing::Duplicate(Wing *pWing)
 	m_bDoubleFin    = pWing->m_bDoubleFin;
 	m_bDoubleSymFin = pWing->m_bDoubleSymFin;
 
-	m_WingSection.clear();
+	ClearWingSections();
 
 	for (int is=0; is<pWing->m_WingSection.size(); is++)
 	{
@@ -1083,7 +1094,7 @@ void Wing::Duplicate(Wing *pWing)
 	m_CoGIzz = pWing->m_CoGIzz;
 	m_CoGIxz = pWing->m_CoGIxz;
 
-	m_PointMass.clear();
+	ClearPointMasses();
 
 	for(int im=0; im<pWing->m_PointMass.size();im++)
 	{
@@ -2090,7 +2101,7 @@ bool Wing::SerializeWing(QDataStream &ar, bool bIsStoring)
 			m_WingName = "";
 			return false;
 		}
-		m_WingSection.clear();
+		ClearWingSections();
 		for(int is=0; is<=NPanel; is++) m_WingSection.append(new WingSection);
 
 		QString strFoil;
@@ -2262,7 +2273,7 @@ bool Wing::SerializeWing(QDataStream &ar, bool bIsStoring)
 				ReadCString(ar, tag[im]);
 			}
 
-			m_PointMass.clear();
+			ClearPointMasses();
 			for(int im=0; im<nMass; im++)
 			{
 				m_PointMass.append(new PointMass(mass[im], position[im], tag[im]));
@@ -2747,20 +2758,21 @@ bool Wing::AppendWingSection(double Chord, double Twist, double Pos, double Dihe
 {
 	if(m_WingSection.size()>MAXSPANSECTIONS) return false;
 
-	m_WingSection.append(new WingSection());
-	m_WingSection.last()->m_Chord      = Chord;
-	m_WingSection.last()->m_Twist      = Twist;
-	m_WingSection.last()->m_YPosition  = Pos ;
-	m_WingSection.last()->m_Dihedral   = Dihedral;
-	m_WingSection.last()->m_Offset     = Offset ;
+	WingSection *pWS = new WingSection();
+	m_WingSection.append(pWS);
+	pWS->m_Chord      = Chord;
+	pWS->m_Twist      = Twist;
+	pWS->m_YPosition  = Pos ;
+	pWS->m_Dihedral   = Dihedral;
+	pWS->m_Offset     = Offset ;
 
-	m_WingSection.last()->m_NXPanels   = NXPanels ;
-	m_WingSection.last()->m_NYPanels   = NYPanels;
-	m_WingSection.last()->m_XPanelDist = XPanelDist;
-	m_WingSection.last()->m_YPanelDist = YPanelDist;
+	pWS->m_NXPanels   = NXPanels ;
+	pWS->m_NYPanels   = NYPanels;
+	pWS->m_XPanelDist = XPanelDist;
+	pWS->m_YPanelDist = YPanelDist;
 
-	m_WingSection.last()->m_RightFoilName  = RightFoilName;
-	m_WingSection.last()->m_LeftFoilName   = LeftFoilName;
+	pWS->m_RightFoilName  = RightFoilName;
+	pWS->m_LeftFoilName   = LeftFoilName;
 
 	return true;
 }

@@ -27,6 +27,7 @@
 #include <QPainter>
 #include <QFontMetrics>
 
+
 QGraph::QGraph()
 {
 	m_bHighlightPoint = false;

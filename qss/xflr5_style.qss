@@ -1,6 +1,4 @@
 
-
-
 /*_____________________ All widgets ______________________*/
 
 QWidget
@@ -10,10 +8,11 @@ QWidget
 	selection-background-color: darkslategray;
 }
 
+/*
 QWidget:focus
 {
-	border: 1px solid lightkhaki;
-}
+	border: 1px solid red;
+}*/
 
 QWidget:item:hover
 {
@@ -23,8 +22,7 @@ QWidget:item:hover
 
 QWidget:item:selected
 {
-	color: white;
-	selection-color: blue;
+	border: 1px yellow;
 	background-color: QLinearGradient( x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 darkgray, stop: 1 black);
 }
 
@@ -209,6 +207,7 @@ QLineEdit, QTextEdit
 	border: 1px solid #1e1e1e;
 	border-radius: 5;
 	selection-background-color: darkslategray;
+	selection-color: white;
 }
 
 QLineEdit:disabled, QTextEdit:disabled
@@ -269,7 +268,7 @@ LineBtn
 	background-color: #101010;
 	border: 1px solid #7f7f7f;
 	border-radius: 5px;
-	min-height: 3.5ex;
+	min-height: 3ex;
 }
 
 LineBtn:hover
@@ -327,19 +326,16 @@ QComboBox:on
 QComboBox::drop-down
 {
 	/* defines the side drop-down arrow */
+
 	subcontrol-origin: padding;
 	subcontrol-position: top right;
-	border-left-width: 1px;
+	border-left-width: 0px;
 	border-left-color: darkgray;
 	border-left-style: solid; /* just a single line */
 	border-top-right-radius: 5px; /* same radius as the QComboBox */
 	border-bottom-right-radius: 5px;
 }
 
-QComboBox::down-arrow
-{
-     image: url(./qss/images/down_arrow.png);
-}
 
 
 
@@ -535,7 +531,7 @@ QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical
 QToolBar::handle
 {
      spacing: 3px; /* spacing between items in the tool bar */
-     background: url(./qss/images/handle.png);
+ /*    background: url(./qss/images/handle.png); */
 }
 
 QToolButton 
@@ -642,15 +638,17 @@ QTabBar::tab:!selected:hover
 
 QCheckBox
 {
-	color: #FFFFFF;
+	color: white;
 	background-color: #414141;
 	padding: 2px;
+	border: 3px;
+	border-color: yellow;
 }
 
 
 QCheckBox:disabled
 {
-	color: #DDDDDD;
+	color: dimgray;
 	background-color: #414141;
 	font: italic;
 }
@@ -666,12 +664,11 @@ QCheckBox::indicator
 
 QCheckBox::indicator:checked
 {
-    image:url(./qss/images/checkbox.png);
+    background-color: qradialgradient(cx:0.5, cy:0.5, radius: 0.7, fx:0.5, fy:0.5, stop:0 lightcoral, stop:1 black) ;
 }
-
-QCheckBox::indicator:unchecked
+QCheckBox::indicator:checked:disabled
 {
- 	image: url(./qss/images/checkbox_unchecked.png);
+    background-color: qradialgradient(cx:0.5, cy:0.5, radius: 0.7, fx:0.5, fy:0.5, stop:0 lightgray, stop:1 black) ;
 }
 
 QCheckBox::indicator:disabled
@@ -687,13 +684,22 @@ QCheckBox::indicator:hover
 
 /*_______________________ radiobutton ________________*/
 
+QRadioButton
+{
+    padding: 2px;
+}
 
+QRadioButton:disabled
+{
+    background: transparent;
+	color: dimgray;
+}
 
 QRadioButton::indicator
 {
     background: qradialgradient(cx:0.5, cy:0.5, radius: 0.7, fx:0.5, fy:0.5, stop:0 dimgray, stop:1 black) ;
-    width: 9px;
-    height: 9px;
+    min-width: 9px;
+    min-height: 9px;
     border: 1px solid gray;
     padding: 1px;
     border-radius: 5px;
@@ -701,12 +707,7 @@ QRadioButton::indicator
 
 QRadioButton::indicator:checked
 {
-    background: qradialgradient(cx:0.5, cy:0.5, radius: 0.7, fx:0.5, fy:0.5, stop:0 white, stop:1 black) ;
-    width: 9px;
-    height: 9px;
-    border: 1px solid gray;
-    padding: 1px;
-    border-radius: 5px;
+    background: qradialgradient(cx:0.5, cy:0.5, radius: 0.7, fx:0.5, fy:0.5, stop:0 lightcoral, stop:1 black) ;
 }
 
 /*_____________________ QToolTip ______________________*/

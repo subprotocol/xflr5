@@ -593,8 +593,9 @@ void GLCreateCpLegendClr(void *pQMiarex)
 	int i;
 	QMiarex *pMiarex = (QMiarex*)pQMiarex;
 
-    QFontMetrics fm(MainFrame::s_TextFont);
-    double fmw = (double) fm.averageCharWidth();
+	QFont fnt(MainFrame::s_TextFont); //valgrind
+	QFontMetrics fm(fnt);
+	double fmw = (double) fm.averageCharWidth();
 
 	double fi, ZPos,dz,Right1, Right2;
 	double color = 0.0;
@@ -2458,8 +2459,8 @@ void GLDrawCpLegend(void *pQMiarex)
     double f;
     double range, delta;
 
-    QFontMetrics fm(MainFrame::s_TextFont);
-    int back = fm.averageCharWidth() * 5;
+	QFontMetrics fm(MainFrame::s_TextFont);
+	int back = fm.averageCharWidth() * 5;
 
     double h = (double)pMiarex->m_r3DCltRect.height();
     double y0 = 2.*h/5.0;
@@ -2543,8 +2544,8 @@ void GLDrawPanelForceLegend(void *pQMiarex, WPolar *pWPolar)
 	range = rmax - rmin;
 
 
-    QFontMetrics fm(MainFrame::s_TextFont);
-    int back = fm.averageCharWidth() * 5;
+	QFontMetrics fm(MainFrame::s_TextFont);
+	int back = fm.averageCharWidth() * 5;
 
     double h = (double)pMiarex->m_r3DCltRect.height();
     double y0 = 2.*h/5.0;

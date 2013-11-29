@@ -47,6 +47,8 @@ class InertiaDlg : public QDialog
 
 public:
     InertiaDlg(QWidget *pParent);
+	~InertiaDlg();
+
 	void InitDialog();
 
 private slots:
@@ -67,6 +69,7 @@ private:
 	void resizeEvent(QResizeEvent *event);
 	void showEvent(QShowEvent *event);
 	void FillMassModel();
+	void ClearPointMasses();
 	void ComputeInertia();
 //	void ComputeBodyInertia(double &Ixx, double &Iyy, double &Izz, double &Ixz);
 	void ComputeBodyAxisInertia();

@@ -66,7 +66,7 @@ Plane::Plane()
 	m_Wing[3].NXPanels(0)   = 7;
 	m_Wing[3].NYPanels(0)   = 7;
 	m_Wing[3].XPanelDist(0) = UNIFORM;
-	m_Wing[3].YPanelDist(0) = SINE;
+	m_Wing[3].YPanelDist(0) = COSINE;
 
 	m_Wing[3].ComputeGeometry();
 
@@ -96,10 +96,16 @@ Plane::Plane()
 	m_bDoubleSymFin = true;
 	m_bBiplane      = false;
 
-	m_PointMass.clear();
+	ClearPointMasses();
 
 	m_PlaneName  = QObject::tr("Plane Name");
 }
+
+Plane::~Plane()
+{
+	ClearPointMasses();
+}
+
 
 /**
  * Calculates and returns the inertia properties of the structure based on the Body and Wing masses and on the existing geometry.
@@ -362,7 +368,7 @@ void Plane::Duplicate(Plane *pPlane)
 	m_CoGIzz = pPlane->m_CoGIzz;
 	m_CoGIxz = pPlane->m_CoGIxz;
 
-	m_PointMass.clear();
+	ClearPointMasses();
 	for(int i=0; i<pPlane->m_PointMass.size();i++)
 	{
 		m_PointMass.append(new PointMass(pPlane->m_PointMass[i]));
@@ -574,36 +580,54 @@ bool Plane::SerializePlane(QDataStream &ar, bool bIsStoring)
 		if(ArchiveFormat>=1012)
 		{
 			ar >> nMass;
-			QVarLengthArray<double> mass;
-			QVarLengthArray<CVector> position;
-			QVarLengthArray<QString> tag;
+			double* mass      = new double[nMass];
+			CVector* position = new CVector[nMass];
+			QStringList tag;
+
 
 			for(int im=0; im<nMass; im++)
 			{
 				ar >> f;
-				mass.append(f);
+				mass[im] = f;
 			}
 			for(int im=0; im<nMass; im++)
 			{
 				ar >> f >> g >> h;
-				position.append(CVector(f,g,h));
+				position[im] = CVector(f,g,h);
 			}
 			for(int im=0; im<nMass; im++)
 			{
-				tag.append("");
+				tag << "";
 				ReadCString(ar, tag[im]);
 			}
 
-			m_PointMass.clear();
+			ClearPointMasses();
+			PointMass *pPM;
 			for(int im=0; im<nMass; im++)
 			{
-				m_PointMass.append(new PointMass(mass[im], position[im], tag[im]));
+				pPM = new PointMass(mass[im], position[im], tag[im]);
+				m_PointMass.append(pPM);
 			}
+
+			delete [] mass;
+			delete [] position;
+			tag.clear();
 		}
 
 		ComputePlane();
 
 		return true;
+	}
+}
+
+
+/** Destroys the PointMass objects in good order to avoid memory leaks */
+void Plane::ClearPointMasses()
+{
+	for(int ipm=m_PointMass.size()-1; ipm>=0; ipm--)
+	{
+		delete m_PointMass.at(ipm);
+		m_PointMass.removeAt(ipm);
 	}
 }
 

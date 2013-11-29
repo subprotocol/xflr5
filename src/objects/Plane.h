@@ -50,6 +50,8 @@ class Plane
 
 public:
 	Plane();
+	~Plane();
+
 	static void SetParents(void *pMainFrame, void*pMiarex);
 
 	double TotalMass();
@@ -62,6 +64,7 @@ public:
 	void RenameWings();
 	void SetBody(Body *pBody);
 
+	void ClearPointMasses();
 	void ComputeVolumeInertia(double &Mass, CVector &CoG, double &Ixx, double &Iyy, double &Izz, double &Ixz);
 	void ComputeBodyAxisInertia();
 

@@ -37,7 +37,6 @@ void *ManageBodiesDlg::s_pMiarex;
 
 ManageBodiesDlg::ManageBodiesDlg(QWidget *pParent) : QDialog(pParent)
 {
-	m_pGL3dBodyDlg = NULL;
 	m_pBody = NULL;
 	setWindowTitle(tr("Body Management"));
 	SetupLayout();
@@ -154,7 +153,7 @@ void ManageBodiesDlg::OnEdit()
 	if(!m_pBody) return;
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	QMiarex * pMiarex = (QMiarex*)s_pMiarex;
-	GL3dBodyDlg *pGL3dBodyDlg = (GL3dBodyDlg*)m_pGL3dBodyDlg;
+	GL3dBodyDlg glbDlg(pMainFrame);
 
 	bool bUsed = false;
 	int i;
@@ -181,10 +180,10 @@ void ManageBodiesDlg::OnEdit()
 
 	Body memBody;
 	memBody.Duplicate(m_pBody);
-	pGL3dBodyDlg->m_bEnableName = false;
-	pGL3dBodyDlg->InitDialog(m_pBody);
+	glbDlg.m_bEnableName = false;
+	glbDlg.InitDialog(m_pBody);
 
-	if(pGL3dBodyDlg->exec() == QDialog::Accepted)
+	if(glbDlg.exec() == QDialog::Accepted)
 	{
 		if(bUsed)
 		{
@@ -315,10 +314,10 @@ void ManageBodiesDlg::OnNameList(QListWidgetItem *pItem)
 void ManageBodiesDlg::OnNew()
 {
 	QMiarex * pMiarex = (QMiarex*)s_pMiarex;
-	GL3dBodyDlg *pGL3dBodyDlg = (GL3dBodyDlg*)m_pGL3dBodyDlg;
+	GL3dBodyDlg glbDlg((MainFrame*)s_pMainFrame);
 	Body *pBody = new Body;
-	pGL3dBodyDlg->SetBody(pBody);
-	if(pGL3dBodyDlg->exec() == QDialog::Accepted)
+	glbDlg.SetBody(pBody);
+	if(glbDlg.exec() == QDialog::Accepted)
 	{
 		pMiarex->AddBody(pBody);
 		MainFrame::SetSaveState(false);

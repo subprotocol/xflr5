@@ -24,6 +24,7 @@
 #ifndef DISPLAYSETTINGSDLG_H
 #define DISPLAYSETTINGSDLG_H
 
+#include <QDir>
 #include <QDialog>
 #include <QPushButton>
 #include <QCheckBox>
@@ -76,6 +77,7 @@ private:
 	static bool s_bStyleSheets;
 	static QString s_StyleName, s_StyleSheetName;
 
+	QDir m_StyleSheetDir;
 };
 
 

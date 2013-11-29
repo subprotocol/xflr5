@@ -613,6 +613,7 @@ void QXDirect::SetControls()
 	pMainFrame->exportCurOpp->setEnabled(m_pCurOpp);
 }
 
+
 /**
 * Connects signals and slots
 */
@@ -1959,6 +1960,8 @@ void QXDirect::OnAnalyze()
 
 	ReadParams();
 
+	m_pctrlAnalyze->setEnabled(false);
+
 	bool bHigh = m_bHighlightOpp;
 	m_bHighlightOpp = false;
 
@@ -1979,6 +1982,8 @@ void QXDirect::OnAnalyze()
 	m_pXFoilAnalysisDlg->hide();
 	m_pXFoilAnalysisDlg->move(m_pXFoilAnalysisDlg->x(), m_pXFoilAnalysisDlg->y());
 // and update window
+
+	m_pctrlAnalyze->setEnabled(true);
 
 	m_bInitBL = !m_pXFoil->lblini;
 	m_pctrlInitBL->setChecked(m_bInitBL);;
@@ -2008,6 +2013,8 @@ void QXDirect::OnBatchAnalysis()
 	m_bPolarView = true;
 	OnPolars();
 	UpdateView();
+
+	m_pctrlAnalyze->setEnabled(false);
 
 	m_pBDlg->m_pFoil     = MainFrame::s_pCurFoil;
 	m_pBDlg->m_Mach      = 0.0;
@@ -2063,6 +2070,8 @@ void QXDirect::OnBatchAnalysis()
 
 	m_pCurOpp = NULL;
 
+	m_pctrlAnalyze->setEnabled(true);
+
 	SetControls();
 	UpdateView();
 }
@@ -2087,6 +2096,8 @@ void QXDirect::OnMultiThreadedBatchAnalysis()
 	m_bPolarView = true;
 	OnPolars();
 	UpdateView();
+
+	m_pctrlAnalyze->setEnabled(false);
 
 	BatchThreadDlg *m_pBatchThreadDlg   = new BatchThreadDlg(pMainFrame);
 
@@ -2141,6 +2152,7 @@ void QXDirect::OnMultiThreadedBatchAnalysis()
 
 	m_pCurOpp = NULL;
 
+	m_pctrlAnalyze->setEnabled(true);
 	SetControls();
 	UpdateView();
 }
@@ -5811,7 +5823,8 @@ void QXDirect::PaintPolarLegend(QPoint place, int bottom, QPainter &painter)
 
 	painter.setFont(MainFrame::s_TextFont);
 
-	QFontMetrics fm(MainFrame::s_TextFont);
+	QFont fnt(MainFrame::s_TextFont); //two step to shut valgrind up
+	QFontMetrics fm(fnt);
 	legendHeight = fm.height()+1;
 
 	QPen TextPen(MainFrame::s_TextColor);

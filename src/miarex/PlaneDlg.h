@@ -84,7 +84,6 @@ private:
 	static void * s_pMiarex;     /**< A pointer to the QMiarex widget */
 	static void * s_pMainFrame;  /**< A pointer to the mainframe window*/
 
-	Wing m_SaveWing;  /**< a local CWing object used to back-up the wing currently being edited */
 
 	Plane * m_pPlane; /**< A pointer to the plane which is currently edited in this dialog window */
 	bool m_bChanged;   /**< Set to true whenever the data in the window has been changed */

@@ -234,22 +234,32 @@ TRANSLATIONS = translations/xflr5v6.ts \
 
 RESOURCES += xflr5.qrc
 
-win32 { 
+win32 {
+ 
     TARGET = XFLR5
     RC_FILE = win/xflr5.rc
+#win32 compiler
+QMAKE_LFLAGS_WINDOWS += -Wl,--large-address-aware
 }
 
 unix { 
     TARGET = xflr5
     
-    # VARIABLES
-    isEmpty(PREFIX):PREFIX = /usr
-    BINDIR = $$PREFIX/bin
-    DATADIR = $$PREFIX/share
-    
-    # MAKE INSTALL
-    INSTALLS += target
-    target.path = $$BINDIR
+#	release: DESTDIR = ../build/release
+#	debug:   DESTDIR = ../build/debug
+
+#	OBJECTS_DIR = $$DESTDIR/.o
+#	MOC_DIR = $$DESTDIR/.moc
+#	RCC_DIR = $$DESTDIR/.rcc
+
+	# VARIABLES
+	isEmpty(PREFIX):PREFIX = /usr
+	BINDIR = $$PREFIX/bin
+	DATADIR = $$PREFIX/share
+
+	# MAKE INSTALL
+	INSTALLS += target
+	target.path = $$BINDIR
 }
 
 macx { 
@@ -282,8 +292,6 @@ OTHER_FILES += doc/ReleaseNotes.txt \
     qss/default.qss
 
 
-#win32 compiler
-QMAKE_LFLAGS_WINDOWS += -Wl,--large-address-aware
 
 
 #MAKE_LFLAGS_WINDOWS += Wl, -heap,500000000

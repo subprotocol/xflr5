@@ -20,6 +20,7 @@
 *****************************************************************************/
 
 #include "TranslatorDlg.h"
+#include "../mainframe.h"
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QStringList>
@@ -28,6 +29,8 @@
 #include <QDir>
 #include <QMessageBox>
 #include <QTranslator>
+
+
 
 TranslatorDlg::TranslatorDlg(QWidget *pParent): QDialog(pParent)
 {
@@ -44,12 +47,12 @@ void TranslatorDlg::OnOK()
 	QListWidgetItem *pItem =  m_pctrlLanguageList->currentItem();
 	if(pItem)
 	{
-		if(pItem->text()=="English") m_LanguageFilePath = "";
-		else m_LanguageFilePath = qmFileForLanguage[pItem->text()];
+		if(pItem->text()=="English") MainFrame::s_LanguageFilePath = "";
+		else                         MainFrame::s_LanguageFilePath = qmFileForLanguage[pItem->text()];
 	}
 	else
 	{
-		m_LanguageFilePath = "";
+		MainFrame::s_LanguageFilePath = "";
 	}
 	QMessageBox::warning(this, tr("Warning"), tr("The change will take effect at the next session"));
 
@@ -66,24 +69,28 @@ void TranslatorDlg::SetupLayout()
 	connect(m_pctrlLanguageList, SIGNAL(itemDoubleClicked(QListWidgetItem *)), this, SLOT(OnOK()));
 
 	QHBoxLayout *CommandButtons = new QHBoxLayout;
-	QPushButton *OKButton = new QPushButton(tr("OK"));
-	QPushButton *CancelButton = new QPushButton(tr("Cancel"));
-	OKButton->setAutoDefault(true);
-	CommandButtons->addStretch(1);
-	CommandButtons->addWidget(OKButton);
-	CommandButtons->addStretch(1);
-	CommandButtons->addWidget(CancelButton);
-	CommandButtons->addStretch(1);
-	connect(OKButton, SIGNAL(clicked()),this, SLOT(OnOK()));
-	connect(CancelButton, SIGNAL(clicked()),this, SLOT(reject()));
+	{
+		QPushButton *OKButton = new QPushButton(tr("OK"));
+		QPushButton *CancelButton = new QPushButton(tr("Cancel"));
+		OKButton->setAutoDefault(true);
+		CommandButtons->addStretch(1);
+		CommandButtons->addWidget(OKButton);
+		CommandButtons->addStretch(1);
+		CommandButtons->addWidget(CancelButton);
+		CommandButtons->addStretch(1);
+		connect(OKButton, SIGNAL(clicked()),this, SLOT(OnOK()));
+		connect(CancelButton, SIGNAL(clicked()),this, SLOT(reject()));
+	}
 
 	QVBoxLayout *MainLayout = new QVBoxLayout;
-	MainLayout->addWidget(lab);
-	MainLayout->addStretch(1);
-	MainLayout->addWidget(m_pctrlLanguageList);
-	MainLayout->addStretch(1);
-	MainLayout->addLayout(CommandButtons);
-	MainLayout->addStretch(1);
+	{
+		MainLayout->addWidget(lab);
+		MainLayout->addStretch(1);
+		MainLayout->addWidget(m_pctrlLanguageList);
+		MainLayout->addStretch(1);
+		MainLayout->addLayout(CommandButtons);
+		MainLayout->addStretch(1);
+	}
 
 	setLayout(MainLayout);
 }
@@ -106,7 +113,7 @@ void TranslatorDlg::InitDialog()
 	m_pctrlLanguageList->setCurrentRow(0);
 	for (int i=0; i<qmFiles.count(); ++i)
 	{
-		if(qmFiles[i]==m_LanguageFilePath)
+		if(qmFiles[i]==MainFrame::s_LanguageFilePath)
 		{
 			m_pctrlLanguageList->setCurrentRow(i+1);
 			break;
@@ -117,19 +124,17 @@ void TranslatorDlg::InitDialog()
 
 QStringList TranslatorDlg::findQmFiles()
 {
-	QDir dir(m_TranslationDirPath);
-	if(!dir.exists())
+	if(!MainFrame::s_TranslationDir.exists())
 	{
-		QMessageBox::warning(this, tr("Warning"), tr("The directory ")+dir.path()+tr(" does not exist"));
+		QMessageBox::warning(this, tr("Warning"), tr("The directory ")+MainFrame::s_TranslationDir.path()+tr(" does not exist"));
 	}
 
-	QStringList fileNames = dir.entryList(QStringList("*.qm"), QDir::Files,
-										  QDir::Name);
+	QStringList fileNames = MainFrame::s_TranslationDir.entryList(QStringList("*.qm"), QDir::Files, QDir::Name);
 	QMutableStringListIterator i(fileNames);
 	while (i.hasNext())
 	{
 		i.next();
-		i.setValue(dir.filePath(i.value()));
+		i.setValue(MainFrame::s_TranslationDir.filePath(i.value()));
 	}
 
 	return fileNames;

@@ -64,8 +64,6 @@ private:
 	static void *s_pMainFrame;
 	static void *s_pMiarex;
 
-	void *m_pGL3dBodyDlg;
-
 	QList <void*> *m_poaBody;
 	QList <void*> *m_poaPlane;
 

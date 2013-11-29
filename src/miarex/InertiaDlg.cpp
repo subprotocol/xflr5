@@ -49,7 +49,7 @@ InertiaDlg::InertiaDlg(QWidget *pParent) : QDialog(pParent)
 
 	m_VolumeMass = 0.0;
 
-	m_PointMass.clear();
+	ClearPointMasses();
 
 	m_bChanged = false;
 
@@ -62,6 +62,23 @@ InertiaDlg::InertiaDlg(QWidget *pParent) : QDialog(pParent)
 
 
 	SetupLayout();
+}
+
+
+InertiaDlg::~InertiaDlg()
+{
+	ClearPointMasses();
+	delete m_pMassModel;
+}
+
+/** Destroys the PointMass objects in good order to avoid memory leaks */
+void InertiaDlg::ClearPointMasses()
+{
+	for(int ipm=m_PointMass.size()-1; ipm>=0; ipm--)
+	{
+		delete m_PointMass.at(ipm);
+		m_PointMass.removeAt(ipm);
+	}
 }
 
 
@@ -323,7 +340,7 @@ void InertiaDlg::InitDialog()
 	int rc = m_pMassModel->rowCount();
 	m_pMassModel->removeRows(0, rc);
 
-	m_PointMass.clear();
+	ClearPointMasses();
 
 	if(m_pWing)
 	{
@@ -682,7 +699,7 @@ void InertiaDlg::OnOK()
 	if(m_pWing)
 	{
 		m_pWing->m_VolumeMass = m_VolumeMass;
-		m_pWing->m_PointMass.clear();
+		m_pWing->ClearPointMasses();
 
 		for(i=0; i<m_PointMass.size(); i++)
 		{
@@ -695,7 +712,7 @@ void InertiaDlg::OnOK()
 	else if(m_pBody)
 	{
 		m_pBody->m_VolumeMass = m_VolumeMass;
-		m_pBody->m_PointMass.clear();
+		m_pBody->ClearPointMasses();
 
 		for(i=0; i< m_PointMass.size(); i++)
 		{
@@ -707,7 +724,7 @@ void InertiaDlg::OnOK()
 	}
 	else if(m_pPlane)
 	{
-		m_pPlane->m_PointMass.clear();
+		m_pPlane->ClearPointMasses();
 
 		for(i=0; i<m_PointMass.size(); i++)
 		{
@@ -732,7 +749,7 @@ void InertiaDlg::ReadData()
 	int i;
 	QString tag;
 
-	m_PointMass.clear();
+	ClearPointMasses();
 
 	for (i=0; i<m_pMassModel->rowCount(); i++)
 	{

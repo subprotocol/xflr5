@@ -26,6 +26,7 @@
 #include <QDialog>
 #include <QCheckBox>
 #include <QLabel>
+#include <QSettings>
 #include "../misc/DoubleEdit.h"
 #include "../misc/LineBtn.h"
 
@@ -39,6 +40,8 @@ class BodyGridDlg : public QDialog
 
 public:
     BodyGridDlg(QWidget *pParent);
+	static void LoadSettings (QSettings *pSettings);
+	static void SaveSettings (QSettings *pSettings);
 
 private slots:
 	void OnOK();
@@ -64,25 +67,25 @@ private:
     DoubleEdit *m_pctrlUnit, *m_pctrlMinUnit, *m_pctrlUnit2, *m_pctrlMinUnit2;
 	QLabel *m_pctrlLength1, *m_pctrlLength2, *m_pctrlLength3, *m_pctrlLength4;
 
-	bool m_bScale;
+	static bool s_bScale;
 
-	bool m_bGrid;
-	int m_Style, m_Width;
-	QColor m_Color;
-	double m_Unit;
-	bool m_bMinGrid;
-	int m_MinStyle, m_MinWidth;
-	QColor m_MinColor;
-	double m_MinorUnit;
+	static bool s_bGrid;
+	static int s_Style, s_Width;
+	static QColor s_Color;
+	static double s_Unit;
+	static bool s_bMinGrid;
+	static int s_MinStyle, s_MinWidth;
+	static QColor s_MinColor;
+	static double s_MinorUnit;
 
-	bool m_bGrid2;
-	int m_Style2, m_Width2;
-	QColor m_Color2;
-	double m_Unit2;
-	bool m_bMinGrid2;
-	int m_MinStyle2, m_MinWidth2;
-	QColor m_MinColor2;
-	double m_MinorUnit2;
+	static bool s_bGrid2;
+	static int s_Style2, s_Width2;
+	static QColor s_Color2;
+	static double s_Unit2;
+	static bool s_bMinGrid2;
+	static int s_MinStyle2, s_MinWidth2;
+	static QColor s_MinColor2;
+	static double s_MinorUnit2;
 };
 
 #endif // BODYGRIDDLG_H

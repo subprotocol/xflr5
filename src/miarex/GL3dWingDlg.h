@@ -57,7 +57,7 @@ class GL3dWingDlg: public QDialog
 
 public:
     GL3dWingDlg(QWidget *pParent);
-
+	~GL3dWingDlg();
 
 private slots:
 	void OnAxes();
@@ -141,7 +141,6 @@ private:
 
 private:
 	static void *s_pMiarex;
-	static void *s_pGLLightDlg;
 	static QList <void*> *s_poaFoil;
 	static QList <void*> *s_poaWing;
 	static QPoint s_WindowPos;

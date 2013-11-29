@@ -48,6 +48,7 @@ class NURBSSurface
 
 public:
 	NURBSSurface(int iAxis=0);
+	~NURBSSurface();
 
 	Frame *AppendFrame();
 	void   ClearFrames();

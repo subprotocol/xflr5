@@ -50,8 +50,6 @@ private:
 	QListWidget *m_pctrlLanguageList;
 	QMap<QString, QString> qmFileForLanguage;
 
-	QString m_LanguageFilePath;
-	QString m_TranslationDirPath;
 };
 
 #endif // TRANSLATORDLG_H

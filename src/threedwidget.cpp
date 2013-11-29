@@ -666,7 +666,7 @@ void ThreeDWidget::NormalVector(GLdouble p1[3], GLdouble p2[3],  GLdouble p3[3],
 *@param Offset_y
 *@param LightFactor a global factor for all light intensities.
 */
-void ThreeDWidget::GLSetupLight(GLLightDlg *pglLightParams, double Offset_y, double LightFactor)
+void ThreeDWidget::GLSetupLight(double Offset_y, double LightFactor)
 {
 	glEnable(GL_LIGHTING);
 	glEnable(GL_LIGHT0);    // the ambient light
@@ -686,26 +686,26 @@ void ThreeDWidget::GLSetupLight(GLLightDlg *pglLightParams, double Offset_y, dou
 	if(LightFactor>1.0) LightFactor = 1.0f;
 
 	// the ambient light conditions.
-	fLightAmbient0[0] = LightFactor*pglLightParams->s_Ambient * pglLightParams->s_Red; // red component
-	fLightAmbient0[1] = LightFactor*pglLightParams->s_Ambient * pglLightParams->s_Green; // green component
-	fLightAmbient0[2] = LightFactor*pglLightParams->s_Ambient * pglLightParams->s_Blue; // blue component
+	fLightAmbient0[0] = LightFactor*GLLightDlg::s_Ambient * GLLightDlg::s_Red; // red component
+	fLightAmbient0[1] = LightFactor*GLLightDlg::s_Ambient * GLLightDlg::s_Green; // green component
+	fLightAmbient0[2] = LightFactor*GLLightDlg::s_Ambient * GLLightDlg::s_Blue; // blue component
 	fLightAmbient0[3] = 1.0; // alpha
 
-	fLightDiffuse0[0] = LightFactor*pglLightParams->s_Diffuse * pglLightParams->s_Red; // red component
-	fLightDiffuse0[1] = LightFactor*pglLightParams->s_Diffuse * pglLightParams->s_Green; // green component
-	fLightDiffuse0[2] = LightFactor*pglLightParams->s_Diffuse * pglLightParams->s_Blue; // blue component
+	fLightDiffuse0[0] = LightFactor*GLLightDlg::s_Diffuse * GLLightDlg::s_Red; // red component
+	fLightDiffuse0[1] = LightFactor*GLLightDlg::s_Diffuse * GLLightDlg::s_Green; // green component
+	fLightDiffuse0[2] = LightFactor*GLLightDlg::s_Diffuse * GLLightDlg::s_Blue; // blue component
 	fLightDiffuse0[3] = 1.0; // alpha
 
-	fLightSpecular0[0] = LightFactor*pglLightParams->s_Specular * pglLightParams->s_Red; // red component
-	fLightSpecular0[1] = LightFactor*pglLightParams->s_Specular * pglLightParams->s_Green; // green component
-	fLightSpecular0[2] = LightFactor*pglLightParams->s_Specular * pglLightParams->s_Blue; // blue component
+	fLightSpecular0[0] = LightFactor*GLLightDlg::s_Specular * GLLightDlg::s_Red; // red component
+	fLightSpecular0[1] = LightFactor*GLLightDlg::s_Specular * GLLightDlg::s_Green; // green component
+	fLightSpecular0[2] = LightFactor*GLLightDlg::s_Specular * GLLightDlg::s_Blue; // blue component
 	fLightSpecular0[3] = 1.0; // alpha
 
 	// And finally, its position
 
-	fLightPosition0[0] = (GLfloat)((pglLightParams->s_XLight));
-	fLightPosition0[1] = (GLfloat)((pglLightParams->s_YLight + Offset_y));
-	fLightPosition0[2] = (GLfloat)((pglLightParams->s_ZLight));
+	fLightPosition0[0] = (GLfloat)((GLLightDlg::s_XLight));
+	fLightPosition0[1] = (GLfloat)((GLLightDlg::s_YLight + Offset_y));
+	fLightPosition0[2] = (GLfloat)((GLLightDlg::s_ZLight));
 	fLightPosition0[3] = 1.0; // W (positional light)
 
 
@@ -716,12 +716,12 @@ void ThreeDWidget::GLSetupLight(GLLightDlg *pglLightParams, double Offset_y, dou
 	glLightfv(GL_LIGHT0, GL_POSITION, fLightPosition0);
 
 
-	float fMatAmbient[4]   = {pglLightParams->s_MatAmbient,  pglLightParams->s_MatAmbient,   pglLightParams->s_MatAmbient,  1.0f};
-	float fMatSpecular[4]  = {pglLightParams->s_MatSpecular, pglLightParams->s_MatSpecular,  pglLightParams->s_MatSpecular, 1.0f};
-	float fMatDiffuse[4]   = {pglLightParams->s_MatDiffuse,  pglLightParams->s_MatDiffuse,   pglLightParams->s_MatDiffuse,  1.0f};
-	float fMatEmission[4]  = {pglLightParams->s_MatEmission, pglLightParams->s_MatEmission,  pglLightParams->s_MatEmission, 1.0f};
+	float fMatAmbient[4]   = {GLLightDlg::s_MatAmbient,  GLLightDlg::s_MatAmbient,   GLLightDlg::s_MatAmbient,  1.0f};
+	float fMatSpecular[4]  = {GLLightDlg::s_MatSpecular, GLLightDlg::s_MatSpecular,  GLLightDlg::s_MatSpecular, 1.0f};
+	float fMatDiffuse[4]   = {GLLightDlg::s_MatDiffuse,  GLLightDlg::s_MatDiffuse,   GLLightDlg::s_MatDiffuse,  1.0f};
+	float fMatEmission[4]  = {GLLightDlg::s_MatEmission, GLLightDlg::s_MatEmission,  GLLightDlg::s_MatEmission, 1.0f};
 
-	if(pglLightParams->s_bColorMaterial)
+	if(GLLightDlg::s_bColorMaterial)
 	{
 		glEnable(GL_COLOR_MATERIAL);
 		glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
@@ -739,14 +739,14 @@ void ThreeDWidget::GLSetupLight(GLLightDlg *pglLightParams, double Offset_y, dou
 	glMaterialfv(GL_FRONT, GL_AMBIENT,   fMatAmbient);
 	glMaterialfv(GL_FRONT, GL_DIFFUSE,   fMatDiffuse);
 	glMaterialfv(GL_FRONT, GL_EMISSION,  fMatEmission);
-	glMateriali( GL_FRONT, GL_SHININESS, pglLightParams->s_iMatShininess);
+	glMateriali( GL_FRONT, GL_SHININESS, GLLightDlg::s_iMatShininess);
 
-	if(pglLightParams->s_bDepthTest)  glEnable(GL_DEPTH_TEST);     else glDisable(GL_DEPTH_TEST);
-	if(pglLightParams->s_bCullFaces)  glEnable(GL_CULL_FACE);      else glDisable(GL_CULL_FACE);
-	if(pglLightParams->s_bSmooth)     glEnable(GL_POLYGON_SMOOTH); else glDisable(GL_POLYGON_SMOOTH);
-	if(pglLightParams->s_bShade)      glShadeModel(GL_SMOOTH);     else glShadeModel(GL_FLAT);
+	if(GLLightDlg::s_bDepthTest)  glEnable(GL_DEPTH_TEST);     else glDisable(GL_DEPTH_TEST);
+	if(GLLightDlg::s_bCullFaces)  glEnable(GL_CULL_FACE);      else glDisable(GL_CULL_FACE);
+	if(GLLightDlg::s_bSmooth)     glEnable(GL_POLYGON_SMOOTH); else glDisable(GL_POLYGON_SMOOTH);
+	if(GLLightDlg::s_bShade)      glShadeModel(GL_SMOOTH);     else glShadeModel(GL_FLAT);
 
-	if(pglLightParams->s_bLocalView) glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER ,0);
+	if(GLLightDlg::s_bLocalView) glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER ,0);
 	else                           glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER ,1);
 
 	glLightModeli(GL_LIGHT_MODEL_TWO_SIDE,0);

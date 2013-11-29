@@ -153,8 +153,8 @@ private:
 	void UpdateView();
 
 	bool InitDialog(Body *pBody);
-	bool LoadSettings(QSettings *pSettings);
-	bool SaveSettings(QSettings *pSettings);
+	static bool LoadSettings(QSettings *pSettings);
+	static bool SaveSettings(QSettings *pSettings);
 
 	void ResizeTables();
 
@@ -170,7 +170,6 @@ private:
 
 private:
 	static void *s_pMainFrame;
-	static void *s_pGLLightDlg;
 	ThreeDWidget m_3dWidget;
 
 	static QPoint s_WindowPos;

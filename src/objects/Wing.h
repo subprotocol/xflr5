@@ -130,6 +130,10 @@ public:
 	void RemoveWingSection(int const iSection);
 	
 
+	void ClearWingSections();
+	void ClearPointMasses();
+
+
 	//access methods
 	int NWingSection() {return m_WingSection.count();}
 	int &NXPanels(const int &iSection);

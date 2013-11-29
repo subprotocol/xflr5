@@ -32,6 +32,8 @@
 #include "../mainframe.h" 
 #include "Miarex.h"
 #include "PlaneDlg.h"
+#include "GL3dWingDlg.h"
+#include "GL3dBodyDlg.h"
 #include "ImportWingDlg.h"
 #include "InertiaDlg.h"
 
@@ -280,59 +282,59 @@ void PlaneDlg::OnDescriptionChanged()
 
 void PlaneDlg::OnDefineWing()
 {
-	QMiarex *pMiarex= (QMiarex*)s_pMiarex;
-	m_SaveWing.Duplicate(m_pPlane->wing());
+	Wing *pSaveWing = new Wing();
+	pSaveWing->Duplicate(m_pPlane->wing());
 
-	GL3dWingDlg *pWingDlg = (GL3dWingDlg*)pMiarex->m_pWingDlg;
+	GL3dWingDlg wingDlg((MainFrame*)s_pMainFrame);
 
-	pWingDlg->m_bAcceptName = false;
-	pWingDlg->InitDialog(m_pPlane->wing());
+	wingDlg.m_bAcceptName = false;
+	wingDlg.InitDialog(m_pPlane->wing());
 
-	if(pWingDlg->exec() ==QDialog::Accepted)
+	if(wingDlg.exec() ==QDialog::Accepted)
 	{
 		SetResults();
 		m_bChanged = true;
 	}
-	else   m_pPlane->wing()->Duplicate(&m_SaveWing);
+	else   m_pPlane->wing()->Duplicate(pSaveWing);
 	m_pPlane->wing()->CreateSurfaces(m_pPlane->m_WingLE[0], 0.0, m_pPlane->m_WingTiltAngle[0]);//necessary for eventual inertia calculations
 }
 
 
 void PlaneDlg::OnDefineFin() 
 {
-	QMiarex *pMiarex= (QMiarex*)s_pMiarex;
-	m_SaveWing.Duplicate(m_pPlane->fin());
+	Wing *pSaveWing = new Wing();
+	pSaveWing->Duplicate(m_pPlane->fin());
 
-	GL3dWingDlg *pWingDlg = (GL3dWingDlg*)pMiarex->m_pWingDlg;
-	pWingDlg->m_bAcceptName = false;
-	pWingDlg->InitDialog(m_pPlane->fin());
+	GL3dWingDlg wingDlg((MainFrame*)s_pMainFrame);
+	wingDlg.m_bAcceptName = false;
+	wingDlg.InitDialog(m_pPlane->fin());
 
 
-	if(pWingDlg->exec() ==QDialog::Accepted)
+	if(wingDlg.exec() ==QDialog::Accepted)
 	{
 		SetResults();	
 		m_bChanged = true;
 	}
-	else   m_pPlane->fin()->Duplicate(&m_SaveWing);
+	else   m_pPlane->fin()->Duplicate(pSaveWing);
 	m_pPlane->fin()->CreateSurfaces(m_pPlane->m_WingLE[3], -90.0, m_pPlane->m_WingTiltAngle[3]);//necessary for eventual inertia calculations
 }
 
 
 void PlaneDlg::OnDefineStab() 
 {
-	QMiarex *pMiarex= (QMiarex*)s_pMiarex;
-	m_SaveWing.Duplicate(m_pPlane->stab());
+	Wing *pSaveWing = new Wing();
+	pSaveWing->Duplicate(m_pPlane->stab());
 
-	GL3dWingDlg *pWingDlg = (GL3dWingDlg*)pMiarex->m_pWingDlg;
-	pWingDlg->m_bAcceptName = false;
-	pWingDlg->InitDialog(m_pPlane->stab());
+	GL3dWingDlg wingDlg((MainFrame*)s_pMainFrame);
+	wingDlg.m_bAcceptName = false;
+	wingDlg.InitDialog(m_pPlane->stab());
 
-	if(pWingDlg->exec() == QDialog::Accepted)
+	if(wingDlg.exec() == QDialog::Accepted)
 	{
 		SetResults();	
 		m_bChanged = true;
 	}
-	else  m_pPlane->stab()->Duplicate(&m_SaveWing);
+	else  m_pPlane->stab()->Duplicate(pSaveWing);
 	m_pPlane->stab()->CreateSurfaces(m_pPlane->m_WingLE[2], 0.0, m_pPlane->m_WingTiltAngle[2]);//necessary for eventual inertia calculations
 }
 
@@ -340,19 +342,19 @@ void PlaneDlg::OnDefineStab()
 
 void PlaneDlg::OnDefineWing2()
 {
-	QMiarex *pMiarex= (QMiarex*)s_pMiarex;
-	m_SaveWing.Duplicate(m_pPlane->wing2());
+	Wing *pSaveWing = new Wing();
+	pSaveWing->Duplicate(m_pPlane->wing2());
 
-	GL3dWingDlg *pWingDlg = (GL3dWingDlg*)pMiarex->m_pWingDlg;
-	pWingDlg->m_bAcceptName = false;
-	pWingDlg->InitDialog(m_pPlane->wing2());
+	GL3dWingDlg wingDlg((MainFrame*)s_pMainFrame);
+	wingDlg.m_bAcceptName = false;
+	wingDlg.InitDialog(m_pPlane->wing2());
 
-	if(pWingDlg->exec() ==QDialog::Accepted)
+	if(wingDlg.exec() ==QDialog::Accepted)
 	{
 		SetResults();
 		m_bChanged = true;
 	}
-	else   m_pPlane->wing2()->Duplicate(&m_SaveWing);
+	else   m_pPlane->wing2()->Duplicate(pSaveWing);
 	m_pPlane->wing2()->CreateSurfaces(m_pPlane->m_WingLE[1], 0.0, m_pPlane->m_WingTiltAngle[1]);//necessary for eventual inertia calculations
 }
 
@@ -383,11 +385,13 @@ void PlaneDlg::OnEditBody()
 
 	Body memBody;
 	memBody.Duplicate(m_pPlane->m_pBody);
-	pMiarex->m_pGL3dBody->m_bEnableName = false;
-	pMiarex->m_pGL3dBody->InitDialog(m_pPlane->m_pBody);
-	pMiarex->m_pGL3dBody->setWindowState(Qt::WindowMaximized);
 
-	if(pMiarex->m_pGL3dBody->exec() == QDialog::Accepted)
+	GL3dBodyDlg glbDlg((MainFrame*)s_pMainFrame);
+	glbDlg.m_bEnableName = false;
+	glbDlg.InitDialog(m_pPlane->m_pBody);
+	glbDlg.setWindowState(Qt::WindowMaximized);
+
+	if(glbDlg.exec() == QDialog::Accepted)
 	{
 		pMiarex->m_bResetglBody = true;
 		pMiarex->m_bResetglBodyMesh = true;
@@ -530,7 +534,7 @@ void PlaneDlg::OnInertia()
 	else
 	{
 		//restore everything
-		m_pPlane->m_PointMass.clear();
+		m_pPlane->ClearPointMasses();
 		for(int im=0; im<memPtMass.size(); im++)
 		{
 			m_pPlane->m_PointMass.append(new PointMass(memPtMass[im]));

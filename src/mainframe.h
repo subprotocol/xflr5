@@ -28,6 +28,7 @@
 #define MAINFRAME_H
 
 #include <QWidget>
+#include <QDir>
 #include <QStringList>
 #include <QStackedWidget>
 #include <QComboBox>
@@ -94,10 +95,12 @@ class MainFrame : public QMainWindow
 	friend class WAdvancedDlg;
 	friend class GraphDlg;
 	friend class LLTAnalysisDlg;
-	friend class DisplaySettingsDlg;
+	friend class wySettingsDlg;
 	friend class ManageFoilsDlg;
 	friend class ManageUFOsDlg;
 	friend class InertiaDlg;
+	friend class TranslatorDlg;
+	friend class DisplaySettingsDlg;
 
 	Q_OBJECT
 
@@ -206,6 +209,7 @@ public:
 	void SetProjectName(QString PathName);
 	void SetMenus();
 	Foil* SetModFoil(Foil* pNewFoil, bool bKeepExistingFoil = false);
+	void SetupDataDir();
 	QString ShortenFileName(QString &PathName);
 	void UpdateFoils();
 	void UpdatePolars();
@@ -224,7 +228,6 @@ public:
 /*___________________________________________Variables_______________________________*/
 
 private:
-	//the dialog boxes are declared as member variables to enable translations... seems to be a Qt bug
 
 	void *m_pAFoil;     /**< A void pointer to the instance of the QAFoil application. The pointer will be cast to the QAFoil type at runtime. This is necessary to prevent loop includes of header files. */
 	void *m_pMiarex;    /**< A void pointer to the instance of the QMiarex application. The pointer will be cast to the QMiarex type at runtime. This is necessary to prevent loop includes of header files. */
@@ -385,7 +388,10 @@ private:
 	bool m_bHighlightWOpp;      /**< true if the active WingOpp should be highlighted on the polar curve. */
 
 
-	QString m_LanguageFilePath;
+	static QDir s_StylesheetDir;
+	static QDir s_TranslationDir;
+	static QString s_LanguageFilePath;
+
 	QString m_ExportLastDirName, m_ImageDirName;
 	QString m_FileName;         /**< The absolute path to the file of the current project. */
 

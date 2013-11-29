@@ -72,6 +72,7 @@ public:
 
 	CVector LeadingPoint();
 
+	void ClearPointMasses();
     void ComputeAero(double *Cp, double &XCP, double &YCP, double &ZCP,
 					 double &GCm, double &GRm, double &GYm, double &Alpha, CVector &CoG);
 	void Duplicate(Body *pBody);

@@ -77,20 +77,22 @@ void GL3DScales::SetupLayout()
 	QGroupBox *CpScaleBox = new QGroupBox(tr("Cp Scale"));
 	{
 		QGridLayout *CpScaleLayout = new QGridLayout;
-		m_pctrlAutoCpScale = new QCheckBox(tr("Auto Scales"));
-		m_pctrlLegendMin = new DoubleEdit(61.234);
-		m_pctrlLegendMax = new DoubleEdit(3.5555);
-		m_pctrlLegendMin->SetPrecision(2);
-		m_pctrlLegendMax->SetPrecision(2);
-		QLabel *lab0 = new QLabel(tr("Min"));
-		QLabel *lab1 = new QLabel(tr("Max"));
-		lab0->setAlignment(Qt::AlignVCenter |Qt::AlignRight);
-		lab1->setAlignment(Qt::AlignVCenter |Qt::AlignRight);
-		CpScaleLayout->addWidget(m_pctrlAutoCpScale,1,2);
-		CpScaleLayout->addWidget(lab1,2,1);
-		CpScaleLayout->addWidget(m_pctrlLegendMax,2,2);
-		CpScaleLayout->addWidget(lab0,3,1);
-		CpScaleLayout->addWidget(m_pctrlLegendMin,3,2);
+		{
+			m_pctrlAutoCpScale = new QCheckBox(tr("Auto Scales"));
+			m_pctrlLegendMin = new DoubleEdit(-1.0);
+			m_pctrlLegendMax = new DoubleEdit(1.0);
+			m_pctrlLegendMin->SetPrecision(2);
+			m_pctrlLegendMax->SetPrecision(2);
+			QLabel *lab0 = new QLabel(tr("Min"));
+			QLabel *lab1 = new QLabel(tr("Max"));
+			lab0->setAlignment(Qt::AlignVCenter |Qt::AlignRight);
+			lab1->setAlignment(Qt::AlignVCenter |Qt::AlignRight);
+			CpScaleLayout->addWidget(m_pctrlAutoCpScale,1,2);
+			CpScaleLayout->addWidget(lab1,2,1);
+			CpScaleLayout->addWidget(m_pctrlLegendMax,2,2);
+			CpScaleLayout->addWidget(lab0,3,1);
+			CpScaleLayout->addWidget(m_pctrlLegendMin,3,2);
+		}
 		CpScaleBox->setLayout(CpScaleLayout);
 	}
 
@@ -231,8 +233,8 @@ void GL3DScales::InitDialog()
 	m_pctrlLengthUnit3->setText(str);
 
 	m_pctrlAutoCpScale->setChecked(pMiarex->s_bAutoCpScale);
-	m_pctrlLegendMin->SetValue(pMiarex->s_LegendMin);
-	m_pctrlLegendMax->SetValue(pMiarex->s_LegendMax);
+	m_pctrlLegendMin->SetValue(QMiarex::s_LegendMin);
+	m_pctrlLegendMax->SetValue(QMiarex::s_LegendMax);
 	m_pctrlLegendMin->setEnabled(!pMiarex->s_bAutoCpScale);
 	m_pctrlLegendMax->setEnabled(!pMiarex->s_bAutoCpScale);
 

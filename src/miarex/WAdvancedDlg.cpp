@@ -114,122 +114,155 @@ void WAdvancedDlg::SetupLayout()
 	m_pctrlControlPos->setSizePolicy(szPolicyMaximum);
 
 	QGroupBox *AllBox = new QGroupBox(tr("All Analysis"));
-	QHBoxLayout *AllLayout = new QHBoxLayout;
-	AllLayout->addWidget(m_pctrlLogFile);
-	AllLayout->addWidget(m_pctrlKeepOutOpps);
-	AllBox->setLayout(AllLayout);
+	{
+		QHBoxLayout *AllLayout = new QHBoxLayout;
+		{
+			AllLayout->addWidget(m_pctrlLogFile);
+			AllLayout->addWidget(m_pctrlKeepOutOpps);
+		}
+		AllBox->setLayout(AllLayout);
+	}
 
 	QGroupBox *VLMPanelBox = new QGroupBox(tr("VLM and Panel Methods"));
-	QHBoxLayout *WingPanelLayout = new QHBoxLayout;
-	QLabel *lab5 = new QLabel(tr("Ignore wing panels with span <"));
-	lab5->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
-	WingPanelLayout->addStretch(1);
-	WingPanelLayout->addWidget(lab5);
-	WingPanelLayout->addWidget(m_pctrlMinPanelSize);
-	WingPanelLayout->addWidget(m_pctrlLength);
-	QHBoxLayout *CoreSizeLayout = new QHBoxLayout;
-	QLabel *lab10 = new QLabel(tr("Core Size"));
-	lab10->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
-	CoreSizeLayout->addStretch(1);
-	CoreSizeLayout->addWidget(lab10);
-	CoreSizeLayout->addWidget(m_pctrlCoreSize);
-	CoreSizeLayout->addWidget(m_pctrlLength2);
-	QVBoxLayout *VLMPanelLayout = new QVBoxLayout;
-	VLMPanelLayout->addLayout(WingPanelLayout);
-	VLMPanelLayout->addLayout(CoreSizeLayout);
-	VLMPanelBox->setLayout(VLMPanelLayout);
+	{
+		QVBoxLayout *VLMPanelLayout = new QVBoxLayout;
+		{
+			QHBoxLayout *WingPanelLayout = new QHBoxLayout;
+			{
+				QLabel *lab5 = new QLabel(tr("Ignore wing panels with span <"));
+				lab5->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+				WingPanelLayout->addStretch(1);
+				WingPanelLayout->addWidget(lab5);
+				WingPanelLayout->addWidget(m_pctrlMinPanelSize);
+				WingPanelLayout->addWidget(m_pctrlLength);
+			}
+			QHBoxLayout *CoreSizeLayout = new QHBoxLayout;
+			{
+				QLabel *lab10 = new QLabel(tr("Core Size"));
+				lab10->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+				CoreSizeLayout->addStretch(1);
+				CoreSizeLayout->addWidget(lab10);
+				CoreSizeLayout->addWidget(m_pctrlCoreSize);
+				CoreSizeLayout->addWidget(m_pctrlLength2);
+			}
+			VLMPanelLayout->addLayout(WingPanelLayout);
+			VLMPanelLayout->addLayout(CoreSizeLayout);
+		}
+		VLMPanelBox->setLayout(VLMPanelLayout);
+	}
 
 	QGroupBox *VLMBox = new QGroupBox(tr("VLM Method"));
-	QGridLayout *VLMLayout = new QGridLayout;
-	QLabel *lab6 = new QLabel(tr("Vortex Position"));
-	QLabel *lab7 = new QLabel(tr("Control Point Position"));
-	QLabel *lab8 = new QLabel("%");
-	QLabel *lab9 = new QLabel("%");
-	QVBoxLayout *VLMMethodLayout = new QVBoxLayout;
-	VLMMethodLayout->addWidget(m_pctrlVLM1);
-	VLMMethodLayout->addWidget(m_pctrlVLM2);
-	lab6->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
-	lab7->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
-	lab8->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
-	lab9->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
-	VLMLayout->addWidget(lab6,1,1);
-	VLMLayout->addWidget(lab7,2,1);
-	VLMLayout->addWidget(m_pctrlVortexPos,1,2);
-	VLMLayout->addWidget(m_pctrlControlPos,2,2);
-	VLMLayout->addWidget(lab8,1,3);
-	VLMLayout->addWidget(lab9,2,3);
-	VLMLayout->addLayout(VLMMethodLayout,4,1,1,2, Qt::AlignLeft);
-	VLMBox->setLayout(VLMLayout);
+	{
+		QGridLayout *VLMLayout = new QGridLayout;
+		{
+			QLabel *lab6 = new QLabel(tr("Vortex Position"));
+			QLabel *lab7 = new QLabel(tr("Control Point Position"));
+			QLabel *lab8 = new QLabel("%");
+			QLabel *lab9 = new QLabel("%");
+			lab6->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+			lab7->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+			lab8->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+			lab9->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+			VLMLayout->addWidget(lab6,1,1);
+			VLMLayout->addWidget(lab7,2,1);
+			VLMLayout->addWidget(m_pctrlVortexPos,1,2);
+			VLMLayout->addWidget(m_pctrlControlPos,2,2);
+			VLMLayout->addWidget(lab8,1,3);
+			VLMLayout->addWidget(lab9,2,3);
+			QVBoxLayout *VLMMethodLayout = new QVBoxLayout;
+			{
+				VLMMethodLayout->addWidget(m_pctrlVLM1);
+				VLMMethodLayout->addWidget(m_pctrlVLM2);
+			}
+			VLMLayout->addLayout(VLMMethodLayout,4,1,1,2, Qt::AlignLeft);
+		}
+		VLMBox->setLayout(VLMLayout);
+	}
 
 	QGroupBox *LLTBox = new QGroupBox(tr("Lifting Line Method"));
-	QGridLayout *LLTLayout = new QGridLayout;
-	QLabel *lab1 = new QLabel(tr("Relax. factor"));
-	QLabel *lab2 = new QLabel(tr("Alpha Precision"));
-	QLabel *lab3 = new QLabel(tr("Max. Iterations"));
-	QLabel *lab4 = new QLabel(tr("Number of spanwise stations"));
-	lab1->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
-	lab2->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
-	lab3->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
-	lab4->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
-	LLTLayout->addWidget(lab1,1,1);
-	LLTLayout->addWidget(lab2,2,1);
-	LLTLayout->addWidget(lab3,3,1);
-	LLTLayout->addWidget(lab4,4,1);
-	LLTLayout->addWidget(m_pctrlRelax,1,2);
-	LLTLayout->addWidget(m_pctrlAlphaPrec,2,2);
-	LLTLayout->addWidget(m_pctrlIterMax,3,2);
-	LLTLayout->addWidget(m_pctrlNStation,4,2);
-	LLTBox->setLayout(LLTLayout);
+	{
+		QGridLayout *LLTLayout = new QGridLayout;
+		{
+			QLabel *lab1 = new QLabel(tr("Relax. factor"));
+			QLabel *lab2 = new QLabel(tr("Alpha Precision"));
+			QLabel *lab3 = new QLabel(tr("Max. Iterations"));
+			QLabel *lab4 = new QLabel(tr("Number of spanwise stations"));
+			lab1->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+			lab2->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+			lab3->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+			lab4->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+			LLTLayout->addWidget(lab1,1,1);
+			LLTLayout->addWidget(lab2,2,1);
+			LLTLayout->addWidget(lab3,3,1);
+			LLTLayout->addWidget(lab4,4,1);
+			LLTLayout->addWidget(m_pctrlRelax,1,2);
+			LLTLayout->addWidget(m_pctrlAlphaPrec,2,2);
+			LLTLayout->addWidget(m_pctrlIterMax,3,2);
+			LLTLayout->addWidget(m_pctrlNStation,4,2);
+		}
+		LLTBox->setLayout(LLTLayout);
+	}
 
 	QGroupBox *PanelBCBox = new QGroupBox(tr("3D Panel boundary conditions"));
-	QVBoxLayout *PanelBCLayout = new QVBoxLayout;
-	PanelBCLayout->addWidget(m_pctrlDirichlet);
-	PanelBCLayout->addWidget(m_pCtrlNeumann);
-	PanelBCBox->setLayout((PanelBCLayout));
+	{
+		QVBoxLayout *PanelBCLayout = new QVBoxLayout;
+		{
+			PanelBCLayout->addWidget(m_pctrlDirichlet);
+			PanelBCLayout->addWidget(m_pCtrlNeumann);
+		}
+		PanelBCBox->setLayout((PanelBCLayout));
+	}
 
 	QHBoxLayout *CommandButtons = new QHBoxLayout;
-	OKButton = new QPushButton(tr("OK"));
-	CancelButton = new QPushButton(tr("Cancel"));
-	QPushButton *ResetButton = new QPushButton(tr("Reset Defaults"));
-	CommandButtons->addStretch(1);
-	CommandButtons->addWidget(OKButton);
-	CommandButtons->addStretch(1);
-	CommandButtons->addWidget(CancelButton);
-	CommandButtons->addStretch(1);
-	CommandButtons->addWidget(ResetButton);
-	CommandButtons->addStretch(1);
-	connect(OKButton, SIGNAL(clicked()),this, SLOT(OnOK()));
-	connect(CancelButton, SIGNAL(clicked()), this, SLOT(reject()));
-	connect(ResetButton, SIGNAL(clicked()), this, SLOT(OnResetDefaults()));
+	{
+		OKButton = new QPushButton(tr("OK"));
+		CancelButton = new QPushButton(tr("Cancel"));
+		QPushButton *ResetButton = new QPushButton(tr("Reset Defaults"));
+		CommandButtons->addStretch(1);
+		CommandButtons->addWidget(OKButton);
+		CommandButtons->addStretch(1);
+		CommandButtons->addWidget(CancelButton);
+		CommandButtons->addStretch(1);
+		CommandButtons->addWidget(ResetButton);
+		CommandButtons->addStretch(1);
+		connect(OKButton, SIGNAL(clicked()),this, SLOT(OnOK()));
+		connect(CancelButton, SIGNAL(clicked()), this, SLOT(reject()));
+		connect(ResetButton, SIGNAL(clicked()), this, SLOT(OnResetDefaults()));
+	}
 
-	QVBoxLayout *LeftSide  = new QVBoxLayout;
-	QVBoxLayout *RightSide = new QVBoxLayout;
 	QHBoxLayout *BothSides = new QHBoxLayout;
-	LeftSide->addWidget(LLTBox);
-	LeftSide->addStretch(1);
-	LeftSide->addWidget(PanelBCBox);
-	LeftSide->addStretch(1);
-	RightSide->addWidget(VLMBox);
-	RightSide->addStretch(1);
-	RightSide->addWidget(VLMPanelBox);
-	RightSide->addStretch(1);
-	BothSides->addLayout(LeftSide);
-	BothSides->addLayout(RightSide);
+	{
+		QVBoxLayout *LeftSide  = new QVBoxLayout;
+		{
+			LeftSide->addWidget(LLTBox);
+			LeftSide->addStretch(1);
+			LeftSide->addWidget(PanelBCBox);
+			LeftSide->addStretch(1);
+		}
+		QVBoxLayout *RightSide = new QVBoxLayout;
+		{
+			RightSide->addWidget(VLMBox);
+			RightSide->addStretch(1);
+			RightSide->addWidget(VLMPanelBox);
+			RightSide->addStretch(1);
+		}
+		BothSides->addLayout(LeftSide);
+		BothSides->addLayout(RightSide);
+	}
 
 	QVBoxLayout *MainLayout = new QVBoxLayout;
-	MainLayout->addLayout(BothSides);
-	MainLayout->addStretch(1);
-	MainLayout->addWidget(AllBox);
-	MainLayout->addStretch(1);
-	MainLayout->addSpacing(30);
-	MainLayout->addLayout(CommandButtons);
+	{
+		MainLayout->addLayout(BothSides);
+		MainLayout->addStretch(1);
+		MainLayout->addWidget(AllBox);
+		MainLayout->addStretch(1);
+		MainLayout->addSpacing(30);
+		MainLayout->addLayout(CommandButtons);
+	}
 
 	setSizePolicy(szPolicyMaximum);
 
 	setLayout(MainLayout);
-
-//	connect(m_pctrlResetWake, SIGNAL(clicked()), SLOT(OnResetWake()));
-//	connect(m_pctrlKeepOutOpps, SIGNAL(clicked()), SLOT(OnKeepOutOpps()));
 }
 
 

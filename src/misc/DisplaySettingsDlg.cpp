@@ -31,7 +31,7 @@
 #include <QFontDialog>
 #include <QStyleFactory>
 #include <QDir>
-
+#include <QtDebug>
 
 bool DisplaySettingsDlg::s_bStyleSheets = true;
 QString DisplaySettingsDlg::s_StyleName;
@@ -46,6 +46,18 @@ DisplaySettingsDlg::DisplaySettingsDlg(QWidget *pParent) : QDialog(pParent)
 	m_bIsGraphModified = false;
 	m_bReverseZoom = false;
 	m_bAlphaChannel = true;
+
+
+#ifdef Q_WS_MAC
+	m_StyleSheetDir.setPath(qApp->applicationDirPath());
+#endif
+#ifdef Q_WS_WIN
+	m_StyleSheetDir.setPath(qApp->applicationDirPath());
+#endif
+#ifdef Q_OS_LINUX
+	m_StyleSheetDir.setPath("/usr/share/xflr5");
+#endif
+
 	SetupLayout();
 
 	connect(m_pctrlStyles, SIGNAL(activated(const QString &)),this, SLOT(OnStyleChanged(const QString &)));
@@ -79,9 +91,10 @@ void DisplaySettingsDlg::SetupLayout()
 	m_pctrlStyles->setCurrentIndex(m_pctrlStyles->findText(defaultStyle));
 
 	// add custom style sheets
-	QDir styleDir("qss");
+
 	QString fileName = "*.qss";
-	QStringList filesList = styleDir.entryList(QStringList(fileName), QDir::Files | QDir::NoSymLinks);
+	QStringList filesList = MainFrame::s_StylesheetDir.entryList(QStringList(fileName), QDir::Files | QDir::NoSymLinks);
+
 
 	for(int is=0; is<filesList.count(); is++)
 	{
@@ -201,13 +214,14 @@ void DisplaySettingsDlg::InitDialog()
 void DisplaySettingsDlg::OnStyleChanged(const QString &StyleName)
 {
 	//test for style sheet
-	QDir styleDir("qss");
+
 	QString fileName = "*.qss";
-	QStringList filesList = styleDir.entryList(QStringList(fileName), QDir::Files | QDir::NoSymLinks);
+	QStringList filesList = MainFrame::s_StylesheetDir.entryList(QStringList(fileName), QDir::Files | QDir::NoSymLinks);
 
 	for(int is=0; is<filesList.count(); is++)
 	{
 		QString styleSheetName = filesList.at(is);
+		qDebug()<<styleSheetName;
 		int len = styleSheetName.length();
 		styleSheetName = styleSheetName.left(len-4);
 		if(styleSheetName.compare(StyleName)==0)
@@ -217,8 +231,6 @@ void DisplaySettingsDlg::OnStyleChanged(const QString &StyleName)
 			s_StyleName.clear();
 			QString styleSheet;
 			MainFrame::ReadStyleSheet(styleSheetName, styleSheet);
-			qApp->setStyleSheet(styleSheet);
-			ensurePolished();
 			return;
 		}
 	}

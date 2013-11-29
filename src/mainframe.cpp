@@ -34,6 +34,7 @@
 #include "miarex/PlaneDlg.h"
 #include "miarex/StabViewDlg.h"
 #include "miarex/ManageUFOsDlg.h"
+#include "miarex/ManageBodiesDlg.h"
 #include "miarex/UFOTableDelegate.h"
 #include "miarex/NURBSDomDoc.h"
 #include "misc/AboutQ5.h"
@@ -44,6 +45,7 @@
 #include "misc/TranslatorDlg.h"
 #include "misc/RenameDlg.h"
 #include "misc/UnitsDlg.h"
+#include "misc/W3dPrefsDlg.h"
 #include "graph/GraphDlg.h"
 #include "xdirect/XDirect.h"
 #include "xdirect/BatchDlg.h"
@@ -82,6 +84,11 @@ QPointer<MainFrame> MainFrame::_self = 0L;
 QString MainFrame::s_VersionName = QString::fromLatin1("XFLR5 v6.09.06");
 QString MainFrame::s_ProjectName = "";
 QString MainFrame::s_LastDirName = "";
+QString MainFrame::s_LanguageFilePath = "";
+QDir MainFrame::s_StylesheetDir;
+QDir MainFrame::s_TranslationDir;
+
+
 Foil * MainFrame::s_pCurFoil=NULL;
 QFont MainFrame::s_TextFont;
 QColor MainFrame::s_TextColor       = QColor(220,220,220);
@@ -109,6 +116,7 @@ int MainFrame::s_MomentUnit = 0;
 QList <void *> MainFrame::m_oaFoil;
 QList <void *> MainFrame::s_oaPolar;
 QLabel *MainFrame::m_pctrlProjectName = NULL;
+
 
 
 MainFrame::MainFrame(QWidget * parent, Qt::WindowFlags flags)
@@ -203,6 +211,8 @@ MainFrame::MainFrame(QWidget * parent, Qt::WindowFlags flags)
         W3dPrefsDlg::LoadSettings(&settings);
 	}
 
+	SetupDataDir();
+
 	SetUnits(s_LengthUnit, s_AreaUnit, s_SpeedUnit, s_WeightUnit, s_ForceUnit, s_MomentUnit,
 			 s_mtoUnit, s_m2toUnit, s_mstoUnit, s_kgtoUnit, s_NtoUnit, s_NmtoUnit);
 
@@ -259,21 +269,11 @@ MainFrame::MainFrame(QWidget * parent, Qt::WindowFlags flags)
 	QString styleSheet;
     if(DisplaySettingsDlg::s_bStyleSheets)
     {
-        ReadStyleSheet(DisplaySettingsDlg::s_StyleSheetName, styleSheet);
-        if(DisplaySettingsDlg::s_bStyleSheets) qApp->setStyleSheet(styleSheet);
-        ensurePolished();
+        ReadStyleSheet(DisplaySettingsDlg::s_StyleSheetName, styleSheet);		
     }
 }
 
 
-void MainFrame::ReadStyleSheet(QString styleSheetName, QString &styleSheet)
-{
-    QFile file("qss/"+styleSheetName+".qss");
-	if(file.open(QFile::ReadOnly))
-	{
-		styleSheet = QLatin1String(file.readAll());
-	}
-}
 
 
 MainFrame::~MainFrame()
@@ -3359,9 +3359,9 @@ bool MainFrame::LoadSettings()
 		DisplaySettingsDlg::s_StyleName = settings.value("StyleName","").toString();
 //		if(!m_StyleName.length()) return false;
 
-		m_GraphExportFilter = settings.value("GraphExportFilter",".csv").toString();
+		s_LanguageFilePath = settings.value("LanguageFilePath").toString();
 
-		m_LanguageFilePath = settings.value("LanguageFilePath").toString();
+		m_GraphExportFilter = settings.value("GraphExportFilter",".csv").toString();
 
 		bFloat  = settings.value("Miarex_Float").toBool();
 		pt.rx() = settings.value("Miarex_x").toInt();
@@ -3798,25 +3798,10 @@ void MainFrame::OnInsertProject()
 
 void MainFrame::OnLanguage()
 {
-	QDir TranslationsDir;
-#ifdef Q_WS_MAC
-	TranslationsDir.setPath(qApp->applicationDirPath());
-#endif
-#ifdef Q_WS_WIN
-	TranslationsDir.setPath(qApp->applicationDirPath());
-#endif
-#ifdef Q_OS_LINUX
-	TranslationsDir.setPath("/usr/share/xflr5");
-	TranslationsDir.setPath(".");/** @todo remove - debug only */
-#endif
-
     TranslatorDlg tDlg(this);
-    tDlg.m_TranslationDirPath = TranslationsDir.canonicalPath() + "/translations" ;
-    tDlg.m_LanguageFilePath = m_LanguageFilePath;
     tDlg.InitDialog();
     if(tDlg.exec()==QDialog::Accepted)
 	{
-        m_LanguageFilePath = tDlg.m_LanguageFilePath;
 	}
 }
 
@@ -5148,7 +5133,6 @@ void MainFrame::SaveSettings()
 		settings.setValue("SizeMaximized", isMaximized());
 		settings.setValue("StyleName", DisplaySettingsDlg::s_StyleName);
 		settings.setValue("GraphExportFilter", m_GraphExportFilter);
-		settings.setValue("LanguageFilePath", m_LanguageFilePath);
 		settings.setValue("Miarex_Float", m_pctrlMiarexWidget->isFloating());
 		settings.setValue("XDirect_Float", m_pctrlXDirectWidget->isFloating());
 		settings.setValue("AFoil_Float", m_pctrlAFoilWidget->isFloating());
@@ -5189,6 +5173,7 @@ void MainFrame::SaveSettings()
 		settings.setValue("TextFontItalic", s_TextFont.italic());
 		settings.setValue("TextFontBold", s_TextFont.bold());
 
+		settings.setValue("LanguageFilePath", s_LanguageFilePath);
 		settings.setValue("ImageFormat", m_ImageFormat);
 		settings.setValue("SaveOpps", m_bSaveOpps);
 		settings.setValue("SaveWOpps", m_bSaveWOpps);
@@ -7061,3 +7046,30 @@ void MainFrame::OnDuplicateFoil()
 }
  
 
+void MainFrame::SetupDataDir()
+{
+#ifdef Q_WS_MAC
+	s_TranslationDir.setPath(qApp->applicationDirPath()+"/translations/");
+	s_StylesheetDir.setPath(qApp->applicationDirPath()+"/qss/");
+#endif
+#ifdef Q_OS_WIN
+	s_TranslationDir.setPath(qApp->applicationDirPath()+"/translations/");
+	s_StylesheetDir.setPath(qApp->applicationDirPath()+"/qss/");
+#endif
+#ifdef Q_OS_LINUX
+	s_TranslationDir.setPath("/usr/share/xflr5/translations");
+	s_StylesheetDir.setPath("/usr/share/xflr5/qss");
+#endif
+
+}
+
+
+void MainFrame::ReadStyleSheet(QString styleSheetName, QString &styleSheet)
+{
+	QFile file(s_StylesheetDir.canonicalPath()+"/"+styleSheetName+".qss");
+	if(file.open(QFile::ReadOnly))
+	{
+		styleSheet = QLatin1String(file.readAll());
+		qApp->setStyleSheet(styleSheet);
+	}
+}
