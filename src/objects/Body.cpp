@@ -30,7 +30,9 @@
 void *Body::s_pMainFrame;
 double Body::s_XPanelPos[300];
 
-
+/**
+ * The public constructor
+ */
 Body::Body()
 {
 	int i;

@@ -7,9 +7,8 @@
 *****************************************************************************/
 
 
-
-#include <QDate>
 #include <QtDebug>
+#include <QDate>
 #include "NURBSDomDoc.h"
 #include "../objects/NURBSSurface.h"
 #include "../globals.h"
@@ -292,7 +291,6 @@ QDomNode NURBSDomDoc::GetNode(QDomNode const &node, QString const &NodeName)
 
 bool NURBSDomDoc::Import(QFile *pFile)
 {
-	qDebug()<<"Importing";
 	if(!setContent(pFile))
 	{
 		pFile->close();

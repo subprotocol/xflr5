@@ -684,6 +684,7 @@ public:
 	int m_CpStyle, m_CpWidth;
 
 	void *m_pglLightDlg;
+
 };
 
 #endif // QMIAREX_H

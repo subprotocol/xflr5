@@ -1387,10 +1387,6 @@ void MainFrame::CreateMiarexActions()
 	editWPolar->setStatusTip(tr("Modify the analysis parameters of this polar"));
 	connect(editWPolar, SIGNAL(triggered()), pMiarex, SLOT(OnEditCurWPolar()));
 
-/*	defineCtrlPolar = new QAction(tr("Define a Control Analysis")+"\t(Ctrl+F6)", this);
-	defineCtrlPolar->setStatusTip(tr("Define a control analysis for the current wing or plane"));
-//	defineCtrlPolar->setShortcut(tr("Ctrl+F6"));
-	connect(defineCtrlPolar, SIGNAL(triggered()), pMiarex, SLOT(OnDefineCtrlPolar()));*/
 
 	defineStabPolar = new QAction(tr("Define a Stability Analysis")+"\t(Shift+F6)", this);
 	defineStabPolar->setStatusTip(tr("Define a stability analysis for the current wing or plane"));

@@ -140,7 +140,6 @@ public:
 	int m_xPanels[MAXBODYFRAMES];              /**< the number of mesh panels between two frames */
 	int m_hPanels[MAXSIDELINES];               /**< the number of mesh panels in the hoop direction, on one side of the Body */
 
-//	CVector m_BodyLEPosition;
 
 	Panel *m_pBodyPanel;                       /** A pointer to the first body panel in the array */
 

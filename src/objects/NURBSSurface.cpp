@@ -244,6 +244,7 @@ bool NURBSSurface::IntersectNURBS(CVector A, CVector B, CVector &I)
 	{
 		tmp = A;		A = B;		  B = tmp;
 	}
+
 	//M0 is the outside Point, M1 is the inside point
 	M0 = A; M1 = B;
 

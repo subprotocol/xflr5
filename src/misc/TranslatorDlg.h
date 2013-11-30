@@ -46,10 +46,8 @@ private:
 	QStringList findQmFiles();
 	QString languageName(const QString &qmFile);
 
-
 	QListWidget *m_pctrlLanguageList;
 	QMap<QString, QString> qmFileForLanguage;
-
 };
 
 #endif // TRANSLATORDLG_H

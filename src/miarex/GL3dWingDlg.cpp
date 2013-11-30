@@ -2270,9 +2270,10 @@ void GL3dWingDlg::SetupLayout()
 	m_pctrlControlsWidget->setLayout(DefLayout);
 
 	QVBoxLayout *LeftLayout = new QVBoxLayout;
-
-	LeftLayout->addWidget(m_pctrlControlsWidget);
-	LeftLayout->addWidget(m_pGLWidget,1);
+	{
+		LeftLayout->addWidget(m_pctrlControlsWidget);
+		LeftLayout->addWidget(m_pGLWidget,1);
+	}
 
 	QGridLayout *DataLayout = new QGridLayout;
 	{
@@ -2332,14 +2333,6 @@ void GL3dWingDlg::SetupLayout()
 		DataLayout->addWidget(m_pctrlAreaUnit1,2,3);
 		DataLayout->addWidget(m_pctrlLength2,3,3);
 		DataLayout->addWidget(m_pctrlAreaUnit2,4,3);
-//		QString strong = QString("%1").arg(QMiarex::s_MaxMatSize/2);
-//		QLabel *lab15 = new QLabel(tr("Max is ")+strong);
-//		DataLayout->addWidget(lab15 ,13,3);
-//		strong = QString("%1").arg(QMiarex::s_MaxMatSize);
-//		QLabel *lab16 = new QLabel(tr("Max is ")+strong);
-//		lab15->setAlignment(Qt::AlignLeft);
-//		DataLayout->addWidget(lab16, 14, 3);
-
 
 		QLabel *lab20 = new QLabel(tr("Mean Geom. Chord"));
 		QLabel *lab21 = new QLabel(tr("Mean Aero Chord"));
@@ -2404,148 +2397,149 @@ void GL3dWingDlg::SetupLayout()
 /*_____________Start Bottom Right Layout Here_________*/
 
 	QVBoxLayout *RightLayout = new QVBoxLayout;
-
-	QGridLayout *ThreeDParams = new QGridLayout;
 	{
-		m_pctrlAxes       = new QCheckBox(tr("Axes"));
-		m_pctrlLight      = new QCheckBox(tr("Light"));
-		m_pctrlSurfaces   = new QCheckBox(tr("Surfaces"));
-		m_pctrlOutline    = new QCheckBox(tr("Outline"));
-		m_pctrlPanels     = new QCheckBox(tr("Panels"));
-		m_pctrlFoilNames  = new QCheckBox(tr("Foil Names"));
-		m_pctrlShowMasses = new QCheckBox(tr("Masses"));
-		m_pctrlAxes->setSizePolicy(szPolicyMinimum);
-		m_pctrlLight->setSizePolicy(szPolicyMinimum);
-		m_pctrlSurfaces->setSizePolicy(szPolicyMinimum);
-		m_pctrlOutline->setSizePolicy(szPolicyMinimum);
-		m_pctrlPanels->setSizePolicy(szPolicyMinimum);
-		ThreeDParams->addWidget(m_pctrlAxes, 1,1);
-		ThreeDParams->addWidget(m_pctrlPanels, 1,2);
-		ThreeDParams->addWidget(m_pctrlSurfaces, 2,1);
-		ThreeDParams->addWidget(m_pctrlOutline, 2,2);
-	//	ThreeDParams->addWidget(m_pctrlLight, 3,1);
-		ThreeDParams->addWidget(m_pctrlFoilNames, 3,1);
-		ThreeDParams->addWidget(m_pctrlShowMasses, 3,2);
-	}
-
-	QVBoxLayout *ThreeDView = new QVBoxLayout;
-	{
-		QHBoxLayout *AxisViewLayout = new QHBoxLayout;
+		QGridLayout *ThreeDParams = new QGridLayout;
 		{
-			m_pctrlX          = new QToolButton;
-			m_pctrlY          = new QToolButton;
-			m_pctrlZ          = new QToolButton;
-			m_pctrlIso        = new QToolButton;
-			if(m_pctrlX->iconSize().height()<=48)
+			m_pctrlAxes       = new QCheckBox(tr("Axes"));
+			m_pctrlLight      = new QCheckBox(tr("Light"));
+			m_pctrlSurfaces   = new QCheckBox(tr("Surfaces"));
+			m_pctrlOutline    = new QCheckBox(tr("Outline"));
+			m_pctrlPanels     = new QCheckBox(tr("Panels"));
+			m_pctrlFoilNames  = new QCheckBox(tr("Foil Names"));
+			m_pctrlShowMasses = new QCheckBox(tr("Masses"));
+			m_pctrlAxes->setSizePolicy(szPolicyMinimum);
+			m_pctrlLight->setSizePolicy(szPolicyMinimum);
+			m_pctrlSurfaces->setSizePolicy(szPolicyMinimum);
+			m_pctrlOutline->setSizePolicy(szPolicyMinimum);
+			m_pctrlPanels->setSizePolicy(szPolicyMinimum);
+			ThreeDParams->addWidget(m_pctrlAxes, 1,1);
+			ThreeDParams->addWidget(m_pctrlPanels, 1,2);
+			ThreeDParams->addWidget(m_pctrlSurfaces, 2,1);
+			ThreeDParams->addWidget(m_pctrlOutline, 2,2);
+		//	ThreeDParams->addWidget(m_pctrlLight, 3,1);
+			ThreeDParams->addWidget(m_pctrlFoilNames, 3,1);
+			ThreeDParams->addWidget(m_pctrlShowMasses, 3,2);
+		}
+
+		QVBoxLayout *ThreeDView = new QVBoxLayout;
+		{
+			QHBoxLayout *AxisViewLayout = new QHBoxLayout;
 			{
-				m_pctrlX->setIconSize(QSize(32,32));
-				m_pctrlY->setIconSize(QSize(32,32));
-				m_pctrlZ->setIconSize(QSize(32,32));
-				m_pctrlIso->setIconSize(QSize(32,32));
+				m_pctrlX          = new QToolButton;
+				m_pctrlY          = new QToolButton;
+				m_pctrlZ          = new QToolButton;
+				m_pctrlIso        = new QToolButton;
+				if(m_pctrlX->iconSize().height()<=48)
+				{
+					m_pctrlX->setIconSize(QSize(32,32));
+					m_pctrlY->setIconSize(QSize(32,32));
+					m_pctrlZ->setIconSize(QSize(32,32));
+					m_pctrlIso->setIconSize(QSize(32,32));
+				}
+				m_pXView   = new QAction(QIcon(":/images/OnXView.png"), tr("X View"), this);
+				m_pYView   = new QAction(QIcon(":/images/OnYView.png"), tr("Y View"), this);
+				m_pZView   = new QAction(QIcon(":/images/OnZView.png"), tr("Z View"), this);
+				m_pIsoView = new QAction(QIcon(":/images/OnIsoView.png"), tr("Iso View"), this);
+				m_pXView->setCheckable(true);
+				m_pYView->setCheckable(true);
+				m_pZView->setCheckable(true);
+				m_pIsoView->setCheckable(true);
+
+				m_pctrlX->setDefaultAction(m_pXView);
+				m_pctrlY->setDefaultAction(m_pYView);
+				m_pctrlZ->setDefaultAction(m_pZView);
+				m_pctrlIso->setDefaultAction(m_pIsoView);
+				AxisViewLayout->addWidget(m_pctrlX);
+				AxisViewLayout->addWidget(m_pctrlY);
+				AxisViewLayout->addWidget(m_pctrlZ);
+				AxisViewLayout->addWidget(m_pctrlIso);
 			}
-			m_pXView   = new QAction(QIcon(":/images/OnXView.png"), tr("X View"), this);
-			m_pYView   = new QAction(QIcon(":/images/OnYView.png"), tr("Y View"), this);
-			m_pZView   = new QAction(QIcon(":/images/OnZView.png"), tr("Z View"), this);
-			m_pIsoView = new QAction(QIcon(":/images/OnIsoView.png"), tr("Iso View"), this);
-			m_pXView->setCheckable(true);
-			m_pYView->setCheckable(true);
-			m_pZView->setCheckable(true);
-			m_pIsoView->setCheckable(true);
 
-			m_pctrlX->setDefaultAction(m_pXView);
-			m_pctrlY->setDefaultAction(m_pYView);
-			m_pctrlZ->setDefaultAction(m_pZView);
-			m_pctrlIso->setDefaultAction(m_pIsoView);
-			AxisViewLayout->addWidget(m_pctrlX);
-			AxisViewLayout->addWidget(m_pctrlY);
-			AxisViewLayout->addWidget(m_pctrlZ);
-			AxisViewLayout->addWidget(m_pctrlIso);
+
+			QHBoxLayout *ViewResetLayout = new QHBoxLayout;
+			{
+				m_pctrlPickCenter     = new QPushButton(tr("Pick Center"));
+				m_pctrlPickCenter->setToolTip(tr("Activate the button, then click on the object to center it in the viewport; alternatively, double click on the object"));
+				m_pctrlReset          = new QPushButton(tr("Reset"));
+				m_pctrlPickCenter->setCheckable(true);
+
+				ViewResetLayout->addWidget(m_pctrlReset);
+				ViewResetLayout->addWidget(m_pctrlPickCenter);
+			}
+			ThreeDView->addLayout(AxisViewLayout);
+			ThreeDView->addLayout(ViewResetLayout);
 		}
 
-
-		QHBoxLayout *ViewResetLayout = new QHBoxLayout;
+		QHBoxLayout *ThreeDViewControls = new QHBoxLayout;
 		{
-			m_pctrlPickCenter     = new QPushButton(tr("Pick Center"));
-			m_pctrlPickCenter->setToolTip(tr("Activate the button, then click on the object to center it in the viewport; alternatively, double click on the object"));
-			m_pctrlReset          = new QPushButton(tr("Reset"));
-			m_pctrlPickCenter->setCheckable(true);
-
-			ViewResetLayout->addWidget(m_pctrlReset);
-			ViewResetLayout->addWidget(m_pctrlPickCenter);
+			QLabel *ClipLabel = new QLabel(tr("Clip Plane"));
+			ClipLabel->setSizePolicy(szPolicyMaximum);
+			m_pctrlClipPlanePos = new QSlider(Qt::Horizontal);
+			m_pctrlClipPlanePos->setMinimum(-300);
+			m_pctrlClipPlanePos->setMaximum(300);
+			m_pctrlClipPlanePos->setSliderPosition(0);
+			m_pctrlClipPlanePos->setTickInterval(30);
+			m_pctrlClipPlanePos->setTickPosition(QSlider::TicksBelow);
+			m_pctrlClipPlanePos->setSizePolicy(szPolicyMinimum);
+			ThreeDViewControls->addWidget(ClipLabel);
+			ThreeDViewControls->addWidget(m_pctrlClipPlanePos);
 		}
-		ThreeDView->addLayout(AxisViewLayout);
-		ThreeDView->addLayout(ViewResetLayout);
+
+		QHBoxLayout *WingModCommands = new QHBoxLayout;
+		{
+			m_pctrlResetMesh    = new QPushButton(tr("Reset Mesh"));
+			m_pctrlScaleWing    = new QPushButton(tr("Scale Wing"));
+			m_pctrlInertiaButton = new QPushButton(tr("Inertia..."));
+		//	m_pctrlSetupLight   = new QPushButton("Setup Light");
+			WingModCommands->addWidget(m_pctrlResetMesh);
+			WingModCommands->addWidget(m_pctrlScaleWing);
+			WingModCommands->addWidget(m_pctrlInertiaButton);
+		//	WingModCommands->addWidget(m_pctrlSetupLight);
+		}
+
+		QHBoxLayout *WingFileCommands = new QHBoxLayout;
+		{
+			m_pImportWingBtn = new QPushButton(tr("Import Wing"));
+			m_pExportWingBtn = new QPushButton(tr("Export Wing"));
+			WingFileCommands->addWidget(m_pImportWingBtn);
+			WingFileCommands->addWidget(m_pExportWingBtn);
+		}
+
+
+		QHBoxLayout *CommandButtons = new QHBoxLayout;
+		{
+			OKButton = new QPushButton(tr("Save and Close"));
+			OKButton->setAutoDefault(true);
+			CancelButton = new QPushButton(tr("Cancel"));
+			CancelButton->setAutoDefault(false);
+			CommandButtons->addWidget(OKButton);
+			CommandButtons->addWidget(CancelButton);
+			connect(OKButton, SIGNAL(clicked()),this, SLOT(OnOK()));
+			connect(CancelButton, SIGNAL(clicked()),this, SLOT(reject()));
+		}
+
+
+		QVBoxLayout *All3DControls = new QVBoxLayout;
+		{
+			All3DControls->addStretch(1);
+			All3DControls->addLayout(ThreeDParams);
+			All3DControls->addLayout(ThreeDView);
+			All3DControls->addLayout(ThreeDViewControls);
+			All3DControls->addStretch(1);
+			All3DControls->addLayout(WingModCommands);
+			All3DControls->addLayout(WingFileCommands);
+			All3DControls->addStretch(1);
+			All3DControls->addSpacing(20);
+			All3DControls->addLayout(CommandButtons);
+		}
+
+		RightLayout->addWidget(WingDescription);
+		RightLayout->addWidget(m_pctrlWingDescription);
+		RightLayout->addStretch();
+		RightLayout->addLayout(DataLayout);
+		RightLayout->addSpacing(20);
+		RightLayout->addLayout(All3DControls);
 	}
-
-	QHBoxLayout *ThreeDViewControls = new QHBoxLayout;
-	{
-		QLabel *ClipLabel = new QLabel(tr("Clip Plane"));
-		ClipLabel->setSizePolicy(szPolicyMaximum);
-		m_pctrlClipPlanePos = new QSlider(Qt::Horizontal);
-		m_pctrlClipPlanePos->setMinimum(-300);
-		m_pctrlClipPlanePos->setMaximum(300);
-		m_pctrlClipPlanePos->setSliderPosition(0);
-		m_pctrlClipPlanePos->setTickInterval(30);
-		m_pctrlClipPlanePos->setTickPosition(QSlider::TicksBelow);
-		m_pctrlClipPlanePos->setSizePolicy(szPolicyMinimum);
-		ThreeDViewControls->addWidget(ClipLabel);
-		ThreeDViewControls->addWidget(m_pctrlClipPlanePos);
-	}
-
-	QHBoxLayout *WingModCommands = new QHBoxLayout;
-	{
-		m_pctrlResetMesh    = new QPushButton(tr("Reset Mesh"));
-		m_pctrlScaleWing    = new QPushButton(tr("Scale Wing"));
-		m_pctrlInertiaButton = new QPushButton(tr("Inertia..."));
-	//	m_pctrlSetupLight   = new QPushButton("Setup Light");
-		WingModCommands->addWidget(m_pctrlResetMesh);
-		WingModCommands->addWidget(m_pctrlScaleWing);
-		WingModCommands->addWidget(m_pctrlInertiaButton);
-	//	WingModCommands->addWidget(m_pctrlSetupLight);
-	}
-        
-	QHBoxLayout *WingFileCommands = new QHBoxLayout;
-	{
-		m_pImportWingBtn = new QPushButton(tr("Import Wing"));
-		m_pExportWingBtn = new QPushButton(tr("Export Wing"));
-		WingFileCommands->addWidget(m_pImportWingBtn);
-		WingFileCommands->addWidget(m_pExportWingBtn);    
-	}
-
-
-	QHBoxLayout *CommandButtons = new QHBoxLayout;
-	{
-		OKButton = new QPushButton(tr("Save and Close"));
-		OKButton->setAutoDefault(true);
-		CancelButton = new QPushButton(tr("Cancel"));
-		CancelButton->setAutoDefault(false);
-		CommandButtons->addWidget(OKButton);
-		CommandButtons->addWidget(CancelButton);
-		connect(OKButton, SIGNAL(clicked()),this, SLOT(OnOK()));
-		connect(CancelButton, SIGNAL(clicked()),this, SLOT(reject()));
-	}
-
-
-	QVBoxLayout *All3DControls = new QVBoxLayout;
-	{
-		All3DControls->addStretch(1);
-		All3DControls->addLayout(ThreeDParams);
-		All3DControls->addLayout(ThreeDView);
-		All3DControls->addLayout(ThreeDViewControls);
-		All3DControls->addStretch(1);
-		All3DControls->addLayout(WingModCommands);
-		All3DControls->addLayout(WingFileCommands);
-		All3DControls->addStretch(1);
-		All3DControls->addSpacing(20);
-		All3DControls->addLayout(CommandButtons);
-	}
-
-	RightLayout->addWidget(WingDescription);
-	RightLayout->addWidget(m_pctrlWingDescription);
-	RightLayout->addStretch();
-	RightLayout->addLayout(DataLayout);
-	RightLayout->addSpacing(20);
-	RightLayout->addLayout(All3DControls);
 
 	QHBoxLayout *MainLayout = new QHBoxLayout;
 	{

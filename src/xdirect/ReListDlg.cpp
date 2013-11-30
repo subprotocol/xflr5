@@ -114,18 +114,20 @@ void ReListDlg::OnCellChanged(QWidget *DoubleEdit)
 void ReListDlg::SetupLayout()
 {
 	QVBoxLayout *CommandButtons = new QVBoxLayout;
-	m_pctrlInsert	= new QPushButton(tr("Insert"));
-	m_pctrlDelete	= new QPushButton(tr("Delete"));
+	{
+		m_pctrlInsert	= new QPushButton(tr("Insert"));
+		m_pctrlDelete	= new QPushButton(tr("Delete"));
 
-	OKButton        = new QPushButton(tr("OK"));
-	CancelButton    = new QPushButton(tr("Cancel"));
-	CommandButtons->addStretch(1);
-	CommandButtons->addWidget(m_pctrlInsert);
-	CommandButtons->addWidget(m_pctrlDelete);
-	CommandButtons->addStretch(2);
-	CommandButtons->addWidget(OKButton);
-	CommandButtons->addWidget(CancelButton);
-	CommandButtons->addStretch(1);
+		OKButton        = new QPushButton(tr("OK"));
+		CancelButton    = new QPushButton(tr("Cancel"));
+		CommandButtons->addStretch(1);
+		CommandButtons->addWidget(m_pctrlInsert);
+		CommandButtons->addWidget(m_pctrlDelete);
+		CommandButtons->addStretch(2);
+		CommandButtons->addWidget(OKButton);
+		CommandButtons->addWidget(CancelButton);
+		CommandButtons->addStretch(1);
+	}
 
 	m_pctrlReView = new QTableView(this);
 
@@ -139,8 +141,10 @@ void ReListDlg::SetupLayout()
 								   QAbstractItemView::AnyKeyPressed);
 
 	QHBoxLayout * MainLayout = new QHBoxLayout(this);
-	MainLayout->addWidget(m_pctrlReView);
-	MainLayout->addLayout(CommandButtons);
+	{
+		MainLayout->addWidget(m_pctrlReView);
+		MainLayout->addLayout(CommandButtons);
+	}
 	setLayout(MainLayout);
 }
 

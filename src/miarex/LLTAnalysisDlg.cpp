@@ -99,8 +99,6 @@ bool LLTAnalysisDlg::AlphaLoop()
 	QMiarex* pMiarex = (QMiarex*)s_pMiarex;
 	int i,iter;
 
-//	CWing::s_AlphaLLT = m_AlphaMin;
-
 	str = tr("Launching analysis....")+"\n\n";
 	UpdateOutput(str);
 	str = QString(tr("Max iterations     = %1")+"\n").arg(m_IterLim);

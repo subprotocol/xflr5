@@ -72,7 +72,6 @@ public:
 
 private:
 	void contextMenuEvent (QContextMenuEvent * event);
-//	void initializeGL();
 	void keyPressEvent(QKeyEvent *event);
 	void keyReleaseEvent(QKeyEvent *event);
 	void mousePressEvent(QMouseEvent *event);

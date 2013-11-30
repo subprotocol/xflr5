@@ -109,19 +109,21 @@ void ManageFoilsDlg::keyPressEvent(QKeyEvent *event)
 void ManageFoilsDlg::SetupLayout()
 {
 	QVBoxLayout *CommandButtons = new QVBoxLayout;
-	m_pctrlDelete     = new QPushButton(tr("Delete"));
-	m_pctrlRename     = new QPushButton(tr("Rename"));
-	m_pctrlExport     = new QPushButton(tr("Export Foil"));
+	{
+		m_pctrlDelete     = new QPushButton(tr("Delete"));
+		m_pctrlRename     = new QPushButton(tr("Rename"));
+		m_pctrlExport     = new QPushButton(tr("Export Foil"));
 
-	CloseButton     = new QPushButton(tr("Close"));
+		CloseButton     = new QPushButton(tr("Close"));
 
-	CommandButtons->addStretch(1);
-	CommandButtons->addWidget(m_pctrlDelete);
-	CommandButtons->addWidget(m_pctrlRename);
-	CommandButtons->addWidget(m_pctrlExport);
-	CommandButtons->addStretch(2);
-	CommandButtons->addWidget(CloseButton);
-	CommandButtons->addStretch(1);
+		CommandButtons->addStretch(1);
+		CommandButtons->addWidget(m_pctrlDelete);
+		CommandButtons->addWidget(m_pctrlRename);
+		CommandButtons->addWidget(m_pctrlExport);
+		CommandButtons->addStretch(2);
+		CommandButtons->addWidget(CloseButton);
+		CommandButtons->addStretch(1);
+	}
 
 	m_pctrlFoilTable   = new QTableView(this);
 	m_pctrlFoilTable->setSelectionMode(QAbstractItemView::SingleSelection);
@@ -135,8 +137,10 @@ void ManageFoilsDlg::SetupLayout()
 	m_pctrlFoilTable->setMinimumWidth(800);
 
 	QHBoxLayout * MainLayout = new QHBoxLayout(this);
-	MainLayout->addWidget(m_pctrlFoilTable);
-	MainLayout->addLayout(CommandButtons);
+	{
+		MainLayout->addWidget(m_pctrlFoilTable);
+		MainLayout->addLayout(CommandButtons);
+	}
 	setLayout(MainLayout);
 
 

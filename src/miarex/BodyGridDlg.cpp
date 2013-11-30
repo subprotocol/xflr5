@@ -329,7 +329,6 @@ void BodyGridDlg::OnMinLine2Style()
 
 
 
-
 void BodyGridDlg::LoadSettings (QSettings *pSettings)
 {
 	pSettings->beginGroup("GL3dBodyGrid");

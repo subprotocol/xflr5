@@ -31,7 +31,6 @@
 #include <QFontDialog>
 #include <QStyleFactory>
 #include <QDir>
-#include <QtDebug>
 
 bool DisplaySettingsDlg::s_bStyleSheets = true;
 QString DisplaySettingsDlg::s_StyleName;

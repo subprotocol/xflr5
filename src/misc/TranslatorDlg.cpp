@@ -60,7 +60,6 @@ void TranslatorDlg::OnOK()
 }
 
 
-
 void TranslatorDlg::SetupLayout()
 {
 	QLabel *lab = new QLabel(tr("Select the application's default language:"));

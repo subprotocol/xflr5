@@ -8834,6 +8834,7 @@ void QMiarex::OnEditCurBody()
 
 	Body memBody;
 	memBody.Duplicate(m_pCurBody);
+
 	GL3dBodyDlg glbDlg(pMainFrame);
 	glbDlg.m_bEnableName = false;
 	glbDlg.InitDialog(m_pCurBody);

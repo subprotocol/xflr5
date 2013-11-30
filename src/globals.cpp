@@ -25,7 +25,7 @@
 
 #include "globals.h"
 #include "mainframe.h"
-#include <QVector3D>
+#include <QtDebug>
 #include <QPen>
 #include <QApplication>
 #include <QFile>
@@ -34,7 +34,6 @@
 #include <QDateTime> 
 #include <QByteArray>
 #include <math.h>
-#include <QtDebug>
 
 
 

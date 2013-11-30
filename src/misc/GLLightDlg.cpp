@@ -26,7 +26,7 @@
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QLabel>
-#include <QtDebug>
+
 
 float GLLightDlg::s_Ambient, GLLightDlg::s_Diffuse, GLLightDlg::s_Specular;
 float GLLightDlg::s_MatAmbient, GLLightDlg::s_MatDiffuse, GLLightDlg::s_MatSpecular, GLLightDlg::s_MatEmission;

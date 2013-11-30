@@ -31,7 +31,7 @@
 #include <QHeaderView>
 #include <QTimer>
 #include <complex>
-#include <QtDebug>
+
 
 void *StabViewDlg::s_pMiarex;
 

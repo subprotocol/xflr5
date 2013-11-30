@@ -215,9 +215,7 @@ private:
 
 	int m_iSection;
 	int m_GLList;
-//	int m_iView;
 
-//	double m_yMAC;
 	double m_glScaled;//zoom factor for UFO
 	double m_ClipPlanePos;
 	double MatIn[4][4], MatOut[4][4];

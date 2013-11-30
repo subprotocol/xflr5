@@ -123,7 +123,6 @@ void PlaneOpp::Release()
 }
 
 
-
 /**
  * Loads or saves the data of this operating point to a binary file. 
  * This method serializes the data associated to the plane, then calls the serialization methods

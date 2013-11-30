@@ -311,6 +311,7 @@ void ManageBodiesDlg::OnNameList(QListWidgetItem *pItem)
 	}
 }
 
+
 void ManageBodiesDlg::OnNew()
 {
 	QMiarex * pMiarex = (QMiarex*)s_pMiarex;

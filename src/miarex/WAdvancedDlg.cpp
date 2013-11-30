@@ -388,3 +388,4 @@ void WAdvancedDlg::SetParams()
 
 
 
+

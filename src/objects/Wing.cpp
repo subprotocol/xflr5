@@ -145,6 +145,7 @@ void Wing::ClearWingSections()
 	}
 }
 
+
 /** Destroys the PointMass objects in good order to avoid memory leaks */
 void Wing::ClearPointMasses()
 {

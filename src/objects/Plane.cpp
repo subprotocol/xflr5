@@ -87,7 +87,6 @@ Plane::Plane()
 	m_CoGIxx = m_CoGIyy = m_CoGIzz = m_CoGIxz = 0.0;
 	m_VolumeMass = m_TotalMass = 0.0;
 
-//	m_bActive       = false;
 	m_bBody         = false;
 	m_bFin          = true;
 	m_bDoubleFin    = false;

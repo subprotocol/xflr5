@@ -24,7 +24,6 @@
 #include <QHBoxLayout>
 #include <QGroupBox>
 #include <QMessageBox>
-#include <QtDebug>
 #include <math.h>
 
 

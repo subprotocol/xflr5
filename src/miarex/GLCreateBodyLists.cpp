@@ -515,9 +515,6 @@ void GLCreateBodyMesh(int iList, Body *pBody)
             glPolygonOffset(1.0, 1.0);
 
             color = MainFrame::s_BackgroundColor;
-//			style = W3dPrefsDlg::s_VLMStyle;
-//			width = W3dPrefsDlg::s_VLMWidth;
-
             glColor3d(color.redF(), color.greenF(), color.blueF());
 
             glLineWidth(1.0);

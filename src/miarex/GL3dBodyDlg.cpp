@@ -85,22 +85,7 @@ GL3dBodyDlg::GL3dBodyDlg(QWidget *pParent): QDialog(pParent)
 {
 	setWindowTitle(tr("Body Edition"));
 	setWindowFlags(Qt::Window);
-//	setSizeGripEnabled(true);
 
-/*	qDebug()<<"_____N=10:";
-	int N=10;
-//	qDebug()<<(int)7.1 <<(int)7.5<< (int)7.5001<< (int)7.9<< (int)(N/2) << (int)((double)N/2.0);
-	for(int i=0; i<N; i++)
-	{
-		m_TmpPic.m_SplineSurface.Weight(i, N);
-	}
-	qDebug()<<"_____N=11:";
-	N=11;
-//	qDebug()<<(int)7.1 <<(int)7.5<< (int)7.5001<< (int)7.9<< (int)(N/2) << (int)((double)N/2.0);
-	for(int i=0; i<N; i++)
-	{
-		m_TmpPic.m_SplineSurface.Weight(i, N);
-	}*/
 
     m_BodyGridDlg = new BodyGridDlg(this);
 	m_pBody = NULL;
@@ -3799,7 +3784,6 @@ void GL3dBodyDlg::TakePicture()
 	m_UndoStack.append(pBody);
 
 	// the new current position is the top of the stack
-//	qDebug()	<< signalsBlocked() << m_pPointDelegate->signalsBlocked() << m_pFrameDelegate->signalsBlocked();
 	m_StackPos = m_UndoStack.size()-1;
 	m_pctrlUndo->setEnabled(m_StackPos>0);
 	m_pctrlRedo->setEnabled(m_StackPos<m_UndoStack.size()-1);

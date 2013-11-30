@@ -85,7 +85,7 @@ private:
 	static void * s_pMainFrame;  /**< A pointer to the mainframe window*/
 
 
-	Plane * m_pPlane; /**< A pointer to the plane which is currently edited in this dialog window */
+	Plane *m_pPlane;   /**< A pointer to the plane which is currently edited in this dialog window */
 	bool m_bChanged;   /**< Set to true whenever the data in the window has been changed */
 	bool m_bDescriptionChanged;
 	bool m_bAcceptName;

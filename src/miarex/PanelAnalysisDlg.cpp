@@ -28,7 +28,6 @@
 #include <QTimer>
 #include <QDir>
 #include <math.h>
-#include <QtDebug>
 #include "PanelAnalysisDlg.h"
 #include "../mainframe.h"
 #include "../globals.h"
@@ -249,7 +248,7 @@ bool PanelAnalysisDlg::AllocateRHS(int &memsize)
 	catch(std::exception &e)
 	{
         Release();
-		qDebug()<< e.what();
+//		qDebug()<< e.what();
 		return false;
 	}
 

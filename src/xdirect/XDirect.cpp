@@ -30,7 +30,6 @@
 #include <QGroupBox>
 #include <QThread>
 #include <math.h>
-#include <QtDebug>
 
 #include "../globals.h"
 #include "../mainframe.h"

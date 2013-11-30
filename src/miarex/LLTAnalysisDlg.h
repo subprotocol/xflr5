@@ -91,6 +91,8 @@ private:
 	void WriteString(QString &strong);
 
 
+	static void *s_pMiarex;     /**< A static pointer to the unique instance of the QMiarex class. */
+	static void *s_pMainFrame;  /**< A static pointer to the unique instance of the MainFrame class. */
 
 	double m_AlphaMin;          /**< The starting aoa for the analysis of type 1 & 2 polars */
 	double m_AlphaMax;          /**< The ending aoa for the analysis of type 1 & 2 polars */
@@ -117,8 +119,6 @@ private:
 	double m_ReMin;             /**< The starting value of the velocity for the analysis of type 4 polars */
 	QRect m_ViscRect;           /**< The rectangle in the client area where the graph is displayed */
 
-	static void *s_pMiarex;     /**< A static pointer to the unique instance of the QMiarex class. */
-	static void *s_pMainFrame;  /**< A static pointer to the unique instance of the MainFrame class. */
 
 
 	//GUI widget variables

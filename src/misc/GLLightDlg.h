@@ -101,8 +101,6 @@ private:
 
 	double m_Size;
 
-public:
-
 };
 
 #endif // GLLIGHTDLG_H

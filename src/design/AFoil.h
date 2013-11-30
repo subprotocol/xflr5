@@ -133,7 +133,6 @@ private slots:
 	void OnRemoveCtrlPt();
 
 private:
-
 	void CheckButtons();
 	void ClearStack(int pos=0);
 	void DrawScale(QPainter &painter, double scalex);

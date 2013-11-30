@@ -133,43 +133,49 @@ void ManageUFOsDlg::keyPressEvent(QKeyEvent *event)
 void ManageUFOsDlg::SetupLayout()
 {
 	QVBoxLayout *CommandButtons = new QVBoxLayout;
-	m_pctrlDelete     = new QPushButton(tr("Delete"));
-	m_pctrlRename     = new QPushButton(tr("Rename"));
+	{
+		m_pctrlDelete     = new QPushButton(tr("Delete"));
+		m_pctrlRename     = new QPushButton(tr("Rename"));
 
-	CloseButton     = new QPushButton(tr("Close"));
+		CloseButton     = new QPushButton(tr("Close"));
 
-	CommandButtons->addStretch(1);
-	CommandButtons->addWidget(m_pctrlRename);
-	CommandButtons->addWidget(m_pctrlDelete);
-	CommandButtons->addStretch(2);
-	CommandButtons->addWidget(CloseButton);
-	CommandButtons->addStretch(1);
+		CommandButtons->addStretch(1);
+		CommandButtons->addWidget(m_pctrlRename);
+		CommandButtons->addWidget(m_pctrlDelete);
+		CommandButtons->addStretch(2);
+		CommandButtons->addWidget(CloseButton);
+		CommandButtons->addStretch(1);
+	}
 
-	m_pctrlUFOTable = new QTableView(this);
-	m_pctrlUFOTable->setSelectionMode(QAbstractItemView::SingleSelection);
-	m_pctrlUFOTable->setSelectionBehavior(QAbstractItemView::SelectRows);
-	m_pctrlUFOTable->horizontalHeader()->setStretchLastSection(true);
-
-	QSizePolicy szPolicyExpanding;
-	szPolicyExpanding.setHorizontalPolicy(QSizePolicy::MinimumExpanding);
-	szPolicyExpanding.setVerticalPolicy(QSizePolicy::Expanding);
-	m_pctrlUFOTable->setSizePolicy(szPolicyExpanding);
-	m_pctrlUFOTable->setMinimumWidth(800);
-
-	m_pctrlDescription = new QTextEdit;
-//	m_pctrlDescription->setEnabled(false);
-	QLabel *Description = new QLabel(tr("Description:"));
 
 	QVBoxLayout *LeftLayout = new QVBoxLayout;
-	LeftLayout->addWidget(m_pctrlUFOTable);
-	LeftLayout->addWidget(Description);
-	LeftLayout->addWidget(m_pctrlDescription);
-	LeftLayout->setStretchFactor(m_pctrlUFOTable, 5);
-	LeftLayout->setStretchFactor(m_pctrlDescription, 1);
+	{
+		m_pctrlUFOTable = new QTableView(this);
+		m_pctrlUFOTable->setSelectionMode(QAbstractItemView::SingleSelection);
+		m_pctrlUFOTable->setSelectionBehavior(QAbstractItemView::SelectRows);
+		m_pctrlUFOTable->horizontalHeader()->setStretchLastSection(true);
+
+		QSizePolicy szPolicyExpanding;
+		szPolicyExpanding.setHorizontalPolicy(QSizePolicy::MinimumExpanding);
+		szPolicyExpanding.setVerticalPolicy(QSizePolicy::Expanding);
+		m_pctrlUFOTable->setSizePolicy(szPolicyExpanding);
+		m_pctrlUFOTable->setMinimumWidth(800);
+
+		m_pctrlDescription = new QTextEdit;
+	//	m_pctrlDescription->setEnabled(false);
+		QLabel *Description = new QLabel(tr("Description:"));
+		LeftLayout->addWidget(m_pctrlUFOTable);
+		LeftLayout->addWidget(Description);
+		LeftLayout->addWidget(m_pctrlDescription);
+		LeftLayout->setStretchFactor(m_pctrlUFOTable, 5);
+		LeftLayout->setStretchFactor(m_pctrlDescription, 1);
+	}
 
 	QHBoxLayout * MainLayout = new QHBoxLayout(this);
-	MainLayout->addLayout(LeftLayout);
-	MainLayout->addLayout(CommandButtons);
+	{
+		MainLayout->addLayout(LeftLayout);
+		MainLayout->addLayout(CommandButtons);
+	}
 	setLayout(MainLayout);
 
 	m_pUFOModel = new QStandardItemModel;

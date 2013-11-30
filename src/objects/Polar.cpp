@@ -24,7 +24,6 @@
 #include "../mainframe.h"
 #include "../globals.h"
 #include "../xdirect/XFoil.h"
-#include <QtDebug>
 
 
 

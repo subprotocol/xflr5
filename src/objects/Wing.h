@@ -129,10 +129,8 @@ public:
 	bool AppendWingSection(double Chord, double Twist, double Pos, double Dihedral, double Offset, int NXPanels, int NYPanels, enumPanelDistribution XPanelDist, enumPanelDistribution YPanelDist, QString RightFoilName, QString LeftFoilName);
 	void RemoveWingSection(int const iSection);
 	
-
 	void ClearWingSections();
 	void ClearPointMasses();
-
 
 	//access methods
 	int NWingSection() {return m_WingSection.count();}

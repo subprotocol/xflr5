@@ -262,7 +262,6 @@ private:
 	bool m_bCurFrameOnly;
 
 	int m_GLList;
-//	int m_iView;
 	static int s_NHoopPoints;			//hoop resolution for NURBS bodies
 	static int s_NXPoints;				//longitudinal resolution for NURBS Bodies
 

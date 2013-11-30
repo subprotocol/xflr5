@@ -2582,5 +2582,5 @@ void GLDrawPanelForceLegend(void *pQMiarex, WPolar *pWPolar)
 
     }
     //glEndList();}
-
 }
+

@@ -89,7 +89,7 @@ public:
 	//use temporary variables to avoid lengthy memory allocation times on the stack
 	double value, eps, bs, cs;
 	CVector t_R, t_Prod, t_Q, t_r, t_N;
-
 };
 
 #endif // SPLINESURFACE_H
+

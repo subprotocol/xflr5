@@ -1188,7 +1188,6 @@ void QAFoil::OnAFoilNormalizeFoil()
 	pMainFrame->statusBar()->showMessage(str);
 
 	UpdateView();
-
 }
 
 

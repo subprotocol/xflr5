@@ -108,7 +108,7 @@ public:
 	static QColor s_CpColor;
 
 	static bool s_bWakePanels;
-
 };
 
 #endif // W3DPREFSDLG_H
+

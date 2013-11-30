@@ -293,7 +293,3 @@ void TwoDPanelDlg::ReadParams()
 
 
 
-
-
-
-

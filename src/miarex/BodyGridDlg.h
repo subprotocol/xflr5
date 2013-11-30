@@ -30,6 +30,7 @@
 #include "../misc/DoubleEdit.h"
 #include "../misc/LineBtn.h"
 
+
 class BodyGridDlg : public QDialog
 {
 	Q_OBJECT

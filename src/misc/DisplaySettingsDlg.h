@@ -60,7 +60,6 @@ private:
 	QPushButton *m_pctrlGraphSettings;
 	QPushButton *OKButton, *CancelButton;
 	QCheckBox *m_pctrlReverseZoom, *m_pctrlAlphaChannel;
-//	QCheckBox *m_pctrlStyleSheets;
 
 	QComboBox *m_pctrlStyles;
 	QPushButton *OK, *Cancel;

@@ -227,6 +227,7 @@ void W3dPrefsDlg::SetupLayout()
 	setLayout(MainLayout);
 }
 
+
 void W3dPrefsDlg::OnOutline()
 {
     LinePickerDlg LPdlg(this);

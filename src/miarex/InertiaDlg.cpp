@@ -92,7 +92,7 @@ void InertiaDlg::ComputeBodyAxisInertia()
 /**
 * Computes the inertia in the frame of reference with origin at the CoG.
 *
-* Assumes that the data has been read
+* Assumes that the data has been read.
 */
 void InertiaDlg::ComputeInertia()
 {

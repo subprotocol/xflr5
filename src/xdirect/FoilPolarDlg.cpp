@@ -618,12 +618,3 @@ void FoilPolarDlg::OnEditingFinished()
 
 
 
-
-
-
-
-
-
-
-
-

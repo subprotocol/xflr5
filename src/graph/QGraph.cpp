@@ -58,10 +58,6 @@ void QGraph::DrawGraph(QPainter &painter)
 	static QColor color;
 	painter.save();
 
-//	Paint background
-//	QBrush bg(m_BkColor);
-//	painter.setBackground(bg);
-
 //	Draw Border
 	if(m_bBorder) color = m_BorderColor;
 	else          color = m_BkColor;

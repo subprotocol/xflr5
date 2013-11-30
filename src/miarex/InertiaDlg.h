@@ -71,7 +71,6 @@ private:
 	void FillMassModel();
 	void ClearPointMasses();
 	void ComputeInertia();
-//	void ComputeBodyInertia(double &Ixx, double &Iyy, double &Izz, double &Ixz);
 	void ComputeBodyAxisInertia();
 	void SetupLayout();
 	void ReadData();

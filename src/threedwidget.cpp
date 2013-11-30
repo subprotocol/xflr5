@@ -557,7 +557,6 @@ void ThreeDWidget::GLDrawAxes(double length, QColor AxisColor, int AxisStyle, in
 
 
 
-
 /**
 Creates a list for a sphere with unit radius
 */
