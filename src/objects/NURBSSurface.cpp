@@ -247,12 +247,6 @@ bool NURBSSurface::IntersectNURBS(CVector A, CVector B, CVector &I)
 	//M0 is the outside Point, M1 is the inside point
 	M0 = A; M1 = B;
 
-/*	if(!IsInNURBSBody(M1))
-	{
-		//consider no intersection (not quite true in special high dihedral cases)
-		I = M1;
-		return false;
-	}*/
 
 	I = (M0+M1)/2.0; t=0.5;
 

@@ -250,8 +250,11 @@ void Body::Duplicate(Body *pBody)
 		m_hPanels[i] = pBody->m_hPanels[i];
 	}
 
-//	m_BodyLEPosition = pBody->m_BodyLEPosition;
-//	SetKnots();
+	ClearPointMasses();
+	for(int im=0; im<pBody->m_PointMass.size(); im++)
+	{
+		m_PointMass.append(new PointMass(pBody->m_PointMass.at(im)));
+	}
 }
 
 
@@ -986,12 +989,11 @@ bool Body::IsInNURBSBody(CVector Pt)
 
 	u = Getu(Pt.x);
 
-    /** @todo check in different cases of fin/body connection */
-    if (u <= 0.0 || u >= 1.0) return false;
+	if (u <= 0.0 || u >= 1.0) return false;
 
 	t_r.Set(0.0, Pt.y, Pt.z);
 
-    if(Pt.y>=0.0) bRight = true;	else bRight = false;
+	bRight = (Pt.y>=0.0);
 
 	v = Getv(u, t_r, bRight);
 	GetPoint(u, v, bRight, t_N);

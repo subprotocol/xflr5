@@ -113,6 +113,8 @@ private:
 	void showEvent(QShowEvent *event);
 	void reject();
 
+	void blockSignalling(bool bBlock);
+
 	void FillFrameTableRow(int row);
 	void FillFrameDataTable();
 	void FillFrameCell(int iItem, int iSubItem);
@@ -160,8 +162,9 @@ private:
 
 private:
 	bool SetBody(Body *pBody);
+
+	void ClearStack(int pos=0);
 	void SetPicture();
-	void StorePicture();
 	void TakePicture();
 
 	void Insert(CVector Pt);
@@ -203,6 +206,7 @@ private:
 	QTableView *m_pctrlFrameTable, *m_pctrlPointTable;
 	QStandardItemModel *m_pFrameModel, *m_pPointModel;
 	BodyTableDelegate *m_pFrameDelegate, *m_pPointDelegate;
+	QItemSelectionModel *m_pSelectionModelPoint, *m_pSelectionModelFrame;
 
 	QAction *m_pInsertPoint, *m_pRemovePoint, *m_pScaleBody;
 	QAction *m_pShowCurFrameOnly, *m_pResetScales;
@@ -210,10 +214,13 @@ private:
 	QAction *m_pExportBodyDef, *m_pImportBodyDef, *m_pExportBodyGeom, *m_pTranslateBody, *m_pBodyInertia;// *m_pSetupLight;
 	QAction *m_pGrid;
 
-	Body m_TmpPic;
-	Body m_UndoPic[20];
-	int m_StackPos, m_StackSize;// undo : current stack position and current stack size
-	bool m_bStored;
+
+	int m_StackPos;               /**< the current position on the Undo stack */
+	QList<Body*> m_UndoStack;      /**< the stack of incremental modifications to the SplineFoil;
+									 we can't use the QStack though, because we need to access
+									 any point in the case of multiple undo operations */
+
+//	bool m_bStored;
 	bool m_bResetFrame;
 
 	bool m_bChanged;
@@ -224,21 +231,26 @@ private:
 
 	Frame *m_pFrame;
 	Body *m_pBody;
-	Panel *m_pPanel;
-	CVector *m_pNode;
 
     BodyGridDlg *m_BodyGridDlg;
 
-	static QList<void*> *s_poaBody;
 
 	ArcBall m_ArcBall;
 	QPoint m_LastPoint, m_PointDown;
+
+	//make static to keep settings across multiple calls
+	static bool s_bglLight;
+	static bool s_bOutline;                   /**< true if the surface outlines are to be displayed in the 3D view*/
+	static bool s_bSurfaces;                  /**< true if the surfaces are to be displayed in the 3D view*/
+	static bool s_bVLMPanels;                 /**< true if the panels are to be displayed in the 3D view*/
+	static bool s_bAxes;                      /**< true if the axes are to be displayed in the 3D view*/
+	static bool s_bShowMasses;                /**< true if the point masses are to be displayed on the openGL 3D view */
+
 
 	bool m_bEnableName;
 	bool m_bTrans;
 	bool m_bDragPoint;
 	bool m_bArcball;			//true if the arcball is to be displayed
-	bool m_bglLight;
 	bool m_bCrossPoint;			//true if the control point on the arcball is to be displayed
 	bool m_bPickCenter;			//true if the user is in the process of picking a new center for OpenGL display
 	bool m_bResetglBody;
@@ -253,7 +265,6 @@ private:
 //	int m_iView;
 	static int s_NHoopPoints;			//hoop resolution for NURBS bodies
 	static int s_NXPoints;				//longitudinal resolution for NURBS Bodies
-	int m_Precision[10];
 
 	double m_ClipPlanePos;
 	double MatIn[4][4], MatOut[4][4];
@@ -261,9 +272,6 @@ private:
 	double m_glTop, m_HorizontalSplit, m_VerticalSplit;//screen split ratio for body 3D view
 	double m_glScaled;//zoom factor for UFO
 	double m_BodyScale, m_FrameScale, m_BodyRefScale, m_FrameRefScale;			// scale for 3D display
-	double m_GLScale;	// the OpenGl scale for the view frustrum with respect to the windows device context
-						// this is not the scale to display the model in the OpenGL view
-	double m_LetterWidth;
 
 	CVector m_UFOOffset;
 	CVector m_BodyOffset;

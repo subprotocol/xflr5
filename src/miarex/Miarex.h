@@ -44,7 +44,6 @@
 #include <QDialog>
 #include <QDataStream>
 #include <QSettings>
-#include "../objects/ArcBall.h"
 #include "GL3DScales.h"
 #include "PanelAnalysisDlg.h"
 #include "LLTAnalysisDlg.h"
@@ -52,6 +51,7 @@
 #include "../misc/DoubleEdit.h"
 #include "../misc/LineCbBox.h"
 #include "../misc/LineDelegate.h"
+#include "../objects/ArcBall.h"
 #include "../objects/Body.h"
 #include "../objects/Wing.h"
 #include "../objects/Plane.h"
@@ -682,6 +682,8 @@ public:
 public:
 	QColor m_CpColor;
 	int m_CpStyle, m_CpWidth;
+
+	void *m_pglLightDlg;
 };
 
 #endif // QMIAREX_H

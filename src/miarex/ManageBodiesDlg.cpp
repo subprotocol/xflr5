@@ -316,7 +316,7 @@ void ManageBodiesDlg::OnNew()
 	QMiarex * pMiarex = (QMiarex*)s_pMiarex;
 	GL3dBodyDlg glbDlg((MainFrame*)s_pMainFrame);
 	Body *pBody = new Body;
-	glbDlg.SetBody(pBody);
+	glbDlg.InitDialog(pBody);
 	if(glbDlg.exec() == QDialog::Accepted)
 	{
 		pMiarex->AddBody(pBody);

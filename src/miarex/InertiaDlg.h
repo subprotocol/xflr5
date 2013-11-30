@@ -76,10 +76,7 @@ private:
 	void SetupLayout();
 	void ReadData();
 
-	Body *m_pBody;
-	Wing *m_pWing;
-	Plane *m_pPlane;
-
+	//layout widget variables
 	QStackedWidget *m_pctrlTopStack;
 	QPushButton *m_pctrlWingInertia, *m_pctrlWing2Inertia, *m_pctrlStabInertia, *m_pctrlFinInertia, *m_pctrlBodyInertia;
 	QPushButton *OKButton;
@@ -100,10 +97,15 @@ private:
 	QMenu *m_pContextMenu;
 	QAction *m_pInsertMassRow, *m_pDeleteMassRow;
 
+
+	//member variables
+	Body *m_pBody;
+	Wing *m_pWing;
+	Plane *m_pPlane;
+
 	double m_VolumeMass;
 	CVector m_VolumeCoG;
 
-	CVector m_PtRef;
 	double m_CoGIxx, m_CoGIyy, m_CoGIzz, m_CoGIxz;
 
 	QList<PointMass*> m_PointMass;

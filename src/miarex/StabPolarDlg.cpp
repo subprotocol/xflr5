@@ -930,7 +930,7 @@ void StabPolarDlg::SetWPolarName()
 	{
 		if(m_pPlane)
 		{
-            if(qAbs(s_StabPolar.m_ControlGain[0]>PRECISION) && m_pPlane)
+            if(qAbs(s_StabPolar.m_ControlGain[0])>PRECISION && m_pPlane)
 			{
 				strong = QString(QString::fromUtf8("-Wing(%g1)"))
 								   .arg(s_StabPolar.m_ControlGain[0],0,'f',1);

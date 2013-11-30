@@ -44,7 +44,6 @@ InertiaDlg::InertiaDlg(QWidget *pParent) : QDialog(pParent)
 	m_pWing = NULL;
 	m_pBody = NULL;
 
-	m_PtRef.Set(0.0, 0.0, 0.0);
 	m_CoGIxx = m_CoGIyy = m_CoGIzz = m_CoGIxz = 0.0;
 
 	m_VolumeMass = 0.0;
@@ -104,7 +103,6 @@ void InertiaDlg::ComputeInertia()
 
 	m_CoGIxx = m_CoGIyy = m_CoGIzz = m_CoGIxz = 0.0;
 	m_VolumeCoG.Set(0.0, 0.0, 0.0);
-	m_PtRef.Set(0.0, 0.0, 0.0);
 
 	Wing *pWing[MAXWINGS];
 	pWing[0] = pWing[1] = pWing[2] = pWing[3] = NULL;

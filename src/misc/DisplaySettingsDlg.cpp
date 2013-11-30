@@ -221,7 +221,6 @@ void DisplaySettingsDlg::OnStyleChanged(const QString &StyleName)
 	for(int is=0; is<filesList.count(); is++)
 	{
 		QString styleSheetName = filesList.at(is);
-		qDebug()<<styleSheetName;
 		int len = styleSheetName.length();
 		styleSheetName = styleSheetName.left(len-4);
 		if(styleSheetName.compare(StyleName)==0)

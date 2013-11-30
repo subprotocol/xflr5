@@ -49,13 +49,13 @@ void GLCreateBody3DSplines( int iList, Body *pBody, int nx, int nh)
 		if(MainFrame::s_bAlphaChannel && pBody->m_BodyColor.alpha()<255)
 		{
 			glColor4d(pBody->m_BodyColor.redF(),pBody->m_BodyColor.greenF(),pBody->m_BodyColor.blueF(), pBody->m_BodyColor.alphaF());
-			glEnable (GL_BLEND);
-			glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+			glEnable(GL_BLEND);
+			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		}
 		else
 		{
 			glColor3d(pBody->m_BodyColor.redF(),pBody->m_BodyColor.greenF(),pBody->m_BodyColor.blueF());
-			glDisable (GL_BLEND);
+			glDisable(GL_BLEND);
 		}
 		glEnable(GL_DEPTH_TEST);
 		glEnable(GL_POLYGON_OFFSET_FILL);
@@ -143,6 +143,7 @@ void GLCreateBody3DSplines( int iList, Body *pBody, int nx, int nh)
 		glLineWidth(W3dPrefsDlg::s_OutlineWidth);
 
 		glEnable(GL_LINE_STIPPLE);
+		glEnable(GL_DEPTH_TEST);
 		if     (W3dPrefsDlg::s_OutlineStyle == Qt::DashLine)       glLineStipple (1, 0xCFCF);
 		else if(W3dPrefsDlg::s_OutlineStyle == Qt::DotLine)        glLineStipple (1, 0x6666);
 		else if(W3dPrefsDlg::s_OutlineStyle == Qt::DashDotLine)    glLineStipple (1, 0xFF18);
@@ -206,6 +207,7 @@ void GLCreateBody3DSplines( int iList, Body *pBody, int nx, int nh)
 			}
 		}
 		glEnd();
+		glDisable(GL_DEPTH_TEST);
 		glDisable(GL_LINE_STIPPLE);
 	}
 	glEndList();

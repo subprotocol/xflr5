@@ -100,15 +100,16 @@ QMenuBar::item:selected
 QMenuBar::item:disabled
 {
 	background: transparent;
-	color: gray;
+	color: dimgray;
 }
 
 
-QMenuBar::item:disabled:hover
+QMenuBar::item:pressed:disabled
 {
 	background: transparent;
-	color: gray;
+	color: dimgray;
 }
+
 
 QMenuBar::item:pressed
 {
@@ -143,6 +144,10 @@ QMenu::item:selected
 	color: black;
 }
 
+QMenu::item:disabled
+{
+	color: dimgray;
+}
 
 QMenu::separator
 {
@@ -268,7 +273,7 @@ LineBtn
 	background-color: #101010;
 	border: 1px solid #7f7f7f;
 	border-radius: 5px;
-	min-height: 3ex;
+	min-height: 3.5ex;
 }
 
 LineBtn:hover
@@ -698,17 +703,29 @@ QRadioButton:disabled
 QRadioButton::indicator
 {
     background: qradialgradient(cx:0.5, cy:0.5, radius: 0.7, fx:0.5, fy:0.5, stop:0 dimgray, stop:1 black) ;
-    min-width: 9px;
-    min-height: 9px;
+    width: 9px;
+    height: 9px;
     border: 1px solid gray;
     padding: 1px;
-    border-radius: 5px;
+    border-radius: 4.5px;
+}
+
+QRadioButton::indicator:unchecked
+{
+    background: transparent;
 }
 
 QRadioButton::indicator:checked
 {
     background: qradialgradient(cx:0.5, cy:0.5, radius: 0.7, fx:0.5, fy:0.5, stop:0 lightcoral, stop:1 black) ;
 }
+
+QRadioButton::indicator:checked:disabled
+{
+    background: qradialgradient(cx:0.5, cy:0.5, radius: 0.7, fx:0.5, fy:0.5, stop:0 dimgray, stop:1 black) ;
+}
+
+
 
 /*_____________________ QToolTip ______________________*/
 

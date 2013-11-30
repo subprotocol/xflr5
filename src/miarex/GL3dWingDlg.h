@@ -202,19 +202,22 @@ private:
 	bool m_bArcball;			//true if the arcball is to be displayed
 	bool m_bCrossPoint;			//true if the control point on the arcball is to be displayed
 	bool m_bPickCenter;			//true if the user is in the process of picking a new center for OpenGL display
-	bool m_bShowLight;			// true if the virtual light is to be displayed
 	bool m_bResetglWing;
 	bool m_bResetglSectionHighlight;
-	bool m_bFoilNames;
-	bool m_bShowMasses;
+
+	static bool s_bOutline;                   /**< true if the surface outlines are to be displayed in the 3D view*/
+	static bool s_bSurfaces;                  /**< true if the surfaces are to be displayed in the 3D view*/
+	static bool s_bVLMPanels;                 /**< true if the panels are to be displayed in the 3D view*/
+	static bool s_bAxes;                      /**< true if the axes are to be displayed in the 3D view*/
+	static bool s_bShowMasses;                /**< true if the point masses are to be displayed on the openGL 3D view */
+	static bool s_bFoilNames;                 /**< true if the foil names are to be displayed on the openGL 3D view */
+
 
 	int m_iSection;
-	int m_StackPos, m_StackSize;// undo : current stack position and current stack size
 	int m_GLList;
 //	int m_iView;
 
 //	double m_yMAC;
-	double m_glTop, m_HorizontalSplit, m_VerticalSplit;//screen split ratio for body 3D view
 	double m_glScaled;//zoom factor for UFO
 	double m_ClipPlanePos;
 	double MatIn[4][4], MatOut[4][4];

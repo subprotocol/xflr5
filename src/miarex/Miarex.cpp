@@ -99,6 +99,9 @@ QMiarex::QMiarex(QWidget *parent)
 	Wing::s_p3DPanelDlg = m_pPanelDlg;  //pointer to the 3DPanel analysis dialog class
 	m_pPanelDlg->m_pCoreSize     = &s_CoreSize;
 
+	m_pglLightDlg = new GLLightDlg(pMainFrame);
+
+
 	m_Node = m_MemNode = m_WakeNode = m_RefWakeNode = NULL;
 	m_Panel = m_MemPanel = m_WakePanel = m_RefWakePanel = NULL;
 
@@ -537,6 +540,7 @@ QMiarex::~QMiarex()
 {
 	Release();
 
+	delete (GLLightDlg*)m_pglLightDlg;
 	delete m_pPanelDlg;
 	delete m_pLLTDlg;
 }
@@ -4726,6 +4730,14 @@ void QMiarex::GLDraw3D()
 		m_GLList++;
 	}
 
+
+	if(!glIsList(GLLISTSPHERE))
+	{
+		p3dWidget->GLCreateUnitSphere();
+		m_GLList++;
+	}
+
+
 	if(m_bResetglBody && m_pCurBody)
 	{
 		if(glIsList(BODYGEOMBASE))
@@ -4993,14 +5005,13 @@ void QMiarex::GLDrawMasses()
 	GetWeightUnit(MassUnit, MainFrame::s_WeightUnit);
 
     glColor3d(W3dPrefsDlg::s_MassColor.redF(), W3dPrefsDlg::s_MassColor.greenF(), W3dPrefsDlg::s_MassColor.blueF());
-	double radius = .01;//2cm
+
 	double zdist = 25.0/(double)m_r3DCltRect.width();
 
 	for(int iw=0; iw<MAXWINGS; iw++)
 	{
 		if(m_pWingList[iw])
 		{
-			glColor3d(0.3, 0.3, 1.0);
 			glPushMatrix();
 			{
 				if(m_pCurPlane)
@@ -5012,6 +5023,7 @@ void QMiarex::GLDrawMasses()
 					else                          glTranslated(0.0, m_pWingList[iw]->m_ProjectedSpan/4.0,0.0);
 
 
+					glColor3d(0.5, 1.0, 0.5);
 					p3dWidget->renderText(0.0, 0.0, zdist,
 										  m_pWingList[iw]->m_WingName+
 										  QString(" %1").arg(m_pWingList[iw]->m_VolumeMass*MainFrame::s_kgtoUnit, 7,'g',3)+
@@ -5020,7 +5032,6 @@ void QMiarex::GLDrawMasses()
 			}
 			glPopMatrix();
 
-            glColor3d(W3dPrefsDlg::s_MassColor.redF(), W3dPrefsDlg::s_MassColor.greenF(), W3dPrefsDlg::s_MassColor.blueF());
 			for(int im=0; im<m_pWingList[iw]->m_PointMass.size(); im++)
 			{
 				glPushMatrix();
@@ -5034,7 +5045,9 @@ void QMiarex::GLDrawMasses()
 					glTranslated(m_pWingList[iw]->m_PointMass[im]->position().x,
 								 m_pWingList[iw]->m_PointMass[im]->position().y,
 								 m_pWingList[iw]->m_PointMass[im]->position().z);
-                    p3dWidget->GLRenderSphere(W3dPrefsDlg::s_MassColor,radius,18,18);
+					glColor3d(W3dPrefsDlg::s_MassColor.redF(), W3dPrefsDlg::s_MassColor.greenF(), W3dPrefsDlg::s_MassColor.blueF());
+					p3dWidget->GLRenderSphere(W3dPrefsDlg::s_MassRadius/m_glScaled);
+					glColor3d(MainFrame::s_TextColor.redF(), MainFrame::s_TextColor.greenF(), MainFrame::s_TextColor.blueF());
 					p3dWidget->renderText(0.0, 0.0, 0.0 +.02,
 										  m_pWingList[iw]->m_PointMass[im]->tag()
 										  +QString(" %1").arg(m_pWingList[iw]->m_PointMass[im]->mass()*MainFrame::s_kgtoUnit, 7,'g',3)
@@ -5055,7 +5068,9 @@ void QMiarex::GLDrawMasses()
 				glTranslated(m_pCurPlane->m_PointMass[im]->position().x,
 							 m_pCurPlane->m_PointMass[im]->position().y,
 							 m_pCurPlane->m_PointMass[im]->position().z);
-                p3dWidget->GLRenderSphere(W3dPrefsDlg::s_MassColor,radius,18,18);
+				glColor3d(W3dPrefsDlg::s_MassColor.redF(), W3dPrefsDlg::s_MassColor.greenF(), W3dPrefsDlg::s_MassColor.blueF());
+				p3dWidget->GLRenderSphere(W3dPrefsDlg::s_MassRadius/m_glScaled);
+				glColor3d(MainFrame::s_TextColor.redF(), MainFrame::s_TextColor.greenF(), MainFrame::s_TextColor.blueF());
 				p3dWidget->renderText(0.0,0.0,0.0+.02,
 								  m_pCurPlane->m_PointMass[im]->tag()
 								  +QString(" %1").arg(m_pCurPlane->m_PointMass[im]->mass()*MainFrame::s_kgtoUnit, 7,'g',3)
@@ -5078,6 +5093,7 @@ void QMiarex::GLDrawMasses()
 							 m_pCurPlane->BodyPos().y,
 							 m_pCurPlane->BodyPos().z);
 
+				glColor3d(0.5, 1.0, 0.5);
 				p3dWidget->renderText(0.0, 0.0, zdist,
 								  m_pCurBody->m_BodyName+
 								  QString(" %1").arg(m_pCurBody->m_VolumeMass*MainFrame::s_kgtoUnit, 7,'g',3)+
@@ -5098,8 +5114,10 @@ void QMiarex::GLDrawMasses()
 								 m_pCurPlane->BodyPos().z);
 				}
 
-                p3dWidget->GLRenderSphere(W3dPrefsDlg::s_MassColor,radius,18,18);
+				glColor3d(W3dPrefsDlg::s_MassColor.redF(), W3dPrefsDlg::s_MassColor.greenF(), W3dPrefsDlg::s_MassColor.blueF());
+				p3dWidget->GLRenderSphere(W3dPrefsDlg::s_MassRadius/m_glScaled);
 
+				glColor3d(MainFrame::s_TextColor.redF(), MainFrame::s_TextColor.greenF(), MainFrame::s_TextColor.blueF());
 				p3dWidget->renderText(0.0, 0.0, 0.0+.02,
 								  m_pCurBody->m_PointMass[im]->tag()
 								  +QString(" %1").arg(m_pCurBody->m_PointMass[im]->mass()*MainFrame::s_kgtoUnit, 7,'g',3)
@@ -5126,7 +5144,9 @@ void QMiarex::GLDrawMasses()
 		glPushMatrix();
 		{
 			glTranslated(CoG.x,CoG.y,CoG.z);
-			p3dWidget->GLRenderSphere(QColor(255,0,0),radius,18,18);
+			glColor3d(1.0, 0.5, 0.5);
+			p3dWidget->GLRenderSphere(W3dPrefsDlg::s_MassRadius*2.0/m_glScaled);
+			glColor3d(MainFrame::s_TextColor.redF(), MainFrame::s_TextColor.greenF(), MainFrame::s_TextColor.blueF());
 			p3dWidget->renderText(0.0, 0.0, 0.0+.02,
 							  "CoG "+QString("%1").arg(Mass*MainFrame::s_kgtoUnit, 7,'g',3)
 							  +MassUnit);
@@ -5491,7 +5511,8 @@ void QMiarex::GLInverseMatrix()
 void QMiarex::GLRenderView()
 {
 	ThreeDWidget *p3dWidget = (ThreeDWidget*)s_p3dWidget;
-	GLLightDlg gllDlg((MainFrame*)s_pMainFrame);
+
+	GLLightDlg *pgllDlg = (GLLightDlg*)m_pglLightDlg;
 
 	double LightFactor;
 	if(m_pCurWing) LightFactor =  (GLfloat)pow(m_pCurWing->m_PlanformSpan/2.0,.1);
@@ -5523,21 +5544,18 @@ void QMiarex::GLRenderView()
 			p3dWidget->renderText(15, 15, strong, MainFrame::s_TextFont);
 		}
 
-		if(gllDlg.isVisible())
+		if(pgllDlg->isVisible())
 		{
 			glDisable(GL_LIGHTING);
 			glDisable(GL_LIGHT0);
 			glPushMatrix();
 			{
-				glTranslated(( gllDlg.s_XLight+ m_UFOOffset.x)*m_GLScale,
-							 ( gllDlg.s_YLight+ m_UFOOffset.y)*m_GLScale,
-							   gllDlg.s_ZLight*m_GLScale);
-				double radius = (gllDlg.s_ZLight+2.0)/40.0*m_GLScale;
-				QColor color;
-				color = QColor((int)(gllDlg.s_Red  *255),
-							   (int)(gllDlg.s_Green*255),
-							   (int)(gllDlg.s_Blue *255));
-				p3dWidget->GLRenderSphere(color,radius,18,18);
+				glTranslated(( pgllDlg->s_XLight+ m_UFOOffset.x)*m_GLScale,
+							 ( pgllDlg->s_YLight+ m_UFOOffset.y)*m_GLScale,
+							   pgllDlg->s_ZLight*m_GLScale);
+				double radius = (pgllDlg->s_ZLight+2.0)/40.0*m_GLScale;
+				glColor3d(pgllDlg->s_Red, pgllDlg->s_Green, pgllDlg->s_Blue);
+				p3dWidget->GLRenderSphere(radius/m_glScaled);
 			}
 			glPopMatrix();
 		}
@@ -5585,8 +5603,7 @@ void QMiarex::GLRenderView()
 
         if(s_bFoilNames) GLDrawFoils();
 
-        if(s_bShowMasses) GLDrawMasses();
-
+		if(s_bShowMasses) GLDrawMasses();
 
 		glLoadIdentity();
         glDisable(GL_CLIP_PLANE1);
@@ -8828,42 +8845,41 @@ void QMiarex::OnEditCurBody()
 
 	if(glbDlg.exec() == QDialog::Accepted)
 	{
-		if(bUsed)
-		{
-			mdDlg.m_Question = tr("The modification will erase all results for the planes using this body.\nContinue ?");
-			mdDlg.InitDialog();
-			int Ans = mdDlg.exec();
-			if (Ans == QDialog::Rejected)
-			{
-				//restore geometry
-				m_pCurBody->Duplicate(&memBody);
-				return;
-			}
-			else if(Ans==20)
-			{
-				Body* pNewBody= new Body();
-				pNewBody->Duplicate(m_pCurBody);
-				m_pCurBody->Duplicate(&memBody);
-				if(!SetModBody(pNewBody))
-				{
-					delete pNewBody;
-				}
 
-				return;
-			}
-			else
+		mdDlg.m_Question = tr("The modification will erase all results for the planes using this body.\nContinue ?");
+		mdDlg.InitDialog();
+		int Ans = mdDlg.exec();
+		if (Ans == QDialog::Rejected)
+		{
+			//restore geometry
+			m_pCurBody->Duplicate(&memBody);
+			return;
+		}
+		else if(Ans==20)
+		{
+			Body* pNewBody= new Body();
+			pNewBody->Duplicate(m_pCurBody);
+			m_pCurBody->Duplicate(&memBody);
+			if(!SetModBody(pNewBody))
 			{
-				//delete all results associated to planes using this body
-				for (i=0; i<m_poaPlane->count();i++)
+				delete pNewBody;
+			}
+
+			return;
+		}
+		else
+		{
+			//delete all results associated to planes using this body
+			for (i=0; i<m_poaPlane->count();i++)
+			{
+				pPlane = (Plane*)m_poaPlane->at(i);
+				if(pPlane->body() == m_pCurBody)
 				{
-					pPlane = (Plane*)m_poaPlane->at(i);
-					if(pPlane->body() == m_pCurBody)
-					{
-						pMainFrame->DeletePlane(pPlane, true);
-					}
+					pMainFrame->DeletePlane(pPlane, true);
 				}
 			}
 		}
+
 
 		if(m_iView==WPOLARVIEW)     CreateWPolarCurves();
 		else if(m_iView==WSTABVIEW) CreateStabilityCurves();
@@ -11411,13 +11427,13 @@ void QMiarex::OnSetupLight()
 	if(m_iView!=W3DVIEW && m_iView!=WSTABVIEW) return;
 	ThreeDWidget *p3dWidget = (ThreeDWidget*)s_p3dWidget;
 
-	GLLightDlg gllDlg((MainFrame*)s_pMainFrame);
-	gllDlg.m_p3DWidget= s_p3dWidget;
+	GLLightDlg *pgllDlg = (GLLightDlg*)m_pglLightDlg;
+	pgllDlg->m_p3DWidget= s_p3dWidget;
 /*    QSize size = QSize(400,400);
     QPoint pos = QPoint(100,50);
 	gllDlg.resize(size);
 	gllDlg.move(pos); */
-	gllDlg.show();
+	pgllDlg->show();
 
 	double LightFactor;
 	if(m_pCurWing) LightFactor =  (GLfloat)pow(m_pCurWing->m_PlanformSpan/2.0,0.1);

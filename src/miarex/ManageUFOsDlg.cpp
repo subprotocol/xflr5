@@ -205,16 +205,15 @@ void ManageUFOsDlg::SetupLayout()
 
 void ManageUFOsDlg::FillUFOTable()
 {
-	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	int i,n;
-	m_pUFOModel->setRowCount(pMainFrame->m_oaWing.size() + pMainFrame->m_oaPlane.size());
+    m_pUFOModel->setRowCount(MainFrame::s_oaWing.size() + MainFrame::s_oaPlane.size());
 
-	for(i=0; i<pMainFrame->m_oaWing.size(); i++)
+    for(i=0; i<MainFrame::s_oaWing.size(); i++)
 	{
 		FillWingRow(i);
 	}
-	n = pMainFrame->m_oaWing.size();
-	for(i=0; i<pMainFrame->m_oaPlane.size(); i++)
+    n = MainFrame::s_oaWing.size();
+    for(i=0; i<MainFrame::s_oaPlane.size(); i++)
 	{
 		FillPlaneRow(i,n);
 	}
@@ -223,12 +222,10 @@ void ManageUFOsDlg::FillUFOTable()
 
 void ManageUFOsDlg::FillWingRow(int row)
 {
-	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
-
-	if(row>=pMainFrame->m_oaWing.size()) return;
+    if(row>=MainFrame::s_oaWing.size()) return;
 
 	QModelIndex ind;
-	Wing *pWing = (Wing*)pMainFrame->m_oaWing.at(row);
+    Wing *pWing = (Wing*)MainFrame::s_oaWing.at(row);
 	if(!pWing) return;
 
 	ind = m_pUFOModel->index(row, 0, QModelIndex());
@@ -260,12 +257,11 @@ void ManageUFOsDlg::FillWingRow(int row)
 
 void ManageUFOsDlg::FillPlaneRow(int row, int n)
 {
-	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	QModelIndex ind;
 
-	if(row>=pMainFrame->m_oaPlane.size()) return;
+    if(row>=MainFrame::s_oaPlane.size()) return;
 
-	Plane *pPlane = (Plane*)pMainFrame->m_oaPlane.at(row);
+    Plane *pPlane = (Plane*)MainFrame::s_oaPlane.at(row);
 	if(!pPlane) return;
 	Wing *pWing = pPlane->wing();
 

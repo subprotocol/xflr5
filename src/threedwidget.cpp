@@ -24,6 +24,7 @@
 #define GLWINGVIEW  7
 */
 
+
 #include <QtOpenGL>
 #include "mainframe.h"
 #include "miarex/Miarex.h" 
@@ -31,6 +32,7 @@
 #include "graph/Curve.h"
 #include "miarex/GL3dBodyDlg.h"
 #include "miarex/GL3dWingDlg.h"
+#include "misc/W3dPrefsDlg.h"
 #include "threedwidget.h"
 
 void *ThreeDWidget::s_pMiarex;
@@ -50,6 +52,7 @@ ThreeDWidget::ThreeDWidget(QWidget *parent)
 	setMouseTracking(true);
 	setCursor(Qt::CrossCursor);
 }
+
 
 /**
 *Overrides the contextMenuEvent method of the base class.
@@ -80,6 +83,7 @@ void ThreeDWidget::contextMenuEvent (QContextMenuEvent * event)
 	}
 }
 
+
 /**
 *Overrides the mousePressEvent method of the base class.
 *Dispatches the handling to the active child application.
@@ -102,6 +106,7 @@ void ThreeDWidget::mousePressEvent(QMouseEvent *event)
 		pDlg->MousePressEvent(event);
 	}
 }
+
 
 /**
 *Overrides the mouseReleaseEvent method of the base class.
@@ -553,74 +558,101 @@ void ThreeDWidget::GLDrawAxes(double length, QColor AxisColor, int AxisStyle, in
 
 
 
+/**
+Creates a list for a sphere with unit radius
+*/
+void ThreeDWidget::GLCreateUnitSphere()
+{
+	double start_lat, start_lon,lat_incr, lon_incr, R;
+	double phi1, phi2, theta1, theta2;
+	GLdouble u[3], v[3], w[3], n[3];
+	int row, col;
+
+	int NumLongitudes, NumLatitudes;
+	NumLongitudes = NumLatitudes = 19;
+
+	glNewList(GLLISTSPHERE, GL_COMPILE);
+	{
+		glDisable(GL_TEXTURE_2D);
+
+		glEnable(GL_DEPTH_TEST);
+		glEnable(GL_POLYGON_OFFSET_FILL);
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
+		glBegin(GL_TRIANGLES);
+//		glColor3d(cr.redF(),cr.greenF(),cr.blueF());
+
+		start_lat = -90;
+		start_lon = 0.0;
+		R = 1.0;
+
+		lat_incr = 180.0 / NumLatitudes;
+		lon_incr = 360.0 / NumLongitudes;
+
+		for (col = 0; col < NumLongitudes; col++)
+		{
+			phi1 = (start_lon + col * lon_incr) * PI/180.0;
+			phi2 = (start_lon + (col + 1) * lon_incr) * PI/180.0;
+
+			for (row = 0; row < NumLatitudes; row++)
+			{
+				theta1 = (start_lat + row * lat_incr) * PI/180.0;
+				theta2 = (start_lat + (row + 1) * lat_incr) * PI/180.0;
+
+				u[0] = R * cos(phi1) * cos(theta1);//x
+				u[1] = R * sin(theta1);//y
+				u[2] = R * sin(phi1) * cos(theta1);//z
+
+				v[0] = R * cos(phi1) * cos(theta2);//x
+				v[1] = R * sin(theta2);//y
+				v[2] = R * sin(phi1) * cos(theta2);//z
+
+				w[0] = R * cos(phi2) * cos(theta2);//x
+				w[1] = R * sin(theta2);//y
+				w[2] = R * sin(phi2) * cos(theta2);//z
+
+				NormalVector(u,v,w,n);
+
+				glNormal3dv(n);
+				glVertex3dv(u);
+				glVertex3dv(v);
+				glVertex3dv(w);
+
+				v[0] = R * cos(phi2) * cos(theta1);//x
+				v[1] = R * sin(theta1);//y
+				v[2] = R * sin(phi2) * cos(theta1);//z
+
+				NormalVector(u,w,v,n);
+				glNormal3dv(n);
+				glVertex3dv(u);
+				glVertex3dv(w);
+				glVertex3dv(v);
+			}
+		}
+		glEnd();
+
+		glDisable(GL_DEPTH_TEST);
+	}
+	glEndList();
+}
+
+
+
 
 /**
 *Renders a sphere in the viewport. Used to draw the point masses and the light.
-*@param cr the sphere's color
 *@param radius the sphere's radius, in IS units
-*@param NumLongitudes the number of longitude arcs to be used to draw the sphere
-*@param NumLatitudes the number of latitude arcs to be used to draw the sphere
 */
-void ThreeDWidget::GLRenderSphere(QColor cr, double radius, int NumLongitudes, int NumLatitudes)
+void ThreeDWidget::GLRenderSphere(double radius)
 {
-	static double start_lat, start_lon,lat_incr, lon_incr, R;
-	static double phi1, phi2, theta1, theta2;
-	static GLdouble u[3], v[3], w[3], n[3];
-	static int row, col;
-
-	glDisable(GL_TEXTURE_2D);
-	glPolygonMode(GL_FRONT,GL_FILL);
-	glBegin(GL_TRIANGLES);
-	glColor3d(cr.redF(),cr.greenF(),cr.blueF());
-
-	start_lat = -90;
-	start_lon = 0.0;
-	R = radius;
-
-	lat_incr = 180.0 / NumLatitudes;
-	lon_incr = 360.0 / NumLongitudes;
-
-	for (col = 0; col < NumLongitudes; col++)
+	if(radius>0)
 	{
-		phi1 = (start_lon + col * lon_incr) * PI/180.0;
-		phi2 = (start_lon + (col + 1) * lon_incr) * PI/180.0;
-
-		for (row = 0; row < NumLatitudes; row++)
-		{
-			theta1 = (start_lat + row * lat_incr) * PI/180.0;
-			theta2 = (start_lat + (row + 1) * lat_incr) * PI/180.0;
-
-			u[0] = R * cos(phi1) * cos(theta1);//x
-			u[1] = R * sin(theta1);//y
-			u[2] = R * sin(phi1) * cos(theta1);//z
-
-			v[0] = R * cos(phi1) * cos(theta2);//x
-			v[1] = R * sin(theta2);//y
-			v[2] = R * sin(phi1) * cos(theta2);//z
-
-			w[0] = R * cos(phi2) * cos(theta2);//x
-			w[1] = R * sin(theta2);//y
-			w[2] = R * sin(phi2) * cos(theta2);//z
-
-			NormalVector(u,v,w,n);
-
-			glNormal3dv(n);
-			glVertex3dv(u);
-			glVertex3dv(v);
-			glVertex3dv(w);
-
-			v[0] = R * cos(phi2) * cos(theta1);//x
-			v[1] = R * sin(theta1);//y
-			v[2] = R * sin(phi2) * cos(theta1);//z
-
-			NormalVector(u,w,v,n);
-			glNormal3dv(n);
-			glVertex3dv(u);
-			glVertex3dv(w);
-			glVertex3dv(v);
-		}
+		glPushMatrix();
+		glScaled(radius, radius, radius);
+		glCallList(GLLISTSPHERE);
+		glScaled(1./radius, 1./radius, 1./radius);
+		glPopMatrix();
 	}
-	glEnd();
 }
 
 

@@ -161,6 +161,7 @@ private:
 
 	void TakePicture();
 	void SetPicture();
+
 	void UpdateView();
 
 	void wheelEvent(QWheelEvent *event);

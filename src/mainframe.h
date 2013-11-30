@@ -432,15 +432,15 @@ public:
 	static int s_MomentUnit;    /**< The index of the user selected unit in the array of moment units. */
 
 
-    static QList <void *> m_oaFoil;    /**< The array of void pointers to the Foil objects. */
+    static QList <void *> s_oaFoil;    /**< The array of void pointers to the Foil objects. */
     static QList <void *> s_oaPolar;   /**< The array of void pointers to the foil Polar objects. */
-    QList <void *> m_oaOpp;     /**< The array of void pointers to the foil operating point objects. */
-    QList <void *> m_oaPlane;   /**< The array of void pointers to the Plane objects. */
-    QList <void *> m_oaWing;    /**< The array of void pointers to the Wing objects. */
+    static QList <void *> s_oaPlane;   /**< The array of void pointers to the Plane objects. */
+    static QList <void *> s_oaWing;    /**< The array of void pointers to the Wing objects. */
+    static QList <void *> s_oaBody;    /**< The array of void pointers to the Body objects. */
     QList <void *> m_oaWPolar;  /**< The array of void pointers to the WPolar objects. */
     QList <void *> m_oaWOpp;    /**< The array of void pointers to the WingOpp objects. */
     QList <void *> m_oaPOpp;    /**< The array of void pointers to the PlaneOpp objects. */
-    QList <void *> m_oaBody;    /**< The array of void pointers to the Body objects. */
+    QList <void *> m_oaOpp;     /**< The array of void pointers to the foil operating point objects. */
 
 	void *m_pGL3DScales;
 

@@ -38,6 +38,8 @@
 /** @enum This enumeration lists the different 3D views used in the program, i.e. the view in Miarex, in Body edition and in Wing edition.*/
 typedef enum {GLMIAREXVIEW,GLBODYVIEW, GLWINGVIEW} enumGLView;
 
+#define GLLISTSPHERE 531
+
 
 /**
 *@class ThreeDWidget 
@@ -61,7 +63,8 @@ public:
 	void CreateArcballList(ArcBall &ArcBall, double GLScale);
 	void ClientToGL(QPoint const &point, CVector &real);
 	void GLDrawAxes(double length, QColor AxisColor, int AxisStyle, int AxisWidth);
-	void GLRenderSphere(QColor cr, double radius, int NumLongitudes, int NumLatitudes);
+	void GLCreateUnitSphere();
+	void GLRenderSphere(double radius);
 	void GLSetupLight(double Offset_y, double LightFactor);
 	void GLToClient(CVector const &real, QPoint &point);
     void GLToClient(double const &x, double const &y, QPoint &point);

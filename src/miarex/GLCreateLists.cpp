@@ -1925,7 +1925,7 @@ void GLCreateStreamLines(void *pQMiarex, Wing *PlaneWing[MAXWINGS], CVector *pNo
 	QProgressDialog dlg("Streamlines calculation", "Abort", 0, pMiarex->m_MatSize, pMainFrame);
 //	dlg.setWindowModality(Qt::WindowModal);
 
-	GL3DScales *p3DScales = (GL3DScales *)pMainFrame->m_pGL3DScales;
+    GL3DScales *p3DScales = (GL3DScales *)pMainFrame->m_pGL3DScales;
 	bool bFound;
 	int i;
 	int m, p, style,  iWing;

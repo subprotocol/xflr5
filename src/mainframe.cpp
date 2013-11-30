@@ -113,8 +113,11 @@ int MainFrame::s_SpeedUnit  = 0;
 int MainFrame::s_ForceUnit  = 0;
 int MainFrame::s_MomentUnit = 0;
 
-QList <void *> MainFrame::m_oaFoil;
+QList <void *> MainFrame::s_oaFoil;
 QList <void *> MainFrame::s_oaPolar;
+QList <void *> MainFrame::s_oaPlane;
+QList <void *> MainFrame::s_oaWing;
+QList <void *> MainFrame::s_oaBody;
 QLabel *MainFrame::m_pctrlProjectName = NULL;
 
 
@@ -168,6 +171,8 @@ MainFrame::MainFrame(QWidget * parent, Qt::WindowFlags flags)
 		QMessageBox::warning(this, tr("Warning"), tr("Your system does not provide support for OpenGL.\nXFLR5 will not operate correctly."));
 	}
 	
+	UndoAFoilAct = RedoAFoilAct = NULL;
+
 	CreateDockWindows();
 
 	s_TextFont.setStyleHint(QFont::TypeWriter, QFont::OpenGLCompatible);
@@ -280,10 +285,10 @@ MainFrame::~MainFrame()
 {
 	if(s_pTraceFile) s_pTraceFile->close();
 
-	for(int ioa=m_oaFoil.size()-1; ioa>=0; ioa--)
+    for(int ioa=s_oaFoil.size()-1; ioa>=0; ioa--)
 	{
-		delete (Foil*)m_oaFoil.at(ioa);
-		m_oaFoil.removeAt(ioa);
+        delete (Foil*)s_oaFoil.at(ioa);
+        s_oaFoil.removeAt(ioa);
 	}
 
     for(int ioa=s_oaPolar.size()-1; ioa>=0; ioa--)
@@ -298,16 +303,16 @@ MainFrame::~MainFrame()
 		m_oaOpp.removeAt(ioa);
 	}
 
-	for(int ioa=m_oaPlane.size()-1; ioa>=0; ioa--)
+    for(int ioa=s_oaPlane.size()-1; ioa>=0; ioa--)
 	{
-		delete (Plane*)m_oaPlane.at(ioa);
-		m_oaPlane.removeAt(ioa);
+        delete (Plane*)s_oaPlane.at(ioa);
+        s_oaPlane.removeAt(ioa);
 	}
 
-	for(int ioa=m_oaWing.size()-1; ioa>=0; ioa--)
+    for(int ioa=s_oaWing.size()-1; ioa>=0; ioa--)
 	{
-		delete (Wing*)m_oaWing.at(ioa);
-		m_oaWing.removeAt(ioa);
+        delete (Wing*)s_oaWing.at(ioa);
+        s_oaWing.removeAt(ioa);
 	}
 
 	for(int ioa=m_oaWPolar.size()-1; ioa>=0; ioa--)
@@ -328,10 +333,10 @@ MainFrame::~MainFrame()
 		m_oaPOpp.removeAt(ioa);
 	}
 
-	for(int ioa=m_oaBody.size()-1; ioa>=0; ioa--)
+    for(int ioa=s_oaBody.size()-1; ioa>=0; ioa--)
 	{
-		delete (Body*)m_oaBody.at(ioa);
-		m_oaBody.removeAt(ioa);
+        delete (Body*)s_oaBody.at(ioa);
+        s_oaBody.removeAt(ioa);
 	}
 }
 
@@ -370,17 +375,17 @@ void MainFrame::AddFoil(Foil *pFoil)
 
 	bool IsInserted = false;
 
-	for (int i=0; i<m_oaFoil.size(); i++)
+    for (int i=0; i<s_oaFoil.size(); i++)
 	{
-		pOldFoil = (Foil*)m_oaFoil.at(i);
+        pOldFoil = (Foil*)s_oaFoil.at(i);
 		if (pFoil->m_FoilName < pOldFoil->m_FoilName)
 		{
-			m_oaFoil.insert(i, pFoil);
+            s_oaFoil.insert(i, pFoil);
 			IsInserted = true;
 			break;
 		}
 	}
-	if (!IsInserted) m_oaFoil.append(pFoil);
+    if (!IsInserted) s_oaFoil.append(pFoil);
 
 	pFoil->InitFoil();
 	s_pCurFoil = pFoil;
@@ -725,12 +730,12 @@ void MainFrame::CreateAFoilActions()
 
 	UndoAFoilAct= new QAction(QIcon(":/images/OnUndo.png"), tr("Undo"), this);
 	UndoAFoilAct->setShortcut(Qt::CTRL + Qt::Key_Z);
-	UndoAFoilAct->setStatusTip(tr("Cancels the last modifiction made to the splines"));
+	UndoAFoilAct->setStatusTip(tr("Cancels the last modification"));
 	connect(UndoAFoilAct, SIGNAL(triggered()), pAFoil, SLOT(OnUndo()));
 
 	RedoAFoilAct= new QAction(QIcon(":/images/OnRedo.png"), tr("Redo"), this);
 	RedoAFoilAct->setShortcut(Qt::CTRL + Qt::SHIFT + Qt::Key_Z);
-	RedoAFoilAct->setStatusTip(tr("Restores the last cancelled modifiction made to the splines"));
+	RedoAFoilAct->setStatusTip(tr("Restores the last cancelled modification"));
 	connect(RedoAFoilAct, SIGNAL(triggered()), pAFoil, SLOT(OnRedo()));
 
 	ShowAllFoils= new QAction(tr("Show All Foils"), this);
@@ -1065,9 +1070,9 @@ void MainFrame::CreateDockWindows()
 	QMiarex::s_p2dWidget = m_p2DWidget;
 	QMiarex::s_p3dWidget = m_pGLWidget;
 	pMiarex->m_ArcBall.m_p3dWidget = m_pGLWidget;
-	pMiarex->m_poaBody   = &m_oaBody;
-	pMiarex->m_poaPlane  = &m_oaPlane;
-	pMiarex->m_poaWing   = &m_oaWing;
+    pMiarex->m_poaBody   = &s_oaBody;
+    pMiarex->m_poaPlane  = &s_oaPlane;
+    pMiarex->m_poaWing   = &s_oaWing;
 	pMiarex->m_poaWPolar = &m_oaWPolar;
 	pMiarex->m_poaWOpp   = &m_oaWOpp;
 	pMiarex->m_poaPOpp   = &m_oaPOpp;
@@ -1076,24 +1081,23 @@ void MainFrame::CreateDockWindows()
 	QXDirect::s_p2DWidget              = m_p2DWidget;
 	pXDirect->m_pCpGraph->m_pParent    = m_p2DWidget;
 	for(int ig=0; ig<MAXPOLARGRAPHS; ig++) pXDirect->m_PlrGraph[ig].m_pParent = m_p2DWidget;
-	pXDirect->m_poaFoil  = &m_oaFoil;
+    pXDirect->m_poaFoil  = &s_oaFoil;
     pXDirect->m_poaPolar = &s_oaPolar;
 	pXDirect->m_poaOpp   = &m_oaOpp;
 
 	QAFoil::s_p2DWidget  = m_p2DWidget;
-	pAFoil->m_poaFoil    = &m_oaFoil;
+    pAFoil->m_poaFoil    = &s_oaFoil;
 	pAFoil->m_pXFoil     = pXDirect->m_pXFoil;
 
 	QXInverse::s_p2DWidget        = m_p2DWidget;
 	pXInverse->s_pMainFrame       = this;
 	pXInverse->m_pXFoil           = pXDirect->m_pXFoil;
 	pXInverse->s_p2DWidget        = m_p2DWidget;
-	pXInverse->m_poaFoil          = &m_oaFoil;
+    pXInverse->m_poaFoil          = &s_oaFoil;
 
-	GL3dBodyDlg::s_poaBody = &m_oaBody;
-	GL3dWingDlg::s_poaFoil = &m_oaFoil;
-	PlaneDlg::s_poaBody    = &m_oaBody;
-	PlaneDlg::s_poaWing    = &m_oaWing;
+    GL3dWingDlg::s_poaFoil = &s_oaFoil;
+    PlaneDlg::s_poaBody    = &s_oaBody;
+    PlaneDlg::s_poaWing    = &s_oaWing;
 
 	GL3dWingDlg::s_pMiarex      = m_pMiarex;
 	ThreeDWidget::s_pMiarex     = m_pMiarex;
@@ -2580,15 +2584,15 @@ Foil* MainFrame::DeleteFoil(Foil *pFoil, bool bAsk)
 			delete pPolar;
 		}
 	}
-	for (j=0; j< m_oaFoil.size(); j++)
+    for (j=0; j< s_oaFoil.size(); j++)
 	{
-		pOldFoil = (Foil*)m_oaFoil.at(j);
+        pOldFoil = (Foil*)s_oaFoil.at(j);
 		if (pOldFoil == pFoil)
 		{
-			if(j>0)                    pNextFoil = (Foil*)m_oaFoil.at(j-1);
-			else if(m_oaFoil.size()>1) pNextFoil = (Foil*)m_oaFoil.at(1);
+            if(j>0)                    pNextFoil = (Foil*)s_oaFoil.at(j-1);
+            else if(s_oaFoil.size()>1) pNextFoil = (Foil*)s_oaFoil.at(1);
 			else                       pNextFoil = NULL;
-			m_oaFoil.removeAt(j);
+            s_oaFoil.removeAt(j);
 			delete pOldFoil;
 			if(s_pCurFoil == pOldFoil) s_pCurFoil = NULL;
 			break;
@@ -2665,12 +2669,12 @@ void MainFrame::DeletePlane(void *pPlanePtr, bool bResultsOnly)
 	if(bResultsOnly) return;
 
 
-	for (i=m_oaPlane.size()-1; i>=0; i--)
+    for (i=s_oaPlane.size()-1; i>=0; i--)
 	{
-		pOldPlane = (Plane*)m_oaPlane.at(i);
+        pOldPlane = (Plane*)s_oaPlane.at(i);
 		if (pOldPlane == pPlane)
 		{
-			m_oaPlane.removeAt(i);
+            s_oaPlane.removeAt(i);
 			delete pPlane;
 			if(pPlane == pMiarex->m_pCurPlane)
 			{
@@ -2691,10 +2695,10 @@ void MainFrame::DeleteProject()
 	int i;
 	void *pObj;
 
-	for (i=m_oaPlane.size()-1; i>=0; i--)
+    for (i=s_oaPlane.size()-1; i>=0; i--)
 	{
-		pObj = m_oaPlane.at(i);
-		m_oaPlane.removeAt(i);
+        pObj = s_oaPlane.at(i);
+        s_oaPlane.removeAt(i);
 		delete (Plane*)pObj;
 	}
 
@@ -2704,10 +2708,10 @@ void MainFrame::DeleteProject()
 		m_oaPOpp.removeAt(i);
 		delete (PlaneOpp*)pObj;
 	}
-	for (i=m_oaWing.size()-1; i>=0; i--)
+    for (i=s_oaWing.size()-1; i>=0; i--)
 	{
-		pObj = m_oaWing.at(i);
-		m_oaWing.removeAt(i);
+        pObj = s_oaWing.at(i);
+        s_oaWing.removeAt(i);
 		delete (Wing*)pObj;
 	}
 
@@ -2725,10 +2729,10 @@ void MainFrame::DeleteProject()
 		delete (WingOpp*)pObj;
 	}
 
-	for (i=m_oaFoil.size()-1; i>=0; i--)
+    for (i=s_oaFoil.size()-1; i>=0; i--)
 	{
-		pObj = m_oaFoil.at(i);
-		m_oaFoil.removeAt(i);
+        pObj = s_oaFoil.at(i);
+        s_oaFoil.removeAt(i);
 		delete (Foil*)pObj;
 	}
     for (i=s_oaPolar.size()-1; i>=0; i--)
@@ -2743,10 +2747,10 @@ void MainFrame::DeleteProject()
 		m_oaOpp.removeAt(i);
 		delete (OpPoint*)pObj;
 	}
-	for (i=m_oaBody.size()-1; i>=0; i--)
+    for (i=s_oaBody.size()-1; i>=0; i--)
 	{
-		pObj = m_oaBody.at(i);
-		m_oaBody.removeAt(i);
+        pObj = s_oaBody.at(i);
+        s_oaBody.removeAt(i);
 		delete (Body*)pObj;
 	}
 
@@ -2854,12 +2858,12 @@ void MainFrame::DeleteWing(void *pWingPtr, bool bResultsOnly)
 
 	// ... Find the wing in the object array and remove it...
 	Wing* pWing;
-	for (i=m_oaWing.size()-1; i>=0; i--)
+    for (i=s_oaWing.size()-1; i>=0; i--)
 	{
-		pWing = (Wing*)m_oaWing.at(i);
+        pWing = (Wing*)s_oaWing.at(i);
 		if (pWing == pThisWing)
 		{
-			m_oaWing.removeAt(i);
+            s_oaWing.removeAt(i);
 			delete pWing;
 			if(pWing == pMiarex->m_pCurWing)	pMiarex->m_pCurWing = NULL;
 			break;
@@ -2888,9 +2892,9 @@ QColor MainFrame::GetColor(int type)
 			Foil *pFoil;
 			for (j=0; j<m_ColorList.size(); j++)
 			{
-				for (i=0; i<m_oaFoil.size(); i++)
+                for (i=0; i<s_oaFoil.size(); i++)
 				{
-					pFoil = (Foil*)m_oaFoil.at(i);
+                    pFoil = (Foil*)s_oaFoil.at(i);
 					bFound = false;
 					if(pFoil->m_FoilColor == m_ColorList.at(j))
 					{
@@ -3029,9 +3033,9 @@ Foil* MainFrame::foil(QString strFoilName)
 	// returns NULL if not found
 	if(!strFoilName.length()) return NULL;
 	Foil* pFoil;
-	for (int i=0; i<m_oaFoil.size(); i++)
+    for (int i=0; i<s_oaFoil.size(); i++)
 	{
-		pFoil = (Foil*)m_oaFoil.at(i);
+        pFoil = (Foil*)s_oaFoil.at(i);
 		if (pFoil->m_FoilName == strFoilName)
 		{
 			return pFoil;
@@ -3597,7 +3601,7 @@ enumApp MainFrame::LoadXFLR5File(QString PathName)
 
 				pXDirect->SetControls();
 
-				if(m_oaPlane.size() || m_oaWing.size()) return MIAREX;
+                if(s_oaPlane.size() || s_oaWing.size()) return MIAREX;
 				else                                    return XFOILANALYSIS;
 			}
 		}
@@ -3851,7 +3855,7 @@ void MainFrame::OnLoadFile()
 		QString strange = PathName.right(4);
 		strange = strange.toLower();
 		if(strange == ".dat" || strange==".plr") OnXDirect();
-		else if(strange==".wpa" && (m_oaWing.size() || m_oaPlane.size())) OnMiarex();
+        else if(strange==".wpa" && (s_oaWing.size() || s_oaPlane.size())) OnMiarex();
 		else OnXDirect();
 	}
 
@@ -4355,7 +4359,7 @@ void MainFrame::OnSelChangeWOpp(int i)
 	if(strong.length())
 	{
 		bool bOK;
-		double x = strong.toDouble(&bOK);
+		double x = locale().toDouble(strong, &bOK);
 		if(bOK)
 		{
 			m_iApp = MIAREX;
@@ -4898,9 +4902,9 @@ void MainFrame::RenameFoil(Foil *pFoil)
 	while(bNotFound)
 	{
 		QStringList NameList;
-		for(k=0; k<m_oaFoil.size(); k++)
+        for(k=0; k<s_oaFoil.size(); k++)
 		{
-			pOldFoil = (Foil*)m_oaFoil.at(k);
+            pOldFoil = (Foil*)s_oaFoil.at(k);
 			NameList.append(pOldFoil->m_FoilName);
 		}
 
@@ -4923,9 +4927,9 @@ void MainFrame::RenameFoil(Foil *pFoil)
 			}
 			else
 			{
-				for (l=0; l<m_oaFoil.size(); l++)
+                for (l=0; l<s_oaFoil.size(); l++)
 				{
-					pOldFoil = (Foil*)m_oaFoil.at(l);
+                    pOldFoil = (Foil*)s_oaFoil.at(l);
 					if(pOldFoil->m_FoilName == strong)
 					{
 						bExists = true;
@@ -4938,25 +4942,25 @@ void MainFrame::RenameFoil(Foil *pFoil)
 					// so rename the foil and associated polars and opps
 					pFoil->m_FoilName = strong;
 					bool bInserted = false;
-					for(i=0;i<m_oaFoil.size();i++)
+                    for(i=0;i<s_oaFoil.size();i++)
 					{
-						pOldFoil = (Foil*)m_oaFoil.at(i);
+                        pOldFoil = (Foil*)s_oaFoil.at(i);
 						if(pOldFoil == pFoil)
 						{
-							m_oaFoil.removeAt(i);
+                            s_oaFoil.removeAt(i);
 							//and re-insert
-							for(l=0;l<m_oaFoil.size();l++)
+                            for(l=0;l<s_oaFoil.size();l++)
 							{
-								pOldFoil = (Foil*)m_oaFoil.at(l);
+                                pOldFoil = (Foil*)s_oaFoil.at(l);
 								if(pFoil->m_FoilName.compare(pOldFoil->m_FoilName, Qt::CaseInsensitive)<0)
 								{
 									//then insert before
-									m_oaFoil.insert(l, pFoil);
+                                    s_oaFoil.insert(l, pFoil);
 									bInserted = true;
 									break;
 								}
 							}
-							if(!bInserted)	m_oaFoil.append(pFoil);
+                            if(!bInserted)	s_oaFoil.append(pFoil);
 							break;
 						}
 					}
@@ -4991,14 +4995,14 @@ void MainFrame::RenameFoil(Foil *pFoil)
 			else
 			{
 				//So delete any foil with that name
-				for (l=m_oaFoil.size()-1;l>=0; l--)
+                for (l=s_oaFoil.size()-1;l>=0; l--)
 				{
-					pOldFoil = (Foil*)m_oaFoil.at(l);
+                    pOldFoil = (Foil*)s_oaFoil.at(l);
 					if(pOldFoil->m_FoilName == strong)
 					{
 						if(s_pCurFoil == pOldFoil)           s_pCurFoil = NULL;
 						if(s_pCurFoil == pOldFoil) s_pCurFoil = NULL;
-						m_oaFoil.removeAt(l);
+                        s_oaFoil.removeAt(l);
 						delete pOldFoil;
 					}
 				}
@@ -5245,24 +5249,29 @@ void MainFrame::SelectOpPoint(OpPoint *pOpp)
 	Polar *pCurPlr    = pXDirect->m_pCurPolar;
 	if(!pOpp || !pCurPlr) return;
 
-	double alpha, Re;
+	QString strange;
+	double val;
+	bool bOK;
 
 	for(int i=0; i<m_pctrlOpPoint->count(); i++)
 	{
+		strange = m_pctrlOpPoint->itemText(i);
+		val = locale().toDouble(strange, &bOK);
+
 		if(pCurPlr->m_PolarType != FIXEDAOAPOLAR)
 		{
-			alpha = m_pctrlOpPoint->itemText(i).toDouble();
-			if(qAbs(alpha-pOpp->Alpha)<0.001)
+			if(bOK && qAbs(val-pOpp->Alpha)<0.001)
 			{
 				m_pctrlOpPoint->setCurrentIndex(i);
+				break;
 			}
 		}
 		else
 		{
-			Re = m_pctrlOpPoint->itemText(i).toDouble();
-			if(qAbs(Re-pOpp->Reynolds)<1.0)
+			if(bOK && qAbs(val-pOpp->Reynolds)<1.0)
 			{
 				m_pctrlOpPoint->setCurrentIndex(i);
+				break;
 			}
 		}
 	}
@@ -5272,36 +5281,40 @@ void MainFrame::SelectOpPoint(OpPoint *pOpp)
 
 void MainFrame::SelectWOpp(double x)
 {
-	//Selects pOpp in the combobox and returns true
-	//On error, selects the first and returns false
+	//Selects a pOpp in the combobox
 	QMiarex *pMiarex = (QMiarex*)m_pMiarex;
 	WPolar *pCurWPlr    = pMiarex->m_pCurWPolar;
-	double alpha;
+	double val;
+	bool bOK;
+	QString strange;
 
 	for(int i=0; i<m_pctrlWOpp->count(); i++)
 	{
+		strange = m_pctrlWOpp->itemText(i);
+		val = locale().toDouble(strange, &bOK);
+
 		if(pCurWPlr->m_WPolarType<FIXEDAOAPOLAR)
 		{
-			alpha = m_pctrlWOpp->itemText(i).toDouble();
-			if(qAbs(alpha-x)<0.001)
+			if(bOK && qAbs(val-x)<0.001)
 			{
 				m_pctrlWOpp->setCurrentIndex(i);
+				break;
 			}
 		}
 		else if(pCurWPlr->m_WPolarType==FIXEDAOAPOLAR)
 		{
-			double QInf = m_pctrlWOpp->itemText(i).toDouble();
-			if(qAbs(QInf-x)<1.0)
+			if(bOK && qAbs(val-x)<1.0)
 			{
 				m_pctrlWOpp->setCurrentIndex(i);
+				break;
 			}
 		}
 		else if(pCurWPlr->m_WPolarType==STABILITYPOLAR)
 		{
-			double Ctrl = m_pctrlWOpp->itemText(i).toDouble();
-			if(qAbs(Ctrl-x)<.001)
+			if(bOK && qAbs(val-x)<.001)
 			{
 				m_pctrlWOpp->setCurrentIndex(i);
+				break;
 			}
 		}
 	}
@@ -5653,11 +5666,11 @@ bool MainFrame::SerializeProject(QDataStream &ar, bool bIsStoring)
 		if (WPolarDlg::s_WPolar.m_bWakeRollUp) ar << 1;
 		else                                               ar << 0;
 
-		ar << m_oaWing.size() ;//number of wings
+        ar << s_oaWing.size() ;//number of wings
 		// Store the wings
-		for (i=0; i<m_oaWing.size();i++)
+        for (i=0; i<s_oaWing.size();i++)
 		{
-			pWing = (Wing*)m_oaWing.at(i);
+            pWing = (Wing*)s_oaWing.at(i);
 			pWing->SerializeWing(ar, true);
 		}
 		// now store all the WPolars
@@ -5683,18 +5696,18 @@ bool MainFrame::SerializeProject(QDataStream &ar, bool bIsStoring)
 		WritePolars(ar, NULL);
 
 		// next the bodies
-		ar << m_oaBody.size();
-		for (i=0; i<m_oaBody.size();i++)
+        ar << s_oaBody.size();
+        for (i=0; i<s_oaBody.size();i++)
 		{
-			pBody = (Body*)m_oaBody.at(i);
+            pBody = (Body*)s_oaBody.at(i);
 			pBody->SerializeBody(ar, bIsStoring);
 		}
 
 		// last write the planes...
-		ar << m_oaPlane.size();
-		for (i=0; i<m_oaPlane.size();i++)
+        ar << s_oaPlane.size();
+        for (i=0; i<s_oaPlane.size();i++)
 		{
-			pPlane = (Plane*)m_oaPlane.at(i);
+            pPlane = (Plane*)s_oaPlane.at(i);
 			pPlane->SerializePlane(ar, bIsStoring);
 		}
 
@@ -5919,9 +5932,9 @@ bool MainFrame::SerializeProject(QDataStream &ar, bool bIsStoring)
             for (j=0; j<s_oaPolar.size(); j++)
 			{
                 pPolar = (Polar*)s_oaPolar.at(j);
-				for (k=0; k<m_oaFoil.size(); k++)
+                for (k=0; k<s_oaFoil.size(); k++)
 				{
-					pFoil = (Foil*)m_oaFoil.at(k);
+                    pFoil = (Foil*)s_oaFoil.at(k);
 					if(pFoil->m_FoilName==pPolar->m_FoilName)
 					{
 						pPolar->m_ACrit    = 9.0;
@@ -6013,9 +6026,9 @@ bool MainFrame::SerializeProject(QDataStream &ar, bool bIsStoring)
 
 		pAFoil->m_pSF->Serialize(ar, bIsStoring);
 
-		for (i=0; i<m_oaWing.size();i++)
+        for (i=0; i<s_oaWing.size();i++)
 		{
-			pWing = (Wing*)m_oaWing[i];
+            pWing = (Wing*)s_oaWing[i];
 			pWing->ComputeGeometry();
 		}
 
@@ -6121,9 +6134,9 @@ Foil* MainFrame::SetModFoil(Foil* pNewFoil, bool bKeepExistingFoil)
 	}
 	else
 	{
-		for (j=0; j<m_oaFoil.size(); j++)
+        for (j=0; j<s_oaFoil.size(); j++)
 		{
-			pOldFoil = (Foil*)m_oaFoil.at(j);
+            pOldFoil = (Foil*)s_oaFoil.at(j);
 			if (pOldFoil->m_FoilName == pNewFoil->m_FoilName)
 			{
 				bExists = true;
@@ -6144,9 +6157,9 @@ Foil* MainFrame::SetModFoil(Foil* pNewFoil, bool bKeepExistingFoil)
 		{
 			Foil *pFoil;
 			QStringList NameList;
-			for(k=0; k<m_oaFoil.size(); k++)
+            for(k=0; k<s_oaFoil.size(); k++)
 			{
-				pFoil = (Foil*)m_oaFoil.at(k);
+                pFoil = (Foil*)s_oaFoil.at(k);
 				NameList.append(pFoil->m_FoilName);
 			}
 
@@ -6164,9 +6177,9 @@ Foil* MainFrame::SetModFoil(Foil* pNewFoil, bool bKeepExistingFoil)
 			if(QDialog::Accepted == resp)
 			{
                 strong = renDlg.m_strName;
-				for (l=0; l<m_oaFoil.size(); l++)
+                for (l=0; l<s_oaFoil.size(); l++)
 				{
-					pOldFoil = (Foil*)m_oaFoil.at(l);
+                    pOldFoil = (Foil*)s_oaFoil.at(l);
 					if(pOldFoil->m_FoilName == strong) exists = true;
 				}
 				if (!exists)
@@ -6183,16 +6196,16 @@ Foil* MainFrame::SetModFoil(Foil* pNewFoil, bool bKeepExistingFoil)
 			{
 				// the user wants to overwrite existing airfoil
 				// So delete any foil with that name
-				for (l=m_oaFoil.size()-1;l>=0; l--)
+                for (l=s_oaFoil.size()-1;l>=0; l--)
 				{
-					pOldFoil = (Foil*)m_oaFoil.at(l);
+                    pOldFoil = (Foil*)s_oaFoil.at(l);
 					if(pOldFoil->m_FoilName == strong)
 					{
 						pNewFoil->m_FoilColor  = pOldFoil->m_FoilColor;
 						pNewFoil->m_nFoilStyle = pOldFoil->m_nFoilStyle;
 						pNewFoil->m_nFoilWidth = pOldFoil->m_nFoilWidth;
 						pNewFoil->m_bPoints    = pOldFoil->m_bPoints;
-						m_oaFoil.removeAt(l);
+                        s_oaFoil.removeAt(l);
 						delete pOldFoil;
 						if(s_pCurFoil == pOldFoil) s_pCurFoil = NULL;
 					}
@@ -6346,14 +6359,14 @@ void MainFrame::UpdateUFOs()
 	pCurPlane = pMiarex->m_pCurPlane;
 
 	QStringList UFONames;
-	for (i=0; i<m_oaWing.size(); i++)
+    for (i=0; i<s_oaWing.size(); i++)
 	{
-		pWing = (Wing*)m_oaWing[i];
+        pWing = (Wing*)s_oaWing[i];
 		UFONames.append(pWing->m_WingName);
 	}
-	for (i=0; i<m_oaPlane.size(); i++)
+    for (i=0; i<s_oaPlane.size(); i++)
 	{
-		pPlane = (Plane*)m_oaPlane[i];
+        pPlane = (Plane*)s_oaPlane[i];
 		UFONames.append(pPlane->PlaneName());
 	}
 	UFONames.sort();
@@ -6639,9 +6652,9 @@ void MainFrame::UpdateFoils()
 
 	Foil *pFoil;
 
-	for (i=0; i<m_oaFoil.size(); i++)
+    for (i=0; i<s_oaFoil.size(); i++)
 	{
-		pFoil = (Foil*)m_oaFoil[i];
+        pFoil = (Foil*)s_oaFoil[i];
 		m_pctrlFoil->addItem(pFoil->m_FoilName);
 	}
 
@@ -6924,11 +6937,11 @@ void MainFrame::WritePolars(QDataStream &ar, Foil *pFoil)
 		//100002 : means we are serializings opps in the new numbered format
 		//100001 : transferred NCrit, XTopTr, XBotTr to polar file
 		//first write foils
-		ar << m_oaFoil.size();
+        ar << s_oaFoil.size();
 
-		for (i=0; i<m_oaFoil.size(); i++)
+        for (i=0; i<s_oaFoil.size(); i++)
 		{
-			pFoil = (Foil*)m_oaFoil.at(i);
+            pFoil = (Foil*)s_oaFoil.at(i);
 			pFoil->Serialize(ar, true);
 		}
 
@@ -7053,8 +7066,8 @@ void MainFrame::SetupDataDir()
 	s_StylesheetDir.setPath(qApp->applicationDirPath()+"/qss/");
 #endif
 #ifdef Q_OS_WIN
-	s_TranslationDir.setPath(qApp->applicationDirPath()+"/translations/");
-	s_StylesheetDir.setPath(qApp->applicationDirPath()+"/qss/");
+    s_TranslationDir.setPath(qApp->applicationDirPath()+"/translations");
+    s_StylesheetDir.setPath(qApp->applicationDirPath()+"/qss");
 #endif
 #ifdef Q_OS_LINUX
 	s_TranslationDir.setPath("/usr/share/xflr5/translations");
@@ -7067,7 +7080,8 @@ void MainFrame::SetupDataDir()
 void MainFrame::ReadStyleSheet(QString styleSheetName, QString &styleSheet)
 {
 	QFile file(s_StylesheetDir.canonicalPath()+"/"+styleSheetName+".qss");
-	if(file.open(QFile::ReadOnly))
+
+    if(file.open(QFile::ReadOnly))
 	{
 		styleSheet = QLatin1String(file.readAll());
 		qApp->setStyleSheet(styleSheet);

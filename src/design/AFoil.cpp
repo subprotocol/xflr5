@@ -1,7 +1,7 @@
 /****************************************************************************
 
 	AFoil Class
-	Copyright (C) 2009-2012 Andre Deperrois adeperrois@xflr5.com
+	Copyright (C) 2009-2013 Andre Deperrois adeperrois@xflr5.com
 
 	This program is free software; you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -39,8 +39,8 @@
 
 
 
-void *QAFoil::s_pMainFrame;
-void *QAFoil::s_p2DWidget;
+void *QAFoil::s_pMainFrame = NULL;
+void *QAFoil::s_p2DWidget = NULL;
 
 /**
  * The public constructor
@@ -143,6 +143,8 @@ QAFoil::QAFoil(QWidget *parent)
  */
 QAFoil::~QAFoil()
 {
+	ClearStack(-1);
+
 	delete m_pTwoDPanelDlg;
 	delete m_pIFDlg;
 	delete m_pNacaFoilDlg;
@@ -186,6 +188,10 @@ void QAFoil::CheckButtons()
 	pMainFrame->AFoilSplineMenu->setEnabled(!MainFrame::s_pCurFoil);
 	pMainFrame->InsertSplinePt->setEnabled(!MainFrame::s_pCurFoil);
 	pMainFrame->RemoveSplinePt->setEnabled(!MainFrame::s_pCurFoil);
+
+	pMainFrame->UndoAFoilAct->setEnabled(m_StackPos>0);
+	pMainFrame->RedoAFoilAct->setEnabled(m_StackPos<m_UndoStack.size()-1);
+
 }
 
 
@@ -2837,6 +2843,13 @@ void QAFoil::TakePicture()
 	m_StackPos = m_UndoStack.size()-1;
 
 	m_bStored = true;
+
+	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
+	if(s_pMainFrame && pMainFrame->UndoAFoilAct && pMainFrame->RedoAFoilAct)
+	{
+		pMainFrame->UndoAFoilAct->setEnabled(m_StackPos>0);
+		pMainFrame->RedoAFoilAct->setEnabled(m_StackPos<m_UndoStack.size()-1);
+	}
 }
 
 
@@ -2863,10 +2876,14 @@ void QAFoil::SetPicture()
  */
 void QAFoil::OnUndo()
 {
+	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
+
 	if(m_StackPos>0)
 	{
 		m_StackPos--;
 		SetPicture();
+		pMainFrame->UndoAFoilAct->setEnabled(m_StackPos>0);
+		pMainFrame->RedoAFoilAct->setEnabled(m_StackPos<m_UndoStack.size()-1);
 	}
 	else
 	{
@@ -2880,10 +2897,13 @@ void QAFoil::OnUndo()
  */
 void QAFoil::OnRedo()
 {
+	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	if(m_StackPos<m_UndoStack.size()-1)
 	{
 		m_StackPos++;
 		SetPicture();
+		pMainFrame->UndoAFoilAct->setEnabled(m_StackPos>0);
+		pMainFrame->RedoAFoilAct->setEnabled(m_StackPos<m_UndoStack.size()-1);
 	}
 }
 
@@ -3083,7 +3103,7 @@ void QAFoil::OnInsertCtrlPt()
 		m_pSF->UpdateSplineFoil();
 	}
 
-	TakePicture();
+//	TakePicture();
 }
 
 
@@ -3127,7 +3147,7 @@ void QAFoil::OnRemoveCtrlPt()
 		}
 	}
 
-	TakePicture();
+//	TakePicture();
 }
 
 

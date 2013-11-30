@@ -74,6 +74,7 @@ private:
 	QCheckBox *m_pctrlShowWake;
 
 public:
+	static double s_MassRadius;
 	static QColor s_MassColor;
 
 	static int s_3DAxisStyle, s_3DAxisWidth;

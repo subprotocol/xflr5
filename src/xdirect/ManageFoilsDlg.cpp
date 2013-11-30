@@ -190,9 +190,9 @@ void ManageFoilsDlg::FillFoilTable()
 {
 	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
 	int i;
-	m_pFoilModel->setRowCount(pMainFrame->m_oaFoil.size());
+	m_pFoilModel->setRowCount(pMainFrame->s_oaFoil.size());
 
-	for(i=0; i<pMainFrame->m_oaFoil.size(); i++)
+	for(i=0; i<pMainFrame->s_oaFoil.size(); i++)
 	{
 		FillTableRow(i);
 	}
@@ -204,7 +204,7 @@ void ManageFoilsDlg::FillTableRow(int row)
 	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
 	QString str, strong;
 	QModelIndex ind;
-	Foil *pFoil = (Foil*)pMainFrame->m_oaFoil.at(row);
+	Foil *pFoil = (Foil*)pMainFrame->s_oaFoil.at(row);
 
 	ind = m_pFoilModel->index(row, 0, QModelIndex());
 	m_pFoilModel->setData(ind,pFoil->m_FoilName);
@@ -328,7 +328,7 @@ void ManageFoilsDlg::OnDoubleClickTable(const QModelIndex &index)
 void ManageFoilsDlg::OnFoilClicked(const QModelIndex& index)
 {
 	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
-	if(index.row()>=pMainFrame->m_oaFoil.size()) return;
+	if(index.row()>=pMainFrame->s_oaFoil.size()) return;
 
 	QStandardItem *pItem = m_pFoilModel->item(index.row(),0);
 	QString FoilName =pItem->text();
