@@ -19,11 +19,9 @@ SOURCES += \
 	src/miarex/GL3dBodyDlg.cpp \
 	src/miarex/LLTAnalysisDlg.cpp \
 	src/miarex/LLTAnalysis.cpp \
-	src/miarex/ImportWingDlg.cpp \
 	src/miarex/InertiaDlg.cpp \
 	src/miarex/NURBSDomDoc.cpp \
 	src/miarex/Miarex.cpp \
-	src/miarex/ManageBodiesDlg.cpp \
 	src/miarex/ManageUFOsDlg.cpp \
 	src/miarex/PlaneDlg.cpp \
 	src/miarex/PanelAnalysisDlg.cpp \
@@ -112,7 +110,8 @@ SOURCES += \
 	src/main.cpp \
 	src/mainframe.cpp \
 	src/threedwidget.cpp \
-	src/twodwidget.cpp
+	src/twodwidget.cpp \
+    src/miarex/ImportObjectDlg.cpp
 
 HEADERS += \
 	src/XFLR5Application.h \
@@ -121,7 +120,6 @@ HEADERS += \
 	src/miarex/GLCreateBodyLists.h \
 	src/miarex/WingScaleDlg.h \
 	src/miarex/CtrlTableDelegate.h \
-	src/miarex/ManageBodiesDlg.h \
 	src/miarex/WPolarDlg.h \
 	src/miarex/WingDelegate.h \
 	src/miarex/PlaneDlg.h \
@@ -133,7 +131,6 @@ HEADERS += \
 	src/miarex/StabPolarDlg.h \
 	src/miarex/LLTAnalysisDlg.h \
 	src/miarex/LLTAnalysis.h \
-	src/miarex/ImportWingDlg.h \
 	src/miarex/BodyGridDlg.h \
 	src/miarex/BodyTableDelegate.h \
 	src/miarex/BodyScaleDlg.h \
@@ -224,7 +221,8 @@ HEADERS += \
 	src/globals.h \
 	src/mainframe.h \
 	src/twodwidget.h \
-	src/threedwidget.h
+	src/threedwidget.h \
+    src/miarex/ImportObjectDlg.h
 
 
 TRANSLATIONS = translations/xflr5v6.ts \

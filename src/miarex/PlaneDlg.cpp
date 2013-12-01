@@ -33,12 +33,10 @@
 #include "PlaneDlg.h"
 #include "GL3dWingDlg.h"
 #include "GL3dBodyDlg.h"
-#include "ImportWingDlg.h"
+#include "ImportObjectDlg.h"
 #include "InertiaDlg.h"
 
 
-QList <void*> *PlaneDlg::s_poaWing;
-QList <void*> *PlaneDlg::s_poaBody;
 void *PlaneDlg::s_pMiarex;
 void *PlaneDlg::s_pMainFrame;
 
@@ -71,15 +69,15 @@ PlaneDlg::PlaneDlg(QWidget *parent) :QDialog(parent)
 	connect(m_pctrlExportWing2, SIGNAL(clicked()), this, SLOT(OnExportWing2()));
 	connect(m_pctrlDefineStab,  SIGNAL(clicked()), this, SLOT(OnDefineStab()));
 	connect(m_pctrlDefineFin,   SIGNAL(clicked()), this, SLOT(OnDefineFin()));
-	connect(m_pctrlEditBody,    SIGNAL(clicked()), this, SLOT(OnEditBody()));
 
 	connect(m_pctrlPlaneInertia, SIGNAL(clicked()), this, SLOT(OnInertia()));
 
 	connect(OKButton,     SIGNAL(clicked()), this, SLOT(OnOK()));
 	connect(CancelButton, SIGNAL(clicked()), this, SLOT(reject()));
 
-	connect(m_pctrlBody, SIGNAL(clicked()), this, SLOT(OnBodyCheck()));
-	connect(m_pctrlBodyList,  SIGNAL(activated(int)),    this, SLOT(OnSelChangeBodyList(int)));
+	connect(m_pctrlBody,       SIGNAL(clicked()), this, SLOT(OnBodyCheck()));
+	connect(m_pctrlDefineBody, SIGNAL(clicked()), this, SLOT(OnDefineBody()));
+	connect(m_pctrlImportBody, SIGNAL(clicked()), this, SLOT(OnImportBody()));
 
 	connect(m_pctrlPlaneDescription, SIGNAL(textChanged()), this, SLOT(OnDescriptionChanged()));
 
@@ -230,35 +228,25 @@ void PlaneDlg::OnBiplane()
 void PlaneDlg::OnBodyCheck()
 {
 	m_bChanged = true;
+
 	if(m_pctrlBody->isChecked())
 	{
-		if(m_pctrlBodyList->count())
+		m_pPlane->m_bBody= true;
+		if(!m_pPlane->body())
 		{
-			m_pctrlBodyList->setEnabled(true);
-			m_pctrlXBody->setEnabled(true);
-			m_pctrlZBody->setEnabled(true);
-			m_pctrlEditBody->setEnabled(true);
-			m_pPlane->m_bBody=true;
-
-			OnSelChangeBodyList();
-		}
-		else
-		{
-			m_pPlane->m_bBody=false;
-			m_pctrlBodyList->setEnabled(false);
-			m_pctrlXBody->setEnabled(false);
-			m_pctrlZBody->setEnabled(false);
-			m_pctrlEditBody->setEnabled(false);
+			m_pPlane->SetBody(new Body);
 		}
 	}
 	else
 	{
-		m_pPlane->m_bBody=false;
-		m_pctrlBodyList->setEnabled(false);
-		m_pctrlXBody->setEnabled(false);
-		m_pctrlZBody->setEnabled(false);
-		m_pctrlEditBody->setEnabled(false);
+		m_pPlane->m_bBody= false;
 	}
+
+	m_pctrlXBody->setEnabled(m_pctrlBody->isChecked());
+	m_pctrlZBody->setEnabled(m_pctrlBody->isChecked());
+	m_pctrlDefineBody->setEnabled(m_pctrlBody->isChecked());
+	m_pctrlImportBody->setEnabled(m_pctrlBody->isChecked());
+
 	SetResults();
 }
 
@@ -377,7 +365,7 @@ void PlaneDlg::OnDoubleFin()
 }
 
 
-void PlaneDlg::OnEditBody()
+void PlaneDlg::OnDefineBody()
 {
 	if(!m_pPlane->m_pBody) return;
 	QMiarex * pMiarex = (QMiarex*)s_pMiarex;
@@ -401,7 +389,6 @@ void PlaneDlg::OnEditBody()
 		SetResults();
 	}
 	else m_pPlane->m_pBody->Duplicate(&memBody);
-
 }
 
 
@@ -462,18 +449,39 @@ void PlaneDlg::OnFin()
 }
 
 
-void PlaneDlg::OnImportWing()
+void PlaneDlg::OnImportBody()
 {
 	QMiarex *pMiarex = (QMiarex*)s_pMiarex;
-    ImportWingDlg dlg(this);
-	dlg.m_WingName = m_pPlane->wing()->m_WingName;
-	dlg.m_poaWing = s_poaWing;
-	dlg.InitDialog();
+	ImportObjectDlg dlg(this);
+	if(m_pPlane->m_bBody && m_pPlane->m_pBody) dlg.m_ObjectName = m_pPlane->body()->m_BodyName;
+	else                                       dlg.m_ObjectName.clear();
+	dlg.InitDialog(false);
 
 	if(dlg.exec() == QDialog::Accepted)
 	{
 		m_bChanged = true;
-		Wing *pWing = pMiarex->GetWing(dlg.m_WingName);
+		Body *pOldBody = pMiarex->GetBody(dlg.m_ObjectName);
+		if(pOldBody)
+		{
+			Body *pNewBody = new Body;
+			pNewBody->Duplicate(pOldBody);
+            m_pPlane->SetBody(pNewBody);
+		}
+	}
+}
+
+
+void PlaneDlg::OnImportWing()
+{
+	QMiarex *pMiarex = (QMiarex*)s_pMiarex;
+	ImportObjectDlg dlg(this);
+	dlg.m_ObjectName = m_pPlane->wing()->m_WingName;
+	dlg.InitDialog(true);
+
+	if(dlg.exec() == QDialog::Accepted)
+	{
+		m_bChanged = true;
+		Wing *pWing = pMiarex->GetWing(dlg.m_ObjectName);
 		if(pWing)
 		{
 			m_pPlane->wing()->Duplicate(pWing);
@@ -486,15 +494,14 @@ void PlaneDlg::OnImportWing()
 void PlaneDlg::OnImportWing2() 
 {
 	QMiarex *pMiarex = (QMiarex*)s_pMiarex;
-    ImportWingDlg dlg(this);
-	dlg.m_WingName = m_pPlane->wing()->m_WingName;
-	dlg.m_poaWing = s_poaWing;
-	dlg.InitDialog();
+	ImportObjectDlg dlg(this);
+	dlg.m_ObjectName = m_pPlane->wing()->m_WingName;
+	dlg.InitDialog(true);
 
 	if(dlg.exec() == QDialog::Accepted)
 	{
 		m_bChanged = true;
-		Wing *pWing = pMiarex->GetWing(dlg.m_WingName);
+		Wing *pWing = pMiarex->GetWing(dlg.m_ObjectName);
 		if(pWing)
 		{
 			m_pPlane->wing2()->Duplicate(pWing);
@@ -560,13 +567,6 @@ void PlaneDlg::OnOK()
 
 	ComputePlane();
 
-//	int nElem = m_pPlane->VLMPanelTotal();
-//	if(nElem>VLMMAXMATSIZE)
-//	{
-//		strong = QString(tr("Total number of VLM panels =%1\n Max Number =%2\nA reduction of the number of VLM panels is required")).arg(nElem).arg(VLMMAXMATSIZE);
-//		QMessageBox::warning(this, tr("Warning"),strong);
-//		return ;
-//	}
 
 	//check the number of surfaces
 	int nSurfaces = 0;
@@ -604,6 +604,14 @@ void PlaneDlg::OnOK()
 	}
 
 	m_pPlane->ComputeBodyAxisInertia();
+
+	if(!m_pctrlBody->isChecked())
+	{
+		delete m_pPlane->m_pBody;
+		m_pPlane->m_pBody = NULL;
+		m_pPlane->m_bBody = false;
+	}
+
 	accept();
 }
 
@@ -653,23 +661,10 @@ void PlaneDlg::OnSymFin()
 }
 
 
-void PlaneDlg::OnSelChangeBodyList(int pos)
-{
-	QString strong;
-	m_bChanged = true;
-	QMiarex *pMiarex = (QMiarex*)s_pMiarex;
-	int sel = m_pctrlBodyList->currentIndex();
-	if (sel >= 0) strong = m_pctrlBodyList->itemText(sel);
-	m_pPlane->SetBody(pMiarex->GetBody(strong));
-}
 
 
 void PlaneDlg::ReadParams()
 {
-	QMiarex *pMiarex  = (QMiarex*)s_pMiarex;
-	int sel;
-	QString strong;
-
 	OnPlaneName();
 	m_pPlane->m_WingTiltAngle[0] = m_pctrlWingTilt->Value();
 	m_pPlane->m_WingTiltAngle[1] = m_pctrlWingTilt2->Value();
@@ -699,9 +694,6 @@ void PlaneDlg::ReadParams()
 	if(m_pctrlFinCheck->isChecked())  m_pPlane->m_bFin  = true;
 	else                              m_pPlane->m_bFin  = false;
 
-	sel = m_pctrlBodyList->currentIndex();
-	if (sel >= 0) strong = m_pctrlBodyList->itemText(sel);
-	m_pPlane->m_pBody = pMiarex->GetBody(strong);
 }
 
 
@@ -726,39 +718,15 @@ void PlaneDlg::reject()
 
 void PlaneDlg::SetParams()
 {
-	int i, pos;
-	Body *pBody = NULL;
 	if(m_pPlane->body()) m_pctrlBody->setChecked(true);
 	else                 m_pctrlBody->setChecked(false);
-	m_pctrlBodyList->clear();
-	for(i=0; i<s_poaBody->size(); i++)
-	{
-		pBody = (Body*)s_poaBody->at(i);
-		m_pctrlBodyList->addItem(pBody->m_BodyName);
-	}
-	if(m_pPlane->body() && pBody)
-	{
-		pos = m_pctrlBodyList->findText(m_pPlane->m_pBody->m_BodyName);
-		m_pctrlBodyList->setCurrentIndex(pos);
-        m_pctrlBody->setEnabled(true);
-        m_pctrlBodyList->setEnabled(true);
-        m_pctrlXBody->setEnabled(true);
-        m_pctrlZBody->setEnabled(true);
-        m_pctrlEditBody->setEnabled(true);
-    }
-	else
-	{
-		if(m_pctrlBodyList->count())
-		{
-			m_pctrlBodyList->setCurrentIndex(0);
-			m_pctrlBody->setEnabled(true);
-		}
-		else m_pctrlBody->setEnabled(false);
-		m_pctrlBodyList->setEnabled(false);
-		m_pctrlXBody->setEnabled(false);
-		m_pctrlZBody->setEnabled(false);
-		m_pctrlEditBody->setEnabled(false);
-	}
+
+	m_pctrlBody->setEnabled(true);
+	m_pctrlXBody->setEnabled(m_pPlane->m_bBody);
+	m_pctrlZBody->setEnabled(m_pPlane->m_bBody);
+	m_pctrlDefineBody->setEnabled(m_pPlane->m_bBody);
+	m_pctrlImportBody->setEnabled(m_pPlane->m_bBody);
+
 
 	m_pctrlPlaneName->setText(m_pPlane->PlaneName());
 	m_pctrlWingTilt->SetValue(m_pPlane->m_WingTiltAngle[0]);
@@ -1013,11 +981,11 @@ void PlaneDlg::SetupLayout()
 		QHBoxLayout *BodyName = new QHBoxLayout;
 		{
 			m_pctrlBody = new QCheckBox(tr("Body"));
-			m_pctrlEditBody = new QPushButton(tr("Edit..."));
-			m_pctrlBodyList = new QComboBox;
+			m_pctrlDefineBody = new QPushButton(tr("Define"));
+			m_pctrlImportBody = new QPushButton(tr("Import"));
 			BodyName->addWidget(m_pctrlBody);
-			BodyName->addWidget(m_pctrlBodyList);
-			BodyName->addWidget(m_pctrlEditBody);
+			BodyName->addWidget(m_pctrlDefineBody);
+			BodyName->addWidget(m_pctrlImportBody);
 		//	m_pctrlBodyList->setMinimumWidth(250);
 			BodyName->addStretch(1);
 		}

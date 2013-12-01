@@ -163,11 +163,9 @@ private slots:
 	void OnDownwash();
 	void OnDragScale(int pos);
 	void OnDuplicateCurUFO();
-	void OnEditCurBody();
 	void OnEditCurWPolar();
+	void OnEditCurBody();
 	void OnEditUFO();
-	void OnExportBodyDef();
-	void OnExportBodyGeom();
 	void OnExporttoAVL();
 	void OnExportCurWOpp();
 	void OnExportCurWPolar();
@@ -183,18 +181,15 @@ private slots:
 	void OnHideUFOWOpps();
 	void OnHideUFOWPolars();
 	void OnHighlightWOpp();
-	void OnImportBody();
 	void OnInitLLTCalc();
 	void OnLiftScale(int pos);
 	void OnLight();
 	void OnImportWPolar();
 	void OnKeepCpSection();
-	void OnManageBodies();
 	void OnManageUFOs();
 	void OnMasses();
 	void OnModalView();
 	void OnMoment();
-	void OnNewBody();
 	void OnNewPlane();
 	void OnNewWing();
 	void OnOutline();
@@ -263,7 +258,7 @@ public:
 
 public:
 	//class methods
-	Body*   AddBody(Body *pBody);
+	void AddBody(Body *pBody);
 	Plane*  AddPlane(Plane *pPlane);
 	void     AddPOpp(bool bPointOut, double *Cp, double *Gamma = NULL, double *Sigma=NULL, PlaneOpp *pPOpp = NULL);
 	Wing*   AddWing(Wing *pWing);
@@ -282,7 +277,6 @@ public:
 	bool CreateWakeElems(int PanelIndex);
 	int  CreateWingElements(Surface *pSurface);
 	void CreateWOpp(WingOpp *pWOpp, Wing *pWing);
-	void DeleteBody(Body *pThisBody);
 	void DrawCpLegend(QPainter &painter, QPoint place, int bottom);
 	void DrawWOppLegend(QPainter &painter, QPoint place, int bottom);
 	void DrawWPolarLegend(QPainter &painter, QPoint place, int bottom);
@@ -337,11 +331,10 @@ public:
 	void SetControlPositions(Panel *pPanel, CVector *pNode, double t, int &NCtrls, QString &out, bool bBCOnly=true);
 	void SetCoreSize(double CoreSize);
 	void SetCurveParams();
-	bool SetModBody(Body *pModBody);
 	bool SetModPlane(Plane *pModPlane);
 	bool SetModWing(Wing *pWing);
 	bool SetModWPolar(WPolar *pModWPolar);
-	bool SetPOpp(bool bCurrent, double x = 0.0);
+	bool SetPlaneOpp(bool bCurrent, double x = 0.0);
 	void SetScale();
 	void SetStabGraphTitles();
 	void SetUFO(QString UFOName="");
@@ -352,7 +345,7 @@ public:
 	void SetWingLegendPos();
 	void SetWPlr(bool bCurrent = true, QString WPlrName = "");
 	void SetWPlrLegendPos();
-	bool SetWOpp(bool bCurrent, double x = 0.0);
+	bool SetWingOpp(bool bCurrent, double x = 0.0);
 	void SnapClient(QString const &FileName);
 	void StopAnimate();
 	QString UFOName();
@@ -569,7 +562,6 @@ public:
 	QList<void *> *m_poaBody;			/**< a pointer to the array of Body objects */
 
 
-	Body *m_pCurBody;             /**< the currently active body */
 	Wing *m_pCurWing;             /**< the currently active wing */
 	WingOpp * m_pCurWOpp;			   /**< the currently active Wing Operating Point*/
 	Plane * m_pCurPlane;          /**< the currently active Plane */

@@ -51,8 +51,9 @@ private slots:
 	void OnStab();
 	void OnBodyCheck();
 	void OnDefineWing();
-	void OnDefineFin();
 	void OnDefineStab();
+	void OnDefineFin();
+	void OnDefineBody();
 	void OnChanged();
 	void OnDescriptionChanged();
 	void OnImportWing();
@@ -64,9 +65,8 @@ private slots:
 	void OnDefineWing2();
 	void OnImportWing2();
 	void OnExportWing2();
-	void OnEditBody();
+	void OnImportBody();
 	void OnInertia();
-	void OnSelChangeBodyList(int pos = 0);
 
 private:
 	void SetupLayout();
@@ -78,9 +78,6 @@ private:
 	void reject();
 
 private:
-	static QList <void*> *s_poaWing;     /**< A pointer to the list of CWing objects */
-	static QList <void*> *s_poaBody;     /**< A pointer to the list of CBody objects */
-
 	static void * s_pMiarex;     /**< A pointer to the QMiarex widget */
 	static void * s_pMainFrame;  /**< A pointer to the mainframe window*/
 
@@ -134,7 +131,6 @@ private:
     DoubleEdit  *m_pctrlWingTilt2;
 	QLineEdit *m_pctrlPlaneName;
 	QTextEdit *m_pctrlPlaneDescription;
-	QComboBox *m_pctrlBodyList;
 	QCheckBox *m_pctrlBiplane;
 	QCheckBox *m_pctrlBody;
 	QCheckBox *m_pctrlStabCheck;
@@ -150,7 +146,8 @@ private:
 	QPushButton	*m_pctrlDefineFin;
 	QPushButton	*m_pctrlVTail;
 	QPushButton	*m_pctrlDefineStab;
-	QPushButton *m_pctrlEditBody;
+	QPushButton *m_pctrlDefineBody;
+	QPushButton *m_pctrlImportBody;
 	QPushButton *m_pctrlPlaneInertia;
 	QPushButton *OKButton;
 	QPushButton *CancelButton;

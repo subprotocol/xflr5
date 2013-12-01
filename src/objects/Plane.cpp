@@ -103,6 +103,7 @@ Plane::Plane()
 Plane::~Plane()
 {
 	ClearPointMasses();
+	if(m_pBody) delete m_pBody;
 }
 
 
@@ -374,9 +375,26 @@ void Plane::Duplicate(Plane *pPlane)
 	}
 
 	m_bBody = pPlane->m_bBody ;
-	m_pBody = pPlane->m_pBody;
+	if(m_bBody)
+	{
+		m_pBody = new Body();
+		m_pBody->Duplicate(pPlane->m_pBody);
+	}
 
+	setAutoBodyName();
 }
+
+
+void Plane::setAutoBodyName()
+{
+	if(!m_pBody) m_BodyName.clear();
+	else
+	{
+		m_BodyName = m_PlaneName+"_body";
+		m_pBody->m_BodyName = m_PlaneName+"_body";
+	}
+}
+
 
 /**
 * Returns the plane's tail volume
@@ -428,7 +446,8 @@ bool Plane::SerializePlane(QDataStream &ar, bool bIsStoring)
 	if (bIsStoring)
 	{
 		// storing code
-		ar << 1012;
+		ar << 1013;
+		//1013 : v6.09.06 added pbody serialization
 		//1012 : QFLR5 v0.03 : added mass properties for inertia calculations
 		//1011 : QFLR5 v0.02 : added Plane description field
 		//1010 : added body LE x and z position
@@ -467,7 +486,7 @@ bool Plane::SerializePlane(QDataStream &ar, bool bIsStoring)
 		if(m_bBody && m_pBody)
 		{
 			ar <<1;
-			WriteCString(ar, m_pBody->m_BodyName);
+			WriteCString(ar, m_BodyName);
 		}
 		else
 		{
@@ -480,6 +499,11 @@ bool Plane::SerializePlane(QDataStream &ar, bool bIsStoring)
 		for(i=0; i<m_PointMass.size(); i++) ar << (float)m_PointMass[i]->mass();
 		for(i=0; i<m_PointMass.size(); i++) ar << (float)m_PointMass[i]->position().x << (float)m_PointMass[i]->position().y << (float)m_PointMass[i]->position().z;
 		for(i=0; i<m_PointMass.size(); i++)  WriteCString(ar, m_PointMass[i]->tag());
+
+		if(m_bBody)
+		{
+			m_pBody->SerializeBody(ar, true);
+		}
 
 		return true;
 	}
@@ -571,8 +595,9 @@ bool Plane::SerializePlane(QDataStream &ar, bool bIsStoring)
 			ar >> k;
 			if(k)  m_bBody=true; else m_bBody=false;
 			ReadCString(ar,strong);
-			m_pBody = pMiarex->GetBody(strong);
-			if(!m_pBody) m_bBody=false;
+			m_BodyName = strong;
+			if(m_BodyName.length()) m_pBody = pMiarex->GetBody(strong);
+			else                    m_pBody = NULL; //redundant
 		}
 		else m_pBody = NULL;
 
@@ -611,6 +636,15 @@ bool Plane::SerializePlane(QDataStream &ar, bool bIsStoring)
 			delete [] mass;
 			delete [] position;
 			tag.clear();
+		}
+
+		if(ArchiveFormat>=1013)
+		{
+			if(m_bBody)
+			{
+				m_pBody = new Body;
+				m_pBody->SerializeBody(ar, false);
+			}
 		}
 
 		ComputePlane();
@@ -671,8 +705,18 @@ void Plane::CreateSurfaces()
 */
 void Plane::SetBody(Body *pBody)
 {
-	m_pBody = pBody;
-	if(!m_pBody) m_bBody = false;
+	if(!pBody)
+	{
+		m_bBody = false;
+		m_pBody = NULL;
+		m_BodyName.clear();
+	}
+	else
+	{
+		m_bBody = true;
+		m_pBody = pBody;
+		setAutoBodyName();
+	}
 }
 
 

@@ -44,6 +44,7 @@
 #include "objects/Foil.h"
 #include "objects/Polar.h"
 #include "objects/OpPoint.h"
+#include "objects/PlaneOpp.h"
 #include "graph/QGraph.h"
 
 
@@ -181,7 +182,7 @@ public:
 	void CreateAFoilMenus();
 	void CreateAFoilToolbar();
 	Foil *DeleteFoil(Foil *pFoil, bool bAsk=true);
-	void DeleteProject();
+	void DeleteProject(bool bClosing=false);
 	void DeletePlane(void *pPlanePtr, bool bResultsOnly = false);
 	void DeleteWing(void *pWingPtr, bool bResultsOnly = false);
 	QColor GetColor(int type);
@@ -200,8 +201,10 @@ public:
 	bool SaveProject(QString PathName="");
 	void SaveSettings();
 	void SelectOpPoint(OpPoint *pOpp);
-	void SelectWOpp(double x);
-	bool SerializeProject(QDataStream &ar, bool bIsStoring);
+    void SelectWOpp(double x=0.0);
+    void SelectWOpp(WingOpp *pWingOpp);
+    void SelectWOpp(PlaneOpp *pPlaneOpp);
+    bool SerializeProject(QDataStream &ar, bool bIsStoring);
 	bool SerializeUFOProject(QDataStream &ar);
 	void SetCentralWidget();
 	void SetCurrentFoil(Foil* pFoil);
@@ -273,8 +276,8 @@ private:
 	//Miarex Menus
 	QMenu *MiarexViewMenu;
 	QMenu *MiarexAnalysisMenu;
-	QMenu *UFOMenu, *currentUFOMenu, *CurWPlrMenu, *CurWOppMenu, *CurBodyMenu;
-	QMenu *MiarexBodyMenu, *MiarexWPlrMenu, *MiarexWOppMenu;
+	QMenu *UFOMenu, *currentUFOMenu, *curWPlrMenu, *curWOppMenu;
+	QMenu *MiarexWPlrMenu, *MiarexWOppMenu;
 	QMenu *WPlrGraphMenu,*WPlrCurGraphMenu, *WOppGraphMenu, *WOppCurGraphMenu;
 	QMenu *WPlrCtxMenu, *WOppCtxMenu, *W3DCtxMenu, *WCpCtxMenu, *WTimeCtxMenu, *W3DStabCtxMenu;
 
@@ -308,7 +311,7 @@ private:
 	//Miarex Actions
 	QAction *WPolarAct, *WOppAct, *W3DAct, *CpViewAct, *StabTimeAct, *RootLocusAct;
 	QAction *W3DPrefsAct, *W3DLightAct, *W3DScalesAct;
-	QAction *DefineWingAct, *DefinePlaneAct, *EditUFOAct, *SaveUFOAsProject;
+	QAction *DefineWingAct, *definePlaneAct, *editUFOAct, *SaveUFOAsProject;
 	QAction *renameCurUFO, *deleteCurUFO, *duplicateCurUFO;
 	QAction *renameCurWPolar, *editWPolar,*exportCurWPolar, *resetCurWPolar;
 	QAction *ShowPolarProps, *ShowWOppProps;
@@ -328,11 +331,11 @@ private:
 	QAction *exportCurWOpp, *showCurWOppOnly, *hideAllWOpps, *showAllWOpps, *deleteAllWOpps;
 	QAction *showAllWPlrOpps, *hideAllWPlrOpps, * deleteAllWPlrOpps;
 	QAction *defineWPolar, *defineStabPolar, *advancedSettings;
-	QAction *defineBody, *importBody, *exportBodyDef, *exportBodyGeom, *ManageBodies, *EditCurBody;
-	QAction *HalfWingAct;
+	QAction *editCurBodyAct;
+	QAction *halfWingAct;
 	QAction *showEllipticCurve, *showXCmRefLocation, *showStabCurve, *showFinCurve, *showWing2Curve;
 	QAction *exporttoAVL, *resetWingScale, *scaleWingAct;
-	QAction *ManageUFOs;
+	QAction *manageUFOsAct;
 	QAction *m_pImportWPolar, *m_pUFOInertia;
 
 	//XDirect Actions

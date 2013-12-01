@@ -1,6 +1,6 @@
 /****************************************************************************
 
-	ManageBodiesDlg  Classes
+	ImportWingDlg Class
 	Copyright (C) 2009 Andre Deperrois adeperrois@xflr5.com
 
 	This program is free software; you can redistribute it and/or modify
@@ -20,64 +20,37 @@
 *****************************************************************************/
 
 
-#ifndef MANAGEBODIESDLG_H
-#define MANAGEBODIESDLG_H
-
-
-#include "../objects/Body.h"
+#ifndef IMPORTWINGDLG_H
+#define IMPORTWINGDLG_H
 
 #include <QDialog>
 #include <QListWidget>
-#include <QPushButton>
-#include <QTextEdit>
+#include <QLabel>
 
-class ManageBodiesDlg : public QDialog
+
+class ImportObjectDlg : public QDialog
 {
 	Q_OBJECT
 
-	friend class Body;
-	friend class MainFrame;
-	friend class QMiarex;
+	friend class PlaneDlg;
 
 public:
-    ManageBodiesDlg(QWidget *pParent);
-	void InitDialog();
+    ImportObjectDlg(QWidget *pParent);
 
 private slots:
-	void OnNameList(QListWidgetItem *pItem);
-	void OnRename();
-	void OnDelete();
-	void OnDuplicate();
-	void OnEdit();
-	void OnNew();
-	void OnDescriptionChanged();
-	void OnExportDefinition();
-	void OnExportGeometry();
-	void OnDoubleClickTable(const QModelIndex &index);
+	void OnOK();
 
 private:
-	void SetBody(Body *pBody = NULL);
 	void SetupLayout();
-	void UpdateBodyList();
-	bool IsInUse(Body *pBody);
+	void InitDialog(bool bWing=true);
+	void OnSelChangeList(QListWidgetItem *pItem);
 
-	static void *s_pMainFrame;
-	static void *s_pMiarex;
-
-	QList <void*> *m_poaBody;
-	QList <void*> *m_poaPlane;
-
-	Body *m_pBody;
-
-	QPushButton *m_pctrlNew, *m_pctrlEdit, *m_pctrlRename, *m_pctrlDelete, *m_pctrlDuplicate;
-	QPushButton *m_pctrlExportDef, *m_pctrlExportGeom;
+	QLabel *m_pctrlQuestion;
 	QListWidget *m_pctrlNameList;
-	QTextEdit *m_pctrlDescription;
+	QString  m_ObjectName;
+
+	bool m_bWing;
+	bool m_bBody;
 };
 
-
-
-#endif // MANAGEBODIESDLG_H
-
-
-
+#endif // IMPORTWINGDLG_H

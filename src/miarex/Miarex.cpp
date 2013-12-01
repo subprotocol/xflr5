@@ -37,7 +37,6 @@
 #include "ManageUFOsDlg.h"
 #include "InertiaDlg.h"
 #include "WingScaleDlg.h"
-#include "ManageBodiesDlg.h"
 #include "WAdvancedDlg.h"
 #include "WPolarDlg.h"
 #include "StabPolarDlg.h"
@@ -118,7 +117,6 @@ QMiarex::QMiarex(QWidget *parent)
 	m_pCurPlane   = NULL;
 	m_pCurWing    = NULL;
 	m_pCurPOpp    = NULL;
-	m_pCurBody    = NULL;
 	m_pCurWPolar  = NULL;
 	m_pCurWOpp    = NULL;
 	m_pCurGraph   = m_WingGraph;
@@ -547,69 +545,39 @@ QMiarex::~QMiarex()
 
 
 /**
- * Inserts the body pointed by pBody in the array of body objects,
- * The position is in alphabetical order by the body name
- * @param a pointer to the CBody object to be inserted
- * @return a pointer to the input CBody object, or NULL if the CBody could not be inserted
+ * If the body is associated to a plane, duplicates the body and attaches it to the Plane
+ * Else destroys the Body.
+ * Used only to import body Objects from files prior to v6.09.06
+ * @param a pointer to the Body object to be inserted
+ * @return true if the body is associated to a plane, false otherwise
  */
-Body* QMiarex::AddBody(Body *pBody)
+void QMiarex::AddBody(Body *pBody)
 {
-	bool bExists   = false;
-	bool bInserted = false;
-	Body *pOldBody;
-	int i,j;
-
-
-	if(pBody->m_BodyName.length())
+	for(int ip=0; ip<m_poaPlane->size(); ip++)
 	{
-		for (i=0; i<m_poaBody->size(); i++)
+		Plane *pPlane = (Plane*)m_poaPlane->at(ip);
+		if(pPlane->m_BodyName==pBody->m_BodyName)
 		{
-			pOldBody = (Body*)m_poaBody->at(i);
-			if (pOldBody->m_BodyName == pBody->m_BodyName)
-			{
-				bExists = true;
-				break;
-			}
+			// duplicate the body - create one for each plane
+			// no more bodies associated to multiple plane
+			Body *planeBody = new Body();
+			planeBody->Duplicate(pBody);
+
+			//attach it and rename it
+			pPlane->SetBody(planeBody);
 		}
 	}
-	else bExists = true;
-
-	while(!bInserted)
+/*	for(int ib=0; ib<m_poaBody->size(); ib++)
 	{
-		if(!bExists)
+		Body *pOldBody = (Body*)m_poaBody->at(ib);
+		if(pOldBody==pBody)
 		{
-			for (j=0; j<m_poaBody->size(); j++)
-			{
-				pOldBody = (Body*)m_poaBody->at(j);
-				if (pBody->m_BodyName.compare(pOldBody->m_BodyName, Qt::CaseInsensitive)<0)
-				{
-					m_poaBody->insert(j, pBody);
-					bInserted = true;
-					break;
-				}
-			}
-			if(!bInserted)
-			{
-				m_poaBody->append(pBody);
-				bInserted = true;
-			}
-			MainFrame::SetSaveState(false);
-			return pBody;
+			m_poaBody->removeAt(ib);
+			delete pBody; //discarded
 		}
-		else
-		{
-			//Ask for user intentions
-			if(!SetModBody(pBody))
-			{
-				delete pBody;
-				return NULL;
-			}
-
-			bExists = false;
-		}
-	}
-	return NULL;
+	} */
 }
+
 
 
 /**
@@ -619,13 +587,9 @@ Body* QMiarex::AddBody(Body *pBody)
  */
 Plane* QMiarex::AddPlane(Plane *pPlane)
 {
-	//
-	//
-	//
 	int i,j;
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	Plane *pOldPlane;
-	QString strong;
 	bool bExists   = false;
 	bool bInserted = false;
 
@@ -1576,7 +1540,7 @@ void QMiarex::SetControls()
 	pMainFrame->StabTimeAct->setChecked(m_iView==WSTABVIEW && m_iStabilityView==STABTIMEVIEW);
 	pMainFrame->RootLocusAct->setChecked(m_iView==WSTABVIEW && m_iStabilityView==STABPOLARVIEW);
 
-	pMainFrame->HalfWingAct->setChecked(m_bHalfWing);
+	pMainFrame->halfWingAct->setChecked(m_bHalfWing);
 	pMainFrame->showEllipticCurve->setChecked(m_bShowElliptic);
 	pMainFrame->showXCmRefLocation->setChecked(m_bXCmRef);
 	pMainFrame->showWing2Curve->setChecked(m_bShowWingCurve[1]);
@@ -1656,21 +1620,19 @@ void QMiarex::SetControls()
     m_pctrlMasses->setChecked(s_bShowMasses);
 
 	pMainFrame->highlightWOppAct->setChecked(m_bHighlightOpp);
-	pMainFrame->CurBodyMenu->setEnabled(m_pCurBody);
-	pMainFrame->EditCurBody->setEnabled(m_pCurBody);
-	pMainFrame->exportBodyDef->setEnabled(m_pCurBody);
-	pMainFrame->exportBodyGeom->setEnabled(m_pCurBody);
 
 	pMainFrame->defineWPolar->setEnabled(m_pCurWing);
 	pMainFrame->defineStabPolar->setEnabled(m_pCurWing);
 
 	pMainFrame->currentUFOMenu->setEnabled(m_pCurWing);
-	pMainFrame->CurWPlrMenu->setEnabled(m_pCurWPolar);
-	pMainFrame->CurWOppMenu->setEnabled(m_pCurWOpp);
+	pMainFrame->curWPlrMenu->setEnabled(m_pCurWPolar);
+	pMainFrame->curWOppMenu->setEnabled(m_pCurWOpp);
 
+	//	pMainFrame->CurBodyMenu->setVisible(m_pCurPlane!=NULL);
+	pMainFrame->editCurBodyAct->setEnabled(m_pCurPlane && m_pCurPlane->body());
 
 	StabViewDlg *pStabView = (StabViewDlg*)pMainFrame->m_pStabView;
-	pStabView->SetControls();
+	if(m_iView==WSTABVIEW) pStabView->SetControls();
 
 	m_pctrlSpanPos->SetValue(m_CurSpanPos);
 	m_pctrlCpSectionSlider->setValue((int)(m_CurSpanPos*100.0));
@@ -1694,6 +1656,7 @@ void QMiarex::SetControls()
 	m_pctrlOutline->setChecked(s_bOutline);
 	m_pctrlStream->setChecked(m_bStream);
 	m_pctrlClipPlanePos->setValue((int)(m_ClipPlanePos*100.0));
+
 
 	SetCurveParams();
 }
@@ -1822,10 +1785,11 @@ void QMiarex::CreateCpCurves()
  */
 int QMiarex::CreateBodyElements()
 {
-	//
-	// Creates the panel elements at the body's surface
-	//
-	if(!m_pCurBody) return 0;
+	if(!m_pCurPlane) return 0;
+	if(!m_pCurPlane->body()) return 0;
+
+	Body *pCurBody = m_pCurPlane->body();
+
 	int i,j,k,l;
 	double uk, uk1, v, dj, dj1, dl1;
 	double dpx, dpz;
@@ -1834,8 +1798,8 @@ int QMiarex::CreateBodyElements()
 	CVector PLA, PTA, PLB, PTB;
 
 	int n0, n1, n2, n3, lnx, lnh;
-	int nx = m_pCurBody->m_nxPanels;
-	int nh = m_pCurBody->m_nhPanels;
+	int nx = pCurBody->m_nxPanels;
+	int nh = pCurBody->m_nhPanels;
 	int p = 0;
 
 	int InitialSize = m_MatSize;
@@ -1850,50 +1814,50 @@ int QMiarex::CreateBodyElements()
 	}
 	else dpx=dpz=0.0;
 
-	if(m_pCurBody->m_LineType==BODYPANELTYPE)
+	if(pCurBody->m_LineType==BODYPANELTYPE)
 	{
 		nx = 0;
-		for(i=0; i<m_pCurBody->FrameSize()-1; i++) nx+=m_pCurBody->m_xPanels[i];
+		for(i=0; i<pCurBody->FrameSize()-1; i++) nx+=pCurBody->m_xPanels[i];
 		nh = 0;
-		for(i=0; i<m_pCurBody->SideLineCount()-1; i++) nh+=m_pCurBody->m_hPanels[i];
+		for(i=0; i<pCurBody->SideLineCount()-1; i++) nh+=pCurBody->m_hPanels[i];
 		FullSize = nx*nh*2;
-		m_pCurBody->m_nxPanels = nx;
-		m_pCurBody->m_nhPanels = nh;
+		pCurBody->m_nxPanels = nx;
+		pCurBody->m_nhPanels = nh;
 
-		for (i=0; i<m_pCurBody->FrameSize()-1; i++)
+		for (i=0; i<pCurBody->FrameSize()-1; i++)
 		{
-			for (j=0; j<m_pCurBody->m_xPanels[i]; j++)
+			for (j=0; j<pCurBody->m_xPanels[i]; j++)
 			{
-				dj  = (double) j   /(double)(m_pCurBody->m_xPanels[i]);
-				dj1 = (double)(j+1)/(double)(m_pCurBody->m_xPanels[i]);
+				dj  = (double) j   /(double)(pCurBody->m_xPanels[i]);
+				dj1 = (double)(j+1)/(double)(pCurBody->m_xPanels[i]);
 
 				//body left side
 				lnh = 0;
-				for (k=0; k<m_pCurBody->SideLineCount()-1; k++)
+				for (k=0; k<pCurBody->SideLineCount()-1; k++)
 				{
 					//build the four corner points of the strips
-					PLB.x =  (1.0- dj) * m_pCurBody->FramePosition(i)      +  dj * m_pCurBody->FramePosition(i+1)       +dpx;
-					PLB.y = -(1.0- dj) * m_pCurBody->getFrame(i)->m_CtrlPoint[k].y   -  dj * m_pCurBody->getFrame(i+1)->m_CtrlPoint[k].y;
-					PLB.z =  (1.0- dj) * m_pCurBody->getFrame(i)->m_CtrlPoint[k].z   +  dj * m_pCurBody->getFrame(i+1)->m_CtrlPoint[k].z    +dpz;
+					PLB.x =  (1.0- dj) * pCurBody->FramePosition(i)      +  dj * pCurBody->FramePosition(i+1)       +dpx;
+					PLB.y = -(1.0- dj) * pCurBody->getFrame(i)->m_CtrlPoint[k].y   -  dj * pCurBody->getFrame(i+1)->m_CtrlPoint[k].y;
+					PLB.z =  (1.0- dj) * pCurBody->getFrame(i)->m_CtrlPoint[k].z   +  dj * pCurBody->getFrame(i+1)->m_CtrlPoint[k].z    +dpz;
 
-					PTB.x =  (1.0-dj1) * m_pCurBody->FramePosition(i)      + dj1 * m_pCurBody->FramePosition(i+1)       +dpx;
-					PTB.y = -(1.0-dj1) * m_pCurBody->getFrame(i)->m_CtrlPoint[k].y   - dj1 * m_pCurBody->getFrame(i+1)->m_CtrlPoint[k].y;
-					PTB.z =  (1.0-dj1) * m_pCurBody->getFrame(i)->m_CtrlPoint[k].z   + dj1 * m_pCurBody->getFrame(i+1)->m_CtrlPoint[k].z    +dpz;
+					PTB.x =  (1.0-dj1) * pCurBody->FramePosition(i)      + dj1 * pCurBody->FramePosition(i+1)       +dpx;
+					PTB.y = -(1.0-dj1) * pCurBody->getFrame(i)->m_CtrlPoint[k].y   - dj1 * pCurBody->getFrame(i+1)->m_CtrlPoint[k].y;
+					PTB.z =  (1.0-dj1) * pCurBody->getFrame(i)->m_CtrlPoint[k].z   + dj1 * pCurBody->getFrame(i+1)->m_CtrlPoint[k].z    +dpz;
 
-					PLA.x =  (1.0- dj) * m_pCurBody->FramePosition(i)      +  dj * m_pCurBody->FramePosition(i+1)       +dpx;
-					PLA.y = -(1.0- dj) * m_pCurBody->getFrame(i)->m_CtrlPoint[k+1].y -  dj * m_pCurBody->getFrame(i+1)->m_CtrlPoint[k+1].y;
-					PLA.z =  (1.0- dj) * m_pCurBody->getFrame(i)->m_CtrlPoint[k+1].z +  dj * m_pCurBody->getFrame(i+1)->m_CtrlPoint[k+1].z  +dpz;
+					PLA.x =  (1.0- dj) * pCurBody->FramePosition(i)      +  dj * pCurBody->FramePosition(i+1)       +dpx;
+					PLA.y = -(1.0- dj) * pCurBody->getFrame(i)->m_CtrlPoint[k+1].y -  dj * pCurBody->getFrame(i+1)->m_CtrlPoint[k+1].y;
+					PLA.z =  (1.0- dj) * pCurBody->getFrame(i)->m_CtrlPoint[k+1].z +  dj * pCurBody->getFrame(i+1)->m_CtrlPoint[k+1].z  +dpz;
 
-					PTA.x =  (1.0-dj1) * m_pCurBody->FramePosition(i)      + dj1 * m_pCurBody->FramePosition(i+1)       +dpx;
-					PTA.y = -(1.0-dj1) * m_pCurBody->getFrame(i)->m_CtrlPoint[k+1].y - dj1 * m_pCurBody->getFrame(i+1)->m_CtrlPoint[k+1].y;
-					PTA.z =  (1.0-dj1) * m_pCurBody->getFrame(i)->m_CtrlPoint[k+1].z + dj1 * m_pCurBody->getFrame(i+1)->m_CtrlPoint[k+1].z  +dpz;
+					PTA.x =  (1.0-dj1) * pCurBody->FramePosition(i)      + dj1 * pCurBody->FramePosition(i+1)       +dpx;
+					PTA.y = -(1.0-dj1) * pCurBody->getFrame(i)->m_CtrlPoint[k+1].y - dj1 * pCurBody->getFrame(i+1)->m_CtrlPoint[k+1].y;
+					PTA.z =  (1.0-dj1) * pCurBody->getFrame(i)->m_CtrlPoint[k+1].z + dj1 * pCurBody->getFrame(i+1)->m_CtrlPoint[k+1].z  +dpz;
 
 					LB = PLB;
 					TB = PTB;
 
-					for (l=0; l<m_pCurBody->m_hPanels[k]; l++)
+					for (l=0; l<pCurBody->m_hPanels[k]; l++)
 					{
-						dl1  = (double)(l+1) / (double)(m_pCurBody->m_hPanels[k]);
+						dl1  = (double)(l+1) / (double)(pCurBody->m_hPanels[k]);
 						LA = PLB * (1.0- dl1) + PLA * dl1;
 						TA = PTB * (1.0- dl1) + PTA * dl1;
 
@@ -1978,17 +1942,17 @@ int QMiarex::CreateBodyElements()
 			}
 		}
 	}
-	else if(m_pCurBody->m_LineType==BODYSPLINETYPE)
+	else if(pCurBody->m_LineType==BODYSPLINETYPE)
 	{
 		FullSize = 2*nx*nh;
 		//start with left side... same as for wings
 		for (k=0; k<nx; k++)
 		{
-			uk  = m_pCurBody->s_XPanelPos[k];
-			uk1 = m_pCurBody->s_XPanelPos[k+1];
+			uk  = pCurBody->s_XPanelPos[k];
+			uk1 = pCurBody->s_XPanelPos[k+1];
 
-			m_pCurBody->GetPoint(uk,  0, false, LB);
-			m_pCurBody->GetPoint(uk1, 0, false, TB);
+			pCurBody->GetPoint(uk,  0, false, LB);
+			pCurBody->GetPoint(uk1, 0, false, TB);
 
 			LB.x += dpx;
 			LB.z += dpz;
@@ -1999,8 +1963,8 @@ int QMiarex::CreateBodyElements()
 			{
 				//start with left side... same as for wings
 				v = (double)(l+1) / (double)(nh);
-				m_pCurBody->GetPoint(uk,  v, false, LA);
-				m_pCurBody->GetPoint(uk1, v, false, TA);
+				pCurBody->GetPoint(uk,  v, false, LA);
+				pCurBody->GetPoint(uk1, v, false, TA);
 
 				LA.x += dpx;
 				LA.z += dpz;
@@ -2181,8 +2145,8 @@ int QMiarex::CreateBodyElements()
 			TB = TA;
 		}
 	}
-	m_pCurBody->m_NElements = m_MatSize-InitialSize;
-	return m_pCurBody->m_NElements;
+	pCurBody->m_NElements = m_MatSize-InitialSize;
+	return pCurBody->m_NElements;
 }
 
 
@@ -3294,35 +3258,6 @@ void QMiarex::CreateStabRLCurves()
 	}
 }
 
-/**
- * Deletes the CBody object from the array
- * @param pThisBody the pointer to the CBody bject to be deleted
- */
-void QMiarex::DeleteBody(Body *pThisBody)
-{
-	if(!pThisBody)	return;
-
-	MainFrame::SetSaveState(false);
-	int i;
-
-	// ... Find the Body in the object array and remove it...
-	Body* pBody;
-	for (i=m_poaBody->size()-1; i>=0; i--)
-	{
-		pBody = (Body*)m_poaBody->at(i);
-		if (pBody == pThisBody)
-		{
-			m_poaBody->removeAt(i);
-			delete pBody;
-			if(pBody == m_pCurBody)
-			{
-				m_pCurBody = NULL;
-				SetUFO();
-			}
-			break;
-		}
-	}
-}
 
 
 /**
@@ -4375,13 +4310,23 @@ void QMiarex::FillWPlrCurve(Curve *pCurve, WPolar *pWPolar, int XVar, int YVar)
 */
 Body * QMiarex::GetBody(QString BodyName)
 {
-	int i;
 	Body* pBody;
-	for (i=0; i<m_poaBody->size(); i++)
+	for (int ib=0; ib<m_poaBody->size(); ib++)
 	{
-		pBody = (Body*)m_poaBody->at(i);
+		pBody = (Body*)m_poaBody->at(ib);
 		if (pBody->m_BodyName == BodyName) return pBody;
 	}
+
+	Plane *pPlane;
+	for(int ip=0; ip<m_poaPlane->size(); ip++)
+	{
+		pPlane = (Plane*)m_poaPlane->at(ip);
+		if(pPlane->body())
+		{
+			if(pPlane->body()->m_BodyName == BodyName) return pPlane->body();
+		}
+	}
+
 	return NULL;
 }
 
@@ -4645,9 +4590,12 @@ void QMiarex::GLCallViewLists()
 		for(int iw=0; iw<MAXWINGS; iw++)
 			if(m_pWingList[iw])  glCallList(WINGOUTLINE+iw);
 
-		if(m_pCurPlane)  glTranslated((m_pCurPlane)->BodyPos().x, 0.0, (m_pCurPlane)->BodyPos().z);
-		if(m_pCurBody)	 glCallList(BODYGEOMBASE+MAXBODIES);
-		if(m_pCurPlane)  glTranslated(-(m_pCurPlane)->BodyPos().x, 0.0, -(m_pCurPlane)->BodyPos().z);
+		if(m_pCurPlane && m_pCurPlane->body())
+		{
+			glTranslated((m_pCurPlane)->BodyPos().x, 0.0, (m_pCurPlane)->BodyPos().z);
+			glCallList(BODYGEOMBASE+MAXBODIES);
+			glTranslated(-(m_pCurPlane)->BodyPos().x, 0.0, -(m_pCurPlane)->BodyPos().z);
+		}
 	}
 
 	if(GLLightDlg::IsLightOn())
@@ -4671,7 +4619,7 @@ void QMiarex::GLCallViewLists()
 			}
 		}
 
-		if(m_pCurBody)
+		if(m_pCurPlane && m_pCurPlane->body())
 		{
 			if(m_pCurPlane)	glTranslated((m_pCurPlane)->BodyPos().x, 0.0, (m_pCurPlane)->BodyPos().z);
 			glCallList(BODYGEOMBASE);
@@ -4719,6 +4667,10 @@ void QMiarex::GLDraw3D()
 		m_bResetglOpp  = true;
 	}
 
+	Body *pCurBody = NULL;
+	if(m_pCurPlane) pCurBody = m_pCurPlane->body();
+
+
 	QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
 
 	ThreeDWidget *p3dWidget = (ThreeDWidget*)s_p3dWidget;
@@ -4738,7 +4690,7 @@ void QMiarex::GLDraw3D()
 	}
 
 
-	if(m_bResetglBody && m_pCurBody)
+	if(m_bResetglBody && pCurBody)
 	{
 		if(glIsList(BODYGEOMBASE))
 		{
@@ -4746,8 +4698,8 @@ void QMiarex::GLDraw3D()
 			glDeleteLists(BODYGEOMBASE+MAXBODIES,1);
 			m_GLList -=2;
 		}
-        if(m_pCurBody->m_LineType==BODYPANELTYPE)	    GLCreateBody3DFlatPanels(BODYGEOMBASE, m_pCurBody);
-        else if(m_pCurBody->m_LineType==BODYSPLINETYPE) GLCreateBody3DSplines(BODYGEOMBASE, m_pCurBody, GL3dBodyDlg::s_NXPoints, GL3dBodyDlg::s_NHoopPoints);
+		if(pCurBody->m_LineType==BODYPANELTYPE)	    GLCreateBody3DFlatPanels(BODYGEOMBASE, pCurBody);
+		else if(pCurBody->m_LineType==BODYSPLINETYPE) GLCreateBody3DSplines(BODYGEOMBASE, pCurBody, GL3dBodyDlg::s_NXPoints, GL3dBodyDlg::s_NHoopPoints);
 
 		m_bResetglBody = false;
 	}
@@ -4756,9 +4708,9 @@ void QMiarex::GLDraw3D()
 	if(m_bResetglGeom  && (m_iView==W3DVIEW || m_iView==WSTABVIEW))
 	{
 		Body TranslatedBody;
-		if(m_pCurBody && m_pCurPlane)
+		if(pCurBody && m_pCurPlane)
 		{
-			TranslatedBody.Duplicate(m_pCurBody);
+			TranslatedBody.Duplicate(pCurBody);
 			TranslatedBody.Translate(m_pCurPlane->BodyPos());
 		}
 		for(int iw=0; iw<MAXWINGS; iw++)
@@ -4771,8 +4723,8 @@ void QMiarex::GLDraw3D()
 			}
 			if(m_pWingList[iw])
 			{
-                if(m_pCurBody && m_pCurPlane) GLCreateGeom(this, m_pWingList[iw], WINGSURFACES+iw, &TranslatedBody);
-				else                          GLCreateGeom(this, m_pWingList[iw], WINGSURFACES+iw, m_pCurBody);
+				if(pCurBody && m_pCurPlane) GLCreateGeom(this, m_pWingList[iw], WINGSURFACES+iw, &TranslatedBody);
+				else                          GLCreateGeom(this, m_pWingList[iw], WINGSURFACES+iw, pCurBody);
 			}
 		}
 		m_bResetglGeom = false;
@@ -5080,8 +5032,9 @@ void QMiarex::GLDrawMasses()
 		}
 
 	}
-	if(m_pCurBody)
+	if(m_pCurPlane && m_pCurPlane->body())
 	{
+		Body *pCurBody = m_pCurPlane->body();
 //		glColor3d(W3dPrefsDlg::s_MassColor.redF()*.75, W3dPrefsDlg::s_MassColor.greenF()*.75, W3dPrefsDlg::s_MassColor.blueF()*.75);
 		glColor3d(0.0, 0.0, 0.7);
 
@@ -5095,18 +5048,18 @@ void QMiarex::GLDrawMasses()
 
 				glColor3d(0.5, 1.0, 0.5);
 				p3dWidget->renderText(0.0, 0.0, zdist,
-								  m_pCurBody->m_BodyName+
-								  QString(" %1").arg(m_pCurBody->m_VolumeMass*MainFrame::s_kgtoUnit, 7,'g',3)+
+								  pCurBody->m_BodyName+
+								  QString(" %1").arg(pCurBody->m_VolumeMass*MainFrame::s_kgtoUnit, 7,'g',3)+
 								  MassUnit);
 			}
 		}
 		glPopMatrix();
         glColor3d(W3dPrefsDlg::s_MassColor.redF(), W3dPrefsDlg::s_MassColor.greenF(), W3dPrefsDlg::s_MassColor.blueF());
-		for(int im=0; im<m_pCurBody->m_PointMass.size(); im++)
+		for(int im=0; im<pCurBody->m_PointMass.size(); im++)
 		{
 			glPushMatrix();
 			{
-				glTranslated(m_pCurBody->m_PointMass[im]->position().x,m_pCurBody->m_PointMass[im]->position().y,m_pCurBody->m_PointMass[im]->position().z);
+				glTranslated(pCurBody->m_PointMass[im]->position().x,pCurBody->m_PointMass[im]->position().y,pCurBody->m_PointMass[im]->position().z);
 				if(m_pCurPlane)
 				{
 					glTranslated(m_pCurPlane->BodyPos().x,
@@ -5119,8 +5072,8 @@ void QMiarex::GLDrawMasses()
 
 				glColor3d(MainFrame::s_TextColor.redF(), MainFrame::s_TextColor.greenF(), MainFrame::s_TextColor.blueF());
 				p3dWidget->renderText(0.0, 0.0, 0.0+.02,
-								  m_pCurBody->m_PointMass[im]->tag()
-								  +QString(" %1").arg(m_pCurBody->m_PointMass[im]->mass()*MainFrame::s_kgtoUnit, 7,'g',3)
+								  pCurBody->m_PointMass[im]->tag()
+								  +QString(" %1").arg(pCurBody->m_PointMass[im]->mass()*MainFrame::s_kgtoUnit, 7,'g',3)
 								  +MassUnit);
 			}
 			glPopMatrix();
@@ -5232,8 +5185,7 @@ void QMiarex::GLDrawWingLegend(Wing *pWing, Plane *pPlane, WPolar *pWPolar)
     QString length, surface;
     QString UFOName;
 
-	QFont fnt(MainFrame::s_TextFont); //two steps to shut valgrind up
-	QFontMetrics fm(fnt);
+	QFontMetrics fm(MainFrame::s_TextFont);
     dD = fm.height();//pixels
 
     total = 13;
@@ -5514,9 +5466,7 @@ void QMiarex::GLRenderView()
 
 	GLLightDlg *pgllDlg = (GLLightDlg*)m_pglLightDlg;
 
-	double LightFactor;
-	if(m_pCurWing) LightFactor =  (GLfloat)pow(m_pCurWing->m_PlanformSpan/2.0,.1);
-	else           LightFactor = 1.0;
+	double LightFactor = qMin(1.0, m_glScaled);
 
 	static GLdouble pts[4];
 	pts[0]= 0.0; pts[1]=0.0; pts[2]=-1.0; pts[3]= m_ClipPlanePos;  //x=m_VerticalSplit
@@ -5534,7 +5484,7 @@ void QMiarex::GLRenderView()
 		if(m_ClipPlanePos>4.9999) 	glDisable(GL_CLIP_PLANE1);
 		else						glEnable(GL_CLIP_PLANE1);
 
-		p3dWidget->GLSetupLight(m_UFOOffset.y,LightFactor);
+		p3dWidget->GLSetupLight(m_UFOOffset.y, LightFactor);
 		glDisable(GL_LIGHTING);
 		glDisable(GL_LIGHT0);
 
@@ -5674,21 +5624,23 @@ bool QMiarex::InitializePanels()
 	// add the number of body panels
 	//create the body elements only if there is a body, and the analysis is not of the VLM Type
 	bool bBodyEl = false;
-	if(m_pCurBody)
+	if(m_pCurPlane && m_pCurPlane->body())
 	{
+		Body *pCurBody = m_pCurPlane->body();
+
 		if(!m_pCurWPolar) bBodyEl = true;//no risk...
 		else if(m_pCurWPolar->m_AnalysisMethod==PANELMETHOD && !m_pCurWPolar->m_bIgnoreBodyPanels)
 		{
 			bBodyEl = true;
-			if(m_pCurBody->m_LineType==BODYPANELTYPE)
+			if(pCurBody->m_LineType==BODYPANELTYPE)
 			{
 				nx = 0;
-				for(int i=0; i<m_pCurBody->FrameSize()-1; i++) nx+=m_pCurBody->m_xPanels[i];
+				for(int i=0; i<pCurBody->FrameSize()-1; i++) nx+=pCurBody->m_xPanels[i];
 				nh = 0;
-				for(int i=0; i<m_pCurBody->SideLineCount()-1; i++) nh+=m_pCurBody->m_hPanels[i];
+				for(int i=0; i<pCurBody->SideLineCount()-1; i++) nh+=pCurBody->m_hPanels[i];
 				PanelArraySize += nx*nh*2;
 			}
-			else PanelArraySize += 2 * m_pCurBody->m_nxPanels * m_pCurBody->m_nhPanels;
+			else PanelArraySize += 2 * pCurBody->m_nxPanels * pCurBody->m_nhPanels;
 		}
 		else bBodyEl = false;
 	}
@@ -5793,19 +5745,21 @@ bool QMiarex::InitializePanels()
 	{
 		Nel = CreateBodyElements();
 
-		m_pCurBody->m_pBodyPanel = ptr;
-/*		HalfSize = m_pCurBody->m_NElements/2;
+		if(m_pCurPlane && m_pCurPlane->body())
+			m_pCurPlane->body()->m_pBodyPanel = ptr;
+
+/*		HalfSize = pCurBody->m_NElements/2;
 		p  = HalfSize-1;
 		pp = HalfSize;
 
-		for(k=0; k<m_pCurBody->m_nxPanels; k++)
+		for(k=0; k<pCurBody->m_nxPanels; k++)
 		{
-			for(l=0; l<m_pCurBody->m_nhPanels; l++)
+			for(l=0; l<pCurBody->m_nhPanels; l++)
 			{
-				m_pCurBody->m_pPanel[p].m_iSym    = m_pCurBody->m_pPanel[pp+m_pCurBody->m_nhPanels-l-1].m_iElement;
+				pCurBody->m_pPanel[p].m_iSym    = pCurBody->m_pPanel[pp+pCurBody->m_nhPanels-l-1].m_iElement;
 				p--;
 			}
-			pp += m_pCurBody->m_nhPanels;
+			pp += pCurBody->m_nhPanels;
 		}*/
 	}
 
@@ -6569,7 +6523,7 @@ void QMiarex::LLTAnalyze(double V0, double VMax, double VDelta, bool bSequence, 
 	if(!m_bLogFile || !(m_pLLTDlg->m_bError || m_pLLTDlg->m_bWarning)) m_pLLTDlg->hide();
 
 	pMainFrame->UpdateWOpps();
-	SetWOpp(false, V0);
+	SetWingOpp(false, V0);
 }
 
 
@@ -7777,10 +7731,10 @@ void QMiarex::OnAnimateModeSingle(bool bStep)
 void QMiarex::OnAnimateWOppSingle()
 {
 	static bool bIsValid, bSkipOne;
-	static int size, pos;
+    static int size;
 	static PlaneOpp *pPOpp;
 	static WingOpp *pWOpp;
-	static QString str;
+
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	//KickIdle
 	if(m_iView!=W3DVIEW && m_iView !=WOPPVIEW) return; //nothing to animate
@@ -7859,16 +7813,8 @@ void QMiarex::OnAnimateWOppSingle()
 				UpdateView();
 			}
 
-			//select current WOpp in Combobox
-			if(m_pCurWPolar->m_WPolarType!=FIXEDAOAPOLAR) str = QString("%1").arg(m_pCurWOpp->m_Alpha,8,'f',2);
-			else                          str = QString("%1").arg(m_pCurWOpp->m_QInf,8,'f',2);
-			pos = pMainFrame->m_pctrlWOpp->findText(str);
-			if(pos>=0)
-			{
-				pMainFrame->blockSignals(true);
-				pMainFrame->m_pctrlWOpp->setCurrentIndex(pos);
-				pMainFrame->blockSignals(false);
-			}
+			//select the PlanePOpp in the top listbox
+            pMainFrame->SelectWOpp(m_pCurWOpp);
 		}
 		else if(bIsValid) bSkipOne = false;
 
@@ -8394,7 +8340,7 @@ void QMiarex::OnDeleteAllWPlrOpps()
 	m_pCurPOpp = NULL;
 	m_bResetglMesh = true;
 	pMainFrame->UpdateWOpps();
-	SetWOpp(true);
+	SetWingOpp(true);
 	if (m_iView==WOPPVIEW)      CreateWOppCurves();
 	else if(m_iView==WCPVIEW)   CreateCpCurves();
 	else if(m_iView==WSTABVIEW) CreateStabilityCurves();
@@ -8431,7 +8377,7 @@ void QMiarex::OnDeleteAllWOpps()
 	m_pCurWOpp = NULL;
 	m_pCurPOpp = NULL;
 	pMainFrame->UpdateWOpps();
-	SetWOpp(true);
+	SetWingOpp(true);
 	if (m_iView==WOPPVIEW)      CreateWOppCurves();
 	else if(m_iView==WCPVIEW)   CreateCpCurves();
 	else if(m_iView==WSTABVIEW) CreateStabilityCurves();
@@ -8496,7 +8442,7 @@ void QMiarex::OnDeleteCurWOpp()
 		m_pCurPOpp = NULL;
 		m_pCurWOpp = NULL;
 		pMainFrame->UpdateWOpps();
-		SetWOpp(true);
+		SetWingOpp(true);
 		MainFrame::SetSaveState(false);
 		if (m_iView==WOPPVIEW)      CreateWOppCurves();
 		else if(m_iView==WCPVIEW)   CreateCpCurves();
@@ -8520,7 +8466,7 @@ void QMiarex::OnDeleteCurWOpp()
 			}
 		}
 		pMainFrame->UpdateWOpps();
-		SetWOpp(true);
+		SetWingOpp(true);
 		if(pMainFrame->m_pctrlWOpp->count())
 		{
 			QString strong;
@@ -8800,14 +8746,18 @@ void QMiarex::OnDuplicateCurUFO()
 	}
 }
 
+
+
 /**
  * The user has requested an edition of the current body
  * Launch the edition interface, and on return, insert the body i.a.w. user instructions
  */
 void QMiarex::OnEditCurBody()
 {
-	if(!m_pCurBody || !m_pCurPlane) return;
+	if(!m_pCurPlane || !m_pCurPlane->body()) return;
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
+
+	Body *pCurBody = m_pCurPlane->body();
 
 	bool bUsed = false;
 	int i;
@@ -8816,7 +8766,7 @@ void QMiarex::OnEditCurBody()
 	for (i=0; i< m_poaPlane->size(); i++)
 	{
 		pPlane = (Plane*)m_poaPlane->at(i);
-		if(pPlane->body() && pPlane->body()==m_pCurBody)
+		if(pPlane->body() && pPlane->body()==pCurBody)
 		{
 			// Does this plane have results
 			for(int j=0; j<m_poaWPolar->size(); j++)
@@ -8832,74 +8782,59 @@ void QMiarex::OnEditCurBody()
 		}
 	}
 
-	Body memBody;
-	memBody.Duplicate(m_pCurBody);
+	Plane *pModPlane = new Plane();
+	pModPlane->Duplicate(m_pCurPlane);
 
 	GL3dBodyDlg glbDlg(pMainFrame);
 	glbDlg.m_bEnableName = false;
-	glbDlg.InitDialog(m_pCurBody);
+	glbDlg.InitDialog(pModPlane->body());
 	glbDlg.move(GL3dBodyDlg::s_WindowPos);
 	glbDlg.resize(GL3dBodyDlg::s_WindowSize);
 	if(GL3dBodyDlg::s_bWindowMaximized) glbDlg.setWindowState(Qt::WindowMaximized);
 
+	if(glbDlg.exec()!=QDialog::Accepted) return;
+
 	ModDlg mdDlg(pMainFrame);
 
-	if(glbDlg.exec() == QDialog::Accepted)
+	if(bUsed)
 	{
-
-		mdDlg.m_Question = tr("The modification will erase all results for the planes using this body.\nContinue ?");
+		mdDlg.m_Question = tr("The modification will erase all results associated to this Plane.\nContinue ?");
 		mdDlg.InitDialog();
 		int Ans = mdDlg.exec();
+
 		if (Ans == QDialog::Rejected)
 		{
 			//restore geometry
-			m_pCurBody->Duplicate(&memBody);
+			delete pModPlane; // clean up
 			return;
 		}
 		else if(Ans==20)
 		{
-			Body* pNewBody= new Body();
-			pNewBody->Duplicate(m_pCurBody);
-			m_pCurBody->Duplicate(&memBody);
-			if(!SetModBody(pNewBody))
+			//save mods to a new plane object
+			if(!SetModPlane(pModPlane))
 			{
-				delete pNewBody;
+				delete pModPlane;
 			}
-
+			else
+			{
+				m_pCurPlane = AddPlane(pModPlane);
+			}
+			SetUFO();
+			pMainFrame->UpdateUFOs();
+			UpdateView();
 			return;
 		}
-		else
-		{
-			//delete all results associated to planes using this body
-			for (i=0; i<m_poaPlane->count();i++)
-			{
-				pPlane = (Plane*)m_poaPlane->at(i);
-				if(pPlane->body() == m_pCurBody)
-				{
-					pMainFrame->DeletePlane(pPlane, true);
-				}
-			}
-		}
-
-
-		if(m_iView==WPOLARVIEW)     CreateWPolarCurves();
-		else if(m_iView==WSTABVIEW) CreateStabilityCurves();
-		else if(m_iView==WOPPVIEW)  CreateWOppCurves();
-		else if(m_iView==WCPVIEW)   CreateCpCurves();
-
-		SetUFO();
-		m_bResetglBody     = true;
-		m_bResetglBodyMesh = true;
-		m_bResetglGeom     = true;
-		m_bResetglMesh     = true;
-		pMainFrame->UpdateWOpps();
-		MainFrame::SetSaveState(false);
-		m_bIs2DScaleSet = false;
-		SetScale();
-        SetControls();
-		UpdateView();
 	}
-	else m_pCurBody->Duplicate(&memBody);
+
+	//then modifications are automatically recorded
+	m_pCurPlane->Duplicate(pModPlane);
+	pMainFrame->DeletePlane(m_pCurPlane, true);// will also set new surface and Aerochord in WPolars
+	SetUFO();
+
+	if(m_iView==WPOLARVIEW)		CreateWPolarCurves();
+	else if(m_iView==WSTABVIEW)	CreateStabilityCurves();
+	else if(m_iView==WOPPVIEW)	CreateWOppCurves();
+	else if(m_iView==WCPVIEW)	CreateCpCurves();
 }
 
 
@@ -9033,52 +8968,6 @@ void QMiarex::OnEditUFO()
 }
 
 
-/**
- * Exports the definition of the active body to a text file
- *@todo would be advantageously replaced by an international standard format
- */
-void QMiarex::OnExportBodyDef()
-{
-	if(!m_pCurBody) return;
-	m_pCurBody->ExportDefinition();
-}
-
-/**
- * Exports the points of the active body to a text file
- *@todo would be advantageously replaced by an international standard format
- */
-void QMiarex::OnExportBodyGeom()
-{
-	if(!m_pCurBody) return;
-	QString LengthUnit, FileName;
-	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
-	GetLengthUnit(LengthUnit, MainFrame::s_LengthUnit);
-
-	FileName = m_pCurBody->m_BodyName;
-	FileName.replace("/", " ");
-
-	int type = 1;
-
-	QString filter =".csv";
-
-	FileName = QFileDialog::getSaveFileName(pMainFrame, QObject::tr("Export Body Geometry"),
-											MainFrame::s_LastDirName ,
-											QObject::tr("Text File (*.txt);;Comma Separated Values (*.csv)"),
-											&filter);
-	if(!FileName.length()) return;
-
-	int pos = FileName.lastIndexOf("/");
-	if(pos>0) MainFrame::s_LastDirName = FileName.left(pos);
-	pos = FileName.lastIndexOf(".csv");
-	if (pos>0) type = 2;
-
-	QFile XFile(FileName);
-
-	if (!XFile.open(QIODevice::WriteOnly | QIODevice::Text)) return ;
-
-	QTextStream out(&XFile);
-	m_pCurBody->ExportGeometry(out, MainFrame::s_mtoUnit, type, GL3dBodyDlg::s_NXPoints, GL3dBodyDlg::s_NHoopPoints);
-}
 
 
 /**
@@ -9872,129 +9761,6 @@ void QMiarex::OnHighlightWOpp()
 
 
 /**
- * The user has requested the import of a body definition from a text file.
- * Createss a new CBody object, fills it with the data from the text file, and adds it to the array
- */
-void QMiarex::OnImportBody()
-{
-	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
-	Body *pNewBody = new Body();
-	if(!pNewBody) return;
-
-	double mtoUnit;
-
-	UnitsDlg uDlg(pMainFrame);
-	uDlg.m_bLengthOnly = true;
-	uDlg.m_Length    = MainFrame::s_LengthUnit;
-	uDlg.m_Area      = MainFrame::s_AreaUnit;
-	uDlg.m_Speed     = MainFrame::s_SpeedUnit;
-	uDlg.m_Weight    = MainFrame::s_WeightUnit;
-	uDlg.m_Force     = MainFrame::s_ForceUnit;
-	uDlg.m_Moment    = MainFrame::s_MomentUnit;
-	uDlg.m_Question = QObject::tr("Choose the length unit to read this file :");
-	uDlg.InitDialog();
-
-	if(uDlg.exec() == QDialog::Accepted)
-	{
-		switch(uDlg.m_Length)
-		{
-			case 0:{//mdm
-				mtoUnit  = 1000.0;
-				break;
-			}
-			case 1:{//cm
-				mtoUnit  = 100.0;
-				break;
-			}
-			case 2:{//dm
-				mtoUnit  = 10.0;
-				break;
-			}
-			case 3:{//m
-				mtoUnit  = 1.0;
-				break;
-			}
-			case 4:{//in
-				mtoUnit  = 1000.0/25.4;
-				break;
-			}
-			case 5:{///ft
-				mtoUnit  = 1000.0/25.4/12.0;
-				break;
-			}
-			default:{//m
-				mtoUnit  = 1.0;
-				break;
-			}
-		}
-	}
-	else return;
-
-	QString PathName;
-//	bool bOK;
-//	QByteArray textline;
-//	const char *text;
-
-	PathName = QFileDialog::getOpenFileName(pMainFrame, QObject::tr("Open File"),
-											MainFrame::s_LastDirName,
-											QObject::tr("All files (*.*)"));
-	if(!PathName.length()) return;
-	int pos = PathName.lastIndexOf("/");
-	if(pos>0) MainFrame::s_LastDirName = PathName.left(pos);
-
-	QFile XFile(PathName);
-	if (!XFile.open(QIODevice::ReadOnly))
-	{
-		QString strange = QObject::tr("Could not read the file\n")+PathName;
-		QMessageBox::warning(pMainFrame, QObject::tr("Warning"), strange);
-		return;
-	}
-
-	QTextStream in(&XFile);
-
-	if(!pNewBody->ImportDefinition(in, mtoUnit))
-	{
-		delete pNewBody;
-		return;
-	}
-	XFile.close();
-
-
-	if(!SetModBody(pNewBody))
-	{
-		delete pNewBody;
-		UpdateView();
-	}
-	else
-	{
-//		if(!m_pCurBody) return;
-		m_pCurBody = pNewBody;
-		Body memBody;
-		memBody.Duplicate(m_pCurBody);
-		GL3dBodyDlg glbDlg(pMainFrame);
-		glbDlg.SetBody(m_pCurBody);
-		glbDlg.m_bEnableName = false;
-		glbDlg.move(GL3dBodyDlg::s_WindowPos);
-		glbDlg.resize(GL3dBodyDlg::s_WindowSize);
-		if(GL3dBodyDlg::s_bWindowMaximized) glbDlg.setWindowState(Qt::WindowMaximized);
-
-		if(glbDlg.exec() == QDialog::Accepted)
-		{
-			m_bResetglBody = true;
-			m_bResetglBodyMesh = true;
-			m_bResetglGeom = true;
-			m_bResetglMesh = true;
-		}
-		else m_pCurBody->Duplicate(&memBody);
-
-		m_pCurBody = NULL;
-		UpdateView();
-		MainFrame::SetSaveState(false);
-	}
-}
-
-
-/**
  * The user has requested the import of a polar definition from a text file.
  * Createss a new CWPolar object, fills it with the data from the text file, and adds it to the array
  *@todo not used often, nor thouroughly tested
@@ -10156,17 +9922,6 @@ void QMiarex::OnLight()
 	UpdateView();
 }
 
-/**
- * The user has requested the launch of the dialog box used to manage the array of bodies
- */
-void QMiarex::OnManageBodies()
-{
-	ManageBodiesDlg mbDlg((MainFrame*)s_pMainFrame);
-	mbDlg.m_poaBody = m_poaBody;
-	mbDlg.m_poaPlane = m_poaPlane;
-	mbDlg.InitDialog();
-	mbDlg.exec();
-}
 
 
 /**
@@ -10206,29 +9961,6 @@ void QMiarex::OnMoment()
 	UpdateView();
 }
 
-/**
- * The user has requested the creation of a new body.
- * Launches the dialog box, and stores the body in the array i.a.w. user instructions
- */
-void QMiarex::OnNewBody()
-{
-	Body *pBody = new Body;
-
-	GL3dBodyDlg glbDlg((MainFrame*)s_pMainFrame);
-	glbDlg.move(GL3dBodyDlg::s_WindowPos);
-	glbDlg.resize(GL3dBodyDlg::s_WindowSize);
-	if(GL3dBodyDlg::s_bWindowMaximized) glbDlg.setWindowState(Qt::WindowMaximized);
-	glbDlg.InitDialog(pBody);
-
-	if(glbDlg.exec() == QDialog::Accepted)
-	{
-		AddBody(pBody);
-		MainFrame::SetSaveState(false);
-        SetControls();
-
-	}
-	else delete pBody;
-}
 
 
 /**
@@ -12523,7 +12255,8 @@ void QMiarex::PanelAnalyze(double V0, double VMax, double VDelta, bool bSequence
 	m_pPanelDlg->m_MatSize        = m_MatSize;
 	m_pPanelDlg->m_NWakeColumn    = m_NWakeColumn;
 	m_pPanelDlg->m_pPlane         = m_pCurPlane;
-	m_pPanelDlg->m_pBody          = m_pCurBody;
+	if(m_pCurPlane)	m_pPanelDlg->m_pBody = m_pCurPlane->body();
+	else            m_pPanelDlg->m_pBody = NULL;
 	m_pPanelDlg->m_pWing          = m_pCurWing;
 
 	for(int iw=0; iw<MAXWINGS; iw++) m_pPanelDlg->m_pWingList[iw] = m_pWingList[iw];
@@ -12562,8 +12295,8 @@ void QMiarex::PanelAnalyze(double V0, double VMax, double VDelta, bool bSequence
 	
 	pMainFrame->UpdateWOpps();
 
-	if(m_pCurPlane)     SetPOpp(false, m_pPanelDlg->m_Alpha);
-	else if(m_pCurWing) SetWOpp(false, m_pPanelDlg->m_Alpha);
+	if(m_pCurPlane)     SetPlaneOpp(false, m_pPanelDlg->m_Alpha);
+	else if(m_pCurWing) SetWingOpp(false, m_pPanelDlg->m_Alpha);
 
 	m_bResetglWake=true; //TODO remove
 }
@@ -13204,14 +12937,6 @@ void QMiarex::Set3DScale()
 		m_glViewportTrans.z = 0.0;
 		m_bIs3DScaleSet = true;
 	}
-	else if(m_pCurBody)
-	{
-		m_glScaled = (GLfloat)(3./4.*2.0*m_GLScale/m_pCurBody->Length());
-		m_glViewportTrans.x = 0.0;
-		m_glViewportTrans.y = 0.0;
-		m_glViewportTrans.z = 0.0;
-		m_bIs3DScaleSet = true;
-	}
 	else //(m_iView==3)
 	{
 		double gh = (double)m_r3DCltRect.height()/(double)m_r3DCltRect.width() ;
@@ -13394,154 +13119,6 @@ void QMiarex::SetCurveParams()
 			m_pctrlUnit3->setText("");
 		}
 	}
-}
-
-
-/**
- * Inserts a modified CBody object in the array, i.a.w. user instructions
- * @param pModBody a pointer to the instance of the CBody object to be inserted
- * @return true if the body was successfully inserted, false otherwise
- */
-bool QMiarex::SetModBody(Body *pModBody)
-{
-	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
-	if(!pModBody) pModBody = m_pCurBody;
-	Body * pBody, *pOldBody;
-	Plane *pPlane;
-	QString strong;
-
-	bool bExists = true;
-	int resp, k, l;
-
-	QStringList NameList;
-	for(k=0; k<m_poaBody->size(); k++)
-	{
-		pBody = (Body*)m_poaBody->at(k);
-		NameList.append(pBody->m_BodyName);
-	}
-
-	RenameDlg renDlg(pMainFrame);
-	renDlg.m_pstrArray = & NameList;
-	renDlg.m_strQuestion = tr("Enter the new name for the Body :");
-	renDlg.m_strName = pModBody->m_BodyName;
-	renDlg.InitDialog();
-
-	while (bExists)
-	{
-		resp = renDlg.exec();
-		if(resp==QDialog::Accepted)
-		{
-			//Is the new name already used ?
-			bExists = false;
-			for (k=0; k<m_poaBody->size(); k++)
-			{
-				pBody = (Body*)m_poaBody->at(k);
-				if (pBody->m_BodyName == renDlg.m_strName)
-				{
-					bExists = true;
-					break;
-				}
-			}
-			if(!bExists)
-			{
-				pModBody->m_BodyName = renDlg.m_strName;
-				//replace the Body in alphabetical order in the array
-				//remove the current Body from the array
-				bool bInserted = false;
-				for (l=0; l<m_poaBody->size();l++)
-				{
-					pBody = (Body*)m_poaBody->at(l);
-					if(pBody == pModBody)
-					{
-						m_poaBody->removeAt(l);
-						// but don't delete it ! we need to re-insert it
-						break;
-					}
-				}
-				for (l=0; l<m_poaBody->size();l++)
-				{
-					pBody = (Body*)m_poaBody->at(l);
-
-					if (pBody->m_BodyName.compare(pModBody->m_BodyName, Qt::CaseInsensitive)>0)
-					{
-						//then insert before
-						m_poaBody->insert(l, pModBody);
-						bInserted = true;
-						break;
-					}
-				}
-				if(!bInserted)	m_poaBody->append(pModBody);
-				MainFrame::SetSaveState(false);
-				return true;
-			}
-		}
-		else if(resp ==10)
-		{
-			//user wants to overwrite
-			pOldBody  = GetBody(renDlg.m_strName);
-			if(pOldBody)
-			{
-				//first we check if this old body is used by one or more planes
-				bool bIsInUse = false;
-				resp = QMessageBox::Yes;
-				for(k=0; k<m_poaPlane->size(); k++)
-				{
-					pPlane = (Plane*)m_poaPlane->at(k);
-					if(pPlane->body() && pPlane->body()==pOldBody)
-					{
-						bIsInUse = true;
-						break;
-					}
-				}
-				if(bIsInUse)
-				{
-					strong = tr("The body ") + pOldBody->m_BodyName+ tr(" is used by one or more planes.\n Overwrite anyway ? (Results will be lost)");
-					resp = QMessageBox::question(this, tr("Question"), strong,
-												 QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel,
-												 QMessageBox::Cancel);
-				}
-				if(resp == QMessageBox::Yes)
-				{
-					for (k=0; k<m_poaBody->size(); k++)
-					{
-						pBody = (Body*)m_poaBody->at(k);
-						if (pBody->m_BodyName == renDlg.m_strName)
-						{
-							m_poaBody->removeAt(k);
-							if(pBody==m_pCurBody)
-							{
-								m_pCurBody = NULL;
-							}
-							delete pBody;
-							bExists = false;
-							break;
-						}
-					}
-					for(k=0; k<m_poaPlane->size(); k++)
-					{
-						pPlane = (Plane*)m_poaPlane->at(k);
-						if(pPlane->body() && pPlane->body()==pOldBody)
-						{
-							pPlane->SetBody(pModBody);
-							pMainFrame->DeletePlane(pPlane, true);
-							pMainFrame->UpdateWOpps();
-						}
-					}
-				}
-			}
-
-			pModBody->m_BodyName = renDlg.m_strName;
-			m_pCurBody = pModBody;
-
-			MainFrame::SetSaveState(false);
-			return true;
-		}
-		else
-		{
-			return false;//cancelled
-		}
-	}
-	return false ;//useless...
 }
 
 
@@ -14095,7 +13672,7 @@ bool QMiarex::SetModWPolar(WPolar *pModWPolar)
 *@param bCurrent, if true, uses the x value of the current operating point; this is useful if the user has changed the polar, but wants to display the same aoa for instance
 *@return true if a new valid operating point has been selected
 */
-bool QMiarex::SetPOpp(bool bCurrent, double x)
+bool QMiarex::SetPlaneOpp(bool bCurrent, double x)
 {
 	if(!m_pCurPlane) return false;
 
@@ -14147,6 +13724,7 @@ bool QMiarex::SetPOpp(bool bCurrent, double x)
 		}
 	}
 
+
 	m_pCurPOpp = pPOpp;
 
 	SetCurveParams();
@@ -14165,10 +13743,7 @@ bool QMiarex::SetPOpp(bool bCurrent, double x)
 		if(m_pCurWPolar) m_pCurWPolar->m_AMem = m_pCurPOpp->m_Alpha;
 
 		//select m_pCurPOpp in the listbox
-		if(m_pCurWPolar->m_WPolarType<FIXEDAOAPOLAR)          pMainFrame->SelectWOpp(m_pCurPOpp->m_Alpha);
-		else if(m_pCurWPolar->m_WPolarType == FIXEDAOAPOLAR)  pMainFrame->SelectWOpp(m_pCurPOpp->m_QInf);
-		else if(m_pCurWPolar->m_WPolarType == STABILITYPOLAR) pMainFrame->SelectWOpp(m_pCurPOpp->m_Ctrl);
-		;
+        pMainFrame->SelectWOpp(m_pCurPOpp);
 
 		//if we have a type 7 polar, set the panels in the control's position
 		if(m_pCurWPolar && m_pCurWPolar->m_WPolarType==STABILITYPOLAR)
@@ -14206,6 +13781,7 @@ bool QMiarex::SetPOpp(bool bCurrent, double x)
 	}
 	return true;
 }
+
 
 
 /**
@@ -14262,7 +13838,6 @@ void QMiarex::SetUFO(QString UFOName)
 			{
 				for(int i=0; i<4; i++) m_pWingList[i] = NULL;
 				m_pCurPlane = NULL;
-				m_pCurBody  = NULL;
 				m_pCurWing  = NULL;
 				m_pCurWOpp  = NULL;
 				m_pCurPOpp  = NULL;
@@ -14283,8 +13858,8 @@ void QMiarex::SetUFO(QString UFOName)
 
 	if(!m_pCurWing && !m_pCurPlane)
 	{
-		for(int i=0; i<4; i++) m_pWingList[i] = NULL;
-		m_pCurBody  = NULL;
+		for(int i=0; i<MAXWINGS; i++) m_pWingList[i] = NULL;
+		m_pCurWPolar = NULL;
 		m_pCurWOpp  = NULL;
 		m_pCurPOpp  = NULL;
 
@@ -14306,44 +13881,39 @@ void QMiarex::SetUFO(QString UFOName)
 		else
 			m_pWingList[3]  = NULL;
 
-		m_pCurBody     = m_pCurPlane->body();
 	}
 	else
 	{
 		m_pCurPOpp  = NULL;
-		m_pCurBody  = NULL;
 		m_pWingList[0] = m_pCurWing;
 		m_pWingList[1] = m_pWingList[2] =m_pWingList[3] = NULL;
 	}
 
 
 	m_bResetglGeom   = true;
-	if(m_pCurBody) m_bResetglBody   = true;
-	else           m_bResetglBody   = false;
-
+	if(m_pCurPlane && m_pCurPlane->body()) m_bResetglBody   = true;
+	else                                   m_bResetglBody   = false;
 	m_bResetglMesh = true;
 
-	CVector T(0.0,0.0,0.0);
 
 	double dx, dz;
 	dx=dz=0.0;
-
 	if(m_pCurPlane)
 	{
 		if(m_pCurPlane->body())
 		{
 			dx = m_pCurPlane->BodyPos().x;
 			dz = m_pCurPlane->BodyPos().z;
+			m_pCurPlane->body()->SetKnots();
+			m_pCurPlane->body()->SetPanelPos();
 		}
 	}
 
-	if(m_pCurBody)
-	{
-		m_pCurBody->SetKnots();
-		m_pCurBody->SetPanelPos();
-	}
 	
 	m_NSurfaces = 0;
+
+	Body *pCurBody=NULL;
+	if(m_pCurPlane) pCurBody = m_pCurPlane->body();
 
 	for(int iw=0; iw<MAXWINGS; iw++)
 	{
@@ -14354,7 +13924,7 @@ void QMiarex::SetUFO(QString UFOName)
 			else if(iw==3)             m_pWingList[iw]->CreateSurfaces(m_pCurPlane->WingLE(iw), -90.0, m_pCurPlane->WingTiltAngle(iw));
 			for (i=0; i<m_pWingList[iw]->m_NSurfaces; i++)
 			{
-				m_pWingList[iw]->m_Surface[i].SetSidePoints(m_pCurBody, dx, dz);
+				m_pWingList[iw]->m_Surface[i].SetSidePoints(pCurBody, dx, dz);
 				m_pSurface[m_NSurfaces] = &m_pWingList[iw]->m_Surface[i];
 				m_NSurfaces++;
 			}
@@ -14362,44 +13932,10 @@ void QMiarex::SetUFO(QString UFOName)
 		}
 	}
 
-	if(m_pCurBody)  m_pCurBody->ComputeBodyAxisInertia();
 	if(m_pCurPlane) m_pCurPlane->ComputeBodyAxisInertia();
 
-	WPolar *pWPolar;
-	for(i=0; i<m_poaWPolar->size(); i++)
-	{
-		pWPolar = (WPolar*)m_poaWPolar->at(i);
-		if(pWPolar->m_WPolarType==STABILITYPOLAR)
-		{
-			pWPolar->m_AnalysisMethod=PANELMETHOD;
-			if(qAbs(pWPolar->m_Mass)<PRECISION)
-			{
-				//very special case, the polar was generated by v600 or v601
-				// need to reload inertia data from plane inertia
-				pWing  = GetWing(pWPolar->m_UFOName);
-				pPlane = GetPlane(pWPolar->m_UFOName);
-
-				if(pWing)
-				{
-					pWPolar->m_Mass = pWing->TotalMass();
-					pWPolar->m_CoG    = pWing->m_CoG;
-					pWPolar->m_CoGIxx = pWing->m_CoGIxx;
-					pWPolar->m_CoGIyy = pWing->m_CoGIyy;
-					pWPolar->m_CoGIzz = pWing->m_CoGIzz;
-					pWPolar->m_CoGIxz = pWing->m_CoGIxz;
-				}
-				else if(pPlane)
-				{
-					pWPolar->m_Mass = pPlane->TotalMass();
-					pWPolar->m_CoG    = pPlane->CoG();
-					pWPolar->m_CoGIxx = pPlane->m_CoGIxx;
-					pWPolar->m_CoGIyy = pPlane->m_CoGIyy;
-					pWPolar->m_CoGIzz = pPlane->m_CoGIzz;
-					pWPolar->m_CoGIxz = pPlane->m_CoGIxz;
-				}
-			}
-		}
-	}
+	MainFrame*pMainFrame = (MainFrame*)s_pMainFrame;
+	pMainFrame->UpdateWPolars();
 
 	if (m_pCurWPolar)
 	{
@@ -14827,7 +14363,7 @@ void QMiarex::SetWPlr(bool bCurrent, QString WPlrName)
 		}
 	}
 
-	if(pWPolar && pWPolar == m_pCurWPolar) SetWOpp(true);
+	if(pWPolar && pWPolar == m_pCurWPolar) SetWingOpp(true);
 	else
 	{
 		m_bResetglMesh = true;
@@ -14915,8 +14451,8 @@ void QMiarex::SetWPlr(bool bCurrent, QString WPlrName)
 		double Alpha = 0.0;
 		if(m_pCurWOpp) Alpha = m_pCurWOpp->m_Alpha;
 
-		if(m_pCurPlane)     SetPOpp(false, Alpha);
-		else if(m_pCurWing) SetWOpp(false, Alpha);
+		if(m_pCurPlane)     SetPlaneOpp(false, Alpha);
+		else if(m_pCurWing) SetWingOpp(false, Alpha);
 
 /*		if (m_pCurPOpp){
 			// try to set the same as the existing WOpp... Special for Marc
@@ -15088,7 +14624,7 @@ void QMiarex::SetWPlrLegendPos()
  *@param x the aoa or velocity or control parameter of the operating point to set
  *@return true if an operating point was successfully set
  */
-bool QMiarex::SetWOpp(bool bCurrent, double x)
+bool QMiarex::SetWingOpp(bool bCurrent, double x)
 {
 	m_bResetglOpp    = true;
 	m_bResetglStream = true;
@@ -15113,7 +14649,7 @@ bool QMiarex::SetWOpp(bool bCurrent, double x)
 	// else set the comboBox's first, if any
 	// else set it to NULL
 	QString strong;
-	if(m_pCurPlane)	  return SetPOpp(bCurrent, x);
+	if(m_pCurPlane)	  return SetPlaneOpp(bCurrent, x);
 
 	WingOpp *pWOpp = NULL;
 	if(bCurrent)
@@ -15176,9 +14712,7 @@ bool QMiarex::SetWOpp(bool bCurrent, double x)
 //		m_WakePanelFactor =		m_pCurWOpp->m_WakeFactor;
 
 		//select m_pCurWOpp in the listbox
-		if(m_pCurWPolar->m_WPolarType<FIXEDAOAPOLAR)          pMainFrame->SelectWOpp(m_pCurWOpp->m_Alpha);
-		else if(m_pCurWPolar->m_WPolarType == FIXEDAOAPOLAR)  pMainFrame->SelectWOpp(m_pCurWOpp->m_QInf);
-		else if(m_pCurWPolar->m_WPolarType == STABILITYPOLAR) pMainFrame->SelectWOpp(m_pCurWOpp->m_Ctrl);
+        pMainFrame->SelectWOpp(m_pCurWOpp);
 
 		//if we have a type 7 polar, set the panels in the control's position
 		if(m_pCurWPolar && m_pCurWPolar->m_WPolarType==STABILITYPOLAR)
@@ -15187,7 +14721,9 @@ bool QMiarex::SetWOpp(bool bCurrent, double x)
 			m_pPanelDlg->m_pWPolar        = m_pCurWPolar;
 			m_pPanelDlg->m_pPlane         = m_pCurPlane;
 			for(int iw=0; iw<MAXWINGS; iw++) m_pPanelDlg->m_pWingList[iw] = m_pWingList[iw];
-			m_pPanelDlg->m_pBody          = m_pCurBody;
+			Body *pCurBody = NULL;
+			if(m_pCurPlane) pCurBody = m_pCurPlane->body();
+			m_pPanelDlg->m_pBody = pCurBody;
 			int  nCtrls;
 			QString strong;
 			SetControlPositions(m_Panel, m_Node, m_pCurWOpp->m_Ctrl, nCtrls, strong, false);
@@ -15381,11 +14917,11 @@ void QMiarex::StopAnimate()
 	{
 		if(m_pCurPlane)
 		{
-			SetPOpp(true);
+			SetPlaneOpp(true);
 		}
 		else if(m_pCurWing)
 		{
-			SetWOpp(true);
+			SetWingOpp(true);
 		}
 	}
 }

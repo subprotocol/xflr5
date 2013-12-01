@@ -59,7 +59,6 @@ void DoubleEdit::focusOutEvent (QFocusEvent *event)
 }
 
 
-
 double DoubleEdit::ReadValue()
 {
 	bool bOK;
@@ -71,12 +70,12 @@ double DoubleEdit::ReadValue()
 //	else    return m_Value;
 }
 
+
 void DoubleEdit::SetValue(double val)
 {
 	m_Value = val;
 	FormatValue();
 }
-
 
 
 void DoubleEdit::keyPressEvent(QKeyEvent *event)

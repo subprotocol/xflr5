@@ -68,6 +68,8 @@ public:
 	void ComputeVolumeInertia(double &Mass, CVector &CoG, double &Ixx, double &Iyy, double &Izz, double &Ixz);
 	void ComputeBodyAxisInertia();
 
+	void setAutoBodyName();
+
 	int VLMPanelTotal();
 
 	/**
@@ -148,6 +150,9 @@ private:
 	CVector m_BodyPos;                          /**< the translation vector to apply to the Body */
 
 public:
+	QString m_BodyName;                         /**< identifies this plane's body */
+
+
 	QList<PointMass*> m_PointMass;              /**< the array of PointMass objects */
 	double m_CoGIxx;                            /**< the Ixx component of the inertia tensor, calculated at the CoG */
 	double m_CoGIyy;                            /**< the Ixx component of the inertia tensor, calculated at the CoG */

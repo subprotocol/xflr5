@@ -257,6 +257,7 @@ void Body::Duplicate(Body *pBody)
 	{
 		m_PointMass.append(new PointMass(pBody->m_PointMass.at(im)));
 	}
+	m_VolumeMass = pBody->m_VolumeMass;
 }
 
 

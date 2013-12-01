@@ -16,8 +16,6 @@
 
 
 xflr5 v6.09.06, November xxx, 2013
-	- improved the default stylesheet
-	- fixed translation issues
 	- introduced number input/ouput using system locale settings.
 	- mesh resizing is now enabled without any limit other than the one set by the compiler and the system
 	- fixed the issues with the animation of foil operating points
@@ -26,7 +24,10 @@ xflr5 v6.09.06, November xxx, 2013
 	- added import/export of the wing geometry via plain-text files
 	- fixed the bug which caused the pitching moment to be zero
 	- solved most (all?) of the issues with OpenGL text rendering
+	- improved the default stylesheet
+	- fixed the translation issues
 	- made the code compatible with msvc nmake
+	- removed the access to the array of body objects; bodies are now objects attached to a single plane
 	- deep code cleaning
 	- other minor corrections and enhancements
 
