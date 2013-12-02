@@ -39,6 +39,7 @@ bool BatchDlg::s_bCurrentFoil=true;
 void * BatchDlg::s_pXFoil;
 void * BatchDlg::s_pMainFrame;
 void * BatchDlg::s_pXDirect;
+QPoint BatchDlg::s_Position;
 
 
 
@@ -1437,6 +1438,17 @@ void BatchDlg::WriteString(QString &strong)
 }
 
 
+
+
+void BatchDlg::showEvent(QShowEvent *event)
+{
+    move(s_Position);
+}
+
+void BatchDlg::hideEvent(QHideEvent *event)
+{
+    s_Position = pos();
+}
 
 
 

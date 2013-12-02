@@ -31,39 +31,20 @@
 #include <QPixmap>
 #include <QSettings>
 #include <QLabel>
+#include <QPushButton>
 #include <QRadioButton>
 #include <QCheckBox>
 #include <QStackedWidget>
-#include "../misc/RenameDlg.h"
 #include "../misc/LineBtn.h"
 #include "../misc/LineCbBox.h"
 #include "../misc/LineDelegate.h"
 #include "../misc/DoubleEdit.h"
-#include "../misc/PolarFilterDlg.h"
-#include "../misc/ObjectPropsDlg.h"
 #include "../objects/Polar.h"
 #include "../objects/Foil.h"
 #include "../objects/OpPoint.h"
 #include "../graph/QGraph.h"
-#include "../graph/GraphDlg.h"
 #include "XFoil.h"
-#include "EditPlrDlg.h"
-#include "XFoilAnalysisDlg.h"
-#include "XFoilAdvancedDlg.h"
-#include "FoilPolarDlg.h"
-#include "BatchDlg.h"
-#include "TwoDPanelDlg.h"
-#include "InterpolateFoilsDlg.h"
-#include "NacaFoilDlg.h"
-#include "ManageFoilsDlg.h"
 
-#include "FoilCoordDlg.h"
-#include "FoilGeomDlg.h"
-#include "TEGapDlg.h"
-#include "LEDlg.h"
-#include "FlapDlg.h"
-#include "CAddDlg.h"
-#include "XDirectStyleDlg.h"
 
 #define MAXPOLARGRAPHS 5
 
@@ -263,30 +244,6 @@ protected:
 
 
 private:
-	//the dialog boxes are declared as member variables to enable translations... seems to be a Qt bug
-	PolarFilterDlg *m_pPolarFilterDlg;
-	ObjectPropsDlg *m_pObjectPropsDlg;
-	GraphDlg *m_pGraphDlg;
-	RenameDlg *m_pRenameDlg;
-	EditPlrDlg *m_pEditPlrDlg;
-	XFoilAnalysisDlg *m_pXFoilAnalysisDlg;
-	XFoilAdvancedDlg *m_pXFoilAdvancedDlg;
-	FoilPolarDlg *m_pFPDlg;
-	BatchDlg *m_pBDlg;
-//	BatchThreadDlg *m_pBatchThreadDlg;
-	XDirectStyleDlg *m_pXDirectStyleDlg;
-	ManageFoilsDlg *m_pManageFoilsDlg;
-
-	TwoDPanelDlg *m_pTwoDPanelDlg;
-	InterpolateFoilsDlg *m_pIFDlg;
-	NacaFoilDlg *m_pNacaFoilDlg;
-	FoilCoordDlg *m_pFoilCoordDlg;
-	FoilGeomDlg *m_pFoilGeomDlg;
-	TEGapDlg *m_pTEGapDlg;
-	LEDlg *m_pLEDlg;
-	FlapDlg *m_pFlapDlg;
-	CAddDlg *m_pCAddDlg;
-
 
 	QStackedWidget *m_pctrlMiddleControls;
 

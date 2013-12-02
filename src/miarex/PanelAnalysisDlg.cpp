@@ -35,7 +35,7 @@
 #include "Miarex.h"
 
 void *PanelAnalysisDlg::s_pMiarex;
-
+QPoint PanelAnalysisDlg::s_Position;
 int PanelAnalysisDlg::s_MaxRHSSize = VLMMAXRHS;
 
 
@@ -4627,3 +4627,13 @@ void PanelAnalysisDlg::VLMCmn(CVector const &A, CVector const &B, CVector const 
 }
 
 
+
+void PanelAnalysisDlg::showEvent(QShowEvent *event)
+{
+    move(s_Position);
+}
+
+void PanelAnalysisDlg::hideEvent(QHideEvent *event)
+{
+    s_Position = pos();
+}

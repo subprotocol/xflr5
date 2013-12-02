@@ -25,7 +25,7 @@
 #include <QDialog>
 #include <QLabel>
 #include "../objects/Foil.h"
-#include "../misc/DoubleEdit.h"
+#include "../misc/IntEdit.h"
 
 
 class NacaFoilDlg : public QDialog
@@ -52,8 +52,8 @@ public:
 
 	Foil *m_pBufferFoil;
 	QPushButton *OKButton, *CancelButton;
-	DoubleEdit *m_pctrlNumber;
-	DoubleEdit *m_pctrlPanels;
+	IntEdit *m_pctrlNumber;
+	IntEdit *m_pctrlPanels;
 	QLabel * m_pctrlMessage;
 
 	bool m_bGenerated;

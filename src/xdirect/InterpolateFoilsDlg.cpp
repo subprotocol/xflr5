@@ -20,12 +20,14 @@
 *****************************************************************************/
 
 #include <QGroupBox>
-
+#include <QVBoxLayout>
 #include "InterpolateFoilsDlg.h"
 #include "../mainframe.h"
 #include "XFoil.h"
 #include "XDirect.h"
 #include "../design/AFoil.h"
+
+
 
 void *InterpolateFoilsDlg::s_pXFoil;
 

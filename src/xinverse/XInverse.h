@@ -142,10 +142,6 @@ private:
 
 private:
 
-//	GraphDlg *m_pGraphDlg;
-//	InverseOptionsDlg *m_pXInverseStyleDlg;
-//	PertDlg *m_pPertDlg;
-
 	QTextEdit *m_pctrlOutput;
 	QLabel *m_pctrlSpecif;
 	QRadioButton *m_pctrlSpecAlpha, *m_pctrlSpecCl;

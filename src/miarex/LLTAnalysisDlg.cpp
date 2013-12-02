@@ -35,6 +35,7 @@
 
 void *LLTAnalysisDlg::s_pMainFrame;
 void *LLTAnalysisDlg::s_pMiarex;
+QPoint LLTAnalysisDlg::s_Position;
 
 
 /**
@@ -578,3 +579,14 @@ void LLTAnalysisDlg::UpdateGraph(int x, double y)
 }
 
 
+
+
+void LLTAnalysisDlg::showEvent(QShowEvent *event)
+{
+    move(s_Position);
+}
+
+void LLTAnalysisDlg::hideEvent(QHideEvent *event)
+{
+    s_Position = pos();
+}

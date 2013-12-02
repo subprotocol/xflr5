@@ -51,16 +51,12 @@ void NacaFoilDlg::SetupLayout()
 		QLabel *NacaNumber   = new QLabel(tr("4 or 5 digits"));
 		QLabel *PanelNumber  = new QLabel(tr("Number of Panels"));
 
-		m_pctrlNumber = new DoubleEdit(0,0);
-		m_pctrlPanels = new DoubleEdit(100,0);
+		m_pctrlNumber = new IntEdit(0);
+		m_pctrlPanels = new IntEdit(100);
+		m_pctrlPanels->SetMax(IQX);
+
 		m_pctrlMessage = new QLabel();
 		m_pctrlMessage->setMinimumWidth(120);
-
-	//	QValidator *PanelValid = new QIntValidator(0, IQX, this);
-	//	m_pctrlPanels->setValidator(PanelValid);
-
-	//	QValidator *NacaValid = new QIntValidator(0, 100000000, this);
-	//	m_pctrlNumber->setValidator(NacaValid);
 
 		m_pctrlNumber->setAlignment(Qt::AlignRight);
 		m_pctrlPanels->setAlignment(Qt::AlignRight);
@@ -104,7 +100,7 @@ void NacaFoilDlg::SetupLayout()
 
 void NacaFoilDlg::EditingFinished()
 {
-	s_Digits = m_pctrlNumber->text().toInt();
+	s_Digits = locale().toInt(m_pctrlNumber->text().trimmed());
 	s_Panels = m_pctrlPanels->Value();
 
 	GenerateFoil();

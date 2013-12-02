@@ -12284,15 +12284,15 @@ void QMiarex::PanelAnalyze(double V0, double VMax, double VDelta, bool bSequence
 		m_pPanelDlg->m_AlphaDelta = VDelta;
 	}
 
-
 	if(!m_pPanelDlg->InitDialog()) return;
-	m_pPanelDlg->show();
+
+    m_pPanelDlg->show();
+
 	m_pPanelDlg->StartAnalysis();
 //	m_bResetglMesh = true;
 
 	if(!m_bLogFile || !m_pPanelDlg->m_bWarning) m_pPanelDlg->hide();
 
-	
 	pMainFrame->UpdateWOpps();
 
 	if(m_pCurPlane)     SetPlaneOpp(false, m_pPanelDlg->m_Alpha);
@@ -14073,7 +14073,6 @@ void QMiarex::SetupLayout()
 			CheckDispLayout->addWidget(m_pctrlStream,   5, 2);
 			CheckDispLayout->addWidget(m_pctrlWOppAnimate,  6, 1);
 			CheckDispLayout->addWidget(m_pctrlAnimateWOppSpeed,6,2);
-
 		}
 		DisplayBox->setLayout(CheckDispLayout);
 	}
@@ -14103,9 +14102,11 @@ void QMiarex::SetupLayout()
 			m_pctrlCurveStyle = new LineCbBox();
 			m_pctrlCurveWidth = new LineCbBox();
 			m_pctrlCurveColor = new LineBtn();
-			m_pctrlCurveColor->setMinimumHeight(m_pctrlCurveStyle->minimumSizeHint().height());
+            m_pctrlCurveColor->setMinimumHeight(135);
+//            m_pctrlCurveColor->setMinimumHeight(m_pctrlCurveStyle->sizeHint().height());
 
-			for (int i=0; i<5; i++)
+
+            for (int i=0; i<5; i++)
 			{
 				m_pctrlCurveStyle->addItem(tr("item"));
 				m_pctrlCurveWidth->addItem(tr("item"));

@@ -55,10 +55,8 @@ void XFoilAdvancedDlg::SetupLayout()
 	{
 		QLabel *lab2 = new QLabel(tr("Iteration Limit"));
 		lab2->setAlignment(Qt::AlignRight);
-		m_pctrlIterLimit = new QLineEdit;
-		m_pctrlIterLimit->setAlignment(Qt::AlignRight);
-		QValidator *IterValid = new QIntValidator(0, 100000000, this);
-		m_pctrlIterLimit->setValidator(IterValid);
+		m_pctrlIterLimit = new IntEdit;
+
 		IterBoxLayout->addStretch(1);
 		IterBoxLayout->addWidget(lab2);
 		IterBoxLayout->addWidget(m_pctrlIterLimit);
@@ -95,8 +93,7 @@ void XFoilAdvancedDlg::InitDialog()
 {
 	m_pctrlVAccel->SetValue(m_VAccel);
 	m_pctrlInitBL->setChecked(m_bInitBL);
-	QString str = QString("%1").arg(m_IterLimit);
-	m_pctrlIterLimit->setText(str);
+	m_pctrlIterLimit->SetValue(m_IterLimit);
 	m_pctrlFullReport->setChecked(m_bFullReport);
 }
 
@@ -132,8 +129,7 @@ void XFoilAdvancedDlg::keyPressEvent(QKeyEvent *event)
 
 void XFoilAdvancedDlg::OnOK()
 {
-	QString str = m_pctrlIterLimit->text();
-	m_IterLimit = str.toInt();
+	m_IterLimit = m_pctrlIterLimit->Value();
 	m_VAccel = m_pctrlVAccel->Value();
 	m_bInitBL = m_pctrlInitBL->isChecked();
 	m_bFullReport = m_pctrlFullReport->isChecked();

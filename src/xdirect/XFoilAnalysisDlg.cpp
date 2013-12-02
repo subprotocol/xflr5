@@ -22,7 +22,7 @@
 #include <QApplication>
 #include <QDir>
 #include <QDateTime>
-
+#include <QHBoxLayout>
 
 #include "XFoilAnalysisDlg.h"
 #include "XDirect.h"
@@ -30,6 +30,8 @@
 
 void *XFoilAnalysisDlg::s_pMainFrame;
 void *XFoilAnalysisDlg::s_pXDirect;
+QPoint XFoilAnalysisDlg::s_Position;
+
 
 XFoilAnalysisDlg::XFoilAnalysisDlg(QWidget *pParent) : QDialog(pParent)
 {
@@ -579,6 +581,29 @@ void XFoilAnalysisDlg::WriteString(QString &strong)
 	QTextStream ds(m_pXFile);
 	ds << strong;
 }
+
+void XFoilAnalysisDlg::showEvent(QShowEvent *event)
+{
+    move(s_Position);
+}
+
+void XFoilAnalysisDlg::hideEvent(QHideEvent *event)
+{
+    s_Position = pos();
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

@@ -49,6 +49,8 @@ public:
 
 private:
 	void keyPressEvent(QKeyEvent *event);
+    void showEvent(QShowEvent *event);
+    void hideEvent(QHideEvent *event);
 
 	void AddOpPoint();
 	void AlphaLoop();
@@ -84,7 +86,9 @@ private slots:
 	void OnFoilList();
 	void OnFoilSelectionType();
 
-protected:
+private:
+    static QPoint s_Position;   /**< the position on the client area of the dialog's topleft corner */
+
 	QRadioButton * m_pctrlFoil1, * m_pctrlFoil2;
 	QPushButton *m_pctrlFoilList;
 	QRadioButton *m_rbtype1, *m_rbtype2, *m_rbtype3, *m_rbtype4, *m_rbRange1, *m_rbRange2;

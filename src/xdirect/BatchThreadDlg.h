@@ -69,7 +69,11 @@ private:
 
 	void CleanUp();
 	Polar * CreatePolar(Foil *pFoil, double Re, double Mach, double NCrit);
-	void keyPressEvent(QKeyEvent *event);
+
+    void keyPressEvent(QKeyEvent *event);
+    void showEvent(QShowEvent *event);
+    void hideEvent(QHideEvent *event);
+
 	void ReadParams();
 	void SetFileHeader();
 	void SetPlrName(Polar *pNewPolar);
@@ -92,7 +96,7 @@ private slots:
 	void OnFoilList();
 	void OnFoilSelectionType();
 
-protected:
+private:
 	QRadioButton * m_pctrlFoil1, * m_pctrlFoil2;
 	QPushButton *m_pctrlFoilList;
 	QRadioButton *m_rbRange1, *m_rbRange2;
@@ -112,6 +116,7 @@ protected:
 	static void *s_pMainFrame;         /**< a void pointer to the instance of the application's MainFrame class */
 	static bool s_bCurrentFoil;        /**< true if the analysis should be performed only for the current foil */
 	static bool s_bUpdatePolarView;    /**< true if the polar graphs should be updated during the analysis */
+    static QPoint s_Position;          /**< the position on the client area of the dialog's topleft corner */
 
 
 	double m_ReMin;             /**< the min Re for a range analysis */

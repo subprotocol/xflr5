@@ -34,12 +34,13 @@
 #include <QThreadPool>
 
 
-//bool BatchThreadDlg::s_bStoreOpp = false;
 bool BatchThreadDlg::s_bCurrentFoil=true;
 bool BatchThreadDlg::s_bUpdatePolarView = false;
 void * BatchThreadDlg::s_pXFoil;
 void * BatchThreadDlg::s_pMainFrame;
 void * BatchThreadDlg::s_pXDirect;
+QPoint BatchThreadDlg::s_Position;
+
 
 /**
  * The public contructor
@@ -968,6 +969,16 @@ void BatchThreadDlg::StartThread()
 }
 
 
+
+void BatchThreadDlg::showEvent(QShowEvent *event)
+{
+    move(s_Position);
+}
+
+void BatchThreadDlg::hideEvent(QHideEvent *event)
+{
+    s_Position = pos();
+}
 
 
 

@@ -52,13 +52,14 @@ private slots:
 
 
 private:
-	void AddOpPoint();
-//	void paintEvent ( QPaintEvent * event );
-//	void processEvents(QEventLoop::ProcessEventsFlags flags);
+    void showEvent(QShowEvent *event);
+    void hideEvent(QHideEvent *event);
+
 	void accept();
 	void reject();
 
-	void ResetCurves();
+    void AddOpPoint();
+    void ResetCurves();
 	void SetAlpha(double AlphaMin, double AlphaMax, double DeltaAlpha);
 	void SetCl(double ClMin, double ClMax, double DeltaCl);
 	void SetRe(double ReMin, double ReMax, double DeltaRe);
@@ -72,6 +73,9 @@ private:
 	bool AlphaLoop();
 	bool Iterate();
 	bool ReLoop();
+
+    //variables
+    static QPoint s_Position;   /**< the position on the client area of he dialog's topleft corner */
 
 	GraphWidget * m_pGraphWidget;
 	QTextEdit *m_pctrlTextOutput;

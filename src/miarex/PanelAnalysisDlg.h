@@ -77,10 +77,8 @@ private slots:
 
 
 private:
-
-	QTextEdit *m_pctrlTextOutput;
-	QPushButton *m_pctrlCancel;
-	QProgressBar *m_pctrlProgress;
+    void showEvent(QShowEvent *event);
+    void hideEvent(QHideEvent *event);
 
 	void keyPressEvent(QKeyEvent *event);
 
@@ -149,8 +147,12 @@ public:
 	void GetSpeedVector(CVector const &C, float *Mu,  float *Sigma,  CVector &VT, bool bAll=true);
 	
 private:
-	static void *s_pMiarex;          /**< a void pointer to the instance of the QMiarex class. */
+    QTextEdit *m_pctrlTextOutput;
+    QPushButton *m_pctrlCancel;
+    QProgressBar *m_pctrlProgress;
 
+    static void *s_pMiarex;          /**< a void pointer to the instance of the QMiarex class. */
+    static QPoint s_Position;        /**< the position on the client area of he dialog's topleft corner */
 	static int s_MaxRHSSize;         /**< the max number of RHS points, used for memeory allocation */
 
 	QFile *m_pXFile;                /**< A pointer to the instance of the output log file */

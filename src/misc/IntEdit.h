@@ -1,7 +1,7 @@
 /****************************************************************************
 
-	XFoilAdvancedDlg Class
-	Copyright (C) 2009 Andre Deperrois adeperrois@xflr5.com
+	IntEdit Class
+	Copyright (C) 2013 Andre Deperrois adeperrois@xflr5.com
 
 	This program is free software; you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -20,47 +20,42 @@
 *****************************************************************************/
 
 
+#ifndef INTEDIT_H
+#define INTEDIT_H
 
-#ifndef XFOILADVANCEDDLG_H
-#define XFOILADVANCEDDLG_H
-
-#include <QDialog>
-#include <QCheckBox>
-#include <QHBoxLayout>
-#include <QPushButton>
+#include <QIntValidator>
+#include <QLineEdit>
+#include <QKeyEvent>
 
 
-#include "../misc/DoubleEdit.h"
-#include "../misc/IntEdit.h"
-
-
-class XFoilAdvancedDlg : public QDialog
+class IntEdit : public QLineEdit
 {
-	Q_OBJECT
+public:
+	IntEdit(QWidget *pParent=NULL);
+	IntEdit(int val);
 
-	friend class QXDirect;
+	~IntEdit() {delete m_pDV;}
+
+	void focusOutEvent ( QFocusEvent * event );
+	void keyPressEvent(QKeyEvent *event);
+
+
+	int Value(){return m_Value;}
+	void SetValue(int val);
+
+
+	void SetValueNoFormat(int val);
+
+	void FormatValue();
+	int ReadValue();
+	void SetMin(int min) {m_pDV->setBottom(min);}
+	void SetMax(int max) {m_pDV->setTop(max);}
+
+
 
 public:
-	XFoilAdvancedDlg(QWidget *pParent=NULL);
-	void InitDialog();
-
-
-private slots:
-	void OnOK();
-
-private:
-	void keyPressEvent(QKeyEvent *event);
-	void SetupLayout();
-	QCheckBox *m_pctrlInitBL, *m_pctrlFullReport;
-	IntEdit *m_pctrlIterLimit;
-    DoubleEdit * m_pctrlVAccel;
-	QPushButton *OKButton, *CancelButton;
-
-	int m_IterLimit;
-	double m_VAccel;
-	bool m_bInitBL;
-	bool m_bFullReport;
-
+	QIntValidator *m_pDV;
+	int m_Value;//we need to store a full precision value, irrespective of the display
 };
 
-#endif // XFOILADVANCEDDLG_H
+#endif // IntEdit_H

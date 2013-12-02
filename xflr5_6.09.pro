@@ -31,7 +31,8 @@ SOURCES += \
 	src/miarex/WAdvancedDlg.cpp \
 	src/miarex/WingDelegate.cpp \
 	src/miarex/WingScaleDlg.cpp \
-	src/miarex/WPolarDlg.cpp \
+	src/miarex/WPolarDlg.cpp  \
+	src/miarex/ImportObjectDlg.cpp\
 	src/xdirect/BatchDlg.cpp \
 	src/xdirect/BatchThreadDlg.cpp \
 	src/xdirect/XFoilTask.cpp \
@@ -85,6 +86,7 @@ SOURCES += \
 	src/misc/DisplaySettingsDlg.cpp \
 	src/misc/ColorButton.cpp \
 	src/misc/DoubleEdit.cpp \
+	src/misc/IntEdit.cpp \
 	src/misc/GLLightDlg.cpp \
 	src/misc/AboutQ5.cpp \
 	src/misc/NewNameDlg.cpp \
@@ -110,8 +112,7 @@ SOURCES += \
 	src/main.cpp \
 	src/mainframe.cpp \
 	src/threedwidget.cpp \
-	src/twodwidget.cpp \
-    src/miarex/ImportObjectDlg.cpp
+	src/twodwidget.cpp
 
 HEADERS += \
 	src/XFLR5Application.h \
@@ -140,6 +141,7 @@ HEADERS += \
 	src/miarex/BodyTransDlg.h \
 	src/miarex/GL3DScales.h \
 	src/miarex/GL3dBodyDlg.h \
+	src/miarex/ImportObjectDlg.h \
 	src/xdirect/XFoil.h \
 	src/xdirect/XFoilAnalysisDlg.h \
 	src/xdirect/XFoilAdvancedDlg.h \
@@ -201,6 +203,7 @@ HEADERS += \
 	src/misc/LineCbBox.h \
 	src/misc/AboutQ5.h \
 	src/misc/DoubleEdit.h \
+	src/misc/IntEdit.h \
 	src/misc/GLLightDlg.h \
 	src/misc/ProgressDlg.h \
 	src/misc/NewNameDlg.h \
@@ -221,8 +224,7 @@ HEADERS += \
 	src/globals.h \
 	src/mainframe.h \
 	src/twodwidget.h \
-	src/threedwidget.h \
-    src/miarex/ImportObjectDlg.h
+	src/threedwidget.h
 
 
 TRANSLATIONS = translations/xflr5v6.ts \

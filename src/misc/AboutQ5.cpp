@@ -63,7 +63,7 @@ void AboutQ5::SetupLayout()
 	QLabel *lab8  = new QLabel(tr("This program has been developed exclusively for the analysis of model aircraft"));
 	QLabel *lab9  = new QLabel(tr("Any other usage is strongly disapproved"));
 	QLabel *lab10 = new QLabel(tr("Program distributed  under the terms of the GNU General Public License"));
-	QLabel *lab11 = new QLabel(tr("German translation by Martin Willner (mjw@mjw.co.at)"));
+    QLabel *lab11 = new QLabel(tr("German translation by Martin Willner"));
 	QLabel *lab12 = new QLabel(tr("Japanese translation by IKUSU, Koichi Akabe, Misatus, dynamicsoar, hide253"));
 	QLabel *lab13 = new QLabel(tr("icchy_07, ina111, ohayo_cycling, ohisa_64, ozawa64."));
 	QLabel *lab14 = new QLabel(tr("French translation by Jean-Luc Coulon"));

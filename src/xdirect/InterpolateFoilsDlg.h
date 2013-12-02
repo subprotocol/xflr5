@@ -25,7 +25,6 @@
 #define INTERPOLATEFOILSDLG_H
 
 #include <QDialog>
-#include <QLineEdit>
 #include <QComboBox>
 #include <QLabel>
 #include <QSlider>

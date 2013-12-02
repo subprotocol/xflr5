@@ -78,8 +78,11 @@ private slots:
 
 
 private:
-	bool AlphaLoop();
-	void keyPressEvent(QKeyEvent *event);
+    void keyPressEvent(QKeyEvent *event);
+    void showEvent(QShowEvent *event);
+    void hideEvent(QHideEvent *event);
+
+    bool AlphaLoop();
 	bool QInfLoop();
 	void ResetCurves();
 	void SetAlpha(double AlphaMin, double AlphaMax, double AlphaDelta);
@@ -93,8 +96,9 @@ private:
 
 	static void *s_pMiarex;     /**< A static pointer to the unique instance of the QMiarex class. */
 	static void *s_pMainFrame;  /**< A static pointer to the unique instance of the MainFrame class. */
+    static QPoint s_Position;   /**< the position on the client area of he dialog's topleft corner */
 
-	double m_AlphaMin;          /**< The starting aoa for the analysis of type 1 & 2 polars */
+    double m_AlphaMin;          /**< The starting aoa for the analysis of type 1 & 2 polars */
 	double m_AlphaMax;          /**< The ending aoa for the analysis of type 1 & 2 polars */
 	double m_AlphaDelta;        /**< The aoa increment for the analysis of type 1 & 2 polars */
 	bool m_bCancel;             /**< true if the user has cancelled the analysis */

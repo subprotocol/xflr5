@@ -61,10 +61,9 @@ void TwoDPanelDlg::SetupLayout()
 		InputDataLayout->addWidget(l6,6,1);
 
 
-		m_pctrlNPanels = new QLineEdit("100");
-		m_pctrlNPanels->setAlignment(Qt::AlignRight);
-		QValidator *PanelValid = new QIntValidator(0, 1000000, this);
-		m_pctrlNPanels->setValidator(PanelValid);
+		m_pctrlNPanels = new IntEdit(100);
+		m_pctrlNPanels->SetMax(IQX);
+
 		m_pctrlCVpar  = new DoubleEdit;
 		m_pctrlCTErat = new DoubleEdit;
 		m_pctrlCTRrat = new DoubleEdit;
@@ -139,8 +138,7 @@ void TwoDPanelDlg::InitDialog()
 	xpref1 = pXFoil->xpref1;
 	xpref2 = pXFoil->xpref2;
 
-	QString strong = QString("%1").arg(npan);
-	m_pctrlNPanels->setText(strong);
+	m_pctrlNPanels->SetValue(npan);
 	m_pctrlCVpar->SetValue(cvpar);
 	m_pctrlCTErat->SetValue(cterat);
 	m_pctrlCTRrat->SetValue(ctrrat);
@@ -277,7 +275,7 @@ void TwoDPanelDlg::ReadParams()
 {
 	XFoil *pXFoil = (XFoil*)s_pXFoil;
 
-	pXFoil->npan   = m_pctrlNPanels->text().toInt();
+	pXFoil->npan   = m_pctrlNPanels->Value();
 	pXFoil->cvpar  = m_pctrlCVpar->Value();
 	pXFoil->cterat = m_pctrlCTErat->Value();
 	pXFoil->ctrrat = m_pctrlCTRrat->Value();
