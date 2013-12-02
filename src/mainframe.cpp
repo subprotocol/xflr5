@@ -3317,8 +3317,8 @@ bool MainFrame::LoadSettings()
         XFoilAnalysisDlg::s_Position = QPoint(kx+31, ky+31);
         BatchThreadDlg::s_Position   = QPoint(kx+31, ky+31);
         BatchDlg::s_Position         = QPoint(kx+31, ky+31);
-        LLTAnalysisDlg::s_Position   =  QPoint(kx+31, ky+31);
-        PanelAnalysisDlg::s_Position =  QPoint(kx+31, ky+31);
+        LLTAnalysisDlg::s_Position   = QPoint(kx+31, ky+31);
+        PanelAnalysisDlg::s_Position = QPoint(kx+31, ky+31);
 
 		DisplaySettingsDlg::s_StyleName = settings.value("StyleName","").toString();
 

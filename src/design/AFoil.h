@@ -40,19 +40,9 @@
 
 #include "../params.h"
 #include "FoilTableDelegate.h"
-#include "LECircleDlg.h"
-#include "../misc/DoubleEdit.h"
 #include "../objects/Foil.h"
 #include "../objects/SplineFoil.h"
-#include "../xdirect/NacaFoilDlg.h"
-#include "../xdirect/CAddDlg.h"
-#include "../xdirect/TwoDPanelDlg.h"
-#include "../xdirect/TEGapDlg.h"
-#include "../xdirect/LEDlg.h"
-#include "../xdirect/FlapDlg.h"
-#include "../xdirect/FoilCoordDlg.h"
-#include "../xdirect/FoilGeomDlg.h"
-#include "../xdirect/InterpolateFoilsDlg.h"
+
 
 
 /**
@@ -175,17 +165,6 @@ private:
 
 
 private:
-
-	TwoDPanelDlg *m_pTwoDPanelDlg;
-	InterpolateFoilsDlg *m_pIFDlg;
-	NacaFoilDlg *m_pNacaFoilDlg;
-	FoilCoordDlg *m_pFoilCoordDlg;
-	FoilGeomDlg *m_pFoilGeomDlg;
-	TEGapDlg *m_pTEGapDlg;
-	LEDlg *m_pLEDlg;
-	FlapDlg *m_pFlapDlg;
-	CAddDlg *m_pCAddDlg;
-
 
 	QTableView *m_pctrlFoilTable;
 	QStandardItemModel *m_pFoilModel;

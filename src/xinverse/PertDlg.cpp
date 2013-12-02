@@ -22,8 +22,7 @@
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include "PertDlg.h"
-#include "../xdirect/XDirect.h"
-#include "../design/AFoil.h"
+
 
 
 
