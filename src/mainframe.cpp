@@ -196,14 +196,41 @@ MainFrame::MainFrame(QWidget * parent, Qt::WindowFlags flags)
 	QXInverse *pXInverse = (QXInverse*)m_pXInverse;
 	QMiarex *pMiarex     = (QMiarex*)m_pMiarex;
 
+#ifdef Q_WS_MAC
+		QSettings settings(QSettings::NativeFormat,QSettings::UserScope,"sourceforge.net","xflr5");
+#else
+		QSettings settings(QSettings::IniFormat,QSettings::UserScope,"XFLR5");
+#endif
+	QString str;
+	int kx=117, ky=57;
+	bool bOK;
+	settings.beginGroup("MainFrame");
+	{
+		str = settings.value("LanguageFilePath").toString();
+		if(str.length()) s_LanguageFilePath = str;
+		kx = settings.value("FrameGeometryx", 117).toInt(&bOK);
+		ky = settings.value("FrameGeometryy",  57).toInt(&bOK);
+	}
+	settings.endGroup();
+
+	XFoilAnalysisDlg::s_Position = QPoint(kx+31, ky+31);
+	BatchThreadDlg::s_Position   = QPoint(kx+31, ky+31);
+	BatchDlg::s_Position         = QPoint(kx+31, ky+31);
+	LLTAnalysisDlg::s_Position   = QPoint(kx+31, ky+31);
+	PanelAnalysisDlg::s_Position = QPoint(kx+31, ky+31);
+
+	if(s_LanguageFilePath.length())
+	{
+		qApp->removeTranslator(&m_Translator);
+		if(m_Translator.load(s_LanguageFilePath))
+		{
+			qApp->installTranslator(&m_Translator);
+		}
+	}
+
+
 	if(LoadSettings())
 	{
-#ifdef Q_WS_MAC
-        QSettings settings(QSettings::NativeFormat,QSettings::UserScope,"sourceforge.net","xflr5");
-#else
-        QSettings settings(QSettings::IniFormat,QSettings::UserScope,"XFLR5");
-#endif
-
 		m_RefGraph.LoadSettings(&settings);
 
 		pAFoil->LoadSettings(&settings);
@@ -3311,14 +3338,6 @@ bool MainFrame::LoadSettings()
 		SettingsFormat = settings.value("SettingsFormat").toInt();
 		if(SettingsFormat != SETTINGSFORMAT) return false;
 
-        int kx, ky; bool bOK;
-        kx = settings.value("FrameGeometryx").toInt(&bOK);
-        ky = settings.value("FrameGeometryy").toInt(&bOK);
-        XFoilAnalysisDlg::s_Position = QPoint(kx+31, ky+31);
-        BatchThreadDlg::s_Position   = QPoint(kx+31, ky+31);
-        BatchDlg::s_Position         = QPoint(kx+31, ky+31);
-        LLTAnalysisDlg::s_Position   = QPoint(kx+31, ky+31);
-        PanelAnalysisDlg::s_Position = QPoint(kx+31, ky+31);
 
 		DisplaySettingsDlg::s_StyleName = settings.value("StyleName","").toString();
 
@@ -3880,14 +3899,14 @@ void MainFrame::OnMiarex()
 	m_pctrlXInverseWidget->hide();
 	m_pctrlMiarexWidget->show();
 
-	pMiarex->SetControls();
+//	pMiarex->SetControls();
 	pMiarex->SetUFO();
 	pMiarex->m_bArcball = false;
 	UpdateUFOs();
 
 	SetMenus();
 	SetCentralWidget();
-	pMiarex->SetControls();
+//	pMiarex->SetControls();
 	UpdateView();
 }
 
@@ -4286,8 +4305,8 @@ void MainFrame::OnSelChangeWPolar(int i)
 //	int sel = m_pctrlWPolar->currentIndex();
 	if (i>=0) strong = m_pctrlWPolar->itemText(i);
 	m_iApp = MIAREX;
-	pMiarex->SetWPlr(false, strong);
-	pMiarex->SetWingOpp(true);
+	pMiarex->SetWPolar(false, strong);
+//	pMiarex->SetWingOpp(true);
 	pMiarex->SetControls();
 	pMiarex->UpdateView();
 }

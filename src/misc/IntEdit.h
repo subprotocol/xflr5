@@ -32,7 +32,7 @@ class IntEdit : public QLineEdit
 {
 public:
 	IntEdit(QWidget *pParent=NULL);
-	IntEdit(int val);
+	IntEdit(int val, QWidget *pParent=NULL);
 
 	~IntEdit() {delete m_pDV;}
 

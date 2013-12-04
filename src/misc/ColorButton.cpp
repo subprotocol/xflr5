@@ -19,14 +19,31 @@
 
 *****************************************************************************/
 
+#include "../mainframe.h"
 #include "ColorButton.h"
 #include <QPainter>
 #include <QStyleOption>
 
-ColorButton::ColorButton()
+ColorButton::ColorButton(QWidget *pParent) : QAbstractButton(pParent)
 {
 	m_Color = Qt::darkGray;
+
+	QSizePolicy szPolicyExpanding;
+	szPolicyExpanding.setHorizontalPolicy(QSizePolicy::Minimum);
+	szPolicyExpanding.setVerticalPolicy(QSizePolicy::Minimum);
+	setSizePolicy(szPolicyExpanding);
+
 }
+
+
+QSize ColorButton::sizeHint() const
+{
+	QFontMetrics fm(MainFrame::s_TextFont);
+	int w = 5 * fm.averageCharWidth();
+	int h = fm.height()*3/2;
+	return QSize(w, h);
+}
+
 
 void ColorButton::SetColor(QColor const & color)
 {
@@ -34,10 +51,12 @@ void ColorButton::SetColor(QColor const & color)
 	update();
 }
 
+
 QColor &ColorButton::GetColor()
 {
 	return m_Color;
 }
+
 
 void ColorButton::paintEvent ( QPaintEvent * event )
 {
@@ -58,18 +77,14 @@ void ColorButton::paintEvent ( QPaintEvent * event )
 	painter.setBackgroundMode(Qt::TransparentMode);
 	QRect r = rect();
 
-	QPen GreyPen(QColor(70,70,70), 1, Qt::DotLine);
+	QPen blackPen(Qt::black, 1, Qt::SolidLine);
 	QBrush colorbrush(paintcolor);
 	painter.setBrush(colorbrush);
-	r.adjust(3,3,-3,-3);
-	painter.setPen(Qt::NoPen);
-//	painter.drawRoundedRect(r, 10, 50, Qt::RelativeSize);
-	painter.drawRect(r);
-	painter.setPen(GreyPen);
-	painter.setBrush(Qt::NoBrush);
-	r.adjust(-1,-1,0,0);
-//	painter.drawRoundedRect(r, 10, 50, Qt::RelativeSize);
-	painter.drawRect(r);
+//	r.adjust(3,3,-3,-3);
+
+	painter.setPen(blackPen);
+	painter.drawRoundedRect(r, 5, 25, Qt::RelativeSize);
+
 
 }
 

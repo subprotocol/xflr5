@@ -20,24 +20,35 @@
 *****************************************************************************/
 
 #include "../globals.h"
+#include "../mainframe.h"
 #include "LineCbBox.h"
+#include <QtDebug>
 #include <QPainter>
 #include <QPaintEvent>
 
-LineCbBox::LineCbBox(void *pParent)
+LineCbBox::LineCbBox(QWidget *pParent)
+	:QComboBox(pParent)
 {
+	setParent(pParent);
 	m_Style = 0;
 	m_Width = 1;
 	m_Color = QColor(255,100,50);
+
+	QSizePolicy szPolicyExpanding;
+	szPolicyExpanding.setHorizontalPolicy(QSizePolicy::MinimumExpanding);
+	szPolicyExpanding.setVerticalPolicy(QSizePolicy::Minimum);
+	setSizePolicy(szPolicyExpanding);
 }
 
 
-LineCbBox::LineCbBox(int const &style, int const &width, QColor const &color)
+QSize LineCbBox::sizeHint() const
 {
-	m_Style = style;
-	m_Width = width;
-	m_Color = color;
+	QFontMetrics fm(MainFrame::s_TextFont);
+	int w = 13 * fm.averageCharWidth();
+	int h = fm.height();
+	return QSize(w, h);
 }
+
 
 
 void LineCbBox::SetLine(int const &style, int const &width, QColor const &color)
@@ -63,7 +74,7 @@ void LineCbBox::paintEvent (QPaintEvent *event)
 	else            ContourColor = Qt::lightGray;
 
 	QRect r = event->rect();
-	QRect g = rect();
+//	QRect g = rect();
 	painter.setBrush(Qt::NoBrush);
 	painter.setBackgroundMode(Qt::TransparentMode);
 

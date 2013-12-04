@@ -905,6 +905,8 @@ void StabViewDlg::SetControls()
 	QString str, strong;
 	GetSpeedUnit(str, MainFrame::s_SpeedUnit);
 
+	blockSignals(true);
+
 	m_pctrlLongDynamics->setChecked(pMiarex->m_bLongitudinal);
 	m_pctrlLatDynamics->setChecked(!pMiarex->m_bLongitudinal);
 
@@ -1011,6 +1013,8 @@ void StabViewDlg::SetControls()
 	m_pctrlModeStep->SetValue(pMiarex->m_Modedt);
 
 	FillEigenThings();
+
+	blockSignals(false);
 }
 
 

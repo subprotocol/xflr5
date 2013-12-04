@@ -92,12 +92,13 @@ void WAdvancedDlg::SetupLayout()
 	m_pctrlVLM1->setSizePolicy(szPolicyMinimum);
 	m_pctrlVLM2->setSizePolicy(szPolicyMinimum);
 
-    m_pctrlInterNodes   = new DoubleEdit();
+	m_pctrlNStation     = new IntEdit(20, this);
+	m_pctrlIterMax      = new IntEdit(100, this);
+
+	m_pctrlInterNodes   = new DoubleEdit();
     m_pctrlRelax        = new DoubleEdit(20,1);
     m_pctrlAlphaPrec    = new DoubleEdit(.01, 4);
     m_pctrlMinPanelSize = new DoubleEdit(1.00,2);
-    m_pctrlNStation     = new DoubleEdit(20,0);
-    m_pctrlIterMax      = new DoubleEdit(100,0);
     m_pctrlMaxWakeIter  = new DoubleEdit(5,0);
     m_pctrlCoreSize     = new DoubleEdit(.0001, 4);
     m_pctrlVortexPos    = new DoubleEdit(25.0, 2);

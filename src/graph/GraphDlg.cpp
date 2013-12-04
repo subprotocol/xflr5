@@ -964,6 +964,8 @@ void GraphDlg::SetupLayout()
 
 				BackDataLayout->addWidget(m_pctrlGraphBack,1,2);
 				BackDataLayout->addWidget(m_pctrlBorderStyle,2,2);
+
+				BackDataLayout->setColumnStretch(0,1);
 			}
 			BackBox->setLayout(BackDataLayout);
 		}
@@ -980,7 +982,6 @@ void GraphDlg::SetupLayout()
 
 	QGridLayout *ScalePageLayout = new QGridLayout;
 	{
-
 		QLabel *XAxis2 = new QLabel(tr("X Axis"));
 		QLabel *YAxis2 = new QLabel(tr("Y Axis"));
 		XAxis2->setAlignment(Qt::AlignCenter);
@@ -1034,8 +1035,9 @@ void GraphDlg::SetupLayout()
 	//________Axis Page______________________
 	QGridLayout *AxisDataLayout = new QGridLayout;
 	{
+		AxisDataLayout->setRowStretch(0,1);
 		QLabel *AxisStyleLabel = new QLabel(tr("Axis Style"));
-		AxisStyleLabel->setMinimumWidth(100);
+
 		m_pctrlXMajGridShow = new QCheckBox(tr("X Major Grid"));
 		m_pctrlYMajGridShow = new QCheckBox(tr("Y Major Grid"));
 		m_pctrlXMinGridShow = new QCheckBox(tr("X Minor Grid"));
@@ -1044,7 +1046,7 @@ void GraphDlg::SetupLayout()
 		m_pctrlAutoYMinUnit = new QCheckBox(tr("Auto Unit"));
 
 		m_pctrlAxisStyle = new LineBtn(this);
-		m_pctrlAxisStyle->setMinimumWidth(100);
+
 		m_pctrlXMajGridStyle = new LineBtn(this);
 		m_pctrlYMajGridStyle = new LineBtn(this);
 		m_pctrlXMinGridStyle = new LineBtn(this);

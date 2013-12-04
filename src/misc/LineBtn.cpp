@@ -33,14 +33,10 @@
 LineBtn::LineBtn(QWidget *parent)
     : QAbstractButton(parent)
 {
-	QFontMetrics fm(MainFrame::s_TextFont);
-//	setMinimumWidth(17*fm.averageCharWidth());
-//	setMinimumHeight(fm.height());
-
-    QSizePolicy szPolicyExpanding;
-    szPolicyExpanding.setHorizontalPolicy(QSizePolicy::MinimumExpanding);
-    szPolicyExpanding.setVerticalPolicy(QSizePolicy::MinimumExpanding);
-    setSizePolicy(szPolicyExpanding);
+	QSizePolicy szPolicyExpanding;
+	szPolicyExpanding.setHorizontalPolicy(QSizePolicy::MinimumExpanding);
+	szPolicyExpanding.setVerticalPolicy(QSizePolicy::Minimum);
+	setSizePolicy(szPolicyExpanding);
 
 	m_Color = Qt::darkGray;
 	m_Style = 0;
@@ -60,6 +56,14 @@ void LineBtn::mouseReleaseEvent(QMouseEvent *event)
 }
 
 
+QSize LineBtn::sizeHint() const
+{
+	QFontMetrics fm(MainFrame::s_TextFont);
+	int w = 13 * fm.averageCharWidth();
+	int h = fm.height();
+	return QSize(w, h);
+}
+
 
 void LineBtn::SetColor(QColor const & color)
 {
@@ -67,17 +71,20 @@ void LineBtn::SetColor(QColor const & color)
 	update();
 }
 
+
 void LineBtn::SetStyle(int const & style)
 {
 	m_Style = style;
 	update();
 }
 
+
 void LineBtn::SetWidth(int const & width)
 {
 	m_Width = width;
 	update();
 }
+
 
 void LineBtn::SetStyle(int const &style, int const &width, QColor const & color)
 {
@@ -87,15 +94,18 @@ void LineBtn::SetStyle(int const &style, int const &width, QColor const & color)
 	update();
 }
 
+
 QColor &LineBtn::GetColor()
 {
 	return m_Color;
 }
 
+
 int &LineBtn::GetStyle()
 {
 	return m_Style;
 }
+
 
 int &LineBtn::GetWidth()
 {

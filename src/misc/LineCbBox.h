@@ -29,9 +29,11 @@ class LineCbBox : public QComboBox
 {
 
 public:
-	LineCbBox(void *pParent = NULL);
-	LineCbBox(int const &style, int const &width, QColor const &color);
+	LineCbBox(QWidget *pParent=NULL);
+
+	QSize sizeHint() const;
 	void paintEvent (QPaintEvent *event);
+
 	void SetLine(int const &style, int const &width, QColor const &color);
 
 private:

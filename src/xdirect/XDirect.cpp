@@ -6848,7 +6848,17 @@ void QXDirect::SetPolarLegendPos()
  */
 void QXDirect::SetupLayout()
 {
-	setAttribute(Qt::WA_AlwaysShowToolTips);
+	QSizePolicy szPolicyExpanding;
+	szPolicyExpanding.setHorizontalPolicy(QSizePolicy::Expanding);
+	szPolicyExpanding.setVerticalPolicy(QSizePolicy::Expanding);
+
+	QSizePolicy szPolicyMinimum;
+	szPolicyMinimum.setHorizontalPolicy(QSizePolicy::Minimum);
+	szPolicyMinimum.setVerticalPolicy(QSizePolicy::Minimum);
+
+	QSizePolicy szPolicyMaximum;
+	szPolicyMaximum.setHorizontalPolicy(QSizePolicy::Maximum);
+	szPolicyMaximum.setVerticalPolicy(QSizePolicy::Maximum);
 
 
 	QGroupBox *AnalysisBox = new QGroupBox(tr("Analysis settings"));
@@ -6943,13 +6953,16 @@ void QXDirect::SetupLayout()
 			DisplayGroup->addWidget(m_pctrlShowPressure);
 			DisplayGroup->addWidget(m_pctrlAnimate);
 			DisplayGroup->addWidget(m_pctrlAnimateSpeed);
+			DisplayGroup->addStretch(1);
 		//	DisplayGroup->addWidget(m_pctrlHighlightOpp);
 		}
 		DisplayBox->setLayout(DisplayGroup);
+		DisplayBox->setSizePolicy(szPolicyExpanding);
 	}
 	QGroupBox *PolarPropsBox = new QGroupBox(tr("Polar properties"));
 	{
 		m_pctrlPolarProps = new QLabel;
+		m_pctrlPolarProps->setSizePolicy(szPolicyExpanding);
 	//	m_pctrlPolarProps->setReadOnly(true);
 	//	m_pctrlPolarProps->setWordWrapMode(QTextOption::NoWrap);
 		QHBoxLayout *PolarPropsLayout = new QHBoxLayout;
@@ -6971,8 +6984,8 @@ void QXDirect::SetupLayout()
 				CurveDisplay->addWidget(m_pctrlShowPoints);
 			}
 
-			m_pctrlCurveStyle = new LineCbBox();
-			m_pctrlCurveWidth = new LineCbBox();
+			m_pctrlCurveStyle = new LineCbBox(this);
+			m_pctrlCurveWidth = new LineCbBox(this);
 			m_pctrlCurveColor = new LineBtn(this);
 			m_pctrlCurveColor->setMinimumHeight(m_pctrlCurveStyle->minimumSizeHint().height());
 
@@ -7015,7 +7028,6 @@ void QXDirect::SetupLayout()
 		m_pctrlMiddleControls->addWidget(DisplayBox);
 		m_pctrlMiddleControls->addWidget(PolarPropsBox);
 
-		mainLayout->addStretch(1);
 		mainLayout->addWidget(AnalysisBox);
 		mainLayout->addStretch(1);
 		mainLayout->addWidget(m_pctrlMiddleControls);
@@ -7026,20 +7038,13 @@ void QXDirect::SetupLayout()
 
 	setLayout(mainLayout);
 
-	QSizePolicy szPolicyExpanding;
-	szPolicyExpanding.setHorizontalPolicy(QSizePolicy::Expanding);
-	szPolicyExpanding.setVerticalPolicy(QSizePolicy::Expanding);
+	setAttribute(Qt::WA_AlwaysShowToolTips);
 
-	QSizePolicy szPolicyMinimum;
-	szPolicyMinimum.setHorizontalPolicy(QSizePolicy::Minimum);
-	szPolicyMinimum.setVerticalPolicy(QSizePolicy::Minimum);
-
-	QSizePolicy szPolicyMaximum;
-	szPolicyMaximum.setHorizontalPolicy(QSizePolicy::Maximum);
-	szPolicyMaximum.setVerticalPolicy(QSizePolicy::Maximum);
-
-	setSizePolicy(szPolicyMaximum);
+	setSizePolicy(szPolicyExpanding);
 }
+
+
+
 
 /**
  * Interrupts the OpPoint animation

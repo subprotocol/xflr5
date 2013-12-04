@@ -4,15 +4,10 @@
 QWidget
 {
 	color: white;
-	background-color: #414141;
+	background-color: #2a2a2a;
 	selection-background-color: darkslategray;
 }
 
-/*
-QWidget:focus
-{
-	border: 1px solid red;
-}*/
 
 QWidget:item:hover
 {
@@ -33,29 +28,38 @@ QWidget:disabled
 	background-color: #2A2a2a;
 }
 
-/*_____________________ QMainWindow ______________________*/
+/*_____________________ QGroupBox ______________________*/
 
-QMainWindow::separator
+QGroupBox
 {
-    background-color: QLinearGradient(x1:0, y1:0, x2:0, y2:1, stop:0 #161616, stop: 0.5 #151515, stop: 0.6 #212121, stop:1 #343434);
-    color: white;
-    padding-left: 4px;
-    border: 1px solid #4c4c4c;
-    spacing: 3px; /* spacing between items in the tool bar */
+	padding: 2ex 3px 0px 3px;
+/*	font-weight: bold; */
+	color: papayawhip;
+	margin-top: 3ex;
+	border-top: 1px solid dimgray;
+	border-right: 1px solid QLinearGradient(x1:0, y1:0, x2:0, y2:1, stop:0 dimgray, stop:1 #2a2a2a);
+	border-left: 1px solid QLinearGradient(x1:0, y1:0, x2:0, y2:1, stop:0 dimgray, stop:1 #2a2a2a);
 }
 
-QMainWindow::separator:hover
-{
-    background-color: QLinearGradient(x1:0, y1:0, x2:0, y2:1, stop:0 #60B71a, stop:0.5 #b56c17 stop:1 #83cc2f);
-    color: white;
-    padding-left: 4px;
-    border: 1px solid #6c6c6c;
-    spacing: 3px; /* spacing between items in the tool bar */
-}
 
+QGroupBox::title
+{
+	padding-top: 1ex;
+	padding-right: 11px ;
+	padding-bottom: 1px;
+	padding-left: 11px;
+	subcontrol-origin: margin;
+	subcontrol-position: top center;
+}
 
 /*_____________________ QDockWidget ______________________*/
 
+
+QDockWidget
+{
+	font: bold;
+	color: oldlace;
+}
 
 QDockWidget::title
 {
@@ -227,7 +231,7 @@ QLineEdit:disabled, QTextEdit:disabled
 
 QPushButton
 {
-	color: #FFFFFF;
+	color: cornsilk;
 	background-color: QLinearGradient( x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #101010, stop: 0.5 #202020, stop: 1 #101010);
 	border-width: 1px;
 	border-color: #1e1e1e;
@@ -408,7 +412,7 @@ QListWidget::item:hover
 
 QSlider:disabled
 {
-	background-color: #414141;
+	background-color: #2a2a2a;
 }
 
 QSlider:handle:horizontal
@@ -644,7 +648,7 @@ QTabBar::tab:!selected:hover
 QCheckBox
 {
 	color: white;
-	background-color: #414141;
+	background-color: #2a2a2a;
 	padding: 2px;
 	border: 3px;
 	border-color: yellow;
@@ -654,7 +658,7 @@ QCheckBox
 QCheckBox:disabled
 {
 	color: dimgray;
-	background-color: #414141;
+	background-color: #2a2a2a;
 	font: italic;
 }
 

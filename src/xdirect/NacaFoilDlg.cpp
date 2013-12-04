@@ -51,8 +51,8 @@ void NacaFoilDlg::SetupLayout()
 		QLabel *NacaNumber   = new QLabel(tr("4 or 5 digits"));
 		QLabel *PanelNumber  = new QLabel(tr("Number of Panels"));
 
-		m_pctrlNumber = new IntEdit(0);
-		m_pctrlPanels = new IntEdit(100);
+		m_pctrlNumber = new IntEdit(0, this);
+		m_pctrlPanels = new IntEdit(100, this);
 		m_pctrlPanels->SetMax(IQX);
 
 		m_pctrlMessage = new QLabel();

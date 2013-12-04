@@ -343,7 +343,7 @@ public:
 	void SetWGraphScale();
 	void SetWGraphTitles(Graph* pGraph);
 	void SetWingLegendPos();
-	void SetWPlr(bool bCurrent = true, QString WPlrName = "");
+	void SetWPolar(bool bCurrent = true, QString WPlrName = "");
 	void SetWPlrLegendPos();
 	bool SetWingOpp(bool bCurrent, double x = 0.0);
 	void SnapClient(QString const &FileName);

@@ -33,8 +33,9 @@ IntEdit::IntEdit(QWidget *pParent)
 }
 
 
-IntEdit::IntEdit(int val)
+IntEdit::IntEdit(int val, QWidget *pParent)
 {
+	if(pParent) setParent(pParent);
 	m_Value = val;
 	m_pDV = new QIntValidator(this);
 	setValidator(m_pDV);

@@ -50,6 +50,7 @@ signals:
 public:
 	void mouseReleaseEvent(QMouseEvent *event);
 	void paintEvent(QPaintEvent *event);
+	QSize sizeHint() const;
 
 private:
 	QColor m_Color;

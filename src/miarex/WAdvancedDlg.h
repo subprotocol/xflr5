@@ -28,6 +28,9 @@
 #include <QPushButton>
 #include <QLabel>
 #include "../misc/DoubleEdit.h"
+#include "../misc/IntEdit.h"
+
+
 
 class WAdvancedDlg : public QDialog
 {
@@ -60,8 +63,8 @@ private:
     DoubleEdit *m_pctrlRelax;
     DoubleEdit *m_pctrlAlphaPrec;
     DoubleEdit *m_pctrlMinPanelSize;
-    DoubleEdit *m_pctrlNStation;
-    DoubleEdit *m_pctrlIterMax;
+	IntEdit *m_pctrlNStation;
+	IntEdit *m_pctrlIterMax;
     DoubleEdit *m_pctrlMaxWakeIter;
     DoubleEdit *m_pctrlCoreSize;
     DoubleEdit *m_pctrlVortexPos;

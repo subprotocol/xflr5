@@ -444,6 +444,8 @@ public:
 
 	void *m_pGL3DScales;
 
+	QTranslator m_Translator;  /**< the translator object; due to a Qt bug, need to load twice: once from the main function, once from the mainframe */
+
 };
 
 #endif // MAINFRAME_H

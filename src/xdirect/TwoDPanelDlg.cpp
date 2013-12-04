@@ -61,7 +61,7 @@ void TwoDPanelDlg::SetupLayout()
 		InputDataLayout->addWidget(l6,6,1);
 
 
-		m_pctrlNPanels = new IntEdit(100);
+		m_pctrlNPanels = new IntEdit(100, this);
 		m_pctrlNPanels->SetMax(IQX);
 
 		m_pctrlCVpar  = new DoubleEdit;

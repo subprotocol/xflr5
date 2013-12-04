@@ -22,14 +22,15 @@
 #ifndef COLORBUTTON_H
 #define COLORBUTTON_H
 
-#include <QPushButton>
+#include <QAbstractButton>
 
-class ColorButton : public QPushButton
+class ColorButton : public QAbstractButton
 {
 public:
-	ColorButton();
+	ColorButton(QWidget *pParent = NULL);
 
 	void paintEvent ( QPaintEvent * event );
+	QSize sizeHint() const;
 
 	void SetColor(QColor const & color);
 	QColor &GetColor();
