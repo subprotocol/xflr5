@@ -1,7 +1,7 @@
 /****************************************************************************
 
 	MainFrame  Class
-	Copyright (C) 2008-2010 Andre Deperrois adeperrois@xflr5.com
+    Copyright (C) 2008-2013 Andre Deperrois adeperrois@xflr5.com
 
 	This program is free software; you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -126,7 +126,7 @@ MainFrame::MainFrame(QWidget * parent, Qt::WindowFlags flags)
 {
 	if(s_bTrace)
 	{
-		QString FileName = QDir::tempPath() + "/Trace.log";
+        QString FileName = QDir::homePath() + "/Trace.log";
 		s_pTraceFile = new QFile(FileName);
 		if (!s_pTraceFile->open(QIODevice::ReadWrite | QIODevice::Text)) s_bTrace = false;
 	}
@@ -3126,31 +3126,6 @@ void MainFrame::keyPressEvent(QKeyEvent *event)
 				UpdateView();
 				break;
 			}	
-			case Qt::Key_F12:
-			{
-				QString PathName = "/home/windsoarer/test.x3d";
-				QFile XFile(PathName);
-				Body Body;
-				NURBSDomDoc DomDoc(&Body.m_SplineSurface);
-
-				if (event->modifiers().testFlag(Qt::ShiftModifier))
-				{
-					if (!XFile.open(QIODevice::ReadOnly)) break;
-					DomDoc.Import(&XFile);
-				}
-				else
-				{
-					if (!XFile.open(QIODevice::WriteOnly))
-					{
-						QMessageBox::warning(window(), tr("Warning"), tr("Could not open the file for writing"));
-						break;
-					}
-					QTextStream ar(&XFile);
-					DomDoc.Export(ar);
-					XFile.close();
-				}
-				break;
-			}
 
 			default:
 				event->ignore();
@@ -3477,7 +3452,9 @@ enumApp MainFrame::LoadXFLR5File(QString PathName)
 	end = end.toLower();
 	//QString dir = fileinfo.canonicalPath();
 
-	int pos = PathName.lastIndexOf("/");
+    PathName.replace(QDir::separator(), "/"); // Qt sometimes uses the windows \ separator
+
+    int pos = PathName.lastIndexOf("/");
 	if(pos>0) s_LastDirName = PathName.left(pos);
 	if(end==".plr")
 	{
@@ -3667,7 +3644,6 @@ void MainFrame::OnExportCurGraph()
 	QString FileName;
 
 	pGraph->GetGraphName(FileName);
-	FileName.replace("/", " ");
 	FileName = QFileDialog::getSaveFileName(this, tr("Export Graph"), m_ExportLastDirName,
 											tr("Text File (*.txt);;Comma Separated Values (*.csv)"),
 											&m_GraphExportFilter);
@@ -3819,9 +3795,15 @@ void MainFrame::OnLoadFile()
 		if (warn_non_airfoil_multiload) {
 			QMessageBox::warning(0, QObject::tr("Warning"), QObject::tr("Multiple file loading only available for airfoil files.\nNon *.dat files will be ignored."));
 		}
-	} else {
+    }
+    else
+    {
 		PathName = PathNames.at(0);
 		if(!PathName.length()) return;
+
+
+        PathName.replace(QDir::separator(), "/"); // Qt sometimes uses the windows \ separator
+
 		int pos = PathName.lastIndexOf("/");
 		if(pos>0) s_LastDirName = PathName.left(pos);
 
@@ -4146,14 +4128,14 @@ void MainFrame::OnSaveUFOAsProject()
 	QString Filter = ".wpa";
 	QString FileName = strong;
 
-	FileName.replace("/", " ");
 	PathName = QFileDialog::getSaveFileName(this, tr("Save the Project File"),
 											s_LastDirName+"/"+FileName,
 											tr("XFLR5 Project File (*.wpa)"), &Filter);
 	if(!PathName.length()) return;//nothing more to do
 	int pos = PathName.indexOf(".wpa", Qt::CaseInsensitive);
 	if(pos<0) PathName += ".wpa";
-	pos = PathName.lastIndexOf("/");
+    PathName.replace(QDir::separator(), "/"); // Qt sometimes uses the windows \ separator
+    pos = PathName.lastIndexOf("/");
 	if(pos>0) s_LastDirName = PathName.left(pos);
 
 
@@ -4171,7 +4153,6 @@ void MainFrame::OnSaveUFOAsProject()
 #endif
 	ar.setByteOrder(QDataStream::LittleEndian);
 	SerializeUFOProject(ar);
-//	m_FileName = PathName;
 	fp.close();
 
 }
@@ -4611,7 +4592,7 @@ void MainFrame::openRecentFile()
         if(s_oaPolar.size())
 		{
 			if(pXDirect->m_bPolarView) pXDirect->CreatePolarCurves();
-			else                   pXDirect->CreateOppCurves();
+            else                       pXDirect->CreateOppCurves();
 		}
 		OnXDirect();
 		UpdateFoils();
@@ -5049,22 +5030,22 @@ bool MainFrame::SaveProject(QString PathName)
 	if(!PathName.length())
 	{
 		if(FileName.right(1)=="*") 	FileName = FileName.left(FileName.length()-1);
-		FileName.replace("/", " ");
 
-
-		PathName = QFileDialog::getSaveFileName(this, tr("Save the Project File"),
+        PathName = QFileDialog::getSaveFileName(this, tr("Save the Project File"),
 												s_LastDirName+"/"+FileName,
-												tr("XFLR5 v6 Project File (*.wpa);;XFLR5 v5 Project File (*.*)"),
+                                                tr("XFLR5 v6 Project File (*.wpa)"),
 												&Filter);
 
 		if(!PathName.length()) return false;//nothing more to do
-		int pos = PathName.indexOf(".wpa", Qt::CaseInsensitive);
+
+        int pos = PathName.indexOf(".wpa", Qt::CaseInsensitive);
 		if(pos<0) PathName += ".wpa";
-		pos = PathName.lastIndexOf("/");
+
+        PathName.replace(QDir::separator(), "/"); // Qt sometimes uses the windows \ separator
+
+        pos = PathName.lastIndexOf("/");
 		if(pos>0) s_LastDirName = PathName.left(pos);
 	}
-//	int x = QString::compare(Filter, "XFLR5 v5 Project File (*.wpa)", Qt::CaseInsensitive);
-//	x = QString::compare(Filter, "XFLR5 v6 Project File (*.wpa)", Qt::CaseInsensitive);
 
 	QFile fp(PathName);
 

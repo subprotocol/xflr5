@@ -34,6 +34,9 @@ Graph::Graph()
 	//Type is used to determine automatic scales
 	m_Type = 1;
 
+    m_X = 0;
+    m_Y = 1;
+
 	xmin         = .0;
 	xmax         = .10;
 	ymin         = .0;
@@ -75,6 +78,21 @@ Graph::Graph()
 	m_CurveColors[7] = QColor( 70, 125, 255);
 	m_CurveColors[8] = QColor(125, 255,  70);
 	m_CurveColors[9] = QColor(255, 70,  200);
+
+    m_AxisStyle   = 0;
+    m_AxisWidth   = 1;
+    m_BorderStyle = 0;
+    m_BorderWidth = 2;
+    m_XMajStyle   = 0;
+    m_XMajWidth   = 1;
+    m_XMinStyle   = 1;
+    m_XMinWidth   = 1;
+    m_YMajStyle   = 0;
+    m_YMajWidth   = 1;
+    m_YMinStyle   = 1;
+    m_YMinWidth   = 1;
+
+    m_LogPixelsY  = 0;
 
 	m_iMargin= 44;
 
