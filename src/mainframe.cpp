@@ -1199,7 +1199,7 @@ void MainFrame::CreateMenus()
 	optionsMenu->addAction(resetSettingsAct);
 
 	helpMenu = menuBar()->addMenu(tr("&?"));
-	helpMenu->addAction(guidelinesAct);
+//	helpMenu->addAction(guidelinesAct);
 	helpMenu->addAction(aboutQtAct);
 	helpMenu->addAction(aboutAct);
 
