@@ -21,6 +21,7 @@
 
 #include "TranslatorDlg.h"
 #include "../mainframe.h"
+#include <QtDebug>
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QStringList>
@@ -105,8 +106,8 @@ void TranslatorDlg::InitDialog()
 
 	for (int i=0; i<qmFiles.count(); ++i)
 	{
-		qmFileForLanguage.insert(languageName(qmFiles[i]), qmFiles[i]);
-		m_pctrlLanguageList->addItem(languageName(qmFiles[i]));
+        qmFileForLanguage.insert(languageName(qmFiles[i]), qmFiles[i]);
+        m_pctrlLanguageList->addItem(languageName(qmFiles[i]));
 	}
 
 	m_pctrlLanguageList->setCurrentRow(0);

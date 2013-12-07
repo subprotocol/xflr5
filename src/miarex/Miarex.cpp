@@ -4332,7 +4332,7 @@ Body * QMiarex::GetBody(QString BodyName)
 		pPlane = (Plane*)m_poaPlane->at(ip);
 		if(pPlane->body())
 		{
-			if(pPlane->body()->m_BodyName == BodyName) return pPlane->body();
+            if((pPlane->PlaneName()+"/Body") == BodyName) return pPlane->body();
 		}
 	}
 
@@ -6150,6 +6150,135 @@ void QMiarex::JoinSurfaces(Surface *pLeftSurf, Surface *pRightSurf, int pl, int 
 void QMiarex::keyPressEvent(QKeyEvent *event)
 {
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
+    if(event->key()==Qt::Key_0 || event->text()=="0")
+    {
+        if(m_iView==WSTABVIEW)
+        {
+            m_iStabilityView  = STABTIMEVIEW;
+//				m_pCurGraph = &m_TimeGraph1;
+//				m_pCurTimeGraph= m_pCurGraph;
+            SetWPlrLegendPos();
+            UpdateView();
+        }
+        return;
+    }
+    else if(event->key()==Qt::Key_1 || event->text()=="1")
+    {
+        if(m_iView==WPOLARVIEW)
+        {
+            m_iWPlrView  = ONEPOLARGRAPH;
+            m_pCurGraph = m_WPlrGraph;
+            m_pCurWPlrGraph = m_pCurGraph;
+            SetWPlrLegendPos();
+        }
+        else if(m_iView==WOPPVIEW)
+        {
+            m_iWingView =1;
+            m_pCurGraph = m_WingGraph;
+            m_pCurWingGraph = m_pCurGraph;
+            SetWingLegendPos();
+        }
+        else if(m_iView==WSTABVIEW)
+        {
+            if(m_iStabilityView==STABTIMEVIEW)
+            {
+                m_iStabTimeView =1;
+                m_pCurGraph = m_TimeGraph;
+                m_pCurTimeGraph = m_pCurGraph;
+                SetWingLegendPos();
+            }
+        }
+        UpdateView();
+        return;
+    }
+    else if(event->key()==Qt::Key_2 || event->text()=="2")
+    {
+        if(m_iView==WPOLARVIEW)
+        {
+            m_iWPlrView  = ONEPOLARGRAPH;
+            m_pCurGraph = m_WPlrGraph+1;
+            m_pCurWPlrGraph = m_pCurGraph;
+            SetWPlrLegendPos();
+        }
+        else if(m_iView==WOPPVIEW)
+        {
+            m_iWingView =1;
+            m_pCurGraph = m_WingGraph+1;
+            m_pCurWingGraph = m_pCurGraph;
+            SetWingLegendPos();
+        }
+        else if(m_iView==WSTABVIEW)
+        {
+            if(m_iStabilityView==STABTIMEVIEW)
+            {
+                m_iStabTimeView =1;
+                m_pCurGraph = m_TimeGraph+1;
+                m_pCurTimeGraph = m_pCurGraph;
+                SetWingLegendPos();
+            }
+        }
+        UpdateView();
+        return;
+    }
+    else if(event->key()==Qt::Key_3 || event->text()=="3")
+    {
+        if(m_iView==WPOLARVIEW)
+        {
+            m_iWPlrView = ONEPOLARGRAPH;
+            m_pCurGraph = m_WPlrGraph+2;
+            m_pCurWPlrGraph = m_pCurGraph;
+            SetWPlrLegendPos();
+        }
+        else if(m_iView==WOPPVIEW)
+        {
+            m_iWingView =1;
+            m_pCurGraph = m_WingGraph+2;
+            m_pCurWingGraph = m_pCurGraph;
+            SetWingLegendPos();
+        }
+        else if(m_iView==WSTABVIEW)
+        {
+            if(m_iStabilityView==STABTIMEVIEW)
+            {
+                m_iStabTimeView =1;
+                m_pCurGraph = m_TimeGraph+2;
+                m_pCurTimeGraph = m_pCurGraph;
+                SetWingLegendPos();
+            }
+        }
+        UpdateView();
+        return;
+    }
+    else if(event->key()==Qt::Key_4 || event->text()=="4")
+    {
+        if(m_iView==WPOLARVIEW)
+        {
+            m_iWPlrView = ONEPOLARGRAPH;
+            m_pCurGraph = m_WPlrGraph+3;
+            m_pCurWPlrGraph = m_pCurGraph;
+            SetWPlrLegendPos();
+        }
+        else if(m_iView==WOPPVIEW)
+        {
+            m_iWingView =1;
+            m_pCurGraph = m_WingGraph+3;
+            m_pCurWingGraph = m_pCurGraph;
+            SetWingLegendPos();
+        }
+        else if(m_iView==WSTABVIEW)
+        {
+            if(m_iStabilityView==STABTIMEVIEW)
+            {
+                m_iStabTimeView =1;
+                m_pCurGraph = m_TimeGraph+3;
+                m_pCurTimeGraph = m_pCurGraph;
+                SetWingLegendPos();
+            }
+        }
+        UpdateView();
+        return;
+    }
+
 	switch (event->key())
 	{
 		case Qt::Key_Return:
@@ -6181,134 +6310,7 @@ void QMiarex::keyPressEvent(QKeyEvent *event)
 			UpdateView();
 			break;
 		}
-		case Qt::Key_0:
-		{
-			if(m_iView==WSTABVIEW)
-			{
-				m_iStabilityView  = STABTIMEVIEW;
-//				m_pCurGraph = &m_TimeGraph1;
-//				m_pCurTimeGraph= m_pCurGraph;
-				SetWPlrLegendPos();
-				UpdateView();
-			}
-			break;
-		}
-		case Qt::Key_1:
-		{
-			if(m_iView==WPOLARVIEW)
-			{
-				m_iWPlrView  = ONEPOLARGRAPH;
-				m_pCurGraph = m_WPlrGraph;
-				m_pCurWPlrGraph = m_pCurGraph;
-				SetWPlrLegendPos();
-			}
-			else if(m_iView==WOPPVIEW)
-			{
-				m_iWingView =1;
-				m_pCurGraph = m_WingGraph;
-				m_pCurWingGraph = m_pCurGraph;
-				SetWingLegendPos();
-			}
-			else if(m_iView==WSTABVIEW)
-			{
-				if(m_iStabilityView==STABTIMEVIEW)
-				{
-					m_iStabTimeView =1;
-					m_pCurGraph = m_TimeGraph;
-					m_pCurTimeGraph = m_pCurGraph;
-					SetWingLegendPos();
-				}
-			}
-			UpdateView();
-			break;
-		}
-		case Qt::Key_2:
-		{
-			if(m_iView==WPOLARVIEW)
-			{
-				m_iWPlrView  = ONEPOLARGRAPH;
-				m_pCurGraph = m_WPlrGraph+1;
-				m_pCurWPlrGraph = m_pCurGraph;
-				SetWPlrLegendPos();
-			}
-			else if(m_iView==WOPPVIEW)
-			{
-				m_iWingView =1;
-				m_pCurGraph = m_WingGraph+1;
-				m_pCurWingGraph = m_pCurGraph;
-				SetWingLegendPos();
-			}
-			else if(m_iView==WSTABVIEW)
-			{
-				if(m_iStabilityView==STABTIMEVIEW)
-				{
-					m_iStabTimeView =1;
-					m_pCurGraph = m_TimeGraph+1;
-					m_pCurTimeGraph = m_pCurGraph;
-					SetWingLegendPos();
-				}
-			}
-			UpdateView();
-			break;
-		}
-		case Qt::Key_3:
-		{
-			if(m_iView==WPOLARVIEW)
-			{
-				m_iWPlrView = ONEPOLARGRAPH;
-				m_pCurGraph = m_WPlrGraph+2;
-				m_pCurWPlrGraph = m_pCurGraph;
-				SetWPlrLegendPos();
-			}
-			else if(m_iView==WOPPVIEW)
-			{
-				m_iWingView =1;
-				m_pCurGraph = m_WingGraph+2;
-				m_pCurWingGraph = m_pCurGraph;
-				SetWingLegendPos();
-			}
-			else if(m_iView==WSTABVIEW)
-			{
-				if(m_iStabilityView==STABTIMEVIEW)
-				{
-					m_iStabTimeView =1;
-					m_pCurGraph = m_TimeGraph+2;
-					m_pCurTimeGraph = m_pCurGraph;
-					SetWingLegendPos();
-				}
-			}
-			UpdateView();
-			break;
-		}
-		case Qt::Key_4:
-		{
-			if(m_iView==WPOLARVIEW)
-			{
-				m_iWPlrView = ONEPOLARGRAPH;
-				m_pCurGraph = m_WPlrGraph+3;
-				m_pCurWPlrGraph = m_pCurGraph;
-				SetWPlrLegendPos();
-			}
-			else if(m_iView==WOPPVIEW)
-			{
-				m_iWingView =1;
-				m_pCurGraph = m_WingGraph+3;
-				m_pCurWingGraph = m_pCurGraph;
-				SetWingLegendPos();
-			}
-			else if(m_iView==WSTABVIEW)
-			{
-				if(m_iStabilityView==STABTIMEVIEW)
-				{
-					m_iStabTimeView =1;
-					m_pCurGraph = m_TimeGraph+3;
-					m_pCurTimeGraph = m_pCurGraph;
-					SetWingLegendPos();
-				}
-			}
-			UpdateView();
-			break;
-		}
+
 		case Qt::Key_L:
 		{
 			pMainFrame->OnLogFile();
@@ -7546,6 +7548,10 @@ void QMiarex::OnAnalyze()
 	}
 
 	m_pctrlAnalyze->setEnabled(false);
+    pMainFrame->m_pctrlUFO->setEnabled(false);
+    pMainFrame->m_pctrlWPolar->setEnabled(false);
+    pMainFrame->m_pctrlWOpp->setEnabled(false);
+
 	if(m_pCurWPolar->m_AnalysisMethod==LLTMETHOD)
 	{
 		LLTAnalyze(V0, VMax, VDelta, m_bSequence, m_bInitLLTCalc);
@@ -7572,6 +7578,9 @@ void QMiarex::OnAnalyze()
         }
 	}
 	m_pctrlAnalyze->setEnabled(true);
+    pMainFrame->m_pctrlUFO->setEnabled(true);
+    pMainFrame->m_pctrlWPolar->setEnabled(true);
+    pMainFrame->m_pctrlWOpp->setEnabled(true);
 
 	//restore things as they were
 	m_bHighlightOpp = bHigh;

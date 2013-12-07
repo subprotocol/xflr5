@@ -21,7 +21,6 @@
 
 #include <math.h>
 #include <QMenu>
-
 #include "mainframe.h"
 #include "graph/QGraph.h"
 #include "graph/Curve.h"
