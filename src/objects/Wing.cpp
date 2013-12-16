@@ -1323,26 +1323,16 @@ double Wing::Offset(double yob)
  * @param yob the relative position where the twist angle will be calculated
  * @return the twist angle in degrees
  */
-double Wing::Twist(double y)
+double Wing::Twist(double yob)
 {
 	double tau;
+
+	double y= qAbs(yob*m_PlanformSpan/2.0);//geometry is symetric
+
 	// calculate twist at each station
 	if (y>=0.0)
 	{
 		//right wing
-		for (int is=0; is<NWingSection(); is++)
-		{
-			if(YPosition(is) <= y && y <=YPosition(is+1))
-			{
-				tau = (y-YPosition(is))/(YPosition(is+1)-YPosition(is));
-				return Twist(is)+(Twist(is+1)-Twist(is)) * tau;
-			}
-		}
-	}
-	else
-	{
-		//left wing
-		y=qAbs(y);
 		for (int is=0; is<NWingSection()-1; is++)
 		{
 			if(YPosition(is) <= y && y <=YPosition(is+1))
@@ -1352,8 +1342,7 @@ double Wing::Twist(double y)
 			}
 		}
 	}
-
-	return -1.0;
+	return 0.0;
 }
 
 
@@ -1457,7 +1446,7 @@ void Wing::GetViewYZPos(double xrel, double y, double &yv, double &zv, int pos)
 	double fy = qAbs(y);
 	double sign;
 	if(fy<1.0e-10) sign = 1.0;
-	else sign = y/fy;
+	else           sign = y/fy;
 
 //	if(fy<=0.0) return 0.0;
 	for (int is=0; is<NWingSection()-1; is++)
@@ -1476,7 +1465,7 @@ void Wing::GetViewYZPos(double xrel, double y, double &yv, double &zv, int pos)
 
 			yv *= sign;
 			//	add washout calculated about chord quarter line :
-			twist = Twist(fy)*PI/180.;
+			twist = Twist(fy*2./m_PlanformSpan)*PI/180.;
 			chord = Chord(fy*2./m_PlanformSpan);
 			zv -= (xrel-0.25)*chord*sin(twist);
 

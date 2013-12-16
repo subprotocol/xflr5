@@ -577,7 +577,6 @@ void LLTAnalysis::LLTInitializeGeom()
 	for (k=0; k<=s_NLLTStations; k++)
 	{
 		y   = cos(k*PI/s_NLLTStations)* m_pWing->m_PlanformSpan/2.0;
-		m_Twist[k] = m_pWing->Twist(y);
 		m_SpanPos[k] = m_pWing->m_PlanformSpan/2.0 * cos((double)k*PI/s_NLLTStations);
 	}
 

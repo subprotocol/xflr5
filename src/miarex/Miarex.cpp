@@ -5294,7 +5294,7 @@ void QMiarex::GLDrawWingLegend(Wing *pWing, Plane *pPlane, WPolar *pWPolar)
                 ZPos +=dD;
             }
 
-            Result = QString(QObject::tr("Tip Twist      = %1")).arg(pWing->Twist(pWing->NWingSection()-1),c,'f',d);
+			Result = QString(QObject::tr("Tip Twist      = %1")).arg(pWing->TipTwist(),c,'f',d);
 			pGLWidget->renderText(LeftPos, ZPos, Result, MainFrame::s_TextFont);
             ZPos +=dD;
 

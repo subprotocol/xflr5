@@ -6021,11 +6021,11 @@ bool MainFrame::SerializeProject(QDataStream &ar, bool bIsStoring)
 
 		pAFoil->m_pSF->Serialize(ar, bIsStoring);
 
-        for (i=0; i<s_oaWing.size();i++)
+/*        for (i=0; i<s_oaWing.size();i++)
 		{
             pWing = (Wing*)s_oaWing[i];
 			pWing->ComputeGeometry();
-		}
+		}*/
 
 		if(m_iApp==MIAREX) pMiarex->SetUFO();
 

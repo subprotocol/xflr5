@@ -158,7 +158,7 @@ public:
 	double Chord(double yob);
 	double Offset(double yob);
 	double Dihedral(double yob);
-	double Twist(double y);
+	double Twist(double yob);
 	double AverageSweep();
 	double TotalMass();
 	double C4(double yob, double xRef);
