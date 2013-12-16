@@ -25,7 +25,6 @@
 #include "LLTAnalysis.h"
 #include "LLTAnalysisDlg.h"
 #include <QString>
-#include <QtDebug>
 
 
 int LLTAnalysis::s_NLLTStations = 0;
@@ -33,7 +32,9 @@ double LLTAnalysis::s_RelaxMax = 0.0;
 double LLTAnalysis::s_CvPrec = 0.0;
 
 
-
+/**
+ *The public constructor
+ */
 LLTAnalysis::LLTAnalysis(void *pParent)
 {
 	m_pParent = pParent;
@@ -44,7 +45,9 @@ LLTAnalysis::LLTAnalysis(void *pParent)
 	ResetVariables();
 }
 
-
+/**
+* Initializes the variables to default values
+*/
 void LLTAnalysis::ResetVariables()
 {
 	m_bSkip      = false;
@@ -54,27 +57,23 @@ void LLTAnalysis::ResetVariables()
 
 	m_IterLim = 0;
 
-	memset(m_Chord, 0, sizeof(m_Chord));
-	memset(m_Offset, 0, sizeof(m_Offset));
-	memset(m_Twist, 0, sizeof(m_Twist));
-	memset(m_SpanPos, 0, sizeof(m_SpanPos));
-	memset(m_StripArea, 0, sizeof(m_StripArea));
-
-
-	memset(m_Re, 0, sizeof(m_Re));
-	memset(m_Cl, 0, sizeof(m_Cl));
-	memset(m_Ai, 0, sizeof(m_Ai));
-	memset(m_ICd, 0, sizeof(m_ICd));
-	memset(m_PCd, 0, sizeof(m_PCd));
-
-
-	memset(m_Cm, 0, sizeof(m_Cm));
-	memset(m_CmAirf, 0, sizeof(m_CmAirf));
-	memset(m_XCPSpanRel, 0, sizeof(m_XCPSpanRel));
-	memset(m_XCPSpanAbs, 0, sizeof(m_XCPSpanAbs));
+	memset(m_Chord,         0, sizeof(m_Chord));
+	memset(m_Offset,        0, sizeof(m_Offset));
+	memset(m_Twist,         0, sizeof(m_Twist));
+	memset(m_SpanPos,       0, sizeof(m_SpanPos));
+	memset(m_StripArea,     0, sizeof(m_StripArea));
+	memset(m_Re,            0, sizeof(m_Re));
+	memset(m_Cl,            0, sizeof(m_Cl));
+	memset(m_Ai,            0, sizeof(m_Ai));
+	memset(m_ICd,           0, sizeof(m_ICd));
+	memset(m_PCd,           0, sizeof(m_PCd));
+	memset(m_Cm,            0, sizeof(m_Cm));
+	memset(m_CmAirf,        0, sizeof(m_CmAirf));
+	memset(m_XCPSpanRel,    0, sizeof(m_XCPSpanRel));
+	memset(m_XCPSpanAbs,    0, sizeof(m_XCPSpanAbs));
 	memset(m_BendingMoment, 0, sizeof(m_BendingMoment));
-	memset(m_XTrTop, 0, sizeof(m_XCPSpanAbs));
-	memset(m_XTrBot, 0, sizeof(m_BendingMoment));
+	memset(m_XTrTop,        0, sizeof(m_XCPSpanAbs));
+	memset(m_XTrBot,        0, sizeof(m_BendingMoment));
 
 	m_LengthUnit.clear();
 	m_mtoUnit = 0.0;
@@ -94,11 +93,14 @@ void LLTAnalysis::ResetVariables()
 }
 
 
-
+/** 
+* Initializes the Reynolds numbers and lift coefficients for the first iteration in LLT
+* @todo : useless; change processing order --> set linear solution first, QInf next
+ * @param QInf the freestream velocity, in m/s
+ * @param Alpha the angle of attack, in degrees
+*/
 void LLTAnalysis::LLTSetInitialCl(double &QInf, double const Alpha)
 {
-	//Initializes the Reynolds numbers and lift coefficients for the first iteration in LLT
-
 	Foil *pFoil0 = NULL;
 	Foil *pFoil1 = NULL;
 	double yob, tau;
@@ -130,16 +132,63 @@ void LLTAnalysis::LLTSetInitialCl(double &QInf, double const Alpha)
 }
 
 
+/**
+ * The multiplier for the lift, drag and pitching-moment coefficients in the case of asymmetrical distributions.
+ * cf. NACA TN-1269 for details
+ * @param m the index of the span station
+ * @return the value of the eta factor
+*/
 double LLTAnalysis::Eta(int m)
 {
-	//Auxiliary calculation of the Eta factor in LLT
-
 	return PI/2.0/(double)m_pWing->m_NStation * sin((double)m*PI/(double)m_pWing->m_NStation) ;
+}
+
+/**
+ * The multiplier for the yawing and rolling moment coefficients in the case of asymmetrical distributions.
+ * cf. NACA TN-1269 for details
+ * @param m 
+ * @return the value of the sigma factor
+*/
+double LLTAnalysis::Sigma(int m)
+{
+	return PI/8.0/(double)m_pWing->m_NStation * sin(2.*(double)m*PI/(double)m_pWing->m_NStation) ;
 }
 
 
 
+/**
+ * The multiplier for the induced angle of attack in the case of asymmetrical distributions.
+ * cf. NACA TN-1269 for details
+ * @param m 
+ * @param k
+ * @return the value of the beta factor
+*/
+double LLTAnalysis::Beta(int m, int k)
+{
+	double b;
+	double fk = (double)k;
+	double fm = (double)m;
+	double fr = (double)m_pWing->m_NStation;
 
+	if (m==k) b = 180.0*fr/8.0/PI/sin(fk*PI/fr);
+	else if (IsEven(m+k)) b=0.0;
+	else
+	{
+		double c1 = 180.0/4.0/PI/fr/sin(fk*PI/fr);
+		double c2 =   1.0/(1.0-cos((fk+fm)*PI/fr))
+					- 1.0/(1.0-cos((fk-fm)*PI/fr));
+		b = c1 * c2;
+	}
+	return b;
+}
+
+
+/**
+ * Once the solution has converged, computes the wing's aerodynamic coefficients and stores them in the member variables.
+ * @param QInf the freestream velocity, in m/s
+ * @param Alpha the angle of attack, in degrees
+ * @param ErrorMessage a reference to the output string which is filled with the error messages
+ */
 void LLTAnalysis::LLTComputeWing(double QInf, double Alpha, QString &ErrorMessage)
 {
 	Foil* pFoil0 = NULL;
@@ -147,8 +196,8 @@ void LLTAnalysis::LLTComputeWing(double QInf, double Alpha, QString &ErrorMessag
 
 	int m;
 	QString strange;
-
 	double yob, tau, c4, arad, zpos;
+	
 	yob = tau = c4 = arad = zpos = 0.0;
 	double Integral0           = 0.0;
 	double Integral1           = 0.0;
@@ -298,11 +347,12 @@ void LLTAnalysis::LLTComputeWing(double QInf, double Alpha, QString &ErrorMessag
 
 
 
-
+/**
+ * Calculates the bending moment at span stations, based on the results of the analysis and on the freestrem velocity.
+ * @param QInf the freestream velocity, in m/s
+ */
 void LLTAnalysis::LLTSetBending(double QInf)
 {
-	//bending moment
-
 	int j,jj;
 
 	//dynamic pressure, kg/m3
@@ -335,7 +385,15 @@ void LLTAnalysis::LLTSetBending(double QInf)
 	}
 }
 
-
+/**
+ * Calculates the linear solution to the Lifting line problem, for the given wing geometry and angle of attack.
+ * This is the starting point for the non-linear iterations.
+ * A simplifying assumtion is that the lift slope is Cl = 2.pi (alpha-alpha0+wahshout) at all positions.
+ * Numerical experiments have shown however that the non-linear LLT converges in roughly the same amount of iterations 
+ * whatever the initial state, even if random or asymetric.
+ * @param Alpha the angle of attack, in degrees
+ * @return true if a linear solution has been set, false otherwise. Should always be true, unless the user has defined some crazy wing configuration. Who knows what a user can do ?
+ */
 bool LLTAnalysis::LLTSetLinearSolution(double Alpha)
 {
 	double* aij = new double[s_NLLTStations*s_NLLTStations];
@@ -362,7 +420,6 @@ bool LLTAnalysis::LLTSetLinearSolution(double Alpha)
 
 		st0 = sin(t0);
 
-
 		for (j=1; j<s_NLLTStations; j++)
 		{
 			dj   = (double)j;
@@ -387,7 +444,10 @@ bool LLTAnalysis::LLTSetLinearSolution(double Alpha)
 
 	for (i=1; i<s_NLLTStations; i++)
 	{
-		t0  = i * PI/dn;
+		di  = (double)i;
+		t0  = di * PI/dn;
+		yob = cos(t0);
+		
 		m_Cl[i] = 0.0;
 		for (j=1; j<s_NLLTStations; j++)
 		{
@@ -395,20 +455,13 @@ bool LLTAnalysis::LLTSetLinearSolution(double Alpha)
 			snt0 = sin(dj*t0);
 			m_Cl[i] += rhs[j]* snt0;
 		}
-		yob   = cos(i*PI/s_NLLTStations);
 		m_pWing->GetFoils(&pFoil0, &pFoil1, yob*b/2.0, tau);
 		GetLinearizedPolar(pFoil0, pFoil1, m_Re[i], tau, a0, slope);
 		a0 = GetZeroLiftAngle(pFoil0, pFoil1, m_Re[i], tau); //better approximation ?
 
-		m_Cl[i] *= slope*180.0/PI*cs/m_Chord[i];
-		m_Ai[i]  = -(Alpha-a0+m_Twist[i]) + m_Cl[i]/slope;
+		m_Cl[i] *= slope*180.0/PI*cs/m_pWing->Chord(yob);
+		m_Ai[i]  = -(Alpha-a0+m_pWing->Twist(yob)) + m_Cl[i]/slope;
 	}
-
-/*	qDebug()<<"______Linear_________";
-	for (int in=0; in< s_NLLTStations; in++)
-	{
-		qDebug("%13.7f   %13.7f", m_Ai[in], m_Cl[in]);
-	}*/
 
 	delete [] aij;
 	delete [] rhs;
@@ -416,41 +469,13 @@ bool LLTAnalysis::LLTSetLinearSolution(double Alpha)
 }
 
 
-double LLTAnalysis::Sigma(int m)
-{
-	//Auxiliary calculation of the sigma factor in LLT
-	return PI/8.0/(double)m_pWing->m_NStation * sin(2.*(double)m*PI/(double)m_pWing->m_NStation) ;
-}
-
-
-
-
-double LLTAnalysis::Beta(int m, int k)
-{
-	//Auxiliary calculation of the Beta factor in LLT
-	double b;
-	double fk = (double)k;
-	double fm = (double)m;
-	double fr = (double)m_pWing->m_NStation;
-
-	if (m==k) b = 180.0*fr/8.0/PI/sin(fk*PI/fr);
-	else if (IsEven(m+k)) b=0.0;
-	else
-	{
-		double c1 = 180.0/4.0/PI/fr/sin(fk*PI/fr);
-		double c2 =   1.0/(1.0-cos((fk+fm)*PI/fr))
-					- 1.0/(1.0-cos((fk-fm)*PI/fr));
-		b = c1 * c2;
-	}
-	return b;
-}
-
-
+/** 
+ * Calculates the induced angle from the lift coefficient and from the Beta factor
+ * @param k
+ * @return the induced angle, in degrees
+ */
 double LLTAnalysis::AlphaInduced(int k)
 {
-	// Calculates the induced angle from the lift coefficient and
-	// from the Beta factor in LLT
-
 	double ai = 0.0;
 
 	for (int m=1; m<m_pWing->m_NStation; m++)
@@ -463,7 +488,12 @@ double LLTAnalysis::AlphaInduced(int k)
 
 
 
-
+/** 
+ * Performs the iterations of the non-linear LLT analysis.
+ * @param QInf the freestream velocity, in m/s
+ * @param Alpha the angle of attack, in degrees
+ * @return the number of iterations performed, or -1 if the analysis has been user-cancelled
+*/
 int LLTAnalysis::LLTIterate(double &QInf, double Alpha)
 {
 	int k ;
@@ -529,7 +559,7 @@ int LLTAnalysis::LLTIterate(double &QInf, double Alpha)
 
 
 /**
- * Initializes the LLT calculation
+ * Initializes the geometric data necessary for the LLT calculation
 */
 void LLTAnalysis::LLTInitializeGeom()
 {

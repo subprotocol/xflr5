@@ -166,16 +166,8 @@ QXDirect::QXDirect(QWidget *parent) : QWidget(parent)
 
 	m_ASpec = 0.0;
 
-	m_pCpGraph    = new QGraph();
-
+	m_pCpGraph = new QGraph();
 	m_pCpGraph->SetVariables(0,0);
-
-	m_PlrGraph[0].SetVariables(2,1);
-	m_PlrGraph[1].SetVariables(0,1);
-	m_PlrGraph[2].SetVariables(0,5);
-	m_PlrGraph[3].SetVariables(6,1);
-	m_PlrGraph[4].SetVariables(0,10);
-
 	m_pCpGraph->SetXTitle(tr("X"));
 	m_pCpGraph->SetYTitle(tr("Cp"));
 	m_pCpGraph->SetInverted(true);
@@ -187,7 +179,14 @@ QXDirect::QXDirect(QWidget *parent) : QWidget(parent)
 	m_pCpGraph->SetBorderColor(QColor(200,200,200));
 	m_pCpGraph->SetBorder(true);
 	m_pCpGraph->SetBorderStyle(0);
-	m_pCpGraph->SetGraphName(tr("Cp Graph"));
+	m_pCpGraph->SetGraphName("XDirect_Cp_Graph");
+
+
+	m_PlrGraph[0].SetVariables(2,1);
+	m_PlrGraph[1].SetVariables(0,1);
+	m_PlrGraph[2].SetVariables(0,5);
+	m_PlrGraph[3].SetVariables(6,1);
+	m_PlrGraph[4].SetVariables(0,10);
 
 	m_PlrGraph[0].SetXMin(0.0);
 	m_PlrGraph[0].SetXMax(0.1);
@@ -199,7 +198,7 @@ QXDirect::QXDirect(QWidget *parent) : QWidget(parent)
 	m_PlrGraph[0].SetBorderStyle(0);
 	m_PlrGraph[0].SetBorderWidth(3);
 	m_PlrGraph[0].SetMargin(50);
-	m_PlrGraph[0].SetGraphName(tr("Polar Graph"));
+	m_PlrGraph[0].SetGraphName("Polar_Graph");
 
 	m_PlrGraph[2].SetXMin(0.0);
 	m_PlrGraph[2].SetXMax(0.1);
@@ -211,7 +210,7 @@ QXDirect::QXDirect(QWidget *parent) : QWidget(parent)
 	m_PlrGraph[2].SetBorderStyle(0);
 	m_PlrGraph[2].SetBorderWidth(3);
 	m_PlrGraph[2].SetMargin(50);
-	m_PlrGraph[2].SetGraphName(tr("Cm Graph"));
+	m_PlrGraph[2].SetGraphName("Cm_Graph");
 
 	m_PlrGraph[1].SetXMin(0.0);
 	m_PlrGraph[1].SetXMax(0.1);
@@ -223,7 +222,7 @@ QXDirect::QXDirect(QWidget *parent) : QWidget(parent)
 	m_PlrGraph[1].SetBorderStyle(0);
 	m_PlrGraph[1].SetBorderWidth(3);
 	m_PlrGraph[1].SetMargin(50);
-	m_PlrGraph[1].SetGraphName(tr("Cz Graph"));
+	m_PlrGraph[1].SetGraphName("Cz_Graph");
 
 	m_PlrGraph[3].SetXMin(0.0);
 	m_PlrGraph[3].SetXMax(0.1);
@@ -235,7 +234,7 @@ QXDirect::QXDirect(QWidget *parent) : QWidget(parent)
 	m_PlrGraph[3].SetBorderStyle(0);
 	m_PlrGraph[3].SetBorderWidth(3);
 	m_PlrGraph[3].SetMargin(50);
-	m_PlrGraph[3].SetGraphName(tr("Tr Graph"));
+	m_PlrGraph[3].SetGraphName("Tr_Graph");
 
 	m_PlrGraph[4].SetXMin(0.0);
 	m_PlrGraph[4].SetXMax(0.1);
@@ -247,7 +246,7 @@ QXDirect::QXDirect(QWidget *parent) : QWidget(parent)
 	m_PlrGraph[4].SetBorderStyle(0);
 	m_PlrGraph[4].SetBorderWidth(3);
 	m_PlrGraph[4].SetMargin(50);
-	m_PlrGraph[4].SetGraphName(tr("User Graph"));
+	m_PlrGraph[4].SetGraphName("User_Graph");
 
 	for(int ig=0; ig<MAXPOLARGRAPHS; ig++)
 		SetGraphTitles(m_PlrGraph+ig);
@@ -6124,6 +6123,8 @@ void QXDirect::SaveSettings(QSettings *pSettings)
 	m_PlrGraph[4].SaveSettings(pSettings);
 	m_pCpGraph->SaveSettings(pSettings);
 }
+
+
 
 /**
  * Initializes the widget values, depending on the type of Polar

@@ -2459,11 +2459,10 @@ void WPolar::GetPolarProperties(QString &PolarProperties, bool bData)
 	if(m_bViscous) PolarProperties += QObject::tr("Viscous")+"\n";
 	else           PolarProperties += QObject::tr("Inviscid")+"\n";
 
-	if(pPlane)
+	if(pPlane && m_bIgnoreBodyPanels)
 	{
 		PolarProperties += QObject::tr("Body option")+" = ";
-		if(m_bIgnoreBodyPanels) PolarProperties += QObject::tr("Body Panels Ignored")+"\n";
-		//    else              PolarProperties += QObject::tr("Body Included")+"\n";
+		PolarProperties += QObject::tr("Body Panels Ignored")+"\n";
 	}
 
 	PolarProperties += QObject::tr("Ref. Area = ");

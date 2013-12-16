@@ -341,7 +341,7 @@ QMiarex::QMiarex(QWidget *parent)
 		m_TimeGraph[ig].SetType(0);
 		m_TimeGraph[ig].SetMargin(50);
 		m_TimeGraph[ig].SetInverted(false);
-		m_TimeGraph[ig].SetGraphName("Time Response");
+		m_TimeGraph[ig].SetGraphName("Time_Response");
 	}
 
 	//set the axis labels for the time graphs
@@ -372,7 +372,7 @@ QMiarex::QMiarex(QWidget *parent)
 	m_LongRLGraph.SetType(0);
 	m_LongRLGraph.SetMargin(50);
 	m_LongRLGraph.SetInverted(false);
-	m_LongRLGraph.SetGraphName("Longitudinal Modes");
+	m_LongRLGraph.SetGraphName("Longitudinal_Modes");
 	m_LongRLGraph.m_bHighlightPoint = true;
 
 	m_LatRLGraph.SetXMajGrid(true, QColor(120,120,120),2,1);
@@ -386,17 +386,17 @@ QMiarex::QMiarex(QWidget *parent)
 	m_LatRLGraph.SetType(0);
 	m_LatRLGraph.SetMargin(50);
 	m_LatRLGraph.SetInverted(false);
-	m_LatRLGraph.SetGraphName("Lateral Modes");
+	m_LatRLGraph.SetGraphName("Lateral_Modes");
 	m_LatRLGraph.m_bHighlightPoint = true;
 
 	m_WingGraph[0].SetYVariable(0);
 	m_WingGraph[1].SetYVariable(1);
 	m_WingGraph[2].SetYVariable(2);
 	m_WingGraph[3].SetYVariable(3);
-	m_WingGraph[0].SetGraphName("Wing Graph 1");
-	m_WingGraph[1].SetGraphName("Wing Graph 2");
-	m_WingGraph[2].SetGraphName("Wing Graph 3");
-	m_WingGraph[3].SetGraphName("Wing Graph 4");
+	m_WingGraph[0].SetGraphName("Wing_Graph_1");
+	m_WingGraph[1].SetGraphName("Wing_Graph_2");
+	m_WingGraph[2].SetGraphName("Wing_Graph_3");
+	m_WingGraph[3].SetGraphName("Wing_Graph_4");
 
 	m_CpColor = QColor(255,100,150);
 	m_CpStyle = 0;
@@ -423,11 +423,8 @@ QMiarex::QMiarex(QWidget *parent)
 //	memset(m_pPanel, 0, sizeof(m_pPanel));
 
 
-	m_CpGraph.SetGraphName(tr("Cp Graph"));
+	m_CpGraph.SetGraphName("Cp_Graph");
 
-	m_CpColor = QColor(255,0,0);
-	m_CpStyle = 0;
-	m_CpWidth = 1;
 	m_bShowCp = true;
 	m_bShowCpPoints = false;
 
@@ -6546,7 +6543,7 @@ void QMiarex::LLTAnalyze(double V0, double VMax, double VDelta, bool bSequence, 
  */
 bool QMiarex::LoadSettings(QSettings *pSettings)
 {
-	int r,g,b;
+	QColor clr;
 	QString strong;
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	StabViewDlg *pStabView =(StabViewDlg*)pMainFrame->m_pStabView;
@@ -6602,10 +6599,7 @@ bool QMiarex::LoadSettings(QSettings *pSettings)
 
 		m_CpStyle = pSettings->value("CpStyle").toInt();
 		m_CpWidth = pSettings->value("CpWidth").toInt();
-		r = pSettings->value("CpColorRed").toInt();
-		g = pSettings->value("CpColorGreen").toInt();
-		b = pSettings->value("CpColorBlue").toInt();
-		m_CpColor = QColor(r,g,b);
+		m_CpColor = pSettings->value("CpColor", QColor(170, 120, 100)).value<QColor>();
 
 
         W3dPrefsDlg::s_MassColor = pSettings->value("MassColor", QColor(100, 100, 200)).value<QColor>();
@@ -12591,9 +12585,7 @@ bool QMiarex::SaveSettings(QSettings *pSettings)
 
 		pSettings->setValue("CpStyle", m_CpStyle );
 		pSettings->setValue("CpWidth", m_CpWidth );
-		pSettings->setValue("CpColorRed", m_CpColor.red() );
-		pSettings->setValue("CpColorGreen", m_CpColor.green() );
-		pSettings->setValue("CpColorBlue", m_CpColor.blue() );
+		pSettings->setValue("CpColor", m_CpColor);
 
 		pSettings->setValue("CvPrec", LLTAnalysis::s_CvPrec);
 		pSettings->setValue("RelaxMax", LLTAnalysis::s_RelaxMax);

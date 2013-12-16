@@ -53,9 +53,6 @@ void ObjectPropsDlg::SetupLayout()
 	m_pctrlDescription->setLineWrapMode(QTextEdit::NoWrap);
 	m_pctrlDescription->setWordWrapMode(QTextOption::NoWrap);
 
-//	QVBoxLayout *PropertiesLayout = new QVBoxLayout;
-//	PropertiesLayout->addWidget(lab);
-//	PropertiesLayout->addWidget(m_pctrlDescription);
 
 	QPushButton *OKButton = new QPushButton(tr("OK"));
 	QHBoxLayout *CommandButtons = new QHBoxLayout;
@@ -66,10 +63,8 @@ void ObjectPropsDlg::SetupLayout()
 
 	QVBoxLayout * MainLayout = new QVBoxLayout(this);
 	MainLayout->addWidget(m_pctrlDescription);
-//	MainLayout->addStretch(1);
 	MainLayout->addSpacing(20);
 	MainLayout->addLayout(CommandButtons);
-//	MainLayout->addStretch(1);
 
 	setLayout(MainLayout);
 }

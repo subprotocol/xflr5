@@ -696,24 +696,17 @@ void QGraph::SaveSettings(QSettings *pSettings)
 	{
 		//read variables
 		clr = GetAxisColor();
-		pSettings->setValue("AxisColorRed", clr.red());
-		pSettings->setValue("AxisColorGreen",clr.green());
-		pSettings->setValue("AxisColorBlue", clr.blue());
-
+		pSettings->setValue("AxisColor", clr);
 		k = GetAxisStyle();
 		pSettings->setValue("AxisStyle", k);
 		k = GetAxisWidth();
 		pSettings->setValue("AxisWidth", k);
 
 		clr = GetTitleColor();
-		pSettings->setValue("TitleColorRed", clr.red());
-		pSettings->setValue("TitleColorGreen",clr.green());
-		pSettings->setValue("TitleColorBlue", clr.blue());
+		pSettings->setValue("TitleColor", clr);
 
 		clr = GetLabelColor();
-		pSettings->setValue("LabelColorRed", clr.red());
-		pSettings->setValue("LabelColorGreen",clr.green());
-		pSettings->setValue("LabelColorBlue", clr.blue());
+		pSettings->setValue("LabelColor", clr);
 
 		GetTitleLogFont(&lgft);
 		pSettings->setValue("TitleFontName", lgft.family());
@@ -728,25 +721,19 @@ void QGraph::SaveSettings(QSettings *pSettings)
 		pSettings->setValue("LabelFontBold", lgft.bold());
 
 		GetXMajGrid(bs,clr,s,w);
-		pSettings->setValue("XMajGridColorRed", clr.red());
-		pSettings->setValue("XMajGridColorGreen",clr.green());
-		pSettings->setValue("XMajGridColorBlue", clr.blue());
+		pSettings->setValue("XMajGridColor", clr);
 		pSettings->setValue("XMajGridShow",bs);
 		pSettings->setValue("XMajGridStyle",s);
 		pSettings->setValue("XMajGridWidth",w);
 
 		GetYMajGrid(bs,clr,s,w);
-		pSettings->setValue("YMajGridColorRed", clr.red());
-		pSettings->setValue("YMajGridColorGreen",clr.green());
-		pSettings->setValue("YMajGridColorBlue", clr.blue());
+		pSettings->setValue("YMajGridColor", clr);
 		pSettings->setValue("YMajGridShow",bs);
 		pSettings->setValue("YMajGridStyle",s);
 		pSettings->setValue("YMajGridWidth",w);
 
 		GetXMinGrid(bs,ba,clr,s,w,f);
-		pSettings->setValue("XMinGridColorRed", clr.red());
-		pSettings->setValue("XMinGridColorGreen",clr.green());
-		pSettings->setValue("XMinGridColorBlue", clr.blue());
+		pSettings->setValue("XMinGridColor", clr);
 		pSettings->setValue("XMinGridAuto",ba);
 		pSettings->setValue("XMinGridShow",bs);
 		pSettings->setValue("XMinGridStyle",s);
@@ -754,9 +741,7 @@ void QGraph::SaveSettings(QSettings *pSettings)
 		pSettings->setValue("XMinGridUnit",f);
 
 		GetYMinGrid(bs,ba,clr,s,w,f);
-		pSettings->setValue("YMinGridColorRed", clr.red());
-		pSettings->setValue("YMinGridColorGreen",clr.green());
-		pSettings->setValue("YMinGridColorBlue", clr.blue());
+		pSettings->setValue("YMinGridColor", clr);
 		pSettings->setValue("YMinGridAuto",ba);
 		pSettings->setValue("YMinGridShow",bs);
 		pSettings->setValue("YMinGridStyle",s);
@@ -766,17 +751,13 @@ void QGraph::SaveSettings(QSettings *pSettings)
 		clr = GetBorderColor();
 		s   = GetBorderStyle();
 		w   = GetBorderWidth();
-		pSettings->setValue("BorderColorRed", clr.red());
-		pSettings->setValue("BorderColorGreen", clr.green());
-		pSettings->setValue("BorderColorBlue", clr.blue());
+		pSettings->setValue("BorderColor", clr);
 		pSettings->setValue("BorderStyle", s);
 		pSettings->setValue("BorderWidth", w);
 		pSettings->setValue("BorderShow", m_bBorder);
 
 		clr = GetBackColor();
-		pSettings->setValue("BackColorRed", clr.red());
-		pSettings->setValue("BackColorGreen", clr.green());
-		pSettings->setValue("BackColorBlue", clr.blue());
+		pSettings->setValue("BackgroundColor", clr);
 
 		pSettings->setValue("Inverted", m_bYInverted);
 
@@ -789,35 +770,25 @@ void QGraph::SaveSettings(QSettings *pSettings)
 
 void QGraph::LoadSettings(QSettings *pSettings)
 {
-	int k;
-
 	QFont lgft;
 	bool bs, ba;
 	int s,w;
 	int r,g,b;
 	double f;
+	QColor clr;
 
 	pSettings->beginGroup(m_GraphName);
 	{
 		//read variables
-		r = pSettings->value("AxisColorRed",255).toInt();
-		g = pSettings->value("AxisColorGreen",255).toInt();
-		b = pSettings->value("AxisColorBlue",255).toInt();
-		SetAxisColor(QColor(r,g,b));
+		clr = pSettings->value("AxisColor", QColor(255,255,255)).value<QColor>();
+		s = pSettings->value("AxisStyle",0).toInt();
+		w = pSettings->value("AxisWidth",1).toInt();
+		SetAxisData(s,w,clr);
 
-		k = pSettings->value("AxisStyle",0).toInt();
-		SetAxisStyle(k);
-		k = pSettings->value("AxisWidth",1).toInt();
-		SetAxisWidth(k);
-
-		r = pSettings->value("TitleColorRed",255).toInt();
-		g = pSettings->value("TitleColorGreen",255).toInt();
-		b = pSettings->value("TitleColorBlue",255).toInt();
-		SetTitleColor(QColor(r,g,b));
-		r = pSettings->value("LabelColorRed",255).toInt();
-		g = pSettings->value("LabelColorGreen",255).toInt();
-		b = pSettings->value("LabelColorBlue",255).toInt();
-		SetLabelColor(QColor(r,g,b));
+		clr = pSettings->value("TitleColor", QColor(255,255,255)).value<QColor>();
+		SetTitleColor(clr);
+		clr = pSettings->value("LabelColor", QColor(255,255,255)).value<QColor>();
+		SetLabelColor(clr);
 
 		lgft = QFont(pSettings->value("TitleFontName","Comic Sans MS").toString());
 		lgft.setPointSize(pSettings->value("TitleFontSize",8).toInt());
@@ -832,60 +803,48 @@ void QGraph::LoadSettings(QSettings *pSettings)
 		SetLabelLogFont(&lgft);
 
 
-		r  = pSettings->value("XMajGridColorRed",90).toInt();
-		g  = pSettings->value("XMajGridColorGreen",90).toInt();
-		b  = pSettings->value("XMajGridColorBlue",90).toInt();
+		clr  = pSettings->value("XMajGridColor", QColor(90,90,90)).value<QColor>();
 		bs = pSettings->value("XMajGridShow",true).toBool();
 		s  = pSettings->value("XMajGridStyle",1).toInt();
 		w  = pSettings->value("XMajGridWidth",1).toInt();
-		SetXMajGrid(bs,QColor(r,g,b),s,w);
+		SetXMajGrid(bs,clr,s,w);
 
-		r  = pSettings->value("YMajGridColorRed",90).toInt();
-		g  = pSettings->value("YMajGridColorGreen",90).toInt();
-		b  = pSettings->value("YMajGridColorBlue",90).toInt();
+		clr  = pSettings->value("YMajGridColor", QColor(90,90,90)).value<QColor>();
 		bs = pSettings->value("YMajGridShow",true).toBool();
 		s  = pSettings->value("YMajGridStyle",1).toInt();
 		w  = pSettings->value("YMajGridWidth",1).toInt();
-		SetYMajGrid(bs,QColor(r,g,b),s,w);
+		SetYMajGrid(bs,clr,s,w);
 
-		r  = pSettings->value("XMinGridColorRed",50).toInt();
-		g  = pSettings->value("XMinGridColorGreen",50).toInt();
-		b  = pSettings->value("XMinGridColorBlue",50).toInt();
+		clr  = pSettings->value("XMinGridColor", QColor(90,90,90)).value<QColor>();
 		ba = pSettings->value("XMinGridAuto",true).toBool();
 		bs = pSettings->value("XMinGridShow",false).toBool();
 		s  = pSettings->value("XMinGridStyle",2).toInt();
 		w  = pSettings->value("XMinGridWidth",1).toInt();
 		f  = pSettings->value("XMinGridUnit", 0.01).toDouble();
-		SetXMinGrid(bs,ba,QColor(r,g,b),s,w,f);
+		SetXMinGrid(bs,ba,clr,s,w,f);
 
-		r  = pSettings->value("YMinGridColorRed",50).toInt();
-		g  = pSettings->value("YMinGridColorGreen",50).toInt();
-		b  = pSettings->value("YMinGridColorBlue",50).toInt();
+		clr  = pSettings->value("YMinGridColor", QColor(90,90,90)).value<QColor>();
 		ba = pSettings->value("YMinGridAuto",true).toBool();
 		bs = pSettings->value("YMinGridShow",false).toBool();
 		s  = pSettings->value("YMinGridStyle",2).toInt();
 		w  = pSettings->value("YMinGridWidth",1).toInt();
 		f  = pSettings->value("YMinGridUnit",0.01).toDouble();
-		SetYMinGrid(bs,ba,QColor(r,g,b),s,w,f);
+		SetYMinGrid(bs,ba,clr,s,w,f);
 
-		r  = pSettings->value("BorderColorRed",200).toInt();
-		g  = pSettings->value("BorderColorGreen",200).toInt();
-		b  = pSettings->value("BorderColorBlue",200).toInt();
+		clr  = pSettings->value("BorderColor", QColor(200,200,200)).value<QColor>();
 		s  = pSettings->value("BorderStyle",0).toInt();
 		w  = pSettings->value("BorderWidth",2).toInt();
 		m_bBorder = pSettings->value("BorderShow", true).toBool();
-		SetBorderColor(QColor(r,g,b));
+		SetBorderColor(clr);
 		SetBorderStyle(s);
 		SetBorderWidth(w);
 
-		r  = pSettings->value("BackColorRed",0).toInt();
-		g  = pSettings->value("BackColorGreen",20).toInt();
-		b  = pSettings->value("BackColorBlue",20).toInt();
-		SetBkColor(QColor(r,g,b));
+		clr  = pSettings->value("BackgroundColor", QColor(15,19,20)).value<QColor>();
+		SetBkColor(clr);
 
 		m_bYInverted = pSettings->value("Inverted", false).toBool();
 
-		m_X  = pSettings->value("XVariable",1).toInt();
+		m_X  = pSettings->value("XVariable",0).toInt();
 		m_Y  = pSettings->value("YVariable",0).toInt();
 	}
 	pSettings->endGroup();
