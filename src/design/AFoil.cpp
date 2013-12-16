@@ -28,15 +28,15 @@
 #include <QHeaderView>
 #include <QHBoxLayout>
 
-#include "../globals.h"
-#include "../mainframe.h"
-#include "../misc/LinePickerDlg.h"
-#include "../xdirect/XFoil.h"
 #include "AFoil.h"
 #include "AFoilGridDlg.h"
 #include "AFoilTableDlg.h"
 #include "SplineCtrlsDlg.h"
 #include "LECircleDlg.h"
+#include "../globals.h"
+#include "../mainframe.h"
+#include "../misc/LinePickerDlg.h"
+#include "../xdirect/XFoil.h"
 #include "../xdirect/NacaFoilDlg.h"
 #include "../xdirect/CAddDlg.h"
 #include "../xdirect/TwoDPanelDlg.h"

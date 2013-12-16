@@ -35,7 +35,7 @@ WAdvancedDlg::WAdvancedDlg(QWidget *pParent) : QDialog(pParent)
 {
 	setWindowTitle(tr("Wing Analysis Advanced Settings"));
 
-	m_NStation  = 20;
+	m_NLLTStation  = 20;
 	m_AlphaPrec = 0.01;
 	m_Relax     = 20.;
 	m_Iter      = 100;
@@ -327,7 +327,7 @@ void WAdvancedDlg::OnResetDefaults()
 	m_Relax            = 20.0;
 	m_AlphaPrec        = 0.01;
 	m_Iter             = 100;
-	m_NStation         = 20;
+	m_NLLTStation         = 20;
 	m_MaxWakeIter      = 5;
 	m_CoreSize         = 0.0001;
 	m_MinPanelSize     = .001;
@@ -355,7 +355,7 @@ void WAdvancedDlg::ReadParams()
 	m_ControlPos      = m_pctrlControlPos->Value()/100.0;
 	m_WakeInterNodes  = (int)m_pctrlInterNodes->Value();
 	m_Iter            = (int)m_pctrlIterMax->Value();;
-	m_NStation        = (int)m_pctrlNStation->Value();
+	m_NLLTStation     = (int)m_pctrlNStation->Value();
 	m_bDirichlet      = m_pctrlDirichlet->isChecked();
 	m_bTrefftz        = true;
 	m_bResetWake      = m_pctrlResetWake->isChecked();
@@ -370,7 +370,7 @@ void WAdvancedDlg::SetParams()
 	m_pctrlIterMax->SetValue(m_Iter);
 	m_pctrlRelax->SetValue(m_Relax);
 	m_pctrlAlphaPrec->SetValue(m_AlphaPrec);
-	m_pctrlNStation->SetValue(m_NStation);
+	m_pctrlNStation->SetValue(m_NLLTStation);
 
 	m_pctrlCoreSize->SetValue(m_CoreSize* MainFrame::s_mtoUnit);
 	m_pctrlMaxWakeIter->SetValue(m_MaxWakeIter);

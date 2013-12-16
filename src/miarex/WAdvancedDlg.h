@@ -78,7 +78,7 @@ private:
 	bool m_bVLM1;
 
 	int m_Iter;
-	int m_NStation;
+	int m_NLLTStation;
 	int m_WakeInterNodes;
 	int m_MaxWakeIter;
 	int m_InducedDragPoint;

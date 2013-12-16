@@ -17,8 +17,9 @@ QWidget:item:hover
 
 QWidget:item:selected
 {
-	border: 1px yellow;
-	background-color: QLinearGradient( x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 darkgray, stop: 1 black);
+	border: 1px gray;
+	color: black;
+	background-color: lightgray;
 }
 
 QWidget:disabled
@@ -32,10 +33,10 @@ QWidget:disabled
 
 QGroupBox
 {
-	padding: 2ex 3px 0px 3px;
-/*	font-weight: bold; */
+/*	padding: 2ex 3px 0px 3px;*/
+/*	padding: 1ex;*/
 	color: papayawhip;
-	margin-top: 3ex;
+	margin-top: 2ex;
 	border-top: 1px solid dimgray;
 	border-right: 1px solid QLinearGradient(x1:0, y1:0, x2:0, y2:1, stop:0 dimgray, stop:1 #2a2a2a);
 	border-left: 1px solid QLinearGradient(x1:0, y1:0, x2:0, y2:1, stop:0 dimgray, stop:1 #2a2a2a);
@@ -57,6 +58,7 @@ QGroupBox::title
 
 QDockWidget
 {
+	padding: 3px;
 	font: bold;
 	color: oldlace;
 }
@@ -86,18 +88,24 @@ QDockWidget::close-button:pressed, QDockWidget::float-button:pressed
 }
 
 
-
-
 /*_____________________ Menu bar  ______________________*/
 
 QMenuBar::item
 {
-    background: transparent;
+	background: transparent;
+	color : ghostwhite;
+}
+
+QMenuBar::item:hover
+{
+	background: transparent;
+	color : yellow;
 }
 
 QMenuBar::item:selected
 {
-	background-color: #1f2c2a;
+	color: ghostwhite;
+	background-color: darkslategray;
 }
 
 
@@ -137,7 +145,7 @@ QMenu
 
 QMenu::item
 {
-	padding: 2px 20px 2px 20px;
+	padding: 2px 17px 2px 17px;
 	background-color: #1f2c2a;
 	color: white;
 }
@@ -197,11 +205,11 @@ QTableView QTableCornerButton::section
 
 QHeaderView::section
 {
-	background-color: QLinearGradient(x1:0, y1:0, x2:0, y2:1, stop:0 #616161, stop: 0.5 #505050, stop: 0.6 #434343, stop:1 #656565);
+	background-color: #2A3A3A;
 	color: ghostwhite;
 	padding-left: 4px;
-	border: 1px solid black;
-	min-height: 5ex;
+/*	border: 1px solid black;*/
+	min-height: 3ex;
 }
 
 
@@ -277,7 +285,7 @@ LineBtn
 	background-color: #101010;
 	border: 1px solid #7f7f7f;
 	border-radius: 5px;
-	min-height: 3.5ex;
+	min-height: 2.5ex;
 }
 
 LineBtn:hover
@@ -287,7 +295,7 @@ LineBtn:hover
 }
 
 
-LineBtn:disabled
+LineBtn:disabledm_pctrlPanelMethod
 {
 	background-color: #474747;
 }
@@ -300,7 +308,7 @@ QComboBox
 	background-color: #101010;
 	border: 1px solid #7f7f7f;
 	border-radius: 5px;
-	min-height: 3.5ex;
+	min-height: 2.5ex;
 	color: ghostwhite;
 }
 
@@ -310,7 +318,24 @@ QComboBox:disabled
 	color: #878787;
 }
 
-QComboBox QAbstractItemView 
+
+QComboBox:item
+{
+	background-color: #2A3A3A;
+	color: ghostwhite;
+}
+
+QComboBox:item:selected
+{
+	color: black;
+	background-color: gray;
+	border-radius: 5px;
+	border: 1px solid lightkhaki;
+}
+
+
+
+QComboBox QAbstractItemView
 {
 	background-color: #1f2c2a;
 	color: white;
@@ -332,19 +357,18 @@ QComboBox:on
 }
 
 
-QComboBox::drop-down
+/* defines the side drop-down arrow */
+/*QComboBox::drop-down
 {
-	/* defines the side drop-down arrow */
-
 	subcontrol-origin: padding;
 	subcontrol-position: top right;
 	border-left-width: 0px;
 	border-left-color: darkgray;
-	border-left-style: solid; /* just a single line */
-	border-top-right-radius: 5px; /* same radius as the QComboBox */
+	border-left-style: solid; 
+	border-top-right-radius: 5px; 
 	border-bottom-right-radius: 5px;
 }
-
+*/
 
 
 
@@ -649,7 +673,7 @@ QCheckBox
 {
 	color: white;
 	background-color: #2a2a2a;
-	padding: 2px;
+	padding: 1px;
 	border: 3px;
 	border-color: yellow;
 }
@@ -675,6 +699,7 @@ QCheckBox::indicator:checked
 {
     background-color: qradialgradient(cx:0.5, cy:0.5, radius: 0.7, fx:0.5, fy:0.5, stop:0 lightcoral, stop:1 black) ;
 }
+
 QCheckBox::indicator:checked:disabled
 {
     background-color: qradialgradient(cx:0.5, cy:0.5, radius: 0.7, fx:0.5, fy:0.5, stop:0 lightgray, stop:1 black) ;
@@ -695,7 +720,7 @@ QCheckBox::indicator:hover
 
 QRadioButton
 {
-    padding: 2px;
+    padding: 1px;
 }
 
 QRadioButton:disabled

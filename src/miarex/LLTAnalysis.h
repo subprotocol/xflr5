@@ -60,12 +60,14 @@ private:
     double Beta(int m, int k);
     double Eta(int m);
     void LLTComputeWing(double QInf, double Alpha, QString &ErrorMessage);
-    void LLTInitCl(double &QInf, double const Alpha);
-    void LLTInitialize(double QInf);
+    void LLTSetInitialCl(double &QInf, double const Alpha);
+	void LLTInitializeGeom();
     int LLTIterate(double &QInf, double const Alpha);
     void LLTSetBending(double QInf);
     bool LLTSetLinearSolution(double Alpha);
+	void ResetVariables();
     double Sigma(int m);
+
 
     void *m_pParent;                            /**< A void pointer to the instance of the LLTAnalysisDlg class */
     Wing * m_pWing;                             /**< A pointer to the Wing object for which the calculation shall be performed */

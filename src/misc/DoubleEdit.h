@@ -31,14 +31,14 @@
 class DoubleEdit : public QLineEdit
 {
 public:
-    DoubleEdit(QWidget *pParent=NULL);
+	DoubleEdit(QWidget *pParent=NULL);
 	DoubleEdit(double val, int decimals=2);
 
 	~DoubleEdit() {delete m_pDV;}
 
 	void focusOutEvent ( QFocusEvent * event );
 	void keyPressEvent(QKeyEvent *event);
-
+	QSize sizeHint() const;
 
 	double Value(){return m_Value;}
 	void SetValue(double val);

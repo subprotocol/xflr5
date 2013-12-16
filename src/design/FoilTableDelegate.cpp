@@ -24,6 +24,7 @@
 #include "FoilTableDelegate.h"
 #include "AFoil.h"
 #include "../globals.h"
+#include "../mainframe.h"
 
 void *FoilTableDelegate::s_pAFoil;
 
@@ -56,25 +57,6 @@ QWidget *FoilTableDelegate::createEditor(QWidget *parent, const QStyleOptionView
 }
 
 
-void FoilTableDelegate::drawCheck(QPainter *painter, const QStyleOptionViewItem &option, 
-								  const QRect &, Qt::CheckState state) const
-{
-	const int textMargin = QApplication::style()->pixelMetric(QStyle::PM_FocusFrameHMargin) + 1;
-
-/*	QRect checkRect = QStyle::alignedRect(option.direction, Qt::AlignCenter,
-										  check(option, option.rect, Qt::Checked).size(),
-										  QRect(option.rect.x() + textMargin, option.rect.y(),
-												option.rect.width() - (textMargin * 2), option.rect.height()));*/
-	QRect checkRect = QStyle::alignedRect(option.direction,
-										  Qt::AlignCenter,
-										  option.rect.size(),
-										  QRect(option.rect.x() + textMargin, option.rect.y(),
-												option.rect.width() - (2 * textMargin), option.rect.height()));
-
-	QItemDelegate::drawCheck(painter, option, checkRect, state);
-}
-
-
 bool FoilTableDelegate::editorEvent(QEvent *event, QAbstractItemModel *model, const QStyleOptionViewItem &option,
 									const QModelIndex &index)
 {
@@ -92,26 +74,19 @@ bool FoilTableDelegate::editorEvent(QEvent *event, QAbstractItemModel *model, co
 	if (event->type() == QEvent::MouseButtonRelease)
 	{
 		const int textMargin = QApplication::style()->pixelMetric(QStyle::PM_FocusFrameHMargin) + 1;
-/*		QRect checkRect = QStyle::alignedRect(option.direction, Qt::AlignCenter,
-											  check(option, option.rect, Qt::Checked).size(),
-											  QRect(option.rect.x() + textMargin, option.rect.y(),
-													option.rect.width() - (2 * textMargin), option.rect.height()));*/
 		QRect checkRect = QStyle::alignedRect(option.direction,
 											  Qt::AlignCenter,
 											  option.rect.size(),
 											  QRect(option.rect.x() + textMargin, option.rect.y(),
 													option.rect.width() - (2 * textMargin), option.rect.height()));
 
-/*
-QRect QStyle::alignedRect(Qt::LayoutDirection direction, Qt::Alignment alignment, const QSize & size, const QRect & rectangle) [static]
-Returns a new rectangle of the specified size that is aligned to the given rectangle according to the specified alignment and direction.*/
 
-		if (!checkRect.contains(static_cast<QMouseEvent*>(event)->pos())) return false;
+		if (!checkRect.contains(((QMouseEvent*)event)->pos())) return false;
 	}
 	else if (event->type() == QEvent::KeyPress)
 	{
-		if (   static_cast<QKeyEvent*>(event)->key() != Qt::Key_Space
-			&& static_cast<QKeyEvent*>(event)->key() != Qt::Key_Select)
+		if (   ((QKeyEvent*)event)->key() != Qt::Key_Space
+			&& ((QKeyEvent*)event)->key() != Qt::Key_Select)
 			return false;
 	}
 	else
@@ -167,21 +142,19 @@ void FoilTableDelegate::paint(QPainter *painter, const QStyleOptionViewItem &opt
 	else if(index.column()==12 || index.column()==13 || index.column()==14)
 	{
 		QVariant value = index.data(Qt::CheckStateRole);
-//		Qt::CheckState state = (static_cast<Qt::CheckState>(value.toInt()) == Qt::Checked ? Qt::Unchecked : Qt::Checked);
 		Qt::CheckState state;
 		if(value.toInt()==0)  state = Qt::Unchecked;
 		else                  state = Qt::Checked;
-		drawCheck(painter,myOption, myOption.rect, state);
-		drawFocus(painter, myOption, myOption.rect);
+		drawCheck(painter, myOption, myOption.rect, state);
+//		drawFocus(painter, myOption, myOption.rect);
 	}
 	else if(index.column()==15)
 	{
 		QColor color;
 		int style, width;
-		//get a link to the foil to get its style
+
 		if(index.row()==0)
 		{
-
 			color = pAFoil->m_pSF->m_FoilColor;
 			style = pAFoil->m_pSF->m_FoilStyle;
 			width = pAFoil->m_pSF->m_FoilWidth;
@@ -195,23 +168,18 @@ void FoilTableDelegate::paint(QPainter *painter, const QStyleOptionViewItem &opt
 		}
 		QRect r = option.rect;
 		r = pAFoil->m_pctrlFoilTable->visualRect(index);;
-		QColor ContourColor = Qt::gray;
-		
-		painter->setBrush(Qt::NoBrush);
-		painter->setBackgroundMode(Qt::TransparentMode);
+
+		painter->save();
 	
 		QPen LinePen(color);
-		LinePen.setStyle(::GetStyle(style));
+		LinePen.setStyle(GetStyle(style));
 		LinePen.setWidth(width);
 		painter->setPen(LinePen);
 		painter->drawLine(r.left()+5, r.top()+r.height()/2, r.right()-5, r.top()+r.height()/2);
-	
-		QPen ContourPen(ContourColor);
-		painter->setPen(ContourPen);
-		r.adjust(0,2,-1,-3);
-		painter->drawRoundRect(r,5,40);
-		
-		drawFocus(painter, myOption, myOption.rect);
+
+		painter->restore();
+
+//		drawFocus(painter, myOption, myOption.rect);
 	}
 	else
 	{
@@ -220,6 +188,55 @@ void FoilTableDelegate::paint(QPainter *painter, const QStyleOptionViewItem &opt
 		drawDisplay(painter, myOption, myOption.rect, strong);
 		drawFocus(painter, myOption, myOption.rect);
 	}
+}
+
+
+
+void FoilTableDelegate::drawCheck(QPainter *painter, const QStyleOptionViewItem &option,
+								  const QRect &, Qt::CheckState state) const
+{
+//	QItemDelegate::drawCheck(painter, option, checkRect, state);
+
+	QFontMetrics fm(MainFrame::s_TextFont);
+	int h23 = (int)((double)fm.height()*3./5.);//pixels
+	int h3 = (int)((double)fm.height()/3.5);//pixels
+	double h4 = (double)fm.height()/5.0;
+
+	QPoint center = option.rect.center();
+
+	QRect sR2 = QRect(center.x()-h23, center.y()-h23, 2*h23, 2*h23);
+	QRect sR3 = QRect(center.x()-h3, center.y()-h3, 2*h3, 2*h3);
+
+	painter->save();
+	painter->setRenderHint(QPainter::Antialiasing);
+	painter->setBrush(QApplication::palette().button());
+	painter->setBackgroundMode(Qt::TransparentMode);
+
+	QPen checkPen;
+
+	QColor drawClr = QApplication::palette().color(QPalette::Button);
+	QColor textClr = QApplication::palette().color(QPalette::ButtonText);
+
+	checkPen.setColor(drawClr);
+	checkPen.setWidth(1);
+	painter->setPen(checkPen);
+
+	painter->drawRoundedRect(sR2, h4, h4);
+
+	checkPen.setColor(textClr);
+	checkPen.setWidth(2);
+	painter->setPen(checkPen);
+
+	if(state==Qt::Checked)
+	{
+		painter->drawLine(sR3.left(), sR3.bottom(), sR3.right(), sR3.top());
+		painter->drawLine(sR3.left(), sR3.top(),    sR3.right(), sR3.bottom());
+	}
+	else
+	{
+
+	}
+	painter->restore();
 }
 
 

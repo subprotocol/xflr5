@@ -20,7 +20,7 @@
 *****************************************************************************/
 
 #include "DoubleEdit.h"
-
+#include "../mainframe.h"
 
 
 DoubleEdit::DoubleEdit(QWidget *pParent)
@@ -33,7 +33,7 @@ DoubleEdit::DoubleEdit(QWidget *pParent)
 	m_pDV->setDecimals(2);
 	setValidator(m_pDV);
 	setAlignment(Qt::AlignRight);
-	setSizePolicy(QSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred));
+	setSizePolicy(QSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding));
 }
 
 
@@ -46,10 +46,18 @@ DoubleEdit::DoubleEdit(double val, int decimals)
 	m_pDV->setDecimals(decimals);
 	setValidator(m_pDV);
 	setAlignment(Qt::AlignRight);
-	setSizePolicy(QSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred));
+	setSizePolicy(QSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding));
 }
 
 
+
+QSize DoubleEdit::sizeHint() const
+{
+	QFontMetrics fm(MainFrame::s_TextFont);
+	int w = 7 * fm.averageCharWidth();
+	int h = fm.height();
+	return QSize(w, h);
+}
 
 
 void DoubleEdit::focusOutEvent (QFocusEvent *event)

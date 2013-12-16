@@ -778,6 +778,7 @@ void WPolarDlg::SetupLayout()
 			AeroDataLayout->addWidget(m_pctrlNu,3,1);
 			AeroDataLayout->addWidget(m_pctrlViscosity,3,2);
 			AeroDataLayout->addWidget(m_pctrlViscosityUnit,3,3);
+			AeroDataLayout->setRowStretch(4,1);
 		}
 		AeroDataGroupBox->setLayout(AeroDataLayout);
 	}
@@ -809,6 +810,7 @@ void WPolarDlg::SetupLayout()
 			GroundLayout->addWidget(lab10,2,1);
 			GroundLayout->addWidget(m_pctrlHeight,2,2);
 			GroundLayout->addWidget(m_pctrlLengthUnit2,2,3);
+			GroundLayout->setRowStretch(3,1);
 		}
 		GroundGroupBox->setLayout(GroundLayout);
 	}

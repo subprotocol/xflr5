@@ -27,6 +27,7 @@
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 
+
 #include "LLTAnalysisDlg.h"
 #include "Miarex.h"
 #include "../mainframe.h"
@@ -79,7 +80,7 @@ LLTAnalysisDlg::LLTAnalysisDlg(QWidget *pParent) : QDialog(pParent)
 	m_LegendPlace.rx() = 0;
 	m_LegendPlace.ry() = 0;
 
-	m_AlphaMin = m_AlphaMax = m_AlphaDelta = 0.;
+	m_VMin = m_VMax = m_VDelta = 0.;
 	m_ReMin = m_ReMax = m_ReDelta = 0.0;
 
 	m_pXFile       = NULL;
@@ -111,12 +112,11 @@ bool LLTAnalysisDlg::AlphaLoop()
 	str = QString(tr("Number of stations = %1")+"\n\n").arg(LLTAnalysis::s_NLLTStations);
 	UpdateOutput(str);
 	
-	if(m_AlphaMax<m_AlphaMin) m_AlphaDelta = -qAbs(m_AlphaDelta);
-	int ia  = (int)qAbs((m_AlphaMax-m_AlphaMin)*1.001/m_AlphaDelta);
+	if(m_VMax<m_VMin) m_VDelta = -qAbs(m_VDelta);
+	int ia  = (int)qAbs((m_VMax-m_VMin)*1.001/m_VDelta);
 
 	if(!m_bSequence) ia = 0;
 
-	m_LLT.LLTInitialize(m_pWPolar->m_QInf);
 
 	m_IterGraph.ResetLimits();
 	m_IterGraph.SetXMax((double)m_IterLim);
@@ -126,7 +126,7 @@ bool LLTAnalysisDlg::AlphaLoop()
 
 	for (i=0; i<=ia; i++)
 	{
-		Alpha = m_AlphaMin +(double)i * m_AlphaDelta;
+		Alpha = m_VMin +(double)i * m_VDelta;
 		if(m_bCancel) 
 		{
 			str = tr("Analysis cancelled on user request....")+"\n";
@@ -138,7 +138,7 @@ bool LLTAnalysisDlg::AlphaLoop()
 		Curve *pCurve = m_IterGraph.GetCurve(0);
 		pCurve->clear();
 
-		m_LLT.LLTInitCl(m_pWPolar->m_QInf, Alpha);
+		m_LLT.LLTSetInitialCl(m_pWPolar->m_QInf, Alpha);
 		if(m_bInitCalc) m_LLT.LLTSetLinearSolution(Alpha);
 
 		str= QString(tr("Calculating Alpha = %1... ")).arg(Alpha,5,'f',2);
@@ -176,6 +176,7 @@ bool LLTAnalysisDlg::AlphaLoop()
 				pMiarex->UpdateView();
 			}
 			m_bInitCalc = false;
+
 		}
 		else 
 		{
@@ -217,15 +218,13 @@ bool LLTAnalysisDlg::QInfLoop()
 	str = QString(tr("Number of stations = %1")+"\n\n").arg(LLTAnalysis::s_NLLTStations);
 	UpdateOutput(str);
 	
-	if(m_AlphaMax<m_AlphaMin) m_AlphaDelta = -(double)qAbs(m_AlphaDelta);
-	int ia  = (int)qAbs((m_AlphaMax-m_AlphaMin)*1.001/m_AlphaDelta);
+	if(m_VMax<m_VMin) m_VDelta = -(double)qAbs(m_VDelta);
+	int ia  = (int)qAbs((m_VMax-m_VMin)*1.001/m_VDelta);
 
 	if(!m_bSequence) ia = 0;
 
 	str = tr("Initializing analysis...")+"\n";
 	UpdateOutput(str);
-
-	m_LLT.LLTInitialize(m_AlphaMin);
 
 	m_IterGraph.ResetLimits();
 	m_IterGraph.SetXMax((double)m_IterLim);
@@ -234,7 +233,7 @@ bool LLTAnalysisDlg::QInfLoop()
 	double QInf;
 	for (i=0; i<=ia; i++)
 	{
-		QInf = m_AlphaMin + (double)i * m_AlphaDelta;
+		QInf = m_VMin + (double)i * m_VDelta;
 		if(m_bCancel) 
 		{
 			str = tr("Analysis cancelled on user request....")+"\n";
@@ -246,7 +245,7 @@ bool LLTAnalysisDlg::QInfLoop()
 		pCurve->clear();
 
 		if(m_bInitCalc) m_LLT.LLTSetLinearSolution(m_pWPolar->m_ASpec);
-		 m_LLT.LLTInitCl(QInf, m_pWPolar->m_ASpec);
+		 m_LLT.LLTSetInitialCl(QInf, m_pWPolar->m_ASpec);
 		
 		str = QString(tr("Calculating QInf = %1... ")).arg(QInf,6,'f',2);
 		UpdateOutput(str);
@@ -308,9 +307,13 @@ bool LLTAnalysisDlg::QInfLoop()
 /**
 *Initializes the dialog and its associated data.
 */
-void LLTAnalysisDlg::InitDialog()
+void LLTAnalysisDlg::InitDialog(Wing *pWing, WPolar *pWPolar)
 {
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
+
+	m_pWing   = pWing;
+	m_pWPolar = pWPolar;
+
 	QString FileName = QDir::tempPath() + "/XFLR5.log";
 	m_pXFile = new QFile(FileName);
 	if (!m_pXFile->open(QIODevice::WriteOnly | QIODevice::Text)) m_pXFile = NULL;
@@ -340,6 +343,13 @@ void LLTAnalysisDlg::InitDialog()
 
 	m_IterGraph.SetMargin(40);
 	if(pMainFrame) m_IterGraph.CopySettings(&pMainFrame->m_RefGraph,false);
+
+
+	m_LLT.m_pWing    = m_pWing;
+	m_LLT.m_pWPolar  = m_pWPolar;
+	m_LLT.m_poaPolar = &MainFrame::s_oaPolar;
+	m_LLT.ResetVariables();
+	m_LLT.LLTInitializeGeom();
 
 	m_LLT.m_IterLim = m_IterLim;
 }
@@ -399,9 +409,9 @@ void LLTAnalysisDlg::ResetCurves()
 */
 void LLTAnalysisDlg::SetAlpha(double AlphaMin, double AlphaMax, double DeltaAlpha)
 {
-	m_AlphaMin = AlphaMin;
-	m_AlphaMax = AlphaMax;
-	m_AlphaDelta = DeltaAlpha;
+	m_VMin = AlphaMin;
+	m_VMax = AlphaMax;
+	m_VDelta = DeltaAlpha;
 }
 
 
@@ -487,7 +497,6 @@ void LLTAnalysisDlg::SetupLayout()
 */
 void LLTAnalysisDlg::StartAnalysis()
 {
-	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	//all set to launch the analysis
 	if(!m_pWPolar || !m_pWing) return;
 
@@ -500,11 +509,6 @@ void LLTAnalysisDlg::StartAnalysis()
 	m_bFinished   = false;
 
 	m_pctrlTextOutput->clear();
-
-	m_LLT.m_poaPolar = &pMainFrame->s_oaPolar;
-	m_LLT.m_pWing = m_pWing;
-	m_LLT.m_pWPolar = m_pWPolar;
-	m_LLT.LLTInitialize(m_pWPolar->m_QInf);
 
 
 	if (m_pWPolar->m_WPolarType!=FIXEDAOAPOLAR)

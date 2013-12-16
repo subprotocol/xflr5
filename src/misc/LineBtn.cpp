@@ -34,7 +34,7 @@ LineBtn::LineBtn(QWidget *parent)
     : QAbstractButton(parent)
 {
 	QSizePolicy szPolicyExpanding;
-	szPolicyExpanding.setHorizontalPolicy(QSizePolicy::MinimumExpanding);
+	szPolicyExpanding.setHorizontalPolicy(QSizePolicy::Preferred);
 	szPolicyExpanding.setVerticalPolicy(QSizePolicy::Minimum);
 	setSizePolicy(szPolicyExpanding);
 
@@ -59,7 +59,7 @@ void LineBtn::mouseReleaseEvent(QMouseEvent *event)
 QSize LineBtn::sizeHint() const
 {
 	QFontMetrics fm(MainFrame::s_TextFont);
-	int w = 13 * fm.averageCharWidth();
+	int w = 7 * fm.averageCharWidth();
 	int h = fm.height();
 	return QSize(w, h);
 }

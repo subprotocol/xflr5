@@ -193,7 +193,7 @@ QMiarex::QMiarex(QWidget *parent)
 
 
 	m_NSurfaces =   0;
-	m_NStation  =  20;
+
 	m_Iter      = 100;
 	LLTAnalysis::s_CvPrec    =   0.01;
 	LLTAnalysis::s_RelaxMax  =  20.0;
@@ -1127,24 +1127,27 @@ void QMiarex::AddWOpp(double QInf, double Alpha, bool bPointOut, double *Gamma, 
 
             pNewPoint->ReleasePanelSizeArrays();
 
-			for (l=1; l<m_pCurWing->m_NStation; l++)
+			pNewPoint->m_NStation = LLTAnalysis::s_NLLTStations;
+			int nStation = m_pCurWing->m_NStation;
+
+			for (l=1; l<nStation; l++)
 			{
 				pNewPoint->m_SpanPos[l]       = -(float)m_pLLTDlg->m_LLT.m_SpanPos[l];
 				pNewPoint->m_StripArea[l]     =  (float)m_pLLTDlg->m_LLT.m_StripArea[l];
-				pNewPoint->m_Ai[l]            =  (float)m_pLLTDlg->m_LLT.m_Ai[m_NStation-l];
-				pNewPoint->m_Cl[l]            =  (float)m_pLLTDlg->m_LLT.m_Cl[m_NStation-l];
-				pNewPoint->m_PCd[l]           =  (float)m_pLLTDlg->m_LLT.m_PCd[m_NStation-l];
-				pNewPoint->m_ICd[l]           =  (float)m_pLLTDlg->m_LLT.m_ICd[m_NStation-l];
-				pNewPoint->m_Cm[l]            =  (float)m_pLLTDlg->m_LLT.m_Cm[m_NStation-l];
-				pNewPoint->m_CmAirf[l]        =  (float)m_pLLTDlg->m_LLT.m_CmAirf[m_NStation-l];
-				pNewPoint->m_XCPSpanRel[l]    =  (float)m_pLLTDlg->m_LLT.m_XCPSpanRel[m_NStation-l];
-				pNewPoint->m_XCPSpanAbs[l]    =  (float)m_pLLTDlg->m_LLT.m_XCPSpanAbs[m_NStation-l];
-				pNewPoint->m_Re[l]            =  (float)m_pLLTDlg->m_LLT.m_Re[m_NStation-l];
-				pNewPoint->m_Chord[l]         =  (float)m_pLLTDlg->m_LLT.m_Chord[m_NStation-l];
-				pNewPoint->m_Twist[l]         =  (float)m_pLLTDlg->m_LLT.m_Twist[m_NStation-l];
-				pNewPoint->m_XTrTop[l]        =  (float)m_pLLTDlg->m_LLT.m_XTrTop[m_NStation-l];
-				pNewPoint->m_XTrBot[l]        =  (float)m_pLLTDlg->m_LLT.m_XTrBot[m_NStation-l];
-				pNewPoint->m_BendingMoment[l] =  (float)m_pLLTDlg->m_LLT.m_BendingMoment[m_NStation-l];
+				pNewPoint->m_Ai[l]            =  (float)m_pLLTDlg->m_LLT.m_Ai[nStation-l];
+				pNewPoint->m_Cl[l]            =  (float)m_pLLTDlg->m_LLT.m_Cl[nStation-l];
+				pNewPoint->m_PCd[l]           =  (float)m_pLLTDlg->m_LLT.m_PCd[nStation-l];
+				pNewPoint->m_ICd[l]           =  (float)m_pLLTDlg->m_LLT.m_ICd[nStation-l];
+				pNewPoint->m_Cm[l]            =  (float)m_pLLTDlg->m_LLT.m_Cm[nStation-l];
+				pNewPoint->m_CmAirf[l]        =  (float)m_pLLTDlg->m_LLT.m_CmAirf[nStation-l];
+				pNewPoint->m_XCPSpanRel[l]    =  (float)m_pLLTDlg->m_LLT.m_XCPSpanRel[nStation-l];
+				pNewPoint->m_XCPSpanAbs[l]    =  (float)m_pLLTDlg->m_LLT.m_XCPSpanAbs[nStation-l];
+				pNewPoint->m_Re[l]            =  (float)m_pLLTDlg->m_LLT.m_Re[nStation-l];
+				pNewPoint->m_Chord[l]         =  (float)m_pLLTDlg->m_LLT.m_Chord[nStation-l];
+				pNewPoint->m_Twist[l]         =  (float)m_pLLTDlg->m_LLT.m_Twist[nStation-l];
+				pNewPoint->m_XTrTop[l]        =  (float)m_pLLTDlg->m_LLT.m_XTrTop[nStation-l];
+				pNewPoint->m_XTrBot[l]        =  (float)m_pLLTDlg->m_LLT.m_XTrBot[nStation-l];
+				pNewPoint->m_BendingMoment[l] =  (float)m_pLLTDlg->m_LLT.m_BendingMoment[nStation-l];
 				if(qAbs(m_pLLTDlg->m_LLT.m_BendingMoment[l])>qAbs(Cb))	Cb = m_pLLTDlg->m_LLT.m_BendingMoment[l];
 			}
 		}
@@ -6517,17 +6520,15 @@ void QMiarex::LLTAnalyze(double V0, double VMax, double VDelta, bool bSequence, 
 
 	m_pLLTDlg->m_bInitCalc = bInitCalc;
 
-	m_pLLTDlg->m_pWing      = m_pCurWing;
-	m_pLLTDlg->m_pWPolar    = m_pCurWPolar;
 	m_pLLTDlg->m_bSequence  = bSequence;
 
-	m_pLLTDlg->m_AlphaMin   = V0;
-	m_pLLTDlg->m_AlphaMax   = VMax;
-	m_pLLTDlg->m_AlphaDelta = VDelta;
+	m_pLLTDlg->m_VMin   = V0;
+	m_pLLTDlg->m_VMax   = VMax;
+	m_pLLTDlg->m_VDelta = VDelta;
 
 	m_pLLTDlg->m_IterLim = m_Iter;
 
-	m_pLLTDlg->InitDialog();
+	m_pLLTDlg->InitDialog(m_pCurWing, m_pCurWPolar);
 	m_pLLTDlg->show();
 	m_pLLTDlg->StartAnalysis();
 
@@ -6648,7 +6649,7 @@ bool QMiarex::LoadSettings(QSettings *pSettings)
 		else if(m_iView==WSTABVIEW)  m_pCurGraph=m_pCurRLStabGraph;
 
 		m_Iter         = pSettings->value("Iter").toInt();
-		m_NStation     = pSettings->value("NStation").toInt();
+//		m_NStation     = pSettings->value("NStation").toInt();
 		GL3dBodyDlg::s_NHoopPoints  = pSettings->value("NHoopPoints").toInt();
 		GL3dBodyDlg::s_NXPoints     = pSettings->value("NXPoints").toInt();
 		m_InducedDragPoint  = pSettings->value("InducedDragPoint").toInt();
@@ -7902,7 +7903,7 @@ void QMiarex::OnAdvancedSettings()
 	WAdvancedDlg waDlg((MainFrame*)s_pMainFrame);
 	waDlg.m_AlphaPrec       = LLTAnalysis::s_CvPrec;
 	waDlg.m_Relax           = LLTAnalysis::s_RelaxMax;
-	waDlg.m_NStation        = LLTAnalysis::s_NLLTStations;
+	waDlg.m_NLLTStation     = LLTAnalysis::s_NLLTStations;
 	waDlg.m_Iter            = m_Iter;
 	waDlg.m_MaxWakeIter     = m_MaxWakeIter;
 	waDlg.m_CoreSize        = s_CoreSize;
@@ -7922,7 +7923,7 @@ void QMiarex::OnAdvancedSettings()
 	{
 		LLTAnalysis::s_CvPrec        = waDlg.m_AlphaPrec;
 		LLTAnalysis::s_RelaxMax      = waDlg.m_Relax;
-		LLTAnalysis::s_NLLTStations  = waDlg.m_NStation;
+		LLTAnalysis::s_NLLTStations  = waDlg.m_NLLTStation;
 		m_Iter                 = waDlg.m_Iter;
 		m_MaxWakeIter          = waDlg.m_MaxWakeIter;
 		s_CoreSize             = waDlg.m_CoreSize;
@@ -12680,7 +12681,7 @@ bool QMiarex::SaveSettings(QSettings *pSettings)
 		else if(m_iView==WPOLARVIEW) m_pCurGraph=m_pCurWPlrGraph;
 
 		pSettings->setValue("Iter", m_Iter);
-		pSettings->setValue("NStation", m_NStation);
+//		pSettings->setValue("NStation", m_NStation);
 		pSettings->setValue("InducedDragPoint", m_InducedDragPoint);
 		pSettings->setValue("NHoopPoints", GL3dBodyDlg::s_NHoopPoints);
 		pSettings->setValue("NXPoints", GL3dBodyDlg::s_NXPoints);

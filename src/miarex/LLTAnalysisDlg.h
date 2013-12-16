@@ -69,7 +69,7 @@ class LLTAnalysisDlg : public QDialog
 public:
     LLTAnalysisDlg(QWidget *pParent);
 
-	void InitDialog();
+	void InitDialog(Wing *pWing, WPolar *pWPolar);
 	void UpdateGraph(int x, double y);
 
 private slots:
@@ -98,9 +98,9 @@ private:
 	static void *s_pMainFrame;  /**< A static pointer to the unique instance of the MainFrame class. */
     static QPoint s_Position;   /**< the position on the client area of he dialog's topleft corner */
 
-    double m_AlphaMin;          /**< The starting aoa for the analysis of type 1 & 2 polars */
-	double m_AlphaMax;          /**< The ending aoa for the analysis of type 1 & 2 polars */
-	double m_AlphaDelta;        /**< The aoa increment for the analysis of type 1 & 2 polars */
+	double m_VMin;          /**< The starting aoa for the analysis of type 1 & 2 polars */
+	double m_VMax;          /**< The ending aoa for the analysis of type 1 & 2 polars */
+	double m_VDelta;        /**< The aoa increment for the analysis of type 1 & 2 polars */
 	bool m_bCancel;             /**< true if the user has cancelled the analysis */
 	bool m_bError;              /**< true if the analysis couldn't converge within the max number of iterations */
 	bool m_bExit;               /**< true if the analysis should be interrupted - either skipped or cancelled */

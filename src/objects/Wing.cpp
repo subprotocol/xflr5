@@ -963,79 +963,28 @@ void Wing::ComputeChords(int NStation)
 *@param *offset pointer to the array of offset positions at the span stations
 *@param *twist pointer to the array of twist values at the span stations
 */
-void Wing::ComputeChords(int NStation, double *chord, double *offset, double *twist)
+void Wing::ComputeChords(int NStation, double *chord, double *offset)
 {
-	int m;
 	double y, yob, tau;
-	double x0,y0,y1,y2;
-	double SpanPosition[MAXSPANSTATIONS];
-	CVector C;
 
-	if(NStation !=0)
-	{//LLT based
-		m_NStation = NStation;
+	if(NStation ==0) return;
 
-		for (int k=0; k<=NStation; k++)
-		{
-			yob   = cos(k*PI/NStation);
-			y = qAbs(yob * m_PlanformSpan/2);
-			for (int is=0; is<NWingSection(); is++)
-			{
-				if(YPosition(is) < y && y <=YPosition(is+1))
-				{
-					tau = (y-YPosition(is))/(YPosition(is+1)-YPosition(is));
-					chord[k]  = Chord(is)+(Chord(is+1)-Chord(is)) * tau;
-					offset[k] = Offset(is)+(Offset(is+1)-Offset(is)) * tau;
-					break;
-				}
-			}
-		}
-	}
-	else
+	m_NStation = NStation;
+
+	for (int k=0; k<=NStation; k++)
 	{
-		//VLM Mesh based
-		m_NStation    = 0;
-		m = 0;
-
-		x0 = m_Surface[m_NSurfaces/2].m_LA.x;
-		y0 = m_Surface[m_NSurfaces/2].m_LA.y;
-
-		for (int j=m_NSurfaces/2; j<m_NSurfaces; j++)
+		yob   = cos(k*PI/NStation);
+		y = qAbs(yob * m_PlanformSpan/2);
+		for (int is=0; is<NWingSection(); is++)
 		{
-			for (int k=0; k<m_Surface[j].m_NYPanels; k++)
+			if(YPosition(is) < y && y <=YPosition(is+1))
 			{
-				//calculate span positions at each station
-				m_Surface[j].GetyDist(k, y1, y2);
-				SpanPosition[m] = y0 + (y1+y2)/2.0*m_Surface[j].m_Length;
-				m++;
-			}
-			y0+=m_Surface[j].m_Length;
-		}
-
-		m_NStation = 2*m;
-		for (m=0; m<m_NStation/2; m++)
-		{
-			m_SpanPos[m] = -SpanPosition[m_NStation/2-m-1];
-			m_SpanPos[m+m_NStation/2] = SpanPosition[m];
-		}
-
-		m=0;
-		for (int j=0; j<m_NSurfaces; j++)
-		{
-			for (int k=0; k<m_Surface[j].m_NYPanels; k++)
-			{
-				//calculate chords and offsets at each station
-				chord[m]     = m_Surface[j].GetChord(k);
-//				m_StripArea[m] = m_Chord[m]* m_Surface[j].Getdl(k);
-
-				m_Surface[j].GetLeadingPt(k, C);
-				offset[m] = C.x-x0;
-
-				twist[m]  = m_Surface[j].GetTwist(k);
-				m++;
+				tau = (y-YPosition(is))/(YPosition(is+1)-YPosition(is));
+				chord[k]  = Chord(is)+(Chord(is+1)-Chord(is)) * tau;
+				offset[k] = Offset(is)+(Offset(is+1)-Offset(is)) * tau;
+				break;
 			}
 		}
-		m_NStation = m;
 	}
 }
 

@@ -106,7 +106,7 @@ public:
 	void GetFoils(Foil **pFoil0, Foil **pFoil1, double y, double &t);
 	void Duplicate(Wing *pWing);
 	void ComputeChords(int NStation=0);
-	void ComputeChords(int NStation, double *chord, double *offset, double *twist);
+	void ComputeChords(int NStation, double *chord, double *offset);
 	void ComputeGeometry();
 	void ComputeVolumeInertia(CVector &CoG, double &CoGIxx, double &CoGIyy, double &CoGIzz, double &CoGIxz);
 	void ComputeBodyAxisInertia();

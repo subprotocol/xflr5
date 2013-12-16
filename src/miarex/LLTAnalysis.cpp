@@ -25,6 +25,8 @@
 #include "LLTAnalysis.h"
 #include "LLTAnalysisDlg.h"
 #include <QString>
+#include <QtDebug>
+
 
 int LLTAnalysis::s_NLLTStations = 0;
 double LLTAnalysis::s_RelaxMax = 0.0;
@@ -39,7 +41,12 @@ LLTAnalysis::LLTAnalysis(void *pParent)
 	m_pWing = NULL;
 	m_pWPolar = NULL;
 	m_poaPolar = NULL;
+	ResetVariables();
+}
 
+
+void LLTAnalysis::ResetVariables()
+{
 	m_bSkip      = false;
 	m_bCancel    = false;
 	m_bConverged = false;
@@ -88,15 +95,16 @@ LLTAnalysis::LLTAnalysis(void *pParent)
 
 
 
-void LLTAnalysis::LLTInitCl(double &QInf, double const Alpha)
+void LLTAnalysis::LLTSetInitialCl(double &QInf, double const Alpha)
 {
-	//Initializes the Reynolds numbers and lift coefficients for the initial iteration in LLT
+	//Initializes the Reynolds numbers and lift coefficients for the first iteration in LLT
 
 	Foil *pFoil0 = NULL;
 	Foil *pFoil1 = NULL;
 	double yob, tau;
 	int k;
 	bool bOutRe, bError;
+
 	for (k=1; k<s_NLLTStations; k++)
 	{
 		yob   = cos(k*PI/s_NLLTStations);
@@ -257,7 +265,7 @@ void LLTAnalysis::LLTComputeWing(double QInf, double Alpha, QString &ErrorMessag
 		}
 	}
 
-	m_CL            =  Integral0   * m_pWing->m_AR /m_pWing->m_PlanformSpan;
+	m_CL    =  Integral0   * m_pWing->m_AR /m_pWing->m_PlanformSpan;
 	m_CDi   =  InducedDrag * m_pWing->m_AR /m_pWing->m_PlanformSpan  * PI / 180.0;
 	m_CDv   =  ViscousDrag / m_pWing->m_GChord;
 
@@ -328,66 +336,84 @@ void LLTAnalysis::LLTSetBending(double QInf)
 }
 
 
-
 bool LLTAnalysis::LLTSetLinearSolution(double Alpha)
 {
-	double aij[MAXSPANSTATIONS*MAXSPANSTATIONS];// coefficient matrix
-	double rhs[MAXSPANSTATIONS+1];//right hand side
+	double* aij = new double[s_NLLTStations*s_NLLTStations];
+	double* rhs = new double[s_NLLTStations+1];
 
 	memset(aij, 0, sizeof(aij));
 	memset(rhs, 0, sizeof(rhs));
 
 	Foil *pFoil0, *pFoil1;
 	int i,j,p;
-	double fr  = s_NLLTStations;
-	double fj, t0, st0, snt0, c, a0, slope, tau, yob;
-	double cs = m_pWing->Chord(0);
+	int size = s_NLLTStations-1;
+	double dn  = (double)s_NLLTStations;
+	double di, dj, t0, st0, snt0, ch, a0, slope, tau, yob, twist;
+	double cs = m_pWing->RootChord();
+	double b  = m_pWing->m_PlanformSpan;
 
 	for (i=1; i<s_NLLTStations; i++)
 	{
-		c   = m_Chord[i];
-		t0  = i * PI/fr;
+		di  = (double)i;
+		t0  = di * PI/dn;
+		yob = cos(t0);
+		ch = m_pWing->Chord(yob);      //or m_Chord[i], same
+		twist = m_pWing->Twist(yob);   //or m_Twist[i], same
+
 		st0 = sin(t0);
+
+
 		for (j=1; j<s_NLLTStations; j++)
 		{
-			fj = double(j);
-			snt0 = sin(fj*t0);
-			p = (i-1)*(s_NLLTStations-1)+j-1;
-			aij[p]  = snt0 + c*PI/m_pWing->m_PlanformSpan/2.0* fj*snt0/st0;
+			dj   = (double)j;
+			snt0 = sin(dj*t0);
+
+			p = (i-1)*size + (j-1);
+			aij[p]  = snt0 + ch*PI/b/2.0* dj*snt0/st0;
 		}
-		yob   = cos(i*PI/s_NLLTStations);
-		m_pWing->GetFoils(&pFoil0, &pFoil1, yob*m_pWing->m_PlanformSpan/2.0, tau);
-        a0 = GetZeroLiftAngle(pFoil0, pFoil1, m_Re[i], tau);
-		rhs[i] = c/cs * (Alpha-a0+m_Twist[i])/180.0*PI;
+
+		m_pWing->GetFoils(&pFoil0, &pFoil1, yob*b/2.0, tau);
+		a0 = GetZeroLiftAngle(pFoil0, pFoil1, m_Re[i], tau);
+		rhs[i] = ch/cs * (Alpha-a0+twist)/180.0*PI;
 	}
 
 	bool bCancel = false;
-	if(!Gauss(aij,s_NLLTStations-1, rhs+1,0,&bCancel)) return false;
-
+	if(!Gauss(aij, s_NLLTStations-1, rhs+1, 1, &bCancel))
+	{
+		delete [] aij;
+		delete [] rhs;
+		return false;
+	}
 
 	for (i=1; i<s_NLLTStations; i++)
 	{
-		t0  = i * PI/fr;
+		t0  = i * PI/dn;
 		m_Cl[i] = 0.0;
 		for (j=1; j<s_NLLTStations; j++)
 		{
-			fj = double(j);
-			snt0 = sin(fj*t0);
+			dj = double(j);
+			snt0 = sin(dj*t0);
 			m_Cl[i] += rhs[j]* snt0;
 		}
 		yob   = cos(i*PI/s_NLLTStations);
-		m_pWing->GetFoils(&pFoil0, &pFoil1, yob*m_pWing->m_PlanformSpan/2.0, tau);
-        GetLinearizedPolar(pFoil0, pFoil1, m_Re[i], tau, a0, slope);
-        a0 = GetZeroLiftAngle(pFoil0, pFoil1, m_Re[i], tau);//better approximation ?
+		m_pWing->GetFoils(&pFoil0, &pFoil1, yob*b/2.0, tau);
+		GetLinearizedPolar(pFoil0, pFoil1, m_Re[i], tau, a0, slope);
+		a0 = GetZeroLiftAngle(pFoil0, pFoil1, m_Re[i], tau); //better approximation ?
+
 		m_Cl[i] *= slope*180.0/PI*cs/m_Chord[i];
 		m_Ai[i]  = -(Alpha-a0+m_Twist[i]) + m_Cl[i]/slope;
 	}
 
+/*	qDebug()<<"______Linear_________";
+	for (int in=0; in< s_NLLTStations; in++)
+	{
+		qDebug("%13.7f   %13.7f", m_Ai[in], m_Cl[in]);
+	}*/
+
+	delete [] aij;
+	delete [] rhs;
 	return true;
 }
-
-
-
 
 
 double LLTAnalysis::Sigma(int m)
@@ -502,36 +528,29 @@ int LLTAnalysis::LLTIterate(double &QInf, double Alpha)
 }
 
 
-
-void LLTAnalysis::LLTInitialize(double QInf)
+/**
+ * Initializes the LLT calculation
+*/
+void LLTAnalysis::LLTInitializeGeom()
 {
-	//
-	// Initializes the LLT calculation
-	//
+	double yj, yjm, yjp, dy;
 	double y;
 	int k;
 	m_bWingOut = false;
 	m_bConverged = false;
 
 	if(m_pWPolar->m_WPolarType==FIXEDLIFTPOLAR)	m_QInf0 = sqrt(2.*m_pWPolar->m_Mass* 9.81 /m_pWPolar->m_Density/m_pWing->m_PlanformArea);
-	else                                    m_QInf0 = 0.0;
+	else                                        m_QInf0 = 0.0;
 
-	m_bConverged = true;
-	m_bWingOut = false;
+	m_pWing->ComputeChords(s_NLLTStations, m_Chord, m_Offset);
 
-	m_pWing->ComputeChords(s_NLLTStations, m_Chord, m_Offset, m_Twist);
 	for (k=0; k<=s_NLLTStations; k++)
 	{
 		y   = cos(k*PI/s_NLLTStations)* m_pWing->m_PlanformSpan/2.0;
 		m_Twist[k] = m_pWing->Twist(y);
+		m_SpanPos[k] = m_pWing->m_PlanformSpan/2.0 * cos((double)k*PI/s_NLLTStations);
 	}
 
-	for (k=0; k<=s_NLLTStations; k++)
-	{
-		m_SpanPos[k] = m_pWing->m_PlanformSpan/2.0 * cos((double)k*PI/s_NLLTStations);
-		m_Re[k] = m_Chord[k] * QInf/m_pWPolar->m_Viscosity;
-	}
-	double yj, yjm, yjp, dy;
 	for (int j=1; j<s_NLLTStations; j++)
 	{
 		yjp = m_SpanPos[j-1];

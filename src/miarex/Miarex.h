@@ -579,7 +579,7 @@ public:
 	int m_iWingView;			/**< defines how many graphs will be displayed in WOpp view */
 	int m_MaxWakeIter;			/**< wake roll-up iteration limit */
 	int m_NSurfaces;            /**< the number of surfaces which define the wings of the current wing or plane */
-	int m_NStation ;			/**< the number of stations for LLT */
+//	int m_NStation ;			/**< the number of stations for LLT */
 	int m_NWakeColumn;			/**< number of wake columns */
 	int m_posAnimateWOpp;       /**< the current animation aoa ind ex for WOpp animation */
 	int m_posAnimateMode;       /**< the current animation aoa index for Mode animation */

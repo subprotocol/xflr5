@@ -858,6 +858,7 @@ void PlaneDlg::SetupLayout()
 			MainWingLayout->addWidget(m_pctrlLen1,1,4);
 			MainWingLayout->addWidget(m_pctrlLen2,2,4);
 			MainWingLayout->addWidget(lab4,3,4);
+			MainWingLayout->setRowStretch(4,1);
 		}
 		MainWingBox->setLayout(MainWingLayout);
 	}
@@ -928,6 +929,7 @@ void PlaneDlg::SetupLayout()
 			StabLayout->addWidget(m_pctrlLen5,2,4);
 			StabLayout->addWidget(m_pctrlLen6,4,4);
 			StabLayout->addWidget(lab24,5,4);
+			StabLayout->setRowStretch(6,1);
 		}
 		StabBox->setLayout(StabLayout);
 	}
