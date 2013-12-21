@@ -270,12 +270,12 @@ void Polar::AddPoint(double Alpha, double Cd, double Cdp, double Cl, double Cm, 
 					else if (m_PolarType==FIXEDLIFTPOLAR)
                     {
 						if(Cl>0.0) m_Re[i] =  Reynolds/ sqrt(Cl);
-						else m_Re[i] = 0.0;
+						else       m_Re[i] = 0.0;
 					}
 					else if (m_PolarType==RUBBERCHORDPOLAR)
                     {
 						if(Cl>0.0) m_Re[i] =  Reynolds/(Cl);
-						else m_Re[i] = 0.0;
+						else       m_Re[i] = 0.0;
 					}
 
 
@@ -307,7 +307,7 @@ void Polar::AddPoint(double Alpha, double Cd, double Cdp, double Cl, double Cm, 
 					else if (m_PolarType==FIXEDLIFTPOLAR)
                     {
                         if(Cl>0) m_Re.insert(i, Reynolds/sqrt(Cl));
-                        else m_Re[i] = 0.0;
+						else     m_Re[i] = 0.0;
                     }
 					else if (m_PolarType==RUBBERCHORDPOLAR)
                     {
@@ -403,7 +403,7 @@ void Polar::AddPoint(double Alpha, double Cd, double Cdp, double Cl, double Cm, 
 		else if (m_PolarType==RUBBERCHORDPOLAR)
         {
             if(Cl>0.0) m_Re.insert(size, Reynolds/Cl);
-            else     m_Re.insert(size, 0.0);
+			else       m_Re.insert(size, 0.0);
         }
     }
 }

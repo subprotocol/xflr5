@@ -665,7 +665,7 @@ void GLCreateDownwash(void *pQMiarex, Wing *pWing, WingOpp *pWOpp, int List)
 
 	double sina = -sin(pWOpp->m_Alpha*PI/180.0);
 	double cosa =  cos(pWOpp->m_Alpha*PI/180.0);
-	factor = pMiarex->m_VelocityScale/100.0;
+	factor = pMiarex->m_VelocityScale/5.0;
 
 	//DOWNWASH
 	glNewList(List,GL_COMPILE);

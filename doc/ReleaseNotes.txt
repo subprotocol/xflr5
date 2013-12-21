@@ -15,6 +15,12 @@
 *******************************************************************************
 
 
+xflr5 v6.09.07, xxx 2014
+	- Corrected the LLT analysis for numbers of span stations other than 20
+	- Corrected the T.E. downwash calculation for vlm & panel methods - was scaled incorrectly by twice the velocity
+	- Corrected the crash bug when using more threads than the number of (foil, polar) pairs to analyze in mutltithreaded analysis
+
+
 xflr5 v6.09.06, December 7th, 2013
 	- introduced number input/ouput using system locale settings.
 	- mesh resizing is now enabled without any limit other than the one set by the compiler and the system

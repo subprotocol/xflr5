@@ -852,7 +852,7 @@ void BatchThreadDlg::StartAnalysis()
 	UpdateOutput(strong);
 
 	//Start as many threads as the system will support
-	m_nThreads = QThread::idealThreadCount();
+	m_nThreads = qMin(QThread::idealThreadCount(),m_nAnalysis);
 	m_pXFoilTask = new XFoilTask[m_nThreads];
 	XFoilTask::s_bAutoInitBL= pXDirect->m_bAutoInitBL;
 	XFoilTask::s_pBatchThreadDlg = this;

@@ -1073,7 +1073,7 @@ void PanelAnalysisDlg::ScaleResultstoSpeed(int nval)
 					for(int m=0; m<m_pWingList[iw]->m_NStation; m++)
 					{
 						m_F[ m+ q*MAXWINGS*MAXSPANSTATIONS + iw*MAXSPANSTATIONS] *= m_3DQInf[q] * m_3DQInf[q];
-						m_Vd[m+ q*MAXWINGS*MAXSPANSTATIONS + iw*MAXSPANSTATIONS] *= m_3DQInf[q] * m_3DQInf[q];
+						m_Vd[m+ q*MAXWINGS*MAXSPANSTATIONS + iw*MAXSPANSTATIONS] *= m_3DQInf[q];
 					}
 				}
 			}
