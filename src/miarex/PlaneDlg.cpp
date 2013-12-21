@@ -1015,6 +1015,7 @@ void PlaneDlg::SetupLayout()
 			BodyLayout->addWidget(BodyWarning);
 			BodyLayout->addLayout(BodyName);
 			BodyLayout->addLayout(BodyPos);
+            BodyLayout->addStretch(1);
 		}
 		BodyBox->setLayout(BodyLayout);
 	}
