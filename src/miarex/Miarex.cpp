@@ -2998,11 +2998,11 @@ void QMiarex::CreateStabTimeCurves()
 */
 void QMiarex::CreateStabRungeKuttaCurves()
 {
-	static int i, j, TotalPoints, PlotInterval;
+	static int i, TotalPoints, PlotInterval;
 
 	static double t, dt, ctrl_t;
 	static Curve *pCurve0, *pCurve1, *pCurve2, *pCurve3;
-	static double A[4][4], B[MAXCONTROLS][4];
+	static double A[4][4], B[4];
 	static double m[5][4];
 	static double y[4], yp[4];
 	QString CurveTitle;
@@ -3031,12 +3031,12 @@ void QMiarex::CreateStabRungeKuttaCurves()
 	if(m_bLongitudinal)
 	{
 		memcpy(A, m_pCurWOpp->m_ALong, 4*4*sizeof(double));
-		memcpy(B, m_pCurWOpp->m_BLong, MAXCONTROLS*4*sizeof(double));
+		memcpy(B, m_pCurWOpp->m_BLong, 4*sizeof(double));
 	}
 	else
 	{
 		memcpy(A, m_pCurWOpp->m_ALat, 4*4*sizeof(double));
-		memcpy(B, m_pCurWOpp->m_BLat, MAXCONTROLS*4*sizeof(double));
+		memcpy(B, m_pCurWOpp->m_BLat, 4*sizeof(double));
 	}
 
 	// Rebuild the Forced Response matrix
@@ -3072,10 +3072,10 @@ void QMiarex::CreateStabRungeKuttaCurves()
 		m[0][3] = A[3][0]*y[0] + A[3][1]*y[1] + A[3][2]*y[2] + A[3][3]*y[3];
 
 		ctrl_t = pStabView->GetControlInput(t);
-		m[0][0] += B[j][0] * ctrl_t;
-		m[0][1] += B[j][1] * ctrl_t;
-		m[0][2] += B[j][2] * ctrl_t;
-		m[0][3] += B[j][3] * ctrl_t;
+		m[0][0] += B[0] * ctrl_t;
+		m[0][1] += B[1] * ctrl_t;
+		m[0][2] += B[2] * ctrl_t;
+		m[0][3] += B[3] * ctrl_t;
 
 		//middle point m2
 		yp[0] = y[0] + dt/2.0 * m[0][0];
@@ -3089,10 +3089,10 @@ void QMiarex::CreateStabRungeKuttaCurves()
 		m[1][3] = A[3][0]*yp[0] + A[3][1]*yp[1] + A[3][2]*yp[2] + A[3][3]*yp[3];
 
 		ctrl_t = pStabView->GetControlInput(t+dt/2.0);
-		m[1][0] += B[j][0] * ctrl_t;
-		m[1][1] += B[j][1] * ctrl_t;
-		m[1][2] += B[j][2] * ctrl_t;
-		m[1][3] += B[j][3] * ctrl_t;
+		m[1][0] += B[0] * ctrl_t;
+		m[1][1] += B[1] * ctrl_t;
+		m[1][2] += B[2] * ctrl_t;
+		m[1][3] += B[3] * ctrl_t;
 
 		//second point m3
 		yp[0] = y[0] + dt/2.0 * m[1][0];
@@ -3107,10 +3107,10 @@ void QMiarex::CreateStabRungeKuttaCurves()
 
 		ctrl_t = pStabView->GetControlInput(t+dt/2.0);
 
-		m[2][0] += B[j][0] * ctrl_t;
-		m[2][1] += B[j][1] * ctrl_t;
-		m[2][2] += B[j][2] * ctrl_t;
-		m[2][3] += B[j][3] * ctrl_t;
+		m[2][0] += B[0] * ctrl_t;
+		m[2][1] += B[1] * ctrl_t;
+		m[2][2] += B[2] * ctrl_t;
+		m[2][3] += B[3] * ctrl_t;
 
 		//third point m4
 		yp[0] = y[0] + dt * m[2][0];
@@ -3125,10 +3125,10 @@ void QMiarex::CreateStabRungeKuttaCurves()
 
 		ctrl_t = pStabView->GetControlInput(t+dt);
 
-		m[3][0] += B[j][0] * ctrl_t;
-		m[3][1] += B[j][1] * ctrl_t;
-		m[3][2] += B[j][2] * ctrl_t;
-		m[3][3] += B[j][3] * ctrl_t;
+		m[3][0] += B[0] * ctrl_t;
+		m[3][1] += B[1] * ctrl_t;
+		m[3][2] += B[2] * ctrl_t;
+		m[3][3] += B[3] * ctrl_t;
 
 		//final slope m5
 		m[4][0] = 1./6. * (m[0][0] + 2.0*m[1][0] + 2.0*m[2][0] + m[3][0]);
