@@ -1,0 +1,98 @@
+/****************************************************************************
+
+    XFoilAnalysisDlg Class
+	Copyright (C) 2008 Andre Deperrois adeperrois@xflr5.com
+
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program; if not, write to the Free Software
+    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+*****************************************************************************/
+
+#ifndef XFOILANALYSISDLG_H
+#define XFOILANALYSISDLG_H
+
+#include <QDialog>
+#include <QEventLoop>
+#include <QGLWidget>
+#include <QString>
+#include <QFile>
+#include <QTextEdit>
+#include <QPushButton>
+#include <QPoint>
+#include "../../graph/QGraph.h"
+#include "../../graph/GraphWidget.h"
+#include "XFoil.h"
+#include "XFoilTask.h"
+
+class XFoilAnalysisDlg : public QDialog
+{
+	Q_OBJECT
+
+	friend class MainFrame;
+	friend class QXDirect;
+
+public:
+	XFoilAnalysisDlg(QWidget *pParent=NULL);
+
+	void InitDialog();
+
+private slots:
+	void OnCancelAnalysis();
+	void OnSkipPoint();
+	void OnProgress();
+
+private:
+	void showEvent(QShowEvent *event);
+	void hideEvent(QHideEvent *event);
+
+	void accept();
+	void reject();
+
+	void ResetCurves();
+	void SetAlpha(double AlphaMin, double AlphaMax, double DeltaAlpha);
+	void SetCl(double ClMin, double ClMax, double DeltaCl);
+	void SetRe(double ReMin, double ReMax, double DeltaRe);
+	void SetFileHeader();
+	void SetupLayout();
+	void Analyze();
+
+
+	//variables
+	static QPoint s_Position;   /**< the position on the client area of he dialog's topleft corner */
+
+	GraphWidget * m_pGraphWidget;
+	QTextEdit *m_pctrlTextOutput;
+	QPushButton* m_pctrlCancel, *m_pctrlSkip;
+
+	bool m_bAlpha;
+	bool m_bSequence;
+	bool m_bErrors;
+
+	double m_AlphaMin, m_AlphaMax, m_AlphaDelta;
+	double m_ClMin, m_ClMax, m_ClDelta;
+	double m_ReMin, m_ReMax, m_ReDelta;
+
+	static void *s_pXDirect;
+
+	QTimer *EventTimer;
+	QFile *m_pXFile;
+	QPoint m_LegendPlace;
+	QRect m_ViscRect;
+	QGraph *m_pRmsGraph;
+
+	XFoilTask *m_pXFoilTask;
+
+};
+
+#endif
