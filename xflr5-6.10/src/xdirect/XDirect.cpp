@@ -75,6 +75,8 @@ bool QXDirect::s_bInitBL = true;
 bool QXDirect::s_bKeepOpenErrors = true;
 bool QXDirect::s_bFromZero = false;
 
+int QXDirect::s_TimeUpdateInterval = 100;
+
 void *QXDirect::s_pMainFrame;
 void *QXDirect::s_p2DWidget;
 
@@ -104,7 +106,6 @@ QXDirect::QXDirect(QWidget *parent) : QWidget(parent)
 
 	m_bAnimate        = false;
 	m_bAnimatePlus    = false;
-	m_bAutoInitBL     = true;
 	m_bCpGraph        = true;
 	m_bTransGraph     = false;
 	m_bShowPanels     = false;
@@ -138,8 +139,6 @@ QXDirect::QXDirect(QWidget *parent) : QWidget(parent)
 	m_crPressureColor= QColor(0,255,0);
 	m_iPressureStyle = 0;
 	m_iPressureWidth = 1;
-
-	m_IterLim   = 100;
 
 	m_bPolarView          = true;
 	m_iPlrGraph = 0;
@@ -1106,23 +1105,22 @@ void QXDirect::LoadSettings(QSettings *pSettings)
 		s_bInitBL         = pSettings->value("InitBL").toBool();
 		m_bBL             = pSettings->value("BoundaryLayer").toBool();
 		m_bPressure       = pSettings->value("Pressure").toBool();
-		m_bPolarView          = pSettings->value("PolarView").toBool();
+		m_bPolarView      = pSettings->value("PolarView").toBool();
 		m_bShowUserGraph  = pSettings->value("UserGraph").toBool();
 		m_bShowPanels     = pSettings->value("ShowPanels").toBool();
 		m_bType1          = pSettings->value("Type1").toBool();
 		m_bType2          = pSettings->value("Type2").toBool();
 		m_bType3          = pSettings->value("Type3").toBool();
 		m_bType4          = pSettings->value("Type4").toBool();
-		m_bAutoInitBL     = pSettings->value("AutoInitBL").toBool();
 		m_bFromList       = pSettings->value("FromList").toBool();
 		s_bFromZero       = pSettings->value("FromZero").toBool();
 		m_bShowTextOutput = pSettings->value("TextOutput").toBool();
 		m_bNeutralLine    = pSettings->value("NeutralLine").toBool();
 		m_bCurOppOnly     = pSettings->value("CurOppOnly").toBool();
-		m_bShowInviscid   = pSettings->value("ShowInviscid").toBool();
-		m_bCpGraph        = pSettings->value("ShowCpGraph").toBool();
-		m_bSequence       = pSettings->value("Sequence").toBool();
-		m_bHighlightOpp   = pSettings->value("HighlightOpp").toBool();
+		m_bShowInviscid   = pSettings->value("ShowInviscid", false).toBool();
+		m_bCpGraph        = pSettings->value("ShowCpGraph", true).toBool();
+		m_bSequence       = pSettings->value("Sequence", false).toBool();
+		m_bHighlightOpp   = pSettings->value("HighlightOpp", false).toBool();
 		m_bHighlightOpp = false;
 
 		m_crBLColor = pSettings->value("BLColor").value<QColor>();
@@ -1138,7 +1136,8 @@ void QXDirect::LoadSettings(QSettings *pSettings)
 		m_iNeutralWidth = pSettings->value("NeutralWidth").toInt();
 
 		m_XFoilVar       = pSettings->value("XFoilVar").toInt();
-		m_IterLim        = pSettings->value("IterLim").toInt();
+		s_TimeUpdateInterval = pSettings->value("TimeUpdateInterval",100).toInt();
+
 		m_iPlrGraph      = pSettings->value("PlrGraph").toInt();
 
 		switch(pSettings->value("PlrView").toInt())
@@ -1164,10 +1163,12 @@ void QXDirect::LoadSettings(QSettings *pSettings)
 		m_ReynoldsMax     = pSettings->value("ReynoldsMax").toDouble();
 		m_ReynoldsDelta   = pSettings->value("ReynolsDelta").toDouble();
 		m_pXFoil->vaccel  = pSettings->value("VAccel").toDouble();
-		m_bAutoInitBL     = pSettings->value("AutoInitBL").toBool();
 		s_bKeepOpenErrors = pSettings->value("KeepOpenErrors").toBool();
 
-		m_pXFoil->m_bFullReport = pSettings->value("FullReport").toBool();
+		XFoilTask::s_bAutoInitBL    = pSettings->value("AutoInitBL").toBool();
+		XFoilTask::s_IterLim        = pSettings->value("IterLim", 100).toInt();
+
+		XFoil::s_bFullReport = pSettings->value("FullReport").toBool();
 
 		s_refPolar.m_ACrit    = pSettings->value("NCrit").toDouble();
 		s_refPolar.m_XTop     = pSettings->value("XTopTr").toDouble();
@@ -1720,7 +1721,6 @@ void QXDirect::OnMultiThreadedBatchAnalysis()
 
 	m_pBatchThreadDlg->m_pCurFoil  = Foil::curFoil();
 
-	m_pBatchThreadDlg->m_IterLim   = m_IterLim;
 	m_pBatchThreadDlg->m_bAlpha    = true;
 	m_pBatchThreadDlg->m_AlphaMin  = m_Alpha;
 	m_pBatchThreadDlg->m_AlphaMax  = m_AlphaMax;
@@ -4273,6 +4273,7 @@ void QXDirect::OnResetGraphLegend()
 	UpdateView();
 }
 
+
 /**
  * The user has requested the deletion of the dataof the current Polar.
  * The associated OpPoint objects will be deleted too.
@@ -4300,6 +4301,8 @@ void QXDirect::OnResetCurPolar()
 	if(m_bPolarView) CreatePolarCurves();
 	else         CreateOppCurves();
 	UpdateView();
+
+	emit projectModified();
 }
 
 
@@ -4840,18 +4843,18 @@ void QXDirect::OnXDirectStyle()
 void QXDirect::OnXFoilAdvanced()
 {
 	XFoilAdvancedDlg xfaDlg((MainFrame*)s_pMainFrame);
-	xfaDlg.m_IterLimit = m_IterLim;
-	xfaDlg.m_VAccel  = m_pXFoil->vaccel;
-	xfaDlg.m_bInitBL = m_bAutoInitBL;
-	xfaDlg.m_bFullReport    = m_pXFoil->m_bFullReport;
+	xfaDlg.m_IterLimit = XFoilTask::s_IterLim;
+	xfaDlg.m_bInitBL   = XFoilTask::s_bAutoInitBL;
+	xfaDlg.m_VAccel      = XFoil::vaccel;
+	xfaDlg.m_bFullReport = XFoil::s_bFullReport;
 	xfaDlg.InitDialog();
 
 	if (QDialog::Accepted == xfaDlg.exec())
 	{
-		m_pXFoil->vaccel = xfaDlg.m_VAccel;
-		m_IterLim        = xfaDlg.m_IterLimit;
-		m_bAutoInitBL    = xfaDlg.m_bInitBL;
-		m_pXFoil->m_bFullReport    = xfaDlg.m_bFullReport;
+		XFoil::vaccel             = xfaDlg.m_VAccel;
+		XFoil::s_bFullReport   = xfaDlg.m_bFullReport;
+		XFoilTask::s_bAutoInitBL  = xfaDlg.m_bInitBL;
+		XFoilTask::s_IterLim      = xfaDlg.m_IterLimit;
 	}
 }
 
@@ -5607,7 +5610,6 @@ void QXDirect::SaveSettings(QSettings *pSettings)
 		pSettings->setValue("Type2", m_bType2);
 		pSettings->setValue("Type3", m_bType3);
 		pSettings->setValue("Type4", m_bType4);
-		pSettings->setValue("AutoInitBL", m_bAutoInitBL);
 		pSettings->setValue("FromList", m_bFromList);
 		pSettings->setValue("FromZero", s_bFromZero);
 		pSettings->setValue("TextOutput", m_bShowTextOutput);
@@ -5627,7 +5629,7 @@ void QXDirect::SaveSettings(QSettings *pSettings)
 		pSettings->setValue("NeutralStyle", m_iNeutralStyle);
 		pSettings->setValue("NeutralWidth", m_iNeutralWidth);
 		pSettings->setValue("XFoilVar", m_XFoilVar);
-		pSettings->setValue("IterLim", m_IterLim);
+		pSettings->setValue("TimeUpdateInterval", s_TimeUpdateInterval);
 		pSettings->setValue("PlrGraph", m_iPlrGraph);
 
 		switch(m_iPlrView)
@@ -5653,9 +5655,12 @@ void QXDirect::SaveSettings(QSettings *pSettings)
 		pSettings->setValue("ReynoldsMax", m_ReynoldsMax);
 		pSettings->setValue("ReynolsDelta", m_ReynoldsDelta);
 
+		pSettings->setValue("AutoInitBL", XFoilTask::s_bAutoInitBL);
+		pSettings->setValue("IterLim", XFoilTask::s_IterLim);
+		pSettings->setValue("FullReport", XFoil::s_bFullReport);
+
+
 		pSettings->setValue("VAccel", m_pXFoil->vaccel);
-		pSettings->setValue("AutoInitBL", m_bAutoInitBL);
-		pSettings->setValue("FullReport", m_pXFoil->m_bFullReport);
 		pSettings->setValue("KeepOpenErrors", s_bKeepOpenErrors);
 		pSettings->setValue("NCrit", s_refPolar.m_ACrit);
 		pSettings->setValue("XTopTr", s_refPolar.m_XTop);

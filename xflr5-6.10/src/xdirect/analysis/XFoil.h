@@ -227,6 +227,8 @@ public:
 
 //____________VARIABLES___________________________________________________
 
+	static double vaccel;
+
 	double thickb,cambrb;
 
 	bool lalfa, lvisc, lvconv, lwake;
@@ -243,7 +245,7 @@ public:
 	double xcp;
 	double amax;// needed for preprocessing
 	double cvpar,cterat,ctrrat,xsref1,xsref2,xpref1,xpref2;
-	double minf1,vaccel;
+	double minf1;
 	double rmxbl,rlx;
 	double xbf,ybf;
 	double xb[IBX],yb[IBX],nx[IZX],ny[IZX];
@@ -382,8 +384,8 @@ private:
 //	QString ispars;
 
 	static bool s_bCancel;
+	static bool s_bFullReport;
 
-	bool m_bFullReport;
 //	bool lpacc,lqvdes,,lqrefl,lcpref,lforef,lpfile,lpfilx;
 //	bool lppsho,lplot,lclip,lvlab,lcurs,lcminp, lhmomp,lland;
 //	bool lplcam,lgparm,lnorm,,lgsym,lgslop, lcslop,lclock,

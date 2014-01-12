@@ -30,6 +30,8 @@
 #include "../../objects/Polar.h"
 
 bool XFoil::s_bCancel = false;
+bool XFoil::s_bFullReport = false;
+double XFoil::vaccel = 0.01;
 
 XFoil::XFoil()
 {
@@ -43,7 +45,6 @@ XFoil::XFoil()
 	
 	// imx   number of complex mapping coefficients  cn
 	m_bTrace = false;
-	m_bFullReport = false;
 	
 	sccon = 5.6  ;
 	gacon = 6.70;
@@ -1979,7 +1980,7 @@ bool XFoil::cpcalc(int n, double q[], double qinf, double minf, double cp[])
 
 void XFoil::WriteString(QString str, bool bFullReport)
 {
-	if(!bFullReport && !m_bFullReport) return;
+	if(!bFullReport && !s_bFullReport) return;
 	if(m_OutStream.device()!=NULL)         m_OutStream << str;
 	else if(m_OutStream.string()!=NULL)    m_OutStream << str;
 }

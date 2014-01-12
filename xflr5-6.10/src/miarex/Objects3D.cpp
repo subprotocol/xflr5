@@ -2541,7 +2541,7 @@ void Objects3D::renamePlane(QString PlaneName)
  */
 void Objects3D::setControlPositions(Plane *pPlane, WPolar *pWPolar, Panel *pPanel, CVector *pNode, double t, int &NCtrls, QString &out, bool bBCOnly)
 {
-	if(!pWPolar || pPlane) return;
+	if(!pWPolar || !pPlane) return;
 
 	QString strange;
 	Quaternion Quat;

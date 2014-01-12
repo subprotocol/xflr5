@@ -329,7 +329,7 @@ void PanelAnalysis::setRange(double vMin, double vMax, double vDelta, bool bSequ
 		//BuildInfluenceMatrix :     10 x MatSize/400
 		//CreateRHS :                10
 		//CreateWakeContribution :    1
-		//SolveUnitRHS :             90 x MatSize/400
+		//SolveUnitRHS :            400 x MatSize/400
 		//ComputeFarField :          10 x MatSize/400x nrhs
 		//ComputeOnBodyCp :           1 x nrhs
 		//RelaxWake :                20 x nrhs x MaxWakeIter *
@@ -342,7 +342,7 @@ void PanelAnalysis::setRange(double vMin, double vMax, double vDelta, bool bSequ
 
 		s_TotalTime      = 10.0*(double)m_MatSize/400.
 						 + 10.
-						 + 90.*(double)m_MatSize/400.
+						 + 400.*(double)m_MatSize/400.
 						 + 10*(double)m_MatSize/400*(double)m_nRHS
 						 + 1*(double)m_nRHS
 						 + 5*(double)m_nRHS ;
@@ -352,7 +352,7 @@ void PanelAnalysis::setRange(double vMin, double vMax, double vDelta, bool bSequ
 		//BuildInfluenceMatrix :     10 x m_MatSize/400
 		//CreateRHS :                10
 		//CreateWakeContribution :    1
-		//SolveUnitRHS :             90 x MatSize/400
+		//SolveUnitRHS :            400 x MatSize/400
 		//ComputeFarField :          10 x MatSize/400x 1
 		//ComputeOnBodyCp :           1 x nrhs
 		//RelaxWake :                20 x nrhs x MaxWakeIter *
@@ -360,7 +360,7 @@ void PanelAnalysis::setRange(double vMin, double vMax, double vDelta, bool bSequ
 
 		s_TotalTime      = 10.0*(double)m_MatSize/400.
 						 + 10.
-						 + 90.*(double)m_MatSize/400.
+						 + 400.*(double)m_MatSize/400.
 						 + 10*(double)m_MatSize/400*1.
 						 + 1*(double)m_nRHS
 						 + 5*(double)m_nRHS ;
@@ -372,7 +372,7 @@ void PanelAnalysis::setRange(double vMin, double vMax, double vDelta, bool bSequ
 
 		s_TotalTime      = 10.0*(double)m_MatSize/400.       //BuildInfluenceMatrix
 						 + 10.                               //CreateRHS
-						 + 90.*(double)m_MatSize/400.        //SolveUnitRHS
+						 + 400.*(double)m_MatSize/400.        //SolveUnitRHS
 						 + 10*(double)m_MatSize/400          //ComputeFarField
 						 + 2+5*6                             //ComputeStabDer
 						 + 1                                 //ComputeOnBodyCp
@@ -522,7 +522,6 @@ bool PanelAnalysis::alphaLoop()
 	CreateUnitRHS();
 	if (s_bCancel) return true;
 
-
 	if(!m_pWPolar->bThinSurfaces())
 	{
 		//compute wake contribution
@@ -555,7 +554,6 @@ bool PanelAnalysis::alphaLoop()
 
 	CreateDoubletStrength(m_vMin, m_vDelta, m_nRHS);
 	if (s_bCancel) return true;
-
 
 	ComputeFarField(1.0, m_vMin, m_vDelta, m_nRHS);
 	if (s_bCancel) return true;
@@ -1739,7 +1737,8 @@ void PanelAnalysis::ComputeOnBodyCp(double V0, double VDelta, int nval)
 */
 void PanelAnalysis::GetDoubletInfluence(CVector const &C, Panel *pPanel, CVector &V, double &phi, bool bWake, bool bAll)
 {
-	if(pPanel->m_Pos!=MIDSURFACE || pPanel->m_bIsWakePanel)	pPanel->DoubletNASA4023(C, V, phi, bWake);
+	if(pPanel->m_Pos!=MIDSURFACE || pPanel->m_bIsWakePanel)
+		pPanel->DoubletNASA4023(C, V, phi, bWake);
 	else
 	{
 		VLMGetVortexInfluence(pPanel, C, V, bAll);
@@ -1956,6 +1955,7 @@ bool PanelAnalysis::QInfLoop()
 */
 bool PanelAnalysis::SolveUnitRHS()
 {
+	double taskTime = 400.0;
 	int Size = m_MatSize;
 //	if(m_b3DSymetric) Size = m_SymSize;
 
@@ -1964,7 +1964,7 @@ bool PanelAnalysis::SolveUnitRHS()
 
 	traceLog("      Performing LU Matrix decomposition...\n");
 
-	if(!Crout_LU_Decomposition_with_Pivoting(m_aij, m_Index, Size, &s_bCancel, 90.0*(double)m_MatSize/400.0, s_Progress))
+	if(!Crout_LU_Decomposition_with_Pivoting(m_aij, m_Index, Size, &s_bCancel, taskTime*(double)m_MatSize/400.0, s_Progress))
 	{
 		traceLog("      Singular Matrix.... Aborting calculation...\n");
 		m_bInverted = false;
@@ -2106,7 +2106,7 @@ bool PanelAnalysis::unitLoop()
 	//BuildInfluenceMatrix :     10 x MatSize/400
 	//CreateRHS :                10
 	//CreateWakeContribution :    1
-	//SolveUnitRHS :             90 x MatSize/400
+	//SolveUnitRHS :            400 x MatSize/400
 	//ComputeFarField :          10 x MatSize/400x nrhs
 	//ComputeOnBodyCp :           1 x nrhs
 	//RelaxWake :                20 x nrhs x MaxWakeIter *
@@ -2114,7 +2114,7 @@ bool PanelAnalysis::unitLoop()
 
 	s_TotalTime      = 10.0*(double)m_MatSize/400.*(double)m_nRHS
 					 + 10.*(double)m_nRHS
-					 + 90.*(double)m_MatSize/400.*(double)m_nRHS
+					 + 400.*(double)m_MatSize/400.*(double)m_nRHS
 					 + 10*(double)m_MatSize/400*(double)m_nRHS
 					 + 1*(double)m_nRHS
 					 + 5*(double)m_nRHS ;

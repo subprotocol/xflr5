@@ -2848,7 +2848,7 @@ QColor randomColor()
 {
 	QColor clr;
 	clr.setHsv((int)(((double)qrand()/(double)RAND_MAX)*360),
-			 (int)(((double)qrand()/(double)RAND_MAX)*125),
+			 (int)(((double)qrand()/(double)RAND_MAX)*155)+100,
 			 (int)(((double)qrand()/(double)RAND_MAX)*100)+155,
 			 255);
 	return clr;

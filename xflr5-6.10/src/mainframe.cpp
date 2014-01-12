@@ -122,6 +122,8 @@ MainFrame::MainFrame(QWidget *parent, Qt::WindowFlags flags) : QMainWindow(paren
 	Settings::s_TableFont.setFamily(Settings::s_TableFont.defaultFamily());
 	Settings::s_TableFont.setPointSize(8);
 
+	Settings::s_StyleSheetName = "xflr5_style";
+
 	if(!QGLFormat::hasOpenGL())
 	{
 		QMessageBox::warning(this, tr("Warning"), tr("Your system does not provide support for OpenGL.\nXFLR5 will not operate correctly."));
@@ -221,13 +223,12 @@ MainFrame::MainFrame(QWidget *parent, Qt::WindowFlags flags) : QMainWindow(paren
 	SetMenus();
 
 	QString styleSheet;
-    if(Settings::s_bStyleSheets)
-    {
+	if(Settings::s_bStyleSheets)
+	{
 	   ReadStyleSheet(Settings::s_StyleSheetName, styleSheet);
-    }
+	}
 
 	Objects3D::setStaticPointers();
-
 }
 
 
@@ -2820,7 +2821,7 @@ bool MainFrame::LoadSettings()
 
 
 		Settings::s_bStyleSheets  = settings.value("ShowStyleSheets", false).toBool();
-		Settings::s_StyleSheetName = settings.value("StyleSheetName", "").toString();
+		Settings::s_StyleSheetName = settings.value("StyleSheetName", "xflr5_style").toString();
 	}
 
 	return true;
@@ -4847,6 +4848,7 @@ bool MainFrame::SerializeProjectXFL(QDataStream &ar, bool bIsStoring)
 			pPOpp = new PlaneOpp();
 			if(pPOpp->SerializePOppXFL(ar, bIsStoring))
 			{
+				//just append, since POpps have been sorted when first inserted
 				Objects3D::s_oaPOpp.append(pPOpp);
 			}
 			else
@@ -5222,6 +5224,7 @@ bool MainFrame::SerializeProjectWPA(QDataStream &ar, bool bIsStoring)
 					return false;
 				}
 				Objects3D::InsertPOpp(pPOpp);
+//				Objects3D::s_oaPOpp.append(pPOpp);
 			}
 		}
 		pMiarex->m_pCurPOpp = NULL;

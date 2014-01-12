@@ -1654,6 +1654,7 @@ void Wing::PanelTrefftz(void *pAnalysis, double QInf, double Alpha, double *Mu, 
 				iTB = pWakePanel[nw].m_iTB;
 				C = (pWakeNode[iTA] + pWakeNode[iTB])/2.0;
 				pPanelAnalysis->GetSpeedVector(C, Mu, Sigma, Wg, false);
+
 				m_Vd[m] = Wg;
 				InducedAngle = atan2(Wg.dot(WindNormal), QInf);
 				m_Ai[m]      =       InducedAngle*180/PI;
@@ -1725,31 +1726,6 @@ void Wing::PanelTrefftz(void *pAnalysis, double QInf, double Alpha, double *Mu, 
 
 //			if(pWPolar->m_bTiltedGeom) m_F[m].RotateY(-Alpha);
 
-/*			if(s_bVLMSymetric)
-			{
-				if(!m_bIsFin || (m_bIsFin && m_bDoubleFin))
-				{
-					//construct right side results
-					mm = m_NStation-m-1;
-					m_StripArea[mm]  = m_StripArea[m];
-					m_Ai[mm]  = m_Ai[m];
-					m_Cl[mm]  = m_Cl[m];
-					m_ICd[mm] = m_ICd[m];
-
-					m_F[mm].x  =  m_F[m].x;
-					m_F[mm].y  = -m_F[m].y;
-					m_F[mm].z  =  m_F[m].z;
-					m_Vd[mm].x =  m_Vd[m].x;
-					m_Vd[mm].y = -m_Vd[m].y;
-					m_Vd[mm].z =  m_Vd[m].z;
-					StripForce.y = -StripForce.y;
-
-					// add to global force
-					Force += StripForce;
-					m_CL      += StripForce.dot(WindNormal);                // N/q
-					WingIDrag += StripForce.dot(WindDirection)/(3-coef);          // N/q
-				}
-			}*/
 			m++;
 		}
 //		if(s_bVLMSymetric) p+=m_Surface.at(j)->NXPanels * m_Surface.at(j)->NYPanels;

@@ -284,7 +284,15 @@ void QGraph::DrawXTicks(QPainter &painter)
 							 int(xt/m_scalex) + m_ptoffset.x(),int(yp/scaley)           + m_ptoffset.y());
 			painter.setPen(m_LabelColor);
 
-			if(exp_x>=4 || exp_x<=-4)
+			if(fabs(xt)<PRECISION)
+			{
+
+				strLabel = "0";
+				painter.drawText((int)(xt/m_scalex) - fm.width(strLabel)/2 + m_ptoffset.x(),
+								 (int)(yp/scaley)   + TickSize*2 +height   + m_ptoffset.y(),
+								 strLabel);
+			}
+			else if(exp_x>=4 || exp_x<=-4)
 			{
 				main = xt;
 				ExpFormat(main, exp);
@@ -301,7 +309,7 @@ void QGraph::DrawXTicks(QPainter &painter)
 			}
 			else
 			{
-				if(exp_x>0)        strLabel = QString("%1").arg(xt,0,'f',0);
+				if(exp_x>0)         strLabel = QString("%1").arg(xt,0,'f',0);
 				else if (exp_x>=-1) strLabel = QString("%1").arg(xt,6,'f',1);
 				else if (exp_x>=-2) strLabel = QString("%1").arg(xt,6,'f',2);
 				else if (exp_x>=-3) strLabel = QString("%1").arg(xt,6,'f',3);
@@ -358,16 +366,18 @@ void QGraph::DrawYTicks(QPainter &painter)
 
 			painter.setPen(m_LabelColor);
 
-			if(exp_y>=4 || exp_y<=-4)
+
+			if(fabs(yt)<PRECISION)
+			{
+				strLabel = "0";
+				painter.drawText((int)(xp/m_scalex)   - fm.width(strLabel)-TickSize*2 +m_ptoffset.x(),
+								 (int)(yt/scaley) + fmheight4 +m_ptoffset.y(),
+								 strLabel);
+			}
+			else if(abs(exp_y)>=4)
 			{
 				main = yt;
 				ExpFormat(main, exp);
-
-/*				if(qAbs(yt)<1.e-7)
-				{
-					main = 0.0;
-					exp  = 0;
-				}*/
 
 				strLabel    = QString("%1 10").arg(main,5,'f',1);
 				strLabelExp = QString("%1").arg(exp);
@@ -399,7 +409,6 @@ void QGraph::DrawYTicks(QPainter &painter)
 				painter.drawText((int)(xp/m_scalex)   - fm.width(strLabel)-TickSize*2 +m_ptoffset.x(),
 								 (int)(yt/scaley) + fmheight4 +m_ptoffset.y(),
 								 strLabel);
-
 			}
 		}
 		yt += yunit ;

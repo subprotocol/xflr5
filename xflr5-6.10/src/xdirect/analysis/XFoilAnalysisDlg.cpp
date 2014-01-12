@@ -172,7 +172,7 @@ void XFoilAnalysisDlg::InitDialog()
 	m_pRmsGraph->SetXMin(0.0);
 	m_pRmsGraph->SetXMax((double)XFoilTask::s_IterLim);
 	m_pRmsGraph->SetX0(0.0);
-	m_pRmsGraph->SetXUnit((int)(XFoilTask::s_IterLim/10.0));
+	m_pRmsGraph->SetXUnit((int)(XFoilTask::s_IterLim/5.0));
 
 	m_pRmsGraph->SetY0(0.0);
 	m_pRmsGraph->SetYMin(0.0);
@@ -303,7 +303,7 @@ void XFoilAnalysisDlg::Analyze()
 	//create a timer to update the output at regular intervals
 	QTimer *pTimer = new QTimer;
 	connect(pTimer, SIGNAL(timeout()), this, SLOT(OnProgress()));
-	pTimer->setInterval(25);
+	pTimer->setInterval(QXDirect::s_TimeUpdateInterval);
 	pTimer->start();
 
 	//Launch the task
@@ -333,7 +333,6 @@ void XFoilAnalysisDlg::Analyze()
 
 void XFoilAnalysisDlg::OnProgress()
 {
-
 	if(m_pXFoilTask->m_OutMessage.length())
 	{
 		m_pctrlTextOutput->insertPlainText(m_pXFoilTask->m_OutMessage);
@@ -343,7 +342,12 @@ void XFoilAnalysisDlg::OnProgress()
 	m_pXFoilTask->m_OutMessage.clear();
 //	m_pGraphWidget->update();
 //	update();
+
 	repaint();
+
+	QXDirect *pXDirect = (QXDirect*)s_pXDirect;
+	pXDirect->CreatePolarCurves();
+	pXDirect->UpdateView();
 }
 
 

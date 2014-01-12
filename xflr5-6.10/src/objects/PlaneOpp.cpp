@@ -19,7 +19,6 @@
 
 *****************************************************************************/
 
-
 #include "PlaneOpp.h"
 #include "../globals.h"
 #include "../misc/Units.h"
@@ -676,6 +675,10 @@ bool PlaneOpp::SerializePOppWPA(QDataStream &ar, bool bIsStoring)
 
 		m_CP.Copy(m_pPlaneWOpp[0]->m_CP);
 
+		m_Ctrl = m_pPlaneWOpp[0]->m_oldCtrl;
+
+		memcpy(m_EigenValue,  m_pPlaneWOpp[0]->m_oldEigenValue,  16*sizeof(double));
+		memcpy(m_EigenVector, m_pPlaneWOpp[0]->m_oldEigenVector, 64*sizeof(double));
 
 		int pos = 0;
 		for(int iw=0; iw<MAXWINGS; iw++)

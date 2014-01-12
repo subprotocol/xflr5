@@ -51,6 +51,7 @@
 #include <QTextStream>
 #include <complex>
 
+using namespace std;
 
 class WingOpp
 {
@@ -136,6 +137,8 @@ public:
 	double m_IYm;         /**< the wing's induced yawing moment */
 	double m_MaxBending;  /**< the bending moment at the root chord */
 
+	double m_oldCtrl;        /**< the value of the control parameterfor stability polars. @deprecated, kept for compatibility with former .wpa files */
+
 	CVector m_CP;         /**< the position of the centre of pressure */
 
 	double m_Chord[MAXSPANSTATIONS+1];      /**< the chord lengths at stations */
@@ -163,7 +166,8 @@ public:
 	CVector m_Vd[MAXSPANSTATIONS];          /**< the downwash at the trailing edge */
 	CVector m_F[MAXSPANSTATIONS];           /**< the force acting on the chordwise = sum of the panel forces on this strip*/
 
-
+	complex<double> m_oldEigenValue[8];      /**< the eigenvalues of the four longitudinal and four lateral modes. @deprecated, kept for compatibility with former .wpa files */
+	complex<double> m_oldEigenVector[8][4];  /**< the longitudinal and lateral eigenvectors (4 longitudinal + 4 lateral) x 4 components. @deprecated, kept for compatibility with former .wpa files */
 
 };
 #endif

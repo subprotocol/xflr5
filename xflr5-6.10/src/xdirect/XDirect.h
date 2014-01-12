@@ -281,6 +281,7 @@ private:
 	static bool s_bAlpha;             /**< true if performing an analysis based on aoa, false if based on Cl */
 	static bool s_bInitBL;            /**< true if the boundary layer should be initialized for the next xfoil calculation */
 	static bool s_bFromZero;          /**< true if the batch analysis should start from Alpha=0 */
+	static bool s_bKeepOpenErrors; /**< true if the XfoilAnalysisDlg should be kept open if errors occured in the XFoil calculation */
 
 	bool m_bBL;                /**< true if the Boundary layer shoud be displayed */
 	bool m_bPressure;          /**< true if the pressure distirbution should be displayed */
@@ -293,7 +294,6 @@ private:
 	bool m_bType2;             /**< true if the type 2 polars are to be displayed in the graphs */
 	bool m_bType3;             /**< true if the type 3 polars are to be displayed in the graphs */
 	bool m_bType4;             /**< true if the type 4 polars are to be displayed in the graphs */
-	bool m_bAutoInitBL;        /**< true if the BL initialization is left to the code's decision */
 	bool m_bTrans;             /**< true if the user is dragging a view */
 	bool m_bTransGraph;        /**< true if the user is dragging a graph */
 	bool m_bFromList;          /**< true if the batch analysis is based on a list of Re values */
@@ -306,12 +306,12 @@ private:
 	bool m_bXPressed;          /**< true if the 'X' key is pressed */
 	bool m_bYPressed;          /**< true if the 'Y' key is pressed */
 	bool m_bHighlightOpp;      /**< true if the active operating point should be highlighted on the curves of the polar graphs */
-	static bool s_bKeepOpenErrors; /**< true if the XfoilAnalysisDlg should be kept open if errors occured in the XFoil calculation */
 
 
 	int m_posAnimate;          /**< the current aoa in the animation */
 	int m_XFoilVar;            /**< defines the variable for current XFoil results */
-	int m_IterLim;             /**< max iteratio limit for XFoil */
+
+	static int s_TimeUpdateInterval;  /**< time interval in ms between two output display updates during an XFoil analysis */
 
 	int m_iPlrGraph;           /**< defines whch polar graph is selected if m_iPlrView=1 */
 	enumGraphView m_iPlrView;  /**< defines the number of graphs to be displayed in the polar view */

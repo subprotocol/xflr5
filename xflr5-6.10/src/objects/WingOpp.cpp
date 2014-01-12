@@ -63,6 +63,8 @@ WingOpp::WingOpp(int PanelArraySize)
 	m_GCm = m_VCm = m_ICm = m_GRm = m_GYm = m_VYm = m_IYm = 0.0;
 	m_CP.Set(0.0,0.0,0.0);
 
+	m_oldCtrl = 0.0;
+
 	memset(m_Ai,            0, sizeof(m_Ai));
 	memset(m_Twist,         0, sizeof(m_Twist));
 	memset(m_Cl,            0, sizeof(m_Cl));
@@ -82,6 +84,9 @@ WingOpp::WingOpp(int PanelArraySize)
 	memset(m_BendingMoment, 0, sizeof(m_BendingMoment));
 	memset(m_Vd,            0, sizeof(m_Vd));
 	memset(m_F,             0, sizeof(m_F));
+
+	memset(m_oldEigenValue, 0, sizeof(m_oldEigenValue)); //four longitudinal and four lateral modes
+	memset(m_oldEigenVector, 0, sizeof(m_oldEigenVector));
 
 	m_FlapMoment.clear();
 }
@@ -413,12 +418,12 @@ bool WingOpp::SerializeWingOppWPA(QDataStream &ar, bool bIsStoring)
 			for(k=0; k<8;k++)
 			{
 				ar >> f1 >> f2;
-//				m_EigenValue[k] = complex<double>(f1, f2);
+				m_oldEigenValue[k] = complex<double>(f1, f2);
 
 				for(l=0; l<4; l++)
 				{
 					ar >> f1 >> f2;
-//					m_EigenVector[k][l] = complex<double>(f1, f2);
+					m_oldEigenVector[k][l] = complex<double>(f1, f2);
 				}
 			}
 		}
@@ -488,7 +493,7 @@ bool WingOpp::SerializeWingOppWPA(QDataStream &ar, bool bIsStoring)
 
 		if(ArchiveFormat>=1019)
 		{
-			ar>>f; //   m_Ctrl=f;
+			ar>>f;    m_oldCtrl=f;
 
 			//provision
 			for(int i=1; i<20; i++)

@@ -329,6 +329,8 @@ void StabViewDlg::OnAnimateRestart()
 	double sigma, s2, omega, o2;
 	double norm1, norm2, theta_sum, psi_sum, ModeState[6];
 
+    for(int im=0; im<6; im++) ModeState[im] = 0;
+
 	QMiarex * pMiarex = (QMiarex*)s_pMiarex;
 	PlaneOpp *pPOpp = pMiarex->m_pCurPOpp;
 	Plane *pPlane = pMiarex->m_pCurPlane;
@@ -354,57 +356,61 @@ void StabViewDlg::OnAnimateRestart()
 //	maxso  = qMax(qAbs(sigma), qAbs(omega));
 
 	//calculate state at t=0 for normalization
-	if(pMiarex->m_bLongitudinal)
+	if(s2+o2>PRECISION)
 	{
-		//x, z, theta are evaluated by direct inegration of u, w, q
-		ModeState[1] = 0.0;
-		ModeState[3] = 0.0;
-		ModeState[5] = 0.0;
-		ModeState[0] = m_vabs[0]/(s2+o2) * (sigma*cos(m_phi[0])+omega*sin(m_phi[0]));
-		ModeState[2] = m_vabs[1]/(s2+o2) * (sigma*cos(m_phi[1])+omega*sin(m_phi[1]));
-		ModeState[4] = m_vabs[2]/(s2+o2) * (sigma*cos(m_phi[2])+omega*sin(m_phi[2]));
-//		ModeState[4] = m_vabs[3]*cos(m_phi[3]);
+		if(pMiarex->m_bLongitudinal)
+		{
+			//x, z, theta are evaluated by direct inegration of u, w, q
+			ModeState[1] = 0.0;
+			ModeState[3] = 0.0;
+			ModeState[5] = 0.0;
+			ModeState[0] = m_vabs[0]/(s2+o2) * (sigma*cos(m_phi[0])+omega*sin(m_phi[0]));
+			ModeState[2] = m_vabs[1]/(s2+o2) * (sigma*cos(m_phi[1])+omega*sin(m_phi[1]));
+			ModeState[4] = m_vabs[2]/(s2+o2) * (sigma*cos(m_phi[2])+omega*sin(m_phi[2]));
+	//		ModeState[4] = m_vabs[3]*cos(m_phi[3]);
 
-		//add u0 x theta_sum to z component
-		theta_sum      = m_vabs[3]/(s2+o2) * (sigma*cos(m_phi[3])+omega*sin(m_phi[3]));
+			//add u0 x theta_sum to z component
+			theta_sum      = m_vabs[3]/(s2+o2) * (sigma*cos(m_phi[3])+omega*sin(m_phi[3]));
 
-		ModeState[2] -= theta_sum *pPOpp->m_QInf;
+			ModeState[2] -= theta_sum *pPOpp->m_QInf;
+		}
+		else
+		{
+			//y, phi, psi evaluation
+			ModeState[0] = 0.0;
+			ModeState[2] = 0.0;
+			ModeState[4] = 0.0;
+
+			// integrate (v+u0.psi.cos(theta0)) to get y
+			ModeState[1] = m_vabs[0]/(s2+o2) * (sigma*cos(m_phi[0])+omega*sin(m_phi[0]));
+
+			//integrate psi = integrate twice r (thanks Matlab !)
+			psi_sum =   sigma * ( sigma * cos(m_phi[2]) + omega * sin(m_phi[2]))
+					  + omega * (-omega * cos(m_phi[2]) + sigma * sin(m_phi[2]));
+			psi_sum *= m_vabs[2]/ (s2+o2)/(s2+o2);
+
+			ModeState[1] += pPOpp->m_QInf * psi_sum;
+
+			// get directly phi from fourth eigenvector component (alternatively integrate p+r.tan(theta0));
+			ModeState[3] = m_vabs[3]*cos(m_phi[3]);
+	//		m_ModeState[3] = m_ModeNorm*m_vabs[1]/(s2+o2) * (sigma*cos(m_phi[1])+omega*sin(m_phi[1]));
+
+			// integrate once 'p+r.sin(theta0)' to get heading angle
+			ModeState[5] = m_vabs[2]/(s2+o2) * (sigma*cos(m_phi[2])+omega*sin(m_phi[2]));
+		}
 	}
-	else
-	{
-		//y, phi, psi evaluation
-		ModeState[0] = 0.0;
-		ModeState[2] = 0.0;
-		ModeState[4] = 0.0;
 
-		// integrate (v+u0.psi.cos(theta0)) to get y
-		ModeState[1] = m_vabs[0]/(s2+o2) * (sigma*cos(m_phi[0])+omega*sin(m_phi[0]));
-
-		//integrate psi = integrate twice r (thanks Matlab !)
-		psi_sum =   sigma * ( sigma * cos(m_phi[2]) + omega * sin(m_phi[2]))
-				  + omega * (-omega * cos(m_phi[2]) + sigma * sin(m_phi[2]));
-		psi_sum *= m_vabs[2]/ (s2+o2)/(s2+o2);
-
-		ModeState[1] += pPOpp->m_QInf * psi_sum;
-
-		// get directly phi from fourth eigenvector component (alternatively integrate p+r.tan(theta0));
-		ModeState[3] = m_vabs[3]*cos(m_phi[3]);
-//		m_ModeState[3] = m_ModeNorm*m_vabs[1]/(s2+o2) * (sigma*cos(m_phi[1])+omega*sin(m_phi[1]));
-
-		// integrate once 'p+r.sin(theta0)' to get heading angle
-		ModeState[5] = m_vabs[2]/(s2+o2) * (sigma*cos(m_phi[2])+omega*sin(m_phi[2]));
-	}
 	//max 10% span
 	norm1 = qMax(qAbs(ModeState[0]), qAbs(ModeState[1]));
 	norm1 = qMax(norm1, qAbs(ModeState[2]));
-	if(norm1>0.0)  norm1 = pPlane->m_Wing[0].m_PlanformSpan *.10 / norm1;
-	else           norm1 = 1.0;
+	if(norm1>PRECISION)  norm1 = pPlane->m_Wing[0].m_PlanformSpan *.10 / norm1;
+	else                 norm1 = 1.0;
 
 	//max 10degrees
 	norm2 = qMax(qAbs(ModeState[3]), qAbs(ModeState[4]));
 	norm2 = qMax(norm2, qAbs(ModeState[5]));
-	if(norm2>0.0)  norm2 = PI*(10.0/180.0)/ norm2;
-	else           norm2 = 1.0;
+	if(norm2>PRECISION)  norm2 = PI*(10.0/180.0)/ norm2;
+	else                 norm2 = 1.0;
 
 	pMiarex->m_ModeNorm = qMin(norm1, norm2);
 

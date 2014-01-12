@@ -279,7 +279,7 @@ v4.14 December 30th, 2008 (limited release only)
 v4.13 December 6th, 2008
 	- Corrected a minor bug in Inverse design which prevented a second consecutive application of the spline
 	- Corrected a minor bug in the display of bodies imported from text files
-	- Set default coresize = 1�m minimum both in VLM and Panel methods
+	- Set default coresize = 1micrometer minimum both in VLM and Panel methods
 	- Switched to Trefftz plane integration for lift force in 3D Panel method --> impact on results
 	- Improved the export interface to AVL for planes and wings, including control surfaces
 	- Improved the interface for 3D cross section Cp display

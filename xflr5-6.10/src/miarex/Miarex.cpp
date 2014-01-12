@@ -3537,7 +3537,7 @@ bool QMiarex::LoadSettings(QSettings *pSettings)
 		Objects3D::s_MaxWakeIter       = pSettings->value("MaxWakeIter").toInt();
 		Panel::s_CtrlPos       = pSettings->value("CtrlPos").toDouble();
 		Panel::s_VortexPos     = pSettings->value("VortexPos").toDouble();
-		Panel::s_CoreSize      = pSettings->value("CoreSize").toDouble();
+		Panel::s_CoreSize      = pSettings->value("CoreSize", 0.000001).toDouble();
 		Wing::s_MinPanelSize   = pSettings->value("MinPanelSize").toDouble();
 
 	}
@@ -4518,44 +4518,57 @@ void QMiarex::OnAnimateModeSingle(bool bStep)
 	if(t>=100) StopAnimate();
 
 
-	if(m_bLongitudinal)
+	if(s2+o2>PRECISION)
 	{
-		//x, z, theta are evaluated by direct integration of u, w, q
-		m_ModeState[1] = 0.0;
-		m_ModeState[3] = 0.0;
-		m_ModeState[5] = 0.0;
-		m_ModeState[0] = norm*vabs[0]*exp(sigma*t)/(s2+o2) * (sigma*cos(omega*t+phi[0])+omega*sin(omega*t+phi[0]));
-		m_ModeState[2] = norm*vabs[1]*exp(sigma*t)/(s2+o2) * (sigma*cos(omega*t+phi[1])+omega*sin(omega*t+phi[1]));
-		m_ModeState[4] = norm*vabs[2]*exp(sigma*t)/(s2+o2) * (sigma*cos(omega*t+phi[2])+omega*sin(omega*t+phi[2]));
-//		m_ModeState[4] = norm*vabs[3]*exp(sigma*t)*cos(omega*t+phi[3]);
+		if(m_bLongitudinal)
+		{
+			//x, z, theta are evaluated by direct integration of u, w, q
+			m_ModeState[1] = 0.0;
+			m_ModeState[3] = 0.0;
+			m_ModeState[5] = 0.0;
+			m_ModeState[0] = norm*vabs[0]*exp(sigma*t)/(s2+o2) * (sigma*cos(omega*t+phi[0])+omega*sin(omega*t+phi[0]));
+			m_ModeState[2] = norm*vabs[1]*exp(sigma*t)/(s2+o2) * (sigma*cos(omega*t+phi[1])+omega*sin(omega*t+phi[1]));
+			m_ModeState[4] = norm*vabs[2]*exp(sigma*t)/(s2+o2) * (sigma*cos(omega*t+phi[2])+omega*sin(omega*t+phi[2]));
+	//		m_ModeState[4] = norm*vabs[3]*exp(sigma*t)*cos(omega*t+phi[3]);
 
-		//add u0 x theta_sum to z component
-		theta_sum      = norm*vabs[3]*exp(sigma*t)/(s2+o2) * (sigma*cos(omega*t+phi[3])+omega*sin(omega*t+phi[3]));
-		m_ModeState[2] -= theta_sum *m_pCurPOpp->m_pPlaneWOpp[0]->m_QInf;
+			//add u0 x theta_sum to z component
+			theta_sum      = norm*vabs[3]*exp(sigma*t)/(s2+o2) * (sigma*cos(omega*t+phi[3])+omega*sin(omega*t+phi[3]));
+			m_ModeState[2] -= theta_sum *m_pCurPOpp->m_pPlaneWOpp[0]->m_QInf;
+		}
+		else
+		{
+			//y, phi, psi evaluation
+			m_ModeState[0] = 0.0;
+			m_ModeState[2] = 0.0;
+			m_ModeState[4] = 0.0;
+
+			// integrate (v+u0.psi.cos(theta0)) to get y
+			m_ModeState[1] = norm*vabs[0]*exp(sigma*t)/(s2+o2) * (sigma*cos(omega*t+phi[0])+omega*sin(omega*t+phi[0]));
+
+			//integrate psi = integrate twice r (thanks Matlab !)
+			psi_sum =   sigma * ( sigma * cos(omega*t+phi[2]) + omega * sin(omega*t+phi[2]))
+					  + omega * (-omega * cos(omega*t+phi[2]) + sigma * sin(omega*t+phi[2]));
+			psi_sum *= vabs[2] * exp(sigma*t)/(s2+o2)/(s2+o2);
+
+			m_ModeState[1] += norm * m_pCurPOpp->m_pPlaneWOpp[0]->m_QInf * psi_sum;
+
+			// get directly phi from fourth eigenvector component (alternatively integrate p+r.tan(theta0));
+			m_ModeState[3] = norm*vabs[3]*exp(sigma*t)*cos(omega*t+phi[3]);
+	//		m_ModeState[3] = norm*vabs[1]*exp(sigma*t)/(s2+o2) * (sigma*cos(omega*t+phi[1])+omega*sin(omega*t+phi[1]));
+
+			// integrate once 'p+r.sin(theta0)' to get heading angle
+			m_ModeState[5] = norm*vabs[2]*exp(sigma*t)/(s2+o2) * (sigma*cos(omega*t+phi[2])+omega*sin(omega*t+phi[2]));
+		}
 	}
 	else
 	{
-		//y, phi, psi evaluation
-		m_ModeState[0] = 0.0;
+		//something went wrong somewhere
+		m_ModeState[1] = 0.0;
 		m_ModeState[2] = 0.0;
+		m_ModeState[3] = 0.0;
 		m_ModeState[4] = 0.0;
-
-		// integrate (v+u0.psi.cos(theta0)) to get y
-		m_ModeState[1] = norm*vabs[0]*exp(sigma*t)/(s2+o2) * (sigma*cos(omega*t+phi[0])+omega*sin(omega*t+phi[0]));
-
-		//integrate psi = integrate twice r (thanks Matlab !)
-		psi_sum =   sigma * ( sigma * cos(omega*t+phi[2]) + omega * sin(omega*t+phi[2]))
-				  + omega * (-omega * cos(omega*t+phi[2]) + sigma * sin(omega*t+phi[2]));
-		psi_sum *= vabs[2] * exp(sigma*t)/(s2+o2)/(s2+o2);
-
-		m_ModeState[1] += norm * m_pCurPOpp->m_pPlaneWOpp[0]->m_QInf * psi_sum;
-
-		// get directly phi from fourth eigenvector component (alternatively integrate p+r.tan(theta0));
-		m_ModeState[3] = norm*vabs[3]*exp(sigma*t)*cos(omega*t+phi[3]);
-//		m_ModeState[3] = norm*vabs[1]*exp(sigma*t)/(s2+o2) * (sigma*cos(omega*t+phi[1])+omega*sin(omega*t+phi[1]));
-
-		// integrate once 'p+r.sin(theta0)' to get heading angle
-		m_ModeState[5] = norm*vabs[2]*exp(sigma*t)/(s2+o2) * (sigma*cos(omega*t+phi[2])+omega*sin(omega*t+phi[2]));
+		m_ModeState[5] = 0.0;
+		m_ModeState[6] = 0.0;
 	}
 	
 	//increase the time for the next update

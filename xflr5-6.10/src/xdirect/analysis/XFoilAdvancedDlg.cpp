@@ -1,7 +1,7 @@
 /****************************************************************************
 
 	XFoilAdvancedDlg Class
-	Copyright (C) 2009 Andre Deperrois adeperrois@xflr5.com
+	Copyright (C) 2009-2014 Andre Deperrois adeperrois@xflr5.com
 
 	This program is free software; you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -23,6 +23,7 @@
 #include "../XDirect.h"
 #include "XFoilAdvancedDlg.h"
 
+
 XFoilAdvancedDlg::XFoilAdvancedDlg(QWidget *pParent) : QDialog(pParent)
 {
 	setWindowTitle(tr("XFoil Settings"));
@@ -33,61 +34,94 @@ XFoilAdvancedDlg::XFoilAdvancedDlg(QWidget *pParent) : QDialog(pParent)
 	m_bInitBL = true;
 	m_bFullReport = false;
 
+	connect(m_pctrlDefaults, SIGNAL(clicked()), SLOT(OnDefaults()));
 	connect(OKButton, SIGNAL(clicked()),this, SLOT(OnOK()));
 	connect(CancelButton, SIGNAL(clicked()), this, SLOT(reject()));
 }
 
 
+
 void XFoilAdvancedDlg::SetupLayout()
 {
-	QHBoxLayout *VAccelBoxLayout = new QHBoxLayout;
+	QHBoxLayout *pVAccelBoxLayout = new QHBoxLayout;
 	{
 		QLabel *lab1 = new QLabel(tr("VAccel"));
 		lab1->setAlignment(Qt::AlignRight);
 		m_pctrlVAccel = new DoubleEdit;
 		m_pctrlVAccel->setAlignment(Qt::AlignRight);
-		VAccelBoxLayout->addStretch(1);
-		VAccelBoxLayout->addWidget(lab1);
-		VAccelBoxLayout->addWidget(m_pctrlVAccel);
+		pVAccelBoxLayout->addStretch(1);
+		pVAccelBoxLayout->addWidget(lab1);
+		pVAccelBoxLayout->addWidget(m_pctrlVAccel);
 	}
 
-	QHBoxLayout *IterBoxLayout = new QHBoxLayout;
+	QHBoxLayout *pIterBoxLayout = new QHBoxLayout;
 	{
 		QLabel *lab2 = new QLabel(tr("Iteration Limit"));
 		lab2->setAlignment(Qt::AlignRight);
 		m_pctrlIterLimit = new IntEdit;
 
-		IterBoxLayout->addStretch(1);
-		IterBoxLayout->addWidget(lab2);
-		IterBoxLayout->addWidget(m_pctrlIterLimit);
+		pIterBoxLayout->addStretch(1);
+		pIterBoxLayout->addWidget(lab2);
+		pIterBoxLayout->addWidget(m_pctrlIterLimit);
 	}
 
 	m_pctrlInitBL = new QCheckBox(tr("Re-initialize BLs after an unconverged iteration"));
 	m_pctrlFullReport = new QCheckBox(tr("Show full log report for an XFoil analysis"));
 	m_pctrlKeepErrorsOpen = new QCheckBox(tr("Keep Xfoil interface open if analysis errors"));
 
-	QHBoxLayout *CommandButtonsLayout = new QHBoxLayout;
+	QHBoxLayout *pTimerLayout = new QHBoxLayout;
 	{
+		QLabel *pTimerLabel = new QLabel(tr("Time interval between graph updates"));
+		QLabel *pTimerUnitLabel = new QLabel("ms");
+		m_pctrlTimerInterval = new IntEdit(QXDirect::s_TimeUpdateInterval, this);
+		m_pctrlTimerInterval->SetMin(0);
+		pTimerLayout->addStretch();
+		pTimerLayout->addWidget(pTimerLabel);
+		pTimerLayout->addWidget(m_pctrlTimerInterval);
+		pTimerLayout->addWidget(pTimerUnitLabel);
+	}
+
+	QHBoxLayout *pCommandButtonsLayout = new QHBoxLayout;
+	{
+		m_pctrlDefaults = new QPushButton(tr("Reset Defaults"));
 		OKButton      = new QPushButton(tr("OK"));
 		CancelButton  = new QPushButton(tr("Cancel"));
-		CommandButtonsLayout->addStretch(1);
-		CommandButtonsLayout->addWidget(OKButton);
-		CommandButtonsLayout->addStretch(1);
-		CommandButtonsLayout->addWidget(CancelButton);
-		CommandButtonsLayout->addStretch(1);
+		pCommandButtonsLayout->addStretch(1);
+		pCommandButtonsLayout->addWidget(m_pctrlDefaults);
+		pCommandButtonsLayout->addStretch(1);
+		pCommandButtonsLayout->addWidget(OKButton);
+		pCommandButtonsLayout->addStretch(1);
+		pCommandButtonsLayout->addWidget(CancelButton);
+		pCommandButtonsLayout->addStretch(1);
 	}
 
-	QVBoxLayout *MainLayout = new QVBoxLayout;
+	QVBoxLayout *pMainLayout = new QVBoxLayout;
 	{
-		MainLayout->addLayout(VAccelBoxLayout);
-		MainLayout->addLayout(IterBoxLayout);
-		MainLayout->addWidget(m_pctrlInitBL);
-		MainLayout->addWidget(m_pctrlFullReport);
-		MainLayout->addWidget(m_pctrlKeepErrorsOpen);
-		MainLayout->addLayout(CommandButtonsLayout);
+		pMainLayout->addStretch();
+		pMainLayout->addLayout(pVAccelBoxLayout);
+		pMainLayout->addLayout(pIterBoxLayout);
+		pMainLayout->addWidget(m_pctrlInitBL);
+		pMainLayout->addWidget(m_pctrlFullReport);
+		pMainLayout->addWidget(m_pctrlKeepErrorsOpen);
+		pMainLayout->addLayout(pTimerLayout);
+		pMainLayout->addStretch();
+		pMainLayout->addSpacing(15);
+		pMainLayout->addLayout(pCommandButtonsLayout);
 	}
 
-	setLayout(MainLayout);
+	setLayout(pMainLayout);
+}
+
+
+void XFoilAdvancedDlg::OnDefaults()
+{
+	m_IterLimit = 100;
+	m_VAccel = 0.001;
+	m_bInitBL = true;
+	m_bFullReport = false;
+	QXDirect::s_bKeepOpenErrors = true;
+	QXDirect::s_TimeUpdateInterval = 100;
+	InitDialog();
 }
 
 
@@ -98,6 +132,7 @@ void XFoilAdvancedDlg::InitDialog()
 	m_pctrlIterLimit->SetValue(m_IterLimit);
 	m_pctrlFullReport->setChecked(m_bFullReport);
 	m_pctrlKeepErrorsOpen->setChecked(QXDirect::s_bKeepOpenErrors);
+	m_pctrlTimerInterval->SetValue(QXDirect::s_TimeUpdateInterval);
 }
 
 
@@ -131,12 +166,14 @@ void XFoilAdvancedDlg::keyPressEvent(QKeyEvent *event)
 }
 
 
+
 void XFoilAdvancedDlg::OnOK()
 {
 	m_IterLimit = m_pctrlIterLimit->Value();
 	m_VAccel = m_pctrlVAccel->Value();
 	m_bInitBL = m_pctrlInitBL->isChecked();
 	m_bFullReport = m_pctrlFullReport->isChecked();
+	QXDirect::s_TimeUpdateInterval = m_pctrlTimerInterval->Value();
 	QXDirect::s_bKeepOpenErrors = m_pctrlKeepErrorsOpen->isChecked();
 	done(1);
 }

@@ -115,7 +115,7 @@ public:
 	int m_nControls;	              /**< the number of control surfaces associated to the WingOpp */
 
 	complex<double> m_EigenValue[8];      /**< the eigenvalues of the four longitudinal and four lateral modes */
-	complex<double> m_EigenVector[8][4];  /**< the mongitudinal and lateral eigenvectors (4 longitudinal + 4 lateral) x 4 components */
+	complex<double> m_EigenVector[8][4];  /**< the longitudinal and lateral eigenvectors (4 longitudinal + 4 lateral) x 4 components */
 
 	//non dimensional stability derivatives
 	double CXu, CZu, Cmu, CXa, CLa, Cma, CXq, CLq, Cmq, CYb, CYp, CYr, Clb, Clp, Clr, Cnb, Cnp, Cnr;

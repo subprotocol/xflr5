@@ -1,7 +1,7 @@
 /****************************************************************************
 
 	BatchDlg Class
-        Copyright (C) 2003-2010 Andre Deperrois adeperrois@xflr5.com
+	   Copyright (C) 2003-2014 Andre Deperrois adeperrois@xflr5.com
 
 	This program is free software; you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -102,8 +102,6 @@ BatchDlg::BatchDlg(QWidget *pParent) : QDialog(pParent)
 	m_pRmsGraph->SetYMax( 1.0);
 	m_pRmsGraph->SetType(1);
 	m_pRmsGraph->SetMargin(40);
-
-
 
 	connect(m_pctrlFoil1, SIGNAL(clicked()), this, SLOT(OnFoilSelectionType()));
 	connect(m_pctrlFoil2, SIGNAL(clicked()), this, SLOT(OnFoilSelectionType()));
@@ -332,6 +330,7 @@ void BatchDlg::AlphaLoop()
 	int iAlpha, nAlpha;
 	double alphadeg;
 //	QPoint Place(m_pctrlGraphOutput->rect().left()+m_pRmsGraph->GetMargin()*2, m_pctrlGraphOutput->rect().top()+m_pRmsGraph->GetMargin()/2);
+	QXDirect *pXDirect = (QXDirect*)s_pXDirect;
 
 
 	nAlpha = (int)(qAbs((m_SpMax-m_SpMin)*1.000/m_SpInc));//*1.0001 to make sure upper limit is included
@@ -354,6 +353,12 @@ void BatchDlg::AlphaLoop()
 
 		m_bErrors = m_bErrors || m_pXFoilTask->m_bErrors;
 
+		if(pXDirect->m_bPolarView)
+		{
+			pXDirect->CreatePolarCurves();
+			pXDirect->UpdateView();
+		}
+
 		if(m_bCancel)
 		{
 			str = tr("Analysis interrupted")+"\n";
@@ -364,7 +369,19 @@ void BatchDlg::AlphaLoop()
 }
 
 
-
+void BatchDlg::reject()
+{
+	if(m_bIsRunning)
+	{
+		m_bCancel    = true;
+		XFoil::s_bCancel = true;
+	}
+	else
+	{
+		QDialog::reject();
+		//close the dialog box
+	}
+}
 
 
 void BatchDlg::CleanUp()
@@ -464,8 +481,7 @@ void BatchDlg::keyPressEvent(QKeyEvent *event)
 			}
 			else
 			{
-				reject();
-				//close the dialog box
+				QDialog::reject();
 			}
 			break;
 		}
@@ -900,6 +916,7 @@ void BatchDlg::ReadParams()
  */
 void BatchDlg::ReLoop()
 {
+	QXDirect *pXDirect = (QXDirect*)s_pXDirect;
 	QString str;
 
 	int iRe, nRe;
@@ -934,7 +951,19 @@ void BatchDlg::ReLoop()
 		m_bErrors = m_bErrors || m_pXFoilTask->m_bErrors;
 		str = "\n";
 		OutputMsg(str);
-		if(m_bCancel) break;
+
+		if(pXDirect->m_bPolarView)
+		{
+			pXDirect->CreatePolarCurves();
+			pXDirect->UpdateView();
+		}
+
+		if(m_bCancel)
+		{
+			str = tr("Analysis interrupted")+"\n";
+			OutputMsg(str);
+			break;
+		}
 
 	}//end Re loop
 }
@@ -951,7 +980,7 @@ void BatchDlg::ResetCurves()
 	m_pRmsGraph->SetAutoX(false);
 	m_pRmsGraph->SetXMin(0.0);
 	m_pRmsGraph->SetXMax((double)XFoilTask::s_IterLim);
-	m_pRmsGraph->SetXUnit((int)(XFoilTask::s_IterLim/10.0));
+	m_pRmsGraph->SetXUnit((int)(XFoilTask::s_IterLim/5.0));
 	m_pRmsGraph->SetYMin(-1.0);
 	m_pRmsGraph->SetYMax( 1.0);
 	m_pRmsGraph->SetX0(0.0);
@@ -1013,7 +1042,6 @@ void BatchDlg::SetPlrName(Polar *pPolar)
 
 void BatchDlg::Analyze()
 {
-	QXDirect *pXDirect = (QXDirect*)s_pXDirect;
 	QString strong;
 
 	m_pctrlAnalyze->setText(tr("Cancel"));
@@ -1021,7 +1049,7 @@ void BatchDlg::Analyze()
 	//create a timer to update the output at regular intervals
 	QTimer *pTimer = new QTimer;
 	connect(pTimer, SIGNAL(timeout()), this, SLOT(OnProgress()));
-	pTimer->setInterval(100);
+	pTimer->setInterval(QXDirect::s_TimeUpdateInterval);
 	pTimer->start();
 
 	if(s_bCurrentFoil)
@@ -1031,7 +1059,6 @@ void BatchDlg::Analyze()
 	}
 	else
 	{
-
 		for(int i=0; i<m_FoilList.count();i++)
 		{
 			m_pFoil = Foil::foil(m_FoilList.at(i));
@@ -1043,12 +1070,6 @@ void BatchDlg::Analyze()
 			strong = "\n\n";
 			OutputMsg(strong);
 		}
-	}
-
-	if(pXDirect->m_bPolarView)
-	{
-		pXDirect->CreatePolarCurves();
-		pXDirect->UpdateView();
 	}
 
 	pTimer->stop();
@@ -1070,7 +1091,6 @@ void BatchDlg::Analyze()
 	OnProgress();
 
 	CleanUp();
-
 }
 
 

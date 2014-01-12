@@ -1,7 +1,7 @@
 /****************************************************************************
 
 	BatchDlg Class
-	Copyright (C) 2003-2008 Andre Deperrois adeperrois@xflr5.com
+	Copyright (C) 2003-2014 Andre Deperrois adeperrois@xflr5.com
 
 	This program is free software; you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -50,6 +50,7 @@ private:
 	void keyPressEvent(QKeyEvent *event);
 	void showEvent(QShowEvent *event);
 	void hideEvent(QHideEvent *event);
+	void reject();
 
 	void AlphaLoop();
 	void CleanUp();

@@ -25,7 +25,7 @@
 #include "Panel.h"
 #include <math.h>
 
-double Panel::s_CoreSize = PRECISION;
+double Panel::s_CoreSize = 0.000001;
 double Panel::s_VortexPos = 0.25;
 double Panel::s_CtrlPos   = 0.75;
 double Panel::mat[9];

@@ -73,9 +73,6 @@ BatchThreadDlg::BatchThreadDlg(QWidget *pParent) : QDialog(pParent)
 
 	m_bIsRunning      = false;
 
-
-	m_IterLim = 100;
-
 	XFoil::s_bCancel = false;
 	XFoilTask::s_bSkipOpp = false;
 	XFoilTask::s_bSkipPolar = false;
@@ -824,7 +821,6 @@ void BatchThreadDlg::WriteString(QString &strong)
  */
 void BatchThreadDlg::StartAnalysis()
 {
-	QXDirect *pXDirect = (QXDirect*)s_pXDirect;
 	Foil *pFoil;
 	Polar *pPolar;
 	QString strong;
@@ -873,11 +869,11 @@ void BatchThreadDlg::StartAnalysis()
 	//Start as many threads as the system will support
 	m_nThreads = min(QThread::idealThreadCount(), nRe);
 	m_pXFoilTask = new XFoilTask[m_nThreads];
-	for(int ixfl=0; ixfl<m_nThreads; ixfl++)
-		m_pXFoilTask[ixfl].m_pParent = this;
+	for(int ixfl=0; ixfl<m_nThreads; ixfl++) m_pXFoilTask[ixfl].m_pParent = this;
 
-	XFoilTask::s_bAutoInitBL= pXDirect->m_bAutoInitBL;
+
 	XFoilTask::s_bCancel = false;
+
 	strong = QString("Using %1 threads\n\n").arg(m_nThreads);
 	UpdateOutput(strong);
 

@@ -143,14 +143,14 @@ void GraphDlg::FillVariableList()
 		m_pctrlYSel->addItem(tr("Airfoil viscous drag coef."));			//4
 		m_pctrlYSel->addItem(tr("Induced drag coef."));					//5
 		m_pctrlYSel->addItem(tr("Total drag coef."));					//6
-		m_pctrlYSel->addItem(tr("Local Drag C.Cd/M.A.C."));				//7
-		m_pctrlYSel->addItem(tr("Airfoil Pitching moment coef."));		//8
-		m_pctrlYSel->addItem(tr("Total Pitching moment coef."));		//9
-		m_pctrlYSel->addItem(tr("Reynolds"));							//10
-		m_pctrlYSel->addItem(tr("Top Transition x-pos%"));				//11
-		m_pctrlYSel->addItem(tr("Bottom Transition x-pos%"));			//12
-		m_pctrlYSel->addItem(tr("Centre of Pressure x-pos%"));			//13
-		m_pctrlYSel->addItem(tr("Bending moment"));						//14
+		m_pctrlYSel->addItem(tr("Local Drag C.Cd/M.A.C."));              //7
+		m_pctrlYSel->addItem(tr("Airfoil Pitching moment coef."));       //8
+		m_pctrlYSel->addItem(tr("Total Pitching moment coef."));         //9
+		m_pctrlYSel->addItem(tr("Reynolds"));                            //10
+		m_pctrlYSel->addItem(tr("Top Transition x-pos%"));               //11
+		m_pctrlYSel->addItem(tr("Bottom Transition x-pos%"));            //12
+		m_pctrlYSel->addItem(tr("Centre of Pressure x-pos%"));           //13
+		m_pctrlYSel->addItem(tr("Bending moment"));                      //14
 	}
 	else if(m_iGraphType == 62)
 	{

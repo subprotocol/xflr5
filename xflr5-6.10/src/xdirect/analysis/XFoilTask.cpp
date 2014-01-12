@@ -83,6 +83,9 @@ void XFoilTask::run()
 	else                                     ReSequence();
 
 	m_bIsFinished = true;
+
+	// For multithreaded analysis, post an event to notify parent window.
+	// Could emit a signal, but signals are converted to events anyway when sent across threads
 	QTimerEvent *event = new QTimerEvent(m_Id);
 	QApplication::postEvent(m_pParent, event);
 	//will be truly finished whent this message has been received by the parent batch analysis
@@ -318,7 +321,6 @@ bool XFoilTask::ReSequence()
 			s_bSkipPolar = false;
 			traceLog("    .......skipping polar \n");
 			return false;
-			return false;
 		}
 
 		qApp->processEvents();
@@ -399,12 +401,12 @@ bool XFoilTask::Iterate()
 		}
 		else m_Iterations = s_IterLim;
 
-		if(s_bSkipOpp)
+		if(s_bSkipOpp || s_bSkipPolar)
 		{
 			XFoilInstance.lblini = false;
 			XFoilInstance.lipan = false;
 			s_bSkipOpp = false;
-			return false;
+			return true;
 		}
 	}
 

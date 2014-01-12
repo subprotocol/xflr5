@@ -138,7 +138,6 @@ private:
 	bool m_bIsRunning;          /**< true until all the pairs of (foil, polar) have been calculated */
 
 	enumPolarType m_PolarType;  /**< the type of analysis to perform */
-	int m_IterLim;              /**< the maximum number of iterations for each aoa */
 
 	int m_nAnalysis;            /**< the number of analysis pairs to run */
 	int m_nThreads;             /**< the number of available threads */
