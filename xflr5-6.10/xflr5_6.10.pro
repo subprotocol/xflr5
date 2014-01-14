@@ -289,7 +289,7 @@ macx {
     TEMPLATE = app
     CONFIG += i386
     QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.4
-    QMAKE_MAC_SDK = /Developer/SDKs/MacOSX10.6.sdk
+    #QMAKE_MAC_SDK = /Developer/SDKs/MacOSX10.6.sdk
     OTHER_FILES += mac/Info.plist
     LIBS += -framework \
         CoreFoundation

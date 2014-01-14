@@ -417,7 +417,7 @@ void ThreeDWidget::setupViewPort(int width, int height)
 	glLoadIdentity();
 	double s = 1.0;
 #ifdef Q_WS_MAC
-	glOrtho(-s,s,-(h*s)/w,(h*s)/w,-100.0*s,100.0*s);
+    glOrtho(-s,s,-(height*s)/width,(height*s)/width,-100.0*s,100.0*s);
 #else
 	glOrtho(-s,s,-s,s,-100.0*s,100.0*s);
 #endif
