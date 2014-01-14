@@ -715,7 +715,7 @@ void PanelAnalysis::CreateRHS(double *RHS, CVector VInf, double *VField)
 			}
 			else if(m_pWPolar->bDirichlet()) RHS[m] = 0.0;
 			if(m_pPanel[p].m_Pos!=MIDSURFACE) C = m_pPanel[p].CollPt;
-			else                      C = m_pPanel[p].CtrlPt;
+			else                              C = m_pPanel[p].CtrlPt;
 
 			for (pp=0; pp<m_MatSize; pp++)
 			{
@@ -2226,16 +2226,15 @@ bool PanelAnalysis::unitLoop()
 * Returns the perturbation velocity created at a point C by a horseshoe or quad vortex with unit circulation located on a panel pPanel
 * @param pPanel a pointer to the Panel where the vortex is located
 * @param C the point where the perrturbation is evaluated
-* @param V a reference to the perturbation velocity vector
-* @param bAll true if the influence of the bound vector should be included
+* @param V a reference to the resulting perturbation velocity vector
+* @param bAll true if the influence of the bound vector should be included. Not necessary in the case of a far-field evaluation.
 */
 void PanelAnalysis::VLMGetVortexInfluence(Panel *pPanel, CVector const &C, CVector &V, bool bAll)
 {
-	// calculates the the panel p's vortex influence at point C
-	// V is the resulting velocity
 	static int lw, pw, p;
 	static CVector AA1, BB1, VT;
-	p = pPanel->m_iElement;
+
+	p = pPanel->m_iElement; 
 
 	V.x = V.y = V.z = 0.0;
 

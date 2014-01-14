@@ -847,7 +847,6 @@ void WPolarDlg::SetWPolarName()
 	if(!m_bAutoName) return;
 	QString str, strong;
 	QString WPolarName;
-	QMiarex *pMiarex = (QMiarex*)s_pMiarex;
 
 	if (s_WPolar.m_WPolarType==FIXEDSPEEDPOLAR)
 	{
@@ -867,16 +866,16 @@ void WPolarDlg::SetWPolarName()
 	if(s_WPolar.m_AnalysisMethod==LLTMETHOD) WPolarName += "-LLT";
 	else if(s_WPolar.m_AnalysisMethod==VLMMETHOD)
 	{
-		if(pMiarex->m_bVLM1) WPolarName += "-VLM1";
-		else		         WPolarName += "-VLM2";
+		if(QMiarex::s_bVLM1) WPolarName += "-VLM1";
+		else		           WPolarName += "-VLM2";
 	}
 	else if(s_WPolar.m_AnalysisMethod==PANELMETHOD)
 	{
 		if(m_pPlane->isWing() && !s_WPolar.m_bThinSurfaces) WPolarName += "-Panel";
 		if(s_WPolar.m_bThinSurfaces)
 		{
-			if(pMiarex->m_bVLM1) WPolarName += "-VLM1";
-			else		         WPolarName += "-VLM2";
+			if(QMiarex::s_bVLM1) WPolarName += "-VLM1";
+			else		           WPolarName += "-VLM2";
 		}
 	}
 

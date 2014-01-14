@@ -363,7 +363,7 @@ void Settings::OnTextFont()
 	//QFont font = QFontDialog::getFont(&ok, m_TextFont, this);
 		//20110324 Works again under QT 4.6, though it loses focus if mouse is moved outside of it (QT bug?)
 		//QFont font = QFontDialog::getFont(&bOK, m_TextFont, this, "",QFontDialog::DontUseNativeDialog);
-       TextFont = QFontDialog::getFont(&bOK, s_TextFont, this);
+	   TextFont = QFontDialog::getFont(&bOK, m_TextFont, this);
 #else
 	TextFont = QFontDialog::getFont(&bOK, s_TextFont, this);
 #endif
@@ -390,7 +390,7 @@ void Settings::OnTableFont()
 	//QFont font = QFontDialog::getFont(&ok, m_TextFont, this);
 		//20110324 Works again under QT 4.6, though it loses focus if mouse is moved outside of it (QT bug?)
 		//QFont font = QFontDialog::getFont(&bOK, m_TextFont, this, "",QFontDialog::DontUseNativeDialog);
-       TableFont = QFontDialog::getFont(&bOK, s_TableFont, this);
+	   TextFont = QFontDialog::getFont(&bOK, m_TextFont, this);
 #else
 	TableFont = QFontDialog::getFont(&bOK, s_TableFont, this);
 #endif

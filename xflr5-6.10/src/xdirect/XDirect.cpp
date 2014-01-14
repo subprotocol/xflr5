@@ -1138,6 +1138,9 @@ void QXDirect::LoadSettings(QSettings *pSettings)
 		m_XFoilVar       = pSettings->value("XFoilVar").toInt();
 		s_TimeUpdateInterval = pSettings->value("TimeUpdateInterval",100).toInt();
 
+		BatchThreadDlg::s_bUpdatePolarView = pSettings->value("BatchUpdatePolarView", false).toBool();
+
+
 		m_iPlrGraph      = pSettings->value("PlrGraph").toInt();
 
 		switch(pSettings->value("PlrView").toInt())
@@ -1598,7 +1601,6 @@ void QXDirect::OnAnalyze()
 	pXFADlg->SetCl(m_Cl, m_ClMax, m_ClDelta);
 	pXFADlg->SetRe(m_Reynolds, m_ReynoldsMax, m_ReynoldsDelta);
 
-	pXFADlg->m_bSequence = m_bSequence;
 	pXFADlg->m_bAlpha = s_bAlpha;
 
 	pXFADlg->InitDialog();
@@ -1641,7 +1643,7 @@ void QXDirect::OnAnalyze()
 void QXDirect::OnBatchAnalysis()
 {
 	MainFrame* pMainFrame = (MainFrame*)s_pMainFrame;
-	if(!Foil::curFoil()) 		return;
+	if(!Foil::curFoil()) return;
 
 	m_bPolarView = true;
 	OnPolarView();
@@ -1690,6 +1692,10 @@ void QXDirect::OnBatchAnalysis()
 
 	m_pctrlAnalyze->setEnabled(true);
 
+	SetOpp();
+
+	emit projectModified();
+
 	SetControls();
 	UpdateView();
 }
@@ -1736,7 +1742,7 @@ void QXDirect::OnMultiThreadedBatchAnalysis()
 	m_pBatchThreadDlg->m_bFromZero = s_bFromZero;
 	m_pBatchThreadDlg->InitDialog();
 
-	if(m_pBatchThreadDlg->exec()==QDialog::Accepted) emit projectModified();
+	m_pBatchThreadDlg->exec();
 
 	m_Reynolds         = m_pBatchThreadDlg->m_ReMin;
 	m_ReynoldsMax      = m_pBatchThreadDlg->m_ReMax;
@@ -1754,11 +1760,19 @@ void QXDirect::OnMultiThreadedBatchAnalysis()
 	SetPolar();
 	pMainFrame->UpdatePolarListBox();
 
-	OpPoint::setCurOpp(NULL);
-
 	m_pctrlAnalyze->setEnabled(true);
+
+
+	pMainFrame->UpdateOppListBox();
+
+	SetOpp();
+
+
 	SetControls();
 	UpdateView();
+
+	emit projectModified();
+
 }
 
 
@@ -2537,6 +2551,9 @@ void QXDirect::OnDeleteFoilPolars()
 	}
 	Polar::setCurPolar(NULL);
 	SetPolar();
+	if(m_bPolarView) CreatePolarCurves();
+	else             CreateOppCurves();
+
 	pMainFrame->UpdatePolarListBox();
 
 	emit projectModified();
@@ -5630,6 +5647,7 @@ void QXDirect::SaveSettings(QSettings *pSettings)
 		pSettings->setValue("NeutralWidth", m_iNeutralWidth);
 		pSettings->setValue("XFoilVar", m_XFoilVar);
 		pSettings->setValue("TimeUpdateInterval", s_TimeUpdateInterval);
+		pSettings->setValue("BatchUpdatePolarView", BatchThreadDlg::s_bUpdatePolarView);
 		pSettings->setValue("PlrGraph", m_iPlrGraph);
 
 		switch(m_iPlrView)
@@ -6490,9 +6508,12 @@ void QXDirect::OnDuplicateFoil()
 void QXDirect::OnRenameCurFoil()
 {
 	MainFrame* pMainFrame = (MainFrame*)s_pMainFrame;
+
+
 	RenameFoil(Foil::curFoil());
 	pMainFrame->UpdateFoilListBox();
 	SetFoil(Foil::curFoil());
+	emit projectModified();
 }
 
 

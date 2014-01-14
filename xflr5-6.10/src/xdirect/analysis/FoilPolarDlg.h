@@ -90,7 +90,7 @@ public:
 	double m_ReDef;
 	double m_ASpec;
 	double m_XTop, m_XBot;
-	double m_ACrit;
+	double m_NCrit;
 	QString m_FoilName;
 	QString m_PlrName;
 

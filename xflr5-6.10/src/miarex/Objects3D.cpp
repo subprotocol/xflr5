@@ -297,7 +297,7 @@ Plane* Objects3D::duplicatePlane(Plane *pPlane)
 bool Objects3D::initializePanels(Plane *pPlane, WPolar *pWPolar)
 {
 	if(!pPlane) return false;
-	int j, k, l, Nel, p, pp, HalfSize;
+    int j, Nel;
 
 	// first check that the total number of panels that will be created does not exceed
 	// the currently allocated memory size for the influence atrix.
@@ -370,39 +370,6 @@ bool Objects3D::initializePanels(Plane *pPlane, WPolar *pWPolar)
 			}
 			pWingList[iw]->m_pWingPanel = ptr;
 			ptr += pWingList[iw]->m_MatSize;
-
-			//create symetry properties between panels
-			if((pWingList[iw]->m_bIsFin && !pWingList[iw]->m_bDoubleFin) || !pWingList[iw]->m_bSymetric)
-			{
-				for(p=0; p<pWingList[iw]->m_MatSize; p++) pWingList[iw]->m_pWingPanel[p].m_iSym=-1;
-			}
-
-			HalfSize = pWingList[iw]->m_MatSize/2;
-			p  = HalfSize-1;
-			pp = HalfSize;
-			for(j=0; j<pWingList[iw]->m_Surface.size(); j++)
-			{
-				if(pWingList[iw]->m_Surface.at(j)->m_bIsRightSurf)
-				{
-					for(k=0; k<pWingList[iw]->m_Surface.at(j)->m_NYPanels; k++)
-					{
-						for(l=0; l<pWingList[iw]->m_Surface.at(j)->m_NXPanels*coef; l++)
-						{
-							pWingList[iw]->m_pWingPanel[p].m_iSym    = pWingList[iw]->m_pWingPanel[pp+pWingList[iw]->m_Surface.at(j)->m_NXPanels*coef-l-1].m_iElement;
-							p--;
-						}
-						pp += pWingList[iw]->m_Surface.at(j)->m_NXPanels*coef;
-					}
-					if(pWingList[iw]->m_Surface.at(j)->m_bIsTipRight && (pWPolar && !pWPolar->m_bThinSurfaces))
-					{
-						for(l=0; l<pWingList[iw]->m_Surface.at(j)->m_NXPanels; l++)
-						{
-							pWingList[iw]->m_pWingPanel[p].m_iSym    = pWingList[iw]->m_pWingPanel[pp+pWingList[iw]->m_Surface.at(j)->m_NXPanels-l-1].m_iElement;
-							p--;
-						}
-					}
-				}
-			}
 		}
 	}
 
@@ -462,14 +429,16 @@ void Objects3D::rotateGeomZ(Panel *pPanel, CVector *pNode, Panel *pWakePanel, CV
 
 	for (p=0; p<nPanels; p++)
 	{
+		// get the index of the panel's four corner points
 		iLA = pPanel[p].m_iLA; iLB = pPanel[p].m_iLB;
 		iTA = pPanel[p].m_iTA; iTB = pPanel[p].m_iTB;
 
+		//set the new panel geometry
 		if(pPanel[p].m_Pos>=MIDSURFACE)       pPanel[p].SetPanelFrame(pNode[iLA], pNode[iLB], pNode[iTA], pNode[iTB]);
 		else if (pPanel[p].m_Pos==BOTSURFACE) pPanel[p].SetPanelFrame(pNode[iLB], pNode[iLA], pNode[iTB], pNode[iTA]);
 	}
 
-	// the wake array is not rotated but translated to remain at the wing's trailing edge
+	// the wake array is not rotated but translated to remain at the wing's trailing edge and aligned with the freestream velocity vector
 	pw=0;
 
 	for (kw=0; kw<NWakeColumn; kw++)
@@ -488,6 +457,8 @@ void Objects3D::rotateGeomZ(Panel *pPanel, CVector *pNode, Panel *pWakePanel, CV
 			pw++;
 		}
 	}
+	
+	//last column, process B side of the column
 	pw -= NXWakePanels;
 	//consider the first panel of the column;
 	Pt = pWakeNode[pWakePanel[pw].m_iLB];
@@ -506,8 +477,11 @@ void Objects3D::rotateGeomZ(Panel *pPanel, CVector *pNode, Panel *pWakePanel, CV
 	//Reset panel frame : CollPt has been translated
 	for (pw=0; pw< nWakePanels; pw++)
 	{
+		// get the index of the panel's four corner points
 		iLA = pWakePanel[pw].m_iLA; iLB = pWakePanel[pw].m_iLB;
 		iTA = pWakePanel[pw].m_iTA; iTB = pWakePanel[pw].m_iTB;
+		
+		//set the new panel geometry
 		pWakePanel[pw].SetPanelFrame(pWakeNode[iLA], pWakeNode[iLB], pWakeNode[iTA], pWakeNode[iTB]);
 	}
 }
@@ -1080,7 +1054,6 @@ int Objects3D::createBodyElements(Plane *pCurPlane)
 						s_Panel[s_MatSize].m_bIsTrailing    = false;
 						s_Panel[s_MatSize].m_Pos = BODYSURFACE;
 						s_Panel[s_MatSize].m_iElement = s_MatSize;
-						s_Panel[s_MatSize].m_iSym     = -1;
 						s_Panel[s_MatSize].m_bIsLeftPanel  = true;
 						s_Panel[s_MatSize].SetPanelFrame(LA, LB, TA, TB);
 
@@ -1190,7 +1163,6 @@ int Objects3D::createBodyElements(Plane *pCurPlane)
 				s_Panel[s_MatSize].m_bIsTrailing    = false;
 				s_Panel[s_MatSize].m_Pos = BODYSURFACE;
 				s_Panel[s_MatSize].m_iElement = s_MatSize;
-				s_Panel[s_MatSize].m_iSym     = -1;
 				s_Panel[s_MatSize].m_bIsLeftPanel  = true;
 				s_Panel[s_MatSize].SetPanelFrame(LA, LB, TA, TB);
 
@@ -1286,8 +1258,6 @@ int Objects3D::createBodyElements(Plane *pCurPlane)
 			s_Panel[s_MatSize].m_bIsTrailing    = false;
 			s_Panel[s_MatSize].m_Pos = BODYSURFACE;
 			s_Panel[s_MatSize].m_iElement = s_MatSize;
-			s_Panel[s_MatSize].m_iSym = -1;
-			s_Panel[i].m_iSym = s_MatSize;
 			s_Panel[s_MatSize].m_bIsLeftPanel  = false;
 			s_Panel[s_MatSize].SetPanelFrame(LA, LB, TA, TB);
 
@@ -1403,7 +1373,6 @@ int Objects3D::createWingElements(Plane *pPlane, WPolar *pWPolar, Surface *pSurf
 
 			s_Panel[s_MatSize].m_Pos = SIDESURFACE;
 			s_Panel[s_MatSize].m_iElement = s_MatSize;
-			s_Panel[s_MatSize].m_iSym  = -1;
 			s_Panel[s_MatSize].m_bIsLeftPanel  = pSurface->m_bIsLeftSurf;
 			s_Panel[s_MatSize].SetPanelFrame(LA, LB, TA, TB);
 			s_Panel[s_MatSize].m_iWake = -1;
@@ -1485,7 +1454,6 @@ int Objects3D::createWingElements(Plane *pPlane, WPolar *pWPolar, Surface *pSurf
 
 			s_Panel[s_MatSize].m_Pos = side;
 			s_Panel[s_MatSize].m_iElement = s_MatSize;
-			s_Panel[s_MatSize].m_iSym  = -1;
 			s_Panel[s_MatSize].m_bIsLeftPanel  = pSurface->m_bIsLeftSurf;
 
 			if(side==MIDSURFACE)        s_Panel[s_MatSize].SetPanelFrame(pSurface->LA, pSurface->LB, pSurface->TA, pSurface->TB);
@@ -1589,7 +1557,6 @@ int Objects3D::createWingElements(Plane *pPlane, WPolar *pWPolar, Surface *pSurf
 
 				s_Panel[s_MatSize].m_Pos = side;
 				s_Panel[s_MatSize].m_iElement = s_MatSize;
-				s_Panel[s_MatSize].m_iSym  = -1;
 				s_Panel[s_MatSize].m_bIsLeftPanel  = pSurface->m_bIsLeftSurf;
 
 				s_Panel[s_MatSize].SetPanelFrame(pSurface->LA, pSurface->LB, pSurface->TA, pSurface->TB);
@@ -1684,7 +1651,6 @@ int Objects3D::createWingElements(Plane *pPlane, WPolar *pWPolar, Surface *pSurf
 
 			s_Panel[s_MatSize].m_Pos = SIDESURFACE;
 			s_Panel[s_MatSize].m_iElement = s_MatSize;
-			s_Panel[s_MatSize].m_iSym  = -1;
 			s_Panel[s_MatSize].m_bIsLeftPanel  = pSurface->m_bIsLeftSurf;
 			s_Panel[s_MatSize].SetPanelFrame(LA, LB, TA, TB);
 			s_Panel[s_MatSize].m_iWake = -1;
@@ -1803,7 +1769,6 @@ bool Objects3D::createWakeElems(int PanelIndex, Plane *pPlane, WPolar* pWPolar)
 		s_WakePanel[mw].Area =  s_WakePanel[mw].Normal.VAbs()/2.0;
 		s_WakePanel[mw].Normal.Normalize();
 		s_WakePanel[mw].SetPanelFrame(LA,LB, TA, TB);
-		s_WakePanel[mw].m_iSym     = -1;
 		s_WakePanel[mw].m_bIsLeftPanel  = false;
 
 		if(l==0)					s_WakePanel[mw].m_iPD = -1;// no panel downstream
@@ -2186,18 +2151,31 @@ Plane * Objects3D::setModPlane(Plane *pModPlane)
 
 
 /**
- * Inserts a modified CWPolar object in the array, i.a.w. user instructions
- * @param pModWPolar a pointer to the instance of the CWPolar object to be inserted
+ * Inserts a new WPolar object in the array.
+ * If the WPolar's name already exists, finds a new one, eventually by overwriting an old WPolar.
+ * @param pModWPolar a pointer to the instance of the WPolar object to be inserted
  * @return a pointer to the polar which has been set, or NULL if failure
  */
-WPolar* Objects3D::setModWPolar(WPolar *pModWPolar, Plane *pCurPlane)
+WPolar* Objects3D::insertNewWPolar(WPolar *pNewWPolar, Plane *pCurPlane)
 {
-	if(!pModWPolar) return NULL;
+	if(!pNewWPolar) return NULL;
 	WPolar *pWPolar, *pOldWPolar;
 
 	bool bExists = true;
 	int resp, k, l;
 
+	//check if this WPolar is already inserted
+	for(int ip=0; ip<s_oaWPolar.size(); ip++)
+	{
+		pOldWPolar = (WPolar*)s_oaWPolar.at(ip);
+		if(pOldWPolar==pNewWPolar)
+		{
+			Trace("this WPolar is already in the array, nothing inserted");
+			return NULL;
+		}
+	}
+
+	//make a list of existing names
 	QStringList NameList;
 	for(k=0; k<s_oaWPolar.size(); k++)
 	{
@@ -2205,83 +2183,112 @@ WPolar* Objects3D::setModWPolar(WPolar *pModWPolar, Plane *pCurPlane)
 		if(pWPolar->m_PlaneName==pCurPlane->planeName()) NameList.append(pWPolar->m_WPlrName);
 	}
 
-	RenameDlg dlg;
-	dlg.InitDialog(&NameList, pModWPolar->m_WPlrName, QObject::tr("Enter the new name for the Polar:"));
-
-	while (bExists)
+	//Is the new WPolar's name already used ?
+	bExists = false;
+	for (k=0; k<NameList.count(); k++)
 	{
-		//Is the new name already used ?
-		bExists = false;
-		for (k=0; k<NameList.count(); k++)
+		if(pNewWPolar->polarName()==NameList.at(k))
 		{
-			if(dlg.newName()==NameList.at(k))
+			bExists = true;
+			break;
+		}
+	}
+
+	if(!bExists)
+	{
+		//just insert the WPolar in alphabetical order
+		for (l=0; l<s_oaWPolar.size();l++)
+		{
+			pOldWPolar = (WPolar*)s_oaWPolar.at(l);
+
+			if(pOldWPolar->m_WPlrName.compare(pNewWPolar->m_WPlrName, Qt::CaseInsensitive) >0)
 			{
-				bExists = true;
+				//then insert before
+				s_oaWPolar.insert(l, pNewWPolar);
+				return pNewWPolar;
+			}
+		}
+		//not inserted, append
+		s_oaWPolar.append(pNewWPolar);
+		return pNewWPolar;
+	}
+
+	// an old object with the WPolar's name exists for this Plane, ask for a new one
+	RenameDlg dlg;
+	dlg.InitDialog(&NameList, pNewWPolar->polarName(), QObject::tr("Enter the new name for the Polar:"));
+	resp = dlg.exec();
+
+	if(resp==10)
+	{
+		//user wants to overwrite an existing name
+		//so find the existing WPolar with that name
+		pWPolar = NULL;
+		for(int ipb=0; ipb<s_oaWPolar.size(); ipb++)
+		{
+			pOldWPolar = (WPolar*)s_oaWPolar.at(ipb);
+			if(pOldWPolar->polarName()==pNewWPolar->polarName() && pWPolar->m_PlaneName==pCurPlane->planeName())
+			{
+				pWPolar = pOldWPolar;
 				break;
 			}
 		}
 
-		if(!bExists)
+		if(pWPolar)
 		{
-			pModWPolar->m_WPlrName = dlg.newName();
-			//replace the WPolar in alphabetical order in the array
-
-			bool bInserted = false;
-			for (l=0; l<s_oaWPolar.size();l++)
+			//remove and delete its children POpps from the array
+			for (l=s_oaPOpp.size()-1;l>=0; l--)
 			{
-				pOldWPolar = (WPolar*)s_oaWPolar.at(l);
-
-				if(pOldWPolar->m_WPlrName.compare(pModWPolar->m_WPlrName, Qt::CaseInsensitive) >0)
+				PlaneOpp *pPOpp = (PlaneOpp*)s_oaPOpp.at(l);
+				if (pPOpp->planeName()==pWPolar->planeName() && pPOpp->polarName()==pWPolar->polarName())
 				{
-					//then insert before
-					s_oaWPolar.insert(l, pModWPolar);
-					bInserted = true;
-					break;
-				}
-			}
-			if(!bInserted)	s_oaWPolar.append(pModWPolar);
-			return pModWPolar;
-		}
-
-		//Name exists, ask for a new name
-		resp = dlg.exec();
-
-		if(resp==10)
-		{
-			//user wants to overwrite an existing name
-			pOldWPolar = NULL;
-			for(int ipb=0; ipb<s_oaWPolar.size(); ipb++)
-			{
-				pWPolar = (WPolar*)s_oaWPolar.at(ipb);
-				if(pWPolar->m_WPlrName==pModWPolar->m_WPlrName && pWPolar->m_PlaneName==pCurPlane->planeName())
-				{
-					pOldWPolar = pWPolar;
-					for (l=s_oaPOpp.size()-1;l>=0; l--)
-					{
-						PlaneOpp *pPOpp = (PlaneOpp*)s_oaPOpp.at(l);
-						if (pPOpp->m_PlaneName==pOldWPolar->m_PlaneName && pPOpp->m_PlrName==pOldWPolar->m_WPlrName)
-						{
-							s_oaPOpp.removeAt(l);
-							delete pPOpp;
-						}
-					}
-
-					s_oaWPolar.removeAt(ipb);
-					if( pOldWPolar!=pModWPolar) delete pOldWPolar;
-					s_oaWPolar.insert(ipb, pModWPolar);
-
-					return pModWPolar;
+					s_oaPOpp.removeAt(l);
+					delete pPOpp;
 				}
 			}
 		}
-		else if(resp==QDialog::Rejected)
+
+		//room has been made, insert the new WPolar in alphabetical order
+		for (l=0; l<s_oaWPolar.size();l++)
 		{
-			return NULL;
+			pOldWPolar = (WPolar*)s_oaWPolar.at(l);
+
+			if(pOldWPolar->m_WPlrName.compare(pNewWPolar->m_WPlrName, Qt::CaseInsensitive) >0)
+			{
+				//then insert before
+				s_oaWPolar.insert(l, pNewWPolar);
+				return pNewWPolar;
+			}
 		}
-		//else continue loop with new name
-		pModWPolar->m_WPlrName=dlg.newName();
+		//not inserted, append
+		s_oaWPolar.append(pNewWPolar);
+		return pNewWPolar;
+
 	}
-	return NULL;//useless...
+	else if(resp==QDialog::Rejected)
+	{
+		return NULL;
+	}
+	else if(resp==QDialog::Accepted)
+	{
+		//not rejected, no overwrite, else the user has selected a non-existing name, rename and insert
+		pNewWPolar->m_WPlrName=dlg.newName();
+		for (l=0; l<s_oaWPolar.size();l++)
+		{
+			pOldWPolar = (WPolar*)s_oaWPolar.at(l);
+
+			if(pOldWPolar->m_WPlrName.compare(pNewWPolar->m_WPlrName, Qt::CaseInsensitive) >0)
+			{
+				//then insert before
+				s_oaWPolar.insert(l, pNewWPolar);
+				return pNewWPolar;
+			}
+		}
+		//not inserted, append
+		s_oaWPolar.append(pNewWPolar);
+		return pNewWPolar;
+
+	}
+	return NULL;//should never gethere
 }
 
 

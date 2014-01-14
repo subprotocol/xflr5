@@ -52,7 +52,7 @@ public:
 
 	void setSequence(double bAlpha, double SpMin, double SpMax, double SpInc);
 	void setReRange(double ReMin, double ReMax, double ReInc);
-	void setGraphPointers(Graph *pGraph, Curve *pCurve0, Curve *pCurve1);
+	void setGraphPointers(Graph *pGraph=NULL, Curve *pCurve0=NULL, Curve *pCurve1=NULL);
 	void traceLog(QString str);
 
 	static bool s_bSkipPolar;

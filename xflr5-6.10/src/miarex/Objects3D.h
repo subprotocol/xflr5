@@ -66,7 +66,7 @@ public:
 	static void      Release();
 	static void      renamePlane(QString PlaneName);
 	static Plane *   setModPlane(Plane *pModPlane);
-	static WPolar *  setModWPolar(WPolar *pModWPolar, Plane *pCurPlane);
+	static WPolar *  insertNewWPolar(WPolar *pModWPolar, Plane *pCurPlane);
 	static void      setStaticPointers();
 	static WPolar *  setWPolarObject(Plane *pCurPlane, WPolar *pCurWPolar, bool bCurrentWPolar, QString WPlrName);
 	static PlaneOpp* setPlaneOppObject(Plane *pPlane, WPolar *pWPolar, PlaneOpp *pCurPOpp, bool bCurrent, double x);

@@ -97,7 +97,6 @@ protected:
 	bool m_bIsWakePanel;     /**< true if the panel lies on the wake of a winf */
 
 	int m_iElement;          /**< panel identification number ; used when the panel array is re-arranged in non sequential order to reduce the matrix size in symetrical calculations */
-	int m_iSym;              /**< reference of the symetric panel, or -1 if none */
 	int m_iPL;               /**< index of the panel which lies left of this panel, or -1 if none */
 	int m_iPR;               /**< index of the panel which lies right of this panel, or -1 if none */
 	int m_iPU;               /**< index of the panel which lies upstream of this panel, or -1 if none */

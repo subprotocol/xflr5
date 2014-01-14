@@ -4527,8 +4527,9 @@ void MainFrame::SelectOpPoint(void *pOppPtr)
 
 	for(int i=0; i<m_pctrlOpPoint->count(); i++)
 	{
-		strange = m_pctrlOpPoint->itemText(i);
-		int val = locale().toDouble(strange, &bOK);
+		strange = m_pctrlOpPoint->itemText(i).trimmed();
+
+		double val = locale().toDouble(strange, &bOK);
 		if(pCurPlr->polarType() != FIXEDAOAPOLAR)
 		{
 			if(bOK && qAbs(val-pOpp->Alpha)<0.001)
@@ -5013,8 +5014,8 @@ bool MainFrame::SerializeProjectWPA(QDataStream &ar, bool bIsStoring)
 			if(ArchiveFormat>=100006)
 			{
 				ar >> k;
-				if (k) pMiarex->m_bVLM1 = true;
-				else   pMiarex->m_bVLM1 = false;
+				if (k) QMiarex::s_bVLM1 = true;
+				else   QMiarex::s_bVLM1 = false;
 
 				ar >> k;
 			}

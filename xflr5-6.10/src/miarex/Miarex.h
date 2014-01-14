@@ -375,9 +375,10 @@ public:
 	static bool s_bSurfaces;                  /**< true if the surfaces are to be displayed in the 3D view*/
 	static bool s_bVLMPanels;                 /**< true if the panels are to be displayed in the 3D view*/
 	static bool s_bAxes;                      /**< true if the axes are to be displayed in the 3D view*/
-    static bool s_bShowMasses;                /**< true if the point masses are to be displayed on the openGL 3D view */
-    static bool s_bFoilNames;                 /**< true if the foil names are to be displayed on the openGL 3D view */
+	static bool s_bShowMasses;                /**< true if the point masses are to be displayed on the openGL 3D view */
+	static bool s_bFoilNames;                 /**< true if the foil names are to be displayed on the openGL 3D view */
 
+	static bool s_bVLM1;                      /**< true if the horseshoe method is selected, false if the quad ring method is selected */
 
 	// Class variables
 
@@ -422,7 +423,6 @@ public:
 	bool m_bType2;                     /**< true if polars of type 2 are to be displayed */
 	bool m_bType4;                     /**< true if polars of type 4 are to be displayed */
 	bool m_bType7;                     /**< true if polars of type 71 are to be displayed */
-	bool m_bVLM1;                      /**< true if the horseshoe method is selected, false if the quad ring method is selected */
 	bool m_bVortices;                  /**< true if the panel vortices should be displayed */
 	bool m_bXBot;                      /**< true if the transition on the bottom surface should be displayed in the operating point or in 3D view*/
 	bool m_bXCmRef; 	               /**< true if the position of the reference point for the moments should be displayed in the operating point view*/

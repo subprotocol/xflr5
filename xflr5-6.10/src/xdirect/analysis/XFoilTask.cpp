@@ -119,7 +119,13 @@ bool XFoilTask::InitializeTask(Foil *pFoil, Polar *pPolar, bool bViscous, bool b
 	return true;
 }
 
-
+/** 
+ * Sets the range of aoa or Cl parameters to analyze 
+ * @param bAlpha true if the input parameter is a range of aoa, false if a range of lift coefficients
+ * @param SpMin the minimum value of the range to analyze
+ * @param SpMax the maximum value of the range to analyze
+ * @param SpInc the increment value for the parameter
+ */
 void XFoilTask::setSequence(double bAlpha, double SpMin, double SpMax, double SpInc)
 {
 	m_bAlpha = bAlpha;
@@ -137,7 +143,12 @@ void XFoilTask::setSequence(double bAlpha, double SpMin, double SpMax, double Sp
 	}
 }
 
-
+/** 
+ * Maps the range of Reynolds numbers to analyze to the member variables
+ * @param ReMin the minimum value of the range to analyze
+ * @param ReMax the maximum value of the range to analyze
+ * @param ReInc the increment value for the Reynolds number
+ */
 void XFoilTask::setReRange(double ReMin, double ReMax, double ReInc)
 {
 	m_ReMin = ReMin;
@@ -145,7 +156,13 @@ void XFoilTask::setReRange(double ReMin, double ReMax, double ReInc)
 	m_ReInc = ReInc;
 }
 
-
+/**
+ * Maps the pointers to the graphs and curves for the output to the member variables.
+ * If the pointers are NULL, no graphic output will be provided.
+ * @param pGraph a pointer to the Graph object
+ * @param pCurve0 a pointer to the rms curve
+ * @param pCurve1 a pointer to the max curve
+ */
 void XFoilTask::setGraphPointers(Graph *pGraph, Curve *pCurve0, Curve* pCurve1)
 {
 	m_pGraph = pGraph;
@@ -155,7 +172,7 @@ void XFoilTask::setGraphPointers(Graph *pGraph, Curve *pCurve0, Curve* pCurve1)
 
 
 /** 
-* Performs a sequence of Xfoil calculations for a range of aoa or lift coefficients
+* Performs a sequence of XFoil calculations for a range of aoa or lift coefficients
 * @return true if the calculation was successful
 */
 bool XFoilTask::AlphaSequence()
@@ -296,11 +313,14 @@ bool XFoilTask::AlphaSequence()
 
 
 
+/** 
+* Performs a sequence of XFoil calculations for a range of Reynolds numbers.
+* @return true if the calculation was successful
+*/
 bool XFoilTask::ReSequence()
 {
 	QString str;
 	int ia;
-
 	double Re;
 
 	if(m_ReMax< m_ReMin) m_ReInc = -qAbs(m_ReInc);
@@ -450,7 +470,10 @@ bool XFoilTask::Iterate()
 
 
 
-/** Sends the analysis messages to the specified text output stream */
+/** 
+ * Sends the analysis messages to the specified text output stream 
+ * @param str the message to output.
+ */
 void XFoilTask::traceLog(QString str)
 {
 	if(m_OutStream.device())

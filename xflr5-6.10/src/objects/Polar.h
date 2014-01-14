@@ -1,7 +1,7 @@
 /****************************************************************************
 
     Polar Class
-	Copyright (C) 2003 Andre Deperrois adeperrois@xflr5.com
+	Copyright (C) 2003-2014 Andre Deperrois adeperrois@xflr5.com
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -87,14 +87,17 @@ public:
 	void GetClLimits(double &Clmin, double &Clmax);
 	void GetLinearizedCl(double &Alpha0, double &slope);
 
-	void setFoilName(QString newFoilName) {m_FoilName = newFoilName;}
-	void setPolarName(QString newPolarName) {m_PlrName = newPolarName;}
 	QString foilName() {return m_FoilName;}
 	QString polarName() {return m_PlrName;}
 
 	enumPolarType polarType() {return m_PolarType;}
 	void setPolarType(enumPolarType type);
 
+	void setFoilName(QString newFoilName) {m_FoilName = newFoilName;}
+	void setPolarName(QString newPolarName) {m_PlrName = newPolarName;}
+
+	void setAutoPolarName();
+	static QString getAutoPolarName(enumPolarType polarType, double Re, double Mach, double NCrit, double ASpec=0.0);
 	static QString variableName(int iVar);
 	static Polar *curPolar() {return s_pCurPolar;}
 	static Polar *getPolar(void* pFoilPtr, QString PolarName);

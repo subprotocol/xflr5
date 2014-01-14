@@ -329,7 +329,7 @@ void StabViewDlg::OnAnimateRestart()
 	double sigma, s2, omega, o2;
 	double norm1, norm2, theta_sum, psi_sum, ModeState[6];
 
-    for(int im=0; im<6; im++) ModeState[im] = 0;
+	for(int im=0; im<6; im++) ModeState[im] = 0;
 
 	QMiarex * pMiarex = (QMiarex*)s_pMiarex;
 	PlaneOpp *pPOpp = pMiarex->m_pCurPOpp;

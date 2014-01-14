@@ -972,9 +972,8 @@ void PlaneDlg::SetupLayout()
 			QLabel *BodyWarning = new QLabel(tr("Warning:\nIncluding the body in the analysis is not recommended.\nCheck the guidelines for explanations."));
 			BodyLayout->addWidget(BodyWarning);
 			BodyLayout->addLayout(BodyName);
-			BodyLayout->addLayout(BodyPos); 
-			BodyLayout->addStretch(1);
-        }
+			BodyLayout->addLayout(BodyPos);
+		}
 		BodyBox->setLayout(BodyLayout);
 	}
 

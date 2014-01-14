@@ -912,7 +912,7 @@ void StabPolarDlg::SetWPolarName()
 	if(!m_pPlane && !s_StabPolar.m_bThinSurfaces) WPolarName += "-Panel";
 	if(s_StabPolar.m_bThinSurfaces)
 	{
-		if(pMiarex->m_bVLM1) WPolarName += "-VLM1";
+		if(pMiarex->s_bVLM1) WPolarName += "-VLM1";
 		else		         WPolarName += "-VLM2";
 	}
 

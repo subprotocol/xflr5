@@ -18,7 +18,10 @@
 	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 *****************************************************************************/
-
+/**
+* @file BatchDlg
+* This file implements the interface to manage a batch analysis of Foils.
+*/
 #ifndef BATCHDLG_H
 #define BATCHDLG_H
 
@@ -37,6 +40,11 @@
 #include "XFoilTask.h"
 
 
+
+/**
+* @class XFoilAnalysisDlg
+* This class provides an interface to manage a batch analysis of Foils.
+*/
 class BatchDlg : public QDialog
 {
 	Q_OBJECT
@@ -100,48 +108,41 @@ private:
 	QTextEdit *m_pctrlTextOutput;
 	GraphWidget *m_pctrlGraphOutput;
 
-	static void* s_pXDirect;
-	static bool s_bCurrentFoil;
-	enumPolarType m_PolarType;
+	static void* s_pXDirect;     /**< a void pointer to the instance of the QXDirect object >*/
+	static bool s_bCurrentFoil;  /**< true if the analysis should be performed on the active Foil, false if on a list of Foils>*/
+	enumPolarType m_PolarType;   /**< the type of Polar to be created for the analysis>*/
 
-	double m_Mach;
+	double m_Mach;               /**< the Mach number for the Polars and the analysis>*/
 
-	double m_ReMin, m_ReMax, m_ReInc;
-	double m_SpMin, m_SpMax, m_SpInc;
+	double m_ReMin, m_ReMax, m_ReInc;  /**< The range of Re values to analyze>*/
+	double m_SpMin, m_SpMax, m_SpInc;  /**< The range of specified aoa, Cl or Re values, depending on the type of Polar and on the user-specified input method.>*/
 
-	double m_AlphaMin, m_AlphaMax, m_AlphaInc;
-	double m_ClMin, m_ClMax, m_ClInc;
+	double m_AlphaMin, m_AlphaMax, m_AlphaInc;  /**< The range of aoa for a Type 1/2/3 Polar >*/
+	double m_ClMin, m_ClMax, m_ClInc;           /**< The range of lift coefficient for a Type 1/2/3 Polar>*/
 
-	double m_ACrit;
-	double m_XTop;
-	double m_XBot;
+	double m_ACrit;                /**< The free transition parameter to be used in the Polar creation>*/
+	double m_XTop;                 /**< The forced transition point on the upper surface to be used in the Polar creation>*/
+	double m_XBot;                 /**< The forced transition point on the lower surface to be used in the Polar creation>*/
 
-	bool m_bOutput;
-	bool m_bAlpha;
-	bool m_bFromList;
-	bool m_bFromZero;
-	bool m_bInitBL;
-	bool m_bCancel;
-	bool m_bIsRunning;
-	bool m_bErrors;
+	bool m_bAlpha;                 /**< true if the analysis should be performed for a range of aoa, false if for a range of licf coefficient.>*/
+	bool m_bFromList;              /**< true if the analysis should be performed on a list of (Re, Ma, Ncrit) sets, false if for a range of Reynolds numbers.>*/
+	bool m_bFromZero;              /**< true if the analysis should start at alpha=0 or Cl=0, false if from min to max.>*/
+	bool m_bInitBL;                /**< true if the boundary layer should be initialized after an unconverged iteration>*/
+	bool m_bCancel;                /**< true if the analysis is in the process of being cancelled>*/
+	bool m_bIsRunning;             /**< true if the analysis is running>*/
+	bool m_bErrors;                /**< true if the analysis has generated errors>*/
 
-	QFile *m_pXFile;
+	QFile *m_pXFile;               /**< a pointer to the log file>*/
 
-	Foil *m_pFoil;
-	Polar *m_pCurPolar;
+	Foil *m_pFoil;                 /**< a pointer to the Foil for which the analysis will be run>*/
+	Polar *m_pCurPolar;            /**< a pointer to the active Polar @todo replace with a local variable>*/
 
-	QFont m_RFont;
-	QFont m_TitleFont;
+	QStringList m_FoilList;        /**< the list of Foil objects to analyze>*/
 
-	QStringList m_FoilList;
-	QString m_PlrName;
+	QGraph *m_pRmsGraph;           /**< a pointer to the output graph >*/
 
-	QGraph *m_pRmsGraph;
-	QRect m_IterRect;
-	Curve* m_pIterCurve;
-
-	XFoilTask *m_pXFoilTask;
-
+	XFoilTask *m_pXFoilTask;       /**< A pointer to the instance of the XFoilTask associated to this batch analysis. 
+	                                    The task is unique to the instance of this class, and re-used each time a new analysis is launched.>*/
 };
 
 #endif // BATCHDLG_H

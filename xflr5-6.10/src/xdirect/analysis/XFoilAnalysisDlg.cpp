@@ -68,11 +68,7 @@ XFoilAnalysisDlg::XFoilAnalysisDlg(QWidget *pParent) : QDialog(pParent)
 	m_pRmsGraph->CopySettings(&Settings::s_RefGraph, false);
 
 	m_bErrors     = false;
-	m_bSequence   = false;
 	m_bAlpha      = true;
-
-	m_LegendPlace.rx() = 0;
-	m_LegendPlace.ry() = 0;
 
 	m_AlphaMin   = 0.0;
 	m_AlphaMax   = 1.0;

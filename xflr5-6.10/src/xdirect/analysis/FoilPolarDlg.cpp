@@ -38,7 +38,7 @@ FoilPolarDlg::FoilPolarDlg(QWidget *pParent) : QDialog(pParent)
 {
 	setWindowTitle(tr("Foil Polar Definition"));
 	m_PolarType = FIXEDSPEEDPOLAR;
-	m_ACrit    = 9.0;
+	m_NCrit    = 9.0;
 	m_XTop   = 1.0;
 	m_XBot   = 1.0;
 	m_Mach     = 0.0;
@@ -309,7 +309,7 @@ void FoilPolarDlg::InitDialog()
 	QString str = tr("Analysis parameters for ");
 	setWindowTitle(str+ m_FoilName);
 
-	m_ACrit     = QXDirect::s_refPolar.m_ACrit;
+	m_NCrit     = QXDirect::s_refPolar.m_ACrit;
 	m_XBot      = QXDirect::s_refPolar.m_XBot;
 	m_XTop      = QXDirect::s_refPolar.m_XTop;
 	m_Mach      = QXDirect::s_refPolar.m_Mach;
@@ -320,7 +320,7 @@ void FoilPolarDlg::InitDialog()
 
 	m_pctrlReynolds->SetValue(m_Reynolds);
 	m_pctrlMach->SetValue(m_Mach);
-	m_pctrlNCrit->SetValue(m_ACrit);
+	m_pctrlNCrit->SetValue(m_NCrit);
 	m_pctrlTopTrans->SetValue(m_XTop);
 	m_pctrlBotTrans->SetValue(m_XBot);
 
@@ -440,7 +440,7 @@ void FoilPolarDlg::OnOK()
 	m_PlrName = m_pctrlAnalysisName->text();
 
 	QXDirect::s_refPolar.setPolarType(m_PolarType);
-	QXDirect::s_refPolar.m_ACrit    = m_ACrit;
+	QXDirect::s_refPolar.m_ACrit    = m_NCrit;
 	QXDirect::s_refPolar.m_XBot     = m_XBot;
 	QXDirect::s_refPolar.m_XTop     = m_XTop;
 	QXDirect::s_refPolar.m_Mach     = m_Mach;
@@ -501,43 +501,10 @@ void FoilPolarDlg::OnPolarType()
 void FoilPolarDlg::SetPlrName()
 {
 	ReadParams();
-	double Re = m_Reynolds/1000000.;
 
 	if(m_bAutoName)
 	{
-		switch(m_PolarType)
-		{
-			case FIXEDSPEEDPOLAR:
-			{
-				m_PlrName = QString("T1_Re%1_M%2").arg(Re,5,'f',3).arg(m_Mach,4,'f',2);
-				break;
-			}
-			case FIXEDLIFTPOLAR:
-			{
-				m_PlrName = QString("T2_Re%1_M%2").arg(Re,5,'f',3).arg(m_Mach,4,'f',2);
-				break;
-			}
-			case RUBBERCHORDPOLAR:
-			{
-				m_PlrName = QString("T3_Re%1_M%2").arg(Re,5,'f',3).arg(m_Mach,4,'f',2);
-				break;
-			}
-			case(FIXEDAOAPOLAR):
-			{
-				m_PlrName = QString("T4_Al%1_M%2").arg(m_ASpec,5,'f',2).arg(m_Mach,4,'f',2);
-				break;
-			}
-			default:
-			{
-				m_PlrName = QString("T1_Re%1_M%2").arg(Re,5,'f',3).arg(m_Mach,4,'f',2);
-				break;
-			}
-		}
-
-
-		QString str = QString("_N%1").arg(m_ACrit,3,'f',1);
-		m_PlrName += str;
-
+		m_PlrName= Polar::getAutoPolarName(m_PolarType, m_Reynolds, m_Mach, m_NCrit, m_ASpec);
 		m_pctrlAnalysisName->setText(m_PlrName);
 	}
 }
@@ -577,7 +544,7 @@ void FoilPolarDlg::ReadParams()
 //  m_pctrlMach->clear();
 //	m_pctrlMach->insert(str.setNum(m_Mach,'f',3));
 
-	m_ACrit  = m_pctrlNCrit->Value();
+	m_NCrit  = m_pctrlNCrit->Value();
 	m_XTop = m_pctrlTopTrans->Value();
 	m_XBot = m_pctrlBotTrans->Value();
 

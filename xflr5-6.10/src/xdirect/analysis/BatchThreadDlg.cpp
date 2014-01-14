@@ -1,4 +1,4 @@
-/****************************************************************************
+﻿/****************************************************************************
 
 	BatchThreadDlg Class
 	   Copyright (C) 2003-2014 Andre Deperrois adeperrois@xflr5.com
@@ -428,7 +428,9 @@ void BatchThreadDlg::keyPressEvent(QKeyEvent *event)
 		{
 			if(m_bIsRunning)
 			{
-				OnAnalyze();//will cancel the threads
+				m_bCancel = true;
+				XFoilTask::s_bCancel = true;
+				XFoil::s_bCancel = true;
 			}
 			else
 			{
@@ -439,7 +441,9 @@ void BatchThreadDlg::keyPressEvent(QKeyEvent *event)
 		default:
 			event->ignore();
 	}
+	event->accept();
 }
+
 
 /**
  * Initializes the dialog and the GUI interface
@@ -510,7 +514,8 @@ void BatchThreadDlg::InitDialog()
 
 
 /**
- * The user has switched between aoa and lift coeficient
+ * The user has switched between aoa and lift coeficient.
+ * Initializes the interface with the corresponding values.
  */
 void BatchThreadDlg::OnAcl()
 {
@@ -546,7 +551,8 @@ void BatchThreadDlg::OnSpecChanged()
 
 
 /**
- * Launches the multi-threaded batch analysis
+ * If an analysis is running, cancels the XFoilTask and returns.
+ * It not, launches the analysis.
  */
 void BatchThreadDlg::OnAnalyze()
 {
@@ -559,7 +565,6 @@ void BatchThreadDlg::OnAnalyze()
 	}
 	m_bCancel    = false;
 	m_bIsRunning = true;
-
 
 	m_pctrlClose->setEnabled(false);
 
@@ -579,6 +584,7 @@ void BatchThreadDlg::OnAnalyze()
 
 /**
  * The user has requested to quit the dialog box
+ * @todo check exit sequence if threads are not terminated yet.
  */
 void BatchThreadDlg::OnClose()
 {
@@ -768,24 +774,8 @@ void BatchThreadDlg::SetFileHeader()
  */
 void BatchThreadDlg::SetPlrName(Polar *pNewPolar)
 {
-	if(m_PolarType!=FIXEDAOAPOLAR)
-	{
-		double R = pNewPolar->m_Reynolds/1000000.;
-		pNewPolar->m_PlrName = QString("T%1_Re%2_M%3")
-								 .arg(pNewPolar->m_PolarType+1)
-								 .arg(R,0,'f',3)
-								 .arg( pNewPolar->m_Mach,0,'f',2);
-	}
-	else
-	{
-		pNewPolar->m_PlrName = QString("T%1_Al%2_M%3")
-								 .arg(pNewPolar->m_PolarType)
-								 .arg(pNewPolar->m_ASpec,5,'f',2)
-								 .arg(pNewPolar->m_Mach,0,'f',2);
-	}
-	QString str;
-	str = QString("_N%1").arg(pNewPolar->m_ACrit,0,'f',1);
-	pNewPolar->m_PlrName += str;
+	if(!pNewPolar) return;
+	pNewPolar->setAutoPolarName();
 }
 
 
@@ -826,15 +816,22 @@ void BatchThreadDlg::StartAnalysis()
 	QString strong;
 	int iRe, nRe;
 
-	m_pctrlAnalyze->setText(tr("Cancel"));
-	strong ="Launching multi-threaded batch analysis\n\n";
-	UpdateOutput(strong);
-
 	if(s_bCurrentFoil)
 	{
 		m_FoilList.clear();
 		m_FoilList.append(Foil::curFoil()->m_FoilName);
 	}
+
+	if(!m_FoilList.count())
+	{
+		strong ="No foil defined for analysis\n\n";
+		UpdateOutput(strong);
+		return;
+	}
+
+	m_pctrlAnalyze->setText(tr("Cancel"));
+	strong ="Launching multi-threaded batch analysis\n\n";
+	UpdateOutput(strong);
 
 	if(!m_bFromList) nRe = (int)qAbs((m_ReMax-m_ReMin)/m_ReInc);
 	else             nRe = QXDirect::s_ReList.count()-1;
@@ -934,7 +931,6 @@ void BatchThreadDlg::timerEvent(QTimerEvent *event)
 				UpdateOutput(strong);
 
 				CleanUp();
-
 				if(pXDirect->m_bPolarView)
 				{
 					pXDirect->CreatePolarCurves();
@@ -943,7 +939,11 @@ void BatchThreadDlg::timerEvent(QTimerEvent *event)
 			}
 		}
 	}
-	else  StartThread(); // analyze a new pair
+	else if(m_bIsRunning)
+	{
+		//need to check if we are still running in case a timer event arrives after a cancellation for instance.
+		StartThread(); // analyze a new pair
+	}
 }
 
 
@@ -989,7 +989,9 @@ void BatchThreadDlg::StartThread()
 	}
 }
 
-
+/**
+ * Outputs the list of the Foil names selected for analysis to the output text window.
+ */
 void BatchThreadDlg::outputFoilList()
 {
 	m_pctrlTextOutput->append("Foils to analyze:");
@@ -1001,6 +1003,9 @@ void BatchThreadDlg::outputFoilList()
 }
 
 
+/**
+ * Outputs the list of the Re values selected for analysis to the output text window.
+ */
 void BatchThreadDlg::outputReList()
 {
 	m_pctrlTextOutput->append("Reynolds numbers to analyze:");
@@ -1029,13 +1034,20 @@ void BatchThreadDlg::outputReList()
 	m_pctrlTextOutput->append("");
 }
 
-
+/**
+ * Overrides the base class showEvent method. Moves the window to its former location.
+ * @param event the showEvent.
+ */
 void BatchThreadDlg::showEvent(QShowEvent *event)
 {
     move(s_Position);
 	event->accept();
 }
 
+/**
+ * Overrides the base class hideEvent method. Stores the window's current position.
+ * @param event the hideEvent.
+ */
 void BatchThreadDlg::hideEvent(QHideEvent *event)
 {
     s_Position = pos();

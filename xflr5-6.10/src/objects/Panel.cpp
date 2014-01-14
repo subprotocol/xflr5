@@ -77,7 +77,6 @@ void Panel::Reset()
 	m_Pos         =  MIDSURFACE;
 
 	m_iElement    = -1;
-	m_iSym        = -1;
 	m_iLA         =  0;
 	m_iLB         =  0;
 	m_iTA         =  0;
@@ -114,6 +113,11 @@ void Panel::SetPanelFrame()
 */
 void Panel::SetPanelFrame(CVector const &LA, CVector const &LB, CVector const &TA, CVector const &TB)
 {
+
+	if(qAbs(LA.y)<1.e-5 && qAbs(TA.y)<1.e-5 && qAbs(LB.y)<1.e-5 && qAbs(TB.y)<1.e-5)
+		m_bIsInSymPlane = true; /** @todo check if any use anymore */
+	else m_bIsInSymPlane = false;
+
 	LATB.x = TB.x - LA.x;
 	LATB.y = TB.y - LA.y;
 	LATB.z = TB.z - LA.z;
@@ -125,13 +129,13 @@ void Panel::SetPanelFrame(CVector const &LA, CVector const &LB, CVector const &T
 	Area = Normal.VAbs()/2.0;
 	Normal.Normalize();
 
-	VA.x = LA.x*(1.0-s_VortexPos)+TA.x*s_VortexPos;
-	VA.y = LA.y*(1.0-s_VortexPos)+TA.y*s_VortexPos;
-	VA.z = LA.z*(1.0-s_VortexPos)+TA.z*s_VortexPos;
+	VA.x = LA.x*(1.0-s_VortexPos) + TA.x*s_VortexPos;
+	VA.y = LA.y*(1.0-s_VortexPos) + TA.y*s_VortexPos;
+	VA.z = LA.z*(1.0-s_VortexPos) + TA.z*s_VortexPos;
 
-	VB.x = LB.x*(1.0-s_VortexPos)+TB.x*s_VortexPos;
-	VB.y = LB.y*(1.0-s_VortexPos)+TB.y*s_VortexPos;
-	VB.z = LB.z*(1.0-s_VortexPos)+TB.z*s_VortexPos;
+	VB.x = LB.x*(1.0-s_VortexPos) + TB.x*s_VortexPos;
+	VB.y = LB.y*(1.0-s_VortexPos) + TB.y*s_VortexPos;
+	VB.z = LB.z*(1.0-s_VortexPos) + TB.z*s_VortexPos;
 
 	Vortex.x = VB.x - VA.x;
 	Vortex.y = VB.y - VA.y;
@@ -143,17 +147,14 @@ void Panel::SetPanelFrame(CVector const &LA, CVector const &LB, CVector const &T
 	VortexPos.y = (VA.y+VB.y)/2.0;
 	VortexPos.z = (VA.z+VB.z)/2.0;
 
-	if(qAbs(LA.y)<1.e-5 && qAbs(TA.y)<1.e-5 && qAbs(LB.y)<1.e-5 && qAbs(TB.y)<1.e-5)
-		m_bIsInSymPlane = true;
-	else m_bIsInSymPlane = false;
 
-	MidA.x = LA.x*(1.0-s_CtrlPos)+TA.x*s_CtrlPos;
-	MidA.y = LA.y*(1.0-s_CtrlPos)+TA.y*s_CtrlPos;
-	MidA.z = LA.z*(1.0-s_CtrlPos)+TA.z*s_CtrlPos;
+	MidA.x = LA.x*(1.0-s_CtrlPos) + TA.x*s_CtrlPos;
+	MidA.y = LA.y*(1.0-s_CtrlPos) + TA.y*s_CtrlPos;
+	MidA.z = LA.z*(1.0-s_CtrlPos) + TA.z*s_CtrlPos;
 
-	MidB.x = LB.x*(1.0-s_CtrlPos)+TB.x*s_CtrlPos;
-	MidB.y = LB.y*(1.0-s_CtrlPos)+TB.y*s_CtrlPos;
-	MidB.z = LB.z*(1.0-s_CtrlPos)+TB.z*s_CtrlPos;
+	MidB.x = LB.x*(1.0-s_CtrlPos) + TB.x*s_CtrlPos;
+	MidB.y = LB.y*(1.0-s_CtrlPos) + TB.y*s_CtrlPos;
+	MidB.z = LB.z*(1.0-s_CtrlPos) + TB.z*s_CtrlPos;
 
 	CtrlPt.x = (MidA.x+MidB.x)/2.0;
 	CtrlPt.y = (MidA.y+MidB.y)/2.0;

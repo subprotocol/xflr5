@@ -926,44 +926,44 @@ void Polar::GetPolarProperties(QString &PolarProperties, bool bData)
 
 	if(m_PolarType==FIXEDSPEEDPOLAR)
 	{
-		strong = QString(QObject::tr("Reynolds number")+" = %1\n").arg(m_Reynolds,0,'f',0);
+		strong = QString(QObject::tr("Reynolds number")+" = %L1\n").arg(m_Reynolds,0,'f',0);
 		PolarProperties += strong;
-		strong = QString(QObject::tr("Mach number") + " = %1\n").arg(m_Mach,5,'f',2);
+		strong = QString(QObject::tr("Mach number") + " = %L1\n").arg(m_Mach,5,'f',2);
 		PolarProperties += strong;
 	}
 	else if(m_PolarType==FIXEDLIFTPOLAR)
 	{
-		strong = QString("Re.sqrt(Cl) = %1\n").arg(m_Reynolds,0,'f',0);
+		strong = QString("Re.sqrt(Cl) = %L1\n").arg(m_Reynolds,0,'f',0);
 		PolarProperties += strong;
-		strong = QString("Ma.sqrt(Cl) = %1\n").arg(m_Mach,5,'f',2);
+		strong = QString("Ma.sqrt(Cl) = %L1\n").arg(m_Mach,5,'f',2);
 		PolarProperties += strong;
 	}
 	else if(m_PolarType==RUBBERCHORDPOLAR)
 	{
-		strong = QString(QObject::tr("Re.Cl")+" = %1\n").arg(m_Reynolds,0,'f',0);
+		strong = QString(QObject::tr("Re.Cl")+" = %L1\n").arg(m_Reynolds,0,'f',0);
 		PolarProperties += strong;
-		strong = QString(QObject::tr("Mach number") + " = %1\n").arg(m_Mach,5,'f',2);
+		strong = QString(QObject::tr("Mach number") + " = %L1\n").arg(m_Mach,5,'f',2);
 		PolarProperties += strong;
 	}
 	else if(m_PolarType==FIXEDAOAPOLAR)
 	{
-		strong = QString(QObject::tr("Alpha")+" = %1"+QString::fromUtf8("°")+"\n").arg(m_ASpec,7,'f',2);
+		strong = QString(QObject::tr("Alpha")+" = %L1"+QString::fromUtf8("°")+"\n").arg(m_ASpec,7,'f',2);
 		PolarProperties += strong;
-		strong = QString(QObject::tr("Mach number") + " = %1\n").arg(m_Mach,5,'f',2);
+		strong = QString(QObject::tr("Mach number") + " = %L1\n").arg(m_Mach,5,'f',2);
 		PolarProperties += strong;
 	}
 
 
-	strong = QString(QObject::tr("NCrit") + " = %1\n").arg(m_ACrit,6,'f',2);
+	strong = QString(QObject::tr("NCrit") + " = %L1\n").arg(m_ACrit,6,'f',2);
 	PolarProperties += strong;
 
-	strong = QString(QObject::tr("Forced top trans.") + " = %1\n").arg(m_XTop,6,'f',2);
+	strong = QString(QObject::tr("Forced top trans.") + " = %L1\n").arg(m_XTop,6,'f',2);
 	PolarProperties += strong;
 
-	strong = QString(QObject::tr("Forced bottom trans.") + " = %1\n").arg(m_XBot,6,'f',2);
+	strong = QString(QObject::tr("Forced bottom trans.") + " = %L1\n").arg(m_XBot,6,'f',2);
 	PolarProperties += strong;
 
-	strong = QString(QObject::tr("Number of data points") +" = %1").arg(m_Alpha	.size());
+	strong = QString(QObject::tr("Number of data points") +" = %L1").arg(m_Alpha	.size());
 	PolarProperties += "\n" +strong;
 
 	if(!bData) return;
@@ -1199,8 +1199,6 @@ Polar *Polar::getPolar(QString m_FoilName, QString PolarName)
 
 
 
-
-
 Polar *Polar::getPolar(void *pFoilPtr, QString PolarName)
 {
 	if (!PolarName.length()) return NULL;
@@ -1218,5 +1216,73 @@ Polar *Polar::getPolar(void *pFoilPtr, QString PolarName)
 	}
 	return NULL;
 }
+
+
+
+void Polar::setAutoPolarName()
+{
+	m_PlrName = getAutoPolarName(m_PolarType, m_Reynolds, m_Mach, m_ACrit, m_ASpec);
+}
+
+
+
+/**
+ * Static polar name creation
+ * @param polarType
+ * @param Re
+ * @param Mach
+ * @param NCrit
+ * @param ASpec
+ * @return
+ */
+QString Polar::getAutoPolarName(enumPolarType polarType, double Re, double Mach, double NCrit, double ASpec)
+{
+	QString polarName;
+	Re = Re/1.e6;
+	switch(polarType)
+	{
+		case FIXEDSPEEDPOLAR:
+		{
+			polarName = QString("T1_Re%1_M%2").arg(Re,5,'f',3).arg(Mach,4,'f',2);
+			break;
+		}
+		case FIXEDLIFTPOLAR:
+		{
+			polarName = QString("T2_Re%1_M%2").arg(Re,5,'f',3).arg(Mach,4,'f',2);
+			break;
+		}
+		case RUBBERCHORDPOLAR:
+		{
+			polarName = QString("T3_Re%1_M%2").arg(Re,5,'f',3).arg(Mach,4,'f',2);
+			break;
+		}
+		case(FIXEDAOAPOLAR):
+		{
+			polarName = QString("T4_Al%1_M%2").arg(ASpec,5,'f',2).arg(Mach,4,'f',2);
+			break;
+		}
+		default:
+		{
+			polarName = QString("T1_Re%1_M%2").arg(Re,5,'f',3).arg(Mach,4,'f',2);
+			break;
+		}
+	}
+
+
+	QString str = QString("_N%1").arg(NCrit,3,'f',1);
+	polarName += str;
+
+	return polarName;
+}
+
+
+
+
+
+
+
+
+
+
 
 

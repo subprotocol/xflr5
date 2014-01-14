@@ -91,9 +91,10 @@ void CVector::RotateZ(CVector const &O, double ZTilt)
 	
 	ZTilt *=PI/180.0;
 
-	x = O.x + OP.x * cos(ZTilt) + OP.y * sin(ZTilt);
-	y = O.y - OP.x * sin(ZTilt) + OP.y * cos(ZTilt);
+	x = O.x + OP.x * cos(ZTilt) - OP.y * sin(ZTilt);
+	y = O.y + OP.x * sin(ZTilt) + OP.y * cos(ZTilt);
 }
+
 
 void  CVector::RotateY(double YTilt)
 {

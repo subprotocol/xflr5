@@ -72,7 +72,6 @@ bool QMiarex::s_bSurfaces = true;
 bool QMiarex::s_bShowMasses = false;
 bool QMiarex::s_bFoilNames = false;
 bool QMiarex::s_bVLMPanels = false;
-
 bool QMiarex::s_bAutoCpScale = true;
 double QMiarex::s_LegendMin = -1.0;
 double QMiarex::s_LegendMax =  1.0;
@@ -98,6 +97,8 @@ bool QMiarex::m_bResetglLegend = true;
 bool QMiarex::m_bResetglBody = true;
 bool QMiarex::m_bResetglBodyMesh = true;
 bool QMiarex::m_bResetglFlow = true;
+
+bool QMiarex::s_bVLM1 = true;
 
 QList<void *> *QMiarex::m_poaPlane = NULL;
 QList<void *> *QMiarex::m_poaWPolar = NULL;
@@ -165,8 +166,6 @@ QMiarex::QMiarex(QWidget *parent)
 
 
 	m_bXPressed = m_bYPressed = false;
-
-	m_bVLM1              = true;
 
 	m_b3DCp              = false;
 	m_bXCP               = false;
@@ -833,10 +832,9 @@ void QMiarex::CreateCpCurves()
 
 
 
-
-
 /**
-* Creates the curves for the graphs in the operating point view
+ * Creates the curves for the graphs in the operating point view.
+ * @todo manage with a boolean flag to recreate only when necessary
 */
 void QMiarex::CreateWOppCurves()
 {
@@ -904,6 +902,7 @@ void QMiarex::CreateWOppCurves()
 
 /**
 * Resets and fills the polar graphs curves with the data from the CWPolar objects
+* @todo manage with a boolean flag to recreate only when necessary
 */
 void QMiarex::CreateWPolarCurves()
 {
@@ -3397,13 +3396,13 @@ bool QMiarex::LoadSettings(QSettings *pSettings)
 		m_b3DCp         = pSettings->value("b3DCp").toBool();
 		m_bDownwash     = pSettings->value("bDownwash").toBool();
 		m_bMoments      = pSettings->value("bMoments").toBool();
-        s_bAutoCpScale  = pSettings->value("bAutoCpScale").toBool();
+		s_bAutoCpScale  = pSettings->value("bAutoCpScale").toBool();
 		m_bShowCpScale  = pSettings->value("bShowCpScale").toBool();
 		m_bCurPOppOnly  = pSettings->value("CurWOppOnly").toBool();
 		m_bShowElliptic = pSettings->value("bShowElliptic").toBool();
 		m_bLogFile      = pSettings->value("LogFile").toBool();
 		m_bDirichlet    = pSettings->value("Dirichlet").toBool();
-		m_bVLM1         = pSettings->value("bVLM1").toBool();
+		s_bVLM1         = pSettings->value("bVLM1").toBool();
 		m_bResetWake    = pSettings->value("ResetWake").toBool();
 		m_bShowWingCurve[0]    = pSettings->value("ShowWing").toBool();
 		m_bShowWingCurve[1]    = pSettings->value("ShowWing2").toBool();
@@ -4563,12 +4562,12 @@ void QMiarex::OnAnimateModeSingle(bool bStep)
 	else
 	{
 		//something went wrong somewhere
-		m_ModeState[1] = 0.0;
+        m_ModeState[0] = 0.0;
+        m_ModeState[1] = 0.0;
 		m_ModeState[2] = 0.0;
 		m_ModeState[3] = 0.0;
 		m_ModeState[4] = 0.0;
 		m_ModeState[5] = 0.0;
-		m_ModeState[6] = 0.0;
 	}
 	
 	//increase the time for the next update
@@ -4736,7 +4735,7 @@ void QMiarex::OnAdvancedSettings()
 	waDlg.m_bKeepOutOpps    = PlaneOpp::s_bKeepOutOpps;
 	waDlg.m_bLogFile        = m_bLogFile;
 	waDlg.m_WakeInterNodes  = m_WakeInterNodes;
-	waDlg.m_bVLM1           = m_bVLM1;
+	waDlg.m_bVLM1           = s_bVLM1;
 
 	waDlg.InitDialog();
 	if(waDlg.exec() == QDialog::Accepted)
@@ -4758,7 +4757,7 @@ void QMiarex::OnAdvancedSettings()
 		m_LLTMaxIterations     = waDlg.m_Iter;
 		m_bDirichlet           = waDlg.m_bDirichlet;
 		m_WakeInterNodes       = waDlg.m_WakeInterNodes;
-		m_bVLM1                = waDlg.m_bVLM1;
+		s_bVLM1                = waDlg.m_bVLM1;
 		m_InducedDragPoint     = waDlg.m_InducedDragPoint;
 
 
@@ -4951,7 +4950,7 @@ void QMiarex::OnDefineStabPolar()
 			if(m_pCurPlane && m_pCurPlane->BiPlane()) pNewStabPolar->m_WArea += m_pCurPlane->wing2()->m_ProjectedArea;
 			pNewStabPolar->m_WSpan        = m_pCurPlane->projectedSpan();
 		}
-		pNewStabPolar->m_bVLM1           = m_bVLM1;
+		pNewStabPolar->m_bVLM1           = s_bVLM1;
 		pNewStabPolar->m_bDirichlet      = m_bDirichlet;
 		pNewStabPolar->m_bTiltedGeom     = false;
 		pNewStabPolar->m_bWakeRollUp     = false;
@@ -4960,7 +4959,7 @@ void QMiarex::OnDefineStabPolar()
 		pNewStabPolar->m_ASpec           = 0.0;
 		pNewStabPolar->m_Height          = 0.0;
 
-		m_pCurWPolar = Objects3D::setModWPolar(pNewStabPolar, m_pCurPlane);
+		m_pCurWPolar = Objects3D::insertNewWPolar(pNewStabPolar, m_pCurPlane);
 		m_pCurPOpp = NULL;
 
 		m_bResetglGeom = true;
@@ -5019,13 +5018,13 @@ void QMiarex::OnDefineWPolar()
 			if(m_pCurPlane && m_pCurPlane->BiPlane()) pNewWPolar->m_WArea += m_pCurPlane->wing2()->m_ProjectedArea;
 		}
 
-		pNewWPolar->m_bVLM1           = m_bVLM1;
+		pNewWPolar->m_bVLM1           = s_bVLM1;
 		pNewWPolar->m_bDirichlet      = m_bDirichlet;
 
 		pNewWPolar->m_Color = MainFrame::GetColor(4);
 		pNewWPolar->m_bIsVisible = true;
 
-		m_pCurWPolar = Objects3D::setModWPolar(pNewWPolar, m_pCurPlane);
+		m_pCurWPolar = Objects3D::insertNewWPolar(pNewWPolar, m_pCurPlane);
 		m_pCurPOpp = NULL;
 
 		m_bResetglGeom = true;
@@ -5100,14 +5099,14 @@ void QMiarex::OnEditCurWPolar()
 			if(m_pCurPlane && m_pCurPlane->BiPlane()) pNewWPolar->m_WArea += m_pCurPlane->wing2()->m_ProjectedArea;
 		}
 
-		pNewWPolar->m_bVLM1           = m_bVLM1;
+		pNewWPolar->m_bVLM1           = s_bVLM1;
 		pNewWPolar->m_bDirichlet      = m_bDirichlet;
 //		pNewWPolar->m_bAVLControls    = false;
 
 		pNewWPolar->m_Color = MainFrame::GetColor(4);
 		pNewWPolar->m_bIsVisible = true;
 
-		m_pCurWPolar = Objects3D::setModWPolar(pNewWPolar, m_pCurPlane);
+		m_pCurWPolar = Objects3D::insertNewWPolar(pNewWPolar, m_pCurPlane);
 		m_pCurPOpp = NULL;
 
 		m_bResetglGeom = true;
@@ -6794,9 +6793,103 @@ void QMiarex::OnRenameCurWPolar()
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	if(!m_pCurWPolar) return;
 	if(!m_pCurPlane) return;
-	Objects3D::setModWPolar(m_pCurWPolar, m_pCurPlane);
-//	SetWPlr();
+
+	WPolar *pWPolar = NULL;
+	WPolar *pOldWPolar = NULL;
+
+	//make a list of existing WPolar names for that Plane
+	QStringList NameList;
+	for(int k=0; k<m_poaWPolar->size(); k++)
+	{
+		pWPolar = (WPolar*)m_poaWPolar->at(k);
+		if(pWPolar->m_PlaneName==m_pCurPlane->planeName())
+			NameList.append(pWPolar->m_WPlrName);
+	}
+
+	RenameDlg dlg;
+	dlg.InitDialog(&NameList, m_pCurWPolar->polarName(), QObject::tr("Enter the new name for the Polar:"));
+	int resp = dlg.exec();
+	if(resp==QDialog::Rejected)
+	{
+		return;
+	}
+	else if(resp==10)
+	{
+		//the user wants to overwrite an existing name
+		if(dlg.newName()==m_pCurWPolar->polarName()) return; //what's the point ?
+
+		// it's a real overwrite
+		// so find the existing WPolar with the new name
+		pWPolar = NULL;
+		for(int ipb=0; ipb<m_poaWPolar->size(); ipb++)
+		{
+			pOldWPolar = (WPolar*)m_poaWPolar->at(ipb);
+			if(pOldWPolar->polarName()==dlg.newName() && pOldWPolar->planeName()==m_pCurPlane->planeName())
+			{
+				pWPolar = pOldWPolar;
+				m_poaWPolar->removeAt(ipb);
+				break;
+			}
+		}
+
+		//remove and delete its children POpps from the array
+		if(pWPolar)
+		{
+			for (int l=m_poaPOpp->size()-1;l>=0; l--)
+			{
+				PlaneOpp *pPOpp = (PlaneOpp*)m_poaPOpp->at(l);
+				if (pPOpp->planeName()==pWPolar->planeName() && pPOpp->polarName()==pWPolar->polarName())
+				{
+					m_poaPOpp->removeAt(l);
+					delete pPOpp;
+				}
+			}
+			//delete the old WPolar;
+			delete pWPolar;
+		}
+	}
+
+	//ready to insert
+	//remove the WPolar from its current position in the array
+	for (int l=0; l<m_poaWPolar->size();l++)
+	{
+		pOldWPolar = (WPolar*)m_poaWPolar->at(l);
+		if(pOldWPolar==m_pCurWPolar)
+		{
+			m_poaWPolar->removeAt(l);
+			break;
+		}
+	}
+	//set the new name
+	m_pCurWPolar->m_WPlrName=dlg.newName();
+
+	//insert
+	bool bInserted = false;
+	for (int l=0; l<m_poaWPolar->size();l++)
+	{
+		pOldWPolar = (WPolar*)m_poaWPolar->at(l);
+
+		if(pOldWPolar->m_WPlrName.compare(m_pCurWPolar->m_WPlrName, Qt::CaseInsensitive) >0)
+		{
+			//then insert before
+			m_poaWPolar->insert(l, m_pCurWPolar);
+			bInserted = true;
+			break;
+		}
+	}
+
+	if(!bInserted) m_poaWPolar->append(m_pCurWPolar);
+
+
 	pMainFrame->UpdateWPolarListBox();
+
+	if(m_iView==WPOLARVIEW)		CreateWPolarCurves();
+	else if(m_iView==WSTABVIEW)	CreateStabilityCurves();
+	else if(m_iView==WOPPVIEW)	CreateWOppCurves();
+	else if(m_iView==WCPVIEW)	CreateCpCurves();
+
+    emit projectModified();
+
 	UpdateView();
 }
 
@@ -6816,6 +6909,8 @@ void QMiarex::OnRenameCurPlane()
 	pMainFrame->UpdatePlaneListBox();
 	m_bResetglLegend = true;
 	UpdateView();
+
+    emit projectModified();
 }
 
 
@@ -8643,7 +8738,7 @@ bool QMiarex::SaveSettings(QSettings *pSettings)
 		pSettings->setValue("CurWOppOnly", m_bCurPOppOnly);
 		pSettings->setValue("bShowElliptic", m_bShowElliptic);
 		pSettings->setValue("LogFile", m_bLogFile);
-		pSettings->setValue("bVLM1", m_bVLM1);
+		pSettings->setValue("bVLM1", s_bVLM1);
 		pSettings->setValue("Dirichlet", m_bDirichlet);
 		pSettings->setValue("KeepOutOpps", PlaneOpp::s_bKeepOutOpps);
 		pSettings->setValue("ResetWake", m_bResetWake );

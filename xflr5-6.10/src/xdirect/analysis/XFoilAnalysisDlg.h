@@ -19,6 +19,10 @@
 
 *****************************************************************************/
 
+/** @file
+ * This file implements the interface for the analysis of the active Foil and Polar objects in QXDirect.
+*/
+
 #ifndef XFOILANALYSISDLG_H
 #define XFOILANALYSISDLG_H
 
@@ -35,6 +39,11 @@
 #include "XFoil.h"
 #include "XFoilTask.h"
 
+
+/**
+* @class XFoilAnalysisDlg
+* This class provides an interface to manage the analysis of the active Foil and Polar pair.
+*/
 class XFoilAnalysisDlg : public QDialog
 {
 	Q_OBJECT
@@ -69,29 +78,25 @@ private:
 
 
 	//variables
-	static QPoint s_Position;   /**< the position on the client area of he dialog's topleft corner */
-
 	GraphWidget * m_pGraphWidget;
 	QTextEdit *m_pctrlTextOutput;
 	QPushButton* m_pctrlCancel, *m_pctrlSkip;
 
-	bool m_bAlpha;
-	bool m_bSequence;
-	bool m_bErrors;
+	static void* s_pXDirect;     /**< a void pointer to the instance of the QXDirect object >*/
+	static QPoint s_Position;   /**< the position on the client area of he dialog's topleft corner */
 
-	double m_AlphaMin, m_AlphaMax, m_AlphaDelta;
-	double m_ClMin, m_ClMax, m_ClDelta;
-	double m_ReMin, m_ReMax, m_ReDelta;
+	bool m_bAlpha;                 /**< true if the analysis should be performed for a range of aoa, false if for a range of licf coefficient.>*/
+	bool m_bErrors;                /**< true if some points are unconverged. Used by the calling class to know if the window should be kept visible at the end of the analysis.>*/
 
-	static void *s_pXDirect;
+	double m_ReMin, m_ReMax, m_ReDelta;  /**< The range of Re values to analyze>*/
 
-	QTimer *EventTimer;
-	QFile *m_pXFile;
-	QPoint m_LegendPlace;
-	QRect m_ViscRect;
-	QGraph *m_pRmsGraph;
+	double m_AlphaMin, m_AlphaMax, m_AlphaDelta;  /**< The range of aoa for a Type 1/2/3 Polar >*/
+	double m_ClMin, m_ClMax, m_ClDelta;           /**< The range of lift coefficient for a Type 1/2/3 Polar>*/
 
-	XFoilTask *m_pXFoilTask;
+	QFile *m_pXFile;               /**< a pointer to the log file>*/
+	QGraph *m_pRmsGraph;           /**< a pointer to the output graph >*/
+
+	XFoilTask *m_pXFoilTask;       /**< A pointer to the instance of the XFoilTask associated to this analysis. >*/
 
 };
 

@@ -21,11 +21,11 @@
         <file>images/OnStabView.png</file>
         <file>images/OnRootLocus.png</file>
         <file>images/xflr5_64.png</file>
-        <file>images/splash.png</file>
         <file>images/OnYView.png</file>
         <file>images/OnXView.png</file>
         <file>images/OnZView.png</file>
         <file>images/OnIsoView.png</file>
         <file>images/OnUndo.png</file>
+        <file>images/splash.png</file>
     </qresource>
 </RCC>
