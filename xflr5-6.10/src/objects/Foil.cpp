@@ -972,6 +972,9 @@ bool Foil::Serialize(QDataStream &ar, bool bIsStoring)
 	else 
 	{
 		ar >> ArchiveFormat;
+		if(ArchiveFormat<1000||ArchiveFormat>1010)
+			return false;
+
 		ReadCString(ar, m_FoilName);
 		if(ArchiveFormat>=1006)
 		{

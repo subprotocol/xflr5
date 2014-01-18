@@ -1,7 +1,7 @@
 /****************************************************************************
 
-    LLTAnalysisDlg Class
-	Copyright (C) 2009 Andre Deperrois adeperrois@xflr5.com
+	LLTAnalysisDlg Class
+	Copyright (C) 2009-2014 Andre Deperrois adeperrois@xflr5.com
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -77,11 +77,11 @@ private slots:
 	void OnProgress();
 
 private:
-    void keyPressEvent(QKeyEvent *event);
-    void showEvent(QShowEvent *event);
-    void hideEvent(QHideEvent *event);
+	void keyPressEvent(QKeyEvent *event);
+	void showEvent(QShowEvent *event);
+	void hideEvent(QHideEvent *event);
 
-    bool AlphaLoop();
+	bool AlphaLoop();
 	bool QInfLoop();
 	void ResetCurves();
 	void SetFileHeader();
@@ -93,7 +93,6 @@ private:
 
 
 	static void *s_pPrePost3D;     /**< A static pointer to the unique instance of the pre/post processing class. */
-	static void *s_pMiarex;     /**< A static pointer to the unique instance of the QMiarex class. */
 	static QPoint s_Position;   /**< the position on the client area of he dialog's topleft corner */
 
 	LLTAnalysis *m_pLLT;          /**< The unique instance of the LLTAnalysis class, called to perform each OpPOint calculation */

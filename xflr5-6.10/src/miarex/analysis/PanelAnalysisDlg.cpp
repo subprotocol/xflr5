@@ -38,7 +38,6 @@
 #include "../../misc/Units.h"
 #include "../Objects3D.h"
 
-void *PanelAnalysisDlg::s_pMiarex;
 QPoint PanelAnalysisDlg::s_Position;
 
 
@@ -231,11 +230,13 @@ void PanelAnalysisDlg::Analyze()
 	m_pPanelAnalysis->initializeAnalysis();
 	m_pPanelAnalysis->loop();
 
-	for(int iPOpp=0; iPOpp<m_pPanelAnalysis->m_PlaneOppList.size(); iPOpp++)
+	if(PlaneOpp::s_bStoreOpps)
 	{
-		Objects3D::InsertPOpp(m_pPanelAnalysis->m_PlaneOppList.at(iPOpp));
+		for(int iPOpp=0; iPOpp<m_pPanelAnalysis->m_PlaneOppList.size(); iPOpp++)
+		{
+			Objects3D::InsertPOpp(m_pPanelAnalysis->m_PlaneOppList.at(iPOpp));
+		}
 	}
-
 	pTimer->stop();
 
 

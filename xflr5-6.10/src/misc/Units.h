@@ -33,8 +33,6 @@ class Units : public QDialog
 	Q_OBJECT
 	friend class MainFrame;
 	friend class QMiarex;
-	friend class GL3dBodyDlg;
-	friend class Body;
 
 public:
     Units(QWidget *parent);
@@ -110,7 +108,6 @@ private:
 	static double s_kgtoUnit;   /**< Conversion factor from kg to the user selected mass unit. */
 	static double s_NtoUnit;    /**< Conversion factor from Newtons to the user selected force unit. */
 	static double s_NmtoUnit;   /**< Conversion factor from N.m to the user selected unit for moments. */
-
 
 
 public:

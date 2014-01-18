@@ -98,7 +98,9 @@ bool QMiarex::m_bResetglBody = true;
 bool QMiarex::m_bResetglBodyMesh = true;
 bool QMiarex::m_bResetglFlow = true;
 
+bool QMiarex::s_bResetCurves = true;
 bool QMiarex::s_bVLM1 = true;
+
 
 QList<void *> *QMiarex::m_poaPlane = NULL;
 QList<void *> *QMiarex::m_poaWPolar = NULL;
@@ -185,7 +187,6 @@ QMiarex::QMiarex(QWidget *parent)
 	m_bPanelForce        = false;
 	m_bLongitudinal      = true;
 	m_bCurPOppOnly       = true;
-	m_bStoreWOpp         = true;
 	m_bCurFrameOnly      = true;
 	m_bType1 = m_bType2 = m_bType4 = m_bType7 = true;
 	m_bShowElliptic      = false;
@@ -275,7 +276,7 @@ QMiarex::QMiarex(QWidget *parent)
 	m_posAnimateMode         = 0;
 
 	memset(m_ModeState, 0, 6*sizeof(double));
-	m_TimeInput[0] = m_TimeInput[1] = m_TimeInput[2] = m_TimeInput[3];
+	m_TimeInput[0] = m_TimeInput[1] = m_TimeInput[2] = m_TimeInput[3] = 0.0;
 	m_TotalTime = 10;//s
 	m_Deltat    = 0.1;//s
 
@@ -415,7 +416,6 @@ QMiarex::QMiarex(QWidget *parent)
 	m_iView = W3DVIEW;
 	m_iWingView = ONEGRAPH;
 	m_iWPlrView = ALLGRAPHS;
-	m_iStabilityView = STAB3DVIEW;
 	m_iStabTimeView = ALLGRAPHS;
 
 	m_CpGraph.SetGraphName(tr("Cp Graph"));
@@ -537,7 +537,6 @@ QMiarex::~QMiarex()
 
 
 
-
 /**
 * Checks and enables all buttons and actions
 * depending on the currently active objects
@@ -553,24 +552,21 @@ void QMiarex::SetControls()
 	else                str_translation=tr("Current Object");
 	pMainFrame->currentPlaneMenu->setTitle(str_translation);
 
-	if(m_iView==W3DVIEW)        m_pctrBottomControls->setCurrentIndex(1);
-	else if(m_iView==WSTABVIEW)
-	{
-		if(m_iStabilityView == STAB3DVIEW) m_pctrBottomControls->setCurrentIndex(1);
-		else                               m_pctrBottomControls->setCurrentIndex(0);
-	}
-	else m_pctrBottomControls->setCurrentIndex(0);
+	if(m_iView==W3DVIEW) m_pctrBottomControls->setCurrentIndex(1);
+	else                 m_pctrBottomControls->setCurrentIndex(0);
 
 	if(m_iView==WPOLARVIEW)     m_pctrlMiddleControls->setCurrentIndex(1);
 	else if(m_iView==WCPVIEW)   m_pctrlMiddleControls->setCurrentIndex(2);
-	else if(m_iView==WSTABVIEW) m_pctrlMiddleControls->setCurrentIndex(1);
+	else if(m_iView==STABTIMEVIEW || m_iView==STABPOLARVIEW) m_pctrlMiddleControls->setCurrentIndex(1);
 	else                        m_pctrlMiddleControls->setCurrentIndex(0);
 
-	if (m_iView==WSTABVIEW ||
-	   (m_iView==W3DVIEW && m_pCurWPolar && m_pCurWPolar->m_WPolarType==STABILITYPOLAR))
-		 pMainFrame->m_pctrlStabViewWidget->show();
-	else
-		 pMainFrame->m_pctrlStabViewWidget->hide();
+	if(m_pCurWPolar && m_pCurWPolar->polarType()==STABILITYPOLAR)
+	{
+		if (m_iView==W3DVIEW || m_iView==STABTIMEVIEW || m_iView==STABPOLARVIEW)
+			pMainFrame->m_pctrlStabViewWidget->show();
+		else pMainFrame->m_pctrlStabViewWidget->hide();
+	}
+	else pMainFrame->m_pctrlStabViewWidget->hide();
 
 	if(m_pCurWPolar)
 	{
@@ -592,10 +588,10 @@ void QMiarex::SetControls()
 
 	pMainFrame->WOppAct->setChecked(m_iView==WOPPVIEW);
 	pMainFrame->WPolarAct->setChecked(m_iView==WPOLARVIEW);
-	pMainFrame->W3DAct->setChecked(m_iView==W3DVIEW || (m_iView==WSTABVIEW && m_iStabilityView==STAB3DVIEW));
+	pMainFrame->W3DAct->setChecked(m_iView==W3DVIEW);
 	pMainFrame->CpViewAct->setChecked(m_iView==WCPVIEW);
-	pMainFrame->StabTimeAct->setChecked(m_iView==WSTABVIEW && m_iStabilityView==STABTIMEVIEW);
-	pMainFrame->RootLocusAct->setChecked(m_iView==WSTABVIEW && m_iStabilityView==STABPOLARVIEW);
+	pMainFrame->StabTimeAct->setChecked(m_iView==STABTIMEVIEW);
+	pMainFrame->RootLocusAct->setChecked(m_iView==STABPOLARVIEW);
 
 	pMainFrame->halfWingAct->setChecked(m_bHalfWing);
 	pMainFrame->showEllipticCurve->setChecked(m_bShowElliptic);
@@ -615,7 +611,7 @@ void QMiarex::SetControls()
 		pMainFrame->twoGraphs->setChecked(m_iWingView==TWOGRAPHS);
 		pMainFrame->fourGraphs->setChecked(m_iWingView==ALLGRAPHS);
 	}
-	else if(m_iView==WSTABVIEW)
+	else if(m_iView==STABTIMEVIEW)
 	{
 		pMainFrame->Graph1->setChecked(m_iStabTimeView==ONEGRAPH && (m_pCurTimeGraph ==  m_TimeGraph));
 		pMainFrame->Graph2->setChecked(m_iStabTimeView==ONEGRAPH && (m_pCurTimeGraph == (m_TimeGraph+1)));
@@ -634,9 +630,9 @@ void QMiarex::SetControls()
 		pMainFrame->fourGraphs->setChecked(m_iWPlrView==ALLGRAPHS);
 	}
 
-	pMainFrame->WPlrGraphMenu->setEnabled(m_iView==WPOLARVIEW || m_iView==WSTABVIEW);
-	pMainFrame->hideAllWPlrs->setEnabled( m_iView==WPOLARVIEW || m_iView==WSTABVIEW);
-	pMainFrame->showAllWPlrs->setEnabled( m_iView==WPOLARVIEW || m_iView==WSTABVIEW);
+	pMainFrame->WPlrGraphMenu->setEnabled(m_iView==WPOLARVIEW || m_iView==STABPOLARVIEW);
+	pMainFrame->hideAllWPlrs->setEnabled( m_iView==WPOLARVIEW || m_iView==STABPOLARVIEW);
+	pMainFrame->showAllWPlrs->setEnabled( m_iView==WPOLARVIEW || m_iView==STABPOLARVIEW);
 
 	m_pctrlAnalyze->setEnabled(m_pCurWPolar);
 	m_pctrlAlphaMin->setEnabled(m_pCurWPolar);
@@ -656,25 +652,25 @@ void QMiarex::SetControls()
 	pMainFrame->showFinCurve->setEnabled(  m_pWingList[3] && (m_iView==WOPPVIEW || m_iView==WCPVIEW));
 	pMainFrame->showAllWPlrOpps->setEnabled(m_iView==WOPPVIEW);
 	pMainFrame->hideAllWPlrOpps->setEnabled(m_iView==WOPPVIEW);
-	pMainFrame->WOppGraphMenu->setEnabled(   m_iView==WOPPVIEW || m_iView==WSTABVIEW);
-	pMainFrame->WOppCurGraphMenu->setEnabled(m_iView==WOPPVIEW || m_iView==WCPVIEW || m_iView==WSTABVIEW);
+	pMainFrame->WOppGraphMenu->setEnabled(   m_iView==WOPPVIEW || m_iView==STABTIMEVIEW);
+	pMainFrame->WOppCurGraphMenu->setEnabled(m_iView==WOPPVIEW || m_iView==WCPVIEW || m_iView==STABTIMEVIEW);
 
 	m_pctrlLift->setEnabled((m_iView==WOPPVIEW||m_iView==W3DVIEW) && m_pCurPOpp);
 	m_pctrlTrans->setEnabled((m_iView==WOPPVIEW||m_iView==W3DVIEW) && m_pCurPOpp);
-	m_pctrlWOppAnimate->setEnabled((m_iView==WOPPVIEW||m_iView==W3DVIEW) && m_pCurPOpp && m_pCurWPolar->m_WPolarType!=STABILITYPOLAR);
+	m_pctrlWOppAnimate->setEnabled((m_iView==WOPPVIEW||m_iView==W3DVIEW) && m_pCurPOpp && m_pCurWPolar->polarType()!=STABILITYPOLAR);
 	m_pctrlAnimateWOppSpeed->setEnabled((m_iView==WOPPVIEW||m_iView==W3DVIEW) && m_pCurPOpp);
 	m_pctrlIDrag->setEnabled(     m_iView==W3DVIEW && m_pCurPOpp);
 	m_pctrlVDrag->setEnabled(     m_iView==W3DVIEW && m_pCurPOpp);
 	m_pctrlDownwash->setEnabled(  m_iView==W3DVIEW && m_pCurPOpp);
 	m_pctrlVortices->setEnabled(  m_iView==W3DVIEW && m_pCurPOpp);
 	m_pctrlMoment->setEnabled(    m_iView==W3DVIEW && m_pCurPOpp);
-	m_pctrlPanelForce->setEnabled(m_iView==W3DVIEW && m_pCurPOpp && m_pCurWPolar && m_pCurWPolar->m_AnalysisMethod!=LLTMETHOD);
-	m_pctrlCp->setEnabled(        m_iView==W3DVIEW && m_pCurPOpp && m_pCurWPolar && m_pCurWPolar->m_AnalysisMethod!=LLTMETHOD);
-	m_pctrlStream->setEnabled(    m_iView==W3DVIEW && m_pCurPOpp && m_pCurWPolar && m_pCurWPolar->m_AnalysisMethod!=LLTMETHOD);
-	m_pctrlSurfVel->setEnabled(   m_iView==W3DVIEW && m_pCurPOpp && m_pCurWPolar && m_pCurWPolar->m_AnalysisMethod!=LLTMETHOD);
+	m_pctrlPanelForce->setEnabled(m_iView==W3DVIEW && m_pCurPOpp && m_pCurWPolar && m_pCurWPolar->analysisMethod()!=LLTMETHOD);
+	m_pctrlCp->setEnabled(        m_iView==W3DVIEW && m_pCurPOpp && m_pCurWPolar && m_pCurWPolar->analysisMethod()!=LLTMETHOD);
+	m_pctrlStream->setEnabled(    m_iView==W3DVIEW && m_pCurPOpp && m_pCurWPolar && m_pCurWPolar->analysisMethod()!=LLTMETHOD);
+	m_pctrlSurfVel->setEnabled(   m_iView==W3DVIEW && m_pCurPOpp && m_pCurWPolar && m_pCurWPolar->analysisMethod()!=LLTMETHOD);
 
-    m_pctrlFoilNames->setChecked(s_bFoilNames);
-    m_pctrlMasses->setChecked(s_bShowMasses);
+	m_pctrlFoilNames->setChecked(s_bFoilNames);
+	m_pctrlMasses->setChecked(s_bShowMasses);
 
 	pMainFrame->highlightWOppAct->setChecked(m_bHighlightOpp);
 
@@ -689,7 +685,7 @@ void QMiarex::SetControls()
 	pMainFrame->editCurBodyAct->setEnabled(m_pCurPlane && m_pCurPlane->body());
 
 	StabViewDlg *pStabView = (StabViewDlg*)pMainFrame->m_pStabView;
-	if(m_iView==WSTABVIEW) pStabView->SetControls();
+	pStabView->SetControls();
 
 	m_pctrlSpanPos->SetValue(m_CurSpanPos);
 	m_pctrlCpSectionSlider->setValue((int)(m_CurSpanPos*100.0));
@@ -915,10 +911,10 @@ void QMiarex::CreateWPolarCurves()
 	{
 		pWPolar = (WPolar*)m_poaWPolar->at(k);
 		if (pWPolar->m_bIsVisible && pWPolar->m_Alpha.size()>0 &&
-		   ((m_bType1 && pWPolar->m_WPolarType==FIXEDSPEEDPOLAR) ||
-			(m_bType2 && pWPolar->m_WPolarType==FIXEDLIFTPOLAR) ||
-			(m_bType4 && pWPolar->m_WPolarType==FIXEDAOAPOLAR) ||
-			(m_bType7 && pWPolar->m_WPolarType==STABILITYPOLAR)))
+		   ((m_bType1 && pWPolar->polarType()==FIXEDSPEEDPOLAR) ||
+			(m_bType2 && pWPolar->polarType()==FIXEDLIFTPOLAR) ||
+			(m_bType4 && pWPolar->polarType()==FIXEDAOAPOLAR) ||
+			(m_bType7 && pWPolar->polarType()==STABILITYPOLAR)))
 		{
 
 			for(int ig=0; ig<MAXGRAPHS; ig++)
@@ -941,7 +937,7 @@ void QMiarex::CreateWPolarCurves()
 */
 void QMiarex::CreateStabilityCurves()
 {
-	if(m_iStabilityView==STABTIMEVIEW)
+	if(m_iView==STABTIMEVIEW)
 	{
 		if(m_StabilityResponseType==1)  CreateStabRungeKuttaCurves();
 		else                            CreateStabTimeCurves();
@@ -1101,7 +1097,7 @@ void QMiarex::CreateStabRungeKuttaCurves()
 	//We need a WOpp
 	if(!m_pCurPOpp) return;//nothing to plot
 	//Check that the current polar is of the stability type
-	if(!m_pCurWPolar || m_pCurWPolar->m_WPolarType!=STABILITYPOLAR) return;
+	if(!m_pCurWPolar || m_pCurWPolar->polarType()!=STABILITYPOLAR) return;
 
 	if(m_bLongitudinal)
 	{
@@ -1262,7 +1258,7 @@ void QMiarex::CreateStabRLCurves()
 	{
 		pWPolar = (WPolar*)m_poaWPolar->at(k);
 		if ((pWPolar->m_bIsVisible||pWPolar->m_bShowPoints)
-			&& pWPolar->m_Alpha.size()>0 && (m_bType7 && pWPolar->m_WPolarType==STABILITYPOLAR))
+			&& pWPolar->m_Alpha.size()>0 && (m_bType7 && pWPolar->polarType()==STABILITYPOLAR))
 		{
 			pLongCurve1 = m_LongRLGraph.AddCurve();
 			pLongCurve2 = m_LongRLGraph.AddCurve();
@@ -1496,11 +1492,11 @@ void QMiarex::DrawOppGraphLegend(QPainter &painter, QPoint place, int bottom)
 		pPOpp = (PlaneOpp*)m_poaPOpp->at(i);
 		for (j=0; j<str.size(); j++)
 		{
-			if (pPOpp->m_PlaneName == str.at(j))	bFound = true;
+			if (pPOpp->planeName() == str.at(j))	bFound = true;
 		}
 		if (!bFound)
 		{
-			str.append(pPOpp->m_PlaneName);
+			str.append(pPOpp->planeName());
 		}
 	}
 
@@ -1561,7 +1557,7 @@ void QMiarex::DrawOppGraphLegend(QPainter &painter, QPoint place, int bottom)
 			for (l=0; l < m_poaPOpp->size(); l++)
 			{
 				pPOpp = (PlaneOpp*)m_poaPOpp->at(l);
-				if (pPOpp->m_bIsVisible && pPOpp->m_PlaneName == str.at(k)) PlanePts++;
+				if (pPOpp->m_bIsVisible && pPOpp->planeName() == str.at(k)) PlanePts++;
 			}
 			if (PlanePts)
 			{
@@ -1587,7 +1583,7 @@ void QMiarex::DrawOppGraphLegend(QPainter &painter, QPoint place, int bottom)
 				for (nc=0; nc < m_poaPOpp->size(); nc++)
 				{
 					pPOpp = (PlaneOpp*)m_poaPOpp->at(nc);
-					if(str.at(k) == pPOpp->m_PlaneName && pPOpp->m_bIsVisible)
+					if(str.at(k) == pPOpp->planeName() && pPOpp->m_bIsVisible)
 					{
 						if(abs(bottom)<abs(place.y() + (int)(1.*ypos*ny+ypos)))
 						{
@@ -1667,7 +1663,7 @@ void QMiarex::DrawWPolarLegend(QPainter &painter, QPoint place, int bottom)
 		{
 			pWPolar = (WPolar*)m_poaWPolar->at(i);
 			if (pWPolar->planeName()==pPlane->planeName()&&
-			   (pWPolar->visible() || (pWPolar->pointsVisible()&&m_iView==WSTABVIEW)))
+			   (pWPolar->visible() || (pWPolar->pointsVisible()&&m_iView==STABPOLARVIEW)))
 			{
 				strPlaneList.append(pPlane->planeName());
 				break;
@@ -1698,13 +1694,13 @@ void QMiarex::DrawWPolarLegend(QPainter &painter, QPoint place, int bottom)
 			pWPolar = (WPolar*)m_poaWPolar->at(l);
 
 			if ( pWPolar->m_Alpha.size() &&
-				(pWPolar->visible() || (pWPolar->pointsVisible() && pWPolar->m_WPolarType==STABILITYPOLAR)) &&
-			   ((pWPolar->m_WPolarType==STABILITYPOLAR && m_iView==WSTABVIEW) || m_iView!=WSTABVIEW) &&
+				(pWPolar->visible() || (pWPolar->pointsVisible() && pWPolar->polarType()==STABILITYPOLAR)) &&
+			   ((pWPolar->polarType()==STABILITYPOLAR && m_iView==STABPOLARVIEW) || m_iView!=STABPOLARVIEW) &&
 				 pWPolar->planeName() == strPlaneList.at(k) &&
-			   ((pWPolar->m_WPolarType==FIXEDSPEEDPOLAR && m_bType1) ||
-				(pWPolar->m_WPolarType==FIXEDLIFTPOLAR  && m_bType2) ||
-				(pWPolar->m_WPolarType==FIXEDAOAPOLAR   && m_bType4) ||
-				(pWPolar->m_WPolarType==STABILITYPOLAR  && m_bType7)))
+			   ((pWPolar->polarType()==FIXEDSPEEDPOLAR && m_bType1) ||
+				(pWPolar->polarType()==FIXEDLIFTPOLAR  && m_bType2) ||
+				(pWPolar->polarType()==FIXEDAOAPOLAR   && m_bType4) ||
+				(pWPolar->polarType()==STABILITYPOLAR  && m_bType7)))
 			{
 					nPlanePlrs++;
 			}
@@ -1738,16 +1734,16 @@ void QMiarex::DrawWPolarLegend(QPainter &painter, QPoint place, int bottom)
 					else if(m_iView==WPOLARVIEW && !pWPolar->visible())
 					{
 					}
-					else if(m_iView==WSTABVIEW && (!pWPolar->visible() && !pWPolar->pointsVisible()))
+					else if(m_iView==STABPOLARVIEW && (!pWPolar->visible() && !pWPolar->pointsVisible()))
 					{
 					}
-					else if(m_iView==WSTABVIEW && pWPolar->m_WPolarType!=STABILITYPOLAR)
+					else if(m_iView==STABPOLARVIEW && pWPolar->polarType()!=STABILITYPOLAR)
 					{
 					}
-					else if((pWPolar->m_WPolarType==FIXEDSPEEDPOLAR && !m_bType1) ||
-							(pWPolar->m_WPolarType==FIXEDLIFTPOLAR  && !m_bType2) ||
-							(pWPolar->m_WPolarType==FIXEDAOAPOLAR   && !m_bType4) ||
-							(pWPolar->m_WPolarType==STABILITYPOLAR  && !m_bType7))
+					else if((pWPolar->polarType()==FIXEDSPEEDPOLAR && !m_bType1) ||
+							(pWPolar->polarType()==FIXEDLIFTPOLAR  && !m_bType2) ||
+							(pWPolar->polarType()==FIXEDAOAPOLAR   && !m_bType4) ||
+							(pWPolar->polarType()==STABILITYPOLAR  && !m_bType7))
 					{
 					}
 					else
@@ -1758,7 +1754,7 @@ void QMiarex::DrawWPolarLegend(QPainter &painter, QPoint place, int bottom)
 						painter.setPen(LegendPen);
 
 						painter.drawLine(place.x() + (int)(0.5*LegendSize), place.y() + (int)(1.*ypos*ny),
-										 place.x() + (int)(1.5*LegendSize), place.y() + (int)(1.*ypos*ny));
+									  place.x() + (int)(1.5*LegendSize), place.y() + (int)(1.*ypos*ny));
 
 						if(pWPolar->m_bShowPoints)
 						{
@@ -1767,7 +1763,7 @@ void QMiarex::DrawWPolarLegend(QPainter &painter, QPoint place, int bottom)
 						}
 						painter.setPen(TextPen);
 						painter.drawText(place.x() + (int)(2.0*LegendSize),
-										 place.y() + (int)(1.*ypos*ny)+(int)(ypos/3), pWPolar->polarName());
+									  place.y() + (int)(1.*ypos*ny)+(int)(ypos/3), pWPolar->polarName());
 						ny++ ;
 					}
 				}
@@ -2157,28 +2153,26 @@ QGraph* QMiarex::GetGraph(QPoint &pt)
 				if(m_WPlrGraph[ig].IsInDrawRect(pt)) {return m_WPlrGraph+ig;}
 		}
 	}
-	else if(m_iView==WSTABVIEW)
+	else if(m_iView==STABTIMEVIEW)
 	{
-		if(m_iStabilityView==STABTIMEVIEW)
-		{
-			if(m_iStabTimeView==ONEGRAPH)
-			{
-				return m_pCurTimeGraph;
-			}
-			else
-			{
-				for(int ig=0; ig<MAXGRAPHS; ig++)
-					if(m_TimeGraph[ig].IsInDrawRect(pt)) return m_TimeGraph+ig;
-			}
-			return NULL;
-		}
-		else if(m_iStabilityView==STABPOLARVIEW)
-		{
-			if(m_pCurRLStabGraph && m_pCurRLStabGraph->IsInDrawRect(pt)) return m_pCurRLStabGraph;
-			return NULL;
-		}
 
+		if(m_iStabTimeView==ONEGRAPH)
+		{
+			return m_pCurTimeGraph;
+		}
+		else
+		{
+			for(int ig=0; ig<MAXGRAPHS; ig++)
+				if(m_TimeGraph[ig].IsInDrawRect(pt)) return m_TimeGraph+ig;
+		}
+		return NULL;
 	}
+	else if(m_iView==STABPOLARVIEW)
+	{
+		if(m_pCurRLStabGraph && m_pCurRLStabGraph->IsInDrawRect(pt)) return m_pCurRLStabGraph;
+		return NULL;
+	}
+
 	else if(m_iView==WCPVIEW)
 	{
 		m_pCurGraph = &m_CpGraph;
@@ -2365,7 +2359,7 @@ void QMiarex::GLDraw3D()
 	}
 
 
-	if(m_bResetglGeom  && (m_iView==W3DVIEW || m_iView==WSTABVIEW))
+	if(m_bResetglGeom  && m_iView==W3DVIEW)
 	{
 		Body TranslatedBody;
 		if(pCurBody && m_pCurPlane)
@@ -2405,7 +2399,7 @@ void QMiarex::GLDraw3D()
 		m_bResetglWake = false;
 	}
 
-	if(m_bResetglMesh && s_bVLMPanels && (m_iView==W3DVIEW || m_iView==WSTABVIEW))
+	if(m_bResetglMesh && s_bVLMPanels && m_iView==W3DVIEW)
 	{
 		if(glIsList(MESHPANELS))
 		{
@@ -2441,7 +2435,7 @@ void QMiarex::GLDraw3D()
 
 		for(int iw=0; iw<MAXWINGS; iw++)
 		{
-			if(glIsList(VLMWINGLIFT))
+			if(glIsList(VLMWINGLIFT+iw))
 			{
 				glDeleteLists(VLMWINGLIFT+iw,1);
 				s_GLList -=1;
@@ -2550,7 +2544,7 @@ void QMiarex::GLDraw3D()
 		m_bResetglPanelCp = false;
 	}
 
-	if((m_bResetglLegend || m_bResetglOpp || m_bResetglGeom) && (m_iView==W3DVIEW || m_iView==WSTABVIEW))
+	if((m_bResetglLegend || m_bResetglOpp || m_bResetglGeom) && m_iView==W3DVIEW)
 	{
 		if(glIsList(WOPPCPLEGENDCLR))
 		{
@@ -2931,7 +2925,7 @@ void QMiarex::GLRenderView()
 		if(s_bAxes)  p3dWidget->GLDrawAxes(1.0/m_glScaled, W3dPrefsDlg::s_3DAxisColor, W3dPrefsDlg::s_3DAxisStyle, W3dPrefsDlg::s_3DAxisWidth);
 
 
-		if(m_pCurWPolar && m_pCurWPolar->m_WPolarType==STABILITYPOLAR)
+		if(m_pCurWPolar && m_pCurWPolar->polarType()==STABILITYPOLAR)
 		{
 			glTranslated(m_ModeState[0], m_ModeState[1], m_ModeState[2]);
 			glRotated(m_ModeState[3]*180.0/PI, 1.0, 0.0 ,0.0);
@@ -2982,132 +2976,120 @@ void QMiarex::GLRenderView()
 void QMiarex::keyPressEvent(QKeyEvent *event)
 {
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
-    if(event->key()==Qt::Key_0 || event->text()=="0")
-    {
-        if(m_iView==WSTABVIEW)
+	if(event->key()==Qt::Key_0 || event->text()=="0")
+	{
+/*		if(m_iView==WSTABVIEW)
 		{
-            m_iStabilityView  = STABTIMEVIEW;
-            SetWPlrLegendPos();
-            UpdateView();
-        }
-        return;
-    }
-    else if(event->key()==Qt::Key_1 || event->text()=="1")
-    {
-        if(m_iView==WPOLARVIEW)
-        {
+			m_iStabilityView  = STABTIMEVIEW;
+			SetWPlrLegendPos();
+			UpdateView();
+		}*/
+		return;
+	}
+	else if(event->key()==Qt::Key_1 || event->text()=="1")
+	{
+		if(m_iView==WPOLARVIEW)
+		{
 			m_iWPlrView  = ONEGRAPH;
-            m_pCurGraph = m_WPlrGraph;
-            m_pCurWPlrGraph = m_pCurGraph;
-            SetWPlrLegendPos();
-        }
-        else if(m_iView==WOPPVIEW)
-        {
+			m_pCurGraph = m_WPlrGraph;
+			m_pCurWPlrGraph = m_pCurGraph;
+			SetWPlrLegendPos();
+		}
+		else if(m_iView==WOPPVIEW)
+		{
 			m_iWingView =ONEGRAPH;
-            m_pCurGraph = m_WingGraph;
-            m_pCurWingGraph = m_pCurGraph;
-            SetWingLegendPos();
-        }
-        else if(m_iView==WSTABVIEW)
-        {
-            if(m_iStabilityView==STABTIMEVIEW)
-            {
-				m_iStabTimeView =ONEGRAPH;
-                m_pCurGraph = m_TimeGraph;
-                m_pCurTimeGraph = m_pCurGraph;
-                SetWingLegendPos();
-            }
-        }
-        UpdateView();
-        return;
-    }
-    else if(event->key()==Qt::Key_2 || event->text()=="2")
-    {
-        if(m_iView==WPOLARVIEW)
-        {
+			m_pCurGraph = m_WingGraph;
+			m_pCurWingGraph = m_pCurGraph;
+			SetWingLegendPos();
+		}
+		else if(m_iView==STABTIMEVIEW)
+		{
+			m_iStabTimeView =ONEGRAPH;
+			m_pCurGraph = m_TimeGraph;
+			m_pCurTimeGraph = m_pCurGraph;
+			SetWingLegendPos();
+		}
+		UpdateView();
+		return;
+	}
+	else if(event->key()==Qt::Key_2 || event->text()=="2")
+	{
+		if(m_iView==WPOLARVIEW)
+		{
 			m_iWPlrView  = ONEGRAPH;
-            m_pCurGraph = m_WPlrGraph+1;
-            m_pCurWPlrGraph = m_pCurGraph;
-            SetWPlrLegendPos();
-        }
-        else if(m_iView==WOPPVIEW)
-        {
+			m_pCurGraph = m_WPlrGraph+1;
+			m_pCurWPlrGraph = m_pCurGraph;
+			SetWPlrLegendPos();
+		}
+		else if(m_iView==WOPPVIEW)
+		{
 			m_iWingView =ONEGRAPH;
-            m_pCurGraph = m_WingGraph+1;
-            m_pCurWingGraph = m_pCurGraph;
-            SetWingLegendPos();
-        }
-        else if(m_iView==WSTABVIEW)
-        {
-            if(m_iStabilityView==STABTIMEVIEW)
-            {
-				m_iStabTimeView =ONEGRAPH;
-                m_pCurGraph = m_TimeGraph+1;
-                m_pCurTimeGraph = m_pCurGraph;
-                SetWingLegendPos();
-            }
-        }
-        UpdateView();
-        return;
-    }
-    else if(event->key()==Qt::Key_3 || event->text()=="3")
-    {
-        if(m_iView==WPOLARVIEW)
-        {
+			m_pCurGraph = m_WingGraph+1;
+			m_pCurWingGraph = m_pCurGraph;
+			SetWingLegendPos();
+		}
+		else if(m_iView==STABTIMEVIEW)
+		{
+			m_iStabTimeView =ONEGRAPH;
+			m_pCurGraph = m_TimeGraph+1;
+			m_pCurTimeGraph = m_pCurGraph;
+			SetWingLegendPos();
+		}
+		UpdateView();
+		return;
+	}
+	else if(event->key()==Qt::Key_3 || event->text()=="3")
+	{
+		if(m_iView==WPOLARVIEW)
+		{
 			m_iWPlrView = ONEGRAPH;
-            m_pCurGraph = m_WPlrGraph+2;
-            m_pCurWPlrGraph = m_pCurGraph;
-            SetWPlrLegendPos();
-        }
-        else if(m_iView==WOPPVIEW)
-        {
+			m_pCurGraph = m_WPlrGraph+2;
+			m_pCurWPlrGraph = m_pCurGraph;
+			SetWPlrLegendPos();
+		}
+		else if(m_iView==WOPPVIEW)
+		{
 			m_iWingView =ONEGRAPH;
-            m_pCurGraph = m_WingGraph+2;
-            m_pCurWingGraph = m_pCurGraph;
-            SetWingLegendPos();
-        }
-        else if(m_iView==WSTABVIEW)
-        {
-            if(m_iStabilityView==STABTIMEVIEW)
-            {
-				m_iStabTimeView =ONEGRAPH;
-                m_pCurGraph = m_TimeGraph+2;
-                m_pCurTimeGraph = m_pCurGraph;
-                SetWingLegendPos();
-            }
-        }
-        UpdateView();
-        return;
-    }
-    else if(event->key()==Qt::Key_4 || event->text()=="4")
-    {
-        if(m_iView==WPOLARVIEW)
-        {
+			m_pCurGraph = m_WingGraph+2;
+			m_pCurWingGraph = m_pCurGraph;
+			SetWingLegendPos();
+		}
+		else if(m_iView==STABTIMEVIEW)
+		{
+			m_iStabTimeView =ONEGRAPH;
+			m_pCurGraph = m_TimeGraph+2;
+			m_pCurTimeGraph = m_pCurGraph;
+			SetWingLegendPos();
+		}
+		UpdateView();
+		return;
+	}
+	else if(event->key()==Qt::Key_4 || event->text()=="4")
+	{
+		if(m_iView==WPOLARVIEW)
+		{
 			m_iWPlrView = ONEGRAPH;
-            m_pCurGraph = m_WPlrGraph+3;
-            m_pCurWPlrGraph = m_pCurGraph;
-            SetWPlrLegendPos();
-        }
-        else if(m_iView==WOPPVIEW)
-        {
+			m_pCurGraph = m_WPlrGraph+3;
+			m_pCurWPlrGraph = m_pCurGraph;
+			SetWPlrLegendPos();
+		}
+		else if(m_iView==WOPPVIEW)
+		{
 			m_iWingView =ONEGRAPH;
-            m_pCurGraph = m_WingGraph+3;
-            m_pCurWingGraph = m_pCurGraph;
-            SetWingLegendPos();
-        }
-        else if(m_iView==WSTABVIEW)
-        {
-            if(m_iStabilityView==STABTIMEVIEW)
-            {
-				m_iStabTimeView =ONEGRAPH;
-                m_pCurGraph = m_TimeGraph+3;
-                m_pCurTimeGraph = m_pCurGraph;
-                SetWingLegendPos();
-            }
-        }
-        UpdateView();
-        return;
-    }
+			m_pCurGraph = m_WingGraph+3;
+			m_pCurWingGraph = m_pCurGraph;
+			SetWingLegendPos();
+		}
+		else if(m_iView==STABTIMEVIEW)
+		{
+			m_iStabTimeView =ONEGRAPH;
+			m_pCurGraph = m_TimeGraph+3;
+			m_pCurTimeGraph = m_pCurGraph;
+			SetWingLegendPos();
+		}
+		UpdateView();
+		return;
+	}
 
 	switch (event->key())
 	{
@@ -3159,7 +3141,7 @@ void QMiarex::keyPressEvent(QKeyEvent *event)
 				m_iWingView = TWOGRAPHS;
 				SetWingLegendPos();
 			}
-			else if(m_iView==WSTABVIEW)
+			else if(m_iView==STABTIMEVIEW)
 			{
 				m_iStabTimeView = TWOGRAPHS;
 				SetWingLegendPos();
@@ -3180,13 +3162,10 @@ void QMiarex::keyPressEvent(QKeyEvent *event)
 				m_iWingView =ALLGRAPHS;
 				SetWingLegendPos();
 			}
-			else if(m_iView==WSTABVIEW)
+			else if(m_iView==STABTIMEVIEW)
 			{
-				if(m_iStabilityView==STABTIMEVIEW)
-				{
-					m_iStabTimeView = ALLGRAPHS;
-					SetWingLegendPos();
-				}
+				m_iStabTimeView = ALLGRAPHS;
+				SetWingLegendPos();
 			}
 			UpdateView();
 			break;
@@ -3223,7 +3202,7 @@ void QMiarex::keyPressEvent(QKeyEvent *event)
 		}
 		case Qt::Key_H:
 		{
-			if((m_iView==WPOLARVIEW ||(m_iView==WSTABVIEW&&m_iStabilityView==STABPOLARVIEW)) && event->modifiers().testFlag(Qt::ControlModifier))
+			if((m_iView==WPOLARVIEW || m_iView==STABPOLARVIEW) && event->modifiers().testFlag(Qt::ControlModifier))
 			{
 				OnHighlightWOpp();
 			}
@@ -3236,10 +3215,10 @@ void QMiarex::keyPressEvent(QKeyEvent *event)
 				m_pCurGraph->SetAuto(true);
 				UpdateView();
 			}
-			else if(m_iView==WOPPVIEW)   OnResetWingScale();
-			else if(m_iView==WPOLARVIEW) OnResetWPlrLegend();
-			else if(m_iView==WSTABVIEW)  OnResetWPlrLegend();
-			else if(m_iView==W3DVIEW)    On3DReset();
+			else if(m_iView==WOPPVIEW)       OnResetWingScale();
+			else if(m_iView==WPOLARVIEW)     OnResetWPlrLegend();
+			else if(m_iView==STABPOLARVIEW)  OnResetWPlrLegend();
+			else if(m_iView==W3DVIEW)        On3DReset();
 
 			break;
 		}
@@ -3266,7 +3245,7 @@ void QMiarex::keyPressEvent(QKeyEvent *event)
 		}
 		case Qt::Key_F5:
 		{
-			OnWOpps();
+			OnWOppView();
 			break;
 		}
 		case Qt::Key_F6:
@@ -3280,7 +3259,7 @@ void QMiarex::keyPressEvent(QKeyEvent *event)
 		{
 			if (event->modifiers().testFlag(Qt::ShiftModifier))        OnRootLocusView();
 			else if (event->modifiers().testFlag(Qt::ControlModifier)) OnTimeView();
-			else                                                       OnWPolars();
+			else                                                       OnWPolarView();
 			break;
 		}
 		case Qt::Key_F9:
@@ -3296,7 +3275,7 @@ void QMiarex::keyPressEvent(QKeyEvent *event)
 		}
 
 		default:
-//			QWidget::keyPressEvent(event);
+			//			QWidget::keyPressEvent(event);
 			event->ignore();
 	}
 }
@@ -3348,7 +3327,7 @@ void QMiarex::LLTAnalyze(double V0, double VMax, double VDelta, bool bSequence, 
 	LLTAnalysis::s_IterLim = m_LLTMaxIterations;
 
 	m_pLLT->setLLTRange(V0, VMax, VDelta, bSequence);
-	m_pLLT->setLLTData(m_pCurPlane->m_Wing, m_pCurWPolar);
+	m_pLLT->setLLTData(m_pCurPlane, m_pCurWPolar);
 
 	m_pLLTDlg->initDialog();
 	m_pLLTDlg->show();
@@ -3410,7 +3389,7 @@ bool QMiarex::LoadSettings(QSettings *pSettings)
 		m_bShowWingCurve[3]    = pSettings->value("ShowFin").toBool();
 		m_bShowWingCurve[0] = true;
 
-		m_bStoreWOpp    = pSettings->value("StoreWOpp").toBool();
+		PlaneOpp::s_bStoreOpps    = pSettings->value("StoreWOpp").toBool();
 		m_bSequence     = pSettings->value("Sequence").toBool();
 		m_bHighlightOpp = pSettings->value("HighlightOpp").toBool();
 //		m_bHighlightOpp = false;
@@ -3434,8 +3413,8 @@ bool QMiarex::LoadSettings(QSettings *pSettings)
 		else if(k==1) m_iView = WPOLARVIEW;
 		else if(k==2) m_iView = W3DVIEW;
 		else if(k==3) m_iView = WCPVIEW;
-		else if(k==4) m_iView = WSTABVIEW;
-
+		else if(k==4) m_iView = STABTIMEVIEW;
+		else if(k==5) m_iView = STABPOLARVIEW;
 
 		k = pSettings->value("iWingView").toInt();
 		if(k==0)      m_iWingView  = ALLGRAPHS;
@@ -3446,11 +3425,6 @@ bool QMiarex::LoadSettings(QSettings *pSettings)
 		if(k==0)      m_iWPlrView  = ALLGRAPHS;
 		else if(k==1) m_iWPlrView  = ONEGRAPH;
 		else if(k==2) m_iWPlrView  = TWOGRAPHS;
-
-		k = pSettings->value("iWStabView").toInt();
-		if(k==0)      m_iStabilityView = STABTIMEVIEW;
-		else if(k==1) m_iStabilityView = STABPOLARVIEW;
-		else if(k==2) m_iStabilityView = STAB3DVIEW;
 
 		k = pSettings->value("iStabTimeView").toInt();
 		if(k==0)      m_iStabTimeView  = ALLGRAPHS;
@@ -3467,9 +3441,9 @@ bool QMiarex::LoadSettings(QSettings *pSettings)
 		if     (k==1) m_pCurRLStabGraph = &m_LongRLGraph;
 		else if(k==2) m_pCurRLStabGraph = &m_LatRLGraph;
 
-		if(m_iView==WOPPVIEW)        m_pCurGraph=m_pCurWingGraph;
-		else if(m_iView==WPOLARVIEW) m_pCurGraph=m_pCurWPlrGraph;
-		else if(m_iView==WSTABVIEW)  m_pCurGraph=m_pCurRLStabGraph;
+		if(m_iView==WOPPVIEW)            m_pCurGraph=m_pCurWingGraph;
+		else if(m_iView==WPOLARVIEW)     m_pCurGraph=m_pCurWPlrGraph;
+		else if(m_iView==STABPOLARVIEW)  m_pCurGraph=m_pCurRLStabGraph;
 
 		m_LLTMaxIterations         = pSettings->value("Iter").toInt();
 		GL3dBodyDlg::s_NHoopPoints  = pSettings->value("NHoopPoints").toInt();
@@ -3571,7 +3545,7 @@ bool QMiarex::LoadSettings(QSettings *pSettings)
  */
 void QMiarex::doubleClickEvent(QPoint pos)
 {
-	if(m_iView==W3DVIEW || (m_iView==WSTABVIEW && m_iStabilityView==STAB3DVIEW))
+	if(m_iView==W3DVIEW)
 	{
 		ThreeDWidget *p3dWidget = (ThreeDWidget*)s_p3dWidget;
 
@@ -3597,7 +3571,7 @@ void QMiarex::doubleClickEvent(QPoint pos)
 			if(m_iView==WPOLARVIEW)
 			{
 			}
-			else if(m_iView==WSTABVIEW && m_iStabilityView==STABPOLARVIEW)
+			else if(m_iView==STABPOLARVIEW)
 			{
 				if(m_pCurWPolar)
 				{
@@ -3637,7 +3611,7 @@ void QMiarex::mouseMoveEvent(QMouseEvent *event)
 
 	bCtrl = false;
 	if(event->modifiers() & Qt::ControlModifier) bCtrl =true;
-	if(m_iView==W3DVIEW || (m_iView==WSTABVIEW && m_iStabilityView==STAB3DVIEW))
+	if(m_iView==W3DVIEW)
 	{
 		p3dWidget->ClientToGL(point, Real);
 
@@ -3672,7 +3646,7 @@ void QMiarex::mouseMoveEvent(QMouseEvent *event)
 	else
 	{
 		if ((event->buttons() & Qt::LeftButton) && m_bTrans &&
-			(m_iView==WOPPVIEW || m_iView==WPOLARVIEW || m_iView==WCPVIEW || m_iView==WSTABVIEW))
+			(m_iView==WOPPVIEW || m_iView==WPOLARVIEW || m_iView==WCPVIEW || m_iView==STABTIMEVIEW || m_iView==STABPOLARVIEW))
 		{
 			if(m_pCurGraph && m_bTransGraph)
 			{
@@ -3725,22 +3699,18 @@ void QMiarex::mouseMoveEvent(QMouseEvent *event)
 					UpdateView();
 				}
 			}
-			else if (m_iView==WSTABVIEW)
+			else if(m_iView==STABTIMEVIEW)
 			{
-				// we translate the legend
-				if(m_iStabilityView==STABTIMEVIEW)
-				{
-					m_WingLegendOffset.rx() += Delta.x();
-					m_WingLegendOffset.ry() += Delta.y();
-					UpdateView();
-					
-				}
-				else if(m_iStabilityView==STABPOLARVIEW)
-				{
-					m_WPlrLegendOffset.rx() += Delta.x();
-					m_WPlrLegendOffset.ry() += Delta.y();
-					UpdateView();					
-				}				
+				m_WingLegendOffset.rx() += Delta.x();
+				m_WingLegendOffset.ry() += Delta.y();
+				UpdateView();
+
+			}
+			else if(m_iView==STABPOLARVIEW)
+			{
+				m_WPlrLegendOffset.rx() += Delta.x();
+				m_WPlrLegendOffset.ry() += Delta.y();
+				UpdateView();
 			}
 		}
 
@@ -3748,7 +3718,7 @@ void QMiarex::mouseMoveEvent(QMouseEvent *event)
 		//scaling
 		{
 			// we zoom the graph or the wing
-			if(m_iView ==WOPPVIEW ||m_iView==WPOLARVIEW || m_iView==WCPVIEW || m_iView==WSTABVIEW)
+			if(m_iView ==WOPPVIEW ||m_iView==WPOLARVIEW || m_iView==WCPVIEW || m_iView==STABTIMEVIEW || m_iView==STABPOLARVIEW)
 			{
 				if(m_pCurGraph && m_pCurGraph->IsInDrawRect(point))
 				{
@@ -3813,7 +3783,7 @@ void QMiarex::mousePressEvent(QMouseEvent *event)
 	{
 		QPoint point = event->pos();
 
-		if(m_iView==W3DVIEW || (m_iView==WSTABVIEW && m_iStabilityView==STAB3DVIEW))
+		if(m_iView==W3DVIEW)
 		{
 		//	point is in client coordinates
 
@@ -3858,8 +3828,8 @@ void QMiarex::mousePressEvent(QMouseEvent *event)
 			m_pCurGraph = GetGraph(point);
 			if(m_r2DCltRect.contains(point)) p2dWidget->setFocus();
 			
-			if(m_pCurGraph && m_iView==WSTABVIEW && (m_iStabilityView==STABPOLARVIEW)
-			   && m_pCurWPolar && m_pCurWPolar->m_WPolarType==STABILITYPOLAR)
+			if(m_pCurGraph && m_iView==STABPOLARVIEW
+			   && m_pCurWPolar && m_pCurWPolar->polarType()==STABILITYPOLAR)
 			{
 				//first we try to see if the user intended to select a mode;
 				//if not, then we initiate the graph translation
@@ -3951,7 +3921,7 @@ void QMiarex::mousePressEvent(QMouseEvent *event)
  */
 void QMiarex::mouseReleaseEvent(QMouseEvent *event)
 {
-	if(m_iView==W3DVIEW || (m_iView==WSTABVIEW && m_iStabilityView==STAB3DVIEW))
+	if(m_iView==W3DVIEW)
 	{
 		QGLWidget* p3dWidget = (QGLWidget*)s_p3dWidget;
 		p3dWidget->setCursor(Qt::CrossCursor);
@@ -3991,12 +3961,12 @@ void QMiarex::On3DView()
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 
 	m_bArcball = false;
-	m_iStabilityView = STAB3DVIEW;
+
 	if(m_iView==W3DVIEW)
 	{
 		SetControls();
 		UpdateView();
-		if(m_pCurWPolar && m_pCurWPolar->m_WPolarType==STABILITYPOLAR)
+		if(m_pCurWPolar && m_pCurWPolar->polarType()==STABILITYPOLAR)
 		{
 			pMainFrame->m_pctrlStabViewWidget->show();
 		}
@@ -4005,16 +3975,11 @@ void QMiarex::On3DView()
 
 	m_bIs3DScaleSet = false;
 
-	m_iView =W3DVIEW;
-
+	m_iView = W3DVIEW;
 	SetControls();
 
 	pMainFrame->SetCentralWidget();
 
-	if(m_pCurWPolar && m_pCurWPolar->m_WPolarType==STABILITYPOLAR)
-	{
-		pMainFrame->m_pctrlStabViewWidget->show();
-	}
 
 	UpdateView();
 	return;
@@ -4181,7 +4146,7 @@ void QMiarex::OnAllWingGraphScales()
 			m_WingGraph[ig].SetXMax( halfspan*Units::mtoUnit());
 		}
 	}
-	else if(m_iView==WSTABVIEW && m_iStabilityView==STABTIMEVIEW)
+	else if(m_iView==STABTIMEVIEW)
 	{
 		for(int ig=0; ig<MAXGRAPHS; ig++)
 		{
@@ -4220,7 +4185,7 @@ void QMiarex::OnAllWPolarGraphScales()
 		m_CpGraph.ResetYLimits();
 		m_CpGraph.SetInverted(true);
 	}
-	else if(m_iView==WSTABVIEW)
+	else if(m_iView==STABTIMEVIEW)
 	{
 		for(int ig=0; ig<MAXGRAPHS; ig++)
 		{
@@ -4335,19 +4300,19 @@ void QMiarex::OnAnalyze()
 	// make sure that the latest parameters are loaded
 	OnReadAnalysisData();
 
-	if(m_pCurWPolar->m_WPolarType==FIXEDAOAPOLAR)
+	if(m_pCurWPolar->polarType()==FIXEDAOAPOLAR)
 	{
 		V0     = m_QInfMin;
 		VMax   = m_QInfMax;
 		VDelta = m_QInfDelta;
 	}
-	else if(m_pCurWPolar->m_WPolarType==STABILITYPOLAR)
+	else if(m_pCurWPolar->polarType()==STABILITYPOLAR)
 	{
 		V0     = m_ControlMin;
 		VMax   = m_ControlMax;
 		VDelta = m_ControlDelta;
 	}
-	else if(m_pCurWPolar->m_WPolarType <FIXEDAOAPOLAR)
+	else if(m_pCurWPolar->polarType() <FIXEDAOAPOLAR)
 	{
 		V0     = m_AlphaMin;
 		VMax   = m_AlphaMax;
@@ -4397,7 +4362,7 @@ void QMiarex::OnAnalyze()
 	{
 		if(Objects3D::s_MatSize>0 && s_pPanel && s_pNode)
         {
-            if(m_pCurWPolar->m_WPolarType>STABILITYPOLAR)
+		  if(m_pCurWPolar->polarType()>STABILITYPOLAR)
             {
                 QString strong;
                 strong = tr("Control polars are not supported in XFLR5 v6.\nPlease use stability polars instead.");
@@ -4407,7 +4372,7 @@ void QMiarex::OnAnalyze()
             PanelAnalyze(V0, VMax, VDelta, m_bSequence);
         }
 	}
-	else if(m_pCurWPolar->m_WPolarType==STABILITYPOLAR)
+	else if(m_pCurWPolar->polarType()==STABILITYPOLAR)
 	{
 		if(Objects3D::s_MatSize>0 && s_pPanel && s_pNode)
         {
@@ -4423,8 +4388,7 @@ void QMiarex::OnAnalyze()
 	m_bHighlightOpp = bHigh;
 
 	//refresh the view
-	if(m_iView==WPOLARVIEW)     CreateWPolarCurves();
-	else if(m_iView==WSTABVIEW) CreateStabilityCurves();
+	s_bResetCurves = true;
 	UpdateView();
 	SetControls();
 	pMainFrame->setFocus();
@@ -4457,8 +4421,8 @@ void QMiarex::OnAnimateWOpp()
 				pPOpp = (PlaneOpp*)m_poaPOpp->at(l);
 
 				if (pPOpp &&
-					pPOpp->m_PlrName  == m_pCurWPolar->polarName() &&
-					pPOpp->m_PlaneName == m_pCurPlane->planeName())
+					pPOpp->polarName() == m_pCurWPolar->polarName() &&
+					pPOpp->planeName() == m_pCurPlane->planeName())
 				{
 						if(m_pCurPOpp->m_Alpha - pPOpp->m_Alpha<0.0001)
 							m_posAnimateWOpp = l;
@@ -4491,12 +4455,12 @@ void QMiarex::OnAnimateModeSingle(bool bStep)
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	StabViewDlg *pStabView =(StabViewDlg*)pMainFrame->m_pStabView;
 
-	if(m_iView!=WSTABVIEW && m_iView!=W3DVIEW)
+	if(m_iView!=W3DVIEW)
 	{
 		m_pTimerMode->stop();
 		return; //nothing to animate
 	}
-	if(!m_pCurPlane || !m_pCurWPolar || m_pCurWPolar->m_WPolarType!=STABILITYPOLAR || !m_pCurPOpp)
+	if(!m_pCurPlane || !m_pCurWPolar || m_pCurWPolar->polarType()!=STABILITYPOLAR || !m_pCurPOpp)
 	{
 		m_pTimerMode->stop();
 		return; //nothing to animate
@@ -4608,7 +4572,7 @@ void QMiarex::OnAnimateWOppSingle()
 			if(!pPOpp) return;
 		}
 		if(m_pCurPlane)
-			bIsValid =(pPOpp->m_PlrName==m_pCurWPolar->polarName()  &&  pPOpp->m_PlaneName==m_pCurPlane->planeName());
+			bIsValid =(pPOpp->m_PlrName==m_pCurWPolar->polarName()  &&  pPOpp->planeName()==m_pCurPlane->planeName());
 
 		if (bIsValid && !bSkipOne)
 		{
@@ -4839,18 +4803,9 @@ void QMiarex::OnCpView()
 */
 void QMiarex::OnCurWOppOnly()
 {
-
 	m_bCurPOppOnly = !m_bCurPOppOnly;
-	if(m_iView==WOPPVIEW)
-	{
-		CreateWOppCurves();
-		UpdateView();
-	}
-	else if(m_iView==WSTABVIEW && m_iStabilityView==STABTIMEVIEW)
-	{
-		CreateStabilityCurves();
-		UpdateView();
-	}
+	s_bResetCurves = true;
+	UpdateView();
 	SetControls();
 }
 
@@ -4922,7 +4877,7 @@ void QMiarex::OnDefineStabPolar()
 		emit projectModified();
 
 		WPolar* pNewStabPolar      = new WPolar;
-		pNewStabPolar->m_PlaneName = m_pCurPlane->planeName();
+		pNewStabPolar->setPlaneName(m_pCurPlane->planeName());
 		pNewStabPolar->m_Color = MainFrame::GetColor(4);
 		pNewStabPolar->m_Width = 2;
 		pNewStabPolar->m_bShowPoints = true;
@@ -4933,9 +4888,9 @@ void QMiarex::OnDefineStabPolar()
 		pNewStabPolar->DuplicateSpec(&StabPolarDlg::s_StabPolar);
 
 
-		if(pNewStabPolar->m_WPlrName.length()>60)
+		if(pNewStabPolar->polarName().length()>60)
 		{
-			pNewStabPolar->m_WPlrName = pNewStabPolar->m_WPlrName.left(60)+"..."+QString("(%1)").arg(m_poaWPolar->size());
+			pNewStabPolar->polarName() = pNewStabPolar->polarName().left(60)+"..."+QString("(%1)").arg(m_poaWPolar->size());
 		}
 
 		if(pNewStabPolar->m_RefAreaType==PLANFORMAREA)
@@ -5001,7 +4956,7 @@ void QMiarex::OnDefineWPolar()
 		emit projectModified();
 		pNewWPolar->DuplicateSpec(&WPolarDlg::s_WPolar);
 		pNewWPolar->setPlaneName(m_pCurPlane->planeName());
-		pNewWPolar->setPolarName(wpDlg.s_WPolar.m_WPlrName);
+		pNewWPolar->setPolarName(wpDlg.s_WPolar.polarName());
 
 		pNewWPolar->m_WMAChord = m_pCurPlane->mac();
 
@@ -5062,13 +5017,13 @@ void QMiarex::OnEditCurWPolar()
 
 	WPolar *pNewWPolar = new WPolar;
 
-	if(m_pCurWPolar->m_WPolarType!=STABILITYPOLAR)
+	if(m_pCurWPolar->polarType()!=STABILITYPOLAR)
 	{
 		WPolarDlg dlg(pMainFrame);
 		dlg.InitDialog(m_pCurPlane, m_pCurWPolar);
 		res = dlg.exec();
 		pNewWPolar->DuplicateSpec(&dlg.s_WPolar);
-		WPolarName=dlg.s_WPolar.m_WPlrName;
+		WPolarName=dlg.s_WPolar.polarName();
 	}
 	else
 	{
@@ -5076,7 +5031,7 @@ void QMiarex::OnEditCurWPolar()
 		dlg.InitDialog(m_pCurPlane, m_pCurWPolar);
 		res = dlg.exec();
 		pNewWPolar->DuplicateSpec(&dlg.s_StabPolar);
-		WPolarName=dlg.s_StabPolar.m_WPlrName;
+		WPolarName=dlg.s_StabPolar.polarName();
 	}
 
 	if (res == QDialog::Accepted)
@@ -5156,9 +5111,7 @@ void QMiarex::OnEditCurWPolarPts()
 	bool bPoints = m_pCurWPolar->m_bShowPoints;
 	m_pCurWPolar->m_bShowPoints = true;
 
-	if(m_iView==WPOLARVIEW)     CreateWPolarCurves();
-	else if(m_iView==WSTABVIEW) CreateStabilityCurves();
-
+	s_bResetCurves = true;
 	UpdateView();
 
 	if(epDlg.exec() == QDialog::Accepted)
@@ -5171,9 +5124,7 @@ void QMiarex::OnEditCurWPolarPts()
 	}
 	m_pCurWPolar->m_bShowPoints = bPoints;
 
-	if(m_iView==WPOLARVIEW)     CreateWPolarCurves();
-	else if(m_iView==WSTABVIEW) CreateStabilityCurves();
-
+	s_bResetCurves = true;
 	UpdateView();
 	SetControls();
 	delete pMemWPolar;
@@ -5198,7 +5149,7 @@ void QMiarex::OnDeleteAllWPlrOpps()
 		{
 			pPOpp = (PlaneOpp*) m_poaPOpp->at(i);
 			if(pPOpp->m_PlrName == m_pCurWPolar->polarName() &&
-			   pPOpp->m_PlaneName == m_pCurPlane->planeName())
+			   pPOpp->planeName() == m_pCurPlane->planeName())
 			{
 				m_poaPOpp->removeAt(i);
 				delete pPOpp;
@@ -5210,10 +5161,8 @@ void QMiarex::OnDeleteAllWPlrOpps()
 	m_bResetglMesh = true;
 	pMainFrame->UpdatePOppListBox();
 	SetPlaneOpp(true);
-	if (m_iView==WOPPVIEW)      CreateWOppCurves();
-	else if(m_iView==WCPVIEW)   CreateCpCurves();
-	else if(m_iView==WSTABVIEW) CreateStabilityCurves();
 	SetControls();
+	s_bResetCurves = true;
 	UpdateView();
 }
 
@@ -5237,12 +5186,12 @@ void QMiarex::OnDeleteAllWOpps()
 
 	m_pCurPOpp = NULL;
 	pMainFrame->UpdatePOppListBox();
+
 	SetPlaneOpp(true);
-	if (m_iView==WOPPVIEW)      CreateWOppCurves();
-	else if(m_iView==WCPVIEW)   CreateCpCurves();
-	else if(m_iView==WSTABVIEW) CreateStabilityCurves();
 
 	SetControls();
+
+	s_bResetCurves = true;
 	UpdateView();
 }
 
@@ -5265,11 +5214,8 @@ void QMiarex::OnDeleteCurPlane()
 
 	SetPlane();
 	pMainFrame->UpdatePlaneListBox();
-	if(m_iView==WPOLARVIEW)     CreateWPolarCurves();
-	else if(m_iView==WSTABVIEW) CreateStabilityCurves();
-	else if(m_iView==WOPPVIEW)  CreateWOppCurves();
-	else if(m_iView==WCPVIEW)   CreateCpCurves();
 	SetControls();
+	s_bResetCurves = true;
 	UpdateView();
 }
 
@@ -5302,10 +5248,8 @@ void QMiarex::OnDeleteCurWOpp()
 		pMainFrame->UpdatePOppListBox();
 		SetPlaneOpp(true);
 		emit projectModified();
-		if (m_iView==WOPPVIEW)      CreateWOppCurves();
-		else if(m_iView==WCPVIEW)   CreateCpCurves();
-		else if(m_iView==WSTABVIEW) CreateStabilityCurves();
 
+		s_bResetCurves = true;
 		UpdateView();
 	}
 
@@ -5332,7 +5276,7 @@ void QMiarex::OnDeletePlaneOpps()
 		for (i=m_poaPOpp->size()-1; i>=0; i--)
 		{
 			pPOpp = (PlaneOpp*)m_poaPOpp->at(i);
-			if (pPOpp->m_PlaneName == m_pCurPlane->planeName())
+			if (pPOpp->planeName() == m_pCurPlane->planeName())
 			{
 				m_poaPOpp->removeAt(i);
 				delete pPOpp;
@@ -5341,14 +5285,12 @@ void QMiarex::OnDeletePlaneOpps()
 	}
 	m_pCurPOpp = NULL;
 
-	if (m_iView==WOPPVIEW)      CreateWOppCurves();
-	else if(m_iView==WCPVIEW)   CreateCpCurves();
-	else if(m_iView==WSTABVIEW) CreateStabilityCurves();
 
 	MainFrame* pMainFrame = (MainFrame*)s_pMainFrame;
 	emit projectModified();
 	pMainFrame->UpdatePOppListBox();
 	SetControls();
+	s_bResetCurves = true;
 	UpdateView();
 }
 
@@ -5381,7 +5323,7 @@ void QMiarex::OnDeletePlaneWPolars()
 			for (int i=m_poaPOpp->size()-1; i>=0; i--)
 			{
 				pPOpp = (PlaneOpp*)m_poaPOpp->at(i);
-				if (pPOpp->m_PlrName == pWPolar->polarName()   &&  pPOpp->m_PlaneName== PlaneName)
+				if (pPOpp->m_PlrName == pWPolar->polarName()   &&  pPOpp->planeName()== PlaneName)
 				{
 					m_poaPOpp->removeAt(i);
 					delete pPOpp;
@@ -5428,7 +5370,7 @@ void QMiarex::OnDeleteCurWPolar()
 	for (i=m_poaPOpp->size()-1; i>=0; i--)
 	{
 		pPOpp = (PlaneOpp*)m_poaPOpp->at(i);
-		if (pPOpp->m_PlrName  == m_pCurWPolar->polarName()  &&  pPOpp->m_PlaneName == PlaneName)
+		if (pPOpp->m_PlrName  == m_pCurWPolar->polarName()  &&  pPOpp->planeName() == PlaneName)
 		{
 			m_poaPOpp->removeAt(i);
 			delete pPOpp;
@@ -5559,10 +5501,8 @@ void QMiarex::OnEditCurBody()
 	Objects3D::deletePlaneResults(m_pCurPlane);// will also set new surface and Aerochord in WPolars
 	SetPlane();
 
-	if(m_iView==WPOLARVIEW)		CreateWPolarCurves();
-	else if(m_iView==WSTABVIEW)	CreateStabilityCurves();
-	else if(m_iView==WOPPVIEW)	CreateWOppCurves();
-	else if(m_iView==WCPVIEW)	CreateCpCurves();
+	s_bResetCurves = true;
+	UpdateView();
 }
 
 
@@ -5594,7 +5534,7 @@ void QMiarex::OnEditCurPlane()
 	for (i=0; i<m_poaPOpp->size(); i++)
 	{
 		pPOpp = (PlaneOpp*)m_poaPOpp->at(i);
-		if(pPOpp->m_PlaneName == m_pCurPlane->planeName())
+		if(pPOpp->planeName() == m_pCurPlane->planeName())
 		{
 			bHasResults = true;
 			break;
@@ -5653,10 +5593,7 @@ void QMiarex::OnEditCurPlane()
 			m_bResetglGeom = true;
 			m_bResetglMesh = true;
 //			m_bResetglOpp  = true;
-			if(m_iView==WPOLARVIEW)		CreateWPolarCurves();
-			else if(m_iView==WSTABVIEW)	CreateStabilityCurves();
-			else if(m_iView==WOPPVIEW)	CreateWOppCurves();
-			else if(m_iView==WCPVIEW)	CreateCpCurves();
+			s_bResetCurves = true;
 		}
 
 		SetPlane();
@@ -5724,7 +5661,7 @@ void QMiarex::OnExportCurWOpp()
 	out << VERSIONNAME;
 	out << "\n\n";
 
-	if(m_pCurPOpp)		out << m_pCurPOpp->m_PlaneName<< "\n";
+	if(m_pCurPOpp)		out << m_pCurPOpp->planeName()<< "\n";
 
 	strong = m_pCurPOpp->m_pPlaneWOpp[0]->m_PlrName + "\n";
 	out << strong;
@@ -5784,7 +5721,7 @@ void QMiarex::OnExportCurWOpp()
 	strong = QString(tr("Bend. =")+sep+" %1\n\n").arg(m_pCurPOpp->m_pPlaneWOpp[0]->m_MaxBending, 11, 'f', 6);
 	out << strong;
 
-	if(m_pCurWPolar->m_WPolarType==STABILITYPOLAR)
+	if(m_pCurWPolar->polarType()==STABILITYPOLAR)
 	{
 		//export non dimensional stability derivatives
 		if(exporttype==TXT)
@@ -6024,7 +5961,7 @@ void QMiarex::OnExportCurWPolar()
 	QString FileName, filter;
 
 	if(Settings::s_ExportFileType==TXT) filter = "Text File (*.txt)";
-	else                                  filter = "Comma Separated Values (*.csv)";
+	else                                filter = "Comma Separated Values (*.csv)";
 
 	FileName = m_pCurWPolar->polarName();
 	FileName.replace("/", " ");
@@ -6034,15 +5971,26 @@ void QMiarex::OnExportCurWPolar()
 											&filter);
 
 	if(!FileName.length()) return;
+
 	int pos = FileName.lastIndexOf("/");
 	if(pos>0) Settings::s_LastDirName = FileName.left(pos);
 	pos = FileName.lastIndexOf(".csv");
-	if (pos>0) Settings::s_ExportFileType = CSV;
-	else       Settings::s_ExportFileType = TXT;
+
+	if(filter.indexOf("*.txt")>0)
+	{
+		Settings::s_ExportFileType = TXT;
+		if(FileName.indexOf(".txt")<0) FileName +=".txt";
+	}
+	else if(filter.indexOf("*.csv")>0)
+	{
+		Settings::s_ExportFileType = CSV;
+		if(FileName.indexOf(".csv")<0) FileName +=".csv";
+	}
+
 
 	QFile XFile(FileName);
 
-	if (!XFile.open(QIODevice::WriteOnly | QIODevice::Text)) return ;
+	if (!XFile.open(QIODevice::WriteOnly | QIODevice::Text)) return;
 
 	QTextStream out(&XFile);
 	m_pCurWPolar->Export(out, Settings::s_ExportFileType);
@@ -6232,7 +6180,6 @@ void QMiarex::OnGraphSettings()
 				m_pCurGraph->SetAutoY(true);
 				m_pCurGraph->SetAutoYMinUnit(true);
 			}
-			CreateWOppCurves();
 		}
 		else if(m_iView==WPOLARVIEW)
 		{
@@ -6246,11 +6193,10 @@ void QMiarex::OnGraphSettings()
 				m_pCurGraph->SetAuto(true);
 				m_pCurGraph->SetAutoYMinUnit(true);
 			}
-			CreateWPolarCurves();
 		}
-		else if(m_iView==WSTABVIEW)
+		else if(m_iView==STABTIMEVIEW || m_iView==STABPOLARVIEW)
 		{
-			CreateStabilityCurves();
+			s_bResetCurves = true;
 			SetStabGraphTitles();
 		}
 	}
@@ -6258,6 +6204,7 @@ void QMiarex::OnGraphSettings()
 	{
 		pGraph->CopySettings(&graph);
 	}
+	s_bResetCurves = true;
 	UpdateView();
 }
 
@@ -6292,12 +6239,12 @@ void QMiarex::OnHideAllWPolars()
 	{
 		pWPolar = (WPolar*)m_poaWPolar->at(i);
 		pWPolar->m_bIsVisible = false;
-		if(pWPolar->m_WPolarType==STABILITYPOLAR) pWPolar->m_bShowPoints = false;
+		if(pWPolar->polarType()==STABILITYPOLAR) pWPolar->m_bShowPoints = false;
 	}
-	if(m_iView==WPOLARVIEW)		CreateWPolarCurves();
-	else if(m_iView==WSTABVIEW)	CreateStabilityCurves();
+
 	emit projectModified();
 	SetCurveParams();
+	s_bResetCurves = true;
 	UpdateView();
 }
 
@@ -6317,7 +6264,7 @@ void QMiarex::OnHideAllWPlrOpps()
 		for (i=0; i< m_poaPOpp->size(); i++)
 		{
 			pPOpp = (PlaneOpp*)m_poaPOpp->at(i);
-			if (pPOpp->m_PlaneName == m_pCurWPolar->planeName() &&
+			if (pPOpp->planeName() == m_pCurWPolar->planeName() &&
 				pPOpp->m_PlrName   == m_pCurWPolar->polarName())
 			{
 				pPOpp->m_bIsVisible = false;
@@ -6327,10 +6274,7 @@ void QMiarex::OnHideAllWPlrOpps()
 	emit projectModified();
 	SetCurveParams();
 
-	if (m_iView==WOPPVIEW)      CreateWOppCurves();
-	else if(m_iView==WCPVIEW)   CreateCpCurves();
-	else if(m_iView==WSTABVIEW) CreateStabilityCurves();
-
+	s_bResetCurves = true;
 	UpdateView();
 }
 
@@ -6352,10 +6296,7 @@ void QMiarex::OnHideAllWOpps()
 	emit projectModified();
 	SetCurveParams();
 
-	if (m_iView==WOPPVIEW)      CreateWOppCurves();
-	else if(m_iView==WCPVIEW)   CreateCpCurves();
-	else if(m_iView==WSTABVIEW) CreateStabilityCurves();
-
+	s_bResetCurves = true;
 	UpdateView();
 }
 
@@ -6370,18 +6311,15 @@ void QMiarex::OnHidePlaneOpps()
 	for (i=0; i< m_poaPOpp->size(); i++)
 	{
 		pPOpp = (PlaneOpp*)m_poaPOpp->at(i);
-		if (pPOpp->m_PlaneName == m_pCurWPolar->planeName())
+		if (pPOpp->planeName() == m_pCurWPolar->planeName())
 		{
 			pPOpp->m_bIsVisible = false;
 		}
 	}
 
-	if (m_iView==WOPPVIEW)      CreateWOppCurves();
-	else if(m_iView==WCPVIEW)   CreateCpCurves();
-	else if(m_iView==WSTABVIEW) CreateStabilityCurves();
-
 	emit projectModified();
 	SetCurveParams();
+	s_bResetCurves = true;
 	UpdateView();
 }
 
@@ -6404,15 +6342,13 @@ void QMiarex::OnHidePlaneWPolars()
 		if (pWPolar->planeName() == PlaneName)
 		{
 			pWPolar->m_bIsVisible = false;
-			if(pWPolar->m_WPolarType==STABILITYPOLAR) pWPolar->m_bShowPoints = false;
+			if(pWPolar->polarType()==STABILITYPOLAR) pWPolar->m_bShowPoints = false;
 		}
 	}
 
-	if(m_iView==WPOLARVIEW)		CreateWPolarCurves();
-	else if(m_iView==WSTABVIEW)	CreateStabilityCurves();
-
 	SetCurveParams();
 	emit projectModified();
+	s_bResetCurves = true;
 	UpdateView();
 }
 
@@ -6423,7 +6359,7 @@ void QMiarex::OnHidePlaneWPolars()
  */
 void QMiarex::OnHighlightWOpp()
 {
-	if(m_iView!=WPOLARVIEW && !(m_iView==WSTABVIEW && m_iStabilityView==STABPOLARVIEW)) return;
+	if(m_iView!=WPOLARVIEW && m_iView!=STABPOLARVIEW) return;
 	m_bHighlightOpp = !m_bHighlightOpp;
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	pMainFrame->highlightWOppAct->setChecked(m_bHighlightOpp);
@@ -6431,9 +6367,7 @@ void QMiarex::OnHighlightWOpp()
 	for(int ig=0; ig<MAXGRAPHS; ig++)
 		m_WPlrGraph[ig].m_bHighlightPoint = m_bHighlightOpp;
 
-	if(m_iView==WPOLARVIEW)		CreateWPolarCurves();
-	else if(m_iView==WSTABVIEW)	CreateStabilityCurves();
-
+	s_bResetCurves = true;
 	UpdateView();
 }
 
@@ -6712,7 +6646,7 @@ void QMiarex::OnReadAnalysisData()
 	m_bSequence = m_pctrlSequence->isChecked();
 	m_bInitLLTCalc = m_pctrlInitLLTCalc->isChecked();
 
-	if(m_pCurWPolar && m_pCurWPolar->m_WPolarType==FIXEDAOAPOLAR)
+	if(m_pCurWPolar && m_pCurWPolar->polarType()==FIXEDAOAPOLAR)
 	{
 		m_QInfMin   = m_pctrlAlphaMin->Value()         /Units::mstoUnit();
 		m_QInfMax   = m_pctrlAlphaMax->Value()         /Units::mstoUnit();
@@ -6723,7 +6657,7 @@ void QMiarex::OnReadAnalysisData()
 			m_pctrlAlphaDelta->SetValue(1.0);
 		}
 	}
-	else if(m_pCurWPolar && m_pCurWPolar->m_WPolarType==STABILITYPOLAR)
+	else if(m_pCurWPolar && m_pCurWPolar->polarType()==STABILITYPOLAR)
 	{
 		m_ControlMin   = m_pctrlAlphaMin->Value();
 		m_ControlMax   = m_pctrlAlphaMax->Value();
@@ -6770,16 +6704,8 @@ void QMiarex::OnPolarFilter()
 		m_bType2 = pfDlg.m_bType2;
 		m_bType4 = pfDlg.m_bType4;
 		m_bType7 = pfDlg.m_bType7;
-		if(m_iView==WPOLARVIEW)
-		{
-			CreateWPolarCurves();
-			UpdateView();
-		}
-		else if(m_iView==WSTABVIEW)
-		{
-			CreateStabilityCurves();
-			UpdateView();
-		}
+		s_bResetCurves = true;
+		UpdateView();
 	}
 }
 
@@ -6802,8 +6728,8 @@ void QMiarex::OnRenameCurWPolar()
 	for(int k=0; k<m_poaWPolar->size(); k++)
 	{
 		pWPolar = (WPolar*)m_poaWPolar->at(k);
-		if(pWPolar->m_PlaneName==m_pCurPlane->planeName())
-			NameList.append(pWPolar->m_WPlrName);
+		if(pWPolar->planeName()==m_pCurPlane->planeName())
+			NameList.append(pWPolar->polarName());
 	}
 
 	RenameDlg dlg;
@@ -6861,7 +6787,7 @@ void QMiarex::OnRenameCurWPolar()
 		}
 	}
 	//set the new name
-	m_pCurWPolar->m_WPlrName=dlg.newName();
+	m_pCurWPolar->setPolarName(dlg.newName());
 
 	//insert
 	bool bInserted = false;
@@ -6869,7 +6795,7 @@ void QMiarex::OnRenameCurWPolar()
 	{
 		pOldWPolar = (WPolar*)m_poaWPolar->at(l);
 
-		if(pOldWPolar->m_WPlrName.compare(m_pCurWPolar->m_WPlrName, Qt::CaseInsensitive) >0)
+		if(pOldWPolar->polarName().compare(m_pCurWPolar->polarName(), Qt::CaseInsensitive) >0)
 		{
 			//then insert before
 			m_poaWPolar->insert(l, m_pCurWPolar);
@@ -6883,13 +6809,9 @@ void QMiarex::OnRenameCurWPolar()
 
 	pMainFrame->UpdateWPolarListBox();
 
-	if(m_iView==WPOLARVIEW)		CreateWPolarCurves();
-	else if(m_iView==WSTABVIEW)	CreateStabilityCurves();
-	else if(m_iView==WOPPVIEW)	CreateWOppCurves();
-	else if(m_iView==WCPVIEW)	CreateCpCurves();
+	emit projectModified();
 
-    emit projectModified();
-
+	s_bResetCurves = true;
 	UpdateView();
 }
 
@@ -6945,7 +6867,7 @@ void QMiarex::OnResetCurWPolar()
 		for(int i=m_poaPOpp->size()-1; i>=0; --i)
 		{
 			pPOpp = (PlaneOpp*) m_poaPOpp->at(i);
-			if(pPOpp->m_PlrName==m_pCurWPolar->polarName() && pPOpp->m_PlaneName==m_pCurPlane->planeName())
+			if(pPOpp->m_PlrName==m_pCurWPolar->polarName() && pPOpp->planeName()==m_pCurPlane->planeName())
 			{
 				m_poaPOpp->removeAt(i);
 				delete pPOpp;
@@ -6957,7 +6879,6 @@ void QMiarex::OnResetCurWPolar()
 
 	if(m_iView==WPOLARVIEW)
 	{
-		CreateWPolarCurves();
 		if(m_pCurWPolar)
 		{
 			QString PolarProps;
@@ -6965,12 +6886,9 @@ void QMiarex::OnResetCurWPolar()
 			m_pctrlPolarProps->setText(PolarProps);
 		}
 	}
-	else if(m_iView==WSTABVIEW) CreateStabilityCurves();
-	else if(m_iView==WOPPVIEW)  CreateWOppCurves();
-	else if(m_iView==WCPVIEW)   CreateCpCurves();
-
 
 	emit projectModified();
+	s_bResetCurves = true;
 	UpdateView();
 }
 
@@ -7059,10 +6977,8 @@ void QMiarex::OnScaleWing()
 			SetPlane();
 			pMainFrame->UpdatePlaneListBox();
 		}
-		if(m_iView==WPOLARVIEW)		CreateWPolarCurves();
-		else if(m_iView==WSTABVIEW)	CreateStabilityCurves();
-		else if(m_iView==WOPPVIEW)	CreateWOppCurves();
-		else if(m_iView==WCPVIEW)	CreateCpCurves();
+
+		s_bResetCurves = true;
 		UpdateView();
 	}
 }
@@ -7101,10 +7017,7 @@ void QMiarex::OnShowAllWOpps()
 	emit projectModified();
 	SetCurveParams();
 
-	if (m_iView==WOPPVIEW)      CreateWOppCurves();
-	else if(m_iView==WCPVIEW)   CreateCpCurves();
-	else if(m_iView==WSTABVIEW) CreateStabilityCurves();
-
+	s_bResetCurves = true;
 	UpdateView();
 }
 
@@ -7122,11 +7035,10 @@ void QMiarex::OnShowAllWPolars()
 		pWPolar = (WPolar*)m_poaWPolar->at(i);
 		pWPolar->m_bIsVisible = true;
 	}
-	if(m_iView==WPOLARVIEW)		CreateWPolarCurves();
-	else if(m_iView==WSTABVIEW)	CreateStabilityCurves();
 
 	emit projectModified();
 	SetCurveParams();
+	s_bResetCurves = true;
 	UpdateView();
 }
 
@@ -7150,11 +7062,9 @@ void QMiarex::OnShowPlaneWPolarsOnly()
 		pWPolar->m_bIsVisible = (pWPolar->planeName() == PlaneName);
 	}
 
-	if(m_iView==WPOLARVIEW)		CreateWPolarCurves();
-	else if(m_iView==WSTABVIEW)	CreateStabilityCurves();
-
 	SetCurveParams();
 	emit projectModified();
+	s_bResetCurves = true;
 	UpdateView();
 }
 
@@ -7178,11 +7088,10 @@ void QMiarex::OnShowPlaneWPolars()
 		if (pWPolar->planeName() == PlaneName) pWPolar->m_bIsVisible = true;
 	}
 
-	if(m_iView==WPOLARVIEW)		CreateWPolarCurves();
-	else if(m_iView==WSTABVIEW)	CreateStabilityCurves();
 
 	SetCurveParams();
 	emit projectModified();
+	s_bResetCurves = true;
 	UpdateView();
 }
 
@@ -7198,18 +7107,15 @@ void QMiarex::OnShowPlaneOpps()
 	for (i=0; i< m_poaPOpp->size(); i++)
 	{
 		pPOpp = (PlaneOpp*)m_poaPOpp->at(i);
-		if (pPOpp->m_PlaneName == m_pCurWPolar->planeName())
+		if (pPOpp->planeName() == m_pCurWPolar->planeName())
 		{
 			pPOpp->m_bIsVisible = true;
 		}
 	}
 
-	if (m_iView==WOPPVIEW)      CreateWOppCurves();
-	else if(m_iView==WCPVIEW)   CreateCpCurves();
-	else if(m_iView==WSTABVIEW) CreateStabilityCurves();
-
 	emit projectModified();
 	SetCurveParams();
+	s_bResetCurves = true;
 	UpdateView();
 }
 
@@ -7229,7 +7135,7 @@ void QMiarex::OnShowAllWPlrOpps()
 		for (i=0; i< m_poaPOpp->size(); i++)
 		{
 			pPOpp = (PlaneOpp*)m_poaPOpp->at(i);
-			if (pPOpp->m_PlaneName == m_pCurWPolar->planeName() &&
+			if (pPOpp->planeName() == m_pCurWPolar->planeName() &&
 				pPOpp->m_PlrName   == m_pCurWPolar->polarName())
 			{
 				pPOpp->m_bIsVisible = true;
@@ -7239,10 +7145,7 @@ void QMiarex::OnShowAllWPlrOpps()
 	emit projectModified();
 	SetCurveParams();
 
-	if (m_iView==WOPPVIEW)      CreateWOppCurves();
-	else if(m_iView==WCPVIEW)   CreateCpCurves();
-	else if(m_iView==WSTABVIEW) CreateStabilityCurves();
-
+	s_bResetCurves = true;
 	UpdateView();
 }
 
@@ -7358,9 +7261,8 @@ void QMiarex::OnShowCurve()
  **/
 void QMiarex::OnSingleGraph1()
 {
-	if(m_iView==WSTABVIEW)
+	if(m_iView==STABTIMEVIEW)
 	{
-		m_iStabilityView = STABTIMEVIEW;
 		m_iStabTimeView = ONEGRAPH;
 		m_pCurGraph = m_TimeGraph;
 		m_pCurTimeGraph= m_pCurGraph;
@@ -7393,9 +7295,8 @@ void QMiarex::OnSingleGraph1()
  **/
 void QMiarex::OnSingleGraph2()
 {
-	if(m_iView==WSTABVIEW)
+	if(m_iView==STABTIMEVIEW)
 	{
-		m_iStabilityView = STABTIMEVIEW;
 		m_iStabTimeView = ONEGRAPH;
 		m_pCurGraph = m_TimeGraph+1;
 		m_pCurTimeGraph= m_pCurGraph;
@@ -7428,9 +7329,8 @@ void QMiarex::OnSingleGraph2()
  **/
 void QMiarex::OnSingleGraph3()
 {
-	if(m_iView==WSTABVIEW)
+	if(m_iView==STABTIMEVIEW)
 	{
-		m_iStabilityView = STABTIMEVIEW;
 		m_iStabTimeView = ONEGRAPH;
 		m_pCurGraph = m_TimeGraph+2;
 		m_pCurTimeGraph= m_pCurGraph;
@@ -7461,9 +7361,8 @@ void QMiarex::OnSingleGraph3()
  **/
 void QMiarex::OnSingleGraph4()
 {
-	if(m_iView==WSTABVIEW)
+	if(m_iView==STABTIMEVIEW)
 	{
-		m_iStabilityView = STABTIMEVIEW;
 		m_iStabTimeView = ONEGRAPH;
 		m_pCurGraph = m_TimeGraph+3;
 		m_pCurTimeGraph= m_pCurGraph;
@@ -7508,19 +7407,18 @@ void QMiarex::OnStabilityDirection()
 	
 	if(m_bLongitudinal) m_pCurRLStabGraph = &m_LongRLGraph;
 	else                m_pCurRLStabGraph = &m_LatRLGraph;
-	if(m_iStabilityView==STABPOLARVIEW)
-	{
-		m_pCurGraph = m_pCurRLStabGraph;
-	}
+
+	if(m_iView==STABPOLARVIEW) m_pCurGraph = m_pCurRLStabGraph;
 
 	pStabView->SetMode();
 	pStabView->SetControls();
 	SetStabGraphTitles();
 	SetWPlrLegendPos();
-	CreateStabilityCurves();
-	SetCurveParams();
 
+	SetCurveParams();
 	SetControls();
+
+	s_bResetCurves = true;
 	UpdateView();
 }
 
@@ -7533,15 +7431,14 @@ void QMiarex::OnTimeView()
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	StabViewDlg *pStabView =(StabViewDlg*)pMainFrame->m_pStabView;
 	StopAnimate();
-	m_iView = WSTABVIEW;
-	m_iStabilityView = STABTIMEVIEW;
+	m_iView =  STABTIMEVIEW;
 	pStabView->SetControls();
 	SetWingLegendPos();
-	CreateStabilityCurves();
 	
 	pMainFrame->SetCentralWidget();
 	SetCurveParams();
 	SetControls();
+	s_bResetCurves = true;
 	UpdateView();
 }
 
@@ -7552,13 +7449,13 @@ void QMiarex::OnRootLocusView()
 {
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	StopAnimate();
-	m_iView = WSTABVIEW;
-	m_iStabilityView = STABPOLARVIEW;
+	m_iView = STABPOLARVIEW;
 	SetWPlrLegendPos();
-	CreateStabilityCurves();
+
 	pMainFrame->SetCentralWidget();
 	SetCurveParams();
 	SetControls();
+	s_bResetCurves = true;
 	UpdateView();
 }
 
@@ -7570,8 +7467,7 @@ void QMiarex::OnModalView()
 {
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 
-	m_iView = WSTABVIEW;
-	m_iStabilityView = STAB3DVIEW;
+	m_iView = W3DVIEW;
 
 	pMainFrame->SetCentralWidget();
 	SetCurveParams();
@@ -7629,13 +7525,13 @@ void QMiarex::OnSurfaceSpeeds()
  */
 void QMiarex::OnSetupLight()
 {
-	if(m_iView!=W3DVIEW && m_iView!=WSTABVIEW) return;
+	if(m_iView!=W3DVIEW) return;
 	ThreeDWidget *p3dWidget = (ThreeDWidget*)s_p3dWidget;
 
 	GLLightDlg *pgllDlg = (GLLightDlg*)m_pglLightDlg;
 	pgllDlg->m_p3DWidget= s_p3dWidget;
-/*    QSize size = QSize(400,400);
-    QPoint pos = QPoint(100,50);
+/*	QSize size = QSize(400,400);
+	QPoint pos = QPoint(100,50);
 	gllDlg.resize(size);
 	gllDlg.move(pos); */
 	pgllDlg->show();
@@ -7653,7 +7549,7 @@ void QMiarex::OnSetupLight()
  */
 void QMiarex::OnStoreWOpp()
 {
-	m_bStoreWOpp = m_pctrlStoreWOpp->isChecked();
+	PlaneOpp::s_bStoreOpps = m_pctrlStoreWOpp->isChecked();
 }
 
 
@@ -7678,7 +7574,7 @@ void QMiarex::OnTwoGraphs()
 		m_pCurWPlrGraph = m_pCurGraph;
 		SetWPlrLegendPos();
 	}
-	else if(m_iView==WSTABVIEW)
+	else if(m_iView==STABTIMEVIEW)
 	{
 		m_iStabTimeView= TWOGRAPHS;
 		m_pCurGraph = m_TimeGraph;
@@ -7712,7 +7608,7 @@ void QMiarex::OnFourGraphs()
 		m_pCurWPlrGraph = m_pCurGraph;
 		SetWPlrLegendPos();
 	}
-	else if(m_iView==WSTABVIEW)
+	else if(m_iView==STABTIMEVIEW)
 	{
 		m_iStabTimeView= ALLGRAPHS;
 		m_pCurGraph = m_TimeGraph;
@@ -7785,7 +7681,7 @@ void QMiarex::OnPlaneInertia()
 		pWPolar = (WPolar*)m_poaWPolar->at(i);
 		if(pWPolar->m_Alpha.size() && pWPolar->planeName()==PlaneName && pWPolar->m_bAutoInertia)
 		{
-//			if(pWPolar->m_WPolarType==STABILITYPOLAR)
+//			if(pWPolar->polarType()==STABILITYPOLAR)
 //			{
 				bHasResults = true;
 				break;
@@ -7844,7 +7740,7 @@ void QMiarex::OnPlaneInertia()
 					for (int i=m_poaPOpp->size()-1; i>=0; i--)
 					{
 						PlaneOpp *pPOpp = (PlaneOpp*)m_poaPOpp->at(i);
-						if(pPOpp && pPOpp->m_PlaneName==PlaneName && pPOpp->m_PlrName==pWPolar->polarName())
+						if(pPOpp && pPOpp->planeName()==PlaneName && pPOpp->m_PlrName==pWPolar->polarName())
 						{
 							m_poaPOpp->removeAt(i);
 							delete pPOpp;
@@ -7857,7 +7753,7 @@ void QMiarex::OnPlaneInertia()
 		}
 		SetWPolar();
 		emit projectModified();
-		if(m_iView==WPOLARVIEW) CreateWPolarCurves();
+		s_bResetCurves = true;
 		UpdateView();
 	}
 	else
@@ -7873,7 +7769,7 @@ void QMiarex::OnPlaneInertia()
 /**
  * The user ha requested to switch to the operating point view
  */
-void QMiarex::OnWOpps()
+void QMiarex::OnWOppView()
 {
 	MainFrame* pMainFrame = (MainFrame*)s_pMainFrame;
 
@@ -7902,9 +7798,9 @@ void QMiarex::OnWOpps()
 
 
 /**
- * The user ha requested to switch to the polar view
+ * The user has requested to switch to the polar view
  */
-void QMiarex::OnWPolars()
+void QMiarex::OnWPolarView()
 {
 	MainFrame* pMainFrame = (MainFrame*)s_pMainFrame;
 	if (m_bAnimateWOpp) StopAnimate();
@@ -7923,10 +7819,10 @@ void QMiarex::OnWPolars()
 	pMainFrame->SetCentralWidget();
 
 	SetWPlrLegendPos();
-	CreateWPolarCurves();
 	SetCurveParams();
 	SetControls();
 
+	s_bResetCurves = true;
 	UpdateView();
 }
 
@@ -7963,6 +7859,12 @@ void QMiarex::PaintView(QPainter &painter)
 
 	if (m_iView==WPOLARVIEW)
 	{
+		if(s_bResetCurves)
+		{
+			CreateWPolarCurves();
+			s_bResetCurves = false;
+		}
+
 		if (m_iWPlrView == ONEGRAPH)
 		{
 			if(!m_pCurGraph)
@@ -8003,6 +7905,11 @@ void QMiarex::PaintView(QPainter &painter)
 	}
 	else if (m_iView==WOPPVIEW)
 	{
+		if(s_bResetCurves)
+		{
+			CreateWOppCurves();
+			s_bResetCurves = false;
+		}
 		if (m_iWingView == ONEGRAPH && m_pCurPlane)
 		{
 //			PaintSingleWingGraph(painter);
@@ -8060,77 +7967,89 @@ void QMiarex::PaintView(QPainter &painter)
 	}
 	else if (m_iView==WCPVIEW)
 	{
-//		PaintCp(painter);
+		if(s_bResetCurves)
+		{
+			CreateCpCurves();
+			s_bResetCurves = false;
+		}
+
 		m_CpGraph.DrawGraph(painter);
 		QPoint Place(50, h34+20);
 		DrawCpLegend(painter, Place, m_r2DCltRect.bottom());
 	}
-	else if (m_iView==WSTABVIEW)
-	{
-		if(m_iStabilityView==STABTIMEVIEW)
-		{
-			if(m_iStabTimeView==ONEGRAPH)
-			{
-//				PaintSingleTimeGraph(painter);
-				if(!m_pCurTimeGraph) m_pCurTimeGraph = m_TimeGraph;
-		
-				Rect1.setRect(0,0,w,h34);
-				m_pCurTimeGraph->DrawGraph(Rect1, painter);
-				Place.setX((int)(w*2/5));
-				Place.setY(m_pCurTimeGraph->GetMargin()/2);
-				m_pCurTimeGraph->GetGraphName(GraphName);
-				TextPen.setColor(m_pCurTimeGraph->GetTitleColor());
-				painter.setPen(TextPen);
-				painter.drawText(Place, GraphName);
 
-				DrawStabTimeLegend(painter, m_WingLegendOffset, m_r2DCltRect.bottom());
-			}
-			else if(m_iStabTimeView==TWOGRAPHS)
-			{
-				//Paint a two graph time view
-				DrawStabTimeLegend(painter, m_WingLegendOffset, m_r2DCltRect.bottom());
-				Rect1.setRect(m_r2DCltRect.left(),   m_r2DCltRect.top(), w2, h23);
-				Rect2.setRect(w2, m_r2DCltRect.top(),                    w2, h23);
-				m_TimeGraph[0].DrawGraph(Rect1, painter);
-				m_TimeGraph[1].DrawGraph(Rect2, painter);
-			}
-			else if(m_iStabTimeView==ALLGRAPHS)
-			{
-//				PaintFourTimeGraph(painter);
-				//Paint a four graph time view
-				DrawStabTimeLegend(painter, m_WingLegendOffset, m_r2DCltRect.bottom());
-				Rect1.setRect(0,0,w2,h38);
-				Rect2.setRect(w2,0,w2,h38);
-				Rect3.setRect(0,h38,w2,h38);
-				Rect4.setRect(w2,h38,w2,h38);
-				m_TimeGraph[0].DrawGraph(Rect1, painter);
-				m_TimeGraph[1].DrawGraph(Rect2, painter);
-				m_TimeGraph[2].DrawGraph(Rect3, painter);
-				m_TimeGraph[3].DrawGraph(Rect4, painter);
-			}
-		}
-		else 
+	else	if(m_iView==STABTIMEVIEW)
+	{
+		if(s_bResetCurves)
 		{
-//			PaintRLStabGraphs(painter);
-			if(m_iStabilityView==STABPOLARVIEW)
-			{
-				if(m_pCurRLStabGraph)
-				{
-					Rect1.setRect(0,0,w23,m_r2DCltRect.bottom()-00);
-					m_pCurRLStabGraph->DrawGraph(Rect1, painter);
-					Place.setX((int)(w23/3));
-					Place.setY(m_pCurRLStabGraph->GetMargin()/2);
-					m_pCurRLStabGraph->GetGraphName(GraphName);
-					TextPen.setColor(m_pCurRLStabGraph->GetTitleColor());
-					painter.setPen(TextPen);
-					painter.drawText(Place, GraphName);
-					Place.setX(w23+10);
-					Place.setY(10);
-					DrawWPolarLegend(painter, m_WPlrLegendOffset, m_r2DCltRect.bottom());
-				}
-			}
+			if(m_StabilityResponseType==1)  CreateStabRungeKuttaCurves();
+			else                            CreateStabTimeCurves();
+			s_bResetCurves = false;
+		}
+
+		if(m_iStabTimeView==ONEGRAPH)
+		{
+//				PaintSingleTimeGraph(painter);
+			if(!m_pCurTimeGraph) m_pCurTimeGraph = m_TimeGraph;
+
+			Rect1.setRect(0,0,w,h34);
+			m_pCurTimeGraph->DrawGraph(Rect1, painter);
+			Place.setX((int)(w*2/5));
+			Place.setY(m_pCurTimeGraph->GetMargin()/2);
+			m_pCurTimeGraph->GetGraphName(GraphName);
+			TextPen.setColor(m_pCurTimeGraph->GetTitleColor());
+			painter.setPen(TextPen);
+			painter.drawText(Place, GraphName);
+
+			DrawStabTimeLegend(painter, m_WingLegendOffset, m_r2DCltRect.bottom());
+		}
+		else if(m_iStabTimeView==TWOGRAPHS)
+		{
+			//Paint a two graph time view
+			DrawStabTimeLegend(painter, m_WingLegendOffset, m_r2DCltRect.bottom());
+			Rect1.setRect(m_r2DCltRect.left(),   m_r2DCltRect.top(), w2, h23);
+			Rect2.setRect(w2, m_r2DCltRect.top(),                    w2, h23);
+			m_TimeGraph[0].DrawGraph(Rect1, painter);
+			m_TimeGraph[1].DrawGraph(Rect2, painter);
+		}
+		else if(m_iStabTimeView==ALLGRAPHS)
+		{
+//				PaintFourTimeGraph(painter);
+			//Paint a four graph time view
+			DrawStabTimeLegend(painter, m_WingLegendOffset, m_r2DCltRect.bottom());
+			Rect1.setRect(0,0,w2,h38);
+			Rect2.setRect(w2,0,w2,h38);
+			Rect3.setRect(0,h38,w2,h38);
+			Rect4.setRect(w2,h38,w2,h38);
+			m_TimeGraph[0].DrawGraph(Rect1, painter);
+			m_TimeGraph[1].DrawGraph(Rect2, painter);
+			m_TimeGraph[2].DrawGraph(Rect3, painter);
+			m_TimeGraph[3].DrawGraph(Rect4, painter);
 		}
 	}
+	else if(m_iView==STABPOLARVIEW)
+	{
+		if(s_bResetCurves)
+		{
+			CreateStabRLCurves();
+			s_bResetCurves = false;
+		}
+		if(m_pCurRLStabGraph)
+		{
+			Rect1.setRect(0,0,w23,m_r2DCltRect.bottom()-00);
+			m_pCurRLStabGraph->DrawGraph(Rect1, painter);
+			Place.setX((int)(w23/3));
+			Place.setY(m_pCurRLStabGraph->GetMargin()/2);
+			m_pCurRLStabGraph->GetGraphName(GraphName);
+			TextPen.setColor(m_pCurRLStabGraph->GetTitleColor());
+			painter.setPen(TextPen);
+			painter.drawText(Place, GraphName);
+			Place.setX(w23+10);
+			Place.setY(10);
+			DrawWPolarLegend(painter, m_WPlrLegendOffset, m_r2DCltRect.bottom());
+		}
+	}
+
 	painter.restore();
 }
 
@@ -8746,7 +8665,7 @@ bool QMiarex::SaveSettings(QSettings *pSettings)
 		pSettings->setValue("ShowWing2", m_bShowWingCurve[1]);
 		pSettings->setValue("ShowStab", m_bShowWingCurve[2]);
 		pSettings->setValue("ShowFin", m_bShowWingCurve[3]);
-		pSettings->setValue("StoreWOpp", m_bStoreWOpp );
+		pSettings->setValue("StoreWOpp", PlaneOpp::s_bStoreOpps);
 		pSettings->setValue("Sequence", m_bSequence );
 		pSettings->setValue("HighlightOpp", m_bHighlightOpp);
 		pSettings->setValue("AlphaMin", m_AlphaMin);
@@ -8771,7 +8690,6 @@ bool QMiarex::SaveSettings(QSettings *pSettings)
 		pSettings->setValue("Trefftz", PanelAnalysis::s_bTrefftz);
 
 
-		pSettings->setValue("iView", m_iView);
 		switch(m_iView)
 		{
 			case WOPPVIEW:
@@ -8794,9 +8712,14 @@ bool QMiarex::SaveSettings(QSettings *pSettings)
 				pSettings->setValue("iView", 3);
 				break;
 			}
-			case WSTABVIEW:
+			case STABTIMEVIEW:
 			{
 				pSettings->setValue("iView", 4);
+				break;
+			}
+			case STABPOLARVIEW:
+			{
+				pSettings->setValue("iView", 5);
 				break;
 			}
 		}
@@ -8826,24 +8749,6 @@ bool QMiarex::SaveSettings(QSettings *pSettings)
 			default:
 				pSettings->setValue("iWPlrView", 0);
 				break;
-		}
-		switch(m_iStabilityView)
-		{
-			case STABTIMEVIEW:
-			{
-				pSettings->setValue("iWStabView", 0);
-				break;
-			}
-			case STABPOLARVIEW:
-			{
-				pSettings->setValue("iWStabView", 1);
-				break;
-			}
-			case STAB3DVIEW:
-			{
-				pSettings->setValue("iWStabView", 2);
-				break;
-			}
 		}
 
 
@@ -9006,13 +8911,11 @@ void QMiarex::Set2DScale()
 		m_WingGraph[ig].SetAutoXUnit();
 	}
 
-	if(m_iView==WOPPVIEW)        SetWingLegendPos();
-	else if(m_iView==WPOLARVIEW) SetWPlrLegendPos();
-	else if(m_iView==WSTABVIEW) 
-	{
-		if(m_iStabilityView==STABTIMEVIEW) SetWingLegendPos();
-		else                    SetWPlrLegendPos();
-	}
+	if(m_iView==WOPPVIEW)           SetWingLegendPos();
+	else if(m_iView==WPOLARVIEW)    SetWPlrLegendPos();
+	else if(m_iView==STABTIMEVIEW)  SetWingLegendPos();
+	else if(m_iView==STABPOLARVIEW) SetWPlrLegendPos();
+
 
 	if(m_pCurPlane)
 	{
@@ -9090,7 +8993,7 @@ void QMiarex::Set3DRotationCenter(QPoint point)
 
 	bool bIntersect = false;
 
-	if(m_iView==W3DVIEW || (m_iView==WSTABVIEW && m_iStabilityView==STAB3DVIEW))
+	if(m_iView==W3DVIEW )
 	{
 		for(p=0; p<Objects3D::s_MatSize; p++)
 		{
@@ -9154,7 +9057,7 @@ void QMiarex::Set3DRotationCenter(QPoint point)
  */
 void QMiarex::Set3DScale()
 {
-	if(m_iView!=W3DVIEW && (m_iView!=WSTABVIEW || m_iStabilityView!=STAB3DVIEW)) return;
+	if(m_iView!=W3DVIEW ) return;
 	if(m_iView==W3DVIEW) m_bResetglLegend = true;
 	if(m_bIs3DScaleSet && !m_bAutoScales) return;
 
@@ -9223,21 +9126,21 @@ void QMiarex::SetAnalysisParams()
 	}
 
 	m_pctrlInitLLTCalc->setChecked(m_bInitLLTCalc);
-	m_pctrlStoreWOpp->setChecked(m_bStoreWOpp);
+	m_pctrlStoreWOpp->setChecked(PlaneOpp::s_bStoreOpps);
 
-	if (!m_pCurWPolar || (m_pCurWPolar && m_pCurWPolar->m_WPolarType <FIXEDAOAPOLAR))
+	if (!m_pCurWPolar || (m_pCurWPolar && m_pCurWPolar->polarType() <FIXEDAOAPOLAR))
 	{
 		m_pctrlAlphaMin->SetValue(m_AlphaMin);
 		m_pctrlAlphaMax->SetValue(m_AlphaMax);
 		m_pctrlAlphaDelta->SetValue(m_AlphaDelta);
 	}
-	else if(m_pCurWPolar  && m_pCurWPolar->m_WPolarType ==FIXEDAOAPOLAR)
+	else if(m_pCurWPolar  && m_pCurWPolar->polarType() ==FIXEDAOAPOLAR)
 	{
 		m_pctrlAlphaMin->SetValue(m_QInfMin*Units::mstoUnit());
 		m_pctrlAlphaMax->SetValue(m_QInfMax*Units::mstoUnit());
 		m_pctrlAlphaDelta->SetValue(m_QInfDelta*Units::mstoUnit());
 	}
-	else if(m_pCurWPolar && (m_pCurWPolar->m_WPolarType==STABILITYPOLAR))
+	else if(m_pCurWPolar && (m_pCurWPolar->polarType()==STABILITYPOLAR))
 	{
 		m_pctrlAlphaMin->SetValue(m_ControlMin);
 		m_pctrlAlphaMax->SetValue(m_ControlMax);
@@ -9252,7 +9155,7 @@ void QMiarex::SetAnalysisParams()
 void QMiarex::SetCurveParams()
 {
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
-	if(m_iView==WPOLARVIEW || (m_iView==WSTABVIEW && m_iStabilityView==STABPOLARVIEW))
+	if(m_iView==WPOLARVIEW || m_iView==STABPOLARVIEW)
 	{
 		if(m_pCurWPolar)
 		{
@@ -9269,7 +9172,7 @@ void QMiarex::SetCurveParams()
 			FillComboBoxes(false);
 		}
 	}
-	else if(m_iView==WSTABVIEW&& m_iStabilityView==STABTIMEVIEW)
+	else if(m_iView==STABTIMEVIEW)
 	{
 		StabViewDlg *pStabView =(StabViewDlg*)pMainFrame->m_pStabView;
 		if(pStabView->m_pCurve)
@@ -9324,7 +9227,7 @@ void QMiarex::SetCurveParams()
 	}
 
 
-	if(m_pCurWPolar && m_pCurWPolar->m_WPolarType==FIXEDAOAPOLAR)
+	if(m_pCurWPolar && m_pCurWPolar->polarType()==FIXEDAOAPOLAR)
 	{
 		QString str;
 		Units::getSpeedUnitLabel(str);
@@ -9338,7 +9241,7 @@ void QMiarex::SetCurveParams()
 		fontSymbol.setPointSize(Settings::s_TextFont.pointSize()+2);
 		m_pctrlParameterName->setFont(fontSymbol);
 	}
-	else if(m_pCurWPolar && m_pCurWPolar->m_WPolarType==STABILITYPOLAR)
+	else if(m_pCurWPolar && m_pCurWPolar->polarType()==STABILITYPOLAR)
 	{
 		m_pctrlUnit1->setText("");
 		m_pctrlUnit2->setText("");
@@ -9369,8 +9272,8 @@ void QMiarex::SetCurveParams()
  */
 void QMiarex::SetScale()
 {
-	if(m_iView==W3DVIEW || (m_iView==WSTABVIEW&& m_iStabilityView==STAB3DVIEW)) Set3DScale();
-	else                                                                        Set2DScale();
+	if(m_iView==W3DVIEW) Set3DScale();
+	else                 Set2DScale();
 }
 
 
@@ -9399,11 +9302,8 @@ void QMiarex::SetPlane(QString PlaneName)
 		for(int i=0; i<MAXWINGS; i++) m_pWingList[i] = NULL;
 		m_pCurWPolar = NULL;
 		m_pCurPOpp  = NULL;
-
-		if(m_iView==WPOLARVIEW)		CreateWPolarCurves();
-		else if(m_iView==WSTABVIEW)	CreateStabilityCurves();
-		else if(m_iView==WOPPVIEW)	CreateWOppCurves();
-		else if(m_iView==WCPVIEW)	CreateCpCurves();
+		s_bResetCurves = true;
+		UpdateView();
 		QApplication::restoreOverrideCursor();
 		return;
 	}
@@ -9907,18 +9807,14 @@ void QMiarex::SetWPolar(bool bCurrent, QString WPlrName)
 	}
 	else m_pctrlPolarProps->clear();
 
-	if(m_iView==WPOLARVIEW)		CreateWPolarCurves();
-	else if(m_iView==WSTABVIEW)	CreateStabilityCurves();
-	else if(m_iView==WOPPVIEW)	CreateWOppCurves();
-	else if(m_iView==WCPVIEW)	CreateCpCurves();
-
 
 	SetAnalysisParams();
 	SetCurveParams();
 	m_bResetglLegend = true;
+	s_bResetCurves = true;
 
 
-	if(m_pCurWPolar && m_pCurWPolar->m_WPolarType==STABILITYPOLAR)
+	if(m_pCurWPolar && m_pCurWPolar->polarType()==STABILITYPOLAR)
 	{
 		StabViewDlg *pStabView =(StabViewDlg*)pMainFrame->m_pStabView;
 		pStabView->SetControls();
@@ -9960,7 +9856,7 @@ void QMiarex::SetWingLegendPos()
 			m_WingLegendOffset.ry() = h34+margin;
 		}
 	}
-	else if(m_iView==WSTABVIEW)
+	else if(m_iView==STABTIMEVIEW)
 	{
 		if(m_iStabTimeView < ALLGRAPHS)
 		{
@@ -10004,15 +9900,10 @@ void QMiarex::SetWPlrLegendPos()
 			m_WPlrLegendOffset.ry() = margin;
 		}
 	}
-	else if(m_iView==WSTABVIEW)
+	else if(m_iView==STABPOLARVIEW)
 	{
-		if(m_iStabilityView==STABPOLARVIEW)
-		{
-			m_WPlrLegendOffset.rx() = (int)(0.70*w)+margin;
-			m_WPlrLegendOffset.ry() = margin;
-			
-		}
-
+		m_WPlrLegendOffset.rx() = (int)(0.70*w)+margin;
+		m_WPlrLegendOffset.ry() = margin;
 	}
 }
 
@@ -10181,7 +10072,7 @@ void QMiarex::StopAnimate()
 	pStabView->m_pctrlAnimate->setChecked(false);
 
 	if(!m_bAnimateWOpp) return;
-	if(m_iView!=WSTABVIEW)
+//	if(m_iView!=WSTABVIEW)
 	{
 		if(m_pCurPlane)
 		{
@@ -10204,24 +10095,19 @@ void QMiarex::UpdateCurve()
 		m_pCurWPolar->m_Width = m_CurveWidth;
 		m_pCurWPolar->m_bIsVisible  = m_bCurveVisible;
 		m_pCurWPolar->m_bShowPoints = m_bCurvePoints;
-		CreateWPolarCurves();
 	}
-	else if(m_iView==WSTABVIEW && m_pCurWPolar)
+	else if(m_iView==STABTIMEVIEW && m_pCurWPolar)
 	{
-		if(m_iStabilityView==STABTIMEVIEW)
-		{
-			StabViewDlg *pStabView = (StabViewDlg*)pMainFrame->m_pStabView;
-			pStabView->SetTimeCurveStyle(m_CurveColor, m_CurveStyle, m_CurveWidth, m_bCurveVisible, m_bCurvePoints);
-		}
-		else if(m_iStabilityView==STABPOLARVIEW)
-		{
-			m_pCurWPolar->m_Color = m_CurveColor;
-			m_pCurWPolar->m_Style = m_CurveStyle;
-			m_pCurWPolar->m_Width = m_CurveWidth;
-			m_pCurWPolar->m_bIsVisible  = m_bCurveVisible;
-			m_pCurWPolar->m_bShowPoints = m_bCurvePoints;
-			CreateStabilityCurves();
-		}
+		StabViewDlg *pStabView = (StabViewDlg*)pMainFrame->m_pStabView;
+		pStabView->SetTimeCurveStyle(m_CurveColor, m_CurveStyle, m_CurveWidth, m_bCurveVisible, m_bCurvePoints);
+	}
+	else if(m_iView==STABPOLARVIEW)
+	{
+		m_pCurWPolar->m_Color = m_CurveColor;
+		m_pCurWPolar->m_Style = m_CurveStyle;
+		m_pCurWPolar->m_Width = m_CurveWidth;
+		m_pCurWPolar->m_bIsVisible  = m_bCurveVisible;
+		m_pCurWPolar->m_bShowPoints = m_bCurvePoints;
 	}
 	else if (m_iView==WOPPVIEW)
 	{
@@ -10233,7 +10119,6 @@ void QMiarex::UpdateCurve()
 			m_pCurPOpp->m_bIsVisible  = m_bCurveVisible;
 			m_pCurPOpp->m_bShowPoints = m_bCurvePoints;
 		}
-		CreateWOppCurves();
 	}
 	else if (m_iView==WCPVIEW && m_pCurPOpp)
 	{
@@ -10242,8 +10127,9 @@ void QMiarex::UpdateCurve()
 		m_CpWidth = m_CurveWidth;
 		m_bShowCp       = m_bCurveVisible;
 		m_bShowCpPoints = m_bCurvePoints;
-		CreateCpCurves();
 	}
+
+	s_bResetCurves = true;
 	UpdateView();
 	emit projectModified();
 }
@@ -10256,13 +10142,11 @@ void QMiarex::UpdateUnits()
 {
 	if(m_iView==WPOLARVIEW)
 	{
-		CreateWPolarCurves();
 		for(int ig=0; ig<MAXGRAPHS; ig++)
 			SetWGraphTitles(m_WPlrGraph+ig);
 	}
-	else if(m_iView==WSTABVIEW)
+	else if(m_iView==STABTIMEVIEW || m_iView==STABPOLARVIEW)
 	{
-		CreateStabilityCurves();
 		SetStabGraphTitles();
 	}
 	else
@@ -10270,14 +10154,14 @@ void QMiarex::UpdateUnits()
 		if(!m_pCurPlane) return;
 		if (m_iView==WOPPVIEW)
 		{
-			CreateWOppCurves();
 			OnAdjustToWing();
 		}
 		else if(m_iView==WCPVIEW) CreateCpCurves();
 		else if(m_iView==W3DVIEW) m_bResetglLegend = true;
-		else if(m_iView==WSTABVIEW) m_bResetglLegend = true;
+		else if(m_iView==STABTIMEVIEW || m_iView==STABPOLARVIEW) m_bResetglLegend = true;
 	}
 	SetCurveParams();
+	s_bResetCurves = true;
 	UpdateView();
 }
 
@@ -10289,7 +10173,7 @@ void QMiarex::UpdateView()
 {
 	TwoDWidget *p2dWidget = (TwoDWidget*)s_p2dWidget;
 	ThreeDWidget *p3dWidget = (ThreeDWidget*)s_p3dWidget;
-	if(m_iView==W3DVIEW || (m_iView==WSTABVIEW && m_iStabilityView==STAB3DVIEW))
+	if(m_iView==W3DVIEW)
 	{
 		if(p3dWidget) p3dWidget->update();
 	}
@@ -10311,7 +10195,7 @@ void QMiarex::zoomEvent(QPoint pt, double zoomFactor)
 	//Process the message
 
 
-	if(m_iView==W3DVIEW || (m_iView==WSTABVIEW&&m_iStabilityView==STAB3DVIEW))
+	if(m_iView==W3DVIEW)
 	{
 		if(m_pCurPlane)
 		{
@@ -10320,7 +10204,7 @@ void QMiarex::zoomEvent(QPoint pt, double zoomFactor)
 			UpdateView();
 		}
 	}
-	else if(m_iView ==WOPPVIEW || m_iView ==WPOLARVIEW || m_iView ==WCPVIEW || m_iView ==WSTABVIEW)
+	else if(m_iView ==WOPPVIEW || m_iView ==WPOLARVIEW || m_iView ==WCPVIEW || m_iView ==STABTIMEVIEW || m_iView==STABPOLARVIEW)
 	{
 		m_pCurGraph = GetGraph(pt);
 		if(m_pCurGraph && m_pCurGraph->IsInDrawRect(pt))
@@ -10598,15 +10482,11 @@ bool QMiarex::SetPlaneOpp(bool bCurrent, double x)
 		m_pWOpp[0] = m_pWOpp[1] = m_pWOpp[2] = m_pWOpp[3] = NULL;
 	}
 
-	if(m_iView==WPOLARVIEW)     CreateWPolarCurves();
-	else if(m_iView==WCPVIEW)	CreateCpCurves();
-	else if(m_iView==WOPPVIEW)	CreateWOppCurves();
-	else if(m_iView==WSTABVIEW)
+	if(m_iView==STABTIMEVIEW || m_iView==STABPOLARVIEW)
 	{
 		StabViewDlg *pStabView =(StabViewDlg*)pMainFrame->m_pStabView;
 		pStabView->SetControls();
 		pStabView->SetMode();
-		CreateStabilityCurves();
 	}
 	else if(m_iView==W3DVIEW)
 	{
@@ -10622,6 +10502,8 @@ bool QMiarex::SetPlaneOpp(bool bCurrent, double x)
 	m_bResetglLegend = true;
 
 	SetControls();
+
+	s_bResetCurves = true;
 
 	if(!m_pCurPOpp) return false;
 	else if(m_iView==WOPPVIEW)

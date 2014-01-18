@@ -558,7 +558,7 @@ bool Polar::Serialize(QDataStream &ar, bool bIsStoring)
 		ar >> m_Style >> m_Width;
 
 		if(ArchiveFormat>=1002)
-        {
+		{
 			ar >> l;
             if(l!=0 && l!=1 )
             {
@@ -568,14 +568,14 @@ bool Polar::Serialize(QDataStream &ar, bool bIsStoring)
 		}
 
 		ar >> l;
-        if(l!=0 && l!=1 )
-        {
+		if(l!=0 && l!=1 )
+		{
 			return false;
 		}
 		if (l) m_bShowPoints =true; else m_bShowPoints = false;
 			
 		bool bExists;
-        for (i=0; i< n; i++)
+		for (i=0; i< n; i++)
 		{
 			ar >> Alpha >> Cd >> Cdp >> Cl >> Cm;
 			ar >> XTr1 >> XTr2;

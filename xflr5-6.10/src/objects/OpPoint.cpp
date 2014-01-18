@@ -204,7 +204,8 @@ bool OpPoint::SerializeOppXFL(QDataStream &ar, bool bIsStoring, int ArchiveForma
 		ar << m_bBL;
 
 		ar << Cl << Cm << Cd << Cdp;
-		ar << Xtr1 << Xtr2 << ACrit << m_TEHMom << Cpmn;
+		ar << Xtr1 << Xtr2 << m_XCP;
+		ar << ACrit << m_TEHMom << Cpmn;
 
 		for (k=0; k<n; k++)	     ar << (float)Cpv[k] << (float)Cpi[k];
 		for (k=0; k<n; k++)	     ar << (float)Qv[k]  << (float)Qi[k];
@@ -235,7 +236,8 @@ bool OpPoint::SerializeOppXFL(QDataStream &ar, bool bIsStoring, int ArchiveForma
 		ar >> m_bBL;
 
 		ar >> Cl >> Cm >> Cd >> Cdp;
-		ar >> Xtr1 >> Xtr2 >> ACrit >> m_TEHMom >> Cpmn;
+		ar >> Xtr1 >> Xtr2 >> m_XCP;
+		ar >> ACrit >> m_TEHMom >> Cpmn;
 
 		for (k=0; k<n; k++)
 		{
@@ -253,7 +255,7 @@ bool OpPoint::SerializeOppXFL(QDataStream &ar, bool bIsStoring, int ArchiveForma
 		{
 			ar >> f0 >> f1;
 			xd1[k] = f0;
-			yd2[k] = f1;
+			yd1[k] = f1;
 		}
 		for (k=0; k<nd2; k++)
 		{
@@ -473,9 +475,9 @@ void OpPoint::addXFoilData(void *pXFoilPtr)
 	if(!pXFoil->lvisc || !pXFoil->lvconv)	return;
 
 //---- add boundary layer on both sides of airfoil
-	int nd1=0;
-	int nd2=0;
-	int nd3=0;
+	nd1=0;
+	nd2=0;
+	nd3=0;
 	for (is=1; is<=2; is++)
 	{
 		for ( ibl=2; ibl<=pXFoil->iblte[is];ibl++)
@@ -533,9 +535,7 @@ void OpPoint::addXFoilData(void *pXFoilPtr)
 		yd3[i-j] = pXFoil->y[i] + pXFoil->ny[i]*pXFoil->dstr[ibl][is]*dsf2;
 		nd3++;
 	}
-	nd1 = nd1;
-	nd2 = nd2;
-	nd3 = nd3;
+
 }
 
 

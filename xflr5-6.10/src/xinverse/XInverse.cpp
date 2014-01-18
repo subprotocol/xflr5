@@ -1978,6 +1978,8 @@ void QXInverse::PaintFoil(QPainter &painter)
 	str = tr("                     Base");
 	if(m_bModFoil && m_bLoaded)  str +=tr("       Mod.");
 
+	painter.setPen(TextPen);
+
 	painter.drawText(LeftPos,ZPos+D, str);
 	D += dD;
 

@@ -85,7 +85,7 @@ BatchDlg::BatchDlg(QWidget *pParent) : QDialog(pParent)
 	SetupLayout();
 
 	m_pRmsGraph = m_pctrlGraphOutput->graph();
-	m_pRmsGraph->CopySettings(&Settings::s_RefGraph, false);
+//	m_pRmsGraph->CopySettings(&Settings::s_RefGraph, false);
 
 	m_pRmsGraph->SetXTitle(tr("Iter"));
 	m_pRmsGraph->SetYTitle("");//Change from bl newton system solution
@@ -1045,7 +1045,6 @@ void BatchDlg::ResetCurves()
 	m_pRmsGraph->SetY0(0.0);
 
 	m_pXFoilTask->setGraphPointers(m_pRmsGraph, pCurve0, pCurve1);
-
 }
 
 

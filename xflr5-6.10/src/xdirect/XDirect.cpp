@@ -115,7 +115,6 @@ QXDirect::QXDirect(QWidget *parent) : QWidget(parent)
 
 	m_bXPressed = m_bYPressed = false;
 
-
 	m_bTrans          = false;
 	m_bType1          = true;
 	m_bType2          = true;
@@ -1574,9 +1573,11 @@ void QXDirect::OnAnimateSpeed(int val)
 {
 	if(m_pAnimateTimer->isActive())
 	{
-		m_pAnimateTimer->setInterval(800-val);
+		m_pAnimateTimer->setInterval(1000-val);
 	}
 }
+
+
 
 /**
  * The user has clicked the analyze button.
@@ -1597,9 +1598,18 @@ void QXDirect::OnAnalyze()
 	m_bHighlightOpp = false;
 
 	XFoilAnalysisDlg*pXFADlg = (XFoilAnalysisDlg*)m_pXFoilAnalysisDlg;
-	pXFADlg->SetAlpha(m_Alpha, m_AlphaMax, m_AlphaDelta);
-	pXFADlg->SetCl(m_Cl, m_ClMax, m_ClDelta);
-	pXFADlg->SetRe(m_Reynolds, m_ReynoldsMax, m_ReynoldsDelta);
+	if(m_bSequence)
+	{
+		pXFADlg->SetAlpha(m_Alpha, m_AlphaMax, m_AlphaDelta);
+		pXFADlg->SetCl(m_Cl, m_ClMax, m_ClDelta);
+		pXFADlg->SetRe(m_Reynolds, m_ReynoldsMax, m_ReynoldsDelta);
+	}
+	else
+	{
+		pXFADlg->SetAlpha(m_Alpha, m_Alpha, m_AlphaDelta);
+		pXFADlg->SetCl(m_Cl, m_Cl, m_ClDelta);
+		pXFADlg->SetRe(m_Reynolds, m_Reynolds, m_ReynoldsDelta);
+	}
 
 	pXFADlg->m_bAlpha = s_bAlpha;
 
@@ -1609,10 +1619,8 @@ void QXDirect::OnAnalyze()
 
 	if(!s_bKeepOpenErrors || !pXFADlg->m_bErrors) pXFADlg->hide();
 
-
 	// and update window
 	emit projectModified();
-
 
 	m_pctrlAnalyze->setEnabled(true);
 
@@ -4133,7 +4141,6 @@ void QXDirect::OnRenamePolar()
 			}
 			if(!bExists)
 			{
-				Polar::curPolar()->polarName() = renDlg.newName();
 				for (l=(int)m_poaOpp->size()-1;l>=0; l--)
 				{
 					pOpp = (OpPoint*)m_poaOpp->at(l);
@@ -4143,6 +4150,7 @@ void QXDirect::OnRenamePolar()
 						pOpp->m_strPlrName = renDlg.newName();
 					}
 				}
+				Polar::curPolar()->setPolarName(renDlg.newName());
 			}
 			emit projectModified();
 		}
@@ -4193,9 +4201,9 @@ void QXDirect::OnRenamePolar()
 			return ;//cancelled
 		}
 	}
-	Polar::setCurPolar(NULL);
-	OpPoint::setCurOpp(NULL);
-	SetPolar();
+//	Polar::setCurPolar(NULL);
+//	OpPoint::setCurOpp(NULL);
+//	SetPolar();
 	pMainFrame->UpdatePolarListBox();
 	UpdateView();
 }
@@ -6277,9 +6285,9 @@ void QXDirect::SetupLayout()
 			m_pctrlAnimate       = new QCheckBox(tr("Animate"));
 			m_pctrlAnimateSpeed  = new QSlider(Qt::Horizontal);
 			m_pctrlAnimateSpeed->setMinimum(0);
-			m_pctrlAnimateSpeed->setMaximum(500);
-			m_pctrlAnimateSpeed->setSliderPosition(250);
-			m_pctrlAnimateSpeed->setTickInterval(25);
+			m_pctrlAnimateSpeed->setMaximum(1000);
+			m_pctrlAnimateSpeed->setSliderPosition(500);
+			m_pctrlAnimateSpeed->setTickInterval(50);
 			m_pctrlAnimateSpeed->setTickPosition(QSlider::TicksBelow);
 			DisplayGroup->addWidget(m_pctrlShowBL);
 			DisplayGroup->addWidget(m_pctrlShowPressure);

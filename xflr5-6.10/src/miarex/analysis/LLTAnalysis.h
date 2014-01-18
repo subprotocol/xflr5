@@ -37,7 +37,7 @@
 
 #include "../../params.h"
 #include "../../globals.h"
-#include "../../objects/Wing.h"
+#include "../../objects/Plane.h"
 #include "../../graph/QGraph.h"
 #include <QList>
 
@@ -72,17 +72,18 @@ private:
 	PlaneOpp *createPlaneOpp(double QInf, double Alpha, bool bWingOut);
 	void initializeAnalysis();
 	void setLLTRange(double AlphaMin, double AlphaMax, double AlphaDelta, bool bSequence);
-	void setLLTData(Wing *pWing, WPolar *pWPolar);
+	void setLLTData(Plane *pPlane, WPolar *pWPolar);
 	bool loop();
 	bool alphaLoop();
 	bool QInfLoop();
 	void traceLog(QString str);
 
 
+	void *m_pParent;                            /**< A void pointer to the instance of the LLTAnalysisDlg class >*/
 
-	void *m_pParent;                            /**< A void pointer to the instance of the LLTAnalysisDlg class */
-	Wing * m_pWing;                             /**< A pointer to the Wing object for which the calculation shall be performed */
-	WPolar *m_pWPolar;                          /**< A pointer to the WPolar object for which the calculation shall be performed */
+	Plane * m_pPlane;                           /**< A pointer to the Plane object for which the main wing calculation shall be performed >*/
+	Wing * m_pWing;                             /**< A pointer to the Wing object for which the calculation shall be performed >*/
+	WPolar *m_pWPolar;                          /**< A pointer to the WPolar object for which the calculation shall be performed >*/
 
 	double m_vMin;          /**< The starting aoa for the analysis of type 1 & 2 polars */
 	double m_vMax;          /**< The ending aoa for the analysis of type 1 & 2 polars */

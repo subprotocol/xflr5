@@ -91,16 +91,15 @@ private:
 	int m_UnitType;//1= International, 2= English
 	double m_WingLoad;
 
-	QStackedWidget *m_pctrlAnalysisControls;
 
-    DoubleEdit *m_pctrlXCmRef, *m_pctrlZCmRef;
-    DoubleEdit *m_pctrlDensity;
-    DoubleEdit *m_pctrlViscosity;
-    DoubleEdit *m_pctrlAlpha;
-    DoubleEdit *m_pctrlBeta;
-    DoubleEdit *m_pctrlWeight;
-    DoubleEdit *m_pctrlQInf;
-    DoubleEdit *m_pctrlHeight;
+	DoubleEdit *m_pctrlXCmRef, *m_pctrlZCmRef;
+	DoubleEdit *m_pctrlDensity;
+	DoubleEdit *m_pctrlViscosity;
+	DoubleEdit *m_pctrlAlpha;
+	DoubleEdit *m_pctrlBeta;
+	DoubleEdit *m_pctrlWeight;
+	DoubleEdit *m_pctrlQInf;
+	DoubleEdit *m_pctrlHeight;
 	QLineEdit *m_pctrlWPolarName;
 
 	QCheckBox *m_pctrlPlaneInertia;
@@ -111,8 +110,7 @@ private:
 	QCheckBox *m_pctrlAutoName;
 
 	QRadioButton *m_pctrlType1,*m_pctrlType2,*m_pctrlType4;
-	QRadioButton *m_pctrlWingMethod1, *m_pctrlWingMethod2, *m_pctrlWingMethod3;
-	QRadioButton *m_pctrlPanelMethod;
+	QRadioButton *m_pctrlLLTMethod, *m_pctrlVLMMethod, *m_pctrlPanelMethod;
 	QRadioButton *m_pctrlUnit1, *m_pctrlUnit2;
 	QRadioButton *m_pctrlArea1, *m_pctrlArea2;
 

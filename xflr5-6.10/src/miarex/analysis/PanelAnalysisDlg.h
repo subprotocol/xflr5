@@ -72,8 +72,8 @@ private slots:
 
 
 private:
-    void showEvent(QShowEvent *event);
-    void hideEvent(QHideEvent *event);
+	void showEvent(QShowEvent *event);
+	void hideEvent(QHideEvent *event);
 	void keyPressEvent(QKeyEvent *event);
 
 
@@ -85,12 +85,11 @@ private:
 	void UpdateView();
 	
 private:
-    QTextEdit *m_pctrlTextOutput;
-    QPushButton *m_pctrlCancel;
-    QProgressBar *m_pctrlProgress;
+	QTextEdit *m_pctrlTextOutput;
+	QPushButton *m_pctrlCancel;
+	QProgressBar *m_pctrlProgress;
 
-    static void *s_pMiarex;          /**< a void pointer to the instance of the QMiarex class. */
-    static QPoint s_Position;        /**< the position on the client area of he dialog's topleft corner */
+	static QPoint s_Position;        /**< the position on the client area of he dialog's topleft corner */
 
 	QFile *m_pXFile;                /**< A pointer to the instance of the output log file */
 

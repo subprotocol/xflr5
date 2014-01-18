@@ -863,8 +863,6 @@ void MainFrame::CreateDockWindows()
 
 	ThreeDWidget::s_pMiarex       = m_pMiarex;
 	WPolar::s_pMiarex             = m_pMiarex;
-	LLTAnalysisDlg::s_pMiarex     = m_pMiarex;
-	PanelAnalysisDlg::s_pMiarex   = m_pMiarex;
 	StabPolarDlg::s_pMiarex       = m_pMiarex;
 	PlaneTableDelegate::s_pMiarex = m_pMiarex;
 	WPolarDlg::s_pMiarex          = m_pMiarex;
@@ -950,13 +948,13 @@ void MainFrame::CreateMiarexActions()
 	WOppAct->setCheckable(true);
 	WOppAct->setStatusTip(tr("Switch to the Operating point view"));
 //	WOppAct->setShortcut(Qt::Key_F5);
-	connect(WOppAct, SIGNAL(triggered()), pMiarex, SLOT(OnWOpps()));
+	connect(WOppAct, SIGNAL(triggered()), pMiarex, SLOT(OnWOppView()));
 
 	WPolarAct = new QAction(QIcon(":/images/OnPolarView.png"), tr("Polar View")+"\tF8", this);
 	WPolarAct->setCheckable(true);
 	WPolarAct->setStatusTip(tr("Switch to the Polar view"));
 //	WPolarAct->setShortcut(Qt::Key_F8);
-	connect(WPolarAct, SIGNAL(triggered()), pMiarex, SLOT(OnWPolars()));
+	connect(WPolarAct, SIGNAL(triggered()), pMiarex, SLOT(OnWPolarView()));
 
 	StabTimeAct = new QAction(QIcon(":/images/OnStabView.png"),tr("Time Response Vew")+"\tShift+F8", this);
 	StabTimeAct->setCheckable(true);
@@ -2727,6 +2725,9 @@ bool MainFrame::LoadSettings()
 
 
 		Settings::s_StyleName = settings.value("StyleName","").toString();
+		int k = settings.value("ExportFileType", 0).toInt();
+		if (k==0) Settings::s_ExportFileType = TXT;
+		else      Settings::s_ExportFileType = CSV;
 
 		s_LanguageFilePath = settings.value("LanguageFilePath").toString();
 
@@ -3083,23 +3084,21 @@ void MainFrame::OnExportCurGraph()
 	if(pos>0) m_ExportLastDirName = FileName.left(pos);
 
 
-
-	enumTextFileType type = CSV;
 	if(m_GraphExportFilter.indexOf("*.txt")>0)
 	{
-		type = TXT;
+		Settings::s_ExportFileType = TXT;
 		if(FileName.indexOf(".txt")<0) FileName +=".txt";
 	}
 	else if(m_GraphExportFilter.indexOf("*.csv")>0)
 	{
-		type = CSV;
+		Settings::s_ExportFileType = CSV;
 		if(FileName.indexOf(".csv")<0) FileName +=".csv";
 	}
 
 	QFile XFile(FileName);
 	if (!XFile.open(QIODevice::WriteOnly | QIODevice::Text)) return;
 
-	pGraph->ExportToFile(XFile, type);
+	pGraph->ExportToFile(XFile, Settings::s_ExportFileType);
 }
 
 
@@ -3451,9 +3450,9 @@ void MainFrame::OnRestoreToolbars()
 		m_pctrlXInverseWidget->hide();
 		m_pctrlMiarexWidget->show();
 		m_pctrlMiarexToolBar->show();
-		QMiarex *pMiarex = (QMiarex*)m_pMiarex;
-		if(pMiarex->m_iView==WSTABVIEW) m_pctrlStabViewWidget->show();
-		else                            m_pctrlStabViewWidget->hide();
+//		QMiarex *pMiarex = (QMiarex*)m_pMiarex;
+//		if(pMiarex->m_iView==WSTABVIEW) m_pctrlStabViewWidget->show();
+//		else                            m_pctrlStabViewWidget->hide();
 	}
 }
 
@@ -3629,7 +3628,6 @@ void MainFrame::OnSelChangeWPolar(int sel)
 	if (sel>=0) strong = m_pctrlPlanePolar->itemText(sel);
 	m_iApp = MIAREX;
 	pMiarex->SetWPolar(false, strong);
-//	pMiarex->SetWingOpp(true);
 	pMiarex->SetControls();
 	pMiarex->UpdateView();
 }
@@ -4370,6 +4368,10 @@ void MainFrame::SaveSettings()
 		settings.setValue("SizeHeight", size().height());
 		settings.setValue("SizeMaximized", isMaximized());
 		settings.setValue("StyleName", Settings::s_StyleName);
+
+		if (Settings::s_ExportFileType==TXT) settings.setValue("ExportFileType", 0);
+		else                                 settings.setValue("ExportFileType", 1);
+
 		settings.setValue("GraphExportFilter", m_GraphExportFilter);
 		settings.setValue("Miarex_Float", m_pctrlMiarexWidget->isFloating());
 		settings.setValue("XDirect_Float", m_pctrlXDirectWidget->isFloating());
@@ -4447,16 +4449,11 @@ void MainFrame::SetCentralWidget()
 	}
 	else if(m_iApp==MIAREX)
 	{
-		if(pMiarex->m_iView==WOPPVIEW || pMiarex->m_iView==WPOLARVIEW || pMiarex->m_iView==WCPVIEW)
+		if(pMiarex->m_iView==WOPPVIEW || pMiarex->m_iView==WPOLARVIEW || pMiarex->m_iView==WCPVIEW ||
+		   pMiarex->m_iView==STABPOLARVIEW || pMiarex->m_iView==STABTIMEVIEW)
 			m_pctrlCentralWidget->setCurrentIndex(0);
 		else if(pMiarex->m_iView==W3DVIEW)
 			m_pctrlCentralWidget->setCurrentIndex(1);
-		else if(pMiarex->m_iView==WSTABVIEW)
-		{
-			if(pMiarex->m_iStabilityView==STABTIMEVIEW ||
-			   pMiarex->m_iStabilityView==STABPOLARVIEW  )   m_pctrlCentralWidget->setCurrentIndex(0);
-			else                                             m_pctrlCentralWidget->setCurrentIndex(1);
-		}
 	}
 }
 

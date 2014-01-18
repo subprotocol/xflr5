@@ -291,7 +291,7 @@ void StabViewDlg::OnAnimate()
 	if(m_pctrlAnimate->isChecked())
 	{
 //		pMiarex->m_iView = WSTABVIEW;
-		pMiarex->m_iStabilityView=STAB3DVIEW;
+		pMiarex->m_iView=W3DVIEW;
 		pMiarex->SetControls();
 		
 		pMiarex->m_Modedt = m_pctrlModeStep->Value();
@@ -444,14 +444,14 @@ void StabViewDlg::OnPlotStabilityGraph()
 void StabViewDlg::OnModeSelection()
 {
 	QMiarex * pMiarex = (QMiarex*)s_pMiarex;
-	if(pMiarex->m_iStabilityView==STABTIMEVIEW)
+	if(pMiarex->m_iView==STABTIMEVIEW)
 	{
 		if(m_pctrlTimeMode1->isChecked())      m_iCurrentMode = 0;
 		else if(m_pctrlTimeMode2->isChecked()) m_iCurrentMode = 1;
 		else if(m_pctrlTimeMode3->isChecked()) m_iCurrentMode = 2;
 		else if(m_pctrlTimeMode4->isChecked()) m_iCurrentMode = 3;
 	}
-	else if(pMiarex->m_iStabilityView==STABPOLARVIEW || pMiarex->m_iStabilityView==STAB3DVIEW)
+	else if(pMiarex->m_iView==STABPOLARVIEW || pMiarex->m_iView==W3DVIEW)
 	{
 		if(m_pctrlRLMode1->isChecked())      m_iCurrentMode = 0;
 		else if(m_pctrlRLMode2->isChecked()) m_iCurrentMode = 1;
@@ -461,7 +461,7 @@ void StabViewDlg::OnModeSelection()
 	if(!pMiarex->m_bLongitudinal) m_iCurrentMode +=4;
 	SetMode(m_iCurrentMode);
 
-	if(pMiarex->m_iStabilityView==STABPOLARVIEW && pMiarex->m_bHighlightOpp)
+	if(pMiarex->m_iView==STABPOLARVIEW && pMiarex->m_bHighlightOpp)
 	{
 		pMiarex->CreateStabRLCurves();
 		pMiarex->UpdateView();
@@ -590,9 +590,9 @@ void StabViewDlg::SetupLayout()
 			m_pctrlUnit1->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
 			m_pctrlUnit2->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
 			m_pctrlUnit3->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
-            m_pctrlStabVar1 = new DoubleEdit(0.00,3);
-            m_pctrlStabVar2 = new DoubleEdit(0.00,3);
-            m_pctrlStabVar3 = new DoubleEdit(1.00,3);
+			m_pctrlStabVar1 = new DoubleEdit(0.00,3);
+			m_pctrlStabVar2 = new DoubleEdit(0.00,3);
+			m_pctrlStabVar3 = new DoubleEdit(1.00,3);
 			QGridLayout *VarParams = new QGridLayout;
 			VarParams->addWidget(m_pctrlStabLabel1,1,1);
 			VarParams->addWidget(m_pctrlStabLabel2,2,1);
@@ -917,7 +917,7 @@ void StabViewDlg::SetControls()
 //		m_pControlModel->setRowCount(0);
 	}
 
-	if(pMiarex->m_iStabilityView==STABTIMEVIEW)
+	if(pMiarex->m_iView==STABTIMEVIEW)
 	{
 		m_pctrlStackWidget->setCurrentIndex(0);
 		m_pctrlInitialConditionsWidget->setCurrentIndex(pMiarex->m_StabilityResponseType);
@@ -926,12 +926,12 @@ void StabViewDlg::SetControls()
 		m_pctrlForcedResponse->setChecked(pMiarex->m_StabilityResponseType==1);
 		m_pctrlModalResponse->setChecked(pMiarex->m_StabilityResponseType==2);
 	}
-	else if(pMiarex->m_iStabilityView==STABPOLARVIEW)
+	else if(pMiarex->m_iView==STABPOLARVIEW)
 	{
 		m_pctrlStackWidget->setCurrentIndex(1);
 		m_pctrlModeViewType->setCurrentIndex(0);
 	}
-	else if(pMiarex->m_iStabilityView==STAB3DVIEW)
+	else if(pMiarex->m_iView==W3DVIEW)
 	{
 		m_pctrlStackWidget->setCurrentIndex(1);
 		m_pctrlModeViewType->setCurrentIndex(1);
@@ -974,16 +974,16 @@ void StabViewDlg::SetControls()
 	m_pctrlRLMode4->setChecked(m_iCurrentMode%4==3);
 
 
-	m_pctrlRLMode1->setEnabled(pMiarex->m_iStabilityView>0 && pMiarex->m_pCurPOpp);
-	m_pctrlRLMode2->setEnabled(pMiarex->m_iStabilityView>0 && pMiarex->m_pCurPOpp);
-	m_pctrlRLMode3->setEnabled(pMiarex->m_iStabilityView>0 && pMiarex->m_pCurPOpp);
-	m_pctrlRLMode4->setEnabled(pMiarex->m_iStabilityView>0 && pMiarex->m_pCurPOpp);
+	m_pctrlRLMode1->setEnabled(pMiarex->m_iView>=STABTIMEVIEW && pMiarex->m_pCurPOpp);
+	m_pctrlRLMode2->setEnabled(pMiarex->m_iView>=STABTIMEVIEW && pMiarex->m_pCurPOpp);
+	m_pctrlRLMode3->setEnabled(pMiarex->m_iView>=STABTIMEVIEW  && pMiarex->m_pCurPOpp);
+	m_pctrlRLMode4->setEnabled(pMiarex->m_iView>=STABTIMEVIEW  && pMiarex->m_pCurPOpp);
 
 	// Enable the time response controls only if
 	//   - the polar's type is 7
 	//   - we have an active wopp
 	//   - the StabilityView is0
-	bool bEnableTimeCtrl = pMiarex->m_pCurPOpp && pMiarex->m_pCurPOpp->m_WPolarType==STABILITYPOLAR && pMiarex->m_iStabilityView==STABTIMEVIEW;
+	bool bEnableTimeCtrl = pMiarex->m_pCurPOpp && pMiarex->m_pCurPOpp->m_WPolarType==STABILITYPOLAR && pMiarex->m_iView==STABTIMEVIEW;
 	m_pctrlAddCurve->setEnabled(bEnableTimeCtrl);
 	m_pctrlRenameCurve->setEnabled(m_pctrlCurveList->count());
 	m_pctrlPlotStabGraph->setEnabled(m_pctrlCurveList->count());
@@ -1006,7 +1006,7 @@ void StabViewDlg::SetControls()
 	//   - the polar's type is 7
 	//   - we have an active wopp
 	//   - the StabilityView is 3
-	bool bEnable3DAnimation = pMiarex->m_iStabilityView==STAB3DVIEW && pMiarex->m_pCurPOpp && pMiarex->m_pCurPOpp->m_WPolarType==STABILITYPOLAR;
+	bool bEnable3DAnimation = pMiarex->m_iView==W3DVIEW && pMiarex->m_pCurPOpp && pMiarex->m_pCurPOpp->m_WPolarType==STABILITYPOLAR;
 	m_pctrlAnimate->setEnabled(bEnable3DAnimation);
 	m_pctrlAnimateRestart->setEnabled(bEnable3DAnimation);
 	m_pctrlAnimationAmplitude->setEnabled(bEnable3DAnimation);

@@ -154,6 +154,7 @@ public:
 
 	CVector m_CP;         /**< the position of the centre of pressure */
 
+	static bool s_bStoreOpps;       /**< true if the OpPoints should be added to the array at the end of the analysis*/
 	static bool s_bKeepOutOpps;     /**< true if points with viscous propertiesinterpolated out of the polar mesh should be kept */
 
 };

@@ -26,6 +26,7 @@
 #include "../../misc/GLLightDlg.h"
 #include "../../misc/W3dPrefsDlg.h"
 #include "../../misc/Settings.h"
+#include "../../misc/LengthUnitDlg.h"
 #include "../../misc/Units.h"
 #include "./BodyTransDlg.h"
 #include "./InertiaDlg.h"
@@ -2468,54 +2469,17 @@ void GL3dBodyDlg::OnImportBodyDef()
 
 	double mtoUnit = 1.0;
 
-	/** @todo create a specofoc dialog for units */
-/*	UnitsDlg Dlg(this);
+	/** @todo create a specific dialog for units */
+	LengthUnitDlg luDlg(this);
 
-	Dlg.m_bLengthOnly = true;
-	Dlg.m_Length    = UnitsDlg::lengthUnit();
-	Dlg.m_Area      = UnitsDlg::areaUnit();
-	Dlg.m_Speed     = UnitsDlg::speedUnit();
-	Dlg.m_Weight    = UnitsDlg::weightUnit();
-	Dlg.m_Force     = UnitsDlg::forceUnit();
-	Dlg.m_Moment    = UnitsDlg::momentUnit();
-	Dlg.m_Question = QObject::tr("Choose the length unit to read this file :");
-	Dlg.InitDialog();
+	luDlg.m_Question = QObject::tr("Choose the length unit to read this file :");
+	luDlg.InitDialog(Units::lengthUnitIndex());
 
-	if(Dlg.exec() == QDialog::Accepted)
+	if(luDlg.exec() == QDialog::Accepted)
 	{
-		switch(Dlg.m_Length)
-		{
-			case 0:{//mdm
-				mtoUnit  = 1000.0;
-				break;
-			}
-			case 1:{//cm
-				mtoUnit  = 100.0;
-				break;
-			}
-			case 2:{//dm
-				mtoUnit  = 10.0;
-				break;
-			}
-			case 3:{//m
-				mtoUnit  = 1.0;
-				break;
-			}
-			case 4:{//in
-				mtoUnit  = 1000.0/25.4;
-				break;
-			}
-			case 5:{///ft
-				mtoUnit  = 1000.0/25.4/12.0;
-				break;
-			}
-			default:{//m
-				mtoUnit  = 1.0;
-				break;
-			}
-		}
+		mtoUnit = luDlg.mtoUnit();
 	}
-	else return; */
+	else return;
 
 	QString PathName;
 

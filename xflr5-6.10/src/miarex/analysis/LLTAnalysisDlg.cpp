@@ -1,7 +1,7 @@
 /****************************************************************************
 
-    LLTAnalysisDlg Class
-	Copyright (C) 2009 Andre Deperrois adeperrois@xflr5.com
+	LLTAnalysisDlg Class
+	Copyright (C) 2009-2014 Andre Deperrois adeperrois@xflr5.com
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -37,7 +37,6 @@
 
 
 void *LLTAnalysisDlg::s_pPrePost3D;
-void *LLTAnalysisDlg::s_pMiarex;
 QPoint LLTAnalysisDlg::s_Position;
 
 
@@ -54,8 +53,10 @@ LLTAnalysisDlg::LLTAnalysisDlg(QWidget *pParent, LLTAnalysis *pLLTAnalysis) : QD
 
 	m_pIterGraph = m_pGraphWidget->graph();
 	m_pIterGraph->CopySettings(&Settings::s_RefGraph, false);
-	m_pIterGraph->SetXTitle(tr("Iterations"));
+//	m_pIterGraph->SetXTitle(tr("Iterations"));
 	m_pIterGraph->SetYTitle("");
+	QFont fnt("Symbol");
+	m_pIterGraph->SetTitleFont(fnt);
 
 	m_pIterGraph->SetAuto(true);
 
@@ -274,9 +275,12 @@ void LLTAnalysisDlg::Analyze()
 
 	m_pLLT->m_OutStream.flush();
 
-	for(int iPOpp=0; iPOpp<m_pLLT->m_PlaneOppList.size(); iPOpp++)
+	if(PlaneOpp::s_bStoreOpps)
 	{
-        Objects3D::InsertPOpp(m_pLLT->m_PlaneOppList.at(iPOpp));
+		for(int iPOpp=0; iPOpp<m_pLLT->m_PlaneOppList.size(); iPOpp++)
+		{
+			Objects3D::InsertPOpp(m_pLLT->m_PlaneOppList.at(iPOpp));
+		}
 	}
 
 	m_bFinished = true;

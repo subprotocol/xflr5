@@ -343,13 +343,6 @@ bool Objects3D::initializePanels(Plane *pPlane, WPolar *pWPolar)
 //	if(pCurWPolar)	NXWakePanels = pCurWPolar->m_NXWakePanels;
 //	else                NXWakePanels = 1;
 
-	int coef = 1;
-	if(pWPolar)
-	{
-		if(pWPolar->m_bThinSurfaces) coef = 1;
-		else                              coef = 2;
-	}
-
 	Wing *pWingList[MAXWINGS];
 	pWingList[0] = pPlane->wing();
 	pWingList[1] = pPlane->wing2();
@@ -2226,7 +2219,7 @@ WPolar* Objects3D::insertNewWPolar(WPolar *pNewWPolar, Plane *pCurPlane)
 		for(int ipb=0; ipb<s_oaWPolar.size(); ipb++)
 		{
 			pOldWPolar = (WPolar*)s_oaWPolar.at(ipb);
-			if(pOldWPolar->polarName()==pNewWPolar->polarName() && pWPolar->m_PlaneName==pCurPlane->planeName())
+			if(pOldWPolar->polarName()==pNewWPolar->polarName() && pOldWPolar->m_PlaneName==pCurPlane->planeName())
 			{
 				pWPolar = pOldWPolar;
 				break;

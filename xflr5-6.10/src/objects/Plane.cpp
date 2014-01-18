@@ -800,6 +800,7 @@ void Plane::setBody(Body *pBody)
 
 /**
  * Returns the number of mesh panels defined on this Plane's surfaces.
+ * Assumes thin surfaces for the wings.
  * @return the number of mesh panels
  */
 int Plane::VLMPanelTotal()

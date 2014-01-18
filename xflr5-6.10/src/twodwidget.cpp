@@ -376,14 +376,12 @@ void TwoDWidget::contextMenuEvent (QContextMenuEvent * event)
 			}
 
 			pMiarex->m_pCurGraph = pMiarex->GetGraph(CltPt);
-			if(pMiarex->m_iView==WOPPVIEW)         pMainFrame->WOppCtxMenu->exec(ScreenPt);
-			else if (pMiarex->m_iView==WPOLARVIEW) pMainFrame->WPlrCtxMenu->exec(ScreenPt);
-			else if (pMiarex->m_iView==WCPVIEW)    pMainFrame->WCpCtxMenu->exec(ScreenPt);
-			else if(pMiarex->m_iView==WSTABVIEW)
-			{
-				if(pMiarex->m_iStabilityView==STABTIMEVIEW)       pMainFrame->WTimeCtxMenu->exec(ScreenPt);
-				else if(pMiarex->m_iStabilityView==STABPOLARVIEW) pMainFrame->WPlrCtxMenu->exec(ScreenPt);
-			}
+			if(pMiarex->m_iView==WOPPVIEW)            pMainFrame->WOppCtxMenu->exec(ScreenPt);
+			else if (pMiarex->m_iView==WPOLARVIEW)    pMainFrame->WPlrCtxMenu->exec(ScreenPt);
+			else if (pMiarex->m_iView==WCPVIEW)       pMainFrame->WCpCtxMenu->exec(ScreenPt);
+			else if (pMiarex->m_iView==STABTIMEVIEW)  pMainFrame->WTimeCtxMenu->exec(ScreenPt);
+			else if (pMiarex->m_iView==STABPOLARVIEW) pMainFrame->WPlrCtxMenu->exec(ScreenPt);
+
 			break;
 		}
 		case XFOILANALYSIS:

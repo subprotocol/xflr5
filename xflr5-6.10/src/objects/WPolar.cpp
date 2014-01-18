@@ -541,9 +541,7 @@ void WPolar::Export(QTextStream &out, enumTextFileType FileType, bool bDataOnly)
 			out << strong;
 		}
 
-		Header = "   alpha      CL          ICd        PCd        TCd        CY        Cm         Rm         Ym       IYm       QInf        XCP\n";
-		out << Header;
-		Header = " _________  ________   ________  _________  _________  _________  _________  _________  _________  _________  _________  _________\n";
+		Header = "   alpha      CL          CDi        CDv        CD         CY         Cl         Cm         Cn        Cni       QInf        XCP\n";
 		out << Header;
 		for (j=0; j<m_Alpha.size(); j++)
 		{
@@ -554,8 +552,8 @@ void WPolar::Export(QTextStream &out, enumTextFileType FileType, bool bDataOnly)
 					 .arg(m_PCd[j],9,'f',6)
 					 .arg(m_TCd[j],9,'f',6)
 					 .arg(m_CY[j] ,9,'f',6)
-					 .arg(m_GCm[j],9,'f',6)
 					 .arg(m_GRm[j],9,'f',6)
+					 .arg(m_GCm[j],9,'f',6)
 					 .arg(m_GYm[j],9,'f',6)
 					 .arg(m_IYm[j],9,'f',6)
 					 .arg(m_QInfinite[j],8,'f',4)
@@ -585,9 +583,7 @@ void WPolar::Export(QTextStream &out, enumTextFileType FileType, bool bDataOnly)
 			out << strong;
 		}
 
-		Header = "alpha, CL, ICd, PCd, TCd, CY, GCm, GRm,GYm, IYm, QInf, XCP\n";
-		out << Header;
-		Header = " _________,  ________,   ________,  _________,  _________,  _________,  _________,  _________,  _________,  _________,  _________,  _________\n";
+		Header = "alpha, CL, CDi, CDv, CD, CY, Cl, Cm, Cn, Cni, QInf, XCP\n";
 		out << Header;
 		for (j=0; j<m_Alpha.size(); j++)
 		{
@@ -599,8 +595,8 @@ void WPolar::Export(QTextStream &out, enumTextFileType FileType, bool bDataOnly)
 					 .arg(m_PCd[j],9,'f',6)
 					 .arg(m_TCd[j],9,'f',6)
 					 .arg(m_CY[j] ,9,'f',6)
-					 .arg(m_GCm[j],9,'f',6)
 					 .arg(m_GRm[j],9,'f',6)
+					 .arg(m_GCm[j],9,'f',6)
 					 .arg(m_GYm[j],9,'f',6)
 					 .arg(m_IYm[j],9,'f',6)
 					 .arg(m_QInfinite[j],8,'f',4)
@@ -1508,7 +1504,7 @@ void WPolar::GetPolarProperties(QString &PolarProperties, bool bData)
 
 		if(!pPlane->isWing())
 		{
-            if(qAbs(m_ControlGain[iCtrl])>PRECISION)
+			if(qAbs(m_ControlGain[iCtrl])>PRECISION)
 			{
 				strong = QString(QString::fromUtf8("Wing Tilt: gain=%1°/unit\n")).arg(m_ControlGain[iCtrl],0,'f',2);
 				PolarProperties +=strong;
@@ -1516,7 +1512,7 @@ void WPolar::GetPolarProperties(QString &PolarProperties, bool bData)
 			iCtrl=1;
 			if(pPlane->stab())
 			{
-                if(qAbs(m_ControlGain[iCtrl])>PRECISION)
+				if(qAbs(m_ControlGain[iCtrl])>PRECISION)
 				{
 					strong = QString(QString::fromUtf8("Elev. Tilt: gain=%1°/unit\n")).arg(m_ControlGain[iCtrl],0,'f',2);
 					PolarProperties +=strong;

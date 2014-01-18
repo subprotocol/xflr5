@@ -63,11 +63,12 @@ void ThreeDWidget::contextMenuEvent (QContextMenuEvent * event)
 	if(m_iView == GLMIAREXVIEW)
 	{
 		QMiarex *pMiarex = (QMiarex *)s_pMiarex;
-		if(pMiarex->m_iView==WSTABVIEW && pMiarex->m_iStabilityView==STAB3DVIEW)
+		if (pMiarex->m_iView==W3DVIEW)
 		{
-			pMainFrame->W3DStabCtxMenu->exec(ScreenPt);
+			if(pMiarex->m_pCurWPolar->polarType()==STABILITYPOLAR)
+				pMainFrame->W3DStabCtxMenu->exec(ScreenPt);
+			else pMainFrame->W3DCtxMenu->exec(ScreenPt);
 		}
-		else if (pMiarex->m_iView==W3DVIEW) pMainFrame->W3DCtxMenu->exec(ScreenPt);
 	}
 	else  if(m_iView ==GLBODYVIEW)
 	{
@@ -283,7 +284,7 @@ void ThreeDWidget::paintGL()
 	{
 		QMiarex* pMiarex = (QMiarex*)s_pMiarex;
 		pMiarex->GLDraw3D();
-		if(pMiarex->m_iView==W3DVIEW || pMiarex->m_iView==WSTABVIEW)      pMiarex->GLRenderView();
+		if(pMiarex->m_iView==W3DVIEW) pMiarex->GLRenderView();
 	}
 	else if(m_iView == GLBODYVIEW)
 	{

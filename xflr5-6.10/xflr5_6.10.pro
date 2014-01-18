@@ -36,6 +36,7 @@ SOURCES += \
 	src/misc/MinTextEdit.cpp \
 	src/misc/EditPlrDlg.cpp \
 	src/misc/Units.cpp \
+	src/misc/LengthUnitDlg.cpp \
 	src/miarex/Miarex.cpp \
 	src/miarex/Objects3D.cpp \
 	src/miarex/analysis/StabPolarDlg.cpp \
@@ -148,6 +149,7 @@ HEADERS += \
 	src/misc/MinTextEdit.h \
 	src/misc/EditPlrDlg.h \
 	src/misc/Units.h \
+	src/misc/LengthUnitDlg.h \
 	src/miarex/Miarex.h \
 	src/miarex/Objects3D.h \
 	src/miarex/analysis/WAdvancedDlg.h \

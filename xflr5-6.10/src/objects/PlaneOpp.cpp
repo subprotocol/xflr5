@@ -23,7 +23,7 @@
 #include "../globals.h"
 #include "../misc/Units.h"
 
-
+bool PlaneOpp::s_bStoreOpps=true;
 bool PlaneOpp::s_bKeepOutOpps=false;
 
 /**

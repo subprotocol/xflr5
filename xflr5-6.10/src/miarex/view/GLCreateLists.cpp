@@ -1585,11 +1585,11 @@ void GLCreateLiftStrip(Wing *pWing, WPolar *pWPolar, WingOpp *pWOpp, int List)
 	glNewList(List,GL_COMPILE);
 	{
 		QMiarex::s_GLList++;
-        glEnable (GL_LINE_STIPPLE);
+		glEnable (GL_LINE_STIPPLE);
 
-        color = W3dPrefsDlg::s_XCPColor;
-        style = W3dPrefsDlg::s_XCPStyle;
-        width = W3dPrefsDlg::s_XCPWidth;
+		color = W3dPrefsDlg::s_XCPColor;
+		style = W3dPrefsDlg::s_XCPStyle;
+		width = W3dPrefsDlg::s_XCPWidth;
 
 		if     (style == 1) 	glLineStipple (1, 0xCFCF);
 		else if(style == 2) 	glLineStipple (1, 0x6666);

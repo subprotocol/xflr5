@@ -687,7 +687,6 @@ void PlaneDlg::SetParams()
 	m_pctrlDefineBody->setEnabled(m_pPlane->m_bBody);
 	m_pctrlImportBody->setEnabled(m_pPlane->m_bBody);
 
-
 	m_pctrlPlaneName->setText(m_pPlane->planeName());
 	m_pctrlWingTilt->SetValue(m_pPlane->m_WingTiltAngle[0]);
 	m_pctrlWingTilt2->SetValue(m_pPlane->m_WingTiltAngle[1]);

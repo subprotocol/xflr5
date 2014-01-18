@@ -795,9 +795,10 @@ void LLTAnalysis::setLLTRange(double AlphaMin, double AlphaMax, double DeltaAlph
 
 
 
-void LLTAnalysis::setLLTData(Wing *pWing, WPolar *pWPolar)
+void LLTAnalysis::setLLTData(Plane *pPlane, WPolar *pWPolar)
 {
-	m_pWing    = pWing;
+	m_pPlane   = pPlane;
+	m_pWing    = pPlane->wing();
 	m_pWPolar  = pWPolar;
 }
 
@@ -844,11 +845,10 @@ PlaneOpp* LLTAnalysis::createPlaneOpp(double QInf, double Alpha, bool bWingOut)
 	}
 	else
 	{
-		pNewPOpp->m_PlaneName           = m_pWing->WingName();
+		pNewPOpp->m_PlaneName           = m_pPlane->planeName();
 		pNewPOpp->m_PlrName             = m_pWPolar->polarName();
 		pNewPOpp->m_AnalysisMethod      = m_pWPolar->analysisMethod();
 		pNewPOpp->m_WPolarType          = m_pWPolar->polarType();
-
 
 		pNewPOpp->m_Alpha               = Alpha;
 		pNewPOpp->m_QInf                = QInf;

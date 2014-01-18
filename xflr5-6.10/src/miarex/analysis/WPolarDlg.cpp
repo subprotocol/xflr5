@@ -52,9 +52,9 @@ WPolarDlg::WPolarDlg(QWidget *pParent) : QDialog(pParent)
 
 void WPolarDlg::Connect()
 {
-	connect(m_pctrlWingMethod1, SIGNAL(toggled(bool)), this, SLOT(OnMethod()));
-	connect(m_pctrlWingMethod2, SIGNAL(toggled(bool)), this, SLOT(OnMethod()));
-	connect(m_pctrlWingMethod3, SIGNAL(toggled(bool)), this, SLOT(OnMethod()));
+	connect(m_pctrlLLTMethod, SIGNAL(toggled(bool)), this, SLOT(OnMethod()));
+	connect(m_pctrlVLMMethod, SIGNAL(toggled(bool)), this, SLOT(OnMethod()));
+	connect(m_pctrlPanelMethod, SIGNAL(toggled(bool)), this, SLOT(OnMethod()));
 
 	connect(m_pctrlUnit1, SIGNAL(toggled(bool)), this, SLOT(OnUnit()));
 	connect(m_pctrlUnit2, SIGNAL(toggled(bool)), this, SLOT(OnUnit()));
@@ -66,21 +66,21 @@ void WPolarDlg::Connect()
 	connect(m_pctrlAutoName, SIGNAL(clicked()), this, SLOT(OnAutoName()));
 //	connect(m_pctrlWakeRollUp, SIGNAL(clicked()), this, SLOT(OnWakeRollUp()));
 	connect(m_pctrlTiltGeom, SIGNAL(clicked()), this, SLOT(OnTiltedGeom()));
-    connect(m_pctrlViscous, SIGNAL(clicked()), this, SLOT(OnViscous()));
+	connect(m_pctrlViscous, SIGNAL(clicked()), this, SLOT(OnViscous()));
 	connect(m_pctrlIgnoreBodyPanels, SIGNAL(clicked()), this, SLOT(OnIgnoreBodyPanels()));
 
 	connect(m_pctrlGroundEffect, SIGNAL(clicked()), this, SLOT(OnGroundEffect()));
 	connect(m_pctrlPlaneInertia, SIGNAL(clicked()), this, SLOT(OnPlaneInertia()));
 
-	connect(m_pctrlXCmRef, SIGNAL(editingFinished()), this, SLOT(OnEditingFinished()));
-	connect(m_pctrlZCmRef, SIGNAL(editingFinished()), this, SLOT(OnEditingFinished()));
-	connect(m_pctrlDensity, SIGNAL(editingFinished()), this, SLOT(OnEditingFinished()));
-	connect(m_pctrlViscosity, SIGNAL(editingFinished()), this, SLOT(OnEditingFinished()));
-	connect(m_pctrlAlpha, SIGNAL(editingFinished()), this, SLOT(OnEditingFinished()));
-	connect(m_pctrlBeta, SIGNAL(editingFinished()), this, SLOT(OnEditingFinished()));
-	connect(m_pctrlWeight, SIGNAL(editingFinished()), this, SLOT(OnEditingFinished()));
-	connect(m_pctrlQInf, SIGNAL(editingFinished()), this, SLOT(OnEditingFinished()));
-	connect(m_pctrlHeight, SIGNAL(editingFinished()), this, SLOT(OnEditingFinished()));
+	connect(m_pctrlXCmRef,     SIGNAL(editingFinished()), this, SLOT(OnEditingFinished()));
+	connect(m_pctrlZCmRef,     SIGNAL(editingFinished()), this, SLOT(OnEditingFinished()));
+	connect(m_pctrlDensity,    SIGNAL(editingFinished()), this, SLOT(OnEditingFinished()));
+	connect(m_pctrlViscosity,  SIGNAL(editingFinished()), this, SLOT(OnEditingFinished()));
+	connect(m_pctrlAlpha,      SIGNAL(editingFinished()), this, SLOT(OnEditingFinished()));
+	connect(m_pctrlBeta,       SIGNAL(editingFinished()), this, SLOT(OnEditingFinished()));
+	connect(m_pctrlWeight,     SIGNAL(editingFinished()), this, SLOT(OnEditingFinished()));
+	connect(m_pctrlQInf,       SIGNAL(editingFinished()), this, SLOT(OnEditingFinished()));
+	connect(m_pctrlHeight,     SIGNAL(editingFinished()), this, SLOT(OnEditingFinished()));
 	connect(m_pctrlWPolarName, SIGNAL(editingFinished()), this, SLOT(OnEditingFinished()));
 	connect(m_pctrlWPolarName, SIGNAL(textEdited ( const QString &  )), this, SLOT(OnWPolarName()));
 
@@ -136,7 +136,6 @@ void WPolarDlg::EnableControls()
 	m_pctrlXCmRef->setEnabled(!s_WPolar.m_bAutoInertia);
 	m_pctrlZCmRef->setEnabled(!s_WPolar.m_bAutoInertia);
 
-	m_pctrlPanelMethod->setEnabled(false);
 }
 
 
@@ -158,14 +157,18 @@ void WPolarDlg::InitDialog(Plane *pPlane, WPolar *pWPolar)
 		m_pctrlAutoName->setChecked(true);
 	}
 
+
 	if(m_pPlane->isWing())
 	{
-		m_pctrlAnalysisControls->setCurrentIndex(0);
+		m_pctrlLLTMethod->setText("LLT");
+		m_pctrlVLMMethod->setText("VLM");
 	}
 	else
 	{
 		s_WPolar.m_AnalysisMethod=VLMMETHOD;
-		m_pctrlAnalysisControls->setCurrentIndex(1);
+		s_WPolar.m_bThinSurfaces = true;
+		m_pctrlVLMMethod->setText(tr("Mix 3D Panels/VLM"));
+		m_pctrlPanelMethod->setVisible(false);
 	}
 
 	//initialize the name box
@@ -243,24 +246,21 @@ void WPolarDlg::InitDialog(Plane *pPlane, WPolar *pWPolar)
 
 	if(s_WPolar.m_AnalysisMethod==LLTMETHOD)
 	{
-		m_pctrlWingMethod1->setChecked(true);
+		m_pctrlLLTMethod->setChecked(true);
 		m_pctrlViscous->setChecked(true);
 		m_pctrlViscous->setEnabled(false);
 	}
 	else if(s_WPolar.m_AnalysisMethod==VLMMETHOD)
 	{
-		m_pctrlWingMethod2->setChecked(true);
+		m_pctrlVLMMethod->setChecked(true);
 		m_pctrlViscous->setEnabled(true);
 	}
 	else if(s_WPolar.m_AnalysisMethod==PANELMETHOD)
 	{
-		if(s_WPolar.m_bThinSurfaces)  m_pctrlWingMethod2->setChecked(true);
-		else                          m_pctrlWingMethod3->setChecked(true);
+		if(s_WPolar.m_bThinSurfaces)  m_pctrlVLMMethod->setChecked(true);
+		else                          m_pctrlPanelMethod->setChecked(true);
 		m_pctrlViscous->setEnabled(true);
 	}
-
-	m_pctrlPanelMethod->setChecked(true);
-	if(!m_pPlane->isWing()) s_WPolar.m_bThinSurfaces = true;
 
 
 	m_pctrlArea1->setChecked(s_WPolar.m_RefAreaType==1);
@@ -407,7 +407,7 @@ void WPolarDlg::OnGroundEffect()
 
 void WPolarDlg::OnMethod()
 {
-	if (m_pctrlWingMethod1->isChecked())
+	if (m_pctrlLLTMethod->isChecked())
 	{
 		s_WPolar.m_bViscous      = true;
 		s_WPolar.m_bThinSurfaces = true;
@@ -416,12 +416,12 @@ void WPolarDlg::OnMethod()
 		s_WPolar.m_AnalysisMethod  = LLTMETHOD;
 		m_pctrlTiltGeom->setChecked(false);
 	}
-	else if (m_pctrlWingMethod2->isChecked())
+	else if (m_pctrlVLMMethod->isChecked())
 	{
 		s_WPolar.m_bThinSurfaces = true;
 		s_WPolar.m_AnalysisMethod = PANELMETHOD;
 	}
-	else if (m_pctrlWingMethod3->isChecked())
+	else if (m_pctrlPanelMethod->isChecked())
 	{
 		s_WPolar.m_bThinSurfaces = false;
 		s_WPolar.m_AnalysisMethod = PANELMETHOD;
@@ -611,10 +611,10 @@ void WPolarDlg::SetupLayout()
 			PlaneLayout->addWidget(lab1,1,1);
 			PlaneLayout->addWidget(lab5,2,1);
 			PlaneLayout->addWidget(lab6,3,1);
-            m_pctrlQInf    = new DoubleEdit(10.05);
+			m_pctrlQInf    = new DoubleEdit(10.05);
 			m_pctrlQInf->SetMin(0.0);
-            m_pctrlAlpha   = new DoubleEdit(1.00,2);
-            m_pctrlBeta    = new DoubleEdit(0.00,2);
+			m_pctrlAlpha   = new DoubleEdit(1.00,2);
+			m_pctrlBeta    = new DoubleEdit(0.00,2);
 			PlaneLayout->addWidget(m_pctrlQInf,1,2);
 			PlaneLayout->addWidget(m_pctrlAlpha,2,2);
 			PlaneLayout->addWidget(m_pctrlBeta,3,2);
@@ -646,11 +646,11 @@ void WPolarDlg::SetupLayout()
 				InertiaDataLayout->addWidget(lab2,1,1);
 				InertiaDataLayout->addWidget(lab3,2,1);
 				InertiaDataLayout->addWidget(lab4,3,1);
-                m_pctrlWeight  = new DoubleEdit(1.234);
+				m_pctrlWeight  = new DoubleEdit(1.234);
 				m_pctrlWeight->SetPrecision(3);
 				m_pctrlWeight->SetMin(0.0);
-                m_pctrlXCmRef  = new DoubleEdit(100.00,3);
-                m_pctrlZCmRef  = new DoubleEdit(100.00,3);
+				m_pctrlXCmRef  = new DoubleEdit(100.00,3);
+				m_pctrlZCmRef  = new DoubleEdit(100.00,3);
 				InertiaDataLayout->addWidget(m_pctrlWeight,1,2);
 				InertiaDataLayout->addWidget(m_pctrlXCmRef,2,2);
 				InertiaDataLayout->addWidget(m_pctrlZCmRef,3,2);
@@ -688,36 +688,24 @@ void WPolarDlg::SetupLayout()
 	}
 
 //_________________________Main Layout
-	m_pctrlAnalysisControls = new QStackedWidget;
+
+	QGroupBox *pAnalysisMethods = new QGroupBox(tr("Analysis Methods"));
 	{
-		QGroupBox *WingMethodBox = new QGroupBox(tr("Wing analysis methods"));
+		QVBoxLayout *pMethodLayout = new QVBoxLayout;
 		{
-			QVBoxLayout *WingMethodLayout = new QVBoxLayout;
-			{
-				m_pctrlWingMethod1 = new QRadioButton(tr("LLT"));
-				m_pctrlWingMethod2 = new QRadioButton(tr("VLM"));
-				m_pctrlWingMethod3 = new QRadioButton(tr("3D Panels"));
+			m_pctrlLLTMethod   = new QRadioButton(tr("LLT (Wing only)"));
+			m_pctrlVLMMethod   = new QRadioButton(tr("VLM"));
+			m_pctrlPanelMethod = new QRadioButton(tr("3D Panels"));
 
-				WingMethodLayout->addWidget(m_pctrlWingMethod1);
-				WingMethodLayout->addWidget(m_pctrlWingMethod2);
-				WingMethodLayout->addWidget(m_pctrlWingMethod3);
-			}
-			WingMethodBox->setLayout(WingMethodLayout);
+			pMethodLayout->addWidget(m_pctrlLLTMethod);
+			pMethodLayout->addWidget(m_pctrlVLMMethod);
+			pMethodLayout->addWidget(m_pctrlPanelMethod);
 		}
+		pAnalysisMethods->setLayout(pMethodLayout);
 
-		m_pctrlPanelMethod = new QRadioButton(tr("Mix 3D Panels/VLM"));
-		QGroupBox *PlaneMethodBox = new QGroupBox("Plane analysis methods");
-		{
-			QHBoxLayout *PlaneMethodLayout = new QHBoxLayout;
-			{
-				PlaneMethodLayout->addWidget(m_pctrlPanelMethod);
-				PlaneMethodBox->setLayout(PlaneMethodLayout);
-			}
-		}
-
-		m_pctrlAnalysisControls->addWidget(WingMethodBox);
-		m_pctrlAnalysisControls->addWidget(PlaneMethodBox);
 	}
+
+
 
 	QGroupBox *AeroDataGroupBox = new QGroupBox(tr("Aerodynamic Data"));
 	{
@@ -727,12 +715,12 @@ void WPolarDlg::SetupLayout()
 			m_pctrlUnit1 = new QRadioButton(tr("International"));
 			m_pctrlUnit2 = new QRadioButton(tr("Imperial"));
 			m_pctrlRho = new QLabel("r =");
-            m_pctrlDensity = new DoubleEdit(1.225,3);
+			m_pctrlDensity = new DoubleEdit(1.225,3);
 			m_pctrlDensityUnit = new QLabel("kg/m3");
 			m_pctrlNu = new QLabel("n =");
 			m_pctrlRho->setAlignment(Qt::AlignRight | Qt::AlignCenter);
 			m_pctrlNu->setAlignment(Qt::AlignRight | Qt::AlignCenter);
-            m_pctrlViscosity = new DoubleEdit(1.500e-5,3);
+			m_pctrlViscosity = new DoubleEdit(1.500e-5,3);
 			m_pctrlViscosityUnit = new QLabel("m2/s");
 			m_pctrlRho->setFont(SymbolFont);
 			m_pctrlNu->setFont(SymbolFont);
@@ -809,7 +797,7 @@ void WPolarDlg::SetupLayout()
 		DataLayout->addWidget(NameGroup,1,1);
 		DataLayout->addWidget(FlightDataBox,2,1);
 		DataLayout->addWidget(InertiaBox,3,1);
-		DataLayout->addWidget(m_pctrlAnalysisControls,4,1);
+		DataLayout->addWidget(pAnalysisMethods,4,1);
 		DataLayout->addWidget(OptionsGroupBox,5,1);
 		DataLayout->addWidget(TypeGroup, 1,2);
 		DataLayout->addWidget(FlightGroup,2,2);

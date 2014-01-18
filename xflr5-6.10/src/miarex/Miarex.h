@@ -63,13 +63,7 @@
 
 /** This enumeration defines the options for the active view.
  *May be the operaring point view, the polar view, the 3D view, the Cp view, or the stability view*/
-typedef enum {WOPPVIEW, WPOLARVIEW, W3DVIEW, WCPVIEW, WSTABVIEW} enumMiarexViews;
-
-/** In the case of a stability view, this enumeration defines the display options.
- *May be the a time graph view, a root locus view, or a 3D view, */
-typedef enum {STABTIMEVIEW, STABPOLARVIEW, STAB3DVIEW} enumStabilityViews;
-
-
+typedef enum {WOPPVIEW, WPOLARVIEW, W3DVIEW, WCPVIEW, STABTIMEVIEW, STABPOLARVIEW} enumMiarexViews;
 
 
 /**
@@ -235,8 +229,8 @@ private slots:
 	void OnVortices();
 	void OnWing2Curve();
 	void OnWOppProps();
-	void OnWOpps();
-	void OnWPolars();
+	void OnWOppView();
+	void OnWPolarView();
 	void OnWPolarProps();
 
 public:
@@ -332,11 +326,11 @@ public:
 	// Widget variables ... self explicit, not documented
 	QPushButton *m_pctrlKeepCpSection, *m_pctrlResetCpSection;
 	QSlider *m_pctrlCpSectionSlider;
-    DoubleEdit *m_pctrlSpanPos;
+	DoubleEdit *m_pctrlSpanPos;
 	QCheckBox *m_pctrlSequence;
-    DoubleEdit *m_pctrlAlphaMin;
-    DoubleEdit *m_pctrlAlphaMax;
-    DoubleEdit *m_pctrlAlphaDelta;
+	DoubleEdit *m_pctrlAlphaMin;
+	DoubleEdit *m_pctrlAlphaMax;
+	DoubleEdit *m_pctrlAlphaDelta;
 	QCheckBox *m_pctrlInitLLTCalc;
 	QCheckBox *m_pctrlStoreWOpp;
 	QPushButton *m_pctrlAnalyze;
@@ -415,7 +409,6 @@ public:
 	bool m_bShowElliptic;              /**< true if the elliptic loading should be displayed in the local lift graph */
 	bool m_bShowWingCurve[MAXWINGS];   /**< true if various plane's wing curves shoud be displayed*/
 	bool m_bSpeeds;                    /**< true if the velocities should be displayed in the operating point or 3D view*/
-	bool m_bStoreWOpp;                 /**< true if the WOpp should be stored after a calculation */
 	bool m_bStream;                    /**< defines whether the streamlines should be displayed in the operating point or 3D view*/
 	bool m_bTrans;                     /**< true if the view is being dragged */
 	bool m_bTransGraph;	               /**< true if a graph is being dragged */
@@ -446,9 +439,10 @@ public:
 	static bool m_bResetglBodyMesh;           /**< true if the openGL list for panel mesh needs to be re-generated */
 	static bool m_bResetglFlow;               /**< true if the crossflow OpenGL list needs to be refreshed */
 
+	static bool s_bResetCurves;               /**< true if the curves of the active view should be regenerated before the next view update >*/
 
 	static bool s_bICd;                       /**< true if the induced drag forces should be displayed in the operating point or 3D view*/
-	static bool s_bVCd;                      /**< true if the viscous drag forces should be displayed in the operating point or 3D view*/
+	static bool s_bVCd;                       /**< true if the viscous drag forces should be displayed in the operating point or 3D view*/
 
 	static bool s_bAutoCpScale;		       /**< true if the Cp scale should be set automatically */
 	static double s_LegendMin;                /**< minimum value of the Cp scale in 3D view */
@@ -499,7 +493,6 @@ public:
 
 	int m_StabilityResponseType;   /**< 0 = initial conditions, 1=forced response, 2=modal response */
 
-	enumStabilityViews m_iStabilityView;    /**< defines which type of stability post-processing method is to be used */
 	enumGraphView m_iWPlrView;              /**< defines how many graphs will be displayed in WPolar view */
 	enumGraphView m_iWingView;              /**< defines how many graphs will be displayed in the operating point view */
 	enumGraphView m_iStabTimeView;          /**< defines how many graphs will be displayed in the stability time view */
