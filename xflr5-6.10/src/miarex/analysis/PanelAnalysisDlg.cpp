@@ -47,6 +47,7 @@ QPoint PanelAnalysisDlg::s_Position;
 PanelAnalysisDlg::PanelAnalysisDlg(QWidget *pParent, PanelAnalysis *pPanelAnalysis) : QDialog(pParent)
 {
 	setWindowTitle(tr("3D Panel Analysis"));
+	m_pXFile = NULL;
 	SetupLayout();
 	m_pPanelAnalysis = pPanelAnalysis;
 }
@@ -57,6 +58,7 @@ PanelAnalysisDlg::PanelAnalysisDlg(QWidget *pParent, PanelAnalysis *pPanelAnalys
  */
 PanelAnalysisDlg::~PanelAnalysisDlg()
 {
+	if(m_pXFile) delete m_pXFile;
 }
 
 
@@ -149,31 +151,35 @@ void PanelAnalysisDlg::SetupLayout()
 	setMinimumHeight(r.height()/2);
 	setMinimumWidth(r.width()/2);
 
-	m_pctrlTextOutput = new QTextEdit;
+	m_pctrlTextOutput = new QTextEdit(this);
 	m_pctrlTextOutput->setReadOnly(true);
 	m_pctrlTextOutput->setLineWrapMode(QTextEdit::NoWrap);
 	m_pctrlTextOutput->setWordWrapMode(QTextOption::NoWrap);
 //	m_pctrlTextOutput->setFont(Settings::m_TableFont);
 
-	m_pctrlProgress = new QProgressBar;
+	m_pctrlProgress = new QProgressBar(this);
 	m_pctrlProgress->setOrientation(Qt::Horizontal);
 	m_pctrlProgress->setMinimum(0);
 	m_pctrlProgress->setMaximum(100);
 	m_pctrlProgress->setValue(0);
 
-	m_pctrlCancel = new QPushButton(tr("Cancel"));
+	m_pctrlCancel = new QPushButton(tr("Cancel"),this);
 	connect(m_pctrlCancel, SIGNAL(clicked()), this, SLOT(OnCancelAnalysis()));
 
-	QHBoxLayout *ButtonLayout = new QHBoxLayout;
-	ButtonLayout->addStretch(1);
-	ButtonLayout->addWidget(m_pctrlCancel);
-	ButtonLayout->addStretch(1);
+	QHBoxLayout *pButtonLayout = new QHBoxLayout;
+	{
+		pButtonLayout->addStretch(1);
+		pButtonLayout->addWidget(m_pctrlCancel);
+		pButtonLayout->addStretch(1);
+	}
 
-	QVBoxLayout *mainLayout = new QVBoxLayout;
-	mainLayout->addWidget(m_pctrlTextOutput);
-	mainLayout->addWidget(m_pctrlProgress);
-	mainLayout->addLayout(ButtonLayout);
-	setLayout(mainLayout);
+	QVBoxLayout *pMainLayout = new QVBoxLayout;
+	{
+		pMainLayout->addWidget(m_pctrlTextOutput);
+		pMainLayout->addWidget(m_pctrlProgress);
+		pMainLayout->addLayout(pButtonLayout);
+	}
+	setLayout(pMainLayout);
 }
 
 

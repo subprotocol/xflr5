@@ -177,6 +177,8 @@ private:
 	static void *s_pMainFrame;  /**< a static pointer to the instance of the application's MainFrame object */
 	static void *s_p2DWidget;   /**< a static pointer to the instance of the application's central widget used for 2D drawings */
 
+	int *m_precision;           /**< the array of digit numbers for each column of the Foil table >*/
+
 	bool m_bScale;              /**< true if the scale should be displayed */
 	bool m_bZoomPlus;           /**< true if the user is in the process of zooming in by drawing a rectangle */
 	bool m_bZoomYOnly;          /**< true if only the y-axis should be scaled */

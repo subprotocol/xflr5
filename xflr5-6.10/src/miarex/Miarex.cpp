@@ -129,21 +129,26 @@ Panel *QMiarex::s_pRefWakePanel = NULL;
 QMiarex::QMiarex(QWidget *parent)
 	: QWidget(parent)
 {
+	setAttribute(Qt::WA_DeleteOnClose);
+
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 
 	//construct and initialize everything
-	int memsize=0;
-	if(!Objects3D::Allocate(memsize))
+/*	int memsize=0;
+	if(!Objects3D::AllocatePanelArrays(memsize))
 	{
-		QString strange = tr("This memory does not have enough RAM to run xflr5");
+		QString strange = tr("This computer does not have enough RAM to run xflr5");
 		Trace(strange);
 		QMessageBox::warning(pMainFrame, tr("Warning"), strange);
 	}
 	else
 	{
-		QString strange = QString("Initial memory allocation for PanelAnalysis is %1 MB").arg((double)memsize/1024./1024., 7, 'f', 2);
+		QString strange = QString("QMiarex::Initial memory allocation for PanelAnalysis is %1 MB").arg((double)memsize/1024./1024., 7, 'f', 2);
 		Trace(strange);
-	}
+	}*/
+
+	if(Objects3D::s_pPanelAnalysis) delete Objects3D::s_pPanelAnalysis;
+	Objects3D::s_pPanelAnalysis = new PanelAnalysis; //construct on the heap and not on the stack to avoid memory overflow,
 
 
 	m_pLLT    = new LLTAnalysis();
@@ -319,8 +324,8 @@ QMiarex::QMiarex(QWidget *parent)
 	m_WPlrGraph[3].SetGraphName("Wing_Polar_Graph_4");
 	m_WPlrGraph[0].SetVariables(4,1);
 	m_WPlrGraph[1].SetVariables(0,1);
-	m_WPlrGraph[2].SetVariables(0,5);
-	m_WPlrGraph[3].SetVariables(0,12);
+	m_WPlrGraph[2].SetVariables(0,6);
+	m_WPlrGraph[3].SetVariables(0,13);
 	for(int ig=0; ig<MAXGRAPHS; ig++) SetWGraphTitles(m_WPlrGraph+ig);
 
 	m_CpGraph.SetXMajGrid(true, QColor(120,120,120),2,1);
@@ -463,6 +468,23 @@ QMiarex::QMiarex(QWidget *parent)
 
 
 /**
+ * The public destructor.
+ */
+QMiarex::~QMiarex()
+{
+	qDebug("Destroying Miarex");
+	delete (GLLightDlg*)m_pglLightDlg;
+	if(m_pLLTDlg) delete m_pLLTDlg;
+	if(m_pLLT)    delete m_pLLT;
+	if(m_pPanelAnalysisDlg) delete m_pPanelAnalysisDlg;
+
+	Objects3D::deleteObjects();
+	Objects3D::ReleasePanelMemory();
+	delete Objects3D::s_pPanelAnalysis;
+}
+
+
+/**
  * Connect signals and slots
  */
 void QMiarex::Connect()
@@ -496,14 +518,14 @@ void QMiarex::Connect()
 	connect(m_pTimerWOpp, SIGNAL(timeout()), this, SLOT(OnAnimateWOppSingle()));
 	connect(m_pTimerMode, SIGNAL(timeout()), this, SLOT(OnAnimateModeSingle()));
 
-	connect(m_pctrlSurfaces, SIGNAL(clicked()), SLOT(OnSurfaces()));
-	connect(m_pctrlOutline, SIGNAL(clicked()), SLOT(OnOutline()));
-	connect(m_pctrlPanels, SIGNAL(clicked()), SLOT(OnPanels()));
-	connect(m_pctrlVortices, SIGNAL(clicked()), SLOT(OnVortices()));
+	connect(m_pctrlSurfaces,  SIGNAL(clicked()), SLOT(OnSurfaces()));
+	connect(m_pctrlOutline,   SIGNAL(clicked()), SLOT(OnOutline()));
+	connect(m_pctrlPanels,    SIGNAL(clicked()), SLOT(OnPanels()));
+	connect(m_pctrlVortices,  SIGNAL(clicked()), SLOT(OnVortices()));
 	connect(m_pctrlFoilNames, SIGNAL(clicked()), SLOT(OnFoilNames()));
-	connect(m_pctrlMasses, SIGNAL(clicked()), SLOT(OnMasses()));
+	connect(m_pctrlMasses,    SIGNAL(clicked()), SLOT(OnMasses()));
+	connect(m_pctrlLight,     SIGNAL(clicked()), SLOT(OnLight()));
 	connect(m_pctrlClipPlanePos, SIGNAL(sliderMoved(int)), this, SLOT(OnClipPlane(int)));
-	connect(m_pctrlLight, SIGNAL(clicked()), SLOT(OnLight()));
 
 	connect(m_pctrlKeepCpSection,  SIGNAL(clicked()), this, SLOT(OnKeepCpSection()));
 	connect(m_pctrlResetCpSection, SIGNAL(clicked()), this, SLOT(OnResetCpSection()));
@@ -521,17 +543,6 @@ void QMiarex::Connect()
 	connect(m_pctrlAlphaMin, SIGNAL(editingFinished()), this, SLOT(OnReadAnalysisData()));
 	connect(m_pctrlAlphaMax, SIGNAL(editingFinished()), this, SLOT(OnReadAnalysisData()));
 	connect(m_pctrlAlphaDelta, SIGNAL(editingFinished()), this, SLOT(OnReadAnalysisData()));
-}
-
-
-/**
- * The public destructor.
- */
-QMiarex::~QMiarex()
-{
-	delete (GLLightDlg*)m_pglLightDlg;
-	delete m_pLLTDlg;
-	delete m_pPanelAnalysisDlg;
 }
 
 
@@ -5216,6 +5227,7 @@ void QMiarex::OnDeleteCurPlane()
 	pMainFrame->UpdatePlaneListBox();
 	SetControls();
 	s_bResetCurves = true;
+	emit projectModified();
 	UpdateView();
 }
 
@@ -5420,6 +5432,7 @@ void QMiarex::OnDuplicateCurPlane()
 	m_pCurPlane = Objects3D::duplicatePlane(m_pCurPlane);
 	pMainFrame->UpdatePlaneListBox();
 	SetPlane(m_pCurPlane->planeName());
+	emit projectModified();
 }
 
 
@@ -6107,7 +6120,7 @@ void QMiarex::OnStabCurve()
  */
 void QMiarex::OnFoilNames()
 {
-    s_bFoilNames = m_pctrlFoilNames->isChecked();
+	s_bFoilNames = m_pctrlFoilNames->isChecked();
 	UpdateView();
 }
 
@@ -9498,8 +9511,8 @@ void QMiarex::SetupLayout()
 				m_pctrlCurveStyle->addItem(tr("item"));
 				m_pctrlCurveWidth->addItem(tr("item"));
 			}
-			m_pStyleDelegate = new LineDelegate;
-			m_pWidthDelegate = new LineDelegate;
+			m_pStyleDelegate = new LineDelegate(this);
+			m_pWidthDelegate = new LineDelegate(this);
 			m_pctrlCurveStyle->setItemDelegate(m_pStyleDelegate);
 			m_pctrlCurveWidth->setItemDelegate(m_pWidthDelegate);
 
@@ -9575,14 +9588,14 @@ void QMiarex::SetupLayout()
 		{
 			QGridLayout *pThreeDParamsLayout = new QGridLayout;
 			{
-				m_pctrlAxes       = new QCheckBox(tr("Axes"));
-				m_pctrlLight      = new QCheckBox(tr("Light"));
-				m_pctrlSurfaces   = new QCheckBox(tr("Surfaces"));
-				m_pctrlOutline    = new QCheckBox(tr("Outline"));
-				m_pctrlPanels     = new QCheckBox(tr("Panels"));
-				m_pctrlFoilNames  = new QCheckBox(tr("Foil Names"));
-				m_pctrlVortices   = new QCheckBox(tr("Vortices"));
-				m_pctrlMasses     = new QCheckBox(tr("Masses"));
+				m_pctrlAxes       = new QCheckBox(tr("Axes"), this);
+				m_pctrlLight      = new QCheckBox(tr("Light"), this);
+				m_pctrlSurfaces   = new QCheckBox(tr("Surfaces"), this);
+				m_pctrlOutline    = new QCheckBox(tr("Outline"), this);
+				m_pctrlPanels     = new QCheckBox(tr("Panels"), this);
+				m_pctrlFoilNames  = new QCheckBox(tr("Foil Names"), this);
+				m_pctrlVortices   = new QCheckBox(tr("Vortices"), this);
+				m_pctrlMasses     = new QCheckBox(tr("Masses"), this);
 
 				pThreeDParamsLayout->addWidget(m_pctrlAxes, 1,1);
 				pThreeDParamsLayout->addWidget(m_pctrlPanels, 1,2);

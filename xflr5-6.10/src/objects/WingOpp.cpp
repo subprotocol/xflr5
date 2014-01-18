@@ -182,9 +182,6 @@ bool WingOpp::SerializeWingOppWPA(QDataStream &ar, bool bIsStoring)
 	float f, f0, f1, f2, f3;
 	QColor clr;
 
-	float *m_G, *m_Sigma, *m_Cp;
-	m_G = m_Sigma = m_Cp = NULL;
-
 	if(bIsStoring)
 	{
 		// we don't store any more in wpa format
@@ -343,19 +340,11 @@ bool WingOpp::SerializeWingOppWPA(QDataStream &ar, bool bIsStoring)
 		{
 			ar>> m_NVLMPanels;
 
-			if(m_G)     delete m_G;
-			if(m_Sigma) delete m_Sigma;
-			if(m_Cp)    delete m_Cp;
-
-			m_G     = new float[m_NVLMPanels];
-			m_Sigma = new float[m_NVLMPanels];
-			m_Cp    = new float[m_NVLMPanels];
-
 			if(ArchiveFormat<1023 || m_AnalysisMethod !=LLTMETHOD)
 			{
 				for (p=0; p<m_NVLMPanels;p++)
 				{
-					ar >> f; m_Cp[p] =f;
+					ar >> f;// Cp =f; // not stored... Cp array is stored at PlaneOpp level
 				}
 			}
 		}
@@ -366,8 +355,8 @@ bool WingOpp::SerializeWingOppWPA(QDataStream &ar, bool bIsStoring)
 			{
 				for (p=0; p<m_NVLMPanels;p++)
 				{
-					ar >> f; m_G[p] =f;
-					if(ArchiveFormat<1010) m_G[p] =  f/1000.0;
+					ar >> f;
+//					if(ArchiveFormat<1010) Gamma[p] =  f/1000.0;
 				}
 			}
 		}
@@ -377,7 +366,7 @@ bool WingOpp::SerializeWingOppWPA(QDataStream &ar, bool bIsStoring)
 			{
 				for (p=0; p<m_NVLMPanels;p++)
 				{
-					ar >> f; m_Sigma[p] = f;
+					ar >> f;
 				}
 			}
 		}
@@ -509,6 +498,8 @@ bool WingOpp::SerializeWingOppWPA(QDataStream &ar, bool bIsStoring)
 		{
 			ar >> f; m_CP.z=f;
 		}
+
+
 	}
 	return true;
 }

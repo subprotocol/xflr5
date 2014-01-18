@@ -52,9 +52,7 @@ Settings::Settings(QWidget *pParent) : QDialog(pParent)
 {
 	setWindowTitle(tr("General Display Settings"));
 
-	s_RefGraph.SetTitleFont(s_TextFont);
-	s_RefGraph.SetLabelFont(s_TextFont);
-	s_RefGraph.SetGraphName("Reference Graph");
+	s_RefGraph.SetGraphName("Reference_Graph");
 
 	m_pMainFrame = pParent;
 	m_bIsGraphModified = false;

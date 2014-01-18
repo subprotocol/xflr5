@@ -202,7 +202,7 @@ private:
 
 	QRadioButton *m_pctrlFlatPanels, *m_pctrlBSplines;
 	LineBtn *m_pctrlBodyStyle;
-    DoubleEdit *m_pctrlNXPanels, *m_pctrlNHoopPanels;
+	DoubleEdit *m_pctrlNXPanels, *m_pctrlNHoopPanels;
 	QComboBox *m_pctrlXDegree, *m_pctrlHoopDegree;
 	QPushButton *m_pctrlMenuButton;
 	QMenu *BodyMenu;
@@ -219,7 +219,11 @@ private:
 	QAction *m_pGrid;
 
 
-	int m_StackPos;               /**< the current position on the Undo stack */
+	int *m_pPointPrecision;  /**< the array of digit numbers for each column of the Point table >*/
+	int *m_pFramePrecision;  /**< the array of digit numbers for each column of the Frame table >*/
+
+
+	int m_StackPos;                /**< the current position on the Undo stack */
 	QList<Body*> m_UndoStack;      /**< the stack of incremental modifications to the SplineFoil;
 									 we can't use the QStack though, because we need to access
 									 any point in the case of multiple undo operations */

@@ -25,9 +25,9 @@
 #include <QApplication>
 #include <QMessageBox>
 #include <QLocale>
+#include <QProcess>
+#include <QtDebug>
 
-#define VLMMAXMATSIZE    5000     /**< The max number of VLM panels for the whole plane. Sets the size of the influence matrix and its RHS.*/
-#define VLMHALF          2500     /**< Half the value of VLMMAXMATSIZE. */
 
 
 QList<Surface *> Objects3D::s_SurfaceList;
@@ -45,8 +45,7 @@ Panel *Objects3D::s_RefWakePanel = NULL;
 
 PanelAnalysis *Objects3D::s_pPanelAnalysis = NULL;
 
-int Objects3D::s_MaxMatSize = VLMMAXMATSIZE;
-int Objects3D::s_MaxRHSSize = VLMMAXRHS;
+int Objects3D::s_MaxPanelSize = 0;
 
 int Objects3D::s_MatSize     = 0;
 int Objects3D::s_WakeSize    = 0;
@@ -71,7 +70,6 @@ Objects3D::Objects3D()
 {
 	s_Node  = s_MemNode  = s_WakeNode  = s_RefWakeNode  = NULL;
 	s_Panel = s_MemPanel = s_WakePanel = s_RefWakePanel = NULL;
-
 }
 
 
@@ -79,28 +77,26 @@ Objects3D::Objects3D()
  * Reserves the memory necessary to all the arrays used in a Panel analysis.
  *@return true if the memory could be allocated, false otherwise.
  */
-bool Objects3D::Allocate(int &memsize)
+bool Objects3D::AllocatePanelArrays(int &memsize)
 {
-	Trace(QString("QMiarex::Allocating() %1 Panels").arg(s_MaxMatSize));
-
-	s_pPanelAnalysis = new PanelAnalysis; //construct on the heap and not on the stack to avoid memory overflow,
+//	Trace(QString("QMiarex::Allocating() %1 Panels").arg(s_MaxPanelSize));
 
 	try
 	{
-		s_Node        = new CVector[2*s_MaxMatSize];
-		s_MemNode     = new CVector[2*s_MaxMatSize];
-		s_WakeNode    = new CVector[2*s_MaxMatSize];
-		s_RefWakeNode = new CVector[2*s_MaxMatSize];
+		s_Node        = new CVector[2*s_MaxPanelSize];
+		s_MemNode     = new CVector[2*s_MaxPanelSize];
+		s_WakeNode    = new CVector[2*s_MaxPanelSize];
+		s_RefWakeNode = new CVector[2*s_MaxPanelSize];
 
-		s_Panel        = new Panel[s_MaxMatSize];
-		s_MemPanel     = new Panel[s_MaxMatSize];
-		s_WakePanel    = new Panel[s_MaxMatSize];
-		s_RefWakePanel = new Panel[s_MaxMatSize];
+		s_Panel        = new Panel[s_MaxPanelSize];
+		s_MemPanel     = new Panel[s_MaxPanelSize];
+		s_WakePanel    = new Panel[s_MaxPanelSize];
+		s_RefWakePanel = new Panel[s_MaxPanelSize];
 	}
 	catch(std::exception & e)
 	{
-		Release();
-		s_MaxMatSize = 0;
+		ReleasePanelMemory();
+		s_MaxPanelSize = 0;
 
 		Trace(e.what());
 		QString strange = "Memory allocation error: the request for additional memory has been denied.\nPlease reduce the model's size.";
@@ -108,34 +104,32 @@ bool Objects3D::Allocate(int &memsize)
 		return false;
 	}
 
-	memsize  = sizeof(CVector) * 8 * 2 * s_MaxMatSize; //bytes
-	memsize += sizeof(Panel)   * 8 * 2 * s_MaxMatSize; //bytes
+	memsize  = sizeof(CVector) * 8 * 2 * s_MaxPanelSize; //bytes
+	memsize += sizeof(Panel)   * 8 * 2 * s_MaxPanelSize; //bytes
 
-	int MatrixSize=0;
+	Trace(QString("Objects3D::   ...Allocated %1MB for the panel and node arrays").arg((double)memsize/1024./1024.));
 
-	if(!s_pPanelAnalysis->AllocateMatrix(s_MaxMatSize, MatrixSize))
-	{
-		Release();
-		return false;
-	}
+	Panel::s_pNode = s_Node;
+	Panel::s_pWakeNode = s_WakeNode;
 
-	memsize += MatrixSize;
+	Surface::s_pPanel = s_Panel;
+	Surface::s_pNode  = s_Node;
 
-	Trace(QString("   ...Allocated %1MB").arg((double)memsize/1024./1024.));
+	QMiarex::s_pPanel = s_Panel;
+	QMiarex::s_pNode = s_Node;
 
 	return true;
 }
+
 
 
 /**
  * Releases the memory allocated to the Panel and node arrays.
  * Sets the pointers to NULL and the matrixsize to 0.
  */
-void Objects3D::Release()
+void Objects3D::ReleasePanelMemory()
 {
-	Trace("QMiarex::Releasing()");
-
-	s_pPanelAnalysis->Release();
+	Trace("Objects3D::ReleasingPanelMemory()");
 
 	if(s_Node)        delete[] s_Node;
 	if(s_MemNode)     delete[] s_MemNode;
@@ -165,24 +159,8 @@ void Objects3D::setStaticPointers()
 	QMiarex::m_poaWPolar = &s_oaWPolar;
 	QMiarex::m_poaPOpp   = &s_oaPOpp;
 	QMiarex::m_poaBody   = &s_oaBody;
-
-	Panel::s_pNode = s_Node;
-	Panel::s_pWakeNode = s_WakeNode;
-
-	Surface::s_pPanel = s_Panel;
-	Surface::s_pNode  = s_Node;
-
-	QMiarex::s_pPanel = s_Panel;
-	QMiarex::s_pNode = s_Node;
 }
 
-
-Objects3D::~Objects3D()
-{
-	deleteObjects();
-	Release();
-	delete s_pPanelAnalysis;
-}
 
 
 /**
@@ -297,33 +275,45 @@ Plane* Objects3D::duplicatePlane(Plane *pPlane)
 bool Objects3D::initializePanels(Plane *pPlane, WPolar *pWPolar)
 {
 	if(!pPlane) return false;
-    int j, Nel;
+	int Nel=0;
 
 	// first check that the total number of panels that will be created does not exceed
 	// the currently allocated memory size for the influence atrix.
 
 	int PanelArraySize = calculateMatSize(pPlane, pWPolar);
+	int memsize = 0;
 
-	if(PanelArraySize>s_MaxMatSize)
+	if(PanelArraySize>s_MaxPanelSize)
 	{
 
-		Trace(QString("Requesting additional memory for %1 panels").arg(PanelArraySize));
+		Trace(QString("Objects3D::Requesting additional memory for %1 panels").arg(PanelArraySize));
 
 		// allocate 10% more than needed to avoid repeating the operation if the user requirement increases sightly again.
-		s_MaxMatSize = (int)((double)PanelArraySize *1.1);
-		Release();
+		s_MaxPanelSize = (int)((double)PanelArraySize *1.1);
+		ReleasePanelMemory();
 
-		int memsize = 0;
-
-		if(!Allocate(memsize))
+		if(!AllocatePanelArrays(memsize))
 		{
-			s_MaxMatSize = 0;
+			s_MaxPanelSize = 0;
+			return false;
+		}
+	}
+
+	//if a WPolar is defined, allocate the matrix
+	if(pWPolar)
+	{
+		int MatrixSize=0;
+
+		if(!s_pPanelAnalysis->AllocateMatrix(s_MaxPanelSize, MatrixSize))
+		{
+			ReleasePanelMemory();
 			return false;
 		}
 
-		QString strange = QString("Total memory allocation for PanelAnalysis is %1 MB\n").arg((double)memsize/1024./1024., 7, 'f', 2);
-		Trace(strange);
+		Trace("");
+		memsize += MatrixSize;
 	}
+
 
 	// all set to create the panels
 
@@ -333,8 +323,8 @@ bool Objects3D::initializePanels(Plane *pPlane, WPolar *pWPolar)
 	s_nWakeNodes  = 0;
 	s_WakeSize    = 0;
 
-	memset(s_Panel, 0, s_MaxMatSize * sizeof(Panel));
-	memset(s_Node,  0, 2 * s_MaxMatSize * sizeof(CVector));
+	memset(s_Panel, 0, s_MaxPanelSize * sizeof(Panel));
+	memset(s_Node,  0, 2 * s_MaxPanelSize * sizeof(CVector));
 
 	Panel *ptr = s_Panel;
 
@@ -355,10 +345,10 @@ bool Objects3D::initializePanels(Plane *pPlane, WPolar *pWPolar)
 		if(pWingList[iw])
 		{
 			pWingList[iw]->m_MatSize = 0;
-			for(j=0; j<pWingList[iw]->m_Surface.size();j++)
+			for(int jSurf=0; jSurf<pWingList[iw]->m_Surface.size(); jSurf++)
 			{
-				pWingList[iw]->m_Surface.at(j)->ResetFlap();
-				Nel = createWingElements(pPlane, pWPolar, pWingList[iw]->m_Surface.at(j));
+				pWingList[iw]->m_Surface.at(jSurf)->ResetFlap();
+				Nel = createWingElements(pPlane, pWPolar, pWingList[iw]->m_Surface.at(jSurf));
 				pWingList[iw]->m_MatSize += Nel;
 			}
 			pWingList[iw]->m_pWingPanel = ptr;

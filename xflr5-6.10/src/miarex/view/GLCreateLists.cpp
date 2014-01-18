@@ -447,21 +447,21 @@ void GLCreateCp(int nPanels, int nNodes, CVector *pNode, Panel *pPanel, PlaneOpp
 
 	int p, pp, n, averageInf, averageSup, average100;
 
-    double color;
+	double color;
 	double lmin, lmax, range;
 	double *tab  = pPOpp->m_dCp;
 
-	double *CpInf = new double[2*Objects3D::s_MaxMatSize];
-	double *CpSup = new double[2*Objects3D::s_MaxMatSize];
-	double *Cp100 = new double[2*Objects3D::s_MaxMatSize];
+	double *CpInf = new double[2*Objects3D::s_MaxPanelSize];
+	double *CpSup = new double[2*Objects3D::s_MaxPanelSize];
+	double *Cp100 = new double[2*Objects3D::s_MaxPanelSize];
 
 	CVector LA,LB,TA,TB;
 
 	glNewList(PANELCP, GL_COMPILE);
 	{
-        QMiarex::s_GLList++;
-        glEnable(GL_DEPTH_TEST);
-        glEnable(GL_POLYGON_OFFSET_FILL);
+		QMiarex::s_GLList++;
+		glEnable(GL_DEPTH_TEST);
+		glEnable(GL_POLYGON_OFFSET_FILL);
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 		glPolygonOffset(1.0, 1.0);
 
@@ -475,7 +475,7 @@ void GLCreateCp(int nPanels, int nNodes, CVector *pNode, Panel *pPanel, PlaneOpp
 			for (pp=0; pp< nPanels; pp++)
 			{
 				if (pNode[pPanel[pp].m_iLA].IsSame(pNode[n]) || pNode[pPanel[pp].m_iTA].IsSame(pNode[n]) ||
-					pNode[pPanel[pp].m_iTB].IsSame(pNode[n]) || pNode[pPanel[pp].m_iLB].IsSame(pNode[n]))
+				pNode[pPanel[pp].m_iTB].IsSame(pNode[n]) || pNode[pPanel[pp].m_iLB].IsSame(pNode[n]))
 				{
 					if(pPanel[pp].m_Pos==TOPSURFACE)
 					{
@@ -537,34 +537,34 @@ void GLCreateCp(int nPanels, int nNodes, CVector *pNode, Panel *pPanel, PlaneOpp
 				LA.Copy(pNode[pPanel[p].m_iLA]);
 				LB.Copy(pNode[pPanel[p].m_iLB]);
 
-                if(pPanel[p].m_Pos==TOPSURFACE)      color = (CpSup[pPanel[p].m_iLA]-lmin)/range;
+				if(pPanel[p].m_Pos==TOPSURFACE)      color = (CpSup[pPanel[p].m_iLA]-lmin)/range;
 				else if(pPanel[p].m_Pos<=MIDSURFACE) color = (CpInf[pPanel[p].m_iLA]-lmin)/range;
-                else                                 color = (Cp100[pPanel[p].m_iLA]-lmin)/range;
+				else                                 color = (Cp100[pPanel[p].m_iLA]-lmin)/range;
 				glColor3d(GLGetRed(color),GLGetGreen(color),GLGetBlue(color));
 				glVertex3d(LA.x, LA.y, LA.z);
 
-                if(pPanel[p].m_Pos==TOPSURFACE)      color = (CpSup[pPanel[p].m_iTA]-lmin)/range;
+				if(pPanel[p].m_Pos==TOPSURFACE)      color = (CpSup[pPanel[p].m_iTA]-lmin)/range;
 				else if(pPanel[p].m_Pos<=MIDSURFACE) color = (CpInf[pPanel[p].m_iTA]-lmin)/range;
-                else                                 color = (Cp100[pPanel[p].m_iTA]-lmin)/range;
+				else                                 color = (Cp100[pPanel[p].m_iTA]-lmin)/range;
 				glColor3d(GLGetRed(color),GLGetGreen(color),GLGetBlue(color));
 				glVertex3d(TA.x, TA.y, TA.z);
 
-                if(pPanel[p].m_Pos==TOPSURFACE)      color = (CpSup[pPanel[p].m_iTB]-lmin)/range;
+				if(pPanel[p].m_Pos==TOPSURFACE)      color = (CpSup[pPanel[p].m_iTB]-lmin)/range;
 				else if(pPanel[p].m_Pos<=MIDSURFACE) color = (CpInf[pPanel[p].m_iTB]-lmin)/range;
-                else                                 color = (Cp100[pPanel[p].m_iTB]-lmin)/range;
+				else                                 color = (Cp100[pPanel[p].m_iTB]-lmin)/range;
 				glColor3d(GLGetRed(color),GLGetGreen(color),GLGetBlue(color));
 				glVertex3d(TB.x, TB.y, TB.z);
 
-                if(pPanel[p].m_Pos==TOPSURFACE)      color = (CpSup[pPanel[p].m_iLB]-lmin)/range;
+				if(pPanel[p].m_Pos==TOPSURFACE)      color = (CpSup[pPanel[p].m_iLB]-lmin)/range;
 				else if(pPanel[p].m_Pos<=MIDSURFACE) color = (CpInf[pPanel[p].m_iLB]-lmin)/range;
-                else                                 color = (Cp100[pPanel[p].m_iLB]-lmin)/range;
+				else                                 color = (Cp100[pPanel[p].m_iLB]-lmin)/range;
 				glColor3d(GLGetRed(color),GLGetGreen(color),GLGetBlue(color));
 				glVertex3d(LB.x, LB.y, LB.z);
 
 			}
 			glEnd();
 		}
-        glDisable(GL_DEPTH_TEST);
+		glDisable(GL_DEPTH_TEST);
 		glDisable(GL_POLYGON_OFFSET_FILL);
 	}
 	glEndList();
@@ -1108,100 +1108,100 @@ void GLCreateDrag(Wing *pWing, WPolar* pWPolar, WingOpp *pWOpp, int List)
 
 void GLCreateMesh(int iList, int nPanels, Panel *pPanel, CVector *pNode, QColor PanelColor, QColor BackColor, bool bBack)
 {
-    if(!pPanel || !pNode)
-    {
-        glNewList(iList, GL_COMPILE);
-        glEndList();
-        return;
-    }
-    int iLA, iLB, iTA, iTB;
-    int p;
-    CVector  N;
-    N.Set(0.0, 0.0, 0.0);
+	if(!pPanel || !pNode)
+	{
+		glNewList(iList, GL_COMPILE);
+		glEndList();
+		return;
+	}
+	int iLA, iLB, iTA, iTB;
+	int p;
+	CVector  N;
+	N.Set(0.0, 0.0, 0.0);
 
-    glNewList(iList, GL_COMPILE);
-    {
-        glDisable(GL_LINE_STIPPLE);
+	glNewList(iList, GL_COMPILE);
+	{
+		glDisable(GL_LINE_STIPPLE);
 		glEnable(GL_DEPTH_TEST);
-//        glEnable(GL_POLYGON_OFFSET_LINE);
+		//        glEnable(GL_POLYGON_OFFSET_LINE);
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-//        glPolygonOffset(1.0, 1.0);
+		//        glPolygonOffset(1.0, 1.0);
 
-        glLineWidth(1.0);
+		glLineWidth(1.0);
 
-        glColor3d(PanelColor.redF(),PanelColor.greenF(),PanelColor.blueF());
-
-		for (p=0; p<nPanels; p++)
-        {
-            glBegin(GL_QUADS);
-            {
-                iLA = pPanel[p].m_iLA;
-                iLB = pPanel[p].m_iLB;
-                iTA = pPanel[p].m_iTA;
-                iTB = pPanel[p].m_iTB;
-
-                glNormal3d(pPanel[p].Normal.x, pPanel[p].Normal.y, pPanel[p].Normal.z);
-                glVertex3d(pNode[iLA].x, pNode[iLA].y, pNode[iLA].z);
-                glVertex3d(pNode[iTA].x, pNode[iTA].y, pNode[iTA].z);
-                glVertex3d(pNode[iTB].x, pNode[iTB].y, pNode[iTB].z);
-                glVertex3d(pNode[iLB].x, pNode[iLB].y, pNode[iLB].z);
-            }
-            glEnd();
-        }
-        glDisable(GL_DEPTH_TEST);
-        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-        glDisable(GL_POLYGON_OFFSET_LINE);
-    }
-    glEndList();
-
-    if(!bBack) return;
-
-    glNewList(iList+1,GL_COMPILE);
-    {
-        glEnable(GL_DEPTH_TEST);
-        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-        glEnable(GL_POLYGON_OFFSET_FILL);
-        glPolygonOffset(1.0, 1.0);
-
-
-        glColor3d(BackColor.redF(),BackColor.greenF(),BackColor.blueF());
-
-        glLineWidth(1.0);
-        glDisable (GL_LINE_STIPPLE);
+		glColor3d(PanelColor.redF(),PanelColor.greenF(),PanelColor.blueF());
 
 		for (p=0; p<nPanels; p++)
-        {
-            glBegin(GL_QUADS);
-            {
-                iLA = pPanel[p].m_iLA;
-                iLB = pPanel[p].m_iLB;
-                iTA = pPanel[p].m_iTA;
-                iTB = pPanel[p].m_iTB;
+		{
+			glBegin(GL_QUADS);
+			{
+				iLA = pPanel[p].m_iLA;
+				iLB = pPanel[p].m_iLB;
+				iTA = pPanel[p].m_iTA;
+				iTB = pPanel[p].m_iTB;
 
-                glVertex3d(pNode[iLA].x, pNode[iLA].y, pNode[iLA].z);
-                glVertex3d(pNode[iTA].x, pNode[iTA].y, pNode[iTA].z);
-                glVertex3d(pNode[iTB].x, pNode[iTB].y, pNode[iTB].z);
-                glVertex3d(pNode[iLB].x, pNode[iLB].y, pNode[iLB].z);
-                glNormal3d(pPanel[p].Normal.x, pPanel[p].Normal.y, pPanel[p].Normal.z);
-            }
-            glEnd();
-        }
+				glNormal3d(pPanel[p].Normal.x, pPanel[p].Normal.y, pPanel[p].Normal.z);
+				glVertex3d(pNode[iLA].x, pNode[iLA].y, pNode[iLA].z);
+				glVertex3d(pNode[iTA].x, pNode[iTA].y, pNode[iTA].z);
+				glVertex3d(pNode[iTB].x, pNode[iTB].y, pNode[iTB].z);
+				glVertex3d(pNode[iLB].x, pNode[iLB].y, pNode[iLB].z);
+			}
+			glEnd();
+		}
+		glDisable(GL_DEPTH_TEST);
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		glDisable(GL_POLYGON_OFFSET_LINE);
+	}
+	glEndList();
 
-        glDisable(GL_POLYGON_OFFSET_FILL);
-        glDisable(GL_DEPTH_TEST);
-    }
-    glEndList();
+	if(!bBack) return;
+
+	glNewList(iList+1,GL_COMPILE);
+	{
+		glEnable(GL_DEPTH_TEST);
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		glEnable(GL_POLYGON_OFFSET_FILL);
+		glPolygonOffset(1.0, 1.0);
+
+
+		glColor3d(BackColor.redF(),BackColor.greenF(),BackColor.blueF());
+
+		glLineWidth(1.0);
+		glDisable (GL_LINE_STIPPLE);
+
+		for (p=0; p<nPanels; p++)
+		{
+			glBegin(GL_QUADS);
+			{
+				iLA = pPanel[p].m_iLA;
+				iLB = pPanel[p].m_iLB;
+				iTA = pPanel[p].m_iTA;
+				iTB = pPanel[p].m_iTB;
+
+				glVertex3d(pNode[iLA].x, pNode[iLA].y, pNode[iLA].z);
+				glVertex3d(pNode[iTA].x, pNode[iTA].y, pNode[iTA].z);
+				glVertex3d(pNode[iTB].x, pNode[iTB].y, pNode[iTB].z);
+				glVertex3d(pNode[iLB].x, pNode[iLB].y, pNode[iLB].z);
+				glNormal3d(pPanel[p].Normal.x, pPanel[p].Normal.y, pPanel[p].Normal.z);
+			}
+			glEnd();
+		}
+
+		glDisable(GL_POLYGON_OFFSET_FILL);
+		glDisable(GL_DEPTH_TEST);
+	}
+	glEndList();
 }
 
 
 void GLCreateCtrlPts(int nPanels, Panel *pPanel)
 {
 	if(!pPanel || !nPanels)
-    {
-        glNewList(VLMCTRLPTS, GL_COMPILE);
-        glEndList();
-        return;
-    }
+	{
+		glNewList(VLMCTRLPTS, GL_COMPILE);
+		glEndList();
+		return;
+	}
 
 	glNewList(VLMCTRLPTS,GL_COMPILE);
 	{
@@ -1215,8 +1215,8 @@ void GLCreateCtrlPts(int nPanels, Panel *pPanel)
 			{
 				glVertex3d(pPanel[p].CtrlPt.x, pPanel[p].CtrlPt.y, pPanel[p].CtrlPt.z);
 				glVertex3d((pPanel[p].CtrlPt.x + pPanel[p].Normal.x * 0.04),
-						   (pPanel[p].CtrlPt.y + pPanel[p].Normal.y * 0.04),
-						   (pPanel[p].CtrlPt.z + pPanel[p].Normal.z * 0.04));
+				(pPanel[p].CtrlPt.y + pPanel[p].Normal.y * 0.04),
+				(pPanel[p].CtrlPt.z + pPanel[p].Normal.z * 0.04));
 
 			}
 			glEnd();
@@ -1229,11 +1229,11 @@ void GLCreateCtrlPts(int nPanels, Panel *pPanel)
 void GLCreateVortices(int nPanels, Panel *pPanel, CVector *pNode, WPolar *pWPolar)
 {
 	if(!pNode || !pPanel || !nPanels)
-    {
-        glNewList(VLMVORTICES, GL_COMPILE);
-        glEndList();
-        return;
-    }
+	{
+		glNewList(VLMVORTICES, GL_COMPILE);
+		glEndList();
+		return;
+	}
 
 	int p;
 	CVector A, B, C, D, AC, BD;
@@ -1272,11 +1272,11 @@ void GLCreateVortices(int nPanels, Panel *pPanel, CVector *pNode, WPolar *pWPola
 				B = pPanel[p].VB;
 				// we define point AA=A+1 and BB=B+1
 				C.x =  pNode[pPanel[p].m_iTB].x
-					+ (pNode[pPanel[p].m_iTB].x-pPanel[p].VB.x)/3.0;
+				+ (pNode[pPanel[p].m_iTB].x-pPanel[p].VB.x)/3.0;
 				C.y =  pNode[pPanel[p].m_iTB].y;
 				C.z =  pNode[pPanel[p].m_iTB].z;
 				D.x =  pNode[pPanel[p].m_iTA].x
-					+ (pNode[pPanel[p].m_iTA].x-pPanel[p].VA.x)/3.0;
+				+ (pNode[pPanel[p].m_iTA].x-pPanel[p].VA.x)/3.0;
 				D.y =  pNode[pPanel[p].m_iTA].y;
 				D.z =  pNode[pPanel[p].m_iTA].z;
 			}
@@ -1337,9 +1337,9 @@ void GLCreateVortices(int nPanels, Panel *pPanel, CVector *pNode, WPolar *pWPola
 void GLCreateLiftForce(WPolar *pWPolar, PlaneOpp *pPOpp)
 {
 	if(!pWPolar || !pPOpp) return;
-    int style;
+	int style;
 
-    double forcez,forcex,glx, gly, glz;
+	double forcez,forcex,glx, gly, glz;
 	double sign;
 
 	glNewList(LIFTFORCE, GL_COMPILE);
@@ -1347,21 +1347,21 @@ void GLCreateLiftForce(WPolar *pWPolar, PlaneOpp *pPOpp)
 		QMiarex::s_GLList++;
 		glEnable (GL_LINE_STIPPLE);
 
-        style = W3dPrefsDlg::s_XCPStyle;
+		style = W3dPrefsDlg::s_XCPStyle;
 		if     (style == 1) 	glLineStipple (1, 0xCFCF);
 		else if(style == 2) 	glLineStipple (1, 0x6666);
 		else if(style == 3) 	glLineStipple (1, 0xFF18);
 		else if(style == 4) 	glLineStipple (1, 0x7E66);
 		else					glLineStipple (1, 0xFFFF);
 
-        glColor3d(W3dPrefsDlg::s_XCPColor.redF(),W3dPrefsDlg::s_XCPColor.greenF(),W3dPrefsDlg::s_XCPColor.blueF());
+		glColor3d(W3dPrefsDlg::s_XCPColor.redF(),W3dPrefsDlg::s_XCPColor.greenF(),W3dPrefsDlg::s_XCPColor.blueF());
 
 		//Resulting force vector
-        glLineWidth((GLfloat)(W3dPrefsDlg::s_XCPWidth * 2.0));
+		glLineWidth((GLfloat)(W3dPrefsDlg::s_XCPWidth * 2.0));
 
 		double force = 0.5*pWPolar->m_Density * pWPolar->m_WArea
-						  *pPOpp->m_QInf*pPOpp->m_QInf
-						  *pPOpp->m_CL;
+		*pPOpp->m_QInf*pPOpp->m_QInf
+		*pPOpp->m_CL;
 
 		force *= QMiarex::s_LiftScale/500.0;
 
@@ -1377,20 +1377,20 @@ void GLCreateLiftForce(WPolar *pWPolar, PlaneOpp *pPOpp)
 		glz = (GLfloat)pPOpp->m_CP.z;
 
 		glBegin(GL_LINES);
-            glVertex3d(glx,gly,glz);
-            glVertex3d(glx+forcex,gly,glz+forcez);
+		glVertex3d(glx,gly,glz);
+		glVertex3d(glx+forcex,gly,glz+forcez);
 
 		glEnd();
 
 		glBegin(GL_LINES);
-            glVertex3d(glx+forcex, gly, glz+forcez);
-            glVertex3d(glx+forcex+0.008, gly+0.008, glz+forcez-0.012*sign);
-        glEnd();
+		glVertex3d(glx+forcex, gly, glz+forcez);
+		glVertex3d(glx+forcex+0.008, gly+0.008, glz+forcez-0.012*sign);
+		glEnd();
 
 		glBegin(GL_LINES);
-            glVertex3d(glx+forcex, gly, glz+forcez);
-            glVertex3d(glx+forcex-0.008, gly-0.008, glz+forcez-0.012*sign);
-        glEnd();
+		glVertex3d(glx+forcex, gly, glz+forcez);
+		glVertex3d(glx+forcex-0.008, gly-0.008, glz+forcez-0.012*sign);
+		glEnd();
 
 		glDisable (GL_LINE_STIPPLE);
 
@@ -1423,9 +1423,9 @@ void GLCreateMoments(Wing *pWing, WPolar *pWPolar, PlaneOpp *pPOpp)
 		QMiarex::s_GLList++;
 		glEnable (GL_LINE_STIPPLE);
 
-        color = W3dPrefsDlg::s_MomentColor;
-        style = W3dPrefsDlg::s_MomentStyle;
-        width = W3dPrefsDlg::s_MomentWidth;
+		color = W3dPrefsDlg::s_MomentColor;
+		style = W3dPrefsDlg::s_MomentStyle;
+		width = W3dPrefsDlg::s_MomentWidth;
 
 		if     (style == 1) 	glLineStipple (1, 0xCFCF);
 		else if(style == 2) 	glLineStipple (1, 0x6666);

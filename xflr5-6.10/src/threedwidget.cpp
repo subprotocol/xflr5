@@ -65,7 +65,7 @@ void ThreeDWidget::contextMenuEvent (QContextMenuEvent * event)
 		QMiarex *pMiarex = (QMiarex *)s_pMiarex;
 		if (pMiarex->m_iView==W3DVIEW)
 		{
-			if(pMiarex->m_pCurWPolar->polarType()==STABILITYPOLAR)
+			if(pMiarex->m_pCurWPolar && pMiarex->m_pCurWPolar->polarType()==STABILITYPOLAR)
 				pMainFrame->W3DStabCtxMenu->exec(ScreenPt);
 			else pMainFrame->W3DCtxMenu->exec(ScreenPt);
 		}

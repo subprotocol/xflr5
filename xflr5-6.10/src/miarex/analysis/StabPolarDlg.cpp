@@ -44,6 +44,7 @@ StabPolarDlg::StabPolarDlg(QWidget *pParent) : QDialog(pParent)
 	setWindowTitle(tr("Stability Polar Definition"));
 
 	m_bAutoName = true;
+	m_UnitType   = 1;
 
 	m_pWingList[0]  = NULL;
 	m_pWingList[1] = NULL;
@@ -65,7 +66,6 @@ StabPolarDlg::StabPolarDlg(QWidget *pParent) : QDialog(pParent)
 	memset(s_StabPolar.m_bActiveControl, 0, sizeof(s_StabPolar.m_bActiveControl));
 
 	s_StabPolar.m_RefAreaType = 1;
-	m_UnitType    = 1;
 
 	s_StabPolar.m_Density    = 1.225;
 	s_StabPolar.m_Viscosity  = 1.5e-5;
@@ -848,12 +848,12 @@ void StabPolarDlg::SetupLayout()
 	m_pctrlControlTable->setSelectionBehavior(QAbstractItemView::SelectRows);
 	m_pctrlControlTable->horizontalHeader()->setStretchLastSection(true);
 	
-	m_pControlModel = new QStandardItemModel;
+	m_pControlModel = new QStandardItemModel(this);
 	m_pControlModel->setRowCount(10);//temporary
 	m_pControlModel->setColumnCount(4);//temporary
 	m_pctrlControlTable->setModel(m_pControlModel);
 
-	m_pCtrlDelegate = new CtrlTableDelegate;
+	m_pCtrlDelegate = new CtrlTableDelegate(this);
 	m_pctrlControlTable->setItemDelegate(m_pCtrlDelegate);
 	m_pCtrlDelegate->m_pCtrlModel = m_pControlModel;
 	connect(m_pCtrlDelegate,  SIGNAL(closeEditor(QWidget *)), this, SLOT(OnCellChanged(QWidget *)));

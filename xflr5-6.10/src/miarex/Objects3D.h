@@ -35,10 +35,8 @@ class Objects3D
 {
 public:
 	Objects3D();
-	~Objects3D();
 
-
-	static bool      Allocate(int &memsize);
+	static bool      AllocatePanelArrays(int &memsize);
 	static void      addBody(Body *pBody);
 	static void      addPlane(Plane *pPlane);
 	static void      addWPolar(WPolar *pWPolar);
@@ -63,7 +61,7 @@ public:
 	static void      JoinSurfaces(WPolar*pWPolar, Surface *pLeftSurf, Surface *pRightSurf, int pl, int pr);
 	static void      rotateGeomY(Panel *pPanel, CVector *pNode, Panel *pWakePanel, CVector *pWakeNode, int nPanels, int nWakePanels, int nNodes, int nWakeNodes, int NWakeColumn, double const &Alpha, CVector const &P, int NXWakePanels);
 	static void      rotateGeomZ(Panel *pPanel, CVector *pNode, Panel *pWakePanel, CVector *pWakeNode, int nPanels, int nWakePanels, int nNodes, int nWakeNodes, int NWakeColumn, double const &Beta, CVector const &P, int NXWakePanels);
-	static void      Release();
+	static void      ReleasePanelMemory();
 	static void      renamePlane(QString PlaneName);
 	static Plane *   setModPlane(Plane *pModPlane);
 	static WPolar *  insertNewWPolar(WPolar *pModWPolar, Plane *pCurPlane);
@@ -96,8 +94,8 @@ public:
 	static QList<Surface *> s_SurfaceList;	    /**< An array holding the pointers to the wings Surface objects */
 
 
-	static int s_MaxMatSize;                  /**< the maximum matrix size consistent <ith the current memory allocation */
-	static int s_MaxRHSSize;                  /**< the maximum RHS size consistent <ith the current memory allocation */
+	static int s_MaxPanelSize;                  /**< the maximum matrix size consistent <ith the current memory allocation */
+//	static int s_MaxRHSSize;                  /**< the maximum RHS size consistent <ith the current memory allocation */
 
 	static int s_MatSize;                     /**< the matrix size, wich is also the size of the panel array */
 	static int s_WakeSize;                    /**< the size of the wake matrix, if a wake is included in the analysis */

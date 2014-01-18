@@ -798,17 +798,18 @@ void QGraph::LoadSettings(QSettings *pSettings)
 		SetLabelColor(clr);
 
 		lgft = QFont(pSettings->value("TitleFontName","Comic Sans MS").toString());
-		lgft.setPointSize(pSettings->value("TitleFontSize",8).toInt());
+		int size = pSettings->value("TitleFontSize",8).toInt();
+		if(size>0) lgft.setPointSize(size);
 		lgft.setItalic(pSettings->value("TitleFontItalic", false).toBool());
 		lgft.setBold(pSettings->value("TitleFontBold", false).toBool());
 		SetTitleFont(lgft);
 
 		lgft = QFont(pSettings->value("LabelFontName","Comic Sans MS").toString());
-		lgft.setPointSize(pSettings->value("LabelFontSize",8).toInt());
+		size = pSettings->value("LabelFontSize",8).toInt();
+		if(size>0) lgft.setPointSize(size);
 		lgft.setItalic(pSettings->value("LabelFontItalic", false).toBool());
 		lgft.setBold(pSettings->value("LabelFontBold", false).toBool());
 		SetLabelFont(lgft);
-
 
 		clr  = pSettings->value("XMajGridColor", QColor(90,90,90)).value<QColor>();
 		bs = pSettings->value("XMajGridShow",true).toBool();

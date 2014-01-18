@@ -53,6 +53,7 @@ class XFoilAnalysisDlg : public QDialog
 
 public:
 	XFoilAnalysisDlg(QWidget *pParent=NULL);
+	~XFoilAnalysisDlg();
 
 	void InitDialog();
 

@@ -41,6 +41,8 @@ void *StabViewDlg::s_pMiarex;
 
 StabViewDlg::StabViewDlg(QWidget *parent) : QWidget(parent)
 {
+	setAttribute(Qt::WA_DeleteOnClose);
+
 	setWindowTitle(tr("Stability View Params"));
 	setWindowFlags(Qt::Tool);
 	m_iCurrentMode = 0;
@@ -58,6 +60,7 @@ StabViewDlg::StabViewDlg(QWidget *parent) : QWidget(parent)
 
 StabViewDlg::~StabViewDlg()
 {
+	qDebug("Destroying StabviewDlg");
 	delete [] m_precision;
 }
 
@@ -67,37 +70,37 @@ void StabViewDlg::Connect()
 	QMiarex * pMiarex = (QMiarex*)s_pMiarex;
 
 	connect(m_pctrlLongDynamics, SIGNAL(clicked()), pMiarex, SLOT(OnStabilityDirection()));
-	connect(m_pctrlLatDynamics, SIGNAL(clicked()), pMiarex, SLOT(OnStabilityDirection()));
+	connect(m_pctrlLatDynamics,  SIGNAL(clicked()), pMiarex, SLOT(OnStabilityDirection()));
 
 	connect(m_pctrlPlotStabGraph, SIGNAL(clicked()), this , SLOT(OnPlotStabilityGraph()));
 
-	connect(m_pctrlRLMode1, SIGNAL(clicked()), this, SLOT(OnModeSelection()));
-	connect(m_pctrlRLMode2, SIGNAL(clicked()), this, SLOT(OnModeSelection()));
-	connect(m_pctrlRLMode3, SIGNAL(clicked()), this, SLOT(OnModeSelection()));
-	connect(m_pctrlRLMode4, SIGNAL(clicked()), this, SLOT(OnModeSelection()));
+	connect(m_pctrlRLMode1,   SIGNAL(clicked()), this, SLOT(OnModeSelection()));
+	connect(m_pctrlRLMode2,   SIGNAL(clicked()), this, SLOT(OnModeSelection()));
+	connect(m_pctrlRLMode3,   SIGNAL(clicked()), this, SLOT(OnModeSelection()));
+	connect(m_pctrlRLMode4,   SIGNAL(clicked()), this, SLOT(OnModeSelection()));
 	connect(m_pctrlTimeMode1, SIGNAL(clicked()), this, SLOT(OnModeSelection()));
 	connect(m_pctrlTimeMode2, SIGNAL(clicked()), this, SLOT(OnModeSelection()));
 	connect(m_pctrlTimeMode3, SIGNAL(clicked()), this, SLOT(OnModeSelection()));
 	connect(m_pctrlTimeMode4, SIGNAL(clicked()), this, SLOT(OnModeSelection()));
 	
-	connect(m_pctrlAnimate ,SIGNAL(clicked()), this, SLOT(OnAnimate()));
-	connect(m_pctrlAnimationSpeed ,SIGNAL(valueChanged(int)), this, SLOT(OnAnimationSpeed(int)));
-	connect(m_pctrlAnimationAmplitude ,SIGNAL(valueChanged(int)), this, SLOT(OnAnimationAmplitude(int)));
-	connect(m_pctrlAnimateRestart ,SIGNAL(clicked()), this, SLOT(OnAnimateRestart()));
-	connect(m_pctrlDeltat, SIGNAL(editingFinished()), this, SLOT(OnReadData()));
-	connect(m_pctrlModeStep, SIGNAL(editingFinished()), this, SLOT(OnReadData()));
+	connect(m_pctrlAnimate,            SIGNAL(clicked()),         this, SLOT(OnAnimate()));
+	connect(m_pctrlAnimationSpeed ,    SIGNAL(valueChanged(int)), this, SLOT(OnAnimationSpeed(int)));
+	connect(m_pctrlAnimationAmplitude, SIGNAL(valueChanged(int)), this, SLOT(OnAnimationAmplitude(int)));
+	connect(m_pctrlAnimateRestart,     SIGNAL(clicked()),         this, SLOT(OnAnimateRestart()));
+	connect(m_pctrlDeltat,             SIGNAL(editingFinished()), this, SLOT(OnReadData()));
+	connect(m_pctrlModeStep,           SIGNAL(editingFinished()), this, SLOT(OnReadData()));
 //	connect(m_pCtrlDelegate, SIGNAL(closeEditor(QWidget *)), this, SLOT(OnCellChanged(QWidget *)));
 
 	connect(m_pctrlInitCondResponse, SIGNAL(clicked()), this, SLOT(OnResponseType()));
-	connect(m_pctrlForcedResponse, SIGNAL(clicked()), this, SLOT(OnResponseType()));
-	connect(m_pctrlModalResponse, SIGNAL(clicked()), this, SLOT(OnResponseType()));
+	connect(m_pctrlForcedResponse,   SIGNAL(clicked()), this, SLOT(OnResponseType()));
+	connect(m_pctrlModalResponse,    SIGNAL(clicked()), this, SLOT(OnResponseType()));
 	
-	connect(m_pctrlAddCurve, SIGNAL(clicked()), this, SLOT(OnAddCurve()));
-	connect(m_pctrlDeleteCurve, SIGNAL(clicked()), this, SLOT(OnDeleteCurve()));
-	connect(m_pctrlRenameCurve, SIGNAL(clicked()), this, SLOT(OnRenameCurve()));
+	connect(m_pctrlAddCurve,    SIGNAL(clicked()),      this, SLOT(OnAddCurve()));
+	connect(m_pctrlDeleteCurve, SIGNAL(clicked()),      this, SLOT(OnDeleteCurve()));
+	connect(m_pctrlRenameCurve, SIGNAL(clicked()),      this, SLOT(OnRenameCurve()));
 	connect(m_pctrlCurveList,   SIGNAL(activated(int)), this, SLOT(OnSelChangeCurve(int)));
 	
-	m_pControlModel = new QStandardItemModel;
+	m_pControlModel = new QStandardItemModel(this);
 	m_pControlModel->setRowCount(20);//temporary
 	m_pControlModel->setColumnCount(2);
 	m_pControlModel->setHeaderData(0, Qt::Horizontal, tr("Time (s)"));
@@ -544,25 +547,25 @@ void StabViewDlg::SetupLayout()
 	QFont SymbolFont("Symbol");
 
 	//____________Stability direction__________
-	QGroupBox *StabilityDirBox = new QGroupBox(tr("Stability direction"));
+	QGroupBox *pStabilityDirBox = new QGroupBox(tr("Stability direction"));
 	{
 		m_pctrlLongDynamics = new QRadioButton(tr("Longitudinal"));
 		m_pctrlLatDynamics = new QRadioButton(tr("Lateral"));
-		QHBoxLayout *StabilityDirLayout = new QHBoxLayout;
+		QHBoxLayout *pStabilityDirLayout = new QHBoxLayout;
 		{
-			StabilityDirLayout->addStretch(1);
-			StabilityDirLayout->addWidget(m_pctrlLongDynamics);
-			StabilityDirLayout->addStretch(1);
-			StabilityDirLayout->addWidget(m_pctrlLatDynamics);
-			StabilityDirLayout->addStretch(1);
+			pStabilityDirLayout->addStretch(1);
+			pStabilityDirLayout->addWidget(m_pctrlLongDynamics);
+			pStabilityDirLayout->addStretch(1);
+			pStabilityDirLayout->addWidget(m_pctrlLatDynamics);
+			pStabilityDirLayout->addStretch(1);
 		}
-		StabilityDirBox->setLayout(StabilityDirLayout);
+		pStabilityDirBox->setLayout(pStabilityDirLayout);
 	}
 
 	//_______________________Time view Parameters
 	QGroupBox *TimeBox = new QGroupBox(tr("Time Graph Params"));
 	{
-		QVBoxLayout *ResponseTypeLayout = new QVBoxLayout;
+		QVBoxLayout *pResponseTypeLayout = new QVBoxLayout;
 		{
 			m_pctrlModalResponse = new QRadioButton(tr("Modal Response"));
 			m_pctrlModalResponse->setToolTip("Display the time response on a specific mode with normalized amplitude and random initial phase");
@@ -570,13 +573,13 @@ void StabViewDlg::SetupLayout()
 			m_pctrlInitCondResponse->setToolTip("Display the time response for specific initial conditions");
 			m_pctrlForcedResponse = new QRadioButton(tr("Forced Response"));
 			m_pctrlForcedResponse->setToolTip("Display the time response for a given control actuation in the form of a user-specified function of time");
-			ResponseTypeLayout->addWidget(m_pctrlInitCondResponse);
-			ResponseTypeLayout->addWidget(m_pctrlForcedResponse);
-			ResponseTypeLayout->addWidget(m_pctrlModalResponse);
+			pResponseTypeLayout->addWidget(m_pctrlInitCondResponse);
+			pResponseTypeLayout->addWidget(m_pctrlForcedResponse);
+			pResponseTypeLayout->addWidget(m_pctrlModalResponse);
 		}
 
 
-		QGroupBox *InitCondResponse = new QGroupBox(tr("Initial conditions"));
+		QGroupBox *pInitCondResponse = new QGroupBox(tr("Initial conditions"));
 		{
 			m_pctrlStabLabel1 = new QLabel("u0__");
 			m_pctrlStabLabel2 = new QLabel("w0__");
@@ -606,12 +609,12 @@ void StabViewDlg::SetupLayout()
 			QVBoxLayout *InitCondResponseLayout = new QVBoxLayout;
 			InitCondResponseLayout ->addLayout(VarParams);
 			InitCondResponseLayout->addStretch(1);
-			InitCondResponse->setLayout(InitCondResponseLayout);
+			pInitCondResponse->setLayout(InitCondResponseLayout);
 		}
 
-		QGroupBox *ForcedResponseBox = new QGroupBox(tr("Forced Response"));
+		QGroupBox *pForcedResponseBox = new QGroupBox(tr("Forced Response"));
 		{
-			QVBoxLayout *ForcedResponse = new QVBoxLayout;
+			QVBoxLayout *pForcedResponseLayout = new QVBoxLayout;
 			QLabel *ForcedText = new QLabel(tr("Control function"));
 			m_pctrlControlTable = new QTableView(this);
 			m_pctrlControlTable->setFont(Settings::s_TableFont);
@@ -620,7 +623,7 @@ void StabViewDlg::SetupLayout()
 			m_pctrlControlTable->setMinimumHeight(150);
 			m_pctrlControlTable->setSelectionMode(QAbstractItemView::SingleSelection);
 			m_pctrlControlTable->setSelectionBehavior(QAbstractItemView::SelectRows);
-			m_pCtrlDelegate = new FloatEditDelegate;
+			m_pCtrlDelegate = new FloatEditDelegate(this);
 			m_precision = new int[3];
 			m_precision[0]  = 3;
 			m_precision[1]  = 3;
@@ -630,55 +633,55 @@ void StabViewDlg::SetupLayout()
 			m_pctrlControlTable->setItemDelegate(m_pCtrlDelegate);
 //			m_pCtrlDelegate->m_pCtrlModel = m_pControlModel;
 
-			ForcedResponse->addWidget(ForcedText);
-			ForcedResponse->addWidget(m_pctrlControlTable);
-			ForcedResponse->addStretch(1);
-			ForcedResponseBox->setLayout(ForcedResponse);
+			pForcedResponseLayout->addWidget(ForcedText);
+			pForcedResponseLayout->addWidget(m_pctrlControlTable);
+			pForcedResponseLayout->addStretch(1);
+			pForcedResponseBox->setLayout(pForcedResponseLayout);
 		}
 
-		QGroupBox *ModalTimeBox = new QGroupBox(tr("Modal response"));
+		QGroupBox *pModalTimeBox = new QGroupBox(tr("Modal response"));
 		{
-			QVBoxLayout *ModalTimeLayout = new QVBoxLayout;
+			QVBoxLayout *pModalTimeLayout = new QVBoxLayout;
 			m_pctrlTimeMode1 = new QRadioButton("Mode 1");
 			m_pctrlTimeMode2 = new QRadioButton("Mode 2");
 			m_pctrlTimeMode3 = new QRadioButton("Mode 3");
 			m_pctrlTimeMode4 = new QRadioButton("Mode 4");
 			m_pctrlModeProperties = new QLabel("Mode Properties");
-			ModalTimeLayout->addWidget(m_pctrlTimeMode1);
-			ModalTimeLayout->addWidget(m_pctrlTimeMode2);
-			ModalTimeLayout->addWidget(m_pctrlTimeMode3);
-			ModalTimeLayout->addWidget(m_pctrlTimeMode4);
-			ModalTimeLayout->addStretch(1);
-			ModalTimeLayout->addWidget(m_pctrlModeProperties);
-			ModalTimeBox->setLayout(ModalTimeLayout);
+			pModalTimeLayout->addWidget(m_pctrlTimeMode1);
+			pModalTimeLayout->addWidget(m_pctrlTimeMode2);
+			pModalTimeLayout->addWidget(m_pctrlTimeMode3);
+			pModalTimeLayout->addWidget(m_pctrlTimeMode4);
+			pModalTimeLayout->addStretch(1);
+			pModalTimeLayout->addWidget(m_pctrlModeProperties);
+			pModalTimeBox->setLayout(pModalTimeLayout);
 		}
 
 		m_pctrlInitialConditionsWidget = new QStackedWidget;
-		m_pctrlInitialConditionsWidget->addWidget(InitCondResponse);
-		m_pctrlInitialConditionsWidget->addWidget(ForcedResponseBox);
-		m_pctrlInitialConditionsWidget->addWidget(ModalTimeBox);
+		m_pctrlInitialConditionsWidget->addWidget(pInitCondResponse);
+		m_pctrlInitialConditionsWidget->addWidget(pForcedResponseBox);
+		m_pctrlInitialConditionsWidget->addWidget(pModalTimeBox);
 		m_pctrlInitialConditionsWidget->setCurrentIndex(0);
 
-        m_pctrlTotalTime = new DoubleEdit(5,3);
+		m_pctrlTotalTime = new DoubleEdit(5,3);
 		m_pctrlTotalTime->setToolTip(tr("Define the total time range for the graphs"));
-        m_pctrlDeltat    = new DoubleEdit(.01,3);
+		m_pctrlDeltat    = new DoubleEdit(.01,3);
 		m_pctrlDeltat->setToolTip(tr("Define the time step for the resolution of the differential equations"));
 
-		QGridLayout *DtLayout  = new QGridLayout;
+		QGridLayout *pDtLayout  = new QGridLayout;
 		{
 			QLabel *DtLabel        = new QLabel("dt=");
 			QLabel *TotalTimeLabel = new QLabel(tr("Total Time")+"=");
 			QLabel *TimeLab1       = new QLabel("s");
 			QLabel *TimeLab2       = new QLabel("s");
-			DtLayout->addWidget(DtLabel,1,1);
-			DtLayout->addWidget(m_pctrlDeltat,1,2);
-			DtLayout->addWidget(TimeLab1,1,3);
-			DtLayout->addWidget(TotalTimeLabel,2,1);
-			DtLayout->addWidget(m_pctrlTotalTime,2,2);
-			DtLayout->addWidget(TimeLab2,2,3);
+			pDtLayout->addWidget(DtLabel,1,1);
+			pDtLayout->addWidget(m_pctrlDeltat,1,2);
+			pDtLayout->addWidget(TimeLab1,1,3);
+			pDtLayout->addWidget(TotalTimeLabel,2,1);
+			pDtLayout->addWidget(m_pctrlTotalTime,2,2);
+			pDtLayout->addWidget(TimeLab2,2,3);
 		}
 
-		QGridLayout *CurveLayout = new QGridLayout;
+		QGridLayout *pCurveLayout = new QGridLayout;
 		{
 			m_pctrlPlotStabGraph = new QPushButton(tr("Recalc."));
 			m_pctrlPlotStabGraph->setToolTip(tr("Re-calculate the currently selected curve with the user-specified input data"));
@@ -689,55 +692,60 @@ void StabViewDlg::SetupLayout()
 			m_pctrlDeleteCurve  = new QPushButton(tr("Delete"));
 			m_pctrlDeleteCurve->setToolTip(tr("Delete the currently selected curve"));
 			m_pctrlCurveList = new QComboBox();
-			CurveLayout->addWidget(m_pctrlAddCurve,1,1);
-			CurveLayout->addWidget(m_pctrlPlotStabGraph,1,2);
-			CurveLayout->addWidget(m_pctrlRenameCurve,2,1);
-			CurveLayout->addWidget(m_pctrlDeleteCurve,2,2);
+			pCurveLayout->addWidget(m_pctrlAddCurve,1,1);
+			pCurveLayout->addWidget(m_pctrlPlotStabGraph,1,2);
+			pCurveLayout->addWidget(m_pctrlRenameCurve,2,1);
+			pCurveLayout->addWidget(m_pctrlDeleteCurve,2,2);
 		}
 
-		QVBoxLayout *TimeLayout = new QVBoxLayout;
+		QGroupBox *pCurveSettingsBox = new QGroupBox(tr("Curve Settings"));
 		{
-			TimeLayout->addLayout(DtLayout);
-			TimeLayout->addWidget(m_pctrlCurveList);
-			TimeLayout->addLayout(CurveLayout);
+			QVBoxLayout *pTimeLayout = new QVBoxLayout;
+			{
+				pTimeLayout->addLayout(pDtLayout);
+				pTimeLayout->addWidget(m_pctrlCurveList);
+				pTimeLayout->addLayout(pCurveLayout);
+			}
+			pCurveSettingsBox->setLayout(pTimeLayout);
 		}
 
-		QGroupBox *CurveSettings = new QGroupBox(tr("Curve Settings"));
-		CurveSettings->setLayout(TimeLayout);
 
-
-		QVBoxLayout	 *TimeParamsLayout = new QVBoxLayout;
+		QVBoxLayout *pTimeParamsLayout = new QVBoxLayout;
 		{
 		//	TimeParamsLayout->addLayout(InitialConditionsLayout);
-			TimeParamsLayout->addLayout(ResponseTypeLayout);
-			TimeParamsLayout->addWidget(m_pctrlInitialConditionsWidget);
-			TimeParamsLayout->addWidget(CurveSettings);
-			TimeParamsLayout->addStretch(5);
+			pTimeParamsLayout->addLayout(pResponseTypeLayout);
+			pTimeParamsLayout->addWidget(m_pctrlInitialConditionsWidget);
+			pTimeParamsLayout->addWidget(pCurveSettingsBox);
+			pTimeParamsLayout->addStretch(5);
 		}
-		TimeBox->setLayout(TimeParamsLayout);
+		TimeBox->setLayout(pTimeParamsLayout);
 	}
 
 	//_______________________Root Locus View and 3D animation Parameters
-	QGroupBox *ModeBox = new QGroupBox(tr("Operating point modes"));
+	QGroupBox *pModeBox = new QGroupBox(tr("Operating point modes"));
 	{
-		QHBoxLayout *RLModeLayout = new QHBoxLayout;
+		QGroupBox *pRLModeBox = new QGroupBox(tr("Mode Selection"));
 		{
-			m_pctrlRLMode1 = new QRadioButton("1");
-			m_pctrlRLMode2 = new QRadioButton("2");
-			m_pctrlRLMode3 = new QRadioButton("3");
-			m_pctrlRLMode4 = new QRadioButton("4");
-			m_pctrlRLMode1->setToolTip(tr("Press Ctrl+H to highlight the mode on the root locus plot"));
-			m_pctrlRLMode2->setToolTip(tr("Press Ctrl+H to highlight the mode on the root locus plot"));
-			m_pctrlRLMode3->setToolTip(tr("Press Ctrl+H to highlight the mode on the root locus plot"));
-			m_pctrlRLMode4->setToolTip(tr("Press Ctrl+H to highlight the mode on the root locus plot"));
-			RLModeLayout->addWidget(m_pctrlRLMode1);
-			RLModeLayout->addWidget(m_pctrlRLMode2);
-			RLModeLayout->addWidget(m_pctrlRLMode3);
-			RLModeLayout->addWidget(m_pctrlRLMode4);
+			QHBoxLayout *pRLModeLayout = new QHBoxLayout;
+			{
+				m_pctrlRLMode1 = new QRadioButton("1");
+				m_pctrlRLMode2 = new QRadioButton("2");
+				m_pctrlRLMode3 = new QRadioButton("3");
+				m_pctrlRLMode4 = new QRadioButton("4");
+				m_pctrlRLMode1->setToolTip(tr("Press Ctrl+H to highlight the mode on the root locus plot"));
+				m_pctrlRLMode2->setToolTip(tr("Press Ctrl+H to highlight the mode on the root locus plot"));
+				m_pctrlRLMode3->setToolTip(tr("Press Ctrl+H to highlight the mode on the root locus plot"));
+				m_pctrlRLMode4->setToolTip(tr("Press Ctrl+H to highlight the mode on the root locus plot"));
+				pRLModeLayout->addWidget(m_pctrlRLMode1);
+				pRLModeLayout->addWidget(m_pctrlRLMode2);
+				pRLModeLayout->addWidget(m_pctrlRLMode3);
+				pRLModeLayout->addWidget(m_pctrlRLMode4);
+			}
+			pRLModeBox->setLayout(pRLModeLayout);
 		}
 
 		//_____________Mode properties _________
-		QGroupBox *FreakBox = new QGroupBox(tr("Mode properties"));
+		QGroupBox *pFreakBox = new QGroupBox(tr("Mode properties"));
 		{
 			QLabel *FreqNLab = new QLabel("F =");
 			QLabel *Freq1Lab = new QLabel(tr("F1 ="));
@@ -747,33 +755,33 @@ void StabViewDlg::SetupLayout()
 			DsiLab->setAlignment(Qt::AlignVCenter | Qt::AlignRight);
 			DsiLab->setFont(SymbolFont);
 
-            m_pctrlFreqN  = new DoubleEdit(0.0,3);
-            m_pctrlFreq1  = new DoubleEdit(0.0,3);
-            m_pctrlDsi    = new DoubleEdit(0.0,3);
+			m_pctrlFreqN  = new DoubleEdit(0.0,3);
+			m_pctrlFreq1  = new DoubleEdit(0.0,3);
+			m_pctrlDsi    = new DoubleEdit(0.0,3);
 			m_pctrlFreqN->setEnabled(false);
 			m_pctrlFreq1->setEnabled(false);
 			m_pctrlDsi->setEnabled(false);
 			QLabel *FreqUnit1 = new QLabel("Hz");
 			QLabel *FreqUnit2 = new QLabel("Hz");
-			QGridLayout *FreakLayout = new QGridLayout;
+			QGridLayout *pFreakLayout = new QGridLayout;
 			{
-				FreakLayout->addWidget(FreqNLab,1,1);
-				FreakLayout->addWidget(Freq1Lab,2,1);
-				FreakLayout->addWidget(DsiLab,3,1);
-				FreakLayout->addWidget(m_pctrlFreqN,1,2);
-				FreakLayout->addWidget(m_pctrlFreq1,2,2);
-				FreakLayout->addWidget(m_pctrlDsi,3,2);
-				FreakLayout->addWidget(FreqUnit1,1,3);
-				FreakLayout->addWidget(FreqUnit2,2,3);
+				pFreakLayout->addWidget(FreqNLab,1,1);
+				pFreakLayout->addWidget(Freq1Lab,2,1);
+				pFreakLayout->addWidget(DsiLab,3,1);
+				pFreakLayout->addWidget(m_pctrlFreqN,1,2);
+				pFreakLayout->addWidget(m_pctrlFreq1,2,2);
+				pFreakLayout->addWidget(m_pctrlDsi,3,2);
+				pFreakLayout->addWidget(FreqUnit1,1,3);
+				pFreakLayout->addWidget(FreqUnit2,2,3);
 
-				FreakBox->setLayout(FreakLayout);
+				pFreakBox->setLayout(pFreakLayout);
 			}
 		}
 
 		//_____________Eigenvalue data box________________________
-		QGroupBox *EigenBox = new QGroupBox(tr("Eigenvalues"));
+		QGroupBox *pEigenBox = new QGroupBox(tr("Eigenvalues"));
 		{
-			QGridLayout *EigenLayout = new QGridLayout;
+			QGridLayout *pEigenLayout = new QGridLayout;
 			{
 				QLabel *LabValue = new QLabel("l=");
 				QFont SymbolFont("Symbol");
@@ -782,11 +790,11 @@ void StabViewDlg::SetupLayout()
 				QLabel *LabVect2 = new QLabel("v2=");
 				QLabel *LabVect3 = new QLabel("v3=");
 				QLabel *LabVect4 = new QLabel("v4=");
-				EigenLayout->addWidget(LabValue,1,1);
-				EigenLayout->addWidget(LabVect1,2,1);
-				EigenLayout->addWidget(LabVect2,3,1);
-				EigenLayout->addWidget(LabVect3,4,1);
-				EigenLayout->addWidget(LabVect4,5,1);
+				pEigenLayout->addWidget(LabValue,1,1);
+				pEigenLayout->addWidget(LabVect1,2,1);
+				pEigenLayout->addWidget(LabVect2,3,1);
+				pEigenLayout->addWidget(LabVect3,4,1);
+				pEigenLayout->addWidget(LabVect4,5,1);
 				m_pctrlEigenValue = new QLineEdit("2+4i");
 				m_pctrlEigenVector1 = new QLineEdit("3-7i");
 				m_pctrlEigenVector2 = new QLineEdit("4-6i");
@@ -802,19 +810,19 @@ void StabViewDlg::SetupLayout()
 				m_pctrlEigenVector2->setEnabled(false);
 				m_pctrlEigenVector3->setEnabled(false);
 				m_pctrlEigenVector4->setEnabled(false);
-				EigenLayout->addWidget(m_pctrlEigenValue,  1,2);
-				EigenLayout->addWidget(m_pctrlEigenVector1,2,2);
-				EigenLayout->addWidget(m_pctrlEigenVector2,3,2);
-				EigenLayout->addWidget(m_pctrlEigenVector3,4,2);
-				EigenLayout->addWidget(m_pctrlEigenVector4,5,2);
-				EigenBox->setLayout(EigenLayout);
+				pEigenLayout->addWidget(m_pctrlEigenValue,  1,2);
+				pEigenLayout->addWidget(m_pctrlEigenVector1,2,2);
+				pEigenLayout->addWidget(m_pctrlEigenVector2,3,2);
+				pEigenLayout->addWidget(m_pctrlEigenVector3,4,2);
+				pEigenLayout->addWidget(m_pctrlEigenVector4,5,2);
+				pEigenBox->setLayout(pEigenLayout);
 			}
 		}
 
 		//	___________3D Animation box_________
-		QGroupBox *AnimationBox = new QGroupBox(tr("Animation"));
+		QGroupBox *pAnimationBox = new QGroupBox(tr("Animation"));
 		{
-			QGridLayout *AnimSpeedLayout = new QGridLayout;
+			QGridLayout *pAnimSpeedLayout = new QGridLayout;
 			{
 				QLabel *LabSpeed = new QLabel(tr("Speed"));
 				LabSpeed->setAlignment(Qt::AlignCenter|Qt::AlignVCenter);
@@ -824,9 +832,11 @@ void StabViewDlg::SetupLayout()
 				m_pctrlAnimationSpeed->setSliderPosition(m_ModeInterval);
 				m_pctrlAnimationSpeed->setNotchesVisible(true);
 				m_pctrlAnimationSpeed->setSingleStep(20);
+				m_pctrlAnimationSpeed->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
 
-				AnimSpeedLayout->addWidget(m_pctrlAnimationSpeed,1,1);
-				AnimSpeedLayout->addWidget(LabSpeed,2,1);
+
+				pAnimSpeedLayout->addWidget(m_pctrlAnimationSpeed,1,1);
+				pAnimSpeedLayout->addWidget(LabSpeed,2,1);
 
 				QLabel *LabAmplitude = new QLabel(tr("Amplitude"));
 				LabAmplitude->setAlignment(Qt::AlignCenter|Qt::AlignVCenter);
@@ -836,52 +846,51 @@ void StabViewDlg::SetupLayout()
 				m_pctrlAnimationAmplitude->setSliderPosition((int)(m_ModeAmplitude*500));
 				m_pctrlAnimationAmplitude->setNotchesVisible(true);
 				m_pctrlAnimationAmplitude->setSingleStep(20);
-				AnimSpeedLayout->addWidget(m_pctrlAnimationAmplitude,1,2);
-				AnimSpeedLayout->addWidget(LabAmplitude,2,2);
+				m_pctrlAnimationAmplitude->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+				pAnimSpeedLayout->addWidget(m_pctrlAnimationAmplitude,1,2);
+				pAnimSpeedLayout->addWidget(LabAmplitude,2,2);
 			}
 
-			QVBoxLayout *AnimationCommandsLayout = new QVBoxLayout;
+			QVBoxLayout *pAnimationCommandsLayout = new QVBoxLayout;
 			{
 				m_pctrlAnimate = new QPushButton(tr("Animate"));
 				m_pctrlAnimate->setCheckable(true);
 				m_pctrlAnimateRestart = new QPushButton(tr("Restart"));
-				AnimationCommandsLayout->addWidget(m_pctrlAnimateRestart);
-				AnimationCommandsLayout->addWidget(m_pctrlAnimate);
+				pAnimationCommandsLayout->addWidget(m_pctrlAnimateRestart);
+				pAnimationCommandsLayout->addWidget(m_pctrlAnimate);
 			}
 
-			QHBoxLayout *StepLayout = new  QHBoxLayout;
+			QHBoxLayout *pStepLayout = new  QHBoxLayout;
 			{
-                m_pctrlModeStep = new DoubleEdit(0.01,3);
+				m_pctrlModeStep = new DoubleEdit(0.01,3);
 				QLabel *StepLabel = new QLabel(tr("Time Step ="));
 				QLabel *StepUnit  = new QLabel(tr("s"));
-				StepLayout->addWidget(StepLabel);
-				StepLayout->addWidget(m_pctrlModeStep);
-				StepLayout->addWidget(StepUnit);
+				pStepLayout->addWidget(StepLabel);
+				pStepLayout->addWidget(m_pctrlModeStep);
+				pStepLayout->addWidget(StepUnit);
 			}
-			QVBoxLayout *AnimationLayout = new QVBoxLayout;
+			QVBoxLayout *pAnimationLayout = new QVBoxLayout;
 			{
-				AnimationLayout->addLayout(StepLayout);
-				AnimationLayout->addLayout(AnimSpeedLayout);
-				AnimationLayout->addLayout(AnimationCommandsLayout);
+				pAnimationLayout->addLayout(pStepLayout);
+				pAnimationLayout->addLayout(pAnimSpeedLayout);
+				pAnimationLayout->addLayout(pAnimationCommandsLayout);
 			}
-			AnimationBox->setLayout(AnimationLayout);
+			pAnimationBox->setLayout(pAnimationLayout);
 		}
 
 
 		m_pctrlModeViewType= new QStackedWidget;
-		m_pctrlModeViewType->addWidget(EigenBox);
-		m_pctrlModeViewType->addWidget(AnimationBox);
+		m_pctrlModeViewType->addWidget(pEigenBox);
+		m_pctrlModeViewType->addWidget(pAnimationBox);
 		m_pctrlModeViewType->setCurrentIndex(0);
 
-		QVBoxLayout *RLLayout = new QVBoxLayout;
+		QVBoxLayout *pRLLayout = new QVBoxLayout;
 		{
-			QGroupBox *RLModeBox = new QGroupBox(tr("Mode Selection"));
-			RLModeBox->setLayout(RLModeLayout);
-			RLLayout->addWidget(RLModeBox);
-			RLLayout->addWidget(FreakBox);
-			RLLayout->addWidget(m_pctrlModeViewType);
-			RLLayout->addStretch(1);
-			ModeBox->setLayout(RLLayout);
+			pRLLayout->addWidget(pRLModeBox);
+			pRLLayout->addWidget(pFreakBox);
+			pRLLayout->addWidget(m_pctrlModeViewType);
+			pRLLayout->addStretch(1);
+			pModeBox->setLayout(pRLLayout);
 		}
 
 	}
@@ -890,13 +899,13 @@ void StabViewDlg::SetupLayout()
 	//___________________Main Layout____________
 	m_pctrlStackWidget = new QStackedWidget;
 	m_pctrlStackWidget->addWidget(TimeBox);
-	m_pctrlStackWidget->addWidget(ModeBox);
+	m_pctrlStackWidget->addWidget(pModeBox);
 	m_pctrlStackWidget->setCurrentIndex(0);
 
-	QVBoxLayout *MainLayout = new QVBoxLayout;
-	MainLayout->addWidget(StabilityDirBox);
-	MainLayout->addWidget(m_pctrlStackWidget);
-	setLayout(MainLayout);
+	QVBoxLayout *pMainLayout = new QVBoxLayout;
+	pMainLayout->addWidget(pStabilityDirBox);
+	pMainLayout->addWidget(m_pctrlStackWidget);
+	setLayout(pMainLayout);
 }
 
 

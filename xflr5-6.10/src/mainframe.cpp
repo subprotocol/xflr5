@@ -89,7 +89,7 @@ QDir MainFrame::s_StylesheetDir;
 QDir MainFrame::s_TranslationDir;
 
 
-bool MainFrame::s_bTrace = false;
+bool MainFrame::s_bTrace = true;
 bool MainFrame::s_bSaved = true;
 QFile *MainFrame::s_pTraceFile = NULL;
 
@@ -100,6 +100,8 @@ QList <QColor> MainFrame::s_ColorList;
 
 MainFrame::MainFrame(QWidget *parent, Qt::WindowFlags flags) : QMainWindow(parent, flags)
 {
+	setAttribute(Qt::WA_DeleteOnClose);
+
 	if(s_bTrace)
 	{
         QString FileName = QDir::homePath() + "/Trace.log";
@@ -121,6 +123,9 @@ MainFrame::MainFrame(QWidget *parent, Qt::WindowFlags flags) : QMainWindow(paren
 	Settings::s_TableFont.setStyleStrategy(QFont::PreferDevice);
 	Settings::s_TableFont.setFamily(Settings::s_TableFont.defaultFamily());
 	Settings::s_TableFont.setPointSize(8);
+
+	Settings::s_RefGraph.SetTitleFont(Settings::s_TextFont);
+	Settings::s_RefGraph.SetLabelFont(Settings::s_TextFont);
 
 	Settings::s_StyleSheetName = "xflr5_style";
 
@@ -232,10 +237,10 @@ MainFrame::MainFrame(QWidget *parent, Qt::WindowFlags flags) : QMainWindow(paren
 }
 
 
-
-
 MainFrame::~MainFrame()
 {
+	qDebug("Destroying mainframe");
+
 	if(s_pTraceFile) s_pTraceFile->close();
 
 	for(int ioa=Foil::s_oaFoil.size()-1; ioa>=0; ioa--)
@@ -1549,14 +1554,14 @@ void MainFrame::CreateMiarexMenus()
 void MainFrame::CreateMiarexToolbar()
 {
 	m_pctrlPlane  = new QComboBox();
-	QStyledItemDelegate *pPlaneDelegate = new QStyledItemDelegate;
-    m_pctrlPlane->setItemDelegate(pPlaneDelegate); //necessary to support stylesheets
+	QStyledItemDelegate *pPlaneDelegate = new QStyledItemDelegate(this);
+	m_pctrlPlane->setItemDelegate(pPlaneDelegate); //necessary to support stylesheets
 	m_pctrlPlanePolar = new QComboBox;
-	QStyledItemDelegate *pPPolarDelegate = new QStyledItemDelegate;
-    m_pctrlPlanePolar->setItemDelegate(pPPolarDelegate); //necessary to support stylesheets
+	QStyledItemDelegate *pPPolarDelegate = new QStyledItemDelegate(this);
+	m_pctrlPlanePolar->setItemDelegate(pPPolarDelegate); //necessary to support stylesheets
 	m_pctrlPlaneOpp   = new QComboBox;
-	QStyledItemDelegate *pPOppDelegate = new QStyledItemDelegate;
-    m_pctrlPlaneOpp->setItemDelegate(pPOppDelegate); //necessary to support stylesheets
+	QStyledItemDelegate *pPOppDelegate = new QStyledItemDelegate(this);
+	m_pctrlPlaneOpp->setItemDelegate(pPOppDelegate); //necessary to support stylesheets
 
 	m_pctrlPlane->setFocusPolicy(Qt::NoFocus);// to override keypressevent and key_F4
 	m_pctrlPlanePolar->setFocusPolicy(Qt::NoFocus);
@@ -1620,13 +1625,13 @@ void MainFrame::CreateXDirectToolbar()
 	m_pctrlPolar   = new QComboBox;
 	m_pctrlOpPoint = new QComboBox;
 
-	QStyledItemDelegate *pFoilDelegate = new QStyledItemDelegate;
+	QStyledItemDelegate *pFoilDelegate = new QStyledItemDelegate(this);
 	m_pctrlFoil->setItemDelegate(pFoilDelegate); //necessary to support stylesheets
 
-	QStyledItemDelegate *pPolarDelegate = new QStyledItemDelegate;
+	QStyledItemDelegate *pPolarDelegate = new QStyledItemDelegate(this);
 	m_pctrlPolar->setItemDelegate(pPolarDelegate); //necessary to support stylesheets
 
-	QStyledItemDelegate *pOppDelegate = new QStyledItemDelegate;
+	QStyledItemDelegate *pOppDelegate = new QStyledItemDelegate(this);
 	m_pctrlOpPoint->setItemDelegate(pOppDelegate); //necessary to support stylesheets
 
 	m_pctrlFoil->setMaxVisibleItems(23);

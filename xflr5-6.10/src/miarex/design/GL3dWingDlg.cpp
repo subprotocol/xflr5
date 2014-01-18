@@ -2249,13 +2249,13 @@ void GL3dWingDlg::SetupLayout()
 
 	QGridLayout *pDataLayout = new QGridLayout;
 	{
-		m_pctrlLength1    = new QLabel("mm");
-		m_pctrlLength2    = new QLabel("mm");
-		m_pctrlLength3    = new QLabel("mm");
-		m_pctrlLength4    = new QLabel("mm");
-		m_pctrlLength5    = new QLabel("mm");
-		m_pctrlAreaUnit1  = new QLabel("mm2");
-		m_pctrlAreaUnit2  = new QLabel("mm2");
+		m_pctrlLength1    = new QLabel("mm", this);
+		m_pctrlLength2    = new QLabel("mm", this);
+		m_pctrlLength3    = new QLabel("mm", this);
+		m_pctrlLength4    = new QLabel("mm", this);
+		m_pctrlLength5    = new QLabel("mm", this);
+		m_pctrlAreaUnit1  = new QLabel("mm2", this);
+		m_pctrlAreaUnit2  = new QLabel("mm2", this);
 		m_pctrlLength1->setAlignment(Qt::AlignLeft);
 		m_pctrlLength2->setAlignment(Qt::AlignLeft);
 		m_pctrlLength3->setAlignment(Qt::AlignLeft);
@@ -2306,13 +2306,13 @@ void GL3dWingDlg::SetupLayout()
 		pDataLayout->addWidget(m_pctrlLength2,3,3);
 		pDataLayout->addWidget(m_pctrlAreaUnit2,4,3);
 
-		QLabel *lab20 = new QLabel(tr("Mean Geom. Chord"));
-		QLabel *lab21 = new QLabel(tr("Mean Aero Chord"));
-		QLabel *lab22 = new QLabel(tr("MAC Span Pos"));
-		QLabel *lab23 = new QLabel(tr("Aspect ratio"));
-		QLabel *lab24 = new QLabel(tr("Taper Ratio"));
-		QLabel *lab25 = new QLabel(tr("Root to Tip Sweep"));
-		QLabel *lab26 = new QLabel(tr("Number of Flaps"));
+		QLabel *lab20 = new QLabel(tr("Mean Geom. Chord"), this);
+		QLabel *lab21 = new QLabel(tr("Mean Aero Chord"), this);
+		QLabel *lab22 = new QLabel(tr("MAC Span Pos"), this);
+		QLabel *lab23 = new QLabel(tr("Aspect ratio"), this);
+		QLabel *lab24 = new QLabel(tr("Taper Ratio"), this);
+		QLabel *lab25 = new QLabel(tr("Root to Tip Sweep"), this);
+		QLabel *lab26 = new QLabel(tr("Number of Flaps"), this);
 		lab20->setAlignment(Qt::AlignRight);
 		lab21->setAlignment(Qt::AlignRight);
 		lab22->setAlignment(Qt::AlignRight);
@@ -2328,13 +2328,13 @@ void GL3dWingDlg::SetupLayout()
 		pDataLayout->addWidget(lab25,11,1);
 		pDataLayout->addWidget(lab26,12,1);
 
-		m_pctrlGeomChord    = new QLabel("170.0");
-		m_pctrlMAC          = new QLabel("150.0");
-		m_pctrlMACSpanPos   = new QLabel("466.00");
-		m_pctrlAspectRatio  = new QLabel("13.33");
-		m_pctrlTaperRatio   = new QLabel("1.50");
-		m_pctrlSweep        = new QLabel("2.58");
-		m_pctrlNFlaps       = new QLabel("0");
+		m_pctrlGeomChord    = new QLabel("170.0", this);
+		m_pctrlMAC          = new QLabel("150.0", this);
+		m_pctrlMACSpanPos   = new QLabel("466.00", this);
+		m_pctrlAspectRatio  = new QLabel("13.33", this);
+		m_pctrlTaperRatio   = new QLabel("1.50", this);
+		m_pctrlSweep        = new QLabel("2.58", this);
+		m_pctrlNFlaps       = new QLabel("0", this);
 		m_pctrlMAC->setAlignment(Qt::AlignRight);
 		m_pctrlGeomChord->setAlignment(Qt::AlignRight);
 		m_pctrlMACSpanPos->setAlignment(Qt::AlignRight);
@@ -2372,13 +2372,13 @@ void GL3dWingDlg::SetupLayout()
 	{
 		QGridLayout *ThreeDParams = new QGridLayout;
 		{
-			m_pctrlAxes       = new QCheckBox(tr("Axes"));
-			m_pctrlLight      = new QCheckBox(tr("Light"));
-			m_pctrlSurfaces   = new QCheckBox(tr("Surfaces"));
-			m_pctrlOutline    = new QCheckBox(tr("Outline"));
-			m_pctrlPanels     = new QCheckBox(tr("Panels"));
-			m_pctrlFoilNames  = new QCheckBox(tr("Foil Names"));
-			m_pctrlShowMasses = new QCheckBox(tr("Masses"));
+			m_pctrlAxes       = new QCheckBox(tr("Axes"), this);
+			m_pctrlLight      = new QCheckBox(tr("Light"), this);
+			m_pctrlSurfaces   = new QCheckBox(tr("Surfaces"), this);
+			m_pctrlOutline    = new QCheckBox(tr("Outline"), this);
+			m_pctrlPanels     = new QCheckBox(tr("Panels"), this);
+			m_pctrlFoilNames  = new QCheckBox(tr("Foil Names"), this);
+			m_pctrlShowMasses = new QCheckBox(tr("Masses"), this);
 			m_pctrlAxes->setSizePolicy(szPolicyMinimum);
 			m_pctrlLight->setSizePolicy(szPolicyMinimum);
 			m_pctrlSurfaces->setSizePolicy(szPolicyMinimum);
@@ -2468,7 +2468,7 @@ void GL3dWingDlg::SetupLayout()
 			m_pExportWingAct = new QAction(tr("Export Wing to File..."), this);
 
 			QPushButton *pMenuButton = new QPushButton(tr("Other"));
-			QMenu *pWingMenu = new QMenu(tr("Actions"));
+			QMenu *pWingMenu = new QMenu(tr("Actions"), this);
 			pWingMenu->addAction(m_pExportWingAct);
 			pWingMenu->addAction(m_pImportWingAct);
 			pWingMenu->addSeparator();
@@ -2630,11 +2630,6 @@ bool GL3dWingDlg::VLMSetAutoMesh(int total)
 		if(m_pWing->NXPanels(i)==0) m_pWing->NXPanels(i) = 1;
 	}
 
-//	if(VLMGetPanelTotal()>VLMMAXMATSIZE/2)
-//	{
-//		QMessageBox::warning(this, tr("Warning"), tr("Too many panels\nReduce the mesh size"));
-//		return false;
-//	}
 	return true;
 }
 

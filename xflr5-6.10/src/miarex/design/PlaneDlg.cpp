@@ -999,12 +999,12 @@ void PlaneDlg::SetupLayout()
 		m_pctrlWingSpan->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
 		m_pctrlStabLeverArm->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
 
-		m_pctrlSurf1 = new QLabel("dm2");
-		m_pctrlSurf2 = new QLabel("dm2");
-		m_pctrlSurf3 = new QLabel("dm2");
-		m_pctrlLen12 = new QLabel("mm");
-		m_pctrlLen13 = new QLabel("mm");
-		m_pctrlVolume = new QLabel("mm3");
+		m_pctrlSurf1 = new QLabel("dm2", this);
+		m_pctrlSurf2 = new QLabel("dm2", this);
+		m_pctrlSurf3 = new QLabel("dm2", this);
+		m_pctrlLen12 = new QLabel("mm", this);
+		m_pctrlLen13 = new QLabel("mm", this);
+		m_pctrlVolume = new QLabel("mm3", this);
 		Data1Layout->addWidget(lab101, 1, 1);
 		Data1Layout->addWidget(m_pctrlWingSurface,1,2);
 		Data1Layout->addWidget(m_pctrlSurf1, 1, 3);

@@ -98,7 +98,7 @@ private:
 
 	bool AllocateMatrix(int matSize, int &memsize);
 	bool AllocateRHS(int matSize, int &memsize);
-	void Release();
+	void ReleaseArrays();
 
 	void traceLog(QString str);
 
@@ -119,12 +119,14 @@ public:
 private:
 
 	static bool s_bTrefftz;     /**< /true if the forces should be evaluated in the far-field plane rather than by on-body summation of panel forces */
-	static int s_MaxRHSSize;    /**< the max number of RHS points, used for memeory allocation */
 	static bool s_bKeepOutOpp;  /**< true if points with viscous interpolation issues should be stored nonetheless */
 	static bool s_bCancel;      /**< true if the user has cancelled the analysis */
 	static int s_TotalTime;     /**< the esimated total time of the analysis, used to set the progress bar. No specific unit. */
 	static double s_Progress;   /**< A measure of the progress of the analysis, used to provide feedback to the user */
 	static bool s_bWarning;     /**< true if one the OpPoints could not be properly interpolated */
+
+	static int s_MaxRHSSize;    /**< the max number of RHS points, used for memeory allocation >*/
+	static int s_MaxMatSize;    /**< the size currently allocated for the influence matrix >*/
 
 	bool m_bPointOut;           /**< true if an interpolation was outside the min or max Cl */
 	bool m_bInverted;           /**< true if the resolution of the linear system has been successful */

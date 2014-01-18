@@ -45,6 +45,8 @@ void *QXInverse::s_p2DWidget;
 QXInverse::QXInverse(QWidget *parent)
 	: QWidget(parent)
 {
+	setAttribute(Qt::WA_DeleteOnClose);
+
 //	m_pGraphDlg        = new GraphDlg(pMainFrame);
 //	m_pXInverseStyleDlg = new InverseOptionsDlg(pMainFrame);
 //	m_pPertDlg         = new PertDlg(pMainFrame);
@@ -138,6 +140,9 @@ QXInverse::QXInverse(QWidget *parent)
  */
 QXInverse::~QXInverse()
 {
+	qDebug("Destroying XInverse");
+	delete m_pModFoil;
+	delete m_pRefFoil;
 //	delete m_pPertDlg;
 //	delete m_pGraphDlg;
 //	delete m_pXInverseStyleDlg;

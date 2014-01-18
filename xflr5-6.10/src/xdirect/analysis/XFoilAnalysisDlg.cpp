@@ -48,7 +48,7 @@ XFoilAnalysisDlg::XFoilAnalysisDlg(QWidget *pParent) : QDialog(pParent)
 	m_pRmsGraph = m_pGraphWidget->graph();
 
 	m_pRmsGraph->SetXTitle(tr("Iter"));
-	m_pRmsGraph->SetYTitle("");//Change from bl newton system solution
+	m_pRmsGraph->SetYTitle("");//Change from BL newton system solution
 
 
 	m_pRmsGraph->SetXMajGrid(true, QColor(120,120,120),2,1);
@@ -82,6 +82,10 @@ XFoilAnalysisDlg::XFoilAnalysisDlg(QWidget *pParent) : QDialog(pParent)
 
 }
 
+XFoilAnalysisDlg::~XFoilAnalysisDlg()
+{
+	delete m_pXFoilTask;
+}
 
 void XFoilAnalysisDlg::SetupLayout()
 {

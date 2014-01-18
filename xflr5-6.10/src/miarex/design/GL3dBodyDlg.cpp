@@ -87,11 +87,15 @@ GL3dBodyDlg::GL3dBodyDlg(QWidget *pParent): QDialog(pParent)
 
 	m_BodyGridDlg = new BodyGridDlg(this);
 	m_pBody = NULL;
+	m_pPointPrecision = NULL;
+	m_pFramePrecision = NULL;
 
 	m_BodyOffset.Set( 0.20, -0.12, 0.0);
 	m_FrameOffset.Set(0.80, -0.50, 0.0);
 	m_HorizontalSplit = -0.45;
 	m_VerticalSplit   =  0.35;
+
+	m_bCurFrameOnly = false;
 
 	m_GLList = 0;
 
@@ -101,6 +105,7 @@ GL3dBodyDlg::GL3dBodyDlg(QWidget *pParent): QDialog(pParent)
 	m_glViewportTrans.y  = 0.0;
 	m_glViewportTrans.z  = 0.0;
 	m_glScaled      = 1.0;
+	m_glTop = 0.0;
 
 	m_StackPos  = 0; //the current position on the stack
 	m_bResetFrame = true;
@@ -203,7 +208,7 @@ GL3dBodyDlg::GL3dBodyDlg(QWidget *pParent): QDialog(pParent)
 	connect(m_pctrlOutline,    SIGNAL(clicked()), this, SLOT(OnOutline()));
 	connect(m_pctrlFlatPanels, SIGNAL(clicked()), this, SLOT(OnLineType()));
 	connect(m_pctrlBSplines,   SIGNAL(clicked()), this, SLOT(OnLineType()));
-    connect(m_pctrlBodyStyle,  SIGNAL(clickedLB()), this, SLOT(OnBodyStyle()));
+	connect(m_pctrlBodyStyle,  SIGNAL(clickedLB()), this, SLOT(OnBodyStyle()));
 
 	connect(m_pctrlBodyName,   SIGNAL(editingFinished()), this, SLOT(OnBodyName()));
 	connect(m_pctrlNHoopPanels,SIGNAL(editingFinished()), this, SLOT(OnNURBSPanels()));
@@ -3673,17 +3678,17 @@ void GL3dBodyDlg::SetupLayout()
 	m_pSelectionModelFrame = new QItemSelectionModel(m_pFrameModel);
 	m_pctrlFrameTable->setSelectionModel(m_pSelectionModelFrame);
 
-	m_pFrameDelegate = new BodyTableDelegate;
+	m_pFrameDelegate = new BodyTableDelegate(this);
 	m_pctrlFrameTable->setItemDelegate(m_pFrameDelegate);
-	int *pFramePrecision = new int[2];
-	pFramePrecision[0] = 3;//five digits for x and y coordinates
-	pFramePrecision[1] = 0;
-	m_pFrameDelegate->SetPointer(pFramePrecision);
+	m_pFramePrecision = new int[2];
+	m_pFramePrecision[0] = 3;//five digits for x and y coordinates
+	m_pFramePrecision[1] = 0;
+	m_pFrameDelegate->SetPointer(m_pFramePrecision);
 
 	//Setup Point Table
 	m_pctrlPointTable->horizontalHeader()->setStretchLastSection(true);
 
-	m_pPointModel = new QStandardItemModel;
+	m_pPointModel = new QStandardItemModel(this);
 	m_pPointModel->setRowCount(10);//temporary
 	m_pPointModel->setColumnCount(3);
 	m_pctrlPointTable->setModel(m_pPointModel);
@@ -3692,11 +3697,11 @@ void GL3dBodyDlg::SetupLayout()
 
 	m_pPointDelegate = new BodyTableDelegate;
 	m_pctrlPointTable->setItemDelegate(m_pPointDelegate);
-	int *pPointPrecision = new int[3];
-	pPointPrecision[0] = 3;//five digits for x and y coordinates
-	pPointPrecision[1] = 3;
-	pPointPrecision[2] = 0;
-	m_pPointDelegate->SetPointer(pPointPrecision);
+	m_pPointPrecision = new int[3];
+	m_pPointPrecision[0] = 3;//five digits for x and y coordinates
+	m_pPointPrecision[1] = 3;
+	m_pPointPrecision[2] = 0;
+	m_pPointDelegate->SetPointer(m_pPointPrecision);
 }
 
 

@@ -61,6 +61,8 @@ void *QAFoil::s_p2DWidget = NULL;
 QAFoil::QAFoil(QWidget *parent)
 	: QWidget(parent)
 {
+	setAttribute(Qt::WA_DeleteOnClose);
+
 	m_hcCross = QCursor(Qt::CrossCursor);
 	m_hcMove  = QCursor(Qt::ClosedHandCursor);
 
@@ -71,6 +73,7 @@ QAFoil::QAFoil(QWidget *parent)
 
 	m_poaFoil  = NULL;
 	m_pctrlFoilTable = NULL;
+	m_precision = NULL;
 
 	m_pSF = new SplineFoil();
 	m_pSF->m_bModified = false;
@@ -148,9 +151,12 @@ QAFoil::QAFoil(QWidget *parent)
  */
 QAFoil::~QAFoil()
 {
-	ClearStack(-1);
+	qDebug("Destroying AFoil");
 
-	delete m_pSF;
+	ClearStack(-1);
+	if(m_pSF) delete m_pSF;
+	if(m_pBufferFoil) delete m_pBufferFoil;
+	if(m_precision) delete [] m_precision;
 }
 
 
@@ -2641,7 +2647,7 @@ void QAFoil::SetupLayout()
 	setLayout(MainLayout);
 
 
-	m_pFoilModel = new QStandardItemModel;
+	m_pFoilModel = new QStandardItemModel(this);
 	m_pFoilModel->setRowCount(10);//temporary
 	m_pFoilModel->setColumnCount(16);
 
@@ -2665,7 +2671,7 @@ void QAFoil::SetupLayout()
 	m_pctrlFoilTable->setWindowTitle(tr("Foils"));
 	m_pctrlFoilTable->horizontalHeader()->setStretchLastSection(true);
 
-	m_pFoilDelegate = new FoilTableDelegate;
+	m_pFoilDelegate = new FoilTableDelegate(this);
 	m_pctrlFoilTable->setItemDelegate(m_pFoilDelegate);
 	m_pFoilDelegate->m_pFoilModel = m_pFoilModel;
 
@@ -2677,25 +2683,25 @@ void QAFoil::SetupLayout()
 	m_pctrlFoilTable->setColumnHidden(11, true);
 
 
-	int  *precision = new int[16];
-	precision[0]  = 2;
-	precision[1]  = 2;
-	precision[2]  = 2;
-	precision[3]  = 2;
-	precision[4]  = 2;
-	precision[5]  = 0;
-	precision[6]  = 2;
-	precision[7]  = 2;
-	precision[8]  = 2;
-	precision[9]  = 2;
-	precision[10] = 2;
-	precision[11] = 2;
-	precision[12] = 2;
-	precision[13] = 2;
-	precision[14] = 2;
-	precision[15] = 2;
+	m_precision = new int[16];
+	m_precision[0]  = 2;
+	m_precision[1]  = 2;
+	m_precision[2]  = 2;
+	m_precision[3]  = 2;
+	m_precision[4]  = 2;
+	m_precision[5]  = 0;
+	m_precision[6]  = 2;
+	m_precision[7]  = 2;
+	m_precision[8]  = 2;
+	m_precision[9]  = 2;
+	m_precision[10] = 2;
+	m_precision[11] = 2;
+	m_precision[12] = 2;
+	m_precision[13] = 2;
+	m_precision[14] = 2;
+	m_precision[15] = 2;
 
-	m_pFoilDelegate->m_Precision = precision;
+	m_pFoilDelegate->m_Precision = m_precision;
 //	connect(m_pFoilDelegate,  SIGNAL(closeEditor(QWidget *)), this, SLOT(OnCellChanged(QWidget *)));
 
 	connect(this, SIGNAL(projectModified()), (MainFrame*)s_pMainFrame, SLOT(OnProjectModified()));

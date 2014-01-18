@@ -286,14 +286,18 @@ QXDirect::QXDirect(QWidget *parent) : QWidget(parent)
  * Not really necessary. Qt does the clean-up pretty well by itself
  * Old C++ practice
  */
- QXDirect::~QXDirect()
+QXDirect::~QXDirect()
 {
+	qDebug()<<"Destroying XDirect";
+	delete (XFoilAnalysisDlg*)m_pXFoilAnalysisDlg;
 }
 
 
 /** Sets the state of the window's widgets i.a.w. the state of the active ojbects and views. */
 void QXDirect::SetControls()
 {
+	setAttribute(Qt::WA_DeleteOnClose);
+
 	MainFrame* pMainFrame = (MainFrame*)s_pMainFrame;
 
 	if(m_bPolarView) m_pctrlMiddleControls->setCurrentIndex(1);
@@ -6335,8 +6339,8 @@ void QXDirect::SetupLayout()
 				m_pctrlCurveStyle->addItem("item");
 				m_pctrlCurveWidth->addItem("item");
 			}
-			m_pStyleDelegate = new LineDelegate;
-			m_pWidthDelegate = new LineDelegate;
+			m_pStyleDelegate = new LineDelegate(this);
+			m_pWidthDelegate = new LineDelegate(this);
 			m_pctrlCurveStyle->setItemDelegate(m_pStyleDelegate);
 			m_pctrlCurveWidth->setItemDelegate(m_pWidthDelegate);
 

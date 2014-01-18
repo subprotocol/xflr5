@@ -396,11 +396,14 @@ void ReynoldsFormat(QString &str, double f)
 void Trace(int n)
 {
 	if(!MainFrame::s_bTrace) return;
-	QTextStream ts(MainFrame::s_pTraceFile);
-
 	QDateTime dt = QDateTime::currentDateTime();
-	QString str = dt.toString("dd.MM.yyyy  hh:mm:ss  ");
-	ts << str << n << "\n";
+	QString str = dt.toString("hh:mm:ss  ");
+
+	if(MainFrame::s_pTraceFile && MainFrame::s_pTraceFile->isOpen())
+	{
+		QTextStream ts(MainFrame::s_pTraceFile);
+		ts << str << n << "\n";
+	}
 	qDebug()<<str<<n;
 }
 
@@ -414,11 +417,14 @@ void Trace(int n)
 void Trace(QString msg)
 {
 	if(!MainFrame::s_bTrace) return;
-	QTextStream ts(MainFrame::s_pTraceFile);
-
 	QDateTime dt = QDateTime::currentDateTime();
-	QString str = dt.toString("dd.MM.yyyy  hh:mm:ss  ")+ msg ;
-	ts<<str<<"\n";
+	QString str = dt.toString("hh:mm:ss  ")+ msg;
+
+	if(MainFrame::s_pTraceFile && MainFrame::s_pTraceFile->isOpen())
+	{
+		QTextStream ts(MainFrame::s_pTraceFile);
+		ts<<str<<"\n";
+	}
 	qDebug()<<str;
 }
 
@@ -433,16 +439,20 @@ void Trace(QString msg)
 void Trace(QString msg, int n)
 {
 	if(!MainFrame::s_bTrace) return;
-	QTextStream ts(MainFrame::s_pTraceFile);
 
 	QString strong;
 	strong = QString("  %1").arg(n);
 	strong = msg + strong;
 
 	QDateTime dt = QDateTime::currentDateTime();
-	QString str = dt.toString("dd.MM.yyyy  hh:mm:ss  ");
+	QString str = dt.toString("hh:mm:ss  ");
 	str += strong;
-	ts << str << "\n";
+
+	if(MainFrame::s_pTraceFile && MainFrame::s_pTraceFile->isOpen())
+	{
+		QTextStream ts(MainFrame::s_pTraceFile);
+		ts << str << "\n";
+	}
 	qDebug()<<str;
 }
 
@@ -457,18 +467,21 @@ void Trace(QString msg, int n)
 void Trace(QString msg, double f)
 {
 	if(!MainFrame::s_bTrace) return;
-	QTextStream ts(MainFrame::s_pTraceFile);
 
 	QString strong;
 	strong = QString("  %1").arg(f);
 	strong = msg + strong;
 
-
 	QDateTime dt = QDateTime::currentDateTime();
-	QString str = dt.toString("dd.MM.yyyy  hh:mm:ss  ");
+	QString str = dt.toString("hh:mm:ss  ");
 
 	str += strong;
-	ts << str << "\n";
+
+	if(MainFrame::s_pTraceFile && MainFrame::s_pTraceFile->isOpen())
+	{
+		QTextStream ts(MainFrame::s_pTraceFile);
+		ts << str << "\n";
+	}
 	qDebug()<<str;
 }
 

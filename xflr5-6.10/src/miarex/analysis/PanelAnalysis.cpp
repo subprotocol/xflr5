@@ -27,7 +27,9 @@
 #include "PanelAnalysis.h"
 
 
+int PanelAnalysis::s_MaxMatSize = 0;
 int PanelAnalysis::s_MaxRHSSize = VLMMAXRHS;
+
 bool PanelAnalysis::s_bCancel = false;
 bool PanelAnalysis::s_bWarning = false;
 bool PanelAnalysis::s_bKeepOutOpp = false;
@@ -46,36 +48,16 @@ PanelAnalysis::PanelAnalysis()
 	m_Ai = m_Cl = m_ICd = NULL;
 	m_F = NULL;
 	m_Vd = NULL;
+
 	m_aij = m_aijWake = NULL;
+	m_uRHS = m_vRHS = m_wRHS = m_pRHS = m_qRHS = m_rRHS = NULL;
+	m_cRHS = m_uWake = m_wWake = NULL;
+	m_uVl = m_wVl = NULL;
+	m_Speed = NULL;
+	m_Index = NULL;
+
 	m_RHS = m_RHSRef = m_SigmaRef = m_Sigma = m_Mu = m_Cp = NULL;
 	m_3DQInf = NULL;
-	m_uVl = m_wVl = NULL;
-	m_uRHS = m_vRHS = m_wRHS = m_rRHS = m_cRHS = m_uWake = m_wWake = NULL;
-	m_Index = NULL;
-	m_Speed = NULL;
-
-	m_Alpha = 0.0;
-	m_QInf  = 0.0;
-	m_vMin  = m_vMax = m_vDelta  = 0.0;
-
-	m_bSequence      = false;
-
-	m_bInverted      = false;
-
-	m_MatSize = m_nNodes = 0;
-	m_CL  = m_CX  = m_CY  = 0.0;
-	m_GCm = m_GRm = m_GYm = m_VCm = m_VYm = m_IYm = 0.0;
-	m_CP.Set(0.0,0.0,0.0);
-	m_ViscousDrag = m_InducedDrag = 0.0;
-
-	m_MatSize        = 0;
-//	m_SymSize        = 0;
-	m_nNodes         = 0;
-	m_NWakeColumn    = 0;
-	m_nMaxWakeIter    = 0;
-
-	m_nWakeNodes = 0;
-	m_WakeSize   = 0;
 
 	m_pWingList[0] = m_pWingList[1] = m_pWingList[2] = m_pWingList[3] = NULL;
 
@@ -93,7 +75,34 @@ PanelAnalysis::PanelAnalysis()
 	m_pRefWakeNode   = NULL;
 
 
+	m_Alpha = 0.0;
+	m_QInf  = 0.0;
+	m_OpAlpha = 0.0;
 	m_Ctrl = 0.0;
+	m_vMin  = m_vMax = m_vDelta  = 0.0;
+
+	m_bSequence      = false;
+
+	m_bInverted      = false;
+
+	m_MatSize = m_nNodes = 0;
+	m_CL  = m_CX  = m_CY  = 0.0;
+	m_GCm = m_GRm = m_GYm = m_VCm = m_ICm = m_VYm = m_IYm = 0.0;
+	m_CP.Set(0.0,0.0,0.0);
+	m_ViscousDrag = m_InducedDrag = 0.0;
+
+	m_MatSize        = 0;
+//	m_SymSize        = 0;
+	m_nNodes         = 0;
+	m_NWakeColumn    = 0;
+	m_nMaxWakeIter    = 0;
+
+	m_nWakeNodes = 0;
+	m_WakeSize   = 0;
+
+	ftmp = phiG = Omega = 0.0;
+	r1v = r2v = 0.0;
+
 	Theta0 = 0.0;
 	u0     = 0.0;
 
@@ -105,6 +114,7 @@ PanelAnalysis::PanelAnalysis()
 	CXu = CZu = Cmu = CXq = CZq = Cmq = CXa = CZa = Cma = 0.0;
 	CYb = CYp = CYr = Clb = Clp = Clr = Cnb = Cnp = Cnr = 0.0;
 	CXe = CYe = CZe = Cle = Cme = Cne = 0.0;
+
 
 	memset(m_ALong, 0, 16*sizeof(double));
 	memset(m_ALat,  0, 16*sizeof(double));
@@ -120,7 +130,7 @@ PanelAnalysis::PanelAnalysis()
  */
 PanelAnalysis::~PanelAnalysis()
 {
-	Release();
+	ReleaseArrays();
 	delete [] m_Ai;
 	delete [] m_Cl;
 	delete [] m_ICd;
@@ -135,7 +145,13 @@ PanelAnalysis::~PanelAnalysis()
  */
 bool PanelAnalysis::AllocateMatrix(int matSize, int &memsize)
 {
-	Trace("Allocating matrix arrays");
+	QString strange;
+
+	if(matSize<=s_MaxMatSize) return true;  //current analysis requires smaller size than that currently allocated
+
+	ReleaseArrays();
+
+	Trace("PanelAnalysis::Allocating matrix arrays");
 
 	int size2 = matSize * matSize;
 	try
@@ -160,17 +176,23 @@ bool PanelAnalysis::AllocateMatrix(int matSize, int &memsize)
 	}
 	catch(std::exception & e)
 	{
-		Release();
+		ReleaseArrays();
+		s_MaxMatSize = 0;
 		Trace(e.what());
-		QString strange = "Memory allocation error: the request for additional memory has been denied.\nPlease reduce the model's size.";
+		strange = "Memory allocation error: the request for additional memory has been denied.\nPlease reduce the model's size.";
 		Trace(strange);
 		return false;
 	}
+
+	s_MaxMatSize = matSize;
 
 	memsize  = sizeof(double)  * 2 * size2; //bytes
 	memsize += sizeof(double)  * 9 * matSize; //bytes
 	memsize += sizeof(CVector) * 3 * matSize;
 	memsize += sizeof(int)     * 1 * matSize;
+
+	strange = QString("PanelAnalysis::Memory allocation for the matrix arrays is %1 MB").arg((double)memsize/1024./1024., 7, 'f', 2);
+	Trace(strange);
 
 	memset(m_aij,     0, size2 * sizeof(double));
 	memset(m_aijWake, 0, size2 * sizeof(double));
@@ -195,12 +217,16 @@ bool PanelAnalysis::AllocateMatrix(int matSize, int &memsize)
 
 	if(!AllocateRHS(matSize, RHSSize))
 	{
-		QString strange = "Memory allocation error: the request for additional memory has been denied.\nPlease educe the model's size.";
+		strange = "Memory allocation error: the request for additional memory has been denied.\nPlease educe the model's size.";
 		traceLog(strange);
 		return false;
 	}
 
 	memsize += RHSSize;
+
+	strange = QString("PanelAnalysis::Memory allocation for the analysis arrays is %1 MB").arg((double)memsize/1024./1024., 7, 'f', 2);
+	Trace(strange);
+
 	return true;
 }
 
@@ -211,8 +237,10 @@ bool PanelAnalysis::AllocateMatrix(int matSize, int &memsize)
  */
 bool PanelAnalysis::AllocateRHS(int matSize, int &memsize)
 {
-	Trace("Allocating RHS arrays");
+	Trace("PanelAnalysis::Allocating RHS arrays");
 	int size = matSize * s_MaxRHSSize;
+
+	if(size==0) return false;
 
 	try
 	{
@@ -227,7 +255,7 @@ bool PanelAnalysis::AllocateRHS(int matSize, int &memsize)
 	}
 	catch(std::exception &e)
 	{
-		Release();
+		ReleaseArrays();
 		Trace(e.what());
 		return false;
 	}
@@ -243,6 +271,10 @@ bool PanelAnalysis::AllocateRHS(int matSize, int &memsize)
 
 	memset(m_3DQInf, 0, s_MaxRHSSize*sizeof(double));
 
+	QString strange = QString("PanelAnalysis::Memory allocation for the RHS arrays is %1 MB").arg((double)memsize/1024./1024., 7, 'f', 2);
+	Trace(strange);
+
+
 	return true;
 }
 
@@ -250,8 +282,10 @@ bool PanelAnalysis::AllocateRHS(int matSize, int &memsize)
 /**
  * Releases the memory reserved for matrix and RHS arrays
  */
-void PanelAnalysis::Release()
+void PanelAnalysis::ReleaseArrays()
 {
+	Trace("PanelAnalysis::Releasing Matrix and RHS arrays");
+
 	if(m_aij)     delete [] m_aij;
 	if(m_aijWake) delete [] m_aijWake;
 	m_aij = m_aijWake = NULL;
@@ -264,7 +298,7 @@ void PanelAnalysis::Release()
 	if(m_Cp)       delete [] m_Cp;
 	m_RHS = m_RHSRef = m_SigmaRef = m_Sigma = m_Mu = m_Cp = NULL;
 
-	if(m_3DQInf) delete m_3DQInf;
+	if(m_3DQInf) delete [] m_3DQInf;
 	m_3DQInf = NULL;
 
 	if(m_uVl) delete [] m_uVl;
@@ -275,6 +309,8 @@ void PanelAnalysis::Release()
 	if(m_vRHS)  delete [] m_vRHS;
 	if(m_wRHS)  delete [] m_wRHS;
 	if(m_rRHS)  delete [] m_rRHS;
+	if(m_pRHS)  delete [] m_pRHS;
+	if(m_qRHS)  delete [] m_qRHS;
 	if(m_cRHS)  delete [] m_cRHS;
 	if(m_uWake) delete [] m_uWake;
 	if(m_wWake) delete [] m_wWake;
@@ -285,6 +321,8 @@ void PanelAnalysis::Release()
 
 	if(m_Speed) delete [] m_Speed;
 	m_Speed = NULL;
+
+	s_MaxMatSize = 0;
 }
 
 
@@ -1975,39 +2013,15 @@ bool PanelAnalysis::SolveUnitRHS()
 	traceLog("      Solving the LU system...\n");
 	Crout_LU_with_Pivoting_Solve(m_aij, m_uRHS, m_Index, m_RHS,      Size, &s_bCancel);
 	Crout_LU_with_Pivoting_Solve(m_aij, m_wRHS, m_Index, m_RHS+Size, Size, &s_bCancel);
-	//______________________________________________________________________________________
-	//Reconstruct right side results if calculation was symetric
-	int p;
-/*	if(m_b3DSymetric)
-	{
-		m=0;
-		for (p=0; p<m_MatSize; p++)
-		{
-			if(m_pPanel[p].m_bIsLeftPanel)
-			{
-				m_uRHS[p] = m_RHS[m];
-				m_wRHS[p] = m_RHS[m+Size];
-				if(m_pPanel[p].m_iSym>=0)
-				{
-					m_uRHS[m_pPanel[p].m_iSym] = m_RHS[m];
-					m_wRHS[m_pPanel[p].m_iSym] = m_RHS[m+Size];
-				}
-				m++;
-			}
-		}
-	}
-	else*/
-//	{
-		memcpy(m_uRHS, m_RHS,           m_MatSize*sizeof(double));
-		memcpy(m_wRHS, m_RHS+m_MatSize, m_MatSize*sizeof(double));
-//	}
 
+	memcpy(m_uRHS, m_RHS,           m_MatSize*sizeof(double));
+	memcpy(m_wRHS, m_RHS+m_MatSize, m_MatSize*sizeof(double));
 
 	//   Define unit local velocity vector, necessary for moment calculations in stability analysis of 3D panels
 	CVector u(1.0, 0.0, 0.0);
 	CVector w(0.0, 0.0, 1.0);
 	double Cp;
-	for (p=0; p<m_MatSize; p++)
+	for (int p=0; p<m_MatSize; p++)
 	{
 		if(m_pPanel[p].m_Pos!=MIDSURFACE)
 		{
