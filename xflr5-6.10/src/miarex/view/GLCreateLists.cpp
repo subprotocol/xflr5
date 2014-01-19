@@ -34,6 +34,7 @@
 
 #define SIDEPOINTS 73
 
+
 void GLCreateGeom(Wing *pWing, int List, Body *pBody)
 {
 	if(!pWing) return;
@@ -1882,15 +1883,13 @@ void GLCreateTrans(Wing *pWing, WingOpp *pWOpp, int List)
 }
 
 
-void GLCreateStreamLines(Wing *PlaneWing[MAXWINGS], CVector *pNode, WPolar *pWPolar, PlaneOpp *pPOpp)
+bool GLCreateStreamLines(Wing *PlaneWing[MAXWINGS], CVector *pNode, WPolar *pWPolar, PlaneOpp *pPOpp)
 {
-	QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-
 	if(!PlaneWing[0] || !pPOpp || !pWPolar || pWPolar->m_AnalysisMethod==LLTMETHOD  || !Objects3D::s_MatSize)
 	{
 		glNewList(VLMSTREAMLINES,GL_COMPILE); glEndList();
-        QMiarex::s_GLList++;
-		return;
+		QMiarex::s_GLList++;
+		return false;
 	}
 
 	double memcoresize = Panel::coreSize();
@@ -1898,8 +1897,8 @@ void GLCreateStreamLines(Wing *PlaneWing[MAXWINGS], CVector *pNode, WPolar *pWPo
 
 	Wing *pWing;
 
-    QProgressDialog dlg("Streamlines calculation", "Abort", 0, Objects3D::s_MatSize);
-//	dlg.setWindowModality(Qt::WindowModal);
+	QProgressDialog dlg("Streamlines calculation", "Abort", 0, Objects3D::s_MatSize);
+	dlg.setWindowModality(Qt::WindowModal);
 
 	bool bFound;
 	int i;
@@ -1918,19 +1917,19 @@ void GLCreateStreamLines(Wing *PlaneWing[MAXWINGS], CVector *pNode, WPolar *pWPo
 
 	glNewList(VLMSTREAMLINES,GL_COMPILE);
 	{
-        QMiarex::s_GLList++;
+		QMiarex::s_GLList++;
 
 		glEnable (GL_LINE_STIPPLE);
 
-        style = W3dPrefsDlg::s_StreamLinesStyle;
-        if     (style == 1) 	glLineStipple (1, 0xCFCF);
-        else if(style == 2) 	glLineStipple (1, 0x6666);
-        else if(style == 3) 	glLineStipple (1, 0xFF18);
-        else if(style == 4) 	glLineStipple (1, 0x7E66);
-        else					glLineStipple (1, 0xFFFF);
+		style = W3dPrefsDlg::s_StreamLinesStyle;
+		if     (style == 1) 	glLineStipple (1, 0xCFCF);
+		else if(style == 2) 	glLineStipple (1, 0x6666);
+		else if(style == 3) 	glLineStipple (1, 0xFF18);
+		else if(style == 4) 	glLineStipple (1, 0x7E66);
+		else					glLineStipple (1, 0xFFFF);
 
-        glLineWidth(W3dPrefsDlg::s_StreamLinesWidth);
-        glColor3d(W3dPrefsDlg::s_StreamLinesColor.redF(), W3dPrefsDlg::s_StreamLinesColor.greenF(), W3dPrefsDlg::s_StreamLinesColor.blueF());
+		glLineWidth(W3dPrefsDlg::s_StreamLinesWidth);
+		glColor3d(W3dPrefsDlg::s_StreamLinesColor.redF(), W3dPrefsDlg::s_StreamLinesColor.greenF(), W3dPrefsDlg::s_StreamLinesColor.blueF());
 
 		VInf.Set(pPOpp->m_QInf,0.0,0.0);
 
@@ -2065,7 +2064,6 @@ void GLCreateStreamLines(Wing *PlaneWing[MAXWINGS], CVector *pNode, WPolar *pWPo
 					dlg.setValue(m);
 					m++;
 
-//					qApp->processEvents();
 					if(dlg.wasCanceled()) break;
 				}
 				if(dlg.wasCanceled()) break;
@@ -2079,21 +2077,24 @@ void GLCreateStreamLines(Wing *PlaneWing[MAXWINGS], CVector *pNode, WPolar *pWPo
 
 	//restore things as they were
 	Panel::setCoreSize(memcoresize);
-	QApplication::restoreOverrideCursor();
+
+	if(dlg.wasCanceled()) return false;
+	return true;
+
 }
 
 
-void GLCreateSurfSpeeds(Panel *pPanel, WPolar *pWPolar, PlaneOpp *pPOpp)
+bool GLCreateSurfSpeeds(Panel *pPanel, WPolar *pWPolar, PlaneOpp *pPOpp)
 {
 	if(!pWPolar || !pPOpp || pPOpp->analysisMethod()==LLTMETHOD || !pPanel || !Objects3D::s_MatSize)
 	{
 		glNewList(SURFACESPEEDS, GL_COMPILE);
-        QMiarex::s_GLList++;
+		QMiarex::s_GLList++;
 		glEndList();
-		return;
+		return false;
 	}
 	
-	QProgressDialog dlg("Streamlines calculation", "Abort", 0, Objects3D::s_MatSize/*, (MainFrame*)QMiarex::s_pMainFrame*/);
+	QProgressDialog dlg("Surface velocities calculation", "Abort", 0, Objects3D::s_MatSize/*, (MainFrame*)QMiarex::s_pMainFrame*/);
 
 	int p, style;
 	double factor;
@@ -2111,12 +2112,12 @@ void GLCreateSurfSpeeds(Panel *pPanel, WPolar *pWPolar, PlaneOpp *pPOpp)
 
 	glNewList(SURFACESPEEDS, GL_COMPILE);
 	{
-        QMiarex::s_GLList++;
+		QMiarex::s_GLList++;
 
 		glEnable (GL_LINE_STIPPLE);
 
-        glLineWidth(W3dPrefsDlg::s_WakeWidth);
-        style = W3dPrefsDlg::s_WakeStyle;
+		glLineWidth(W3dPrefsDlg::s_WakeWidth);
+		style = W3dPrefsDlg::s_WakeStyle;
 		
 		if     (style == 1) 	glLineStipple (1, 0xCFCF);
 		else if(style == 2) 	glLineStipple (1, 0x6666);
@@ -2124,7 +2125,7 @@ void GLCreateSurfSpeeds(Panel *pPanel, WPolar *pWPolar, PlaneOpp *pPOpp)
 		else if(style == 4) 	glLineStipple (1, 0x7E66);
 		else					glLineStipple (1, 0xFFFF);
 
-        glColor3d(W3dPrefsDlg::s_WakeColor.redF(), W3dPrefsDlg::s_WakeColor.greenF(), W3dPrefsDlg::s_WakeColor.blueF());
+		glColor3d(W3dPrefsDlg::s_WakeColor.redF(), W3dPrefsDlg::s_WakeColor.greenF(), W3dPrefsDlg::s_WakeColor.blueF());
 
 		for (p=0; p<Objects3D::s_MatSize; p++)
 		{
@@ -2200,6 +2201,8 @@ void GLCreateSurfSpeeds(Panel *pPanel, WPolar *pWPolar, PlaneOpp *pPOpp)
 	glEndList();
 
 	dlg.hide();
+	if(dlg.wasCanceled()) return false;
+	return true;
 }
 
 

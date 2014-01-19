@@ -963,6 +963,13 @@ void Surface::SetSidePoints(Body * pBody, double dx, double dz)
 
 	//SideA, SideB are mid points (VLM) or bottom points (3DPanels)
 	//SideA_T, SideB_T, are top points (3DPanels);
+	SideA.clear();
+	SideA_T.clear();
+	SideA_B.clear();
+	SideB.clear();
+	SideB_T.clear();
+	SideB_B.clear();
+
 	for(int i=0; i<m_NXPanels+1; i++)
 	{
 		SideA.append(CVector(0,0,0));

@@ -34,12 +34,11 @@ class FoilTableDelegate : public QItemDelegate
 	friend class ManageFoilsDlg;
 
 public:
-	FoilTableDelegate(QObject *parent = 0);
+	FoilTableDelegate(QObject *pParent = 0);
 
 	QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &, const QModelIndex &index) const;
 
-	bool editorEvent(QEvent *event, QAbstractItemModel *, const QStyleOptionViewItem &,
-										const QModelIndex &index);
+	bool editorEvent(QEvent *event, QAbstractItemModel *pModel, const QStyleOptionViewItem &option, const QModelIndex &index);
 
 	void setEditorData(QWidget *editor, const QModelIndex &index) const;
 	void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const;
@@ -50,7 +49,8 @@ public:
 private:
 	QStandardItemModel *m_pFoilModel;
 	int *m_Precision; ///table of float precisions for each column
-	static void *s_pAFoil;
+	void *m_pAFoil;
+	void *m_pManageFoils;
 };
 
 #endif // FOILTABLEDELEGATE_H

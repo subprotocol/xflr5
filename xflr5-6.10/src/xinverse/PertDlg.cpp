@@ -156,7 +156,7 @@ void PertDlg::InitDialog()
 	memcpy(m_backr, m_cnr, sizeof(m_cnr));
 	memcpy(m_backi, m_cni, sizeof(m_cni));
 
-	m_pCnModel = new QStandardItemModel;
+	m_pCnModel = new QStandardItemModel(this);
 	m_pCnModel->setRowCount(10);//temporary
 	m_pCnModel->setColumnCount(3);
 
@@ -169,7 +169,7 @@ void PertDlg::InitDialog()
 	m_pctrlCnTable->setColumnWidth(1,100);
 	m_pctrlCnTable->setColumnWidth(2,100);
 
-	m_pFloatDelegate = new FloatEditDelegate;
+	m_pFloatDelegate = new FloatEditDelegate(this);
 	m_pctrlCnTable->setItemDelegate(m_pFloatDelegate);
 
 	m_precision = new int[3];

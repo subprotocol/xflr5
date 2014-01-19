@@ -88,11 +88,11 @@ void *QXDirect::s_p2DWidget;
 */
 QXDirect::QXDirect(QWidget *parent) : QWidget(parent)
 {
+	setAttribute(Qt::WA_DeleteOnClose);
+
 	SetupLayout();
 
 	m_pXFoil = new XFoil();
-
-	m_pXFoilAnalysisDlg = new XFoilAnalysisDlg;
 
 	m_CurveStyle = 0;
 	m_CurveWidth = 1;
@@ -289,7 +289,6 @@ QXDirect::QXDirect(QWidget *parent) : QWidget(parent)
 QXDirect::~QXDirect()
 {
 	qDebug()<<"Destroying XDirect";
-	delete (XFoilAnalysisDlg*)m_pXFoilAnalysisDlg;
 }
 
 
@@ -1601,7 +1600,8 @@ void QXDirect::OnAnalyze()
 	bool bHigh = m_bHighlightOpp;
 	m_bHighlightOpp = false;
 
-	XFoilAnalysisDlg*pXFADlg = (XFoilAnalysisDlg*)m_pXFoilAnalysisDlg;
+	XFoilAnalysisDlg *pXFADlg = new XFoilAnalysisDlg;
+
 	if(m_bSequence)
 	{
 		pXFADlg->SetAlpha(m_Alpha, m_AlphaMax, m_AlphaDelta);
@@ -1622,6 +1622,8 @@ void QXDirect::OnAnalyze()
 	pXFADlg->Analyze();
 
 	if(!s_bKeepOpenErrors || !pXFADlg->m_bErrors) pXFADlg->hide();
+
+	delete pXFADlg;
 
 	// and update window
 	emit projectModified();
@@ -1663,41 +1665,43 @@ void QXDirect::OnBatchAnalysis()
 
 	m_pctrlAnalyze->setEnabled(false);
 
-	BatchDlg btchDlg(pMainFrame);
-	btchDlg.m_pFoil     = Foil::curFoil();
-	btchDlg.m_bAlpha    = true;
+	BatchDlg *pBatchDlg = new BatchDlg;
+	pBatchDlg->m_pFoil     = Foil::curFoil();
+	pBatchDlg->m_bAlpha    = true;
 
-	btchDlg.m_SpMin     = m_Alpha;
-	btchDlg.m_SpMax     = m_AlphaMax;
-	btchDlg.m_SpInc     = m_AlphaDelta;
-	btchDlg.m_AlphaMin  = m_Alpha;
-	btchDlg.m_AlphaMax  = m_AlphaMax;
-	btchDlg.m_AlphaInc  = m_AlphaDelta;
-	btchDlg.m_ClMin     = m_Cl;
-	btchDlg.m_ClMax     = m_ClMax;
-	btchDlg.m_ClInc     = m_ClDelta;
-	btchDlg.m_ReMin     = m_Reynolds;
-	btchDlg.m_ReMax     = m_ReynoldsMax;
-	btchDlg.m_ReInc     = m_ReynoldsDelta;
+	pBatchDlg->m_SpMin     = m_Alpha;
+	pBatchDlg->m_SpMax     = m_AlphaMax;
+	pBatchDlg->m_SpInc     = m_AlphaDelta;
+	pBatchDlg->m_AlphaMin  = m_Alpha;
+	pBatchDlg->m_AlphaMax  = m_AlphaMax;
+	pBatchDlg->m_AlphaInc  = m_AlphaDelta;
+	pBatchDlg->m_ClMin     = m_Cl;
+	pBatchDlg->m_ClMax     = m_ClMax;
+	pBatchDlg->m_ClInc     = m_ClDelta;
+	pBatchDlg->m_ReMin     = m_Reynolds;
+	pBatchDlg->m_ReMax     = m_ReynoldsMax;
+	pBatchDlg->m_ReInc     = m_ReynoldsDelta;
 
-	btchDlg.m_bFromList = m_bFromList;
-	btchDlg.m_bFromZero = s_bFromZero;
-	btchDlg.InitDialog();
+	pBatchDlg->m_bFromList = m_bFromList;
+	pBatchDlg->m_bFromZero = s_bFromZero;
+	pBatchDlg->InitDialog();
 
-	if(btchDlg.exec()==QDialog::Accepted) emit projectModified();
+	if(pBatchDlg->exec()==QDialog::Accepted) emit projectModified();
 
-	m_Reynolds         = btchDlg.m_ReMin;
-	m_ReynoldsMax      = btchDlg.m_ReMax;
-	m_ReynoldsDelta    = btchDlg.m_ReInc;
-	m_Alpha            = btchDlg.m_AlphaMin;
-	m_AlphaMax         = btchDlg.m_AlphaMax;
-	m_AlphaDelta       = btchDlg.m_AlphaInc;
-	m_Cl               = btchDlg.m_ClMin;
-	m_ClMax            = btchDlg.m_ClMax;
-	m_ClDelta          = btchDlg.m_ClInc;
-	s_bAlpha           = btchDlg.m_bAlpha;
-	m_bFromList        = btchDlg.m_bFromList;
-	s_bFromZero        = btchDlg.m_bFromZero;
+	m_Reynolds         = pBatchDlg->m_ReMin;
+	m_ReynoldsMax      = pBatchDlg->m_ReMax;
+	m_ReynoldsDelta    = pBatchDlg->m_ReInc;
+	m_Alpha            = pBatchDlg->m_AlphaMin;
+	m_AlphaMax         = pBatchDlg->m_AlphaMax;
+	m_AlphaDelta       = pBatchDlg->m_AlphaInc;
+	m_Cl               = pBatchDlg->m_ClMin;
+	m_ClMax            = pBatchDlg->m_ClMax;
+	m_ClDelta          = pBatchDlg->m_ClInc;
+	s_bAlpha           = pBatchDlg->m_bAlpha;
+	m_bFromList        = pBatchDlg->m_bFromList;
+	s_bFromZero        = pBatchDlg->m_bFromZero;
+
+	delete pBatchDlg;
 
 	SetPolar();
 	pMainFrame->UpdatePolarListBox();
@@ -1735,39 +1739,41 @@ void QXDirect::OnMultiThreadedBatchAnalysis()
 
 	m_pctrlAnalyze->setEnabled(false);
 
-	BatchThreadDlg *m_pBatchThreadDlg   = new BatchThreadDlg(pMainFrame);
+	BatchThreadDlg *pBatchThreadDlg   = new BatchThreadDlg;
 
-	m_pBatchThreadDlg->m_pCurFoil  = Foil::curFoil();
+	pBatchThreadDlg->m_pCurFoil  = Foil::curFoil();
 
-	m_pBatchThreadDlg->m_bAlpha    = true;
-	m_pBatchThreadDlg->m_AlphaMin  = m_Alpha;
-	m_pBatchThreadDlg->m_AlphaMax  = m_AlphaMax;
-	m_pBatchThreadDlg->m_AlphaInc  = m_AlphaDelta;
-	m_pBatchThreadDlg->m_ClMin     = m_Cl;
-	m_pBatchThreadDlg->m_ClMax     = m_ClMax;
-	m_pBatchThreadDlg->m_ClInc     = m_ClDelta;
-	m_pBatchThreadDlg->m_ReMin     = m_Reynolds;
-	m_pBatchThreadDlg->m_ReMax     = m_ReynoldsMax;
-	m_pBatchThreadDlg->m_ReInc     = m_ReynoldsDelta;
+	pBatchThreadDlg->m_bAlpha    = true;
+	pBatchThreadDlg->m_AlphaMin  = m_Alpha;
+	pBatchThreadDlg->m_AlphaMax  = m_AlphaMax;
+	pBatchThreadDlg->m_AlphaInc  = m_AlphaDelta;
+	pBatchThreadDlg->m_ClMin     = m_Cl;
+	pBatchThreadDlg->m_ClMax     = m_ClMax;
+	pBatchThreadDlg->m_ClInc     = m_ClDelta;
+	pBatchThreadDlg->m_ReMin     = m_Reynolds;
+	pBatchThreadDlg->m_ReMax     = m_ReynoldsMax;
+	pBatchThreadDlg->m_ReInc     = m_ReynoldsDelta;
 
-	m_pBatchThreadDlg->m_bFromList = m_bFromList;
-	m_pBatchThreadDlg->m_bFromZero = s_bFromZero;
-	m_pBatchThreadDlg->InitDialog();
+	pBatchThreadDlg->m_bFromList = m_bFromList;
+	pBatchThreadDlg->m_bFromZero = s_bFromZero;
+	pBatchThreadDlg->InitDialog();
 
-	m_pBatchThreadDlg->exec();
+	pBatchThreadDlg->exec();
 
-	m_Reynolds         = m_pBatchThreadDlg->m_ReMin;
-	m_ReynoldsMax      = m_pBatchThreadDlg->m_ReMax;
-	m_ReynoldsDelta    = m_pBatchThreadDlg->m_ReInc;
-	m_Alpha            = m_pBatchThreadDlg->m_AlphaMin;
-	m_AlphaMax         = m_pBatchThreadDlg->m_AlphaMax;
-	m_AlphaDelta       = m_pBatchThreadDlg->m_AlphaInc;
-	m_Cl               = m_pBatchThreadDlg->m_ClMin;
-	m_ClMax            = m_pBatchThreadDlg->m_ClMax;
-	m_ClDelta          = m_pBatchThreadDlg->m_ClInc;
-	s_bAlpha           = m_pBatchThreadDlg->m_bAlpha;
-	m_bFromList        = m_pBatchThreadDlg->m_bFromList;
-	s_bFromZero        = m_pBatchThreadDlg->m_bFromZero;
+	m_Reynolds         = pBatchThreadDlg->m_ReMin;
+	m_ReynoldsMax      = pBatchThreadDlg->m_ReMax;
+	m_ReynoldsDelta    = pBatchThreadDlg->m_ReInc;
+	m_Alpha            = pBatchThreadDlg->m_AlphaMin;
+	m_AlphaMax         = pBatchThreadDlg->m_AlphaMax;
+	m_AlphaDelta       = pBatchThreadDlg->m_AlphaInc;
+	m_Cl               = pBatchThreadDlg->m_ClMin;
+	m_ClMax            = pBatchThreadDlg->m_ClMax;
+	m_ClDelta          = pBatchThreadDlg->m_ClInc;
+	s_bAlpha           = pBatchThreadDlg->m_bAlpha;
+	m_bFromList        = pBatchThreadDlg->m_bFromList;
+	s_bFromZero        = pBatchThreadDlg->m_bFromZero;
+
+	delete pBatchThreadDlg;
 
 	SetPolar();
 	pMainFrame->UpdatePolarListBox();

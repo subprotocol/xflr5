@@ -378,7 +378,6 @@ private:
 	QPoint m_PolarLegendOffset; /**< the offset position for the legend display in the client area */
 
 	XFoil *m_pXFoil;		    /**< a pointer to the unique instance of the XFoil object */
-	void *m_pXFoilAnalysisDlg;
 };
 
 

@@ -196,7 +196,8 @@ void GL3dWingDlg::ComputeGeometry()
 	m_pWing->ComputeGeometry();
 	m_pWing->CreateSurfaces(CVector(0.0,0.0,0.0), 0.0, 0.0);
 
-	for (int j=0; j<m_pWing->m_Surface.size(); j++) m_pWing->m_Surface.at(j)->SetSidePoints(NULL, 0.0, 0.0);
+	for (int j=0; j<m_pWing->m_Surface.size(); j++)
+		m_pWing->m_Surface.at(j)->SetSidePoints(NULL, 0.0, 0.0);
 }
 
 
@@ -210,20 +211,20 @@ void GL3dWingDlg::contextMenuEvent(QContextMenuEvent *event)
 
 void GL3dWingDlg::Connect()
 {
-	connect(m_pInsertBefore, SIGNAL(triggered()), this, SLOT(OnInsertBefore()));
-	connect(m_pInsertAfter, SIGNAL(triggered()), this, SLOT(OnInsertAfter()));
+	connect(m_pInsertBefore,  SIGNAL(triggered()), this, SLOT(OnInsertBefore()));
+	connect(m_pInsertAfter,   SIGNAL(triggered()), this, SLOT(OnInsertAfter()));
 	connect(m_pDeleteSection, SIGNAL(triggered()), this, SLOT(OnDeleteSection()));
-	connect(m_pResetSection, SIGNAL(triggered()), this, SLOT(OnResetSection()));
+	connect(m_pResetSection,  SIGNAL(triggered()), this, SLOT(OnResetSection()));
 
 	connect(m_pResetScales, SIGNAL(triggered()), this, SLOT(On3DReset()));
 
-	connect(m_pctrlIso, SIGNAL(clicked()),this, SLOT(On3DIso()));
-	connect(m_pctrlX, SIGNAL(clicked()),this, SLOT(On3DFront()));
-	connect(m_pctrlY, SIGNAL(clicked()),this, SLOT(On3DLeft()));
-	connect(m_pctrlZ, SIGNAL(clicked()),this, SLOT(On3DTop()));
-	connect(m_pctrlReset, SIGNAL(clicked()),this, SLOT(On3DReset()));
+	connect(m_pctrlIso,        SIGNAL(clicked()),this, SLOT(On3DIso()));
+	connect(m_pctrlX,          SIGNAL(clicked()),this, SLOT(On3DFront()));
+	connect(m_pctrlY,          SIGNAL(clicked()),this, SLOT(On3DLeft()));
+	connect(m_pctrlZ,          SIGNAL(clicked()),this, SLOT(On3DTop()));
+	connect(m_pctrlReset,      SIGNAL(clicked()),this, SLOT(On3DReset()));
 	connect(m_pctrlPickCenter, SIGNAL(clicked()),this, SLOT(On3DPickCenter()));
-	connect(m_pctrlFoilNames, SIGNAL(clicked()),this, SLOT(OnFoilNames()));
+	connect(m_pctrlFoilNames,  SIGNAL(clicked()),this, SLOT(OnFoilNames()));
 	connect(m_pctrlShowMasses, SIGNAL(clicked()),this, SLOT(OnShowMasses()));
 
 	connect(m_pctrlClipPlanePos, SIGNAL(sliderMoved(int)), this, SLOT(OnClipPlane(int)));
@@ -669,10 +670,9 @@ void GL3dWingDlg::GLCreateMesh()
 
 void GL3dWingDlg::GLCreateSectionHighlight()
 {
-	int jSection,l, jSurf;
-
 	int iSection = 0;
-	for(jSection=0; jSection<m_pWing->NWingSection(); jSection++)
+	int jSurf = 0;
+	for(int jSection=0; jSection<m_pWing->NWingSection(); jSection++)
 	{
 		if(jSection==m_iSection) break;
 		if(qAbs(m_pWing->YPosition(jSection+1)-m_pWing->YPosition(jSection)) > Wing::s_MinPanelSize)
@@ -697,9 +697,9 @@ void GL3dWingDlg::GLCreateSectionHighlight()
 			//plot B side outline
 			glBegin(GL_LINE_STRIP);
 			{
-				for (l=0; l<m_pWing->m_Surface.at(jSurf)->m_NXPanels; l++)
+				for (int lx=0; lx<m_pWing->m_Surface.at(jSurf)->m_NXPanels; lx++)
 				{
-					m_pWing->m_Surface.at(jSurf)->GetPanel(m_pWing->m_Surface.at(jSurf)->m_NYPanels-1, l, TOPSURFACE);
+					m_pWing->m_Surface.at(jSurf)->GetPanel(m_pWing->m_Surface.at(jSurf)->m_NYPanels-1, lx, TOPSURFACE);
 					glVertex3d(m_pWing->m_Surface.at(jSurf)->TB.x,
 							   m_pWing->m_Surface.at(jSurf)->TB.y,
 							   m_pWing->m_Surface.at(jSurf)->TB.z);
@@ -709,9 +709,9 @@ void GL3dWingDlg::GLCreateSectionHighlight()
 						   m_pWing->m_Surface.at(jSurf)->LB.y,
 						   m_pWing->m_Surface.at(jSurf)->LB.z);
 
-				for (l=m_pWing->m_Surface.at(jSurf)->m_NXPanels-1; l>=0; l--)
+				for (int lx=m_pWing->m_Surface.at(jSurf)->m_NXPanels-1; lx>=0; lx--)
 				{
-					m_pWing->m_Surface.at(jSurf)->GetPanel(m_pWing->m_Surface.at(jSurf)->m_NYPanels-1, l, BOTSURFACE);
+					m_pWing->m_Surface.at(jSurf)->GetPanel(m_pWing->m_Surface.at(jSurf)->m_NYPanels-1, lx, BOTSURFACE);
 					glVertex3d(m_pWing->m_Surface.at(jSurf)->TB.x,
 							   m_pWing->m_Surface.at(jSurf)->TB.y,
 							   m_pWing->m_Surface.at(jSurf)->TB.z);
@@ -727,24 +727,24 @@ void GL3dWingDlg::GLCreateSectionHighlight()
 
 				glBegin(GL_LINE_STRIP);
 				{
-					for (l=0; l<m_pWing->m_Surface.at(jSurf)->m_NXPanels; l++)
+					for (int lx=0; lx<m_pWing->m_Surface.at(jSurf)->m_NXPanels; lx++)
 					{
-						m_pWing->m_Surface.at(jSurf)->GetPanel(m_pWing->m_Surface.at(jSurf)->m_NYPanels-1, l, TOPSURFACE);
+						m_pWing->m_Surface.at(jSurf)->GetPanel(m_pWing->m_Surface.at(jSurf)->m_NYPanels-1, lx, TOPSURFACE);
 						glVertex3d(m_pWing->m_Surface.at(jSurf)->TB.x,
-								   m_pWing->m_Surface.at(jSurf)->TB.y,
-								   m_pWing->m_Surface.at(jSurf)->TB.z);
+								 m_pWing->m_Surface.at(jSurf)->TB.y,
+								 m_pWing->m_Surface.at(jSurf)->TB.z);
 					}
 
 					glVertex3d(m_pWing->m_Surface.at(jSurf)->LB.x,
-							   m_pWing->m_Surface.at(jSurf)->LB.y,
-							   m_pWing->m_Surface.at(jSurf)->LB.z);
+							 m_pWing->m_Surface.at(jSurf)->LB.y,
+							 m_pWing->m_Surface.at(jSurf)->LB.z);
 
-					for (l=m_pWing->m_Surface.at(jSection)->m_NXPanels-1; l>=0; l--)
+					for (int lx=m_pWing->m_Surface.at(jSurf)->m_NXPanels-1; lx>=0; lx--)
 					{
-						m_pWing->m_Surface.at(jSurf)->GetPanel(m_pWing->m_Surface.at(jSurf)->m_NYPanels-1, l, BOTSURFACE);
+						m_pWing->m_Surface.at(jSurf)->GetPanel(m_pWing->m_Surface.at(jSurf)->m_NYPanels-1, lx, BOTSURFACE);
 						glVertex3d(m_pWing->m_Surface.at(jSurf)->TB.x,
-								   m_pWing->m_Surface.at(jSurf)->TB.y,
-								   m_pWing->m_Surface.at(jSurf)->TB.z);
+								 m_pWing->m_Surface.at(jSurf)->TB.y,
+								 m_pWing->m_Surface.at(jSurf)->TB.z);
 					}
 				}
 				glEnd();
@@ -758,9 +758,9 @@ void GL3dWingDlg::GLCreateSectionHighlight()
 				//plot A side outline
 				glBegin(GL_LINE_STRIP);
 				{
-					for (l=0; l<m_pWing->m_Surface.at(jSurf)->m_NXPanels; l++)
+					for (int lx=0; lx<m_pWing->m_Surface.at(jSurf)->m_NXPanels; lx++)
 					{
-						m_pWing->m_Surface.at(jSurf)->GetPanel(0, l, TOPSURFACE);
+						m_pWing->m_Surface.at(jSurf)->GetPanel(0, lx, TOPSURFACE);
 						glVertex3d(m_pWing->m_Surface.at(jSurf)->TA.x,
 								   m_pWing->m_Surface.at(jSurf)->TA.y,
 								   m_pWing->m_Surface.at(jSurf)->TA.z);
@@ -770,9 +770,9 @@ void GL3dWingDlg::GLCreateSectionHighlight()
 							   m_pWing->m_Surface.at(jSurf)->LA.y,
 							   m_pWing->m_Surface.at(jSurf)->LA.z);
 
-					for (l=m_pWing->m_Surface.at(jSurf)->m_NXPanels-1; l>=0; l--)
+					for (int lx=m_pWing->m_Surface.at(jSurf)->m_NXPanels-1; lx>=0; lx--)
 					{
-						m_pWing->m_Surface.at(jSurf)->GetPanel(0, l, BOTSURFACE);
+						m_pWing->m_Surface.at(jSurf)->GetPanel(0, lx, BOTSURFACE);
 						glVertex3d(m_pWing->m_Surface.at(jSurf)->TA.x,
 								   m_pWing->m_Surface.at(jSurf)->TA.y,
 								   m_pWing->m_Surface.at(jSurf)->TA.z);
@@ -1910,7 +1910,7 @@ void GL3dWingDlg::ReadSectionData(int sel)
 	strong =pItem->text();
 	strong.replace(" ","");
 	d =strong.toDouble(&bOK);
-	if(bOK) m_pWing->NXPanels(sel) =(int)qMax(1.0,d);
+	if(bOK) m_pWing->NXPanels(sel) = (int)qMax(1.0,d);
 
 	pItem = m_pWingModel->item(sel,7);
 	strong =pItem->text();

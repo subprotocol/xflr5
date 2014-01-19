@@ -84,7 +84,9 @@ XFoilAnalysisDlg::XFoilAnalysisDlg(QWidget *pParent) : QDialog(pParent)
 
 XFoilAnalysisDlg::~XFoilAnalysisDlg()
 {
-	delete m_pXFoilTask;
+qDebug("Destroying XFoilAnalysisDlg");
+	if(m_pXFoilTask) delete m_pXFoilTask;
+	if(m_pXFile) delete m_pXFile;
 }
 
 void XFoilAnalysisDlg::SetupLayout()

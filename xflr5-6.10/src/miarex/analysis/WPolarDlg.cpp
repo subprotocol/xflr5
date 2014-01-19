@@ -33,7 +33,6 @@
 #include <math.h>
 
 
-void* WPolarDlg::s_pMiarex;
 WPolar WPolarDlg::s_WPolar;
 
 WPolarDlg::WPolarDlg(QWidget *pParent) : QDialog(pParent)

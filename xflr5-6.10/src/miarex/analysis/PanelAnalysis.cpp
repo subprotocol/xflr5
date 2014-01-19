@@ -118,9 +118,16 @@ PanelAnalysis::PanelAnalysis()
 
 	memset(m_ALong, 0, 16*sizeof(double));
 	memset(m_ALat,  0, 16*sizeof(double));
+	memset(m_BLong, 0,  4*sizeof(double));
+	memset(m_BLat,  0,  4*sizeof(double));
 	memset(m_R,     0,  9*sizeof(double));
 	memset(m_Is,    0,  9*sizeof(double));
 	memset(m_Ib,    0,  9*sizeof(double));
+	memset(m_rLong, 0,  8*sizeof(double));
+	memset(m_rLat,  0,  8*sizeof(double));
+	memset(m_vLong, 0, 32*sizeof(double));
+	memset(m_vLat,  0, 32*sizeof(double));
+
 }
 
 
@@ -156,8 +163,8 @@ bool PanelAnalysis::AllocateMatrix(int matSize, int &memsize)
 	int size2 = matSize * matSize;
 	try
 	{
-		m_aij      = new double[size2];
-		m_aijWake  = new double[size2];
+		m_aij      = new float[size2];
+		m_aijWake  = new float[size2];
 
 		m_uRHS  = new double[matSize];
 		m_vRHS  = new double[matSize];
@@ -186,7 +193,7 @@ bool PanelAnalysis::AllocateMatrix(int matSize, int &memsize)
 
 	s_MaxMatSize = matSize;
 
-	memsize  = sizeof(double)  * 2 * size2; //bytes
+	memsize  = sizeof(float)   * 2 * size2; //bytes
 	memsize += sizeof(double)  * 9 * matSize; //bytes
 	memsize += sizeof(CVector) * 3 * matSize;
 	memsize += sizeof(int)     * 1 * matSize;
@@ -194,8 +201,8 @@ bool PanelAnalysis::AllocateMatrix(int matSize, int &memsize)
 	strange = QString("PanelAnalysis::Memory allocation for the matrix arrays is %1 MB").arg((double)memsize/1024./1024., 7, 'f', 2);
 	Trace(strange);
 
-	memset(m_aij,     0, size2 * sizeof(double));
-	memset(m_aijWake, 0, size2 * sizeof(double));
+	memset(m_aij,     0, size2 * sizeof(float));
+	memset(m_aijWake, 0, size2 * sizeof(float));
 
 	memset(m_uRHS,  0, matSize*sizeof(double));
 	memset(m_vRHS,  0, matSize*sizeof(double));

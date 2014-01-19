@@ -36,7 +36,6 @@
 
 
 
-void *StabPolarDlg::s_pMiarex;
 WPolar StabPolarDlg::s_StabPolar;
 
 StabPolarDlg::StabPolarDlg(QWidget *pParent) : QDialog(pParent)
@@ -905,15 +904,15 @@ void StabPolarDlg::SetWPolarName()
 	if(!m_bAutoName || !m_pPlane) return;
 	QString str, strong;
 	int i, nCtrl;
-	QMiarex *pMiarex= (QMiarex*)s_pMiarex;
+
 	Units::getSpeedUnitLabel(str);
 	QString WPolarName = "T7";
 
 	if(!m_pPlane && !s_StabPolar.m_bThinSurfaces) WPolarName += "-Panel";
 	if(s_StabPolar.m_bThinSurfaces)
 	{
-		if(pMiarex->s_bVLM1) WPolarName += "-VLM1";
-		else		         WPolarName += "-VLM2";
+		if(QMiarex::s_bVLM1) WPolarName += "-VLM1";
+		else		           WPolarName += "-VLM2";
 	}
 
 	nCtrl = 0;

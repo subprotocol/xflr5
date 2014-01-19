@@ -28,12 +28,11 @@
 
 
 
-void *FoilTableDelegate::s_pAFoil;
-
-
-FoilTableDelegate::FoilTableDelegate(QObject *parent)
- : QItemDelegate(parent)
+FoilTableDelegate::FoilTableDelegate(QObject *pParent)
+ : QItemDelegate(pParent)
 {
+	m_pManageFoils = NULL;
+	m_pAFoil = NULL;
 }
 
 
@@ -59,14 +58,19 @@ QWidget *FoilTableDelegate::createEditor(QWidget *parent, const QStyleOptionView
 }
 
 
-bool FoilTableDelegate::editorEvent(QEvent *event, QAbstractItemModel *, const QStyleOptionViewItem &,
-									const QModelIndex &index)
+bool FoilTableDelegate::editorEvent(QEvent *event, QAbstractItemModel *pModel, const QStyleOptionViewItem &option,
+							 const QModelIndex &index)
 {
 //	if(index.column()<12) return false;
-	QAFoil *pAFoil = (QAFoil*)s_pAFoil;
-	QMouseEvent *pEvent = (QMouseEvent*)event;
-	if(pEvent->buttons() & Qt::LeftButton) pAFoil->OnFoilClicked(index);
-	return true;
+	if(m_pAFoil)
+	{
+		QAFoil *pAFoil = (QAFoil*)m_pAFoil;
+		QMouseEvent *pEvent = (QMouseEvent*)event;
+		if(pEvent->buttons() & Qt::LeftButton) pAFoil->OnFoilClicked(index);
+		event->accept();
+		return true;
+	}
+	else return QItemDelegate::editorEvent(event, pModel, option, index);
 }
 
 
@@ -74,8 +78,8 @@ void FoilTableDelegate::paint(QPainter *painter, const QStyleOptionViewItem &opt
 {
 	QString strong;
 	QStyleOptionViewItem myOption = option;
-	QAFoil *pAFoil = (QAFoil*)s_pAFoil;
-	int NFoils = pAFoil->m_poaFoil->size();
+	QAFoil *pAFoil = (QAFoil*)m_pAFoil;
+	int NFoils = Foil::s_oaFoil.size();
 
 	if(index.row()> NFoils)
 	{
@@ -106,62 +110,73 @@ void FoilTableDelegate::paint(QPainter *painter, const QStyleOptionViewItem &opt
 	}
 	else if(index.column()==12)
 	{
-		if(index.row()==0)	drawCheckBox(painter, myOption.rect, pAFoil->m_pSF->m_bVisible);
-		else
+		if(pAFoil)
 		{
-			Foil *pFoil = (Foil*)pAFoil->m_poaFoil->at(index.row()-1);
-			drawCheckBox(painter, myOption.rect, pFoil->m_bVisible);
+			if(index.row()==0)	drawCheckBox(painter, myOption.rect, pAFoil->m_pSF->m_bVisible);
+			else
+			{
+				Foil *pFoil = (Foil*)Foil::s_oaFoil.at(index.row()-1);
+				drawCheckBox(painter, myOption.rect, pFoil->m_bVisible);
+			}
 		}
 	}
 	else if(index.column()==13)
 	{
-		if(index.row()==0)	drawCheckBox(painter, myOption.rect, pAFoil->m_pSF->m_bOutPoints);
-		else
+		if(pAFoil)
 		{
-			Foil *pFoil = (Foil*)pAFoil->m_poaFoil->at(index.row()-1);
-			drawCheckBox(painter, myOption.rect, pFoil->m_bPoints);
+			if(index.row()==0)	drawCheckBox(painter, myOption.rect, pAFoil->m_pSF->m_bOutPoints);
+			else
+			{
+				Foil *pFoil = (Foil*)Foil::s_oaFoil.at(index.row()-1);
+				drawCheckBox(painter, myOption.rect, pFoil->m_bPoints);
+			}
 		}
 	}
 	else if(index.column()==14)
 	{
-		if(index.row()==0)	drawCheckBox(painter, myOption.rect, pAFoil->m_pSF->m_bCenterLine);
-		else
+		if(pAFoil)
 		{
-			Foil *pFoil = (Foil*)pAFoil->m_poaFoil->at(index.row()-1);
-			drawCheckBox(painter, myOption.rect, pFoil->m_bCenterLine);
+			if(index.row()==0)	drawCheckBox(painter, myOption.rect, pAFoil->m_pSF->m_bCenterLine);
+			else
+			{
+				Foil *pFoil = (Foil*)Foil::s_oaFoil.at(index.row()-1);
+				drawCheckBox(painter, myOption.rect, pFoil->m_bCenterLine);
+			}
 		}
 	}
 	else if(index.column()==15)
 	{
-		QColor color;
-		int style, width;
-
-		if(index.row()==0)
+		if(pAFoil)
 		{
-			color = pAFoil->m_pSF->m_FoilColor;
-			style = pAFoil->m_pSF->m_FoilStyle;
-			width = pAFoil->m_pSF->m_FoilWidth;
+			QColor color;
+			int style, width;
+
+			if(index.row()==0)
+			{
+				color = pAFoil->m_pSF->m_FoilColor;
+				style = pAFoil->m_pSF->m_FoilStyle;
+				width = pAFoil->m_pSF->m_FoilWidth;
+			}
+			else
+			{
+				Foil *pFoil = (Foil*)Foil::s_oaFoil.at(index.row()-1);
+				color = pFoil->m_FoilColor;
+				style = pFoil->m_FoilStyle;
+				width = pFoil->m_FoilWidth;
+			}
+			QRect r = option.rect;
+			r = pAFoil->m_pctrlFoilTable->visualRect(index);;
+
+			painter->save();
+
+			QPen LinePen(color);
+			LinePen.setStyle(getStyle(style));
+			LinePen.setWidth(width);
+			painter->setPen(LinePen);
+			painter->drawLine(r.left()+5, r.top()+r.height()/2, r.right()-5, r.top()+r.height()/2);
+
+			painter->restore();
 		}
-		else
-		{
-			Foil *pFoil = (Foil*)pAFoil->m_poaFoil->at(index.row()-1);
-			color = pFoil->m_FoilColor;
-			style = pFoil->m_FoilStyle;
-			width = pFoil->m_FoilWidth;
-		}
-		QRect r = option.rect;
-		r = pAFoil->m_pctrlFoilTable->visualRect(index);;
-
-		painter->save();
-	
-		QPen LinePen(color);
-		LinePen.setStyle(getStyle(style));
-		LinePen.setWidth(width);
-		painter->setPen(LinePen);
-		painter->drawLine(r.left()+5, r.top()+r.height()/2, r.right()-5, r.top()+r.height()/2);
-
-		painter->restore();
-
 //		drawFocus(painter, myOption, myOption.rect);
 	}
 	else

@@ -68,6 +68,7 @@ class LLTAnalysisDlg : public QDialog
 
 public:
 	LLTAnalysisDlg(QWidget *pParent, LLTAnalysis *pLLTAnalysis);
+	~LLTAnalysisDlg();
 
 	void initDialog();
 	void UpdateGraph(int x, double y);

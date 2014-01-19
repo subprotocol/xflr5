@@ -46,7 +46,7 @@ FoilCoordDlg::FoilCoordDlg(QWidget *pParent) : QDialog(pParent)
 
 FoilCoordDlg::~FoilCoordDlg()
 {
-	delete [] m_precision;
+	if(m_precision) delete [] m_precision;
 }
 
 void FoilCoordDlg::FillList()
@@ -74,7 +74,7 @@ void FoilCoordDlg::InitDialog()
 	QHeaderView *HorizontalHeader = m_pctrlCoordTable->horizontalHeader();
 	HorizontalHeader->setStretchLastSection(true);
 
-	m_pCoordModel = new QStandardItemModel;
+	m_pCoordModel = new QStandardItemModel(this);
 	m_pCoordModel->setRowCount(10);//temporary
 	m_pCoordModel->setColumnCount(2);
 	m_pCoordModel->setHeaderData(0, Qt::Horizontal, QObject::tr("X"));
@@ -82,7 +82,7 @@ void FoilCoordDlg::InitDialog()
 
 	m_pctrlCoordTable->setModel(m_pCoordModel);
 
-	m_pFloatDelegate = new FloatEditDelegate;
+	m_pFloatDelegate = new FloatEditDelegate(this);
 	m_pctrlCoordTable->setItemDelegate(m_pFloatDelegate);
 
 	m_precision = new int[2];

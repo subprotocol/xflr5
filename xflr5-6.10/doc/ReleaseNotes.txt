@@ -15,13 +15,17 @@
 *******************************************************************************
 
 xflr5 v6.10 2014
-	- Created GUI-independant classes for 3D-panel analysis and LLT analysis
-	- Removed the option for independent wing analysis
+	- Defined the influence matrices as arrays of floats instead of doubles - divides by 2 the memory requirement.
 	- Created a new binary .xfl projet file format. Replaces once and for all the awful .wpa format
+	- Removed the option for independent wing analysis
+	- Enabled LLT analysis for all Plane objects
 	- Removed the option for symmetry in 3d analysis
-	- Removed some of the limitations on fixed size arrays
 	- Corrected the bug in type 4 plane analysis- elevator and fin coefficients were incorrectly calculated
+	- Removed the default sizing for panel and matrix arrays. The arrays are now allocated for the size of the largest model loaded in the session.
+	- Corrected some memory leaks
+	- Corrected memory allocation/release mismatches
 	- MASSIVE code cleaning.
+	- Created GUI-independant classes for 3D-panel analysis and LLT analysis
 	- Minor corrections and enhancements
 
 

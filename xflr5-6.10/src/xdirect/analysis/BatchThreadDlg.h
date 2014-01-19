@@ -60,7 +60,7 @@ class BatchThreadDlg : public QDialog
 
 public:
 	BatchThreadDlg(QWidget *pParent=NULL);
-
+	~BatchThreadDlg();
 	void InitDialog();
 
 private:

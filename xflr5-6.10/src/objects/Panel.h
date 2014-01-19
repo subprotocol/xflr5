@@ -70,9 +70,9 @@ class Panel
 public:
 	Panel();
 
-	void VLMCmn(CVector const &C, CVector &V, bool const &bAll);
-	void DoubletNASA4023(CVector const &C, CVector &V, double &phi, bool bWake);
-	void SourceNASA4023(CVector const &C, CVector &V, double &phi);
+	void VLMCmn(CVector const &C, CVector &VTest, bool const &bAll);
+	void DoubletNASA4023(CVector const &C, CVector &VTest, double &phi, bool bWake);
+	void SourceNASA4023(CVector const &C, CVector &VTest, double &phi);
 
 	void RotateBC(CVector const &HA, Quaternion & Qt);
 	void Reset();
@@ -80,9 +80,9 @@ public:
 	void SetPanelFrame(CVector const &LA, CVector const &LB, CVector const &TA, CVector const &TB);
 	bool Intersect(CVector const &A, CVector const &U, CVector &I, double &dist);
 	bool Invert33(double *l);
-	CVector GlobalToLocal(CVector const &V);
+	CVector GlobalToLocal(CVector const &VTest);
 	CVector GlobalToLocal(double const &Vx, double const &Vy, double const &Vz);
-	CVector LocalToGlobal(CVector const &V);
+	CVector LocalToGlobal(CVector const &VTest);
 
 	double Width();
 	double GetArea();
@@ -115,33 +115,20 @@ protected:
 
 	double dl;               /**< The length of the bound vector */
 	double Area;             /**< The panel's area; */
-	double Size;             /**< = SMP + SMQ and provides an estimation of the panel's size. 
+	double SMP, SMQ;
+	double Size;             /**< = SMP + SMQ and provides an estimation of the panel's size.
 	                              This is used to determine if the far-field approximation can be used in 
 								  the evaluation of the source and doublet influent at a distant point */
-	double SMP;              /**< Half panel lenght in the l direction. Cf. document NACA 4023 figure 8.*/
-	double SMQ;              /**< Half panel lenght in the m direction. Cf. document NACA 4023 figure 8. */
 	double lij[9];           /**< The 3x3 matrix used to transform local coordinates in absolute coordinates */
 
 	static CVector *s_pNode;       /**< A static pointer to the global array of panel nodes */
 	static CVector *s_pWakeNode;   /**< A static pointer to the global array of wake panel nodes */
-	static CVector smp, smq, MidA, MidB;  // temp variables
 
 	static double s_VortexPos; /**< Defines the relative position of the bound vortex in the streamwise direction. Usually the vortex is positioned at the panel's quarter chord i.e. s_VortexPos=0.25 */
 	static double s_CtrlPos;   /**< Defines the relative position of the panel's control point in VLM. Usually the control point is positioned at the panel's 3/4 chord : s_VortexPos=0.75 */
 	static double det;         /**< temporary variable */
 	static double mat[9];      /**< temporary array  */
 
-private:
-	//temp variables
-	static double phiw, rz;
-	static double RFF;                 /**< factor used to deteremine if a point is at a far distance from the panel */
-	static double eps;
-	static double side, sign, dist, S, GL;
-	static double RNUM, DNOM, PN, A, B, PA, PB, SM, SL, AM, AL, Al, pjk, CJKi;
-	static CVector *m_pR[5];
-	static CVector PJK, a, b, s, T1, T2, h;
-
-	static CVector ILA, ILB, ITA, ITB, T, V, W, P, LATB, TALB;  // temp variables
 
 public:
 	enumPanelPosition m_Pos;   /**< defines if the panel is positioned on a top, middle, bottom, side or body surface */

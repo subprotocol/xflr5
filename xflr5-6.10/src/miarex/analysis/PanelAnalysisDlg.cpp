@@ -47,10 +47,14 @@ QPoint PanelAnalysisDlg::s_Position;
 PanelAnalysisDlg::PanelAnalysisDlg(QWidget *pParent, PanelAnalysis *pPanelAnalysis) : QDialog(pParent)
 {
 	setWindowTitle(tr("3D Panel Analysis"));
-	m_pXFile = NULL;
 	SetupLayout();
 	m_pPanelAnalysis = pPanelAnalysis;
+
+	QString FileName = QDir::tempPath() + "/XFLR5.log";
+	m_pXFile = new QFile(FileName);
+	if (!m_pXFile->open(QIODevice::WriteOnly | QIODevice::Text)) m_pXFile = NULL;
 }
+
 
 /**
  * The public destructor.
@@ -70,9 +74,6 @@ bool PanelAnalysisDlg::InitDialog()
 	m_pctrlTextOutput->setFont(Settings::s_TableFont);
 	m_Progress = 0.0;
 	m_pctrlProgress->setValue(m_Progress);
-	QString FileName = QDir::tempPath() + "/XFLR5.log";
-	m_pXFile = new QFile(FileName);
-	if (!m_pXFile->open(QIODevice::WriteOnly | QIODevice::Text)) m_pXFile = NULL;
 
 	m_pctrlTextOutput->clear();
 
@@ -116,6 +117,7 @@ void PanelAnalysisDlg::OnCancelAnalysis()
 */
 void PanelAnalysisDlg::SetFileHeader()
 {
+	if(!m_pXFile || !m_pXFile->isOpen()) return;
 	QTextStream out(m_pXFile);
 
 	out << "\n";
@@ -225,7 +227,7 @@ void PanelAnalysisDlg::Analyze()
 	QString len;
 	Units::getLengthUnitLabel(len);
 
-	QTimer *pTimer = new QTimer;
+	QTimer *pTimer = new QTimer(this);
 	connect(pTimer, SIGNAL(timeout()), this, SLOT(OnProgress()));
 	pTimer->setInterval(250);
 	pTimer->start();
@@ -257,7 +259,7 @@ void PanelAnalysisDlg::Analyze()
 	m_pPanelAnalysis->m_OutStream.flush();
 
 	OnProgress();
-	m_pXFile->close();
+	if(m_pXFile && m_pXFile->isOpen())  m_pXFile->close();
 
 	m_pctrlCancel->setText(tr("Close"));
 }

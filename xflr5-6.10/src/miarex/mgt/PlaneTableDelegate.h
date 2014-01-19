@@ -49,7 +49,6 @@ public:
 private:
 	QStandardItemModel *m_pUFOModel;
 	int *m_Precision; ///table of float precisions for each column
-	static void *s_pMiarex;
 };
 
 #endif // UFOTABLEDELEGATE_H

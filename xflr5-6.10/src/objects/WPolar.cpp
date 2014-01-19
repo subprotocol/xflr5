@@ -29,8 +29,6 @@
 #include <QMessageBox>
 
 
-void *WPolar::s_pMiarex;
-
 /**
  * The public constructor
  */
@@ -43,7 +41,7 @@ WPolar::WPolar()
 	m_bThinSurfaces = true;
 	m_bWakeRollUp   = false;
 	m_bTiltedGeom   = false;
-    m_bViscous      = true;
+	m_bViscous      = true;
 	m_bGround       = false;
 	m_bDirichlet    = true;
 	m_bIgnoreBodyPanels = false;

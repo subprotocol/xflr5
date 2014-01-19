@@ -96,7 +96,7 @@ bool QMiarex::m_bResetglStream = true;
 bool QMiarex::m_bResetglLegend = true;
 bool QMiarex::m_bResetglBody = true;
 bool QMiarex::m_bResetglBodyMesh = true;
-bool QMiarex::m_bResetglFlow = true;
+bool QMiarex::m_bResetglSurfVelocities = true;
 
 bool QMiarex::s_bResetCurves = true;
 bool QMiarex::s_bVLM1 = true;
@@ -205,7 +205,7 @@ QMiarex::QMiarex(QWidget *parent)
 	m_bArcball           = false;
 	m_bStream            = false;
 	m_bVortices          = false;
-	m_bSpeeds            = false;
+	m_bSurfVelocities            = false;
 	m_bCrossPoint        = false;
 	m_bPickCenter        = false;
 	m_bShowCpScale       = true;
@@ -322,7 +322,7 @@ QMiarex::QMiarex(QWidget *parent)
 	m_WPlrGraph[1].SetGraphName("Wing_Polar_Graph_2");
 	m_WPlrGraph[2].SetGraphName("Wing_Polar_Graph_3");
 	m_WPlrGraph[3].SetGraphName("Wing_Polar_Graph_4");
-	m_WPlrGraph[0].SetVariables(4,1);
+	m_WPlrGraph[0].SetVariables(2,1);
 	m_WPlrGraph[1].SetVariables(0,1);
 	m_WPlrGraph[2].SetVariables(0,6);
 	m_WPlrGraph[3].SetVariables(0,13);
@@ -2212,7 +2212,7 @@ void QMiarex::GLCallViewLists()
 	if (m_pCurPOpp && m_bStream && m_pCurPOpp->m_AnalysisMethod>=VLMMETHOD && !m_bResetglStream && glIsList(VLMSTREAMLINES) )
 		glCallList(VLMSTREAMLINES);//streamlines are not rotated
 
-	if(m_pCurPOpp && m_bSpeeds && m_pCurPOpp->m_AnalysisMethod>=VLMMETHOD && !m_bResetglFlow)
+	if(m_pCurPOpp && m_bSurfVelocities && m_pCurPOpp->m_AnalysisMethod>=VLMMETHOD && !m_bResetglSurfVelocities)
 		glCallList(SURFACESPEEDS);
 
 	if (m_pCurPOpp) glRotated(m_pCurPOpp->m_pPlaneWOpp[0]->m_Alpha, 0.0, 1.0, 0.0);
@@ -2582,26 +2582,46 @@ void QMiarex::GLDraw3D()
 			//no need to recalculate if not showing
 			if(m_pCurPlane && m_pCurPOpp && m_pCurPOpp->m_AnalysisMethod>=VLMMETHOD)
 			{
-				m_bResetglStream = false;
-                GLCreateStreamLines(m_pWingList, s_pNode, m_pCurWPolar, m_pCurPOpp);
-				m_bStream  = true;
+				if(!GLCreateStreamLines(m_pWingList, s_pNode, m_pCurWPolar, m_pCurPOpp))
+				{
+					m_bStream  = false;
+					m_bResetglStream = true;
+					m_pctrlStream->blockSignals(true);
+					m_pctrlStream->setChecked(false);
+					m_pctrlStream->blockSignals(false);
+				}
+				else
+				{
+					m_bStream  = true;
+					m_bResetglStream = false;
+				}
 			}
 		}
 	}
 
-	if((m_bResetglFlow || m_bResetglOpp) && m_iView==W3DVIEW)
+	if((m_bResetglSurfVelocities || m_bResetglOpp) && m_iView==W3DVIEW)
 	{
 		if(glIsList(SURFACESPEEDS))
 		{
 			glDeleteLists(SURFACESPEEDS,1);
 			s_GLList -=1;
 		}
-		if(m_bSpeeds)
+		if(m_bSurfVelocities)
 		{
 			if(m_pCurPlane && m_pCurPOpp && m_pCurPOpp->m_AnalysisMethod>=VLMMETHOD)
 			{
-				GLCreateSurfSpeeds(s_pPanel, m_pCurWPolar, m_pCurPOpp);
-				m_bResetglFlow = false;
+				if(!GLCreateSurfSpeeds(s_pPanel, m_pCurWPolar, m_pCurPOpp))
+				{
+					m_bSurfVelocities  = false;
+					m_bResetglSurfVelocities = true;
+					m_pctrlSurfVel->blockSignals(true);
+					m_pctrlSurfVel->setChecked(false);
+					m_pctrlSurfVel->blockSignals(false);
+				}
+				else
+				{
+					m_bResetglSurfVelocities = false;
+				}
 			}
 		}
 	}
@@ -3352,8 +3372,8 @@ void QMiarex::LLTAnalyze(double V0, double VMax, double VDelta, bool bSequence, 
 		m_pLLTDlg->hide();
 	}
 
-	pMainFrame->UpdatePOppListBox();
 	SetPlaneOpp(false, V0);
+	pMainFrame->UpdatePOppListBox();
 
     emit projectModified();
 }
@@ -3559,6 +3579,7 @@ void QMiarex::doubleClickEvent(QPoint pos)
 	if(m_iView==W3DVIEW)
 	{
 		ThreeDWidget *p3dWidget = (ThreeDWidget*)s_p3dWidget;
+		p3dWidget->setCursor(Qt::CrossCursor);
 
 		CVector Real;
 		p3dWidget->ClientToGL(pos, Real);
@@ -3571,6 +3592,8 @@ void QMiarex::doubleClickEvent(QPoint pos)
 	}
 	else if(m_pCurGraph) 
 	{
+		TwoDWidget *p2dWidget = (TwoDWidget*)s_p2dWidget;
+		p2dWidget->setCursor(Qt::CrossCursor);
 		Curve *pCloseCurve = NULL;
 		int n=-1;
 
@@ -3914,6 +3937,7 @@ void QMiarex::mousePressEvent(QMouseEvent *event)
 				m_bTransGraph = true;
 				if(m_pCurGraph && m_pCurGraph->IsInDrawRect(point)) m_bTransGraph = true;
 				else                                                m_bTransGraph = false;
+
 				if(m_bTrans || m_bTransGraph) p2dWidget->setCursor(Qt::ClosedHandCursor);
 
 			}
@@ -4304,7 +4328,7 @@ void QMiarex::OnAnalyze()
 	}
 	
 	//prevent an automatic and lengthy redraw of the streamlines after the calculation
-	m_bStream = m_bSpeeds = false;
+	m_bStream = m_bSurfVelocities = false;
 	m_pctrlStream->setChecked(false);
 	m_pctrlSurfVel->setChecked(false);
 
@@ -7525,7 +7549,7 @@ void QMiarex::OnSurfaces()
  */
 void QMiarex::OnSurfaceSpeeds()
 {
-	m_bSpeeds = m_pctrlSurfVel->isChecked();
+	m_bSurfVelocities = m_pctrlSurfVel->isChecked();
 	if(m_pctrlSurfVel->isChecked())
 	{
 //		m_bResetglStream = true;
@@ -8623,9 +8647,9 @@ void QMiarex::PanelAnalyze(double V0, double VMax, double VDelta, bool bSequence
 	if(!m_bLogFile || !PanelAnalysis::s_bWarning)
 		m_pPanelAnalysisDlg->hide();
 
-	pMainFrame->UpdatePOppListBox();
 
-	if(m_pCurPlane)     SetPlaneOpp(false, Objects3D::s_pPanelAnalysis->m_OpAlpha);
+	SetPlaneOpp(false, Objects3D::s_pPanelAnalysis->m_OpAlpha);
+	pMainFrame->UpdatePOppListBox();
 
 	m_bResetglWake=true; //TODO remove
 
@@ -10511,7 +10535,7 @@ bool QMiarex::SetPlaneOpp(bool bCurrent, double x)
 	m_bResetglMesh = true;
 	m_bResetglOpp    = true;
 	m_bResetglStream = true;
-	m_bResetglFlow   = true;
+	m_bResetglSurfVelocities   = true;
 	m_bResetglLegend = true;
 
 	SetControls();

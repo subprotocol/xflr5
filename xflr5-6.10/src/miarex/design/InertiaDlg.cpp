@@ -986,13 +986,13 @@ void InertiaDlg::SetupLayout()
 									  QAbstractItemView::AnyKeyPressed);
 
 
-	m_pMassModel = new QStandardItemModel;
+	m_pMassModel = new QStandardItemModel(this);
 	m_pMassModel->setRowCount(10);//temporary
 	m_pMassModel->setColumnCount(5);
 
 	m_pctrlMassTable->setModel(m_pMassModel);
 
-	m_pFloatDelegate = new FloatEditDelegate;
+	m_pFloatDelegate = new FloatEditDelegate(this);
 	m_pctrlMassTable->setItemDelegate(m_pFloatDelegate);
 	m_precision = new int[5];
 	m_precision[0] = 3;

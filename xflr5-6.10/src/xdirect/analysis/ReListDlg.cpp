@@ -62,7 +62,7 @@ void ReListDlg::InitDialog(QList<double> ReList, QList<double> MachList, QList<d
 	m_MachList.append(MachList);
 	m_NCritList.append(NCritList);
 
-	m_pReModel = new QStandardItemModel;
+	m_pReModel = new QStandardItemModel(this);
 	m_pReModel->setRowCount(3);//temporary
 	m_pReModel->setColumnCount(3);
 
@@ -79,7 +79,7 @@ void ReListDlg::InitDialog(QList<double> ReList, QList<double> MachList, QList<d
 	QHeaderView *HorizontalHeader = m_pctrlReTable->horizontalHeader();
 	HorizontalHeader->setStretchLastSection(true);
 
-	m_pFloatDelegate = new FloatEditDelegate;
+	m_pFloatDelegate = new FloatEditDelegate(this);
 	m_pctrlReTable->setItemDelegate(m_pFloatDelegate);
 
 	m_Precision = new int[3];

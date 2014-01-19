@@ -723,6 +723,61 @@ bool Crout_LU_Decomposition_with_Pivoting(double *A, int pivot[], int n, bool *p
 	return true;
 }
 
+bool Crout_LU_Decomposition_with_Pivoting(float *A, int pivot[], int n, bool *pbCancel, double TaskSize, double &Progress)
+{
+	qDebug("Floating decomposition");
+	int i, j, k;
+	float *p_k, *p_row, *p_col;
+	float max=0.0;
+
+	p_col = NULL;
+
+	//  For each row and column, k = 0, ..., n-1,
+	for (k=0, p_k=A; k<n; p_k+=n, k++)
+	{
+	//  find the pivot row
+		pivot[k] = k;
+		p_col = p_k+k;
+		max = qAbs( *(p_k + k) );
+		for (j=k+1, p_row=p_k+n; j<n; j++, p_row+=n)
+		{
+			if (max<qAbs(*(p_row+k)))
+			{
+				max = qAbs(*(p_row+k));
+				pivot[k] = j;
+				p_col = p_row;
+			}
+		}
+		if(!p_col) return false;
+
+		// and if the pivot row differs from the current row, then
+		// interchange the two rows.
+		if (pivot[k] != k)
+		{
+			for (j=0; j<n; j++)
+			{
+				max = *(p_k + j);
+				*(p_k + j) = *(p_col + j);
+				*(p_col + j) = max;
+			}
+		}
+
+		// and if the matrix is singular, return error
+		if ( *(p_k + k) == 0.0 ) return false;
+
+		// otherwise find the upper triangular matrix elements for row k.
+		for (j = k+1; j < n; j++) *(p_k + j) /= *(p_k + k);
+
+		// update remaining matrix
+		for (i = k+1, p_row = p_k + n; i < n; p_row += n, i++)
+			for (j = k+1; j < n; j++) *(p_row + j) -= *(p_row + k) * *(p_k + j);
+
+		Progress += TaskSize/(double)(n);
+		qApp->processEvents();
+		if(*pbCancel) return false;
+	}
+	return true;
+}
 
 /**
   int Crout_LU_with_Pivoting_Solve(double *LU, double B[], int pivot[],     
@@ -773,7 +828,7 @@ bool Crout_LU_with_Pivoting_Solve(double *LU, double B[], int pivot[], double x[
 		x[k] = B[k];
 		for (i=0; i<k; i++) x[k]-=x[i] * *(p_k+i);
 		x[k] /= *(p_k+k);
-		
+
 		qApp->processEvents();
 		if(*pbCancel) return false;
 	}
@@ -794,7 +849,54 @@ bool Crout_LU_with_Pivoting_Solve(double *LU, double B[], int pivot[], double x[
 		{
 			return false;
 		}
-		
+
+		qApp->processEvents();
+		if(*pbCancel) return false;
+	}
+
+	return true;
+}
+
+bool Crout_LU_with_Pivoting_Solve(float *LU, double B[], int pivot[], double x[], int Size, bool *pbCancel)
+{
+qDebug("Floating solve");
+	int i, k;
+	float *p_k;
+	double dum;
+
+	//  Solve the linear equation Lx = B for x, where L is a lower triangular matrix.
+	for (k=0, p_k=LU; k<Size; p_k+=Size, k++)
+	{
+		if (pivot[k] != k)
+		{
+			dum=B[k]; B[k]=B[pivot[k]]; B[pivot[k]]=dum;
+		}
+
+		x[k] = B[k];
+		for (i=0; i<k; i++) x[k]-=x[i] * *(p_k+i);
+		x[k] /= *(p_k+k);
+
+		qApp->processEvents();
+		if(*pbCancel) return false;
+	}
+
+	//  Solve the linear equation Ux = y, where y is the solution
+	//  obtained above of Lx = B and U is an upper triangular matrix.
+	//  The diagonal part of the upper triangular part of the matrix is
+	//  assumed to be 1.0.
+	for (k=Size-1, p_k=LU+Size*(Size-1); k>=0; k--, p_k-=Size)
+	{
+		if (pivot[k] != k)
+		{
+			dum=B[k]; B[k]=B[pivot[k]]; B[pivot[k]]=dum;
+		}
+
+		for (i=k+1; i<Size; i++) x[k]-=x[i] * *(p_k+i);
+		if (*(p_k+k)==0.0)
+		{
+			return false;
+		}
+
 		qApp->processEvents();
 		if(*pbCancel) return false;
 	}

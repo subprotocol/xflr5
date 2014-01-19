@@ -82,7 +82,6 @@ private slots:
 	void OnPlaneInertia();
 
 private:
-	static void *s_pMiarex;
 	static WPolar s_WPolar;
 
 	Plane *m_pPlane;

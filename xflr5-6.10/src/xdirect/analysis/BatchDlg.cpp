@@ -58,6 +58,8 @@ BatchDlg::BatchDlg(QWidget *pParent) : QDialog(pParent)
 	m_PolarType = FIXEDSPEEDPOLAR;
 	
 	m_Mach  = 0.0;
+
+	m_AlphaMin = m_AlphaMax = m_AlphaInc = 0.0;
 	m_ReMin = 100000.0;
 	m_ReInc =  50000.0;
 	m_ReMax = 300000.0;
@@ -118,6 +120,13 @@ BatchDlg::BatchDlg(QWidget *pParent) : QDialog(pParent)
 	connect(m_rbRange1, SIGNAL(toggled(bool)), this, SLOT(OnRange()));
 	connect(m_rbRange2, SIGNAL(toggled(bool)), this, SLOT(OnRange()));
 	connect(m_pctrlEditList, SIGNAL(clicked()), this, SLOT(OnEditReList()));
+}
+
+
+BatchDlg::~BatchDlg()
+{
+	qDebug("Destroying BatchDlg");
+	if(m_pXFoilTask) delete m_pXFoilTask;
 }
 
 /**

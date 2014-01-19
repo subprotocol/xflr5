@@ -44,8 +44,6 @@
 */
 
 
-
-
 #include "WingOpp.h"
 #include "PlaneOpp.h"
 #include <QVarLengthArray>
@@ -118,7 +116,6 @@ public: //access methods
 	bool bViscous() {return m_bViscous;}
 
 private:
-	static void* s_pMiarex;        /**< a pointer to the unique instance of the application's QMiarex class */
 
 	double   m_AMem;               /**< A variable which stores the last aoa displayed for this polar. Used to display the same aoa when the user switches to another polar */
 	bool     m_bAutoInertia;       /**< true if the inertia to be taken into account is the one of the parent plane */

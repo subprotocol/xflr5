@@ -536,8 +536,45 @@ QProgressBar::chunk
 
 QTabWidget::pane 
 {
-	border: 1px solid #404040;
-	top: 1px;
+	border: 1px solid dimgray;
+}
+
+
+QTabWidget::tab-bar
+{
+	background: darkgray;
+	left: 5px; /* move to the right by 5px */
+}
+
+ /* Style the tab using the tab sub-control. Note that it reads QTabBar _not_ QTabWidget */
+QTabBar::tab
+{
+	 background: QLinearGradient(x1:0, y1:0, x2:0, y2:1, stop:0 dimgray, stop:1 #2a2a2a);
+	 border: 1px solid #C4C4C3;
+	 border-bottom-color: 1px darkgray;
+	 border-top-left-radius: 4px;
+	 border-top-right-radius: 4px;
+	 min-width: 8ex;
+	 padding: 2px;
+}
+
+QTabBar::tab:selected, QTabBar::tab:hover
+{
+	 background: QLinearGradient(x1:0, y1:0, x2:0, y2:1, stop:0 dimgray, stop:1 #2a2a2a);
+}
+
+QTabBar::tab:selected
+{
+	background: dimgray;
+	color: black;
+	border-color: #9B9B9B;
+	border-bottom: 0px;
+}
+
+QTabBar::tab:!selected
+{
+	 margin-top: 2px; /* make non-selected tabs look smaller */
+	 border-bottom-color: darkgray; /* same as pane color */
 }
 
 

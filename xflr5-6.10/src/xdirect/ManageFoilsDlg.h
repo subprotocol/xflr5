@@ -40,6 +40,8 @@ class ManageFoilsDlg : public QDialog
 
 public:
 	ManageFoilsDlg(QWidget *pParent=NULL);
+	~ManageFoilsDlg();
+
 	void InitDialog(QString FoilName);
 
 private slots:
@@ -67,7 +69,7 @@ private:
 
 	int m_iSelection;
 	Foil *m_pFoil;
-
+	int  *m_precision;
 	bool m_bChanged;
 };
 

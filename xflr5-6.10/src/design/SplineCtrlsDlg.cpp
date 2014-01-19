@@ -67,7 +67,7 @@ void SplineCtrlsDlg::InitDialog()
 
 
 	//upper point list
-	m_pUpperListModel = new QStandardItemModel;
+	m_pUpperListModel = new QStandardItemModel(this);
 	m_pUpperListModel->setRowCount(10);//temporary
 	m_pUpperListModel->setColumnCount(3);
 
@@ -80,11 +80,11 @@ void SplineCtrlsDlg::InitDialog()
 	QHeaderView *HorizontalHeader = m_pctrlUpperList->horizontalHeader();
 	HorizontalHeader->setStretchLastSection(true);
 
-	m_pUpperFloatDelegate = new FloatEditDelegate;
+	m_pUpperFloatDelegate = new FloatEditDelegate(this);
 	m_pctrlUpperList->setItemDelegate(m_pUpperFloatDelegate);
 
 	//Lower point list
-	m_pLowerListModel = new QStandardItemModel;
+	m_pLowerListModel = new QStandardItemModel(this);
 	m_pLowerListModel->setRowCount(10);//temporary
 	m_pLowerListModel->setColumnCount(3);
 
@@ -97,7 +97,7 @@ void SplineCtrlsDlg::InitDialog()
 	HorizontalHeader = m_pctrlLowerList->horizontalHeader();
 	HorizontalHeader->setStretchLastSection(true);
 
-	m_pLowerFloatDelegate = new FloatEditDelegate;
+	m_pLowerFloatDelegate = new FloatEditDelegate(this);
 	m_pctrlLowerList->setItemDelegate(m_pLowerFloatDelegate);
 
 	m_precision = new int[3];
@@ -153,7 +153,7 @@ void SplineCtrlsDlg::SetupLayout()
 			}
 
 
-			m_pctrlUpperList = new QTableView;
+			m_pctrlUpperList = new QTableView(this);
 			m_pctrlUpperList->setFont(Settings::s_TableFont);
 			m_pctrlUpperList->setWindowTitle(QObject::tr("Upper side points"));
 			m_pctrlUpperList->setMinimumHeight(200);
@@ -183,8 +183,7 @@ void SplineCtrlsDlg::SetupLayout()
 				LowerLayout->addWidget(m_pctrlOutIntrados, 2,2);
 			}
 
-
-			m_pctrlLowerList = new QTableView;
+			m_pctrlLowerList = new QTableView(this);
 			m_pctrlLowerList->setFont(Settings::s_TableFont);
 			m_pctrlLowerList->setWindowTitle(QObject::tr("Lower side points"));
 			m_pctrlLowerList->setMinimumHeight(200);

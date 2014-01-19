@@ -66,7 +66,7 @@ void EditPlrDlg::InitDialog(void *pXDirect, Polar* pPolar, void *pMiarex, WPolar
 	m_pWPolar = pWPolar;
 
 
-	m_pPointModel = new QStandardItemModel;
+	m_pPointModel = new QStandardItemModel(this);
 	m_pPointModel->setRowCount(10);//temporary
 	m_pPointModel->setColumnCount(14);
 
@@ -91,7 +91,7 @@ void EditPlrDlg::InitDialog(void *pXDirect, Polar* pPolar, void *pMiarex, WPolar
 	QHeaderView *HorizontalHeader = m_pctrlPointTable->horizontalHeader();
 	HorizontalHeader->setStretchLastSection(true);
 
-	m_pFloatDelegate = new FloatEditDelegate;
+	m_pFloatDelegate = new FloatEditDelegate(this);
 	m_pctrlPointTable->setItemDelegate(m_pFloatDelegate);
 
 	m_precision = new int[14];

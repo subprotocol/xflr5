@@ -30,23 +30,12 @@ double Panel::s_VortexPos = 0.25;
 double Panel::s_CtrlPos   = 0.75;
 double Panel::mat[9];
 double Panel::det;
-CVector Panel::smp, Panel::smq, Panel::MidA, Panel::MidB;
 CVector *Panel::s_pNode, *Panel::s_pWakeNode;
-CVector Panel::ILA, Panel::ILB, Panel::ITA, Panel::ITB, Panel::T, Panel::V, Panel::W;
-CVector Panel::P;
-CVector Panel::LATB, Panel::TALB;
 
 //temporary variables
-double Panel::phiw, Panel::rz;
-double Panel::RFF = 10.;
-double Panel::eps = 1.e-7;
-double Panel::side, Panel::sign, Panel::dist, Panel::S, Panel::GL;
-double Panel::RNUM, Panel::DNOM, Panel::PN, Panel::A, Panel::B, Panel::PA, Panel::PB;
-double Panel::SM, Panel::SL, Panel::AM, Panel::AL, Panel::Al, Panel::pjk, Panel::CJKi;
-CVector *Panel::m_pR[5];
-CVector Panel::PJK, Panel::a, Panel::b, Panel::s, Panel::T1, Panel::T2, Panel::h;
 
-
+#define RFF 10.0         /**< factor used to determine if a point is at a far distance from the panel >*/
+#define eps 1.e-7        /**< factor used to determine if a point is on the panel >*/
 
 /**
 * The public constructor
@@ -64,9 +53,8 @@ void Panel::Reset()
 {
 	dl     = 0.0;
 	Size   = 0.0;
-	SMP    = 0.0;
-	SMQ    = 0.0;
 	Area   = 0.0;
+	SMP = SMQ = 0.0;
 
 	m_bIsLeading     = false;
 	m_bIsTrailing    = false;
@@ -113,6 +101,8 @@ void Panel::SetPanelFrame()
 */
 void Panel::SetPanelFrame(CVector const &LA, CVector const &LB, CVector const &TA, CVector const &TB)
 {
+	static CVector TALB, LATB, MidA, MidB;
+	static CVector smp, smq;
 
 	if(qAbs(LA.y)<1.e-5 && qAbs(TA.y)<1.e-5 && qAbs(LB.y)<1.e-5 && qAbs(TB.y)<1.e-5)
 		m_bIsInSymPlane = true; /** @todo check if any use anymore */
@@ -333,8 +323,10 @@ CVector Panel::LocalToGlobal(CVector const &V)
 */
 bool Panel::Intersect(CVector const &A, CVector const &U, CVector &I, double &dist)
 {
-	bool b1, b2, b3, b4;
-	double r,s;
+	static CVector ILA, ILB, ITA, ITB;
+	static CVector T, V, W, P;
+	static bool b1, b2, b3, b4;
+	static double r,s;
 
 	ILA.Copy(s_pNode[m_iLA]);
 	ITA.Copy(s_pNode[m_iTA]);
@@ -435,46 +427,46 @@ double Panel::Width()
 void Panel::RotateBC(CVector const &HA, Quaternion &Qt)
 {
 //	Qt.Conjugate(Vortex);
+	static CVector WTest;
+	WTest.x = VortexPos.x - HA.x;
+	WTest.y = VortexPos.y - HA.y;
+	WTest.z = VortexPos.z - HA.z;
+	Qt.Conjugate(WTest);
+	VortexPos.x = WTest.x + HA.x;
+	VortexPos.y = WTest.y + HA.y;
+	VortexPos.z = WTest.z + HA.z;
 
-	W.x = VortexPos.x - HA.x;
-	W.y = VortexPos.y - HA.y;
-	W.z = VortexPos.z - HA.z;
-	Qt.Conjugate(W);
-	VortexPos.x = W.x + HA.x;
-	VortexPos.y = W.y + HA.y;
-	VortexPos.z = W.z + HA.z;
+	WTest.x = VA.x - HA.x;
+	WTest.y = VA.y - HA.y;
+	WTest.z = VA.z - HA.z;
+	Qt.Conjugate(WTest);
+	VA.x = WTest.x + HA.x;
+	VA.y = WTest.y + HA.y;
+	VA.z = WTest.z + HA.z;
 
-	W.x = VA.x - HA.x;
-	W.y = VA.y - HA.y;
-	W.z = VA.z - HA.z;
-	Qt.Conjugate(W);
-	VA.x = W.x + HA.x;
-	VA.y = W.y + HA.y;
-	VA.z = W.z + HA.z;
+	WTest.x = VB.x - HA.x;
+	WTest.y = VB.y - HA.y;
+	WTest.z = VB.z - HA.z;
+	Qt.Conjugate(WTest);
+	VB.x = WTest.x + HA.x;
+	VB.y = WTest.y + HA.y;
+	VB.z = WTest.z + HA.z;
 
-	W.x = VB.x - HA.x;
-	W.y = VB.y - HA.y;
-	W.z = VB.z - HA.z;
-	Qt.Conjugate(W);
-	VB.x = W.x + HA.x;
-	VB.y = W.y + HA.y;
-	VB.z = W.z + HA.z;
+	WTest.x = CtrlPt.x - HA.x;
+	WTest.y = CtrlPt.y - HA.y;
+	WTest.z = CtrlPt.z - HA.z;
+	Qt.Conjugate(WTest);
+	CtrlPt.x = WTest.x + HA.x;
+	CtrlPt.y = WTest.y + HA.y;
+	CtrlPt.z = WTest.z + HA.z;
 
-	W.x = CtrlPt.x - HA.x;
-	W.y = CtrlPt.y - HA.y;
-	W.z = CtrlPt.z - HA.z;
-	Qt.Conjugate(W);
-	CtrlPt.x = W.x + HA.x;
-	CtrlPt.y = W.y + HA.y;
-	CtrlPt.z = W.z + HA.z;
-
-	W.x = CollPt.x - HA.x;
-	W.y = CollPt.y - HA.y;
-	W.z = CollPt.z - HA.z;
-	Qt.Conjugate(W);
-	CollPt.x = W.x + HA.x;
-	CollPt.y = W.y + HA.y;
-	CollPt.z = W.z + HA.z;
+	WTest.x = CollPt.x - HA.x;
+	WTest.y = CollPt.y - HA.y;
+	WTest.z = CollPt.z - HA.z;
+	Qt.Conjugate(WTest);
+	CollPt.x = WTest.x + HA.x;
+	CollPt.y = WTest.y + HA.y;
+	CollPt.z = WTest.z + HA.z;
 
 	Qt.Conjugate(Vortex);
 	Qt.Conjugate(Normal);
@@ -500,6 +492,11 @@ void Panel::RotateBC(CVector const &HA, Quaternion &Qt)
 void Panel::SourceNASA4023(CVector const &C,  CVector &V, double &phi)
 {
 	int i;
+	static double RNUM, DNOM, pjk, CJKi;
+	static double PN, A, B, PA, PB, SM, SL, AM, AL, Al;
+	static double side, sign, S, GL;
+	static CVector PJK, a, b, s, T1, T2, h;
+	static CVector *m_pR[5];
 	//we use a default core size, unless the user has specified one
 	double CoreSize = 0.00000;
 	if(qAbs(s_CoreSize)>PRECISION) CoreSize = s_CoreSize;
@@ -622,12 +619,10 @@ void Panel::SourceNASA4023(CVector const &C,  CVector &V, double &phi)
 			T2.x   = m.x      * SL*GL;
 			T2.y   = m.y      * SL*GL;
 			T2.z   = m.z      * SL*GL;
-			T.x    = Normal.x * CJKi;
-			T.y    = Normal.y * CJKi;
-			T.z    = Normal.z * CJKi;
-			V.x   += T.x + T1.x - T2.x;
-			V.y   += T.y + T1.y - T2.y;
-			V.z   += T.z + T1.z - T2.z;
+
+			V.x   += Normal.x * CJKi + T1.x - T2.x;
+			V.y   += Normal.y * CJKi + T1.y - T2.y;
+			V.z   += Normal.z * CJKi + T1.z - T2.z;
 		}
 	}
 }
@@ -649,6 +644,12 @@ void Panel::SourceNASA4023(CVector const &C,  CVector &V, double &phi)
 void Panel::DoubletNASA4023(CVector const &C, CVector &V, double &phi, bool bWake)
 {
 	int i;
+	static CVector *m_pR[5];
+	static CVector PJK, a, b, s, T1, h;
+	static double RNUM, DNOM, pjk, CJKi;
+	static double PN, A, B, PA, PB, SM, SL, AM, AL, Al;
+	static double side, sign, GL;
+
 
 	//we use a default core size, unless the user has specified one
 	double CoreSize = 0.00000;

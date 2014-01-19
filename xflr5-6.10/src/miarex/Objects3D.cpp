@@ -574,7 +574,7 @@ void Objects3D::InsertPOpp(PlaneOpp *pPOpp)
 						delete pOldPOpp;
 						s_oaPOpp.insert(i, pPOpp);
 						bIsInserted = true;
-						i = s_oaPOpp.size();// to break
+						break;
 					}
 					else if (pPOpp->m_Alpha > pOldPOpp->m_Alpha)
 					{

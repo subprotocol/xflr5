@@ -408,7 +408,7 @@ public:
 	bool m_bShowCpPoints;              /**< true if the points of the active curve should be displayed in Cp view */
 	bool m_bShowElliptic;              /**< true if the elliptic loading should be displayed in the local lift graph */
 	bool m_bShowWingCurve[MAXWINGS];   /**< true if various plane's wing curves shoud be displayed*/
-	bool m_bSpeeds;                    /**< true if the velocities should be displayed in the operating point or 3D view*/
+	bool m_bSurfVelocities;                    /**< true if the velocities should be displayed in the operating point or 3D view*/
 	bool m_bStream;                    /**< defines whether the streamlines should be displayed in the operating point or 3D view*/
 	bool m_bTrans;                     /**< true if the view is being dragged */
 	bool m_bTransGraph;	               /**< true if a graph is being dragged */
@@ -437,7 +437,7 @@ public:
 	static bool m_bResetglLegend;             /**< true if the legend needs to be reset if the window has been resized */
 	static bool m_bResetglBody;               /**< true if the openGL list for the body needs to be re-generated */
 	static bool m_bResetglBodyMesh;           /**< true if the openGL list for panel mesh needs to be re-generated */
-	static bool m_bResetglFlow;               /**< true if the crossflow OpenGL list needs to be refreshed */
+	static bool m_bResetglSurfVelocities;               /**< true if the crossflow OpenGL list needs to be refreshed */
 
 	static bool s_bResetCurves;               /**< true if the curves of the active view should be regenerated before the next view update >*/
 

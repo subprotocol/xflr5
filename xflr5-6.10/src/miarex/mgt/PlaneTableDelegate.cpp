@@ -23,7 +23,6 @@
 #include "PlaneTableDelegate.h"
 #include "../Objects3D.h"
 
-void *PlaneTableDelegate::s_pMiarex;
 
 PlaneTableDelegate::PlaneTableDelegate(QObject *parent)
  : QItemDelegate(parent)

@@ -865,12 +865,7 @@ void MainFrame::CreateDockWindows()
 
 	LLTAnalysis::s_poaPolar = &Polar::s_oaPolar;
 
-
 	ThreeDWidget::s_pMiarex       = m_pMiarex;
-	WPolar::s_pMiarex             = m_pMiarex;
-	StabPolarDlg::s_pMiarex       = m_pMiarex;
-	PlaneTableDelegate::s_pMiarex = m_pMiarex;
-	WPolarDlg::s_pMiarex          = m_pMiarex;
 
 	XFoilAnalysisDlg::s_pXDirect  = m_pXDirect;
 	NacaFoilDlg::s_pXFoil         = pXDirect->m_pXFoil;

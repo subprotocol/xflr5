@@ -51,6 +51,10 @@ LLTAnalysisDlg::LLTAnalysisDlg(QWidget *pParent, LLTAnalysis *pLLTAnalysis) : QD
 
 	m_pLLT = pLLTAnalysis;
 
+	QString FileName = QDir::tempPath() + "/XFLR5.log";
+	m_pXFile = new QFile(FileName);
+	if (!m_pXFile->open(QIODevice::WriteOnly | QIODevice::Text)) m_pXFile = NULL;
+
 	m_pIterGraph = m_pGraphWidget->graph();
 	m_pIterGraph->CopySettings(&Settings::s_RefGraph, false);
 //	m_pIterGraph->SetXTitle(tr("Iterations"));
@@ -80,11 +84,16 @@ LLTAnalysisDlg::LLTAnalysisDlg(QWidget *pParent, LLTAnalysis *pLLTAnalysis) : QD
 	m_LegendPlace.rx() = 0;
 	m_LegendPlace.ry() = 0;
 
-	m_pXFile       = NULL;
-
 	m_pLLT->m_pGraph = m_pIterGraph;
 }
 
+/**
+ * The class destructor.
+ */
+LLTAnalysisDlg::~LLTAnalysisDlg()
+{
+	if(m_pXFile) delete m_pXFile;
+}
 
 
 /**
@@ -93,10 +102,6 @@ LLTAnalysisDlg::LLTAnalysisDlg(QWidget *pParent, LLTAnalysis *pLLTAnalysis) : QD
 void LLTAnalysisDlg::initDialog()
 {
 	m_pctrlTextOutput->setFont(Settings::s_TableFont);
-
-	QString FileName = QDir::tempPath() + "/XFLR5.log";
-	m_pXFile = new QFile(FileName);
-	if (!m_pXFile->open(QIODevice::WriteOnly | QIODevice::Text)) m_pXFile = NULL;
 
 	SetFileHeader();
 
@@ -158,7 +163,6 @@ void LLTAnalysisDlg::ResetCurves()
 	if(pCurve) pCurve->clear();
 	pCurve = m_pIterGraph->GetCurve(1);
 	if(pCurve) pCurve->clear();
-
 }
 
 
@@ -213,13 +217,13 @@ void LLTAnalysisDlg::SetupLayout()
 	connect(m_pctrlCancel, SIGNAL(clicked()), this, SLOT(OnCancelAnalysis()));
 
 
-	QVBoxLayout *mainLayout = new QVBoxLayout;
+	QVBoxLayout *pMainLayout = new QVBoxLayout;
 	{
-		mainLayout->addWidget(m_pctrlTextOutput);
-		mainLayout->addWidget(m_pGraphWidget,2);
-		mainLayout->addWidget(m_pctrlCancel);
+		pMainLayout->addWidget(m_pctrlTextOutput);
+		pMainLayout->addWidget(m_pGraphWidget,2);
+		pMainLayout->addWidget(m_pctrlCancel);
 	}
-	setLayout(mainLayout);
+	setLayout(pMainLayout);
 }
 
 
@@ -239,7 +243,7 @@ void LLTAnalysisDlg::Analyze()
 	m_bFinished   = false;
 
 
-	QTimer *pTimer = new QTimer;
+	QTimer *pTimer = new QTimer(this);
 	connect(pTimer, SIGNAL(timeout()), this, SLOT(OnProgress()));
 	pTimer->setInterval(100);
 	pTimer->start();

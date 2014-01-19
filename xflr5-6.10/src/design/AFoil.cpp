@@ -27,6 +27,8 @@
 #include <QDesktopWidget>
 #include <QHeaderView>
 #include <QHBoxLayout>
+#include <QtDebug>
+
 
 #include "AFoil.h"
 #include "AFoilGridDlg.h"
@@ -141,7 +143,6 @@ QAFoil::QAFoil(QWidget *parent)
 
 	SetupLayout();
 
-	FoilTableDelegate::s_pAFoil = this;
 	SplineCtrlsDlg::s_pAFoil    = this;
 }
 
@@ -1187,12 +1188,12 @@ void QAFoil::OnAFoilCadd()
 
 	UpdateView();
 
-    CAddDlg caDlg(pMainFrame);
-    caDlg.m_pBufferFoil = m_pBufferFoil;
+	CAddDlg caDlg(pMainFrame);
+	caDlg.m_pBufferFoil = m_pBufferFoil;
 	caDlg.m_pMemFoil    = Foil::curFoil();
 	caDlg.InitDialog();
 
-    if(QDialog::Accepted == caDlg.exec())
+	if(QDialog::Accepted == caDlg.exec())
 	{
 		//then duplicate the buffer foil and add it
 		Foil *pNewFoil = new Foil();
@@ -1782,6 +1783,7 @@ void QAFoil::OnFoilClicked(const QModelIndex& index)
 
 	if(index.row()>=m_poaFoil->size()+1) return;
 	QStandardItem *pItem = m_pFoilModel->item(index.row(),0);
+	if(!pItem) return;
 
 	m_pctrlFoilTable->selectRow(index.row());
 
@@ -2672,6 +2674,7 @@ void QAFoil::SetupLayout()
 	m_pctrlFoilTable->horizontalHeader()->setStretchLastSection(true);
 
 	m_pFoilDelegate = new FoilTableDelegate(this);
+	m_pFoilDelegate->m_pAFoil = this;
 	m_pctrlFoilTable->setItemDelegate(m_pFoilDelegate);
 	m_pFoilDelegate->m_pFoilModel = m_pFoilModel;
 
@@ -3109,6 +3112,7 @@ Foil* QAFoil::AddNewFoil(Foil *pFoil)
 	{
 		pFoil->setFoilName(renDlg.newName());
 		pFoil->insertThisFoil();
+		emit projectModified();
 		return pFoil;
 	}
 	return NULL;

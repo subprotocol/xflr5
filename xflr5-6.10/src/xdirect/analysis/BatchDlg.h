@@ -53,6 +53,7 @@ class BatchDlg : public QDialog
 	friend class QReListDlg;
 public:
 	BatchDlg(QWidget *pParent=NULL);
+	~BatchDlg();
 
 private:
 	void keyPressEvent(QKeyEvent *event);

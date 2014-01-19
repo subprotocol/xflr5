@@ -633,7 +633,7 @@ void Wing::CreateSurfaces(CVector const &T, double XTilt, double YTilt)
 
 
 	if(s_MinPanelSize>0.0) MinPanelSize = s_MinPanelSize;
-	else                              MinPanelSize = 0.0;
+	else                   MinPanelSize = 0.0;
 
 	m_MatSize = 0;
 

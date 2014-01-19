@@ -182,8 +182,8 @@ private:
 	double *m_3DQInf;        /**< a pointer to the calculated balance speeds for each aoa in Type 2 and Type 7 analysis */
 
 
-	double *m_aij;           /**< coefficient matrix for the panel analysis. Is declared as a common member variable to save memory allocation times*/
-	double *m_aijWake;       /**< coefficient matrix. Is declared as a common member variable to save memory allocation times*/
+	float *m_aij;           /**< coefficient matrix for the panel analysis. Is declared as a common member variable to save memory allocation times*/
+	float *m_aijWake;       /**< coefficient matrix. Is declared as a common member variable to save memory allocation times*/
 	double *m_uRHS, *m_vRHS, *m_wRHS;
 	double *m_pRHS, *m_qRHS, *m_rRHS;
 	double *m_cRHS;

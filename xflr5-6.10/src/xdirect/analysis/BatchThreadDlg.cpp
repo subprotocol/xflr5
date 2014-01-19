@@ -48,6 +48,9 @@ BatchThreadDlg::BatchThreadDlg(QWidget *pParent) : QDialog(pParent)
 	QString str = tr("Multi-threaded batch analysis");
 	setWindowTitle(str);
 
+	m_pXFoilTask = NULL;
+	m_pXFile = NULL;
+
 	m_PolarType = FIXEDSPEEDPOLAR;
 
 	m_FoilList.clear();
@@ -92,6 +95,24 @@ BatchThreadDlg::BatchThreadDlg(QWidget *pParent) : QDialog(pParent)
 	connect(m_pctrlSpecMin, SIGNAL(editingFinished()), this, SLOT(OnSpecChanged()));
 	connect(m_pctrlSpecMax, SIGNAL(editingFinished()), this, SLOT(OnSpecChanged()));
 	connect(m_pctrlSpecDelta, SIGNAL(editingFinished()), this, SLOT(OnSpecChanged()));
+}
+
+/**
+ * This course of action will lead us to destruction.
+ */
+BatchThreadDlg::~BatchThreadDlg()
+{
+qDebug("Destroying BatchThreadDlg");
+	if(m_pXFoilTask) delete [] m_pXFoilTask;
+	if(m_pXFile)     delete m_pXFile;
+
+	//clean up the rest of the analysis in case of cancellation
+	for(int ia=m_AnalysisPair.count()-1; ia>=0; ia--)
+	{
+		Analysis *pAnalysis = m_AnalysisPair.last();
+		m_AnalysisPair.removeLast();
+		delete pAnalysis;
+	}
 }
 
 
@@ -173,8 +194,6 @@ void BatchThreadDlg::SetupLayout()
 			RangeSpecLayout->addWidget(m_pctrlEditList);
 		}
 
-
-
 		QVBoxLayout *BatchVarsGroupLayout = new QVBoxLayout;
 		{
 			BatchVarsGroupLayout->addLayout(RangeSpecLayout);
@@ -197,7 +216,6 @@ void BatchThreadDlg::SetupLayout()
 			RangeSpecLayout->addStretch(1);
 			RangeSpecLayout->addWidget(m_pctrlFromZero);
 		}
-
 
 		QGridLayout *RangeVarsLayout = new QGridLayout;
 		{
@@ -309,7 +327,6 @@ void BatchThreadDlg::SetupLayout()
 		RightSide->addWidget(m_pctrlTextOutput,1);
 	//	RightSide->addStretch(1);
 	}
-
 
 	QHBoxLayout *BoxesLayout = new QHBoxLayout;
 	{
@@ -747,6 +764,7 @@ void BatchThreadDlg::ReadParams()
  */
 void BatchThreadDlg::SetFileHeader()
 {
+	if(!m_pXFile) return;
 	QTextStream out(m_pXFile);
 
 	out << "\n";
@@ -797,8 +815,7 @@ void BatchThreadDlg::UpdateOutput(QString &str)
  */
 void BatchThreadDlg::WriteString(QString &strong)
 {
-	if(!m_pXFile) return;
-	if(!m_pXFile->isOpen()) return;
+	if(!m_pXFile || !m_pXFile->isOpen()) return;
 	QTextStream ds(m_pXFile);
 	ds << strong;
 }
@@ -819,13 +836,14 @@ void BatchThreadDlg::StartAnalysis()
 	if(s_bCurrentFoil)
 	{
 		m_FoilList.clear();
-		m_FoilList.append(Foil::curFoil()->m_FoilName);
+		m_FoilList.append(Foil::curFoil()->foilName());
 	}
 
 	if(!m_FoilList.count())
 	{
 		strong ="No foil defined for analysis\n\n";
 		UpdateOutput(strong);
+		CleanUp();
 		return;
 	}
 
@@ -955,10 +973,9 @@ void BatchThreadDlg::StartThread()
 	Analysis *pAnalysis;
 	QString strong;
 	//  browse through the array until we find an available thread
-	while(QThreadPool::globalInstance()->activeThreadCount()<m_nThreads)
+	while(QThreadPool::globalInstance()->activeThreadCount()<m_nThreads && m_AnalysisPair.count())
 	{
 		//re-use a runnable object, don't recreate one, to save memory allocation time
-		//on the other hand, this loop will run permanently;
 		for (int it=0; it<m_nThreads; it++)
 		{
 			if(m_pXFoilTask && m_pXFoilTask[it].m_bIsFinished)
@@ -982,7 +999,9 @@ void BatchThreadDlg::StartThread()
 				QThreadPool::globalInstance()->start(m_pXFoilTask+it);
 
 				//remove it from the todo array
+				pAnalysis = m_AnalysisPair.last();
 				m_AnalysisPair.removeLast();
+				delete pAnalysis;
 				break;
 			}
 		}
