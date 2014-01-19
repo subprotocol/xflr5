@@ -521,10 +521,10 @@ void QMiarex::Connect()
 	connect(m_pctrlSurfaces,  SIGNAL(clicked()), SLOT(OnSurfaces()));
 	connect(m_pctrlOutline,   SIGNAL(clicked()), SLOT(OnOutline()));
 	connect(m_pctrlPanels,    SIGNAL(clicked()), SLOT(OnPanels()));
-	connect(m_pctrlVortices,  SIGNAL(clicked()), SLOT(OnVortices()));
+//	connect(m_pctrlVortices,  SIGNAL(clicked()), SLOT(OnVortices()));
 	connect(m_pctrlFoilNames, SIGNAL(clicked()), SLOT(OnFoilNames()));
 	connect(m_pctrlMasses,    SIGNAL(clicked()), SLOT(OnMasses()));
-	connect(m_pctrlLight,     SIGNAL(clicked()), SLOT(OnLight()));
+//	connect(m_pctrlLight,     SIGNAL(clicked()), SLOT(OnLight()));
 	connect(m_pctrlClipPlanePos, SIGNAL(sliderMoved(int)), this, SLOT(OnClipPlane(int)));
 
 	connect(m_pctrlKeepCpSection,  SIGNAL(clicked()), this, SLOT(OnKeepCpSection()));
@@ -673,7 +673,7 @@ void QMiarex::SetControls()
 	m_pctrlIDrag->setEnabled(     m_iView==W3DVIEW && m_pCurPOpp);
 	m_pctrlVDrag->setEnabled(     m_iView==W3DVIEW && m_pCurPOpp);
 	m_pctrlDownwash->setEnabled(  m_iView==W3DVIEW && m_pCurPOpp);
-	m_pctrlVortices->setEnabled(  m_iView==W3DVIEW && m_pCurPOpp);
+//	m_pctrlVortices->setEnabled(  m_iView==W3DVIEW && m_pCurPOpp);
 	m_pctrlMoment->setEnabled(    m_iView==W3DVIEW && m_pCurPOpp);
 	m_pctrlPanelForce->setEnabled(m_iView==W3DVIEW && m_pCurPOpp && m_pCurWPolar && m_pCurWPolar->analysisMethod()!=LLTMETHOD);
 	m_pctrlCp->setEnabled(        m_iView==W3DVIEW && m_pCurPOpp && m_pCurWPolar && m_pCurWPolar->analysisMethod()!=LLTMETHOD);
@@ -715,7 +715,7 @@ void QMiarex::SetControls()
 	m_pctrlIDrag->setChecked(s_bICd);
 	m_pctrlVDrag->setChecked(s_bVCd);
 	m_pctrlAxes->setChecked(s_bAxes);
-	m_pctrlLight->setChecked(GLLightDlg::IsLightOn());
+//	m_pctrlLight->setChecked(GLLightDlg::IsLightOn());
 	m_pctrlSurfaces->setChecked(s_bSurfaces);
 	m_pctrlOutline->setChecked(s_bOutline);
 	m_pctrlStream->setChecked(m_bStream);
@@ -6570,7 +6570,7 @@ void QMiarex::OnKeepCpSection()
  */
 void QMiarex::OnLight()
 {
-	GLLightDlg::s_bLight = m_pctrlLight->isChecked();
+//	GLLightDlg::s_bLight = m_pctrlLight->isChecked();
 //	m_bResetglGeom = true;
 	UpdateView();
 }
@@ -7664,7 +7664,7 @@ void QMiarex::OnFourGraphs()
  */
 void QMiarex::OnVortices()
 {
-	m_bVortices = m_pctrlVortices->isChecked();
+//	m_bVortices = m_pctrlVortices->isChecked();
 	UpdateView();
 }
 
@@ -9613,12 +9613,12 @@ void QMiarex::SetupLayout()
 			QGridLayout *pThreeDParamsLayout = new QGridLayout;
 			{
 				m_pctrlAxes       = new QCheckBox(tr("Axes"), this);
-				m_pctrlLight      = new QCheckBox(tr("Light"), this);
+//				m_pctrlLight      = new QCheckBox(tr("Light"), this);
 				m_pctrlSurfaces   = new QCheckBox(tr("Surfaces"), this);
 				m_pctrlOutline    = new QCheckBox(tr("Outline"), this);
 				m_pctrlPanels     = new QCheckBox(tr("Panels"), this);
 				m_pctrlFoilNames  = new QCheckBox(tr("Foil Names"), this);
-				m_pctrlVortices   = new QCheckBox(tr("Vortices"), this);
+//				m_pctrlVortices   = new QCheckBox(tr("Vortices"), this);
 				m_pctrlMasses     = new QCheckBox(tr("Masses"), this);
 
 				pThreeDParamsLayout->addWidget(m_pctrlAxes, 1,1);
