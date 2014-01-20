@@ -1843,6 +1843,11 @@ void Foil::insertThisFoil()
 		pOldFoil = (Foil*)s_oaFoil.at(iFoil);
 		if(pOldFoil->foilName()==oldFoilName && pOldFoil!=this)
 		{
+			//copy the old foil's style
+			m_FoilColor = pOldFoil->m_FoilColor;
+			m_FoilStyle = pOldFoil->m_FoilStyle;
+			m_FoilWidth = pOldFoil->m_FoilWidth;
+
 			//we overwrite the old foil and delete its children objects
 			deleteFoil(pOldFoil);
 			//continue loop, shouldn't find any other Foil with the same name, but cleans up former errors eventually

@@ -401,8 +401,8 @@ bool Objects3D::initializePanels(Plane *pPlane, WPolar *pWPolar)
  * @param P the point of origin of the rotation
  */
 void Objects3D::rotateGeomZ(Panel *pPanel, CVector *pNode, Panel *pWakePanel, CVector *pWakeNode,
-							int nPanels, int nWakePanels, int nNodes, int/* nWakeNodes*/, int NWakeColumn,
-							double const &Beta, CVector const &P, int NXWakePanels)
+					   int nPanels, int nWakePanels, int nNodes, int/* nWakeNodes*/, int NWakeColumn,
+					   double const &Beta, CVector const &P, int NXWakePanels)
 {
 	int n, p, pw, kw, lw;
 	int iLA, iLB, iTA, iTB;
@@ -477,8 +477,8 @@ void Objects3D::rotateGeomZ(Panel *pPanel, CVector *pNode, Panel *pWakePanel, CV
  * @param P the point of origin of the rotation
  */
 void Objects3D::rotateGeomY(Panel *pPanel, CVector *pNode, Panel *pWakePanel, CVector *pWakeNode,
-							int nPanels, int nWakePanels, int nNodes, int /*nWakeNodes*/, int NWakeColumn,
-							double const &Alpha, CVector const &P, int NXWakePanels)
+					   int nPanels, int nWakePanels, int nNodes, int /*nWakeNodes*/, int NWakeColumn,
+					   double const &Alpha, CVector const &P, int NXWakePanels)
 {
 	int n, p, pw, kw, lw;
 

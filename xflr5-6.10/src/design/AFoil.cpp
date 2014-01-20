@@ -152,7 +152,7 @@ QAFoil::QAFoil(QWidget *parent)
  */
 QAFoil::~QAFoil()
 {
-	qDebug("Destroying AFoil");
+	Trace("Destroying AFoil");
 
 	ClearStack(-1);
 	if(m_pSF) delete m_pSF;
@@ -2541,7 +2541,7 @@ void QAFoil::SaveSettings(QSettings *pSettings)
 		pSettings->setValue("YMinStyle", m_YMinStyle);
 		pSettings->setValue("XMinWidth", m_XMinWidth);
 		pSettings->setValue("YMinWidth", m_YMinWidth);
-		pSettings->setValue("XMajUnit", m_YGridUnit);
+		pSettings->setValue("XMajUnit", m_XGridUnit);
 		pSettings->setValue("YMajUnit", m_YGridUnit);
 		pSettings->setValue("XMinUnit", m_XMinUnit);
 		pSettings->setValue("YMinUnit", m_YMinUnit);

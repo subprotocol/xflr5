@@ -102,7 +102,7 @@ BatchThreadDlg::BatchThreadDlg(QWidget *pParent) : QDialog(pParent)
  */
 BatchThreadDlg::~BatchThreadDlg()
 {
-qDebug("Destroying BatchThreadDlg");
+//	Trace("Destroying BatchThreadDlg");
 	if(m_pXFoilTask) delete [] m_pXFoilTask;
 	if(m_pXFile)     delete m_pXFile;
 

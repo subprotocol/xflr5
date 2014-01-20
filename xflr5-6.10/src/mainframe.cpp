@@ -239,7 +239,7 @@ MainFrame::MainFrame(QWidget *parent, Qt::WindowFlags flags) : QMainWindow(paren
 
 MainFrame::~MainFrame()
 {
-	qDebug("Destroying mainframe");
+	Trace("Destroying mainframe");
 
 	if(s_pTraceFile) s_pTraceFile->close();
 

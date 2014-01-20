@@ -288,7 +288,7 @@ QXDirect::QXDirect(QWidget *parent) : QWidget(parent)
  */
 QXDirect::~QXDirect()
 {
-	qDebug()<<"Destroying XDirect";
+	Trace("Destroying XDirect");
 }
 
 
@@ -2619,7 +2619,10 @@ void QXDirect::OnCadd()
 		pNewFoil->m_FoilWidth = 1;
 		pNewFoil->m_bPoints = false;
 		OpPoint::setCurOpp((OpPoint*)ptr);
-		if(!AddNewFoil(pNewFoil))	SetBufferFoil();
+
+		if(!AddNewFoil(pNewFoil)) SetBufferFoil();
+		else                      SetFoil(pNewFoil);
+
 		pMainFrame->UpdateFoilListBox();
 	}
 	else
@@ -2658,8 +2661,10 @@ void QXDirect::OnDerotateFoil()
 	str = QString(tr("The foil has been de-rotated by %1 degrees")).arg(angle,6,'f',3);
 	pMainFrame->statusBar()->showMessage(str);
 
-	if(!AddNewFoil(pNewFoil))	SetBufferFoil();
-	SetFoil(pNewFoil);
+
+	if(!AddNewFoil(pNewFoil)) SetBufferFoil();
+	else                      SetFoil(pNewFoil);
+
 	pMainFrame->UpdateFoilListBox();
 
 	emit projectModified();
@@ -3171,8 +3176,9 @@ void QXDirect::OnFoilCoordinates()
 		pNewFoil->m_bPoints = false;
 		OpPoint::setCurOpp((OpPoint*)ptr);
 
-		if(!AddNewFoil(pNewFoil))	SetBufferFoil();
-		SetFoil(pNewFoil);
+		if(!AddNewFoil(pNewFoil)) SetBufferFoil();
+		else                      SetFoil(pNewFoil);
+
 		pMainFrame->UpdateFoilListBox();
 		emit projectModified();
 	}
@@ -3228,8 +3234,10 @@ void QXDirect::OnFoilGeom()
 		pNewFoil->m_FoilWidth = 1;
 		pNewFoil->m_bPoints = false;
 		OpPoint::setCurOpp((OpPoint*)ptr);
-		if(!AddNewFoil(pNewFoil))	SetBufferFoil();
-		SetFoil(pNewFoil);
+
+		if(!AddNewFoil(pNewFoil)) SetBufferFoil();
+		else                      SetFoil(pNewFoil);
+
 		pMainFrame->UpdateFoilListBox();
 		emit projectModified();
 	}
@@ -3793,8 +3801,10 @@ void QXDirect::OnInterpolateFoils()
 		pNewFoil->m_FoilWidth = 1;
 		pNewFoil->m_bPoints = false;
 		pNewFoil->m_FoilName = ifDlg.m_NewFoilName;
-		if(!AddNewFoil(pNewFoil))	SetBufferFoil();
-		SetFoil(pNewFoil);
+
+		if(!AddNewFoil(pNewFoil)) SetBufferFoil();
+		else                      SetFoil(pNewFoil);
+
 		pMainFrame->UpdateFoilListBox();
 		emit projectModified();
 	}
@@ -4421,9 +4431,12 @@ void QXDirect::OnSetFlap()
 		pNewFoil->m_FoilStyle = 0;
 		pNewFoil->m_FoilWidth = 1;
 		pNewFoil->m_bPoints = false;
+
 		OpPoint::setCurOpp((OpPoint*)ptr);
-		if(!AddNewFoil(pNewFoil))	SetBufferFoil();
-		SetFoil(pNewFoil);
+
+		if(!AddNewFoil(pNewFoil)) SetBufferFoil();
+		else                      SetFoil(pNewFoil);
+
 		pMainFrame->UpdateFoilListBox();
 		emit projectModified();
 	}
@@ -4473,8 +4486,10 @@ void QXDirect::OnSetLERadius()
 		pNewFoil->m_FoilWidth = 1;
 		pNewFoil->m_bPoints = false;
 		OpPoint::setCurOpp((OpPoint*)ptr);
-		if(!AddNewFoil(pNewFoil))	SetBufferFoil();
-		SetFoil(pNewFoil);
+
+		if(!AddNewFoil(pNewFoil)) SetBufferFoil();
+		else                      SetFoil(pNewFoil);
+
 		pMainFrame->UpdateFoilListBox();
 		emit projectModified();
 	}
@@ -4526,8 +4541,10 @@ void QXDirect::OnSetTEGap()
 		pNewFoil->m_FoilWidth = 1;
 		pNewFoil->m_bPoints = false;
 		OpPoint::setCurOpp((OpPoint*)ptr);
-		if(!AddNewFoil(pNewFoil))	SetBufferFoil();
-		SetFoil(pNewFoil);
+
+		if(!AddNewFoil(pNewFoil)) SetBufferFoil();
+		else                      SetFoil(pNewFoil);
+
 		pMainFrame->UpdateFoilListBox();
 		emit projectModified();
 	}

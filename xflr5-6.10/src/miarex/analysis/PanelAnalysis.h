@@ -129,7 +129,6 @@ private:
 	static int s_MaxMatSize;    /**< the size currently allocated for the influence matrix >*/
 
 	bool m_bPointOut;           /**< true if an interpolation was outside the min or max Cl */
-	bool m_bInverted;           /**< true if the resolution of the linear system has been successful */
 	bool m_bSequence;           /**< true if the calculation is should be performed for a range of aoa */
 	bool m_bWakeRollUp;         /**< true if wake roll-up is enabled. This option is disabled */
 

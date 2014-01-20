@@ -63,7 +63,7 @@
 
 /** This enumeration defines the options for the active view.
  *May be the operaring point view, the polar view, the 3D view, the Cp view, or the stability view*/
-typedef enum {WOPPVIEW, WPOLARVIEW, W3DVIEW, WCPVIEW, STABTIMEVIEW, STABPOLARVIEW} enumMiarexViews;
+typedef enum {WOPPVIEW, WPOLARVIEW,  WCPVIEW, W3DVIEW, STABTIMEVIEW, STABPOLARVIEW} enumMiarexViews;
 
 
 /**

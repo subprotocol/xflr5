@@ -125,7 +125,7 @@ BatchDlg::BatchDlg(QWidget *pParent) : QDialog(pParent)
 
 BatchDlg::~BatchDlg()
 {
-	qDebug("Destroying BatchDlg");
+//	Trace("Destroying BatchDlg");
 	if(m_pXFoilTask) delete m_pXFoilTask;
 }
 

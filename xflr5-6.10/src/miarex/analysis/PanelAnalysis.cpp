@@ -83,7 +83,6 @@ PanelAnalysis::PanelAnalysis()
 
 	m_bSequence      = false;
 
-	m_bInverted      = false;
 
 	m_MatSize = m_nNodes = 0;
 	m_CL  = m_CX  = m_CY  = 0.0;
@@ -115,7 +114,6 @@ PanelAnalysis::PanelAnalysis()
 	CYb = CYp = CYr = Clb = Clp = Clr = Cnb = Cnp = Cnr = 0.0;
 	CXe = CYe = CZe = Cle = Cme = Cne = 0.0;
 
-
 	memset(m_ALong, 0, 16*sizeof(double));
 	memset(m_ALat,  0, 16*sizeof(double));
 	memset(m_BLong, 0,  4*sizeof(double));
@@ -127,7 +125,6 @@ PanelAnalysis::PanelAnalysis()
 	memset(m_rLat,  0,  8*sizeof(double));
 	memset(m_vLong, 0, 32*sizeof(double));
 	memset(m_vLat,  0, 32*sizeof(double));
-
 }
 
 
@@ -369,7 +366,30 @@ void PanelAnalysis::setRange(double vMin, double vMax, double vDelta, bool bSequ
 
 	//ESTIMATED UNIT TIMES FOR OPERATIONS
 
-	if(m_pWPolar->polarType()<FIXEDAOAPOLAR)
+	if(m_pWPolar->m_bTiltedGeom)
+	{
+
+		//ESTIMATED UNIT TIMES FOR OPERATIONS
+		//BuildInfluenceMatrix :     10 x MatSize/400
+		//CreateRHS :                10
+		//CreateWakeContribution :    1
+		//SolveUnitRHS :            400 x MatSize/400
+		//ComputeFarField :          10 x MatSize/400x nrhs
+		//ComputeOnBodyCp :           1 x nrhs
+		//RelaxWake :                20 x nrhs x MaxWakeIter *
+		//ComputeAeroCoefs :          5 x nrhs
+
+		s_TotalTime      =      10.*(double)m_MatSize/400.
+						 +  10.
+						 + 400.*(double)m_MatSize/400.
+						 +  10.*(double)m_MatSize/400
+						 +   1.
+						 +   5.;
+
+		s_TotalTime *= (double)m_nRHS;
+
+	}
+	else if(m_pWPolar->polarType()<FIXEDAOAPOLAR)
 	{
 		//BuildInfluenceMatrix :     10 x MatSize/400
 		//CreateRHS :                10
@@ -424,7 +444,6 @@ void PanelAnalysis::setRange(double vMin, double vMax, double vDelta, bool bSequ
 						 + 5;                                //ComputeAeroCoefs
 		s_TotalTime *= (double)m_nRHS;
 	}
-
 }
 
 
@@ -432,6 +451,8 @@ void PanelAnalysis::setParams(int nMaxWakeIter)
 {
 	m_nMaxWakeIter = nMaxWakeIter;
 }
+
+
 
 void PanelAnalysis::setArrayPointers(void *pPanel, void *pMemPanel, void *pWakePanel, void *pRefWakePanel,
 									 void *pNode,  void *pMemNode,  void *pWakeNode,  void *pRefWakeNode)
@@ -2012,10 +2033,8 @@ bool PanelAnalysis::SolveUnitRHS()
 	if(!Crout_LU_Decomposition_with_Pivoting(m_aij, m_Index, Size, &s_bCancel, taskTime*(double)m_MatSize/400.0, s_Progress))
 	{
 		traceLog("      Singular Matrix.... Aborting calculation...\n");
-		m_bInverted = false;
 		return false;
 	}
-	else m_bInverted = true;
 
 	traceLog("      Solving the LU system...\n");
 	Crout_LU_with_Pivoting_Solve(m_aij, m_uRHS, m_Index, m_RHS,      Size, &s_bCancel);
@@ -2122,29 +2141,6 @@ bool PanelAnalysis::unitLoop()
 //	int Size = m_MatSize;
 //	if(m_b3DSymetric) Size = m_SymSize;
 
-
-	//ESTIMATED UNIT TIMES FOR OPERATIONS
-	//BuildInfluenceMatrix :     10 x MatSize/400
-	//CreateRHS :                10
-	//CreateWakeContribution :    1
-	//SolveUnitRHS :            400 x MatSize/400
-	//ComputeFarField :          10 x MatSize/400x nrhs
-	//ComputeOnBodyCp :           1 x nrhs
-	//RelaxWake :                20 x nrhs x MaxWakeIter *
-	//ComputeAeroCoefs :          5 x nrhs
-
-	s_TotalTime      = 10.0*(double)m_MatSize/400.*(double)m_nRHS
-					 + 10.*(double)m_nRHS
-					 + 400.*(double)m_MatSize/400.*(double)m_nRHS
-					 + 10*(double)m_MatSize/400*(double)m_nRHS
-					 + 1*(double)m_nRHS
-					 + 5*(double)m_nRHS ;
-
-
-//	if(m_pWPolar->m_bWakeRollUp) TotalTime += 20.0 * (double)nrhs * (double)MaxWakeIter;
-
-//	m_pctrlProgress->setMinimum(0);
-//	m_pctrlProgress->setMaximum((int)TotalTime);
 	s_Progress = 0.0;
 	qApp->processEvents();
 
@@ -2165,8 +2161,8 @@ bool PanelAnalysis::unitLoop()
 
 		// Rotate the wing panels and translate the wake to the new T.E. position
 		Objects3D::rotateGeomY(m_pPanel, m_pNode, m_pWakePanel, m_pWakeNode,
-							   m_MatSize, m_WakeSize, m_nNodes, m_nWakeNodes,
-							   m_NWakeColumn, m_OpAlpha, O, m_pWPolar->m_NXWakePanels);
+						   m_MatSize, m_WakeSize, m_nNodes, m_nWakeNodes,
+						   m_NWakeColumn, m_OpAlpha, O, m_pWPolar->m_NXWakePanels);
 
 		BuildInfluenceMatrix();
 		if (s_bCancel) return true;

@@ -472,7 +472,7 @@ QMiarex::QMiarex(QWidget *parent)
  */
 QMiarex::~QMiarex()
 {
-	qDebug("Destroying Miarex");
+	Trace("Destroying Miarex");
 	delete (GLLightDlg*)m_pglLightDlg;
 	if(m_pLLTDlg) delete m_pLLTDlg;
 	if(m_pLLT)    delete m_pLLT;

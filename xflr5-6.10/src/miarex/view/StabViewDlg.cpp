@@ -60,7 +60,7 @@ StabViewDlg::StabViewDlg(QWidget *parent) : QWidget(parent)
 
 StabViewDlg::~StabViewDlg()
 {
-	qDebug("Destroying StabviewDlg");
+	Trace("Destroying StabviewDlg");
 	delete [] m_precision;
 }
 
@@ -983,10 +983,10 @@ void StabViewDlg::SetControls()
 	m_pctrlRLMode4->setChecked(m_iCurrentMode%4==3);
 
 
-	m_pctrlRLMode1->setEnabled(pMiarex->m_iView>=STABTIMEVIEW && pMiarex->m_pCurPOpp);
-	m_pctrlRLMode2->setEnabled(pMiarex->m_iView>=STABTIMEVIEW && pMiarex->m_pCurPOpp);
-	m_pctrlRLMode3->setEnabled(pMiarex->m_iView>=STABTIMEVIEW  && pMiarex->m_pCurPOpp);
-	m_pctrlRLMode4->setEnabled(pMiarex->m_iView>=STABTIMEVIEW  && pMiarex->m_pCurPOpp);
+	m_pctrlRLMode1->setEnabled(pMiarex->m_pCurPOpp && pMiarex->m_iView>=W3DVIEW);
+	m_pctrlRLMode2->setEnabled(pMiarex->m_pCurPOpp && pMiarex->m_iView>=W3DVIEW);
+	m_pctrlRLMode3->setEnabled(pMiarex->m_pCurPOpp && pMiarex->m_iView>=W3DVIEW);
+	m_pctrlRLMode4->setEnabled(pMiarex->m_pCurPOpp && pMiarex->m_iView>=W3DVIEW);
 
 	// Enable the time response controls only if
 	//   - the polar's type is 7

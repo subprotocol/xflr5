@@ -725,7 +725,6 @@ bool Crout_LU_Decomposition_with_Pivoting(double *A, int pivot[], int n, bool *p
 
 bool Crout_LU_Decomposition_with_Pivoting(float *A, int pivot[], int n, bool *pbCancel, double TaskSize, double &Progress)
 {
-	qDebug("Floating decomposition");
 	int i, j, k;
 	float *p_k, *p_row, *p_col;
 	float max=0.0;
@@ -778,6 +777,7 @@ bool Crout_LU_Decomposition_with_Pivoting(float *A, int pivot[], int n, bool *pb
 	}
 	return true;
 }
+
 
 /**
   int Crout_LU_with_Pivoting_Solve(double *LU, double B[], int pivot[],     
@@ -859,7 +859,6 @@ bool Crout_LU_with_Pivoting_Solve(double *LU, double B[], int pivot[], double x[
 
 bool Crout_LU_with_Pivoting_Solve(float *LU, double B[], int pivot[], double x[], int Size, bool *pbCancel)
 {
-qDebug("Floating solve");
 	int i, k;
 	float *p_k;
 	double dum;
@@ -2963,7 +2962,7 @@ QColor randomColor()
 {
 	QColor clr;
 	clr.setHsv((int)(((double)qrand()/(double)RAND_MAX)*360),
-			 (int)(((double)qrand()/(double)RAND_MAX)*155)+100,
+			 (int)(((double)qrand()/(double)RAND_MAX)*101)+ 99,
 			 (int)(((double)qrand()/(double)RAND_MAX)*100)+155,
 			 255);
 	return clr;
