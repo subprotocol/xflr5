@@ -782,13 +782,13 @@ void MainFrame::CreateDockWindows()
 	m_pctrlXInverseWidget->setFloating(true);
 	m_pctrlXInverseWidget->move(960,60);
 
-    m_pMiarex = new QMiarex;
-    QMiarex * pMiarex = (QMiarex*)m_pMiarex;
-    pMiarex->setAttribute(Qt::WA_DeleteOnClose, false);
-    m_pctrlMiarexWidget->setWidget(pMiarex);
-    m_pctrlMiarexWidget->setVisible(false);
-    m_pctrlMiarexWidget->setFloating(true);
-    m_pctrlMiarexWidget->move(960,60);
+	m_pMiarex = new QMiarex;
+	QMiarex * pMiarex = (QMiarex*)m_pMiarex;
+	pMiarex->setAttribute(Qt::WA_DeleteOnClose, false);
+	m_pctrlMiarexWidget->setWidget(pMiarex);
+	m_pctrlMiarexWidget->setVisible(false);
+	m_pctrlMiarexWidget->setFloating(true);
+	m_pctrlMiarexWidget->move(960,60);
 
 
 	m_pGL3DScales = new GL3DScales(this);

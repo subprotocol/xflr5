@@ -2336,8 +2336,8 @@ int Wing::VLMPanelTotal(bool bThinSurface)
 *    moment coefficients GCm, VCm, ICm, GRm, GYm, VYm, IYm
 */
 void Wing::PanelComputeOnBody(double QInf, double Alpha, double *Cp, double *Gamma, double &XCP, double &YCP, double &ZCP,
-						 double &GCm, double &VCm, double &ICm, double &GRm, double &GYm, double &VYm,double &IYm,
-						 WPolar *pWPolar, CVector CoG)
+						double &GCm, double &VCm, double &ICm, double &GRm, double &GYm, double &VYm,double &IYm,
+						WPolar *pWPolar, CVector CoG)
 
 {
 	int  j, k, l, p, m, nFlap, coef;
@@ -2359,8 +2359,9 @@ void Wing::PanelComputeOnBody(double QInf, double Alpha, double *Cp, double *Gam
 	// Define the wind axis
 	cosa = cos(Alpha*PI/180.0);
 	sina = sin(Alpha*PI/180.0);
-	WindNormal.Set(   -sina, 0.0, cosa);
 	WindDirection.Set( cosa, 0.0, sina);
+	WindNormal.Set(   -sina, 0.0, cosa);
+
 
 	// Calculate the Reynolds number on each strip
 	for (m=0; m< m_NStation; m++) m_Re[m] = m_Chord[m] * QInf /pWPolar->m_Viscosity;
@@ -2394,7 +2395,7 @@ void Wing::PanelComputeOnBody(double QInf, double Alpha, double *Cp, double *Gam
 
 			m_Surface.at(j)->GetLeadingPt(k, PtLEStrip);
 			m_Surface.at(j)->GetC4(k, PtC4Strip, tau);
-			if(pWPolar->m_Beta>0.0)
+			if(fabs(pWPolar->m_Beta)>0.0)
 			{
 				PtC4Strip.RotateZ(Origin, pWPolar->m_Beta);
 				PtLEStrip.RotateZ(Origin, pWPolar->m_Beta);
@@ -2440,7 +2441,7 @@ void Wing::PanelComputeOnBody(double QInf, double Alpha, double *Cp, double *Gam
 
 				XCP       += ForcePt.x * PanelForce.dot(WindNormal); //global center of pressure
 				YCP       += ForcePt.y * PanelForce.dot(WindNormal);
-                ZCP       += ForcePt.z * PanelForce.dot(WindNormal);
+				ZCP       += ForcePt.z * PanelForce.dot(WindNormal);
 				CPStrip   += ForcePt.x * NForce;
 
 				if(m_Surface.at(j)->m_bTEFlap)

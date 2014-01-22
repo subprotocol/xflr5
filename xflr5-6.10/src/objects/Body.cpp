@@ -638,6 +638,7 @@ int Body::InsertFrame(CVector Real)
 			if(m_SplineSurface.m_pFrame[n]->m_Position.x<=Real.x  &&  Real.x<m_SplineSurface.m_pFrame[n+1]->m_Position.x)
 			{
 				m_SplineSurface.m_pFrame.insert(n+1, new Frame(SideLineCount()));
+				m_xPanels.insert(n+1,1);
 
 				for (k=0; k<SideLineCount(); k++)
 				{

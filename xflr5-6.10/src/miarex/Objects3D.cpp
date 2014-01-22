@@ -2337,9 +2337,11 @@ WPolar* Objects3D::setWPolarObject(Plane *pCurPlane, WPolar *pCurWPolar, bool bC
 	CVector RefPoint(0.0, 0.0, 0.0);
 	if(qAbs(pWPolar->m_Beta)>0.001)
 	{
+		// Standard Convention in mechanic of flight is to have Beta>0 with nose to the left
+		// The yaw moement has the opposite convention...
 		rotateGeomZ(s_MemPanel, s_MemNode, s_WakePanel, s_WakeNode,
-					s_MatSize, s_WakeSize, s_nNodes, s_nWakeNodes, s_NWakeColumn,
-					pWPolar->m_Beta, RefPoint, pWPolar->m_NXWakePanels);
+				  s_MatSize, s_WakeSize, s_nNodes, s_nWakeNodes, s_NWakeColumn,
+				  pWPolar->m_Beta, RefPoint, pWPolar->m_NXWakePanels);
 	}
 
 	Wing *pWingList[MAXWINGS];

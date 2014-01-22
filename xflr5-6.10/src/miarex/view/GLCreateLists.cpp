@@ -1621,8 +1621,8 @@ void GLCreateLiftStrip(Wing *pWing, WPolar *pWPolar, WingOpp *pWOpp, int List)
 					{
 						glVertex3d(xt, yt, zt);
 						glVertex3d((xt + amp * cos(dih)*sina),
-									yt + amp * sin(dih),
-									zt + amp * cos(dih)*cosa);
+								  yt + amp * sin(dih),
+								  zt + amp * cos(dih)*cosa);
 					}
 					glEnd();
 				}
@@ -1639,8 +1639,8 @@ void GLCreateLiftStrip(Wing *pWing, WPolar *pWPolar, WingOpp *pWOpp, int List)
 						amp *= QMiarex::s_LiftScale/1000.0;
 
 						glVertex3d(xt + amp * cos(dih)*sina,
-								   yt + amp * sin(dih),
-								   zt + amp * cos(dih)*cosa);
+								 yt + amp * sin(dih),
+								 zt + amp * cos(dih)*cosa);
 					}
 				}
 				glEnd();

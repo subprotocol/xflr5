@@ -24,6 +24,7 @@
 #include <QAction>
 #include <QMessageBox>
 #include <QStatusBar>
+#include <QtDebug>
 
 #include "XInverse.h" 
 #include "FoilSelectionDlg.h"
@@ -47,10 +48,6 @@ QXInverse::QXInverse(QWidget *parent)
 {
 	setAttribute(Qt::WA_DeleteOnClose);
 
-//	m_pGraphDlg        = new GraphDlg(pMainFrame);
-//	m_pXInverseStyleDlg = new InverseOptionsDlg(pMainFrame);
-//	m_pPertDlg         = new PertDlg(pMainFrame);
-
 	m_bFullInverse = false;
 
 	m_pXFoil = NULL;
@@ -58,7 +55,6 @@ QXInverse::QXInverse(QWidget *parent)
 
 	m_bTransGraph    = false;
 	m_bLoaded        = false;
-//	m_bSaved         = true;
 	m_bZoomPlus      = false;
 	m_bZoomXOnly     = false;
 	m_bZoomYOnly     = false;

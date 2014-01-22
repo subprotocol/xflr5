@@ -389,8 +389,8 @@ bool LLTAnalysis::setLinearSolution(double Alpha)
 	double* aij = new double[s_NLLTStations*s_NLLTStations];
 	double* rhs = new double[s_NLLTStations+1];
 
-	memset(aij, 0, sizeof(aij));
-	memset(rhs, 0, sizeof(rhs));
+	memset(aij, 0, s_NLLTStations*s_NLLTStations*sizeof(double));
+	memset(rhs, 0, (s_NLLTStations+1)*sizeof(double));
 
 	Foil *pFoil0, *pFoil1;
 	int i,j,p;

@@ -2220,7 +2220,7 @@ void QMiarex::GLCallViewLists()
 	if(s_bVLMPanels && m_pCurPlane)
 	{
 		if(!(m_b3DCp&&m_pCurPOpp) && !s_bSurfaces) glCallList(MESHBACK);
-        glCallList(MESHPANELS);
+		glCallList(MESHPANELS);
 	}
 
 	if(m_bVortices && m_pCurPlane)
@@ -2238,7 +2238,7 @@ void QMiarex::GLCallViewLists()
 		glCallList(PANELFORCEARROWS);
 	}
 
-	if (m_pCurWPolar && qAbs(m_pCurWPolar->m_Beta)>0.001) glRotated(-m_pCurWPolar->m_Beta, 0.0, 0.0, 1.0);
+	if (m_pCurWPolar && qAbs(m_pCurWPolar->m_Beta)>0.001) glRotated(m_pCurWPolar->m_Beta, 0.0, 0.0, 1.0);
 
 	if(m_bXCP && m_pCurPOpp)
 	{
@@ -2850,9 +2850,6 @@ void QMiarex::GLDrawFoils()
 
 
 
-
-
-
 /**
 * Inverses by transposition the 3x3 rotation matrix used in the 3D display
 */
@@ -2868,6 +2865,7 @@ void QMiarex::GLInverseMatrix()
 		}
 	}
 }
+
 
 /**
 * Renders the OpenGl 3D view
@@ -2914,8 +2912,8 @@ void QMiarex::GLRenderView()
 			glPushMatrix();
 			{
 				glTranslated(( pgllDlg->s_XLight+ m_PlaneOffset.x)*m_GLScale,
-							 ( pgllDlg->s_YLight+ m_PlaneOffset.y)*m_GLScale,
-							   pgllDlg->s_ZLight*m_GLScale);
+						   ( pgllDlg->s_YLight+ m_PlaneOffset.y)*m_GLScale,
+							pgllDlg->s_ZLight*m_GLScale);
 				double radius = (pgllDlg->s_ZLight+2.0)/40.0*m_GLScale;
 				glColor3d(pgllDlg->s_Red, pgllDlg->s_Green, pgllDlg->s_Blue);
 				p3dWidget->GLRenderSphere(radius/m_glScaled);
@@ -2962,33 +2960,25 @@ void QMiarex::GLRenderView()
 			glRotated(m_ModeState[3]*180.0/PI, 1.0, 0.0 ,0.0);
 			glRotated(m_ModeState[4]*180.0/PI, 0.0, 1.0 ,0.0);
 			glRotated(m_ModeState[5]*180.0/PI, 0.0, 0.0 ,1.0);
-			if(qAbs(m_pCurWPolar->m_Beta)>0.001) glRotated(-m_pCurWPolar->m_Beta, 0.0, 0.0, 1.0);
+			if(qAbs(m_pCurWPolar->m_Beta)>0.001) glRotated(m_pCurWPolar->m_Beta, 0.0, 0.0, 1.0);
 		}
 
-        GLCallViewLists();
+		GLCallViewLists();
 
-        if(s_bFoilNames) GLDrawFoils();
+		if(s_bFoilNames) GLDrawFoils();
 
 		if(s_bShowMasses) GLDrawMasses();
 
 		glLoadIdentity();
-        glDisable(GL_CLIP_PLANE1);
+		glDisable(GL_CLIP_PLANE1);
 
-//        glPushMatrix();
-//        {
-//			if(m_pCurPlane) GLDrawWingLegend(); //glCallList(WINGLEGEND);
-//			if(m_pCurPOpp)  GLDrawWOppLegend(); // glCallList(WOPPLEGEND);
-//        }
-//        glPopMatrix();
 
 		if (m_b3DCp && m_pCurPOpp && m_pCurPOpp->m_AnalysisMethod>=VLMMETHOD)
 		{
-//            GLDrawCpLegend(this);
 			glCallList(WOPPCPLEGENDCLR);
 		}
 		else if (m_bPanelForce && m_pCurPOpp && m_pCurPOpp->m_AnalysisMethod>=VLMMETHOD)
 		{
-//            GLDrawPanelForceLegend(this, m_pCurWPolar);
 			glCallList(WOPPCPLEGENDCLR);
         }
 	}

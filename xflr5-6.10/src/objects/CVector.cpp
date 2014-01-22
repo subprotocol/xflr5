@@ -23,30 +23,44 @@
 
 #include <math.h>
 #include "CVector.h"
-#include "Quaternion.h"
-#include "../globals.h"
+
+#define PI             3.14159265358979
 
 
 void CVector::Rotate(CVector const &R, double Angle)
 {
 	//rotate the vector around R with an angle Angle
-	Quaternion Qt;
-	Qt.Set(Angle, R);
-	Qt.Conjugate(x,y,z);
-}
+	static double norm, ux, uy,uz, ca, sa, x0, y0, z0;
 
+	ca = cos(Angle *PI/180.0);
+	sa = sin(Angle *PI/180.0);
+
+	x0 = x;
+	y0 = y;
+	z0 = z;
+
+	norm = sqrt(R.x*R.x+ R.y*R.y + R.z*R.z);
+	ux = R.x/norm;
+	uy = R.y/norm;
+	uz = R.z/norm;
+
+	x =     (ca+ux*ux*(1-ca))  *x0  +  (ux*uy*(1-ca)-uz*sa) *y0 +  (ux*uz*(1-ca)+uy*sa) *z0;
+	y =   (uy*ux*(1-ca)+uz*sa) *x0  +    (ca+uy*uy*(1-ca))  *y0 +  (uy*uz*(1-ca)-ux*sa) *z0;
+	z =   (uz*ux*(1-ca)-uy*sa) *x0  +  (uz*uy*(1-ca)+ux*sa) *y0 +    (ca+uz*uz*(1-ca))  *z0;
+
+}
 
 
 void CVector::Rotate(CVector &O, CVector const &R, double Angle)
 {
 	//rotate the point defined by the vector around origin O, rotation vector R and angle Angle
-	Quaternion Qt;
-	Qt.Set(Angle, R);
-	CVector OP;
+	static CVector OP;
 	OP.x = x-O.x;
 	OP.y = y-O.y;
 	OP.z = z-O.z;
-	Qt.Conjugate(OP);
+
+	OP.Rotate(R, Angle);
+
 	x = O.x + OP.x;
 	y = O.y + OP.y;
 	z = O.z + OP.z;
