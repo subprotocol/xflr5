@@ -247,13 +247,15 @@ QMiarex::QMiarex(QWidget *parent)
 	m_rSingleRect.setWidth(0);
 	m_rSingleRect.setHeight(0);
 
-	m_LastWOpp      = 0.0;
 	m_CurSpanPos    = 0.0;
 	m_WingScale     = 1.0;
 
 	m_AlphaMin     =  0.0;
 	m_AlphaMax     =  1.0;
 	m_AlphaDelta   =  0.5;
+	m_BetaMin      =  0.0;
+	m_BetaMax      =  1.0;
+	m_BetaDelta    =  0.5;
 	m_QInfMin      = 10.0;
 	m_QInfMax      = 50.0;
 	m_QInfDelta    = 10.0;
@@ -322,10 +324,10 @@ QMiarex::QMiarex(QWidget *parent)
 	m_WPlrGraph[1].SetGraphName("Wing_Polar_Graph_2");
 	m_WPlrGraph[2].SetGraphName("Wing_Polar_Graph_3");
 	m_WPlrGraph[3].SetGraphName("Wing_Polar_Graph_4");
-	m_WPlrGraph[0].SetVariables(2,1);
-	m_WPlrGraph[1].SetVariables(0,1);
-	m_WPlrGraph[2].SetVariables(0,6);
-	m_WPlrGraph[3].SetVariables(0,13);
+	m_WPlrGraph[0].SetVariables(3,2);
+	m_WPlrGraph[1].SetVariables(0,2);
+	m_WPlrGraph[2].SetVariables(0,7);
+	m_WPlrGraph[3].SetVariables(0,14);
 	for(int ig=0; ig<MAXGRAPHS; ig++) SetWGraphTitles(m_WPlrGraph+ig);
 
 	m_CpGraph.SetXMajGrid(true, QColor(120,120,120),2,1);
@@ -922,9 +924,10 @@ void QMiarex::CreateWPolarCurves()
 	{
 		pWPolar = (WPolar*)m_poaWPolar->at(k);
 		if (pWPolar->m_bIsVisible && pWPolar->m_Alpha.size()>0 &&
-		   ((m_bType1 && pWPolar->polarType()==FIXEDSPEEDPOLAR) ||
+		    ((m_bType1 && pWPolar->polarType()==FIXEDSPEEDPOLAR) ||
 			(m_bType2 && pWPolar->polarType()==FIXEDLIFTPOLAR) ||
 			(m_bType4 && pWPolar->polarType()==FIXEDAOAPOLAR) ||
+			(            pWPolar->polarType()==BETAPOLAR) ||
 			(m_bType7 && pWPolar->polarType()==STABILITYPOLAR)))
 		{
 
@@ -1709,9 +1712,10 @@ void QMiarex::DrawWPolarLegend(QPainter &painter, QPoint place, int bottom)
 			   ((pWPolar->polarType()==STABILITYPOLAR && m_iView==STABPOLARVIEW) || m_iView!=STABPOLARVIEW) &&
 				 pWPolar->planeName() == strPlaneList.at(k) &&
 			   ((pWPolar->polarType()==FIXEDSPEEDPOLAR && m_bType1) ||
-				(pWPolar->polarType()==FIXEDLIFTPOLAR  && m_bType2) ||
-				(pWPolar->polarType()==FIXEDAOAPOLAR   && m_bType4) ||
-				(pWPolar->polarType()==STABILITYPOLAR  && m_bType7)))
+			    (pWPolar->polarType()==FIXEDLIFTPOLAR  && m_bType2) ||
+			    (pWPolar->polarType()==FIXEDAOAPOLAR   && m_bType4) ||
+			    (pWPolar->polarType()==BETAPOLAR                  ) ||
+			    (pWPolar->polarType()==STABILITYPOLAR  && m_bType7)))
 			{
 					nPlanePlrs++;
 			}
@@ -1752,9 +1756,8 @@ void QMiarex::DrawWPolarLegend(QPainter &painter, QPoint place, int bottom)
 					{
 					}
 					else if((pWPolar->polarType()==FIXEDSPEEDPOLAR && !m_bType1) ||
-							(pWPolar->polarType()==FIXEDLIFTPOLAR  && !m_bType2) ||
-							(pWPolar->polarType()==FIXEDAOAPOLAR   && !m_bType4) ||
-							(pWPolar->polarType()==STABILITYPOLAR  && !m_bType7))
+						   (pWPolar->polarType()==FIXEDLIFTPOLAR  && !m_bType2) ||
+						   (pWPolar->polarType()==STABILITYPOLAR  && !m_bType7))
 					{
 					}
 					else
@@ -2238,13 +2241,16 @@ void QMiarex::GLCallViewLists()
 		glCallList(PANELFORCEARROWS);
 	}
 
-	if (m_pCurWPolar && qAbs(m_pCurWPolar->m_Beta)>0.001) glRotated(m_pCurWPolar->m_Beta, 0.0, 0.0, 1.0);
+	if(m_pCurPOpp && qAbs(m_pCurPOpp->m_Beta)>PRECISION)
+		glRotated(m_pCurPOpp->m_Beta, 0.0, 0.0, 1.0);
+	else if(m_pCurWPolar && m_pCurWPolar->polarType()!=BETAPOLAR && qAbs(m_pCurWPolar->m_BetaSpec)>PRECISION)
+		glRotated(m_pCurWPolar->m_BetaSpec, 0.0, 0.0, 1.0);
 
 	if(m_bXCP && m_pCurPOpp)
 	{
 		for(int iw=0; iw<MAXWINGS; iw++)
 			if(m_pWingList[iw]) glCallList(VLMWINGLIFT+iw);
-        glCallList(LIFTFORCE);
+		glCallList(LIFTFORCE);
 	}
 
 	glDisable(GL_LIGHTING);
@@ -2960,7 +2966,7 @@ void QMiarex::GLRenderView()
 			glRotated(m_ModeState[3]*180.0/PI, 1.0, 0.0 ,0.0);
 			glRotated(m_ModeState[4]*180.0/PI, 0.0, 1.0 ,0.0);
 			glRotated(m_ModeState[5]*180.0/PI, 0.0, 0.0 ,1.0);
-			if(qAbs(m_pCurWPolar->m_Beta)>0.001) glRotated(m_pCurWPolar->m_Beta, 0.0, 0.0, 1.0);
+			if(qAbs(m_pCurWPolar->m_BetaSpec)>0.001) glRotated(m_pCurWPolar->m_BetaSpec, 0.0, 0.0, 1.0);
 		}
 
 		GLCallViewLists();
@@ -3418,6 +3424,9 @@ bool QMiarex::LoadSettings(QSettings *pSettings)
 		m_AlphaMin      = pSettings->value("AlphaMin").toDouble();
 		m_AlphaMax      = pSettings->value("AlphaMax").toDouble();
 		m_AlphaDelta    = pSettings->value("AlphaDelta").toDouble();
+		m_BetaMin       = pSettings->value("BetaMin", 0.0).toDouble();
+		m_BetaMax       = pSettings->value("BetaMax", 1.0).toDouble();
+		m_BetaDelta     = pSettings->value("BetaDelta", 0.5).toDouble();
 		m_QInfMin       = pSettings->value("QInfMin").toDouble();
 		m_QInfMax       = pSettings->value("QInfMax").toDouble();
 		m_QInfDelta     = pSettings->value("QInfDelta").toDouble();
@@ -3546,8 +3555,8 @@ bool QMiarex::LoadSettings(QSettings *pSettings)
 
 	for(int ig=0; ig<MAXGRAPHS; ig++)
 	{
-//		m_TimeGraph[ig].LoadSettings(pSettings);
-//		m_WingGraph[ig].LoadSettings(pSettings);
+		m_TimeGraph[ig].LoadSettings(pSettings);
+		m_WingGraph[ig].LoadSettings(pSettings);
 		m_WPlrGraph[ig].LoadSettings(pSettings);
 		SetWGraphTitles(m_WPlrGraph+ig);
 	}
@@ -4337,6 +4346,12 @@ void QMiarex::OnAnalyze()
 		VMax   = m_ControlMax;
 		VDelta = m_ControlDelta;
 	}
+	else if(m_pCurWPolar->polarType()==BETAPOLAR)
+	{
+		V0     = m_BetaMin;
+		VMax   = m_BetaMax;
+		VDelta = m_BetaDelta;
+	}
 	else if(m_pCurWPolar->polarType() <FIXEDAOAPOLAR)
 	{
 		V0     = m_AlphaMin;
@@ -4386,24 +4401,18 @@ void QMiarex::OnAnalyze()
 	else if(m_pCurWPolar->m_AnalysisMethod==PANELMETHOD)
 	{
 		if(Objects3D::s_MatSize>0 && s_pPanel && s_pNode)
-        {
-		  if(m_pCurWPolar->polarType()>STABILITYPOLAR)
-            {
-                QString strong;
-                strong = tr("Control polars are not supported in XFLR5 v6.\nPlease use stability polars instead.");
-                QMessageBox::warning(pMainFrame, tr("Warning"), strong+"\n");
-                return;
-            }
-            PanelAnalyze(V0, VMax, VDelta, m_bSequence);
-        }
+		{
+			PanelAnalyze(V0, VMax, VDelta, m_bSequence);
+		}
 	}
 	else if(m_pCurWPolar->polarType()==STABILITYPOLAR)
 	{
 		if(Objects3D::s_MatSize>0 && s_pPanel && s_pNode)
-        {
-            PanelAnalyze(V0, VMax, VDelta, m_bSequence);
-        }
+		{
+			PanelAnalyze(V0, VMax, VDelta, m_bSequence);
+		}
 	}
+
 	m_pctrlAnalyze->setEnabled(true);
 	pMainFrame->m_pctrlPlane->setEnabled(true);
 	pMainFrame->m_pctrlPlanePolar->setEnabled(true);
@@ -4936,7 +4945,7 @@ void QMiarex::OnDefineStabPolar()
 		pNewStabPolar->m_bWakeRollUp     = false;
 		pNewStabPolar->m_AnalysisMethod  = PANELMETHOD;
 		pNewStabPolar->m_bGround         = false;
-		pNewStabPolar->m_ASpec           = 0.0;
+		pNewStabPolar->m_AlphaSpec           = 0.0;
 		pNewStabPolar->m_Height          = 0.0;
 
 		m_pCurWPolar = Objects3D::insertNewWPolar(pNewStabPolar, m_pCurPlane);
@@ -6459,7 +6468,7 @@ void QMiarex::OnImportWPolar()
 	pWPolar->polarName() = PolarName;
 
 	bRead  = ReadAVLString(in, Line, strong);// Freestream speed
-	pWPolar->m_QInf = strong.toDouble(&bOK)/Units::mstoUnit();
+	pWPolar->m_QInfSpec = strong.toDouble(&bOK)/Units::mstoUnit();
 
 	bRead  = ReadAVLString(in, Line, strong);// "   alpha      CL          ICd   ..."
 	bRead  = ReadAVLString(in, Line, strong);// " _________  ________   ________  ..."
@@ -6682,6 +6691,17 @@ void QMiarex::OnReadAnalysisData()
 		{
 			m_QInfDelta = 1.0;
 			m_pctrlAlphaDelta->SetValue(1.0);
+		}
+	}
+	else if(m_pCurWPolar && m_pCurWPolar->polarType()==BETAPOLAR)
+	{
+		m_BetaMin   = m_pctrlAlphaMin->Value();
+		m_BetaMax   = m_pctrlAlphaMax->Value();
+		m_BetaDelta = qAbs(m_pctrlAlphaDelta->Value());
+		if(qAbs(m_BetaDelta)<0.01)
+		{
+			m_BetaDelta = 0.01;
+			m_pctrlAlphaDelta->SetValue(0.01);
 		}
 	}
 	else if(m_pCurWPolar && m_pCurWPolar->polarType()==STABILITYPOLAR)
@@ -8299,7 +8319,7 @@ void QMiarex::PaintPlaneOppLegend(QPainter &painter, QRect drawRect)
 
 	D = 0;
 	int RightPos = drawRect.right()-margin - dwidth;
-	int ZPos	 = drawRect.height()-12*dheight;
+	int ZPos	 = drawRect.height()-13*dheight;
 
 	if(m_pCurPOpp && m_pCurPOpp->m_WPolarType==STABILITYPOLAR) ZPos -= dheight;
 	if(m_pCurPOpp && m_pCurPOpp->m_bOut)                       ZPos -= dheight;
@@ -8328,6 +8348,10 @@ void QMiarex::PaintPlaneOppLegend(QPainter &painter, QRect drawRect)
 
 
 		Result = QString("Alpha = %1").arg(m_pCurPOpp->m_Alpha, e,'f',f) + QString::fromUtf8("°  ");
+		D+=dheight;
+		painter.drawText(RightPos, ZPos+D, dwidth, dheight, Qt::AlignRight | Qt::AlignTop, Result);
+
+		Result = QString("Beta = %1").arg(m_pCurPOpp->m_Beta, e,'f',f) + QString::fromUtf8("°  ");
 		D+=dheight;
 		painter.drawText(RightPos, ZPos+D, dwidth, dheight, Qt::AlignRight | Qt::AlignTop, Result);
 
@@ -8698,6 +8722,9 @@ bool QMiarex::SaveSettings(QSettings *pSettings)
 		pSettings->setValue("AlphaMin", m_AlphaMin);
 		pSettings->setValue("AlphaMax", m_AlphaMax);
 		pSettings->setValue("AlphaDelta", m_AlphaDelta);
+		pSettings->setValue("BetaMin", m_BetaMin);
+		pSettings->setValue("BetaMax", m_BetaMax);
+		pSettings->setValue("BetaDelta", m_BetaDelta);
 		pSettings->setValue("QInfMin", m_QInfMin );
 		pSettings->setValue("QInfMax", m_QInfMax );
 		pSettings->setValue("QInfDelta", m_QInfDelta );
@@ -8877,8 +8904,8 @@ bool QMiarex::SaveSettings(QSettings *pSettings)
 	for(int ig=0; ig<MAXGRAPHS; ig++)
 	{
 		m_WPlrGraph[ig].SaveSettings(pSettings);			// the WPolar graphs
-//		m_WingGraph[ig].SaveSettings(pSettings);			// the WOpp graphs
-//		m_TimeGraph[ig].SaveSettings(pSettings);
+		m_WingGraph[ig].SaveSettings(pSettings);			// the WOpp graphs
+		m_TimeGraph[ig].SaveSettings(pSettings);
 	}
 
 	GLLightDlg::SaveSettings(pSettings);
@@ -9155,19 +9182,25 @@ void QMiarex::SetAnalysisParams()
 	m_pctrlInitLLTCalc->setChecked(m_bInitLLTCalc);
 	m_pctrlStoreWOpp->setChecked(PlaneOpp::s_bStoreOpps);
 
-	if (!m_pCurWPolar || (m_pCurWPolar && m_pCurWPolar->polarType() <FIXEDAOAPOLAR))
+	if (!m_pCurWPolar || (m_pCurWPolar && m_pCurWPolar->polarType() < FIXEDAOAPOLAR))
 	{
 		m_pctrlAlphaMin->SetValue(m_AlphaMin);
 		m_pctrlAlphaMax->SetValue(m_AlphaMax);
 		m_pctrlAlphaDelta->SetValue(m_AlphaDelta);
 	}
-	else if(m_pCurWPolar  && m_pCurWPolar->polarType() ==FIXEDAOAPOLAR)
+	else if(m_pCurWPolar  && m_pCurWPolar->polarType() == FIXEDAOAPOLAR)
 	{
 		m_pctrlAlphaMin->SetValue(m_QInfMin*Units::mstoUnit());
 		m_pctrlAlphaMax->SetValue(m_QInfMax*Units::mstoUnit());
 		m_pctrlAlphaDelta->SetValue(m_QInfDelta*Units::mstoUnit());
 	}
-	else if(m_pCurWPolar && (m_pCurWPolar->polarType()==STABILITYPOLAR))
+	else if (m_pCurWPolar || (m_pCurWPolar && m_pCurWPolar->polarType() == BETAPOLAR))
+	{
+		m_pctrlAlphaMin->SetValue(m_BetaMin);
+		m_pctrlAlphaMax->SetValue(m_BetaMax);
+		m_pctrlAlphaDelta->SetValue(m_BetaDelta);
+	}
+	else if(m_pCurWPolar && (m_pCurWPolar->polarType() == STABILITYPOLAR))
 	{
 		m_pctrlAlphaMin->SetValue(m_ControlMin);
 		m_pctrlAlphaMax->SetValue(m_ControlMax);
@@ -9276,6 +9309,17 @@ void QMiarex::SetCurveParams()
 
 		m_pctrlParameterName->setText("Control parameter");
 		QFont fontSymbol(Settings::s_TextFont);
+		fontSymbol.setBold(true);
+		m_pctrlParameterName->setFont(fontSymbol);
+	}
+	else if(m_pCurWPolar && m_pCurWPolar->polarType()==BETAPOLAR)
+	{
+		m_pctrlUnit1->setText(QString::fromUtf8("°"));
+		m_pctrlUnit2->setText(QString::fromUtf8("°"));
+		m_pctrlUnit3->setText(QString::fromUtf8("°"));
+
+		m_pctrlParameterName->setText("b");
+		QFont fontSymbol("Symbol");
 		fontSymbol.setBold(true);
 		m_pctrlParameterName->setFont(fontSymbol);
 	}
@@ -9804,10 +9848,16 @@ void QMiarex::SetWPolar(bool bCurrent, QString WPlrName)
 
 	pMainFrame->UpdatePOppListBox();
 
-	double Alpha = 0.0;
-	if(m_pCurPOpp) Alpha = m_pCurPOpp->m_Alpha;
+	double x = 0.0;
+	if(m_pCurPOpp)
+	{
+		if(m_pCurWPolar && !m_pCurWPolar->isBetaPolar())
+			x = m_pCurPOpp->m_Alpha;
+		else if(m_pCurWPolar && m_pCurWPolar->isBetaPolar())
+			x = m_pCurPOpp->m_Beta;
+	}
 
-	SetPlaneOpp(false, Alpha);
+	SetPlaneOpp(false, x);
 
 
 	if(m_pCurWPolar)
@@ -10491,15 +10541,11 @@ bool QMiarex::SetPlaneOpp(bool bCurrent, double x)
 
 	if(m_pCurPOpp)
 	{
-		m_LastWOpp = m_pCurPOpp->m_Alpha;
-
 		for(int iw=0; iw<MAXWINGS;iw++)
 		{
 			if(m_pCurPOpp->m_pPlaneWOpp[iw]) m_pWOpp[iw] = m_pCurPOpp->m_pPlaneWOpp[iw];
 			else                             m_pWOpp[iw] = NULL;
 		}
-
-		if(m_pCurWPolar) m_pCurWPolar->m_AMem = m_pCurPOpp->m_Alpha;
 
 		//select m_pCurPOpp in the listbox
 		pMainFrame->SelectPlaneOpp(m_pCurPOpp);

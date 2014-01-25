@@ -54,7 +54,8 @@ int Objects3D::s_nWakeNodes  = 0;
 int Objects3D::s_NWakeColumn = 0;
 int Objects3D::s_MaxWakeIter = 5;
 
-double Objects3D::s_LastWOpp = -9999999.0;
+double Objects3D::s_LastAlpha = 0.0;
+double Objects3D::s_LastBeta = 0.0;
 
 
 
@@ -401,8 +402,8 @@ bool Objects3D::initializePanels(Plane *pPlane, WPolar *pWPolar)
  * @param P the point of origin of the rotation
  */
 void Objects3D::rotateGeomZ(Panel *pPanel, CVector *pNode, Panel *pWakePanel, CVector *pWakeNode,
-					   int nPanels, int nWakePanels, int nNodes, int/* nWakeNodes*/, int NWakeColumn,
-					   double const &Beta, CVector const &P, int NXWakePanels)
+                            int nPanels, int nWakePanels, int nNodes, int/* nWakeNodes*/, int NWakeColumn,
+                            double const &Beta, CVector const &P, int NXWakePanels)
 {
 	int n, p, pw, kw, lw;
 	int iLA, iLB, iTA, iTB;
@@ -477,8 +478,8 @@ void Objects3D::rotateGeomZ(Panel *pPanel, CVector *pNode, Panel *pWakePanel, CV
  * @param P the point of origin of the rotation
  */
 void Objects3D::rotateGeomY(Panel *pPanel, CVector *pNode, Panel *pWakePanel, CVector *pWakeNode,
-					   int nPanels, int nWakePanels, int nNodes, int /*nWakeNodes*/, int NWakeColumn,
-					   double const &Alpha, CVector const &P, int NXWakePanels)
+                            int nPanels, int nWakePanels, int nNodes, int /*nWakeNodes*/, int NWakeColumn,
+                            double const &Alpha, CVector const &P, int NXWakePanels)
 {
 	int n, p, pw, kw, lw;
 
@@ -602,6 +603,31 @@ void Objects3D::InsertPOpp(PlaneOpp *pPOpp)
 						i = s_oaPOpp.size();// to break
 					}
 					else if (pPOpp->m_QInf > pOldPOpp->m_QInf)
+					{
+						//insert point
+						s_oaPOpp.insert(i, pPOpp);
+						bIsInserted = true;
+						i = s_oaPOpp.size();// to break
+					}
+				}
+				else if (pPOpp->m_WPolarType==BETAPOLAR)
+				{
+					if(qAbs(pPOpp->m_Beta - pOldPOpp->m_Beta)<0.01)
+					{
+						//replace existing point
+						pPOpp->m_Color = pOldPOpp->m_Color;
+						pPOpp->m_Style = pOldPOpp->m_Style;
+						pPOpp->m_Width = pOldPOpp->m_Width;
+						pPOpp->m_bIsVisible  = pOldPOpp->m_bIsVisible;
+						pPOpp->m_bShowPoints = pOldPOpp->m_bShowPoints;
+
+						s_oaPOpp.removeAt(i);
+						delete pOldPOpp;
+						s_oaPOpp.insert(i, pPOpp);
+						bIsInserted = true;
+						i = s_oaPOpp.size();// to break
+					}
+					else if (pPOpp->m_Beta > pOldPOpp->m_Beta)
 					{
 						//insert point
 						s_oaPOpp.insert(i, pPOpp);
@@ -1939,13 +1965,15 @@ PlaneOpp * Objects3D::getPlaneOpp(Plane *pPlane, WPolar* pWPolar, double x)
 		pPOpp = (PlaneOpp*)s_oaPOpp.at(i);
 		if ((pPOpp->m_PlaneName == pPlane->planeName()) && (pPOpp->m_PlrName == pWPolar->m_WPlrName))
 		{
-			if     (pWPolar->m_WPolarType< FIXEDAOAPOLAR && qAbs(pPOpp->m_Alpha - x)<0.005)  return pPOpp;
-			else if(pWPolar->m_WPolarType==FIXEDAOAPOLAR  && qAbs(pPOpp->m_QInf - x)<0.005)  return pPOpp;
-			else if(pWPolar->m_WPolarType==STABILITYPOLAR && qAbs(pPOpp->m_Ctrl - x)<0.005)  return pPOpp;
+			if     (pWPolar->polarType()< FIXEDAOAPOLAR  && qAbs(pPOpp->m_Alpha - x)<0.005)  return pPOpp;
+			else if(pWPolar->polarType()==FIXEDAOAPOLAR  && qAbs(pPOpp->m_QInf - x)<0.005)  return pPOpp;
+			else if(pWPolar->polarType()==BETAPOLAR      && qAbs(pPOpp->m_Beta - x)<0.005)  return pPOpp;
+			else if(pWPolar->polarType()==STABILITYPOLAR && qAbs(pPOpp->m_Ctrl - x)<0.005)  return pPOpp;
 		}
 	}
 	return NULL;
 }
+
 
 
 /**
@@ -1962,11 +1990,12 @@ WPolar* Objects3D::getWPolar(Plane *pPlane, QString WPolarName)
 	for (i=0; i<s_oaWPolar.size(); i++)
 	{
 		pWPolar = (WPolar*)s_oaWPolar.at(i);
-		if (pWPolar->m_PlaneName == pPlane->planeName() && pWPolar->m_WPlrName == WPolarName)
+		if (pWPolar->planeName()==pPlane->planeName() && pWPolar->polarName()== WPolarName)
 			return pWPolar;
 	}
 	return NULL;
 }
+
 
 
 /**
@@ -1985,8 +2014,6 @@ Plane * Objects3D::getPlane(QString PlaneName)
 	}
 	return NULL;
 }
-
-
 
 
 
@@ -2335,13 +2362,13 @@ WPolar* Objects3D::setWPolarObject(Plane *pCurPlane, WPolar *pCurWPolar, bool bC
 
 	//set sideslip
 	CVector RefPoint(0.0, 0.0, 0.0);
-	if(qAbs(pWPolar->m_Beta)>0.001)
+	if(qAbs(pWPolar->m_BetaSpec)>0.001 && !pWPolar->isBetaPolar())
 	{
 		// Standard Convention in mechanic of flight is to have Beta>0 with nose to the left
 		// The yaw moement has the opposite convention...
 		rotateGeomZ(s_MemPanel, s_MemNode, s_WakePanel, s_WakeNode,
-				  s_MatSize, s_WakeSize, s_nNodes, s_nWakeNodes, s_NWakeColumn,
-				  pWPolar->m_Beta, RefPoint, pWPolar->m_NXWakePanels);
+		            s_MatSize, s_WakeSize, s_nNodes, s_nWakeNodes, s_NWakeColumn,
+		            pWPolar->m_BetaSpec, RefPoint, pWPolar->m_NXWakePanels);
 	}
 
 	Wing *pWingList[MAXWINGS];
@@ -2384,7 +2411,11 @@ WPolar* Objects3D::setWPolarObject(Plane *pCurPlane, WPolar *pCurWPolar, bool bC
 	}
 
 
-	if(pCurPlane) setPlaneOppObject(pCurPlane, pWPolar, NULL, false, s_LastWOpp);
+//	if(pCurPlane)
+//	{
+//		if(pWPolar && pWPolar->isBetaPolar()) setPlaneOppObject(pCurPlane, pWPolar, NULL, false, s_LastBeta);
+//		else                                  setPlaneOppObject(pCurPlane, pWPolar, NULL, false, s_LastAlpha);
+//	}
 
 	if(pWPolar->m_bAutoInertia)
 	{
@@ -2421,15 +2452,14 @@ PlaneOpp* Objects3D::setPlaneOppObject(Plane *pPlane, WPolar *pWPolar, PlaneOpp 
 	else         pPOpp = getPlaneOpp(pPlane, pWPolar, x);
 
 	// first restore the panel geometry
-	memcpy(s_Panel, s_MemPanel, s_MatSize* sizeof(Panel));
-	memcpy(s_Node,  s_MemNode,  s_nNodes * sizeof(CVector));
+	memcpy(s_Panel,     s_MemPanel,  s_MatSize    * sizeof(Panel));
+	memcpy(s_Node,      s_MemNode,   s_nNodes     * sizeof(CVector));
+	memcpy(s_WakePanel, s_WakePanel, s_WakeSize   * sizeof(Panel));
+	memcpy(s_WakeNode,  s_WakeNode,  s_nWakeNodes * sizeof(CVector));
 
 	if(!pPOpp)
 	{
-		if(pWPolar)
-			pPOpp = getPlaneOpp(pPlane, pWPolar, pWPolar->m_AMem);
-		else
-			pPOpp = getPlaneOpp(pPlane, pWPolar, s_LastWOpp);
+		pPOpp = getPlaneOpp(pPlane, pWPolar, s_LastAlpha);
 	}
 
 	if(!pPOpp)
@@ -2447,23 +2477,29 @@ PlaneOpp* Objects3D::setPlaneOppObject(Plane *pPlane, WPolar *pWPolar, PlaneOpp 
 	}
 
 
-	if(pPOpp)
+	if(pPOpp && pWPolar)
 	{
-/*		m_LastWOpp = pCurPOpp->m_Alpha;
-
-		for(int iw=0; iw<MAXWINGS;iw++)
+		s_LastAlpha = pPOpp->m_Alpha;
+		s_LastBeta  = pPOpp->m_Beta;
+/*		for(int iw=0; iw<MAXWINGS;iw++)
 		{
 			if(pCurPOpp->m_pPlaneWOpp[iw]) m_pWOpp[iw] = pCurPOpp->m_pPlaneWOpp[iw];
-			else                             m_pWOpp[iw] = NULL;
+			else                           m_pWOpp[iw] = NULL;
 		}*/
 
-		if(pWPolar) pWPolar->m_AMem = pPOpp->m_Alpha;
-
-
-		//if we have a type 7 polar, set the panels in the control's position
-		if(pWPolar && pWPolar->m_WPolarType==STABILITYPOLAR)
+		if(pWPolar->polarType()==BETAPOLAR)
 		{
-			//set the controls
+			//set sideslip
+			CVector RefPoint(0.0, 0.0, 0.0);
+			// Standard Convention in mechanic of flight is to have Beta>0 with nose to the left
+			// The yaw moment has the opposite convention...
+			rotateGeomZ(s_Panel, s_Node, s_WakePanel, s_WakeNode,
+					  s_MatSize, s_WakeSize, s_nNodes, s_nWakeNodes, s_NWakeColumn,
+					  pPOpp->m_Beta, RefPoint, pWPolar->m_NXWakePanels);
+		}
+		else if(pWPolar->polarType()==STABILITYPOLAR)
+		{
+			//if we have a type 7 polar, set the panels in the control's position
 			int nCtrls;
 			QString strong;
 			setControlPositions(pPlane, pWPolar, s_Panel, s_Node, pPOpp->m_Ctrl, nCtrls, strong, false);
@@ -2514,10 +2550,6 @@ void Objects3D::renamePlane(QString PlaneName)
 	}
 //	return "";
 }
-
-
-
-
 
 
 
@@ -2723,15 +2755,15 @@ void Objects3D::initPanelAnalysis(Plane*, WPolar* pWPolar, double V0, double VMa
 
 	if(pWPolar->m_WPolarType==FIXEDAOAPOLAR)
 	{
-		s_pPanelAnalysis->m_Alpha      = pWPolar->m_ASpec;
+		s_pPanelAnalysis->m_Alpha      = pWPolar->m_AlphaSpec;
 	}
 	else if(pWPolar->m_WPolarType==STABILITYPOLAR)
 	{
-		s_pPanelAnalysis->m_Alpha      = pWPolar->m_ASpec;
+		s_pPanelAnalysis->m_Alpha      = pWPolar->m_AlphaSpec;
 	}
 	else
 	{
-		s_pPanelAnalysis->m_QInf       = pWPolar->m_QInf;
+		s_pPanelAnalysis->m_QInf       = pWPolar->m_QInfSpec;
 	}
 }
 

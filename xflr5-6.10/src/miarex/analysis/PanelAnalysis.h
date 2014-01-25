@@ -63,7 +63,7 @@ private:
 
 	void ComputeAeroCoefs(double V0, double VDelta, int nrhs);
 	void ComputeOnBodyCp(double V0, double VDelta, int nval);
-	void computePlane(double Alpha, double QInf, int qrhs);
+	void computePlane(double Alpha, double QInf, double Beta, int qrhs);
 	void ComputeFarField(double QInf, double Alpha0, double AlphaDelta, int nval);
 	void ComputeBalanceSpeeds(double Alpha, int q);
 	void CreateDoubletStrength(double Alpha0, double AlphaDelta, int nval);
@@ -145,10 +145,11 @@ private:
 	double m_vMax;              /**< The max value of the analysis parameter*/
 	double m_vDelta;            /**< The increment value of the analysis parameter*/
 
-	double m_Alpha;             /**< The angle of attack of the current calculation in degree */
-	double m_OpAlpha;           /**< The angle of attack of the current calculation used in Tilted analysis, in degree */
-	double m_QInf;              /**< The freestream velocity of the current calculation in m/s */
-
+	double m_Alpha;             /**< The angle of attack of the current calculation in degree >*/
+	double m_OpAlpha;           /**< The angle of attack of the current calculation used in Tilted analysis, in degree >*/
+	double m_QInf;              /**< The freestream velocity of the current calculation in m/s >*/
+	double m_OpBeta;            /**< The sideslip angle of the current calculation, in degrees >*/
+	
 	double m_CL;                /**< The lift coefficient */
 	double m_CX;                /**< The drag coefficient */
 	double m_CY;                /**< The side force coefficient */
@@ -181,8 +182,8 @@ private:
 	double *m_3DQInf;        /**< a pointer to the calculated balance speeds for each aoa in Type 2 and Type 7 analysis */
 
 
-	float *m_aij;           /**< coefficient matrix for the panel analysis. Is declared as a common member variable to save memory allocation times*/
-	float *m_aijWake;       /**< coefficient matrix. Is declared as a common member variable to save memory allocation times*/
+	double *m_aij;           /**< coefficient matrix for the panel analysis. Is declared as a common member variable to save memory allocation times*/
+	double *m_aijWake;       /**< coefficient matrix. Is declared as a common member variable to save memory allocation times*/
 	double *m_uRHS, *m_vRHS, *m_wRHS;
 	double *m_pRHS, *m_qRHS, *m_rRHS;
 	double *m_cRHS;

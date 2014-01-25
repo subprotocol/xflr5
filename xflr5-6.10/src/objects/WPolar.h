@@ -74,9 +74,9 @@ public:
 	void AddPlaneOpPoint(PlaneOpp* pPOpp);
 	void ReplacePOppDataAt(int pos, PlaneOpp *pPOpp);
 	void InsertPOppDataAt(int pos, PlaneOpp *pPOpp);
-	void InsertDataAt(int pos, double Alpha, double QInf, double Ctrl, double Cl, double CY, double ICd, double PCd, double GCm,
-								   double ICm, double VCm, double GRm, double GYm, double IYm, double VYm, double XCP, double YCP,
-								   double ZCP, double Cb, double XNP);
+	void InsertDataAt(int pos, double Alpha, double Beta, double QInf, double Ctrl, double Cl, double CY, double ICd, double PCd, double GCm,
+						  double ICm, double VCm, double GRm, double GYm, double IYm, double VYm, double XCP, double YCP,
+						  double ZCP, double Cb, double XNP);
 	void CalculatePoint(int i);
 	void Copy(WPolar *pWPolar);
 	void DuplicateSpec(WPolar *pWPolar);
@@ -94,12 +94,18 @@ public:
 	double density()                    {return m_Density;}        /**< returns the fluid's density, in IS units. */
 	bool pointsVisible()                {return m_bShowPoints;}    /**< returns true if the polar curve's points should be displayed in the graphs. */
 	QString polarName()                 {return m_WPlrName;}       /**< returns the polar's name as a QString object. */
-	enumPolarType polarType()           {return m_WPolarType;}     /**< returns the type of the polar as an index in the enumeration. */
-	double sideSlip()                   {return m_Beta;}           /**< returns the sideslip angle, in degrees. */
+	double sideSlip()                   {return m_BetaSpec;}       /**< returns the sideslip angle, in degrees. */
 	QString planeName()                 {return m_PlaneName;}      /**< returns the name of the polar's parent object as a QString object. */
 	double viscosity()                  {return m_Viscosity;}      /**< returns the fluid's kinematic viscosity, in IS units. */
 	bool visible()                      {return m_bIsVisible;}     /**< returns true if the polar curve should be displayed the graphs. */
 	bool thinSurfaces()                 {return m_bThinSurfaces;}  /**< returns true if the analysis if using thin surfaces, i.e. VLM, false if 3D Panels for the Wing objects. */
+
+	enumPolarType polarType()           {return m_WPolarType;}       /**< returns the type of the polar as an index in the enumeration. */
+	bool isSpeedPolar() {return m_WPolarType==FIXEDSPEEDPOLAR;}      /**< returns true if the polar is of the FIXEDSPEEDPOLAR type, false otherwise >*/
+	bool isFixedLiftPolar() {return m_WPolarType==FIXEDLIFTPOLAR;}   /**< returns true if the polar is of the FIXEDLIFTPOLAR type, false otherwise >*/
+	bool isFixedaoaPolar() {return m_WPolarType==FIXEDAOAPOLAR;}     /**< returns true if the polar is of the FIXEDAOAPOLAR type, false otherwise >*/
+	bool isStabilityPolar() {return m_WPolarType==STABILITYPOLAR;}   /**< returns true if the polar is of the STABILITYPOLAR type, false otherwise >*/
+	bool isBetaPolar() {return m_WPolarType==BETAPOLAR;}             /**< returns true if the polar is of the BETAPOLAR type, false otherwise >*/
 
 	void setPlaneName(QString PlaneName){m_PlaneName = PlaneName;}
 	void setPolarName(QString PolarName){m_WPlrName = PolarName;}
@@ -117,10 +123,8 @@ public: //access methods
 
 private:
 
-	double   m_AMem;               /**< A variable which stores the last aoa displayed for this polar. Used to display the same aoa when the user switches to another polar */
 	bool     m_bAutoInertia;       /**< true if the inertia to be taken into account is the one of the parent plane */
 	bool     m_bDirichlet;         /**< true if Dirichlet boundary conditions should be applied, false if Neumann */
-	double   m_Beta;               /**< The sideslip angle*/
 	bool     m_bGround;            /**< true if ground effect should be taken into account in the analysis */
 	bool     m_bIgnoreBodyPanels;  /**< true if the body panels should be ignored in the analysis */
 	bool     m_bIsVisible;         /**< true if the polar curve is visible in the graphs */
@@ -144,7 +148,8 @@ private:
 	int      m_Width;              /**< the curve's width in pixels for the graphs */
 
 	QList <double>  m_1Cl;        /**< 1/Cl, special for Matthieu */
-	QList <double>  m_Alpha;      /**< angle of attack */
+	QList <double>  m_Alpha;      /**< the angle of attack */
+	QList <double>  m_Beta;       /**< the sideslip angle */
 	QList <double>  m_QInfinite;  /**< the free stream speed - type2 Wpolars */
 	QList <double>  m_Cl32Cd;     /**< the power factor */
 	QList <double>  m_ClCd;       /**< the glide ratio */
@@ -200,21 +205,22 @@ private:
 
 
 public:
-	enumAnalysisMethod m_AnalysisMethod; /**< The method used for the analysis. May be one of the following types : LLTMETHOD, VLMMETHOD, PANELMETHOD */
+	enumAnalysisMethod m_AnalysisMethod;  /**< The method used for the analysis. May be one of the following types : LLTMETHOD, VLMMETHOD, PANELMETHOD */
+	enumPolarType      m_WPolarType;      /**< The type of analysis. May be one of the following types :FIXEDSPEEDPOLAR, FIXEDLIFTPOLAR, FIXEDAOAPOLAR, STABILITYPOLAR */
 	bool          m_bVLM1;                /**< true if the analysis is performed with horseshoe vortices, flase if quad rings */
-	CVector       m_CoG;               /**< the position of the CoG */
-	double        m_Density;            /**< The fluid's density */
-	double        m_Mass;               /**< The mass for type 2 and type 7 polars */
-	double        m_WArea;              /**< The reference area for the calculation of aero coefficients */
-	double        m_WMAChord;           /**< The reference length = the mean aero chord, for the calculation of aero coefficients */
-	enumPolarType m_WPolarType;          /**< The type of analysis. May be one of the following types :FIXEDSPEEDPOLAR, FIXEDLIFTPOLAR, FIXEDAOAPOLAR, STABILITYPOLAR */
-	double        m_WSpan;              /**< The reference span for the calculation of aero coefficients */
+	CVector       m_CoG;                  /**< the position of the CoG */
+	double        m_Density;              /**< The fluid's density */
+	double        m_Mass;                 /**< The mass for type 2 and type 7 polars */
+	double        m_WArea;                /**< The reference area for the calculation of aero coefficients */
+	double        m_WMAChord;             /**< The reference length = the mean aero chord, for the calculation of aero coefficients */
+	double        m_WSpan;                /**< The reference span for the calculation of aero coefficients */
 
 	int      m_nControls;          /**< the number of control surfaces for this wing or plane */
 	int      m_NXWakePanels;       /**< the number of wake panels */
-	double   m_ASpec;              /**< the angle of attack for type 4 polars */
+	double   m_AlphaSpec;          /**< the angle of attack for type 4 & 5 polars */
+	double   m_BetaSpec;           /**< The sideslip angle for type 1,2, 4 polars */
 	double   m_BankAngle;          /**< The bank angle */
-	double   m_QInf;               /**< the freestream velocity for type 1 polars */
+	double   m_QInfSpec;           /**< the freestream velocity for type 1 & 5 polars */
 	double   m_Height;             /**< The plane flight altitude, used if ground effect is to be taken into account*/
 	double   m_Viscosity;          /**< The fluid's kinematic viscosity */
 	QVarLengthArray<double> m_ControlGain;      /**< the scaling factor for each of the control surfaces */

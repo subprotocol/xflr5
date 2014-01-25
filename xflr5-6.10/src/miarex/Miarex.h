@@ -513,11 +513,13 @@ public:
 
 	double m_CurSpanPos;        /**< Span position for Cp Graph  */
 	double m_WingScale;			/**< scale for 2D display */
-	double m_LastWOpp;			/**< last WOPP selected, try to set the same if it exists, for the new polar */
 
 	double m_AlphaMin;          /**< the min value of the aoa for sequential analysis*/
 	double m_AlphaMax;          /**< the max value of the aoa for sequential analysis*/
 	double m_AlphaDelta;        /**< the increment value of the aoa for sequential analysis*/
+	double m_BetaMin;           /**< the min value of the sideslip for sequential analysis*/
+	double m_BetaMax;           /**< the max value of the sideslip for sequential analysis*/
+	double m_BetaDelta;         /**< the increment value of the sideslip for sequential analysis*/
 	double m_ControlMin;        /**< the min value of the control parameter for sequential stability analysis*/
 	double m_ControlMax;        /**< the max value of the control parameter for sequential stability analysis*/
 	double m_ControlDelta;      /**< the increment value of the control parameter for sequential stability analysis*/

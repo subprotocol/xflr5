@@ -857,14 +857,14 @@ bool Crout_LU_with_Pivoting_Solve(double *LU, double B[], int pivot[], double x[
 	return true;
 }
 
-bool Crout_LU_with_Pivoting_Solve(float *LU, double B[], int pivot[], double x[], int Size, bool *pbCancel)
+bool Crout_LU_with_Pivoting_Solve(float *matLU, double B[], int pivot[], double x[], int Size, bool *pbCancel)
 {
 	int i, k;
-	float *p_k;
+	float *pk;
 	double dum;
 
 	//  Solve the linear equation Lx = B for x, where L is a lower triangular matrix.
-	for (k=0, p_k=LU; k<Size; p_k+=Size, k++)
+	for (k=0, pk=matLU; k<Size; pk+=Size, k++)
 	{
 		if (pivot[k] != k)
 		{
@@ -872,8 +872,8 @@ bool Crout_LU_with_Pivoting_Solve(float *LU, double B[], int pivot[], double x[]
 		}
 
 		x[k] = B[k];
-		for (i=0; i<k; i++) x[k]-=x[i] * *(p_k+i);
-		x[k] /= *(p_k+k);
+		for (i=0; i<k; i++) x[k]-=x[i] * *(pk+i);
+		x[k] /= *(pk+k);
 
 		qApp->processEvents();
 		if(*pbCancel) return false;
@@ -883,15 +883,15 @@ bool Crout_LU_with_Pivoting_Solve(float *LU, double B[], int pivot[], double x[]
 	//  obtained above of Lx = B and U is an upper triangular matrix.
 	//  The diagonal part of the upper triangular part of the matrix is
 	//  assumed to be 1.0.
-	for (k=Size-1, p_k=LU+Size*(Size-1); k>=0; k--, p_k-=Size)
+	for (k=Size-1, pk=matLU+Size*(Size-1); k>=0; k--, pk-=Size)
 	{
 		if (pivot[k] != k)
 		{
 			dum=B[k]; B[k]=B[pivot[k]]; B[pivot[k]]=dum;
 		}
 
-		for (i=k+1; i<Size; i++) x[k]-=x[i] * *(p_k+i);
-		if (*(p_k+k)==0.0)
+		for (i=k+1; i<Size; i++) x[k]-=x[i] * *(pk+i);
+		if (*(pk+k)==0.0)
 		{
 			return false;
 		}

@@ -89,7 +89,7 @@ QDir MainFrame::s_StylesheetDir;
 QDir MainFrame::s_TranslationDir;
 
 
-bool MainFrame::s_bTrace = true;
+bool MainFrame::s_bTrace = false;
 bool MainFrame::s_bSaved = true;
 QFile *MainFrame::s_pTraceFile = NULL;
 
@@ -1592,7 +1592,7 @@ void MainFrame::CreateMiarexToolbar()
 
 	connect(m_pctrlPlane,      SIGNAL(activated(int)), this, SLOT(OnSelChangePlane(int)));
 	connect(m_pctrlPlanePolar, SIGNAL(activated(int)), this, SLOT(OnSelChangeWPolar(int)));
-	connect(m_pctrlPlaneOpp,   SIGNAL(activated(int)), this, SLOT(OnSelChangeWOpp(int)));
+	connect(m_pctrlPlaneOpp,   SIGNAL(activated(int)), this, SLOT(OnSelChangePlaneOpp(int)));
 }
 
 
@@ -3633,7 +3633,7 @@ void MainFrame::OnSelChangeWPolar(int sel)
 }
 
 
-void MainFrame::OnSelChangeWOpp(int sel)
+void MainFrame::OnSelChangePlaneOpp(int sel)
 {
 	QString strong;
 	QMiarex *pMiarex = (QMiarex*)m_pMiarex;
@@ -4238,6 +4238,7 @@ bool MainFrame::SerializePlaneProject(QDataStream &ar)
 	if(WPolarDlg::s_WPolar.m_WPolarType==FIXEDSPEEDPOLAR)      ar<<1;
 	else if(WPolarDlg::s_WPolar.m_WPolarType==FIXEDLIFTPOLAR)  ar<<2;
 	else if(WPolarDlg::s_WPolar.m_WPolarType==FIXEDAOAPOLAR)   ar<<4;
+	else if(WPolarDlg::s_WPolar.m_WPolarType==BETAPOLAR)       ar<<5;
 	else if(WPolarDlg::s_WPolar.m_WPolarType==STABILITYPOLAR)  ar<<7;
 	else ar << 0;
 
@@ -4247,15 +4248,15 @@ bool MainFrame::SerializePlaneProject(QDataStream &ar)
 	else ar << 0;
 
 	ar << WPolarDlg::s_WPolar.m_Mass;
-	ar << WPolarDlg::s_WPolar.m_QInf;
+	ar << WPolarDlg::s_WPolar.m_QInfSpec;
 	ar << WPolarDlg::s_WPolar.m_CoG.x;
 	ar << WPolarDlg::s_WPolar.m_CoG.y;
 	ar << WPolarDlg::s_WPolar.m_CoG.z;
 
 	ar << WPolarDlg::s_WPolar.m_Density;
 	ar << WPolarDlg::s_WPolar.m_Viscosity;
-	ar << WPolarDlg::s_WPolar.m_ASpec;
-	ar << WPolarDlg::s_WPolar.m_Beta;
+	ar << WPolarDlg::s_WPolar.m_AlphaSpec;
+	ar << WPolarDlg::s_WPolar.m_BetaSpec;
 
 	ar << WPolarDlg::s_WPolar.m_bTiltedGeom;
 	ar << WPolarDlg::s_WPolar.m_bWakeRollUp;
@@ -4527,9 +4528,10 @@ void MainFrame::SelectOpPoint(void *pOppPtr)
 		strange = m_pctrlOpPoint->itemText(i).trimmed();
 
 		double val = locale().toDouble(strange, &bOK);
-		if(pCurPlr->polarType() != FIXEDAOAPOLAR)
+
+		if(pCurPlr->polarType() == FIXEDAOAPOLAR)
 		{
-			if(bOK && qAbs(val-pOpp->Alpha)<0.001)
+			if(bOK && qAbs(val-pOpp->Reynolds)<1.0)
 			{
 				m_pctrlOpPoint->setCurrentIndex(i);
 				break;
@@ -4537,7 +4539,7 @@ void MainFrame::SelectOpPoint(void *pOppPtr)
 		}
 		else
 		{
-			if(bOK && qAbs(val-pOpp->Reynolds)<1.0)
+			if(bOK && qAbs(val-pOpp->Alpha)<0.001)
 			{
 				m_pctrlOpPoint->setCurrentIndex(i);
 				break;
@@ -4603,6 +4605,7 @@ void MainFrame::SelectPlaneOpp(void *pPlaneOppPtr)
 	{
 		if(pPlaneOpp->m_WPolarType<FIXEDAOAPOLAR)        x = pPlaneOpp->m_Alpha;
 		else if(pPlaneOpp->m_WPolarType==FIXEDAOAPOLAR)  x = pPlaneOpp->m_QInf;
+		else if(pPlaneOpp->m_WPolarType==BETAPOLAR)      x = pPlaneOpp->m_Beta;
 		else if(pPlaneOpp->m_WPolarType==STABILITYPOLAR) x = pPlaneOpp->m_Ctrl;
 	}
 	//Selects a pOpp in the combobox
@@ -4631,6 +4634,14 @@ void MainFrame::SelectPlaneOpp(void *pPlaneOppPtr)
 		else if(pCurWPlr->m_WPolarType==FIXEDAOAPOLAR)
 		{
 			if(bOK && qAbs(val-x)<1.0)
+			{
+				m_pctrlPlaneOpp->setCurrentIndex(i);
+				break;
+			}
+		}
+		else if(pCurWPlr->m_WPolarType==BETAPOLAR)
+		{
+			if(bOK && qAbs(val-x)<0.001)
 			{
 				m_pctrlPlaneOpp->setCurrentIndex(i);
 				break;
@@ -4684,6 +4695,7 @@ bool MainFrame::SerializeProjectXFL(QDataStream &ar, bool bIsStoring)
 		if(WPolarDlg::s_WPolar.m_WPolarType==FIXEDSPEEDPOLAR)      ar<<1;
 		else if(WPolarDlg::s_WPolar.m_WPolarType==FIXEDLIFTPOLAR)  ar<<2;
 		else if(WPolarDlg::s_WPolar.m_WPolarType==FIXEDAOAPOLAR)   ar<<4;
+		else if(WPolarDlg::s_WPolar.m_WPolarType==BETAPOLAR)       ar<<5;
 		else if(WPolarDlg::s_WPolar.m_WPolarType==STABILITYPOLAR)  ar<<7;
 		else ar << 0;
 
@@ -4693,15 +4705,15 @@ bool MainFrame::SerializeProjectXFL(QDataStream &ar, bool bIsStoring)
 		else ar << 0;
 
 		ar << WPolarDlg::s_WPolar.m_Mass;
-		ar << WPolarDlg::s_WPolar.m_QInf;
+		ar << WPolarDlg::s_WPolar.m_QInfSpec;
 		ar << WPolarDlg::s_WPolar.m_CoG.x;
 		ar << WPolarDlg::s_WPolar.m_CoG.y;
 		ar << WPolarDlg::s_WPolar.m_CoG.z;
 
 		ar << WPolarDlg::s_WPolar.m_Density;
 		ar << WPolarDlg::s_WPolar.m_Viscosity;
-		ar << WPolarDlg::s_WPolar.m_ASpec;
-		ar << WPolarDlg::s_WPolar.m_Beta;
+		ar << WPolarDlg::s_WPolar.m_AlphaSpec;
+		ar << WPolarDlg::s_WPolar.m_BetaSpec;
 
 		ar << WPolarDlg::s_WPolar.m_bTiltedGeom;
 		ar << WPolarDlg::s_WPolar.m_bWakeRollUp;
@@ -4791,6 +4803,7 @@ bool MainFrame::SerializeProjectXFL(QDataStream &ar, bool bIsStoring)
 		if(n==1)      WPolarDlg::s_WPolar.m_WPolarType=FIXEDSPEEDPOLAR;
 		else if(n==2) WPolarDlg::s_WPolar.m_WPolarType=FIXEDLIFTPOLAR;
 		else if(n==4) WPolarDlg::s_WPolar.m_WPolarType=FIXEDAOAPOLAR;
+		else if(n==5) WPolarDlg::s_WPolar.m_WPolarType=BETAPOLAR;
 		else if(n==7) WPolarDlg::s_WPolar.m_WPolarType=STABILITYPOLAR;
 
 		ar >> n;
@@ -4799,15 +4812,15 @@ bool MainFrame::SerializeProjectXFL(QDataStream &ar, bool bIsStoring)
 		else if(n==3) WPolarDlg::s_WPolar.m_AnalysisMethod=PANELMETHOD;
 
 		ar >> WPolarDlg::s_WPolar.m_Mass;
-		ar >> WPolarDlg::s_WPolar.m_QInf;
+		ar >> WPolarDlg::s_WPolar.m_QInfSpec;
 		ar >> WPolarDlg::s_WPolar.m_CoG.x;
 		ar >> WPolarDlg::s_WPolar.m_CoG.y;
 		ar >> WPolarDlg::s_WPolar.m_CoG.z;
 
 		ar >> WPolarDlg::s_WPolar.m_Density;
 		ar >> WPolarDlg::s_WPolar.m_Viscosity;
-		ar >> WPolarDlg::s_WPolar.m_ASpec;
-		ar >> WPolarDlg::s_WPolar.m_Beta;
+		ar >> WPolarDlg::s_WPolar.m_AlphaSpec;
+		ar >> WPolarDlg::s_WPolar.m_BetaSpec;
 
 		ar >> WPolarDlg::s_WPolar.m_bTiltedGeom;
 		ar >> WPolarDlg::s_WPolar.m_bWakeRollUp;
@@ -4978,10 +4991,11 @@ bool MainFrame::SerializeProjectWPA(QDataStream &ar, bool bIsStoring)
 				if(k==1)      WPolarDlg::s_WPolar.m_WPolarType = FIXEDSPEEDPOLAR;
 				else if(k==2) WPolarDlg::s_WPolar.m_WPolarType = FIXEDLIFTPOLAR;
 				else if(k==4) WPolarDlg::s_WPolar.m_WPolarType = FIXEDAOAPOLAR;
+				else if(k==5) WPolarDlg::s_WPolar.m_WPolarType = BETAPOLAR;
 				else if(k==7) WPolarDlg::s_WPolar.m_WPolarType = STABILITYPOLAR;
 
 				ar >> f; WPolarDlg::s_WPolar.m_Mass=f;
-				ar >> f; WPolarDlg::s_WPolar.m_QInf=f;
+				ar >> f; WPolarDlg::s_WPolar.m_QInfSpec=f;
 				if(ArchiveFormat>=100013)
 				{
 					ar >> f; WPolarDlg::s_WPolar.m_CoG.x=f;
@@ -4997,10 +5011,10 @@ bool MainFrame::SerializeProjectWPA(QDataStream &ar, bool bIsStoring)
 				if(ArchiveFormat<100010) WPolarDlg::s_WPolar.m_CoG.x=f/1000.0;
 				ar >> f; WPolarDlg::s_WPolar.m_Density   = f;
 				ar >> f; WPolarDlg::s_WPolar.m_Viscosity = f;
-				ar >> f; WPolarDlg::s_WPolar.m_ASpec     = f;
+				ar >> f; WPolarDlg::s_WPolar.m_AlphaSpec     = f;
 				if(ArchiveFormat>=100012)
 				{
-					ar >>f; WPolarDlg::s_WPolar.m_Beta=f;
+					ar >>f; WPolarDlg::s_WPolar.m_BetaSpec=f;
 				}
 
 				ar >> k;
@@ -5486,13 +5500,14 @@ void MainFrame::UpdatePOppListBox()
 		return;
 	}
 
-    for (int iPOpp=0; iPOpp<Objects3D::s_oaPOpp.size(); iPOpp++)
+	for (int iPOpp=0; iPOpp<Objects3D::s_oaPOpp.size(); iPOpp++)
 	{
 		pPOpp = (PlaneOpp*)Objects3D::s_oaPOpp.at(iPOpp);
 		if (pPOpp->planeName()==pCurPlane->planeName() && pPOpp->polarName()==pCurWPlr->polarName())
 		{
 			if(pCurWPlr->polarType()<FIXEDAOAPOLAR)        str = QString("%L1").arg(pPOpp->m_Alpha,8,'f',3);
 			else if(pCurWPlr->polarType()==FIXEDAOAPOLAR)  str = QString("%L1").arg(pPOpp->m_QInf,8,'f',3);
+			else if(pCurWPlr->polarType()==BETAPOLAR)      str = QString("%L1").arg(pPOpp->m_Beta,8,'f',3);
 			else if(pCurWPlr->polarType()==STABILITYPOLAR) str = QString("%L1").arg(pPOpp->m_Ctrl,8,'f',3);
 			m_pctrlPlaneOpp->addItem(str);
 		}

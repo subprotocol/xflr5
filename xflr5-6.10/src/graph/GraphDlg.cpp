@@ -155,13 +155,11 @@ void GraphDlg::FillVariableList()
 	else if(m_iGraphType == 62)
 	{
 		//WingPolar Graph Variables
-		for(int iVar=0; iVar<42; iVar++)
+		for(int iVar=0; iVar<44; iVar++)
 		{
 			m_pctrlXSel->addItem(WPolar::variableName(iVar));
 			m_pctrlYSel->addItem(WPolar::variableName(iVar));
 		}
-
-
 	}
 	else if(m_iGraphType == 64)
 	{

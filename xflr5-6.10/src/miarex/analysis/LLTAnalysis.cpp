@@ -631,7 +631,7 @@ bool LLTAnalysis::alphaLoop()
 
 
 		if(s_bInitCalc) setLinearSolution(Alpha);
-		setVelocity(m_pWPolar->m_QInf);
+		setVelocity(m_pWPolar->m_QInfSpec);
 
 		//initialize first iteration
 		for (int k=1; k<s_NLLTStations; k++)
@@ -645,7 +645,7 @@ bool LLTAnalysis::alphaLoop()
 		str= QString("Calculating Alpha = %1... ").arg(Alpha,5,'f',2);
 		traceLog(str);
 
-		iter = iterate(m_pWPolar->m_QInf, Alpha);
+		iter = iterate(m_pWPolar->m_QInfSpec, Alpha);
 
 		if (iter==-1 && !m_bCancel)
 		{
@@ -659,10 +659,10 @@ bool LLTAnalysis::alphaLoop()
 			//converged,
 			str= QString("    ...converged after %1 iterations\n").arg(iter);
 			traceLog(str);
-			computeWing(m_pWPolar->m_QInf, Alpha, str);// generates wing results,
+			computeWing(m_pWPolar->m_QInfSpec, Alpha, str);// generates wing results,
 			traceLog(str);
 			if (m_bWingOut) m_bWarning = true;
-			PlaneOpp *pPOpp = createPlaneOpp(m_pWPolar->m_QInf, Alpha, m_bWingOut);// Adds WOpp point and adds result to polar
+			PlaneOpp *pPOpp = createPlaneOpp(m_pWPolar->m_QInfSpec, Alpha, m_bWingOut);// Adds WOpp point and adds result to polar
 			m_PlaneOppList.append(pPOpp);
 			s_bInitCalc = false;
 
@@ -701,7 +701,7 @@ bool LLTAnalysis::QInfLoop()
 	traceLog(str);
 
 	QInf = 0.0;
-	Alpha = m_pWPolar->m_ASpec;
+	Alpha = m_pWPolar->m_AlphaSpec;
 
 	for (i=0; i<=m_nPoints; i++)
 	{
@@ -720,7 +720,7 @@ bool LLTAnalysis::QInfLoop()
 			m_pCurve->SetTitle(str);
 		}
 
-		if(s_bInitCalc) setLinearSolution(m_pWPolar->m_ASpec);
+		if(s_bInitCalc) setLinearSolution(m_pWPolar->m_AlphaSpec);
 		setVelocity(QInf);
 
 		//initialize first iteration
@@ -733,7 +733,7 @@ bool LLTAnalysis::QInfLoop()
 
 		str = QString("Calculating QInf = %1... ").arg(QInf,6,'f',2);
 		traceLog(str);
-		iter = iterate(QInf, m_pWPolar->m_ASpec);
+		iter = iterate(QInf, m_pWPolar->m_AlphaSpec);
 
 		if(iter<0)
 		{
@@ -749,10 +749,10 @@ bool LLTAnalysis::QInfLoop()
 			//converged,
 			str = QString("    ...converged after %1 iterations\n").arg(iter);
 			traceLog(str);
-			computeWing(QInf, m_pWPolar->m_ASpec,str);// generates wing results,
+			computeWing(QInf, m_pWPolar->m_AlphaSpec,str);// generates wing results,
 			traceLog(str);
 			if (m_bWingOut) m_bWarning = true;
-			PlaneOpp *pPOpp = createPlaneOpp(QInf, m_pWPolar->m_ASpec, m_bWingOut);// Adds WOpp point and adds result to polar
+			PlaneOpp *pPOpp = createPlaneOpp(QInf, m_pWPolar->m_AlphaSpec, m_bWingOut);// Adds WOpp point and adds result to polar
 			m_PlaneOppList.append(pPOpp);
 
 /*			if(m_bWingOut)

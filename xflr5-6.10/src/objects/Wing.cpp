@@ -56,7 +56,6 @@ Wing::Wing()
 	memset(m_BendingMoment, 0, sizeof(m_BendingMoment));
 	memset(m_Twist, 0, sizeof(m_Twist));
 
-
 	memset(m_SpanPos, 0, sizeof(m_SpanPos));
 	memset(m_StripArea, 0, sizeof(m_StripArea));
 
@@ -64,7 +63,6 @@ Wing::Wing()
 	m_xHinge.insert(0, 1000, 0);
 	m_xPanel.clear();
 	m_xPanel.insert(0, 1000, 0);
-
 
 	m_CoG.Set(0.0,0.0,0.0);
 	m_CoGIxx = m_CoGIyy = m_CoGIzz = m_CoGIxz = 0.0;
@@ -111,10 +109,10 @@ Wing::Wing()
 	m_ProjectedArea = 0.0;
 	m_ProjectedSpan = 0.0;
 
-	m_nFlaps        =  0;
+	m_nFlaps =  0;
 	ClearWingSections();
-	AppendWingSection(.180, .0, 0.0, 1.0, 0.000, 13, 19, COSINE, INVERSESINE, "", "");
-	AppendWingSection(.110, .0, 1.0, 1.0, 0.070, 13, 5,  COSINE, UNIFORM, "", "");
+	AppendWingSection(.180, .0, 0.0, 0.0, 0.000, 13, 19, COSINE, INVERSESINE, "", "");
+	AppendWingSection(.110, .0, 1.0, 0.0, 0.070, 13, 5,  COSINE,     UNIFORM, "", "");
 
 	ComputeGeometry();
 
@@ -127,6 +125,7 @@ Wing::Wing()
 	}
 }
 
+
 /** The public destructor */
 Wing::~Wing()
 {
@@ -134,6 +133,7 @@ Wing::~Wing()
 	ClearPointMasses();
 	ClearSurfaces();
 }
+
 
 /** Destroys the WingSection objects in good order to avoid memory leaks */
 void Wing::ClearWingSections()
@@ -2395,10 +2395,10 @@ void Wing::PanelComputeOnBody(double QInf, double Alpha, double *Cp, double *Gam
 
 			m_Surface.at(j)->GetLeadingPt(k, PtLEStrip);
 			m_Surface.at(j)->GetC4(k, PtC4Strip, tau);
-			if(fabs(pWPolar->m_Beta)>0.0)
+			if(fabs(pWPolar->m_BetaSpec)>0.0)
 			{
-				PtC4Strip.RotateZ(Origin, pWPolar->m_Beta);
-				PtLEStrip.RotateZ(Origin, pWPolar->m_Beta);
+				PtC4Strip.RotateZ(Origin, pWPolar->m_BetaSpec);
+				PtLEStrip.RotateZ(Origin, pWPolar->m_BetaSpec);
 			}
 
 			LeverArmC4CoG = PtC4Strip - CoG;
@@ -2463,12 +2463,16 @@ void Wing::PanelComputeOnBody(double QInf, double Alpha, double *Cp, double *Gam
 			m_XCPSpanAbs[m]    =  CPStrip/NForce ;
 
 			// add viscous properties, if required
-			if(pWPolar->m_bViscous) DragVector.x = m_PCd[m] * m_StripArea[m];// N/q //TODO : orient along wind direction rather than x-axis
-			else                    DragVector.x = 0.0;
+//			if(pWPolar->m_bViscous) DragVector.x = m_PCd[m] * m_StripArea[m];// N/q
+//			else                    DragVector.x = 0.0;
+
+			if(pWPolar->m_bViscous) DragVector = WindDirection * m_PCd[m] * m_StripArea[m];   // N/q
+			else                    DragVector.Set(0.0,0.0,0.0);
 			// global moments, in N.m/q
 			DragMoment =  LeverArmC4CoG * DragVector;
 
 			m_GRm += GeomMoment.dot(WindDirection);
+
 
 			m_VYm += DragMoment.dot(WindNormal);
 
@@ -2486,6 +2490,7 @@ void Wing::PanelComputeOnBody(double QInf, double Alpha, double *Cp, double *Gam
 		if(!pWPolar->m_bThinSurfaces && m_Surface.at(j)->m_bIsTipRight) p += m_Surface.at(j)->m_NXPanels;
 		if(m_Surface.at(j)->m_bTEFlap) nFlap++;
 	}
+
 
 	//global plane dimensionless coefficients
 	GCm += m_VCm + m_ICm;

@@ -138,7 +138,7 @@ private slots:
 	void OnSelChangePolar(int sel);
 	void OnSelChangeOpp(int sel);
 	void OnSelChangePlane(int sel);
-	void OnSelChangeWOpp(int sel);
+	void OnSelChangePlaneOpp(int sel);
 	void OnSelChangeWPolar(int sel);
 	void OnSaveProject();
 	void OnStyleSettings();

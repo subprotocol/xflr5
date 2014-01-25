@@ -46,7 +46,7 @@ PanelAnalysis::PanelAnalysis()
 	m_nRHS = 0;
 
 	m_Ai = m_Cl = m_ICd = NULL;
-	m_F = NULL;
+	m_F  = NULL;
 	m_Vd = NULL;
 
 	m_aij = m_aijWake = NULL;
@@ -74,27 +74,25 @@ PanelAnalysis::PanelAnalysis()
 	m_pWakeNode      = NULL;
 	m_pRefWakeNode   = NULL;
 
-
-	m_Alpha = 0.0;
-	m_QInf  = 0.0;
+	m_Alpha   = 0.0;
+	m_QInf    = 0.0;
 	m_OpAlpha = 0.0;
-	m_Ctrl = 0.0;
-	m_vMin  = m_vMax = m_vDelta  = 0.0;
+	m_OpBeta  = 0.0;
+	m_Ctrl    = 0.0;
+	m_vMin = m_vMax = m_vDelta = 0.0;
 
 	m_bSequence      = false;
-
 
 	m_MatSize = m_nNodes = 0;
 	m_CL  = m_CX  = m_CY  = 0.0;
 	m_GCm = m_GRm = m_GYm = m_VCm = m_ICm = m_VYm = m_IYm = 0.0;
-	m_CP.Set(0.0,0.0,0.0);
+	m_CP.Set( 0.0, 0.0, 0.0);
 	m_ViscousDrag = m_InducedDrag = 0.0;
 
 	m_MatSize        = 0;
-//	m_SymSize        = 0;
 	m_nNodes         = 0;
 	m_NWakeColumn    = 0;
-	m_nMaxWakeIter    = 0;
+	m_nMaxWakeIter   = 0;
 
 	m_nWakeNodes = 0;
 	m_WakeSize   = 0;
@@ -160,8 +158,8 @@ bool PanelAnalysis::AllocateMatrix(int matSize, int &memsize)
 	int size2 = matSize * matSize;
 	try
 	{
-		m_aij      = new float[size2];
-		m_aijWake  = new float[size2];
+		m_aij      = new double[size2];
+		m_aijWake  = new double[size2];
 
 		m_uRHS  = new double[matSize];
 		m_vRHS  = new double[matSize];
@@ -190,7 +188,7 @@ bool PanelAnalysis::AllocateMatrix(int matSize, int &memsize)
 
 	s_MaxMatSize = matSize;
 
-	memsize  = sizeof(float)   * 2 * size2; //bytes
+	memsize  = sizeof(double)  * 2 * size2; //bytes
 	memsize += sizeof(double)  * 9 * matSize; //bytes
 	memsize += sizeof(CVector) * 3 * matSize;
 	memsize += sizeof(int)     * 1 * matSize;
@@ -198,8 +196,8 @@ bool PanelAnalysis::AllocateMatrix(int matSize, int &memsize)
 	strange = QString("PanelAnalysis::Memory allocation for the matrix arrays is %1 MB").arg((double)memsize/1024./1024., 7, 'f', 2);
 	Trace(strange);
 
-	memset(m_aij,     0, size2 * sizeof(float));
-	memset(m_aijWake, 0, size2 * sizeof(float));
+	memset(m_aij,     0, size2 * sizeof(double));
+	memset(m_aijWake, 0, size2 * sizeof(double));
 
 	memset(m_uRHS,  0, matSize*sizeof(double));
 	memset(m_vRHS,  0, matSize*sizeof(double));
@@ -366,7 +364,7 @@ void PanelAnalysis::setRange(double vMin, double vMax, double vDelta, bool bSequ
 
 	//ESTIMATED UNIT TIMES FOR OPERATIONS
 
-	if(m_pWPolar->m_bTiltedGeom)
+	if(m_pWPolar->m_bTiltedGeom || m_pWPolar->polarType()==BETAPOLAR)
 	{
 
 		//ESTIMATED UNIT TIMES FOR OPERATIONS
@@ -497,6 +495,7 @@ bool PanelAnalysis::initializeAnalysis()
 	if(m_pWPolar->polarType()==FIXEDSPEEDPOLAR)     strange = "Type 1 - Fixed speed polar";
 	else if(m_pWPolar->polarType()==FIXEDLIFTPOLAR) strange = "Type 2 - Fixed lift polar";
 	else if(m_pWPolar->polarType()==FIXEDAOAPOLAR)  strange = "Type 4 - Fixed angle of attack polar";
+	else if(m_pWPolar->polarType()==FIXEDAOAPOLAR)  strange = "Type 5 - Sideslip variation polar";
 	else if(m_pWPolar->polarType()==STABILITYPOLAR) strange = "Type 7 - Stability polar";
 	traceLog(strange+"\n");
 
@@ -539,16 +538,20 @@ bool PanelAnalysis::initializeAnalysis()
 
 bool PanelAnalysis::loop()
 {
-	if(m_pWPolar->m_WPolarType<FIXEDAOAPOLAR)
+	if(m_pWPolar->polarType()<FIXEDAOAPOLAR)
 	{
 		if(m_pWPolar->m_bTiltedGeom) return unitLoop();
 		else                         return alphaLoop();
 	}
-	else if(m_pWPolar->m_WPolarType==FIXEDAOAPOLAR)
+	else if(m_pWPolar->polarType()==FIXEDAOAPOLAR)
 	{
 		return QInfLoop();
 	}
-	else if(m_pWPolar->m_WPolarType==STABILITYPOLAR)
+	else if(m_pWPolar->polarType()==BETAPOLAR)
+	{
+		return unitLoop();
+	}
+	else if(m_pWPolar->polarType()==STABILITYPOLAR)
 	{
 		return controlLoop();
 	}
@@ -585,13 +588,16 @@ bool PanelAnalysis::alphaLoop()
 	BuildInfluenceMatrix();
 	if (s_bCancel) return true;
 
+
 	CreateUnitRHS();
 	if (s_bCancel) return true;
+
 
 	if(!m_pWPolar->bThinSurfaces())
 	{
 		//compute wake contribution
 		CreateWakeContribution();
+
 
 		//add wake contribution to matrix and RHS
 		for(int p=0; p<m_MatSize; p++)
@@ -1144,8 +1150,10 @@ void PanelAnalysis::ComputeFarField(double QInf, double Alpha0, double AlphaDelt
 
 	for (q=0; q<nval;q++)
 	{
-		if(m_pWPolar->m_WPolarType!=FIXEDAOAPOLAR) alpha = Alpha0 + q*AlphaDelta;
-		else                                       alpha = m_OpAlpha;
+		if(m_pWPolar->polarType()==FIXEDAOAPOLAR)       alpha = m_OpAlpha;
+		else if(m_pWPolar->polarType()==BETAPOLAR)      alpha = m_OpAlpha;
+		else if(m_pWPolar->polarType()==STABILITYPOLAR) alpha= m_OpAlpha;
+		else                                            alpha = Alpha0 + q*AlphaDelta;
 
 		WindNormal.Set(-sin(alpha*PI/180.0),   0.0, cos(alpha*PI/180.0));
 
@@ -1204,11 +1212,13 @@ void PanelAnalysis::ComputeBalanceSpeeds(double Alpha, int q)
 		if(m_pWingList[iw]) Force += m_WingForce[q*4+iw];
 	}
 
-	if (m_pWPolar->m_WPolarType==FIXEDSPEEDPOLAR) m_3DQInf[q] = m_pWPolar->m_QInf;
-
-	else if(m_pWPolar->m_WPolarType==FIXEDLIFTPOLAR)
+	if (m_pWPolar->polarType()==FIXEDSPEEDPOLAR || m_pWPolar->polarType()==BETAPOLAR)
 	{
-		Lift =  Force.dot(WindNormal) ;//N/q, for 1/ms
+		m_3DQInf[q] = m_pWPolar->m_QInfSpec;
+	}
+	else if(m_pWPolar->polarType()==FIXEDLIFTPOLAR)
+	{
+		Lift =  Force.dot(WindNormal) ;      //N/q, for 1/ms
 		TempCl = Lift/m_pWPolar->m_WArea;
 		if(Lift<=0.0)
 		{
@@ -1247,7 +1257,7 @@ void PanelAnalysis::ScaleResultstoSpeed(int nval)
 	memcpy(m_SigmaRef, m_Sigma, nval*m_MatSize*sizeof(double));
 	memcpy(m_RHSRef,   m_Mu,    nval*m_MatSize*sizeof(double));
 
-	if(m_pWPolar->m_WPolarType!=FIXEDAOAPOLAR)
+	if(m_pWPolar->polarType()!=FIXEDAOAPOLAR)
 	{
 		p=0;
 		for (q=0; q<nval;q++)
@@ -1327,7 +1337,32 @@ void PanelAnalysis::ComputeAeroCoefs(double V0, double VDelta, int nrhs)
 	int q;
 	QString str;
 
-	if(m_pWPolar->m_WPolarType!=FIXEDAOAPOLAR)
+	if(m_pWPolar->m_WPolarType==FIXEDAOAPOLAR)
+	{
+		for (q=0; q<nrhs; q++)
+		{
+			if(s_bCancel) return;
+			str = QString("      Computing Plane for QInf=%1m/s").arg((V0+q*VDelta),7,'f',2);
+			traceLog(str);
+			computePlane(m_Alpha, V0+q*VDelta, m_OpBeta, q);
+			s_Progress += 5.0*(double)nrhs /(double)nrhs;
+			qApp->processEvents();
+		}
+	}
+	else if(m_pWPolar->polarType()==BETAPOLAR)
+	{
+		for (q=0; q<nrhs; q++)
+		{
+			if(s_bCancel) return;
+			str = QString("      Computing Plane for beta=%1").arg((m_OpBeta),0,'f',1);
+			str += QString::fromUtf8("°\n");
+			traceLog(str);
+			computePlane(m_Alpha, m_3DQInf[q], V0+q*VDelta, q);
+			s_Progress += 5.0*(double)nrhs /(double)nrhs;
+			qApp->processEvents();
+		}
+	}
+	else
 	{
 		for (q=0; q<nrhs; q++)
 		{
@@ -1338,21 +1373,9 @@ void PanelAnalysis::ComputeAeroCoefs(double V0, double VDelta, int nrhs)
 				else                          str = QString("      Computing Plane for alpha=%1").arg(m_OpAlpha,7,'f',2);
 				str += QString::fromUtf8("°\n");
 				traceLog(str);
-				computePlane(V0+q*VDelta, m_3DQInf[q], q);
+				computePlane(V0+q*VDelta, m_3DQInf[q], m_OpBeta, q);
 			}
 			s_Progress += 5.0*(double)nrhs/(double)nrhs;
-			qApp->processEvents();
-		}
-	}
-	else
-	{
-		for (q=0; q<nrhs; q++)
-		{
-			if(s_bCancel) return;
-			str = QString("      Computing Plane for QInf=%1m/s").arg((V0+q*VDelta),7,'f',2);
-			traceLog(str);
-			computePlane(m_Alpha, V0+q*VDelta, q);
-			s_Progress += 5.0*(double)nrhs /(double)nrhs;
 			qApp->processEvents();
 		}
 	}
@@ -1368,7 +1391,7 @@ void PanelAnalysis::ComputeAeroCoefs(double V0, double VDelta, int nrhs)
  * @param QInf the freesteam velocity of this calculation
  * @param qrhs the index of the current right hand side calculation
 */
-void PanelAnalysis::computePlane(double Alpha, double QInf, int qrhs)
+void PanelAnalysis::computePlane(double Alpha, double QInf, double Beta, int qrhs)
 {
 	int pos;
 	double *Mu, *Sigma;
@@ -1390,8 +1413,8 @@ void PanelAnalysis::computePlane(double Alpha, double QInf, int qrhs)
 
 	m_QInf      = QInf;
 
-	if(m_pWPolar->m_bTiltedGeom) Alpha     = m_OpAlpha;
-	else                         m_OpAlpha = Alpha;
+	if(m_pWPolar->m_bTiltedGeom || m_pWPolar->isBetaPolar()) Alpha     = m_OpAlpha;
+	else                                                     m_OpAlpha = Alpha;
 
 	for(int iw=0; iw<MAXWINGS; iw++)
 		if(m_pWingList[iw])m_pWingList[iw]->m_bWingOut = false;
@@ -1934,9 +1957,9 @@ bool PanelAnalysis::QInfLoop()
 		CVector O;
 		Objects3D::rotateGeomY(m_pPanel, m_pNode, m_pWakePanel, m_pWakeNode,
 							   m_MatSize, m_WakeSize, m_nNodes, m_nWakeNodes, m_NWakeColumn,
-							   m_pWPolar->m_ASpec, O, m_pWPolar->m_NXWakePanels);
+							   m_pWPolar->m_AlphaSpec, O, m_pWPolar->m_NXWakePanels);
 
-		m_OpAlpha = m_pWPolar->m_ASpec;
+		m_OpAlpha = m_pWPolar->m_AlphaSpec;
 		Alpha = 0.0;
 	}
 	else
@@ -2036,9 +2059,12 @@ bool PanelAnalysis::SolveUnitRHS()
 		return false;
 	}
 
+
 	traceLog("      Solving the LU system...\n");
 	Crout_LU_with_Pivoting_Solve(m_aij, m_uRHS, m_Index, m_RHS,      Size, &s_bCancel);
 	Crout_LU_with_Pivoting_Solve(m_aij, m_wRHS, m_Index, m_RHS+Size, Size, &s_bCancel);
+
+
 
 	memcpy(m_uRHS, m_RHS,           m_MatSize*sizeof(double));
 	memcpy(m_wRHS, m_RHS+m_MatSize, m_MatSize*sizeof(double));
@@ -2059,6 +2085,8 @@ bool PanelAnalysis::SolveUnitRHS()
 
 	return true;
 }
+
+
 
 /**
 *
@@ -2124,7 +2152,7 @@ void PanelAnalysis::SumPanelForces(double *Cp, double Alpha, double &Lift, doubl
 
 /**
 * Launches the calculation of operating points, when linear combination is not an option.
-* This is the case for analysis of tilted geometries, or with wake roll-up
+* This is the case for analysis of tilted geometries, or with wake roll-up, of for Beta-type polars
 *
 *@return true if the aoa was computed successfully, false otherwise.
 */
@@ -2138,9 +2166,6 @@ bool PanelAnalysis::unitLoop()
 	if(!m_pWPolar->m_bWakeRollUp) MaxWakeIter = 1;
 	else                          MaxWakeIter = qMax(m_nMaxWakeIter, 1);
 
-//	int Size = m_MatSize;
-//	if(m_b3DSymetric) Size = m_SymSize;
-
 	s_Progress = 0.0;
 	qApp->processEvents();
 
@@ -2149,26 +2174,41 @@ bool PanelAnalysis::unitLoop()
 
 	for (n=0; n<m_nRHS; n++)
 	{
-		m_OpAlpha = m_vMin+n*m_vDelta;
-		str = QString("      \n    Processing Alpha= %1\n").arg(m_OpAlpha,7,'f',2);
+		if(m_pWPolar->polarType() == FIXEDLIFTPOLAR || m_pWPolar->polarType() == FIXEDSPEEDPOLAR)
+		{
+			m_OpAlpha = m_vMin+n*m_vDelta;
+			m_OpBeta  = m_pWPolar->m_BetaSpec;
+		}
+		else if(m_pWPolar->polarType() == BETAPOLAR)
+		{
+			m_OpAlpha = m_pWPolar->m_AlphaSpec;
+			m_OpBeta  = m_vMin+n*m_vDelta;
+		}	
+			
+		if(m_pWPolar->polarType()!=BETAPOLAR) str = QString("      \n    Processing Alpha= %1\n").arg(m_OpAlpha,0,'f',1);
+		else                                  str = QString("      \n    Processing Beta= %1\n").arg(m_OpBeta,0,'f',1);
 		traceLog(str);
 
 		//reset the initial geometry before a new angle is processed
-		memcpy(m_pPanel, m_pMemPanel, m_MatSize * sizeof(Panel));
-		memcpy(m_pNode,  m_pMemNode,  m_nNodes  * sizeof(CVector));
-		memcpy(m_pWakePanel, m_pRefWakePanel, m_WakeSize * sizeof(Panel));
+		memcpy(m_pPanel,     m_pMemPanel,     m_MatSize    * sizeof(Panel));
+		memcpy(m_pNode,      m_pMemNode,      m_nNodes     * sizeof(CVector));
+		memcpy(m_pWakePanel, m_pRefWakePanel, m_WakeSize   * sizeof(Panel));
 		memcpy(m_pWakeNode,  m_pRefWakeNode,  m_nWakeNodes * sizeof(CVector));
 
 		// Rotate the wing panels and translate the wake to the new T.E. position
 		Objects3D::rotateGeomY(m_pPanel, m_pNode, m_pWakePanel, m_pWakeNode,
-						   m_MatSize, m_WakeSize, m_nNodes, m_nWakeNodes,
-						   m_NWakeColumn, m_OpAlpha, O, m_pWPolar->m_NXWakePanels);
+			                   m_MatSize, m_WakeSize, m_nNodes, m_nWakeNodes,
+			                   m_NWakeColumn, m_OpAlpha, O, m_pWPolar->m_NXWakePanels);
+
+		if(m_pWPolar->polarType()==BETAPOLAR)
+		{
+			Objects3D::rotateGeomZ(m_pPanel, m_pNode, m_pWakePanel, m_pWakeNode,
+			                       m_MatSize, m_WakeSize, m_nNodes, m_nWakeNodes, m_NWakeColumn,
+			                       m_OpBeta, O, m_pWPolar->m_NXWakePanels);
+		}
 
 		BuildInfluenceMatrix();
 		if (s_bCancel) return true;
-
-		// The calculation will be performed at AOA=0.0 because the geometry is tilted...
-		// ... but the operating angle is different :
 
 		CreateUnitRHS();
 		if (s_bCancel) return true;
@@ -2498,7 +2538,7 @@ bool PanelAnalysis::controlLoop()
 				str = QString("      Computing Plane for alpha=%1").arg(m_AlphaEq,7,'f',2);
 				str += QString::fromUtf8("°\n");
 				traceLog(str);
-				computePlane(m_AlphaEq, u0, 0);
+				computePlane(m_AlphaEq, u0, m_OpBeta, 0);
 
 				if (s_bCancel) return true;
 			}
@@ -4195,7 +4235,8 @@ PlaneOpp* PanelAnalysis::createPlaneOpp(double *Cp, double *Gamma, double *Sigma
 
 		pPOpp->m_CP                  = m_CP;
 
-		pPOpp->m_Beta                = m_pWPolar->m_Beta;
+		if(m_pWPolar->polarType()!=BETAPOLAR) pPOpp->m_Beta = m_pWPolar->m_BetaSpec;
+		else                                  pPOpp->m_Beta = m_OpBeta;
 
 		if(m_pWPolar->m_WPolarType==STABILITYPOLAR)
 		{

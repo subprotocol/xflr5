@@ -15,7 +15,8 @@
 *******************************************************************************
 
 xflr5 v6.10 2014
-	- Defined the influence matrices as arrays of floats instead of doubles - divides by 2 the memory requirement.
+	- Introducing type 5 polars for the analysis of variable sideslip
+	- Aligned viscous drag vector with freestream velocity rather than with x-axis - slight impact on viscous results.
 	- Created a new binary .xfl projet file format. Replaces once and for all the awful .wpa format
 	- Removed the option for independent wing analysis
 	- Enabled LLT analysis for all Plane objects

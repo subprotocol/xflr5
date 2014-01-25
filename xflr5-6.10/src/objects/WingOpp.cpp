@@ -649,7 +649,7 @@ void WingOpp::createWOpp(void *pWingPtr, void *pWPolarPtr)
 	m_PlrName             = pWPolar->polarName();
 	m_WPolarType          = pWPolar->m_WPolarType;
 	m_AnalysisMethod      = pWPolar->m_AnalysisMethod;
-	m_Beta                = pWPolar->m_Beta;
+	m_Beta                = pWPolar->m_BetaSpec;
 	m_Phi                 = pWPolar->m_BankAngle;
 	m_Weight              = pWPolar->m_Mass;
 	m_Span                = pWPolar->m_WSpan;

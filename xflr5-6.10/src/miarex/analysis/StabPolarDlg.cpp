@@ -349,7 +349,7 @@ void StabPolarDlg::InitDialog(Plane *pPlane, WPolar *pWPolar)
 	else         m_pctrlUFOName->setText(m_pWingList[0]->WingName());
 
 
-	m_pctrlBeta->SetValue(s_StabPolar.m_Beta);
+	m_pctrlBeta->SetValue(s_StabPolar.m_BetaSpec);
 	m_pctrlPhi->SetValue(s_StabPolar.m_BankAngle);
 
 	if(s_StabPolar.m_AnalysisMethod==LLTMETHOD)
@@ -563,7 +563,7 @@ void StabPolarDlg::ReadParams()
 		s_StabPolar.m_Viscosity = m_pctrlViscosity->Value() / 10.7182881;
 	}
 
-	s_StabPolar.m_Beta  = m_pctrlBeta->Value();
+	s_StabPolar.m_BetaSpec  = m_pctrlBeta->Value();
 	s_StabPolar.m_BankAngle = m_pctrlPhi->Value();
 	SetDensity();
 
@@ -974,9 +974,9 @@ void StabPolarDlg::SetWPolarName()
 	}
 
 
-    if(qAbs(s_StabPolar.m_Beta) > .001)
+    if(qAbs(s_StabPolar.m_BetaSpec) > .001)
 	{
-		strong = QString(QString::fromUtf8("-b%1°")).arg(s_StabPolar.m_Beta,0,'f',1);
+		strong = QString(QString::fromUtf8("-b%1°")).arg(s_StabPolar.m_BetaSpec,0,'f',1);
 		WPolarName += strong;
 	}
 	

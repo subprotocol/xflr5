@@ -99,7 +99,7 @@
 typedef enum{LLTMETHOD, VLMMETHOD, PANELMETHOD} enumAnalysisMethod;
 
 /** @enum The different types of polar available for 2D and 3D calculations. */
-typedef enum{FIXEDSPEEDPOLAR, FIXEDLIFTPOLAR, RUBBERCHORDPOLAR, FIXEDAOAPOLAR, STABILITYPOLAR} enumPolarType;
+typedef enum{FIXEDSPEEDPOLAR, FIXEDLIFTPOLAR, RUBBERCHORDPOLAR, FIXEDAOAPOLAR, STABILITYPOLAR, BETAPOLAR} enumPolarType;
 
 /** @enum The different applications available to the user */
 typedef enum {NOAPP, XFOILANALYSIS, DIRECTDESIGN, INVERSEDESIGN, MIAREX}	enumApp;

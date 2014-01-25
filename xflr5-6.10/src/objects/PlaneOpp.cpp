@@ -168,8 +168,9 @@ void PlaneOpp::GetPlaneOppProperties(QString &WingOppProperties)
 
 	if(m_WPolarType==FIXEDSPEEDPOLAR)     strong += "Type 1 ("+QObject::tr("Fixed speed") +")\n";
 	else if(m_WPolarType==FIXEDLIFTPOLAR) strong += "Type 2 ("+QObject::tr("Fixed lift") +")\n";
-	else if(m_WPolarType==FIXEDAOAPOLAR)  strong += "Type 3 ("+QObject::tr("Fixed angle of attack") +")\n";
-	else if(m_WPolarType==STABILITYPOLAR) strong += "Type 4 ("+QObject::tr("Stability analysis") +")\n";
+	else if(m_WPolarType==FIXEDAOAPOLAR)  strong += "Type 4 ("+QObject::tr("Fixed angle of attack") +")\n";
+	else if(m_WPolarType==BETAPOLAR)      strong += "Type 5 ("+QObject::tr("Beta range") +")\n";
+	else if(m_WPolarType==STABILITYPOLAR) strong += "Type 7 ("+QObject::tr("Stability analysis") +")\n";
 	WingOppProperties += strong;
 
 //	WOppProperties += QObject::tr("Method")+" = ";
@@ -528,6 +529,7 @@ bool PlaneOpp::SerializePOppWPA(QDataStream &ar, bool bIsStoring)
 		if(k==1)      m_WPolarType = FIXEDSPEEDPOLAR;
 		else if(k==2) m_WPolarType = FIXEDLIFTPOLAR;
 		else if(k==4) m_WPolarType = FIXEDAOAPOLAR;
+		else if(k==5) m_WPolarType = BETAPOLAR;
 		else if(k==7) m_WPolarType = STABILITYPOLAR;
 		else return false;
 
@@ -799,6 +801,7 @@ bool PlaneOpp::SerializePOppXFL(QDataStream &ar, bool bIsStoring)
 		if(m_WPolarType==FIXEDSPEEDPOLAR)      ar<<1;
 		else if(m_WPolarType==FIXEDLIFTPOLAR)  ar<<2;
 		else if(m_WPolarType==FIXEDAOAPOLAR)   ar<<4;
+		else if(m_WPolarType==BETAPOLAR)       ar<<5;
 		else if(m_WPolarType==STABILITYPOLAR)  ar<<7;
 		else ar << 1;
 
@@ -888,6 +891,7 @@ bool PlaneOpp::SerializePOppXFL(QDataStream &ar, bool bIsStoring)
 		if(n==1)      m_WPolarType=FIXEDSPEEDPOLAR;
 		else if(n==2) m_WPolarType=FIXEDLIFTPOLAR;
 		else if(n==4) m_WPolarType=FIXEDAOAPOLAR;
+		else if(n==5) m_WPolarType=BETAPOLAR;
 		else if(n==7) m_WPolarType=STABILITYPOLAR;
 
 		ar >> n;

@@ -67,7 +67,7 @@ public:
 	static WPolar *  insertNewWPolar(WPolar *pModWPolar, Plane *pCurPlane);
 	static void      setStaticPointers();
 	static WPolar *  setWPolarObject(Plane *pCurPlane, WPolar *pCurWPolar, bool bCurrentWPolar, QString WPlrName);
-	static PlaneOpp* setPlaneOppObject(Plane *pPlane, WPolar *pWPolar, PlaneOpp *pCurPOpp, bool bCurrent, double x);
+	static PlaneOpp* setPlaneOppObject(Plane *pPlane, WPolar *pWPolar, PlaneOpp *pCurPOpp, bool bCurrent, double x=0);
 	static Plane *   setPlaneObject(QString PlaneName, Plane *pCurPlane);
 	static void      setControlPositions(Plane *pPlane, WPolar *pWPolar, Panel *pPanel, CVector *pNode, double t, int &NCtrls, QString &out, bool bBCOnly);
 
@@ -104,7 +104,8 @@ public:
 	static int s_NWakeColumn;                 /**< the number of wake columns */
 
 
-	static double s_LastWOpp;
+	static double s_LastAlpha;          /**< last angle of attack selected in the top list box>*/
+	static double s_LastBeta;           /**< last sideslip angle selected in the top list box>*/
 
 	static PanelAnalysis *s_pPanelAnalysis;   /**< the one and only instance of the 3D analysis class. */
 	static int s_MaxWakeIter;                 /**< wake roll-up iteration limit */

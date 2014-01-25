@@ -58,14 +58,13 @@ WPolar::WPolar()
 	m_Color = randomColor();
 
 	m_BankAngle = 0.0;
-	m_Beta      = 0.0;
-	m_QInf      = 10.0;
+	m_AlphaSpec = 0.0;
+	m_BetaSpec  = 0.0;
+	m_QInfSpec  = 10.0;
 	m_Mass      = 1.0;
-	m_ASpec     = 0.0;
 	m_WArea     = 0.0;
 	m_WMAChord  = 0.0;
 	m_WSpan     = 0.0;
-	m_AMem      = 0.0;
 	m_Height    = 0.0;
 	m_Density   = 1.225;
 	m_Viscosity = 1.5e-5;//m2/s
@@ -86,6 +85,7 @@ void WPolar::ReplacePOppDataAt(int pos, PlaneOpp *pPOpp)
 	if(pos<0 || pos>= m_Alpha.size()) return;
 
 	m_Alpha[pos]      =  pPOpp->m_Alpha;
+	m_Beta[pos]       =  pPOpp->m_Beta;
 	m_QInfinite[pos]  =  pPOpp->m_QInf;
 	m_CL[pos]         =  pPOpp->m_CL;
 	m_CY[pos]         =  pPOpp->m_CY;
@@ -120,6 +120,7 @@ void WPolar::InsertPOppDataAt(int pos, PlaneOpp *pPOpp)
 	if(pos<0 || pos> m_Alpha.size()) return; // if(pos==size), then the data is appended
 	
 	m_Alpha.insert(pos, pPOpp->m_Alpha);
+	m_Beta.insert(pos, pPOpp->m_Beta);
 	m_QInfinite.insert(pos, pPOpp->m_QInf);
 	m_CL.insert( pos,  pPOpp->m_CL);
 	m_CY.insert( pos,  pPOpp->m_CY);
@@ -182,13 +183,14 @@ void WPolar::InsertPOppDataAt(int pos, PlaneOpp *pPOpp)
 
 
 
-void WPolar::InsertDataAt(int pos, double Alpha, double QInf, double Ctrl, double Cl, double CY, double ICd, double PCd, double GCm, 
-								   double ICm, double VCm, double GRm, double GYm, double IYm, double VYm, double XCP, double YCP,
-								   double ZCP, double Cb, double XNP)
+void WPolar::InsertDataAt(int pos, double Alpha, double Beta, double QInf, double Ctrl, double Cl, double CY, double ICd, double PCd, double GCm,
+							double ICm, double VCm, double GRm, double GYm, double IYm, double VYm, double XCP, double YCP,
+							double ZCP, double Cb, double XNP)
 {
 	if(pos<0 || pos>m_Alpha.size()) return;
 	
 	m_Alpha.insert(pos, Alpha);
+	m_Beta.insert(pos, Beta);
 	m_CL.insert(pos, Cl);
 	m_CY.insert(pos, CY);
 	m_ICd.insert(pos, ICd);
@@ -277,7 +279,7 @@ void WPolar::AddPlaneOpPoint(PlaneOpp *pPOpp)
 			else if(m_WPolarType==FIXEDAOAPOLAR)
 			{
 				// type 4, sort by speed
-                if (qAbs(pPOpp->m_QInf - m_QInfinite[i]) < 0.001)
+				if (qAbs(pPOpp->m_QInf - m_QInfinite[i]) < 0.001)
 				{
 					// then erase former result
 					ReplacePOppDataAt(i, pPOpp);
@@ -292,10 +294,28 @@ void WPolar::AddPlaneOpPoint(PlaneOpp *pPOpp)
 					break;
 				}
 			}
+			else if(m_WPolarType==BETAPOLAR)
+			{
+				// type 5, sort by sideslip angle
+				if (qAbs(pPOpp->m_Beta - m_Beta[i]) < 0.001)
+				{
+					// then erase former result
+					ReplacePOppDataAt(i, pPOpp);
+					bInserted = true;
+					break;
+				}
+				else if (pPOpp->m_Beta < m_Beta[i])
+				{
+					// sort by crescending speed
+					InsertPOppDataAt(i, pPOpp);
+					bInserted = true;
+					break;
+				}
+			}
 			else if(m_WPolarType==STABILITYPOLAR)
 			{
 				// Control or stability analysis, sort by control value
-                if (qAbs(pPOpp->m_Alpha - m_Alpha[i])<0.0001)
+				if (qAbs(pPOpp->m_Alpha - m_Alpha[i])<0.0001)
 				{
 					// then erase former result
 					ReplacePOppDataAt(i, pPOpp);
@@ -429,26 +449,25 @@ void WPolar::CalculatePoint(int i)
 void WPolar::DuplicateSpec(WPolar *pWPolar)
 {
 	m_PlaneName   = pWPolar->m_PlaneName;
-	m_WPlrName   = pWPolar->m_WPlrName;
+	m_WPlrName    = pWPolar->m_WPlrName;
 
 	m_WPolarType  = pWPolar->m_WPolarType;
 
-	m_QInf      = pWPolar->m_QInf;
-	m_ASpec     = pWPolar->m_ASpec;
-	m_AMem      = pWPolar->m_AMem;
-	m_Beta      = pWPolar->m_Beta;
+	m_QInfSpec      = pWPolar->m_QInfSpec;
+	m_AlphaSpec     = pWPolar->m_AlphaSpec;
+
+	if(pWPolar->polarType()==BETAPOLAR) m_BetaSpec = 0.0;
+	else                                m_BetaSpec = pWPolar->m_BetaSpec;
 
 	m_Style  = pWPolar->m_Style;
 	m_Width  = pWPolar->m_Width;
 	m_Color  = pWPolar->m_Color;
-
 
 	// general aerodynamic data - specific to a polar
 	m_Viscosity   = pWPolar->m_Viscosity;
 	m_Density     = pWPolar->m_Density ;
 	m_Height      = pWPolar->m_Height;//for ground effect
 	m_BankAngle   = pWPolar->m_BankAngle;
-
 
 	m_NXWakePanels      = pWPolar->m_NXWakePanels;
 	m_TotalWakeLength   = pWPolar->m_TotalWakeLength;
@@ -467,13 +486,10 @@ void WPolar::DuplicateSpec(WPolar *pWPolar)
 	m_bThinSurfaces   = pWPolar->m_bThinSurfaces;
 	m_bVLM1           = pWPolar->m_bVLM1;
 
-
 	m_nControls       = pWPolar->m_nControls;
 	m_ControlGain.clear();
 	for(int icg=0; icg<pWPolar->m_ControlGain.size(); icg++)
 		m_ControlGain.append(pWPolar->m_ControlGain.at(icg));
-
-
 
 	m_RefAreaType = pWPolar->m_RefAreaType;
 	m_WArea       = pWPolar->m_WArea;//for lift and drag calculations
@@ -490,10 +506,7 @@ void WPolar::DuplicateSpec(WPolar *pWPolar)
 	m_CoGIxz = pWPolar->m_CoGIxz;
 
 	m_CoG = pWPolar->m_CoG;
-
 }
-
-
 
 
 
@@ -527,12 +540,12 @@ void WPolar::Export(QTextStream &out, enumTextFileType FileType, bool bDataOnly)
 
 			if(m_WPolarType==FIXEDSPEEDPOLAR)
 			{
-				strong = QString("Freestream speed : %1 ").arg(m_QInf*Units::mstoUnit(),7,'f',3);
+				strong = QString("Freestream speed : %1 ").arg(m_QInfSpec*Units::mstoUnit(),7,'f',3);
 				strong +=str + "\n";
 			}
 			else if(m_WPolarType==FIXEDAOAPOLAR)
 			{
-				strong = QString("Alpha = %1").arg(m_ASpec) + QString::fromUtf8("°") + "\n";
+				strong = QString("Alpha = %1").arg(m_AlphaSpec) + QString::fromUtf8("°") + "\n";
 			}
 			else strong = "\n";
 
@@ -576,7 +589,7 @@ void WPolar::Export(QTextStream &out, enumTextFileType FileType, bool bDataOnly)
 
 			Units::getSpeedUnitLabel(str);
 			str +="\n\n";
-			strong = QString("Freestream speed :, %1 ").arg(m_QInf*Units::mstoUnit(),3,'f',1);
+			strong = QString("Freestream speed :, %1 ").arg(m_QInfSpec*Units::mstoUnit(),3,'f',1);
 			strong +=str;
 			out << strong;
 		}
@@ -624,129 +637,132 @@ void * WPolar::GetWPlrVariable(int iVar)
 			pVar = &m_Alpha;
 			break;
 		case 1:
-			pVar = &m_CL;
+			pVar = &m_Beta;
 			break;
 		case 2:
-			pVar = &m_TCd;
+			pVar = &m_CL;
 			break;
 		case 3:
-			pVar = &m_PCd;
+			pVar = &m_TCd;
 			break;
 		case 4:
-			pVar = &m_ICd;
+			pVar = &m_PCd;
 			break;
 		case 5:
-			pVar = &m_CY;
+			pVar = &m_ICd;
 			break;
 		case 6:
-			pVar = &m_GCm;
+			pVar = &m_CY;
 			break;
 		case 7:
-			pVar = &m_VCm;
+			pVar = &m_GCm;
 			break;
 		case 8:
-			pVar = &m_ICm;
+			pVar = &m_VCm;
 			break;
 		case 9:
-			pVar = &m_GRm;
+			pVar = &m_ICm;
 			break;
 		case 10:
-			pVar = &m_GYm;
+			pVar = &m_GRm;
 			break;
 		case 11:
-			pVar = &m_VYm;
+			pVar = &m_GYm;
 			break;
 		case 12:
-			pVar = &m_IYm;
+			pVar = &m_VYm;
 			break;
 		case 13:
-			pVar = &m_ClCd;
+			pVar = &m_IYm;
 			break;
 		case 14:
-			pVar = &m_Cl32Cd;
+			pVar = &m_ClCd;
 			break;
 		case 15:
-			pVar = &m_1Cl;
+			pVar = &m_Cl32Cd;
 			break;
 		case 16:
-			pVar = &m_FX;
+			pVar = &m_1Cl;
 			break;
 		case 17:
-			pVar = &m_FY;
+			pVar = &m_FX;
 			break;
 		case 18:
-			pVar = &m_FZ;
+			pVar = &m_FY;
 			break;
 		case 19:
-			pVar = &m_Vx;
+			pVar = &m_FZ;
 			break;
 		case 20:
-			pVar = &m_Vz;
+			pVar = &m_Vx;
 			break;
 		case 21:
-			pVar = &m_QInfinite;
+			pVar = &m_Vz;
 			break;
 		case 22:
-			pVar = &m_Gamma;
+			pVar = &m_QInfinite;
 			break;
 		case 23:
-			pVar = &m_Rm;
+			pVar = &m_Gamma;
 			break;
 		case 24:
-			pVar = &m_Pm;
+			pVar = &m_Rm;
 			break;
 		case 25:
-			pVar = &m_Ym;
+			pVar = &m_Pm;
 			break;
 		case 26:
-			pVar = &m_XCP;
+			pVar = &m_Ym;
 			break;
 		case 27:
-			pVar = &m_YCP;
+			pVar = &m_XCP;
 			break;
 		case 28:
-			pVar = &m_ZCP;
+			pVar = &m_YCP;
 			break;
 		case 29:
-			pVar = &m_MaxBending;
+			pVar = &m_ZCP;
 			break;
 		case 30:
-			pVar = &m_VertPower;
+			pVar = &m_MaxBending;
 			break;
 		case 31:
-			pVar = &m_Oswald;
+			pVar = &m_VertPower;
 			break;
 		case 32:
-			pVar = &m_SM;
+			pVar = &m_Oswald;
 			break;
 		case 33:
-			pVar = &m_Ctrl;
+			pVar = &m_SM;
 			break;
 		case 34:
-			pVar = &m_XNP;
+			pVar = &m_Ctrl;
 			break;
 		case 35:
-			pVar = &m_PhugoidFrequency;
+			pVar = &m_XNP;
 			break;
 		case 36:
-			pVar = &m_PhugoidDamping;
+			pVar = &m_PhugoidFrequency;
 			break;
 		case 37:
-			pVar = &m_ShortPeriodFrequency;
+			pVar = &m_PhugoidDamping;
 			break;
 		case 38:
-			pVar = &m_ShortPeriodDamping;
+			pVar = &m_ShortPeriodFrequency;
 			break;
 		case 39:
-			pVar = &m_DutchRollFrequency;
+			pVar = &m_ShortPeriodDamping;
 			break;
 		case 40:
-			pVar = &m_DutchRollDamping;
+			pVar = &m_DutchRollFrequency;
 			break;
 		case 41:
-			pVar = &m_RollDamping;
+			pVar = &m_DutchRollDamping;
 			break;
 		case 42:
+			pVar = &m_RollDamping;
+			break;
+		case 43:
 			pVar = &m_SpiralDamping;
 			break;
 		default:
@@ -777,132 +793,135 @@ QString WPolar::variableName(int iVar)
 			return "Alpha";
 			break;
 		case 1:
-			return "CL";
+			return "Beta";
 			break;
 		case 2:
-			return "CD";
+			return "CL";
 			break;
 		case 3:
-			return "CD_viscous";
+			return "CD";
 			break;
 		case 4:
-			return "CD_induced";
+			return "CD_viscous";
 			break;
 		case 5:
-			return "CY";
+			return "CD_induced";
 			break;
 		case 6:
-			return "Cm";// Total Pitching moment coef.
+			return "CY";
 			break;
 		case 7:
-			return "Cm_viscous";// Viscous Pitching moment coef.
+			return "Cm";// Total Pitching moment coef.
 			break;
 		case 8:
-			return "Cm_induced";// Induced Pitching moment coef.
+			return "Cm_viscous";// Viscous Pitching moment coef.
 			break;
 		case 9:
-			return "Cl";// Total Rolling moment coef.
+			return "Cm_induced";// Induced Pitching moment coef.
 			break;
 		case 10:
-			return "Cn";// Total Yawing moment coef.
+			return "Cl";// Total Rolling moment coef.
 			break;
 		case 11:
-			return "Cn_viscous";// Profile yawing moment
+			return "Cn";// Total Yawing moment coef.
 			break;
 		case 12:
-			return "Cn_induced";// Induced yawing moment
+			return "Cn_viscous";// Profile yawing moment
 			break;
 		case 13:
-			return "CL/CD";
+			return "Cn_induced";// Induced yawing moment
 			break;
 		case 14:
-			return "CL^(3/2)/CD";
+			return "CL/CD";
 			break;
 		case 15:
-			return "1/Rt(CL)";
+			return "CL^(3/2)/CD";
 			break;
 		case 16:
+			return "1/Rt(CL)";
+			break;
+		case 17:
 			if(Units::forceUnitIndex()==0) return "Fx (N)";
 			else                           return "Fx (lbf)";
 			break;
-		case 17:
+		case 18:
 			if(Units::forceUnitIndex()==0) return "Fy (N)";
 			else                           return "Fy (lbf)";
 			break;
-		case 18:
+		case 19:
 			if(Units::forceUnitIndex()==0) return "Fz (N)";
 			else                           return "Fz (lbf)";
 			break;
-		case 19:
+		case 20:
 			return "Vx ("+StrSpeed+")";
 			break;
-		case 20:
+		case 21:
 			return "Vz ("+StrSpeed+")";
 			break;
-		case 21:
+		case 22:
 			return "V ("+StrSpeed+")";
 			break;
-		case 22:
+		case 23:
 			return "Gamma";
 			break;
-		case 23:
+		case 24:
 			return "L ("+ StrMoment+")";
 			break;
-		case 24:
+		case 25:
 			return "M ("+ StrMoment+")";
 			break;
-		case 25:
+		case 26:
 			return "N ("+ StrMoment+")";
 			break;
-		case 26:
+		case 27:
 			return "CPx ("+ StrLength+")";
 			break;
-		case 27:
+		case 28:
 			return "CPy ("+ StrLength+")";
 			break;
-		case 28:
+		case 29:
 			return "CPz ("+ StrLength+")";
 			break;
-		case 29:
+		case 30:
 			return "BM ("+ StrMoment+")";
 			break;
-		case 30:
+		case 31:
 			return "m.g.Vz (W)";
 			break;
-		case 31:
+		case 32:
 			return "Efficiency";
 			break;
-		case 32:
+		case 33:
 			return "(XCp-XCG)/MAC(%)";
 			break;
-		case 33:
+		case 34:
 			return "ctrl";
 			break;
-		case 34:
+		case 35:
 			return "XNP ("+ StrLength+")";
 			break;
-		case 35:
+		case 36:
 			return "Phugoid Freq. (Hz)";
 			break;
-		case 36:
+		case 37:
 			return "Phugoid Damping";
 			break;
-		case 37:
+		case 38:
 			return "Short Period Freq. (Hz)";
 			break;
-		case 38:
+		case 39:
 			return "Short Period Damping";
 			break;
-		case 39:
+		case 40:
 			return "Dutch Roll Freq. (Hz)";
 			break;
-		case 40:
+		case 41:
 			return "Dutch Roll Damping";
 			break;
-		case 41:
+		case 42:
 			return "Roll Damping";
 			break;
-		case 42:
+		case 43:
 			return "Spiral Damping";
 			break;
 		default:
@@ -938,6 +957,7 @@ void WPolar::Remove(int i)
 {
 	int size = m_Alpha.size();
 	m_Alpha.removeAt(i);
+	m_Beta.removeAt(i);
 	m_CL.removeAt(i);
 	m_CY.removeAt(i);
 	m_ICd.removeAt(i);
@@ -1003,6 +1023,7 @@ void WPolar::ClearData()
 {
 	int size = m_Alpha.size();
 	m_Alpha.clear();
+	m_Beta.clear();
 	m_CL.clear();
 	m_CY.clear();
 	m_ICd.clear();
@@ -1222,15 +1243,15 @@ bool WPolar::SerializeWPlrWPA(QDataStream &ar, bool bIsStoring)
 		else return false;
 
 
-		ar >> f;	m_QInf = f;
+		ar >> f;	m_QInfSpec = f;
 		ar >> f;	m_Mass = f;
-		ar >> f;	m_ASpec = f;
+		ar >> f;	m_AlphaSpec = f;
 		if(m_PolarFormat>=1015)
 		{
 			ar >> f;
-			m_Beta = f;
+			m_BetaSpec = f;
 		}
-		else m_Beta = 0.0;
+		else m_BetaSpec = 0.0;
 		if(m_PolarFormat<1018 && m_PolarFormat>=1002)
 		{
 			ar >> f;			m_CoG.x = f;
@@ -1258,7 +1279,7 @@ bool WPolar::SerializeWPlrWPA(QDataStream &ar, bool bIsStoring)
 			m_WSpan    /=1000.0;
 			m_CoG.x   /=1000.0;
 		}
-		float Alpha,  Cl, CY, ICd, PCd, GCm, GRm, GYm, VCm, ICm, VYm, IYm, QInfinite, XCP, YCP, ZCP, Ctrl, Cb, XNP;
+		float Alpha, Cl, CY, ICd, PCd, GCm, GRm, GYm, VCm, ICm, VYm, IYm, QInfinite, XCP, YCP, ZCP, Ctrl, Cb, XNP;
 		f = Alpha =  Cl = CY = ICd = PCd = GCm = GRm = GYm = VCm = ICm = VYm = IYm = QInfinite = XCP = YCP = ZCP = Ctrl = Cb =0.0;
 //		bool bExists;
 		for (i=0; i< n; i++)
@@ -1312,6 +1333,7 @@ bool WPolar::SerializeWPlrWPA(QDataStream &ar, bool bIsStoring)
 			}
 
 			m_Alpha.append(Alpha);
+			m_Beta.append(m_BetaSpec);
 			m_CL.append(Cl);
 			m_CY.append(CY);
 			m_ICd.append(ICd);
@@ -1467,18 +1489,25 @@ void WPolar::GetPolarProperties(QString &PolarProperties, bool bData)
 
 	if(m_WPolarType==FIXEDSPEEDPOLAR)
 	{
-		strong  = QString(QObject::tr("VInf =")+"%1 ").arg(m_QInf*Units::mstoUnit(),10,'g',2);
+		strong  = QString(QObject::tr("VInf =")+"%1 ").arg(m_QInfSpec*Units::mstoUnit(),10,'g',2);
 		PolarProperties += strong + speedunit+"\n";
 	}
 	else if(m_WPolarType==FIXEDAOAPOLAR)
 	{
-		strong  = QString(QObject::tr("Alpha =")+"%1").arg(m_ASpec,7,'f',2);
+		strong  = QString(QObject::tr("Alpha =")+"%1").arg(m_AlphaSpec,7,'f',2);
 		PolarProperties += strong +QString::fromUtf8("°")+"\n";
 	}
-
-    if(qAbs(m_Beta)>PRECISION)
+	else if(m_WPolarType==BETAPOLAR)
 	{
-		strong  = QString(QObject::tr("Beta")+" = %1").arg(m_Beta,7,'f',2);
+		strong  = QString(QObject::tr("Alpha =")+"%1").arg(m_AlphaSpec,7,'f',2);
+		PolarProperties += strong +QString::fromUtf8("°")+"\n";
+		strong  = QString(QObject::tr("VInf =")+"%1 ").arg(m_QInfSpec*Units::mstoUnit(),10,'g',2);
+		PolarProperties += strong + speedunit+"\n";
+	}
+
+	if(m_WPolarType != BETAPOLAR && qAbs(m_BetaSpec)>PRECISION)
+	{
+		strong  = QString(QObject::tr("Beta")+" = %1").arg(m_BetaSpec,7,'f',2);
 		PolarProperties += strong +QString::fromUtf8("°")+"\n";
 	}
 
@@ -1717,7 +1746,7 @@ bool WPolar::SerializeWPlrXFL(QDataStream &ar, bool bIsStoring)
 	double r0, r1, r2, r3, r4, r5, r6, r7;
 	double i0, i1, i2, i3, i4, i5, i6, i7;
 
-	m_PolarFormat = 200011;
+	m_PolarFormat = 200012;
 	// 200011 : v0.00
 
 	if(bIsStoring)
@@ -1741,6 +1770,7 @@ bool WPolar::SerializeWPlrXFL(QDataStream &ar, bool bIsStoring)
 		if(m_WPolarType==FIXEDSPEEDPOLAR)      ar<<1;
 		else if(m_WPolarType==FIXEDLIFTPOLAR)  ar<<2;
 		else if(m_WPolarType==FIXEDAOAPOLAR)   ar<<4;
+		else if(m_WPolarType==BETAPOLAR)       ar<<5;
 		else if(m_WPolarType==STABILITYPOLAR)  ar<<7;
 		else ar << 0;
 
@@ -1758,7 +1788,7 @@ bool WPolar::SerializeWPlrXFL(QDataStream &ar, bool bIsStoring)
 
 		ar << m_RefAreaType;
 
-		ar << m_bAutoInertia; ;
+		ar << m_bAutoInertia;
 		ar << m_Mass;
 		ar << m_CoG.x  << m_CoG.y  << m_CoG.z;
 		ar << m_CoGIxx << m_CoGIyy << m_CoGIzz << m_CoGIxz;
@@ -1771,15 +1801,15 @@ bool WPolar::SerializeWPlrXFL(QDataStream &ar, bool bIsStoring)
 
 		ar << m_NXWakePanels << m_TotalWakeLength << m_WakePanelFactor;
 
-		ar << m_QInf;
-		ar << m_ASpec;
-		ar << m_Beta;
+		ar << m_QInfSpec;
+		ar << m_AlphaSpec;
+		ar << m_BetaSpec;
 
 		// Last store the array data
 		ar <<m_Alpha.size();
 		for (i=0; i< m_Alpha.size(); i++)
 		{
-			ar << m_Alpha[i] << m_QInfinite[i]<< m_Ctrl[i];
+			ar << m_Alpha[i] << m_Beta[i] << m_QInfinite[i] << m_Ctrl[i];
 			ar << m_CL[i] << m_CY[i] << m_ICd[i] << m_PCd[i] ;
 			ar << m_GCm[i] << m_ICm[i] << m_VCm[i];
 			ar << m_GRm[i];
@@ -1823,6 +1853,7 @@ bool WPolar::SerializeWPlrXFL(QDataStream &ar, bool bIsStoring)
 		if(n==1)      m_WPolarType=FIXEDSPEEDPOLAR;
 		else if(n==2) m_WPolarType=FIXEDLIFTPOLAR;
 		else if(n==4) m_WPolarType=FIXEDAOAPOLAR;
+		else if(n==5) m_WPolarType=BETAPOLAR;
 		else if(n==7) m_WPolarType=STABILITYPOLAR;
 
 		ar >> m_bVLM1;
@@ -1839,7 +1870,7 @@ bool WPolar::SerializeWPlrXFL(QDataStream &ar, bool bIsStoring)
 
 		ar >> m_RefAreaType;
 
-		ar >> m_bAutoInertia; ;
+		ar >> m_bAutoInertia;
 		ar >> m_Mass;
 		ar >> m_CoG.x  >> m_CoG.y  >> m_CoG.z;
 		ar >> m_CoGIxx >> m_CoGIyy >> m_CoGIzz >> m_CoGIxz;
@@ -1854,9 +1885,9 @@ bool WPolar::SerializeWPlrXFL(QDataStream &ar, bool bIsStoring)
 
 		ar >> m_NXWakePanels >> m_TotalWakeLength >> m_WakePanelFactor;
 
-		ar >> m_QInf;
-		ar >> m_ASpec;
-		ar >> m_Beta;
+		ar >> m_QInfSpec;
+		ar >> m_AlphaSpec;
+		ar >> m_BetaSpec;
 
 		// Last store the array data
 		// assumes the arrays have been cleared previously
@@ -1865,13 +1896,25 @@ bool WPolar::SerializeWPlrXFL(QDataStream &ar, bool bIsStoring)
 		ar >> n;
 		for (i=0; i<n; i++)
 		{
-			for(int j=0; j<19; j++)
+			if(m_PolarFormat==200011)
 			{
-				ar >> d[j];
+				for(int j=0; j<19; j++)
+				{
+					ar >> d[j];
+				}
+				InsertDataAt(i, d[0], 0.0,  d[1],  d[2],  d[3],  d[4], d[5], d[6], d[7], d[8], d[9],
+							 d[10], d[11], d[12], d[13], d[14], d[15], d[16], d[17], d[18]);
+			}
+			else
+			{
+				for(int j=0; j<20; j++)
+				{
+					ar >> d[j];
+				}
+				InsertDataAt(i, d[0],  d[1],  d[2],  d[3],  d[4], d[5], d[6], d[7], d[8], d[9], d[10], d[11], d[12], d[13],
+								d[14], d[15], d[16], d[17], d[18], d[19]);
 			}
 
-			InsertDataAt(i, d[0],  d[1],  d[2],  d[3],  d[4], d[5], d[6], d[7], d[8], d[9], d[10], d[11], d[12], d[13],
-							d[14], d[15], d[16], d[17], d[18]);
 
 			ar >> r0 >> r1 >>r2 >> r3;
 			ar >> i0 >> i1 >>i2 >> i3;
@@ -1916,6 +1959,7 @@ void WPolar::Copy(WPolar *pWPolar)
 	for(i=0; i<pWPolar->m_Alpha.size(); i++)
 	{
 		m_Alpha.append(     pWPolar->m_Alpha[i]);
+		m_Beta.append(      pWPolar->m_Beta[i]);
 		m_CL.append(        pWPolar-> m_CL[i]);
 		m_CY.append(        pWPolar-> m_CY[i]);
 		m_ICd.append(       pWPolar-> m_ICd[i]);
