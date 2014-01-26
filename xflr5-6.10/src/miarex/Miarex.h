@@ -372,8 +372,6 @@ public:
 	static bool s_bShowMasses;                /**< true if the point masses are to be displayed on the openGL 3D view */
 	static bool s_bFoilNames;                 /**< true if the foil names are to be displayed on the openGL 3D view */
 
-	static bool s_bVLM1;                      /**< true if the horseshoe method is selected, false if the quad ring method is selected */
-
 	// Class variables
 
 	ArcBall m_ArcBall;                 /**< the instance of the arcball object used for rotating the 3D view */

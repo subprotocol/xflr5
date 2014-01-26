@@ -71,13 +71,13 @@ private slots:
 	void OnArea();
 	void OnUnit();
 	void OnMethod();
-	void OnWPolarName();
+	void OnPolarName();
 	void OnAutoName();
 	void OnTiltedGeom();
 	void OnViscous();
 	void OnIgnoreBodyPanels();
 	void OnGroundEffect();
-	void OnWPolarType();
+	void OnPolarType();
 	void OnEditingFinished();
 	void OnPlaneInertia();
 
@@ -109,7 +109,7 @@ private:
 	QCheckBox *m_pctrlAutoName;
 
 	QRadioButton *m_pctrlType1,*m_pctrlType2,*m_pctrlType4,*m_pctrlType5;
-	QRadioButton *m_pctrlLLTMethod, *m_pctrlVLMMethod, *m_pctrlPanelMethod;
+	QRadioButton *m_pctrlLLTMethod, *m_pctrlVLM1Method, *m_pctrlVLM2Method, *m_pctrlPanelMethod;
 	QRadioButton *m_pctrlUnit1, *m_pctrlUnit2;
 	QRadioButton *m_pctrlArea1, *m_pctrlArea2;
 

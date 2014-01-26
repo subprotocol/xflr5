@@ -39,7 +39,7 @@ class WAdvancedDlg : public QDialog
 	friend class MainFrame;
 
 public:
-    WAdvancedDlg(QWidget *pParent);
+	WAdvancedDlg(QWidget *pParent);
 	void InitDialog();
 
 private slots:
@@ -57,21 +57,19 @@ private:
 	QCheckBox *m_pctrlLogFile;
 	QCheckBox *m_pctrlKeepOutOpps;
 	QRadioButton *m_pctrlDirichlet, *m_pCtrlNeumann;
-	QRadioButton *m_pctrlVLM1, *m_pctrlVLM2;
-    DoubleEdit *m_pctrlRelax;
-    DoubleEdit *m_pctrlAlphaPrec;
-    DoubleEdit *m_pctrlMinPanelSize;
+	DoubleEdit *m_pctrlRelax;
+	DoubleEdit *m_pctrlAlphaPrec;
+	DoubleEdit *m_pctrlMinPanelSize;
 	IntEdit *m_pctrlNStation;
 	IntEdit *m_pctrlIterMax;
-    DoubleEdit *m_pctrlCoreSize;
-    DoubleEdit *m_pctrlVortexPos;
-    DoubleEdit *m_pctrlControlPos;
+	DoubleEdit *m_pctrlCoreSize;
+	DoubleEdit *m_pctrlVortexPos;
+	DoubleEdit *m_pctrlControlPos;
 
 	bool m_bLogFile;
 	bool m_bDirichlet;
 	bool m_bTrefftz;
 	bool m_bKeepOutOpps;
-	bool m_bVLM1;
 
 	int m_Iter;
 	int m_NLLTStation;

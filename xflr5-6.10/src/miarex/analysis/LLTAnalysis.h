@@ -141,7 +141,6 @@ private:
 	static double s_CvPrec;                     /**< Precision criterion to stop the iterations. The difference in induced angle at any span point between two iterations should be less than the criterion */
 	static bool s_bInitCalc;                    /**< true if the iterations analysis should be intialized with the linear solution at each new a.o.a. calculation, false otherwise */
 
-	QTextStream m_OutStream;
 	QString m_OutMessage;
 
 	QList<PlaneOpp*> m_PlaneOppList;

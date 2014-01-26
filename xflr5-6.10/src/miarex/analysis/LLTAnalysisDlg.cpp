@@ -51,10 +51,6 @@ LLTAnalysisDlg::LLTAnalysisDlg(QWidget *pParent, LLTAnalysis *pLLTAnalysis) : QD
 
 	m_pLLT = pLLTAnalysis;
 
-	QString FileName = QDir::tempPath() + "/XFLR5.log";
-	m_pXFile = new QFile(FileName);
-	if (!m_pXFile->open(QIODevice::WriteOnly | QIODevice::Text)) m_pXFile = NULL;
-
 	m_pIterGraph = m_pGraphWidget->graph();
 	m_pIterGraph->CopySettings(&Settings::s_RefGraph, false);
 //	m_pIterGraph->SetXTitle(tr("Iterations"));
@@ -92,7 +88,6 @@ LLTAnalysisDlg::LLTAnalysisDlg(QWidget *pParent, LLTAnalysis *pLLTAnalysis) : QD
  */
 LLTAnalysisDlg::~LLTAnalysisDlg()
 {
-	if(m_pXFile) delete m_pXFile;
 }
 
 
@@ -102,10 +97,6 @@ LLTAnalysisDlg::~LLTAnalysisDlg()
 void LLTAnalysisDlg::initDialog()
 {
 	m_pctrlTextOutput->setFont(Settings::s_TableFont);
-
-	SetFileHeader();
-
-	if(m_pXFile) m_pLLT->m_OutStream.setDevice(m_pXFile);
 
 	m_pIterGraph->DeleteCurves();
 
@@ -145,8 +136,6 @@ void LLTAnalysisDlg::OnCancelAnalysis()
 {
 	m_bCancel = true;
 
-	if(m_pXFile->isOpen()) m_pXFile->close();
-
 	if(m_bFinished) accept();
 }
 
@@ -166,24 +155,6 @@ void LLTAnalysisDlg::ResetCurves()
 }
 
 
-
-/**
-* Initializes the header of the log file
-*/
-void LLTAnalysisDlg::SetFileHeader()
-{
-	if(!m_pXFile) return;
-	QTextStream out(m_pXFile);
-	out << "\n";
-	out << VERSIONNAME;
-	out << "\n";
-
-	QDateTime dt = QDateTime::currentDateTime();
-	QString str = dt.toString("dd.MM.yyyy  hh:mm:ss");
-
-	out << str;
-	out << "\n___________________________________\n\n";
-}
 
 /**
 * Initializes the interface of the dialog box
@@ -277,8 +248,6 @@ void LLTAnalysisDlg::Analyze()
 
 	pTimer->stop();
 
-	m_pLLT->m_OutStream.flush();
-
 	if(PlaneOpp::s_bStoreOpps)
 	{
 		for(int iPOpp=0; iPOpp<m_pLLT->m_PlaneOppList.size(); iPOpp++)
@@ -296,8 +265,27 @@ void LLTAnalysisDlg::Analyze()
 
 	m_pLLT->traceLog(strange);
 	OnProgress();
+
+	QString FileName = QDir::tempPath() + "/XFLR5.log";
+	QFile *pXFile = new QFile(FileName);
+	if(pXFile->open(QIODevice::WriteOnly | QIODevice::Text))
+	{
+		QTextStream outstream(pXFile);
+		outstream << "\n";
+		outstream << VERSIONNAME;
+		outstream << "\n";
+		QDateTime dt = QDateTime::currentDateTime();
+		QString str = dt.toString("dd.MM.yyyy  hh:mm:ss");
+		outstream << str<<"\n";
+
+		outstream << m_pctrlTextOutput->toPlainText();
+		outstream.flush();
+		pXFile->close();
+		delete pXFile;
+	}
+
+
 	m_pctrlCancel->setText(tr("Close"));
-	m_pXFile->close();
 }
 
 
@@ -333,20 +321,6 @@ void LLTAnalysisDlg::UpdateOutput(QString &strong)
 {
 	m_pctrlTextOutput->insertPlainText(strong);
 	m_pctrlTextOutput->ensureCursorVisible();
-	WriteString(strong);
-}
-
-
-/**
-* Appends a string to the log file
-*@param strong the text message to append to the log file.
-*/
-void LLTAnalysisDlg::WriteString(QString &strong)
-{
-	if(!m_pXFile) return;
-	if(!m_pXFile->isOpen()) return;
-	QTextStream ds(m_pXFile);
-	ds << strong;
 }
 
 

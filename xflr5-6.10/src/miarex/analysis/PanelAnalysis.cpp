@@ -784,6 +784,7 @@ void PanelAnalysis::CreateRHS(double *RHS, CVector VInf, double *VField)
 			{
 				// first term of RHS is -V.n
 				RHS[m] = - m_pPanel[p].Normal.dot(VPanel);
+//				if(RHS[m]<PRECISION) RHS[m] = 0.0;
 			}
 			else if(m_pWPolar->bDirichlet()) RHS[m] = 0.0;
 			if(m_pPanel[p].m_Pos!=MIDSURFACE) C = m_pPanel[p].CollPt;
@@ -4361,7 +4362,7 @@ PlaneOpp* PanelAnalysis::createPlaneOpp(double *Cp, double *Gamma, double *Sigma
 	}
 
 	//add the data to the polar object
-	if(PlaneOpp::s_bKeepOutOpps || !pPOpp->m_bOut)
+	if(PlaneOpp::s_bKeepOutOpps || !pPOpp->isOut())
 		m_pWPolar->AddPlaneOpPoint(pPOpp);
 
 	return pPOpp;
@@ -4372,7 +4373,6 @@ PlaneOpp* PanelAnalysis::createPlaneOpp(double *Cp, double *Gamma, double *Sigma
 /** Sends the analysis messages to the specified text output stream */
 void PanelAnalysis::traceLog(QString str)
 {
-	m_OutStream << str;
 	m_OutMessage += str;
 	qApp->processEvents();
 }

@@ -45,6 +45,8 @@ class StabPolarDlg : public QDialog
 
 public:
 	StabPolarDlg(QWidget *pParent=NULL);
+	~StabPolarDlg();
+
 	void InitDialog(Plane *pPlane, WPolar *pWPolar=NULL);
 
 private:
@@ -108,12 +110,15 @@ private:
 
 	DoubleEdit *m_pctrlMass, *m_pctrlCoGx,*m_pctrlCoGz, *m_pctrlIxx, *m_pctrlIyy, *m_pctrlIzz, *m_pctrlIxz;
 
+	int  *m_precision;
+
 	QPushButton *OKButton, *CancelButton;
 
 	static WPolar s_StabPolar;
 
 	Plane *m_pPlane;
 	Wing *m_pWingList[MAXWINGS];         // pointers to the four wings of the currently selected plane
+
 
 	bool m_bAutoName;
 	int m_UnitType;//1= International, 2= Imperial

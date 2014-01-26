@@ -135,21 +135,21 @@ void SplineCtrlsDlg::showEvent(QShowEvent *event)
 
 void SplineCtrlsDlg::SetupLayout()
 {
-	QGroupBox *UpperSideBox = new QGroupBox(tr("Upper side"));
+	QGroupBox *pUpperSideBox = new QGroupBox(tr("Upper side"));
 	{
-		QVBoxLayout *UpperSideLayout = new QVBoxLayout;
+		QVBoxLayout *pUpperSideLayout = new QVBoxLayout;
 		{
-			QGridLayout *UpperLayout = new QGridLayout;
+			QGridLayout *pUpperLayout = new QGridLayout;
 			{
 				QLabel *labupper1 = new QLabel(tr("Spline degree"));
 				QLabel *labupper2 = new QLabel(tr("Output"));
 				m_pctrlDegExtrados = new QComboBox;
 				m_pctrlOutExtrados = new DoubleEdit;
 				m_pctrlOutExtrados->SetPrecision(0);
-				UpperLayout->addWidget(labupper1, 1,1);
-				UpperLayout->addWidget(labupper2, 2,1);
-				UpperLayout->addWidget(m_pctrlDegExtrados, 1,2);
-				UpperLayout->addWidget(m_pctrlOutExtrados, 2,2);
+				pUpperLayout->addWidget(labupper1, 1,1);
+				pUpperLayout->addWidget(labupper2, 2,1);
+				pUpperLayout->addWidget(m_pctrlDegExtrados, 1,2);
+				pUpperLayout->addWidget(m_pctrlOutExtrados, 2,2);
 			}
 
 
@@ -159,28 +159,28 @@ void SplineCtrlsDlg::SetupLayout()
 			m_pctrlUpperList->setMinimumHeight(200);
 			m_pctrlUpperList->setMinimumWidth(250);
 			m_pctrlUpperList->setSelectionBehavior(QAbstractItemView::SelectRows);
-			UpperSideLayout->addLayout(UpperLayout);
-			UpperSideLayout->addStretch(1);
-			UpperSideLayout->addWidget(m_pctrlUpperList);
+			pUpperSideLayout->addLayout(pUpperLayout);
+			pUpperSideLayout->addStretch(1);
+			pUpperSideLayout->addWidget(m_pctrlUpperList);
 		}
-		UpperSideBox->setLayout(UpperSideLayout);
+		pUpperSideBox->setLayout(pUpperSideLayout);
 	}
 
-	QGroupBox *LowerSideBox = new QGroupBox(tr("Lower side"));
+	QGroupBox *pLowerSideBox = new QGroupBox(tr("Lower side"));
 	{
-		QVBoxLayout *LowerSideLayout = new QVBoxLayout;
+		QVBoxLayout *pLowerSideLayout = new QVBoxLayout;
 		{
-			QGridLayout *LowerLayout = new QGridLayout;
+			QGridLayout *pLowerLayout = new QGridLayout;
 			{
 				QLabel *lablower1 = new QLabel(tr("Spline degree"));
 				QLabel *lablower2 = new QLabel(tr("Output"));
 				m_pctrlDegIntrados = new QComboBox;
 				m_pctrlOutIntrados = new DoubleEdit;
 				m_pctrlOutIntrados->SetPrecision(0);
-				LowerLayout->addWidget(lablower1, 1,1);
-				LowerLayout->addWidget(lablower2, 2,1);
-				LowerLayout->addWidget(m_pctrlDegIntrados, 1,2);
-				LowerLayout->addWidget(m_pctrlOutIntrados, 2,2);
+				pLowerLayout->addWidget(lablower1, 1,1);
+				pLowerLayout->addWidget(lablower2, 2,1);
+				pLowerLayout->addWidget(m_pctrlDegIntrados, 1,2);
+				pLowerLayout->addWidget(m_pctrlOutIntrados, 2,2);
 			}
 
 			m_pctrlLowerList = new QTableView(this);
@@ -189,22 +189,22 @@ void SplineCtrlsDlg::SetupLayout()
 			m_pctrlLowerList->setMinimumHeight(200);
 			m_pctrlLowerList->setMinimumWidth(250);
 			m_pctrlLowerList->setSelectionBehavior(QAbstractItemView::SelectRows);
-			LowerSideLayout->addLayout(LowerLayout);
-			LowerSideLayout->addStretch(1);
-			LowerSideLayout->addWidget(m_pctrlLowerList);
+			pLowerSideLayout->addLayout(pLowerLayout);
+			pLowerSideLayout->addStretch(1);
+			pLowerSideLayout->addWidget(m_pctrlLowerList);
 		}
-		LowerSideBox->setLayout(LowerSideLayout);
+		pLowerSideBox->setLayout(pLowerSideLayout);
 	}
 
-	QHBoxLayout *SideLayout = new QHBoxLayout;
+	QHBoxLayout *pSideLayout = new QHBoxLayout;
 	{
-		SideLayout->addWidget(UpperSideBox);
-		SideLayout->addWidget(LowerSideBox);
+		pSideLayout->addWidget(pUpperSideBox);
+		pSideLayout->addWidget(pLowerSideBox);
 	}
 
 	m_pctrlSymetric = new QCheckBox(tr("Symetric foil"));
 
-	QHBoxLayout *WeightLayout = new QHBoxLayout;
+	QHBoxLayout *pWeightLayout = new QHBoxLayout(this);
 	{
 		QLabel *labWeight = new QLabel(tr("Point Weight ="));
 		m_pctrlPtWeight = new QSlider(Qt::Horizontal);
@@ -214,29 +214,29 @@ void SplineCtrlsDlg::SetupLayout()
 		m_pctrlPtWeight->setTickInterval(1);
 		m_pctrlPtWeight->setTickPosition(QSlider::TicksBelow);
 //		m_pctrlPtWeight->setSizePolicy(szPolicyMinimum);
-		WeightLayout->addWidget(labWeight);
-		WeightLayout->addWidget(m_pctrlPtWeight);
+		pWeightLayout->addWidget(labWeight);
+		pWeightLayout->addWidget(m_pctrlPtWeight);
 	}
 
-	QHBoxLayout *CommandButtons = new QHBoxLayout;
+	QHBoxLayout *pCommandButtons = new QHBoxLayout;
 	{
 		OKButton        = new QPushButton(tr("OK"));
 		CancelButton    = new QPushButton(tr("Cancel"));
-		CommandButtons->addStretch(1);
-		CommandButtons->addWidget(OKButton);
-		CommandButtons->addWidget(CancelButton);
-		CommandButtons->addStretch(1);
+		pCommandButtons->addStretch(1);
+		pCommandButtons->addWidget(OKButton);
+		pCommandButtons->addWidget(CancelButton);
+		pCommandButtons->addStretch(1);
 	}
 
-	QVBoxLayout *MainLayout = new QVBoxLayout;
+	QVBoxLayout *pMainLayout = new QVBoxLayout;
 	{
-		MainLayout->addLayout(SideLayout);
-		MainLayout->addStretch(1);
-		MainLayout->addWidget(m_pctrlSymetric);
+		pMainLayout->addLayout(pSideLayout);
+		pMainLayout->addStretch(1);
+		pMainLayout->addWidget(m_pctrlSymetric);
 //		MainLayout->addLayout(WeightLayout);
-		MainLayout->addStretch(1);
-		MainLayout->addLayout(CommandButtons);
-		setLayout(MainLayout);
+		pMainLayout->addStretch(1);
+		pMainLayout->addLayout(pCommandButtons);
+		setLayout(pMainLayout);
 	}
 
 

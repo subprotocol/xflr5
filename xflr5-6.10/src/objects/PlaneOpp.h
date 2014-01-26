@@ -76,6 +76,8 @@ public:
 	QString planeName(){return m_PlaneName;}
 	QString polarName(){return m_PlrName;}
 
+	bool isOut(){return m_bOut;}
+
 private:
 	enumAnalysisMethod m_AnalysisMethod;   /**< defines by which type of method (LLT, VLM, PANEL), this WingOpp was calculated */
 

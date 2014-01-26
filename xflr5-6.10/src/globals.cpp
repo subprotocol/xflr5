@@ -891,7 +891,7 @@ bool Crout_LU_with_Pivoting_Solve(float *matLU, double B[], int pivot[], double 
 		}
 
 		for (i=k+1; i<Size; i++) x[k]-=x[i] * *(pk+i);
-		if (*(pk+k)==0.0)
+		if (fabs(*(pk+k))<PRECISION)
 		{
 			return false;
 		}

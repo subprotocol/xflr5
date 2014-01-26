@@ -85,12 +85,10 @@ private:
 	bool AlphaLoop();
 	bool QInfLoop();
 	void ResetCurves();
-	void SetFileHeader();
 	void SetupLayout();
 	void Analyze();
 	void UpdateView();
 	void UpdateOutput(QString &strong);
-	void WriteString(QString &strong);
 
 
 	static void *s_pPrePost3D;     /**< A static pointer to the unique instance of the pre/post processing class. */
@@ -103,7 +101,6 @@ private:
 	bool m_bFinished;           /**< true if the analysis is completed, false if it is running */
 	QGraph *m_pIterGraph;         /**< A pointer to the QGraph object where the progress of the iterations are displayed */
 	QPoint m_LegendPlace;       /**< The position where the legend should be diplayed in the output graph */
-	QFile *m_pXFile;            /**< A pointer to the instance of the output log file */
 	QRect m_ViscRect;           /**< The rectangle in the client area where the graph is displayed */
 
 

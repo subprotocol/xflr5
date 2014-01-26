@@ -77,11 +77,21 @@ StabPolarDlg::StabPolarDlg(QWidget *pParent) : QDialog(pParent)
 	s_StabPolar.m_bViscous  = true;
 	s_StabPolar.m_bThinSurfaces = true;
 	s_StabPolar.m_AnalysisMethod = VLMMETHOD; */
+
 	s_StabPolar.m_WPolarType = STABILITYPOLAR;
+	s_StabPolar.m_bVLM1 = false;
 
 	SetupLayout();
 	Connect();
 }
+
+
+
+StabPolarDlg::~StabPolarDlg()
+{
+	delete [] m_precision;
+}
+
 
 
 void StabPolarDlg::Connect()
@@ -857,15 +867,15 @@ void StabPolarDlg::SetupLayout()
 	m_pCtrlDelegate->m_pCtrlModel = m_pControlModel;
 	connect(m_pCtrlDelegate,  SIGNAL(closeEditor(QWidget *)), this, SLOT(OnCellChanged(QWidget *)));
 
-	int  *precision = new int[6];
-	precision[0]  = 2;
-	precision[1]  = 0;
-	precision[2]  = 3;
-	precision[3]  = 3;
-	precision[4]  = 3;
-	precision[5]  = 3;
+	m_precision = new int[6];
+	m_precision[0]  = 2;
+	m_precision[1]  = 0;
+	m_precision[2]  = 3;
+	m_precision[3]  = 3;
+	m_precision[4]  = 3;
+	m_precision[5]  = 3;
 
-	m_pCtrlDelegate->m_Precision = precision;
+	m_pCtrlDelegate->m_Precision = m_precision;
 
 
 	QHBoxLayout *CommandButtons = new QHBoxLayout;
@@ -911,8 +921,9 @@ void StabPolarDlg::SetWPolarName()
 	if(!m_pPlane && !s_StabPolar.m_bThinSurfaces) WPolarName += "-Panel";
 	if(s_StabPolar.m_bThinSurfaces)
 	{
-		if(QMiarex::s_bVLM1) WPolarName += "-VLM1";
-		else		           WPolarName += "-VLM2";
+//		if(QMiarex::s_bVLM1) WPolarName += "-VLM1";
+//		else
+			WPolarName += "-VLM2";
 	}
 
 	nCtrl = 0;

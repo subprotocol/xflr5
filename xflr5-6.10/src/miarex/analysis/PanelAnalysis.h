@@ -270,7 +270,6 @@ public: //stability analysis method and variables
 
 
 	bool m_bTrace;
-	QTextStream m_OutStream;
 	QString m_OutMessage;
 };
 

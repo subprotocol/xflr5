@@ -76,9 +76,6 @@ private:
 	void hideEvent(QHideEvent *event);
 	void keyPressEvent(QKeyEvent *event);
 
-
-	void SetFileHeader();
-
 	void SetupLayout();
 	void Analyze();
 
@@ -90,8 +87,6 @@ private:
 	QProgressBar *m_pctrlProgress;
 
 	static QPoint s_Position;        /**< the position on the client area of he dialog's topleft corner */
-
-	QFile *m_pXFile;                /**< A pointer to the instance of the output log file */
 
 	bool m_bIsFinished;         /**< true if the analysis is completed */
 	bool m_bPointOut;           /** true if an interpolation was outside the min or max Cl */

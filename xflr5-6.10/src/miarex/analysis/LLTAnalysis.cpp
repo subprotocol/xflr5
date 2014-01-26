@@ -815,7 +815,6 @@ void LLTAnalysis::initializeAnalysis()
 /** Sends the analysis messages to the specified text output stream */
 void LLTAnalysis::traceLog(QString str)
 {
-	m_OutStream << str;
 	m_OutMessage += str;
 	qApp->processEvents();
 }

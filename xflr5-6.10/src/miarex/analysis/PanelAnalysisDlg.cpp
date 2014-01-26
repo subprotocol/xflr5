@@ -49,10 +49,6 @@ PanelAnalysisDlg::PanelAnalysisDlg(QWidget *pParent, PanelAnalysis *pPanelAnalys
 	setWindowTitle(tr("3D Panel Analysis"));
 	SetupLayout();
 	m_pPanelAnalysis = pPanelAnalysis;
-
-	QString FileName = QDir::tempPath() + "/XFLR5.log";
-	m_pXFile = new QFile(FileName);
-	if (!m_pXFile->open(QIODevice::WriteOnly | QIODevice::Text)) m_pXFile = NULL;
 }
 
 
@@ -62,7 +58,6 @@ PanelAnalysisDlg::PanelAnalysisDlg(QWidget *pParent, PanelAnalysis *pPanelAnalys
  */
 PanelAnalysisDlg::~PanelAnalysisDlg()
 {
-	if(m_pXFile) delete m_pXFile;
 }
 
 
@@ -76,8 +71,6 @@ bool PanelAnalysisDlg::InitDialog()
 	m_pctrlProgress->setValue(m_Progress);
 
 	m_pctrlTextOutput->clear();
-
-	SetFileHeader();
 
 	m_pctrlProgress->setMinimum(0);
 	m_pctrlProgress->setMaximum(100);
@@ -108,24 +101,6 @@ void PanelAnalysisDlg::OnCancelAnalysis()
 {
 	PanelAnalysis::s_bCancel = true;
 	if(m_bIsFinished) { PanelAnalysis::s_bCancel = false; done(1); }
-}
-
-
-
-/**
-*Initializes the header of the log file
-*/
-void PanelAnalysisDlg::SetFileHeader()
-{
-	if(!m_pXFile || !m_pXFile->isOpen()) return;
-	QTextStream out(m_pXFile);
-
-	out << "\n";
-	out << VERSIONNAME;
-	out << "\n";
-	QDateTime dt = QDateTime::currentDateTime();
-	QString str = dt.toString("dd.MM.yyyy  hh:mm:ss");
-	out << str<<"\n";
 }
 
 
@@ -234,7 +209,6 @@ void PanelAnalysisDlg::Analyze()
 
 	qApp->processEvents();
 
-	if(m_pXFile) m_pPanelAnalysis->m_OutStream.setDevice(m_pXFile);
 	m_pPanelAnalysis->initializeAnalysis();
 	m_pPanelAnalysis->loop();
 
@@ -242,7 +216,10 @@ void PanelAnalysisDlg::Analyze()
 	{
 		for(int iPOpp=0; iPOpp<m_pPanelAnalysis->m_PlaneOppList.size(); iPOpp++)
 		{
-			Objects3D::InsertPOpp(m_pPanelAnalysis->m_PlaneOppList.at(iPOpp));
+			//add the data to the polar object
+			PlaneOpp *pPOpp = m_pPanelAnalysis->m_PlaneOppList.at(iPOpp);
+			if(PlaneOpp::s_bKeepOutOpps || !pPOpp->isOut())
+				Objects3D::InsertPOpp(pPOpp);
 		}
 	}
 	pTimer->stop();
@@ -256,10 +233,25 @@ void PanelAnalysisDlg::Analyze()
 		strong = "\n"+tr("Panel Analysis completed ... Errors encountered")+"\n";
 
 	m_pPanelAnalysis->traceLog(strong);
-	m_pPanelAnalysis->m_OutStream.flush();
-
 	OnProgress();
-	if(m_pXFile && m_pXFile->isOpen())  m_pXFile->close();
+
+	QString FileName = QDir::tempPath() + "/XFLR5.log";
+	QFile *pXFile = new QFile(FileName);
+	if(pXFile->open(QIODevice::WriteOnly | QIODevice::Text))
+	{
+		QTextStream outstream(pXFile);
+		outstream << "\n";
+		outstream << VERSIONNAME;
+		outstream << "\n";
+		QDateTime dt = QDateTime::currentDateTime();
+		QString str = dt.toString("dd.MM.yyyy  hh:mm:ss");
+		outstream << str<<"\n";
+
+		outstream << m_pctrlTextOutput->toPlainText();
+		outstream.flush();
+		pXFile->close();
+		delete pXFile;
+	}
 
 	m_pctrlCancel->setText(tr("Close"));
 }

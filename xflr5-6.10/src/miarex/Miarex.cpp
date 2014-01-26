@@ -99,7 +99,6 @@ bool QMiarex::m_bResetglBodyMesh = true;
 bool QMiarex::m_bResetglSurfVelocities = true;
 
 bool QMiarex::s_bResetCurves = true;
-bool QMiarex::s_bVLM1 = true;
 
 
 QList<void *> *QMiarex::m_poaPlane = NULL;
@@ -3408,7 +3407,6 @@ bool QMiarex::LoadSettings(QSettings *pSettings)
 		m_bShowElliptic = pSettings->value("bShowElliptic").toBool();
 		m_bLogFile      = pSettings->value("LogFile").toBool();
 		m_bDirichlet    = pSettings->value("Dirichlet").toBool();
-		s_bVLM1         = pSettings->value("bVLM1").toBool();
 		m_bResetWake    = pSettings->value("ResetWake").toBool();
 		m_bShowWingCurve[0]    = pSettings->value("ShowWing").toBool();
 		m_bShowWingCurve[1]    = pSettings->value("ShowWing2").toBool();
@@ -3526,6 +3524,7 @@ bool QMiarex::LoadSettings(QSettings *pSettings)
 
 
 		WPolarDlg::s_WPolar.m_bAutoInertia =	pSettings->value("bAutoInertia", false).toBool();
+		WPolarDlg::s_WPolar.m_bVLM1 = pSettings->value("bVLM1").toBool();
 
 		PlaneOpp::s_bKeepOutOpps  = pSettings->value("KeepOutOpps").toBool();
 
@@ -4733,7 +4732,6 @@ void QMiarex::OnAdvancedSettings()
 	waDlg.m_bKeepOutOpps    = PlaneOpp::s_bKeepOutOpps;
 	waDlg.m_bLogFile        = m_bLogFile;
 	waDlg.m_WakeInterNodes  = m_WakeInterNodes;
-	waDlg.m_bVLM1           = s_bVLM1;
 
 	waDlg.InitDialog();
 	if(waDlg.exec() == QDialog::Accepted)
@@ -4755,7 +4753,6 @@ void QMiarex::OnAdvancedSettings()
 		m_LLTMaxIterations     = waDlg.m_Iter;
 		m_bDirichlet           = waDlg.m_bDirichlet;
 		m_WakeInterNodes       = waDlg.m_WakeInterNodes;
-		s_bVLM1                = waDlg.m_bVLM1;
 		m_InducedDragPoint     = waDlg.m_InducedDragPoint;
 
 
@@ -4939,7 +4936,7 @@ void QMiarex::OnDefineStabPolar()
 			if(m_pCurPlane && m_pCurPlane->BiPlane()) pNewStabPolar->m_WArea += m_pCurPlane->wing2()->m_ProjectedArea;
 			pNewStabPolar->m_WSpan        = m_pCurPlane->projectedSpan();
 		}
-		pNewStabPolar->m_bVLM1           = s_bVLM1;
+		pNewStabPolar->m_bVLM1           = false;
 		pNewStabPolar->m_bDirichlet      = m_bDirichlet;
 		pNewStabPolar->m_bTiltedGeom     = false;
 		pNewStabPolar->m_bWakeRollUp     = false;
@@ -5007,7 +5004,6 @@ void QMiarex::OnDefineWPolar()
 			if(m_pCurPlane && m_pCurPlane->BiPlane()) pNewWPolar->m_WArea += m_pCurPlane->wing2()->m_ProjectedArea;
 		}
 
-		pNewWPolar->m_bVLM1           = s_bVLM1;
 		pNewWPolar->m_bDirichlet      = m_bDirichlet;
 
 		pNewWPolar->m_Color = MainFrame::GetColor(4);
@@ -5088,7 +5084,6 @@ void QMiarex::OnEditCurWPolar()
 			if(m_pCurPlane && m_pCurPlane->BiPlane()) pNewWPolar->m_WArea += m_pCurPlane->wing2()->m_ProjectedArea;
 		}
 
-		pNewWPolar->m_bVLM1           = s_bVLM1;
 		pNewWPolar->m_bDirichlet      = m_bDirichlet;
 //		pNewWPolar->m_bAVLControls    = false;
 
@@ -8708,7 +8703,7 @@ bool QMiarex::SaveSettings(QSettings *pSettings)
 		pSettings->setValue("CurWOppOnly", m_bCurPOppOnly);
 		pSettings->setValue("bShowElliptic", m_bShowElliptic);
 		pSettings->setValue("LogFile", m_bLogFile);
-		pSettings->setValue("bVLM1", s_bVLM1);
+		pSettings->setValue("bVLM1", WPolarDlg::s_WPolar.m_bVLM1);
 		pSettings->setValue("Dirichlet", m_bDirichlet);
 		pSettings->setValue("KeepOutOpps", PlaneOpp::s_bKeepOutOpps);
 		pSettings->setValue("ResetWake", m_bResetWake );

@@ -5025,8 +5025,8 @@ bool MainFrame::SerializeProjectWPA(QDataStream &ar, bool bIsStoring)
 			if(ArchiveFormat>=100006)
 			{
 				ar >> k;
-				if (k) QMiarex::s_bVLM1 = true;
-				else   QMiarex::s_bVLM1 = false;
+				if (k) WPolarDlg::s_WPolar.m_bVLM1 = true;
+				else   WPolarDlg::s_WPolar.m_bVLM1 = false;
 
 				ar >> k;
 			}

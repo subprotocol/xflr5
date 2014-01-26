@@ -54,7 +54,6 @@ WAdvancedDlg::WAdvancedDlg(QWidget *pParent) : QDialog(pParent)
 	m_ControlPos = 0.75;
 	m_VortexPos  = 0.25;
 
-	m_bVLM1 = true;
 
 	SetupLayout();
 }
@@ -137,14 +136,6 @@ void WAdvancedDlg::SetupLayout()
 			VLMLayout->addWidget(m_pctrlControlPos,2,2);
 			VLMLayout->addWidget(lab8,1,3);
 			VLMLayout->addWidget(lab9,2,3);
-			QVBoxLayout *VLMMethodLayout = new QVBoxLayout;
-			{
-				m_pctrlVLM1 = new QRadioButton(tr("Horseshoe vortex")+" (VLM1)");
-				m_pctrlVLM2 = new QRadioButton(tr("Ring vortex")+" (VLM2)");
-				VLMMethodLayout->addWidget(m_pctrlVLM1);
-				VLMMethodLayout->addWidget(m_pctrlVLM2);
-			}
-			VLMLayout->addLayout(VLMMethodLayout,4,1,1,2, Qt::AlignLeft);
 		}
 		VLMBox->setLayout(VLMLayout);
 	}
@@ -285,8 +276,6 @@ void WAdvancedDlg::InitDialog()
 	m_pctrlControlPos->setEnabled(false);
 	m_pctrlDirichlet->setChecked(m_bDirichlet);
 	m_pCtrlNeumann->setChecked(!m_bDirichlet);
-	m_pctrlVLM1->setChecked( m_bVLM1);
-	m_pctrlVLM2->setChecked(!m_bVLM1);
 }
 
 
@@ -313,7 +302,6 @@ void WAdvancedDlg::OnResetDefaults()
 	m_bDirichlet       = true;
 	m_bTrefftz         = true;
 	m_bKeepOutOpps     = false;
-	m_bVLM1            = true;
 	SetParams();
 }
 
@@ -332,7 +320,6 @@ void WAdvancedDlg::ReadParams()
 	m_bTrefftz        = true;
 	m_bKeepOutOpps    = m_pctrlKeepOutOpps->isChecked();
 	m_bLogFile        = m_pctrlLogFile->isChecked();
-	m_bVLM1           = m_pctrlVLM1->isChecked();
 }
 
 
@@ -352,7 +339,6 @@ void WAdvancedDlg::SetParams()
 
 	m_pctrlControlPos->SetValue(m_ControlPos*100.0);
 	m_pctrlVortexPos->SetValue(m_VortexPos*100.0);
-	m_pctrlVLM1->setChecked(m_bVLM1);
 }
 
 
