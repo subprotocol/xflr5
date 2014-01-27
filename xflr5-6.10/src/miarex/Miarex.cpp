@@ -1490,7 +1490,7 @@ void QMiarex::DrawOppGraphLegend(QPainter &painter, QPoint place, int bottom)
 
 	ny=0;
 
-	QString str1, str2, str3, str4, str5, str6;
+//	QString str1, str2, str3, str4, str5, str6;
 	LegendSize = 30;
 	LegendWidth = 300;
 
@@ -1581,7 +1581,7 @@ void QMiarex::DrawOppGraphLegend(QPainter &painter, QPoint place, int bottom)
 				{
 					ny++;
 					painter.drawText(place.x() + (int)(1*LegendSize),
-									 place.y() + ypos*ny-(int)(ypos/2), str.at(k));
+								  place.y() + ypos*ny-(int)(ypos/2), str.at(k));
 				}
 				else
 				{
@@ -1611,7 +1611,7 @@ void QMiarex::DrawOppGraphLegend(QPainter &painter, QPoint place, int bottom)
 						painter.setPen(LegendPen);
 
 						painter.drawLine(place.x() + (int)(1.5*LegendSize), place.y() + (int)(1.*ypos*ny),
-										 place.x() + (int)(2.5*LegendSize), place.y() + (int)(1.*ypos*ny));
+									  place.x() + (int)(2.5*LegendSize), place.y() + (int)(1.*ypos*ny));
 
 						if(pPOpp->m_bShowPoints)
 						{

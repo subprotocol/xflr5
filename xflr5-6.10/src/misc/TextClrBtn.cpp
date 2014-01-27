@@ -107,7 +107,7 @@ void TextClrBtn::paintEvent(QPaintEvent *event)
 	painter.setFont(m_TextFont);
 
 /*	QStyleOption opt;
-	opt.init(this);
+	opt.initFrom(this);
 	style()->drawPrimitive(QStyle::PE_Widget, &opt, &painter, this);*/
 
 	QFontMetrics fm(m_TextFont);

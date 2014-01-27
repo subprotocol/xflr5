@@ -122,7 +122,7 @@ void LineBtn::paintEvent(QPaintEvent *event)
 	QRect r = rect();
 
 	QStyleOption opt;
-	opt.init(this);
+	opt.initFrom(this);
 	style()->drawPrimitive(QStyle::PE_Widget, &opt, &painter, this);
 
 

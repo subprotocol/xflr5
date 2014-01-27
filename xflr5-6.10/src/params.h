@@ -12,13 +12,13 @@
 #define PARAMS_H
 
 
-#define VERSIONNAME     "xflr5 v6.10"
+#define VERSIONNAME     "xflr5 v6.10.01"
 
 //General
 #define XFLR5
 #define PI             3.14159265358979  
 #define MAXRECENTFILES         8  /**< Defines the maximum number of file names in the recent file list */
-#define SETTINGSFORMAT     53627  /**< A random number which defines the format of the settings file */
+#define SETTINGSFORMAT     53639  /**< A random number which defines the format of the settings file */
 #define PRECISION  0.00000000001  /**< Values are assumed 0 if less than this value. This is to avoid comparing the equality of two floating point numbers */
 
 

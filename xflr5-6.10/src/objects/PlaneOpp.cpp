@@ -1002,10 +1002,10 @@ QString PlaneOpp::title()
 	Units::getSpeedUnitLabel(str2);
 	str3 = QString("_a=%1").arg(m_Alpha,5,'f',2);
 
-	if(qAbs(m_Beta)>0.0) str4 = QString("_b=%1").arg(m_Beta,5,'f',2);
+	if(qAbs(m_Beta)>0.0)             str4 = QString("_b=%1").arg(m_Beta,5,'f',2);
 	else                             str4 ="";
 	if(m_WPolarType==STABILITYPOLAR) str5 = QString("_Ctrl=%1").arg(m_Ctrl,5,'f',2);
-	else                                         str5 ="";
+	else                             str5 ="";
 
 
 	if(m_AnalysisMethod==LLTMETHOD)  str6="_LLT";

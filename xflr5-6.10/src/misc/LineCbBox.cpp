@@ -62,11 +62,13 @@ void LineCbBox::SetLine(int const &style, int const &width, QColor const &color)
 void LineCbBox::paintEvent (QPaintEvent *event)
 {
 	QStyleOption opt;
-	opt.init(this);
+	opt.initFrom(this);
 	QPainter painter(this);
 	style()->drawPrimitive(QStyle::PE_Widget, &opt, &painter, this);
 
 	painter.save();
+
+	painter.setRenderHint(QPainter::Antialiasing);
 
 	QColor ContourColor = Qt::gray;
 

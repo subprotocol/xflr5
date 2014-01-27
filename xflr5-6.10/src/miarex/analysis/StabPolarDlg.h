@@ -37,6 +37,22 @@
 
 
 
+
+class CtrlTableModel: public QStandardItemModel
+{
+public:
+    CtrlTableModel(QObject * parent=NULL) : QStandardItemModel(parent)  { }
+
+    Qt::ItemFlags flags(const QModelIndex & index) const
+    {
+	    if (index.column() == 0)
+		    return Qt::ItemIsEnabled | Qt::ItemIsSelectable;
+	    else
+		    return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable;
+    }
+};
+
+
 class StabPolarDlg : public QDialog
 {
 	Q_OBJECT
@@ -80,7 +96,7 @@ private:
 	void SetViscous();
 
 	QTableView *m_pctrlControlTable;
-	QStandardItemModel *m_pControlModel;
+	CtrlTableModel *m_pControlModel;
 	CtrlTableDelegate *m_pCtrlDelegate;
 
 	DoubleEdit *m_pctrlDensity;
@@ -123,5 +139,8 @@ private:
 	bool m_bAutoName;
 	int m_UnitType;//1= International, 2= Imperial
 };
+
+
+
 
 #endif // STABPOLARDLG_H

@@ -215,7 +215,7 @@ QLineEdit, QTextEdit
 	background-color: #101010;
 	padding: 1px;
 	border-style: solid;
-	border: 1px solid #1e1e1e;
+	border: 1px solid #2e2e2e;
 	border-radius: 5;
 	selection-background-color: darkslategray;
 	selection-color: white;
@@ -236,7 +236,7 @@ QPushButton
 	color: cornsilk;
 	background-color: QLinearGradient( x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #101010, stop: 0.5 #202020, stop: 1 #101010);
 	border-width: 1px;
-	border-color: #1e1e1e;
+	border-color: #2e2e2e;
 	border-style: solid;
 	border-radius: 6;
 	padding: 3px;
@@ -276,38 +276,13 @@ ColorButton
 }
 
 
-
-/*_____________________ LineBtn ______________________*/
-
-
-LineBtn
-{
-	background-color: #101010;
-	border: 1px solid #7f7f7f;
-	border-radius: 5px;
-	min-height: 2.5ex;
-}
-
-LineBtn:hover
-{
-	border: 2px solid darkkhaki;
-	background-color: #272727;
-}
-
-
-LineBtn:disabled
-{
-	background-color: #474747;
-}
-
-
 /*______________________ QListWidget ___________________*/
 
 QListWidget
 {
 	show-decoration-selected: 1;  /* make the selection span the entire width of the view */
 	background-color: #232323;
-	border: 1px solid #7f7f7f;
+	border: 1px solid #2e2e2e;
 	border-radius: 5px;
 	min-height: 3ex;
 	color: ghostwhite;
@@ -701,17 +676,43 @@ QToolTip
 	opacity: 197;
 }
 
+/*_____________________ LineBtn ______________________*/
+
+
+LineBtn
+{
+	background-color: black;
+	border: 1px solid #2e2e2e;
+	border-radius: 3px;
+	min-height: 2.5ex;
+}
+
+LineBtn:hover
+{
+	border: 1px solid darkkhaki;
+}
+
+
+LineBtn:disabled
+{
+	background-color: #474747;
+}
+
 /*_____________________ QComboBox ______________________*/
 
-
-QComboBox
+QComboBox 
 {
-	background: #101010;
-	border: 1px solid #7f7f7f;
-	border-radius: 5px;
-	min-height: 3ex;
-	color: ghostwhite;
+	background: black;
+	border: 1px solid #2e2e2e;
+	border-radius: 3px;
+	padding: 1px 18px 1px 3px;
 }
+
+QComboBox:hover
+{
+	border: 1px solid darkkhaki;
+}
+
 
 QComboBox:disabled
 {
@@ -719,17 +720,20 @@ QComboBox:disabled
 }
 
 
-QComboBox:hover
+QComboBox:!editable, QComboBox::drop-down:editable 
 {
-	color: white;
-	border: 2px solid darkkhaki;
-	background-color: darkslategray;
+	background: black;
+	color: ghostwhite;
 }
 
-
-QComboBox:on
+/* QComboBox gets the "on" state when the popup is open */
+QComboBox:!editable:on, QComboBox::drop-down:editable:on 
 {
-	background-color: darkslategray;
+	background-color: black;
+	color: ghostwhite;
+	border-bottom: 0px;
+	border-bottom-left-radius: 0px;
+	border-bottom-right-radius: 0px;
 }
 
 
@@ -749,15 +753,19 @@ QComboBox::drop-down
 QComboBox QAbstractItemView
 {
 	padding: 1px;
-	background-color: #1f2c2a;
-	color: white;
+	background-color: black;
+	border: 1px solid darkkhaki;
+	border-top: 0px;
+	border-radius: 3px;
+	border-top-left-radius: 0px;
+	border-top-right-radius: 0px;
 }
 
 
 QComboBox QAbstractItemView::item
 {
 	padding: 1px 3px 1px 3px;
-	color: white;
+	color: dimgray;
 }
 
 QComboBox QAbstractItemView::item:selected
@@ -772,3 +780,13 @@ QComboBox QAbstractItemView::item:hover
 	background-color: darkgray;
 	color: black;
 }
+
+
+
+
+
+
+
+
+
+

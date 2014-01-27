@@ -127,7 +127,8 @@ MainFrame::MainFrame(QWidget *parent, Qt::WindowFlags flags) : QMainWindow(paren
 	Settings::s_RefGraph.SetTitleFont(Settings::s_TextFont);
 	Settings::s_RefGraph.SetLabelFont(Settings::s_TextFont);
 
-	Settings::s_StyleSheetName = "xflr5_style";
+//	Settings::s_StyleSheetName = "xflr5_style";
+	Settings::s_StyleSheetName = "";
 
 	if(!QGLFormat::hasOpenGL())
 	{
