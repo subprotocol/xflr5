@@ -45,7 +45,7 @@ private:
 	QTextEdit *m_pctrlDescription;
 	Polar *m_pPolar;
 	WPolar *m_pWPolar;
-	WingOpp *m_pWOpp;
+	PlaneOpp *m_pPOpp;
 	OpPoint *m_pOpp;
 
 	void *m_pXDirect;

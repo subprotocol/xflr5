@@ -1896,24 +1896,14 @@ bool WPolar::SerializeWPlrXFL(QDataStream &ar, bool bIsStoring)
 		ar >> n;
 		for (i=0; i<n; i++)
 		{
-			if(m_PolarFormat==200011)
+
+			for(int j=0; j<20; j++)
 			{
-				for(int j=0; j<19; j++)
-				{
-					ar >> d[j];
-				}
-				InsertDataAt(i, d[0], 0.0,  d[1],  d[2],  d[3],  d[4], d[5], d[6], d[7], d[8], d[9],
-							 d[10], d[11], d[12], d[13], d[14], d[15], d[16], d[17], d[18]);
+				ar >> d[j];
 			}
-			else
-			{
-				for(int j=0; j<20; j++)
-				{
-					ar >> d[j];
-				}
-				InsertDataAt(i, d[0],  d[1],  d[2],  d[3],  d[4], d[5], d[6], d[7], d[8], d[9], d[10], d[11], d[12], d[13],
-								d[14], d[15], d[16], d[17], d[18], d[19]);
-			}
+			InsertDataAt(i, d[0],  d[1],  d[2],  d[3],  d[4], d[5], d[6], d[7], d[8], d[9], d[10], d[11], d[12], d[13],
+							d[14], d[15], d[16], d[17], d[18], d[19]);
+
 
 
 			ar >> r0 >> r1 >>r2 >> r3;

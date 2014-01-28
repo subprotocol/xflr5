@@ -2070,27 +2070,27 @@ void QMiarex::FillWPlrCurve(Curve *pCurve, WPolar *pWPolar, int XVar, int YVar)
 		x = (*pX)[i];
 		y = (*pY)[i];
 
-		if((XVar==14 || XVar==17 || XVar==18) && x<0) bAdd = false;
-		if((YVar==14 || YVar==17 || YVar==18) && y<0) bAdd = false;
+//		if((XVar==16 || XVar==17 || XVar==20) && x<0) bAdd = false;
+//		if((YVar==16 || YVar==17 || YVar==20) && y<0) bAdd = false;
 
 		//Set user units
-		if(XVar==15 || XVar==16 || XVar==17)  x *= Units::NtoUnit(); //force
-		if(YVar==15 || YVar==16 || YVar==17)  y *= Units::NtoUnit(); //force
+		if(XVar==17 || XVar==18 || XVar==19)  x *= Units::NtoUnit(); //force
+		if(YVar==17 || YVar==18 || YVar==19)  y *= Units::NtoUnit(); //force
 
-		if(XVar==18 || XVar==19 || XVar==20)  x *= Units::mstoUnit();//speed
-		if(YVar==18 || YVar==19 || YVar==20)  y *= Units::mstoUnit();//speed
+		if(XVar==20 || XVar==21 || XVar==22)  x *= Units::mstoUnit();//speed
+		if(YVar==20 || YVar==21 || YVar==22)  y *= Units::mstoUnit();//speed
 
-		if(XVar==22 || XVar==23 || XVar==24)  x *= Units::NmtoUnit();//moment
-		if(YVar==22 || YVar==23 || YVar==24)  y *= Units::NmtoUnit();//moment
+		if(XVar==24 || XVar==25 || XVar==26)  x *= Units::NmtoUnit();//moment
+		if(YVar==24 || YVar==25 || YVar==26)  y *= Units::NmtoUnit();//moment
 
-		if(XVar==25 || XVar==26 || XVar==27 ) x *= Units::mtoUnit();//force
-		if(YVar==25 || YVar==26 || YVar==27 ) y *= Units::mtoUnit();//force
+		if(XVar==27 || XVar==28 || XVar==29 ) x *= Units::mtoUnit();//force
+		if(YVar==27 || YVar==28 || YVar==29 ) y *= Units::mtoUnit();//force
 
-		if(XVar==28)                          x *= Units::NmtoUnit();//moment
-		if(YVar==28)                          y *= Units::NmtoUnit();//moment
+		if(XVar==30)                          x *= Units::NmtoUnit();//moment
+		if(YVar==30)                          y *= Units::NmtoUnit();//moment
 
-		if(XVar==34)                          x *= Units::mtoUnit();//length
-		if(YVar==34)                          y *= Units::mtoUnit();//length
+		if(XVar==35)                          x *= Units::mtoUnit();//length
+		if(YVar==35)                          y *= Units::mtoUnit();//length
 
 		if(bAdd)
 		{
@@ -3124,7 +3124,7 @@ void QMiarex::keyPressEvent(QKeyEvent *event)
 		{
 			if (event->modifiers().testFlag(Qt::AltModifier))
 			{
-				OnWPolarProps();
+				OnWPolarProperties();
 				break;
 			}
 			if(!m_pctrlAnalyze->hasFocus())
@@ -10317,16 +10317,15 @@ void QMiarex::zoomEvent(QPoint pt, double zoomFactor)
 /**
  * The user has requested a detailed display of the data of the active polar
  */
-void QMiarex::OnWPolarProps()
+void QMiarex::OnWPolarProperties()
 {
 	if(!m_pCurWPolar) return;
-
 	ObjectPropsDlg opDlg((MainFrame*)s_pMainFrame);
 	opDlg.m_pXDirect = NULL;
 	opDlg.m_pOpp = NULL;
 	opDlg.m_pPolar = NULL;
 	opDlg.m_pMiarex = this;
-	opDlg.m_pWOpp = NULL;
+	opDlg.m_pPOpp = NULL;
 	opDlg.m_pWPolar = m_pCurWPolar;
 	opDlg.InitDialog();
 	opDlg.exec();
@@ -10336,7 +10335,7 @@ void QMiarex::OnWPolarProps()
 /**
  * The user has requested a detailed display of the data of the active operating point
  */
-void QMiarex::OnWOppProps()
+void QMiarex::OnPlaneOppProperties()
 {
 	if(!m_pCurPOpp) return;
 	ObjectPropsDlg opDlg((MainFrame*)s_pMainFrame);
@@ -10344,7 +10343,7 @@ void QMiarex::OnWOppProps()
 	opDlg.m_pOpp = NULL;
 	opDlg.m_pPolar = NULL;
 	opDlg.m_pMiarex = this;
-	opDlg.m_pWOpp = m_pCurPOpp->m_pPlaneWOpp[0];
+	opDlg.m_pPOpp = m_pCurPOpp;
 	opDlg.m_pWPolar = NULL;
 	opDlg.InitDialog();
 	opDlg.exec();
@@ -10500,7 +10499,7 @@ void QMiarex::PaintPanelForceLegendText(QPainter &painter)
 	painter.drawText(ixPos-labellength, iyPos-dy, strForce);
 
 
-	for (i=0; i<=20; i ++)
+	for (i=0; i<=20; i++)
 	{
 		f = rmin + (double)i * delta;
 		strong = QString("%1").arg(f, 5,'f',2);

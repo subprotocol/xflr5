@@ -4240,7 +4240,7 @@ void QXDirect::OnOpPointProps()
 	opDlg.m_pOpp = OpPoint::curOpp();
 	opDlg.m_pPolar = NULL;
 	opDlg.m_pMiarex = NULL;
-	opDlg.m_pWOpp = NULL;
+	opDlg.m_pPOpp = NULL;
 	opDlg.m_pWPolar = NULL;
 	opDlg.InitDialog();
 	opDlg.exec();
@@ -4260,7 +4260,7 @@ void QXDirect::OnPolarProps()
 	opDlg.m_pOpp = NULL;
 	opDlg.m_pPolar = Polar::curPolar();
 	opDlg.m_pMiarex = NULL;
-	opDlg.m_pWOpp = NULL;
+	opDlg.m_pPOpp = NULL;
 	opDlg.m_pWPolar = NULL;
 	opDlg.InitDialog();
 	opDlg.exec();

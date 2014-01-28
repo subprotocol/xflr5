@@ -76,9 +76,9 @@ void GL3DScales::SetupLayout()
 	szPolicyExpanding.setHorizontalPolicy(QSizePolicy::Expanding);
 	szPolicyExpanding.setVerticalPolicy(QSizePolicy::Expanding);
 
-	QGroupBox *CpScaleBox = new QGroupBox(tr("Cp Scale"));
+	QGroupBox *pCpScaleBox = new QGroupBox(tr("Cp Scale"));
 	{
-		QGridLayout *CpScaleLayout = new QGridLayout;
+		QGridLayout *pCpScaleLayout = new QGridLayout;
 		{
 			m_pctrlAutoCpScale = new QCheckBox(tr("Auto Scales"));
 			m_pctrlLegendMin = new DoubleEdit(-1.0);
@@ -89,22 +89,22 @@ void GL3DScales::SetupLayout()
 			QLabel *lab1 = new QLabel(tr("Max"));
 			lab0->setAlignment(Qt::AlignVCenter |Qt::AlignRight);
 			lab1->setAlignment(Qt::AlignVCenter |Qt::AlignRight);
-			CpScaleLayout->addWidget(m_pctrlAutoCpScale,1,2);
-			CpScaleLayout->addWidget(lab1,2,1);
-			CpScaleLayout->addWidget(m_pctrlLegendMax,2,2);
-			CpScaleLayout->addWidget(lab0,3,1);
-			CpScaleLayout->addWidget(m_pctrlLegendMin,3,2);
+			pCpScaleLayout->addWidget(m_pctrlAutoCpScale,1,2);
+			pCpScaleLayout->addWidget(lab1,2,1);
+			pCpScaleLayout->addWidget(m_pctrlLegendMax,2,2);
+			pCpScaleLayout->addWidget(lab0,3,1);
+			pCpScaleLayout->addWidget(m_pctrlLegendMin,3,2);
 		}
-		CpScaleBox->setLayout(CpScaleLayout);
+		pCpScaleBox->setLayout(pCpScaleLayout);
 	}
 
 //_______________________3D Scales
 
-	QGroupBox *ScaleBox = new QGroupBox(tr("Vector Scales"));
+	QGroupBox *pScaleBox = new QGroupBox(tr("Vector Scales"));
 	{
-		QHBoxLayout *ScaleLayout = new QHBoxLayout;
+		QHBoxLayout *pScaleLayout = new QHBoxLayout;
 		{
-			QVBoxLayout *SliderLayout = new QVBoxLayout;
+			QVBoxLayout *pSliderLayout = new QVBoxLayout;
 			{
 				m_pctrlLiftScaleSlider  = new QSlider(Qt::Horizontal);
 				m_pctrlLiftScaleSlider->setMinimum(0);
@@ -124,30 +124,30 @@ void GL3DScales::SetupLayout()
 				m_pctrlVelocityScaleSlider->setSliderPosition(50);
 				m_pctrlVelocityScaleSlider->setTickInterval(5);
 				m_pctrlVelocityScaleSlider->setTickPosition(QSlider::TicksBelow);
-				SliderLayout->addWidget(m_pctrlLiftScaleSlider);
-				SliderLayout->addWidget(m_pctrlDragScaleSlider);
-				SliderLayout->addWidget(m_pctrlVelocityScaleSlider);
+				pSliderLayout->addWidget(m_pctrlLiftScaleSlider);
+				pSliderLayout->addWidget(m_pctrlDragScaleSlider);
+				pSliderLayout->addWidget(m_pctrlVelocityScaleSlider);
 			}
 
-			QVBoxLayout *LabelLayout = new QVBoxLayout;
+			QVBoxLayout *pLabelLayout = new QVBoxLayout;
 			{
 				QLabel *lab2 = new QLabel(tr("Lift "));
 				QLabel *lab3 = new QLabel(tr("Drag "));
 				QLabel *lab4 = new QLabel(tr("Velocity "));
-				LabelLayout->addWidget(lab2);
-				LabelLayout->addWidget(lab3);
-				LabelLayout->addWidget(lab4);
+				pLabelLayout->addWidget(lab2);
+				pLabelLayout->addWidget(lab3);
+				pLabelLayout->addWidget(lab4);
 			}
 
-			ScaleLayout->addLayout(LabelLayout);
-			ScaleLayout->addLayout(SliderLayout);
+			pScaleLayout->addLayout(pLabelLayout);
+			pScaleLayout->addLayout(pSliderLayout);
 		}
-		ScaleBox->setLayout(ScaleLayout);
+		pScaleBox->setLayout(pScaleLayout);
 	}
 
 //__________________________________	Streamlines
 
-	QGroupBox *LengthBox = new QGroupBox(tr("Streamline length"));
+	QGroupBox *pLengthBox = new QGroupBox(tr("Streamline length"));
 	{
 		m_pctrlNXPoint = new DoubleEdit(33,0);
 		m_pctrlNXPoint->SetPrecision(0);
@@ -160,22 +160,22 @@ void GL3DScales::SetupLayout()
 		lab5->setAlignment(Qt::AlignVCenter |Qt::AlignRight);
 		lab6->setAlignment(Qt::AlignVCenter |Qt::AlignRight);
 		lab7->setAlignment(Qt::AlignVCenter |Qt::AlignRight);
-		QGridLayout *LengthLayout = new QGridLayout;
+		QGridLayout *pLengthLayout = new QGridLayout;
 		{
-			LengthLayout->addWidget(lab5, 1, 1);
-			LengthLayout->addWidget(m_pctrlNXPoint , 1, 2);
-			LengthLayout->addWidget(lab6, 2, 1);
-			LengthLayout->addWidget(m_pctrlDeltaL, 2, 2);
-			LengthLayout->addWidget(m_pctrlLengthUnit1, 2, 3);
-			LengthLayout->addWidget(lab7, 3, 1);
-			LengthLayout->addWidget(m_pctrlXFactor, 3, 2);
+			pLengthLayout->addWidget(lab5, 1, 1);
+			pLengthLayout->addWidget(m_pctrlNXPoint , 1, 2);
+			pLengthLayout->addWidget(lab6, 2, 1);
+			pLengthLayout->addWidget(m_pctrlDeltaL, 2, 2);
+			pLengthLayout->addWidget(m_pctrlLengthUnit1, 2, 3);
+			pLengthLayout->addWidget(lab7, 3, 1);
+			pLengthLayout->addWidget(m_pctrlXFactor, 3, 2);
 		}
-		LengthBox->setLayout(LengthLayout);
+		pLengthBox->setLayout(pLengthLayout);
 	}
 
-	QGroupBox *StartBox = new QGroupBox(tr("Start Streamline at"));
+	QGroupBox *pStartBox = new QGroupBox(tr("Start Streamline at"));
 	{
-		QVBoxLayout *StartLayout = new QVBoxLayout;
+		QVBoxLayout *pStartLayout = new QVBoxLayout;
 		{
 			m_pctrlXOffset       = new DoubleEdit(4.56,3);
 			m_pctrlZOffset       = new DoubleEdit(7.89,3);
@@ -188,53 +188,53 @@ void GL3DScales::SetupLayout()
 			QLabel *lab9 = new QLabel(tr("Z-Offset"));
 			lab8->setAlignment(Qt::AlignVCenter |Qt::AlignRight);
 			lab9->setAlignment(Qt::AlignVCenter |Qt::AlignRight);
-			QHBoxLayout *LineLayout = new QHBoxLayout;
+			QHBoxLayout *pLineLayout = new QHBoxLayout;
 			{
-				LineLayout->addWidget(m_pctrlLE);
-				LineLayout->addWidget(m_pctrlTE);
-				LineLayout->addWidget(m_pctrlLine);
+				pLineLayout->addWidget(m_pctrlLE);
+				pLineLayout->addWidget(m_pctrlTE);
+				pLineLayout->addWidget(m_pctrlLine);
 			}
-			QGridLayout *OffsetLayout = new QGridLayout;
+			QGridLayout *pOffsetLayout = new QGridLayout;
 			{
-				OffsetLayout->addWidget(lab8,1,1);
-				OffsetLayout->addWidget(m_pctrlXOffset,1,2);
-				OffsetLayout->addWidget(m_pctrlLengthUnit2,1,3);
-				OffsetLayout->addWidget(lab9,2,1);
-				OffsetLayout->addWidget(m_pctrlZOffset,2,2);
-				OffsetLayout->addWidget(m_pctrlLengthUnit3,2,3);
+				pOffsetLayout->addWidget(lab8,1,1);
+				pOffsetLayout->addWidget(m_pctrlXOffset,1,2);
+				pOffsetLayout->addWidget(m_pctrlLengthUnit2,1,3);
+				pOffsetLayout->addWidget(lab9,2,1);
+				pOffsetLayout->addWidget(m_pctrlZOffset,2,2);
+				pOffsetLayout->addWidget(m_pctrlLengthUnit3,2,3);
 			}
-			StartLayout->addLayout(LineLayout);
-			StartLayout->addLayout(OffsetLayout);
+			pStartLayout->addLayout(pLineLayout);
+			pStartLayout->addLayout(pOffsetLayout);
 		}
-		StartBox->setLayout(StartLayout);
+		pStartBox->setLayout(pStartLayout);
 	}
 
-	QGroupBox *StreamBox = new QGroupBox(tr("Streamlines"));
+	QGroupBox *pStreamBox = new QGroupBox(tr("Streamlines"));
 	{
 		ApplyButton = new QPushButton(tr("Apply"));
 		QVBoxLayout *StreamLayout = new QVBoxLayout;
-		StreamLayout->addWidget(LengthBox);
-		StreamLayout->addWidget(StartBox);
+		StreamLayout->addWidget(pLengthBox);
+		StreamLayout->addWidget(pStartBox);
 		StreamLayout->addStretch(1);
 		StreamLayout->addWidget(ApplyButton);
 		StreamLayout->addStretch(1);
-		StreamBox->setLayout(StreamLayout);
+		pStreamBox->setLayout(StreamLayout);
 	}
 
-	QVBoxLayout *MainLayout = new QVBoxLayout;
+	QVBoxLayout *pMainLayout = new QVBoxLayout;
 	{
-		MainLayout->addStretch(1);
-		MainLayout->addWidget(ScaleBox);
-		MainLayout->addSpacing(15);
-		MainLayout->addStretch(1);
-		MainLayout->addWidget(CpScaleBox);
-		MainLayout->addSpacing(15);
-		MainLayout->addStretch(1);
-		MainLayout->addWidget(StreamBox);
-		MainLayout->addStretch(1);
+		pMainLayout->addStretch(1);
+		pMainLayout->addWidget(pScaleBox);
+		pMainLayout->addSpacing(15);
+		pMainLayout->addStretch(1);
+		pMainLayout->addWidget(pCpScaleBox);
+		pMainLayout->addSpacing(15);
+		pMainLayout->addStretch(1);
+		pMainLayout->addWidget(pStreamBox);
+		pMainLayout->addStretch(1);
 	}
 
-	setLayout(MainLayout);
+	setLayout(pMainLayout);
 }
 
 

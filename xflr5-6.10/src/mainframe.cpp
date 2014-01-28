@@ -1260,12 +1260,12 @@ void MainFrame::CreateMiarexActions()
 	ShowPolarProps = new QAction(tr("Properties"), this);
 	ShowPolarProps->setStatusTip(tr("Show the properties of the currently selected polar"));
 	ShowPolarProps->setShortcut(QKeySequence(Qt::ALT + Qt::Key_Return));
-	connect(ShowPolarProps, SIGNAL(triggered()), pMiarex, SLOT(OnWPolarProps()));
+	connect(ShowPolarProps, SIGNAL(triggered()), pMiarex, SLOT(OnWPolarProperties()));
 
 	ShowWOppProps = new QAction(tr("Properties"), this);
 	ShowWOppProps->setStatusTip(tr("Show the properties of the currently selected operating point"));
 	ShowWOppProps->setShortcut(QKeySequence(Qt::ALT + Qt::SHIFT + Qt::Key_Return));
-	connect(ShowWOppProps, SIGNAL(triggered()), pMiarex, SLOT(OnWOppProps()));
+	connect(ShowWOppProps, SIGNAL(triggered()), pMiarex, SLOT(OnPlaneOppProperties()));
 }
 
 
@@ -2783,7 +2783,7 @@ bool MainFrame::LoadSettings()
 		Units::s_SpeedUnit   = settings.value("SpeedUnit").toInt();
 		Units::s_ForceUnit   = settings.value("ForceUnit").toInt();
 		Units::s_MomentUnit  = settings.value("MomentUnit").toInt();
-		Units::SetUnits();
+		Units::SetUnitConversionFactors();
 
 
 		switch(settings.value("ImageFormat").toInt())
@@ -4692,6 +4692,7 @@ bool MainFrame::SerializeProjectXFL(QDataStream &ar, bool bIsStoring)
 		ar << Units::s_ForceUnit;
 		ar << Units::s_MomentUnit;
 
+
 		//Save default Polar data. Not in the Settings, since this is Project dependant
 		if(WPolarDlg::s_WPolar.m_WPolarType==FIXEDSPEEDPOLAR)      ar<<1;
 		else if(WPolarDlg::s_WPolar.m_WPolarType==FIXEDLIFTPOLAR)  ar<<2;
@@ -4798,6 +4799,10 @@ bool MainFrame::SerializeProjectXFL(QDataStream &ar, bool bIsStoring)
 		ar >> Units::s_SpeedUnit;
 		ar >> Units::s_ForceUnit;
 		ar >> Units::s_MomentUnit;
+
+
+		Units::SetUnitConversionFactors();
+
 
 		//Load the default Polar data. Not in the Settings, since this is Project dependant
 		ar >> n;
@@ -4983,8 +4988,7 @@ bool MainFrame::SerializeProjectWPA(QDataStream &ar, bool bIsStoring)
 				ar >> Units::s_MomentUnit;
 			}
 
-			/** @todo restore */
-//			SetUnits();
+			Units::SetUnitConversionFactors();
 
 			if(ArchiveFormat>=100004)
 			{

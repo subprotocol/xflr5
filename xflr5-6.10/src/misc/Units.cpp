@@ -30,10 +30,10 @@ double Units::s_m2toUnit = 1.0;
 double Units::s_kgtoUnit = 1.0;
 double Units::s_NtoUnit  = 1.0;
 double Units::s_NmtoUnit = 1.0;
-int Units::s_LengthUnit = 0;
-int Units::s_AreaUnit   = 1;
-int Units::s_WeightUnit = 1;
+int Units::s_LengthUnit = 3;
 int Units::s_SpeedUnit  = 0;
+int Units::s_AreaUnit   = 3;
+int Units::s_WeightUnit = 1;
 int Units::s_ForceUnit  = 0;
 int Units::s_MomentUnit = 0;
 
@@ -226,7 +226,7 @@ void Units::OnSelChanged(const QString &)
 	s_ForceUnit   = m_pctrlForce->currentIndex();
 	s_MomentUnit  = m_pctrlMoment->currentIndex();
 
-	SetUnits();
+	SetUnitConversionFactors();
 
 	QString str, strange;
 
@@ -505,7 +505,7 @@ void Units::getWeightUnitLabel(QString &str)
 */
 //void UnitsDlg::SetUnits(int s_LengthUnit, int s_AreaUnit, int s_SpeedUnit, int s_WeightUnit, int s_ForceUnit, int s_MomentMUnit,
 //			         double &s_mtoUnit, double &s_m2toUnit, double &s_mstoUnit,  double &s_kgtoUnit, double &s_NtoUnit, double &s_NmtoUnit)
-void Units::SetUnits()
+void Units::SetUnitConversionFactors()
 {
 	switch(s_LengthUnit)
 	{

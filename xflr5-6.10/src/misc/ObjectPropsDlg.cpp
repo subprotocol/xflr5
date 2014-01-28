@@ -35,7 +35,7 @@ ObjectPropsDlg::ObjectPropsDlg(QWidget *pParent) : QDialog(pParent)
 	m_pXDirect    = NULL;
 	m_pPolar      = NULL;
 	m_pWPolar     = NULL;
-	m_pWOpp       = NULL;
+	m_pPOpp       = NULL;
 	m_pOpp        = NULL;
 
 	SetupLayout();
@@ -98,9 +98,9 @@ void ObjectPropsDlg::InitDialog()
 			m_pWPolar->GetPolarProperties(strange, true);
 			setWindowTitle(tr("Polar Properties"));
 		}
-		else if(m_pWOpp)
+		else if(m_pPOpp)
 		{
-//			m_pWOpp->GetWingOppProperties(strange);
+			m_pPOpp->GetPlaneOppProperties(strange);
 			setWindowTitle(tr("Operating Point Properties"));
 		}
 	}

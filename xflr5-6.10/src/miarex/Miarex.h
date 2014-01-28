@@ -228,10 +228,10 @@ private slots:
 	void OnPlaneInertia();
 	void OnVortices();
 	void OnWing2Curve();
-	void OnWOppProps();
+	void OnPlaneOppProperties();
 	void OnWOppView();
 	void OnWPolarView();
-	void OnWPolarProps();
+	void OnWPolarProperties();
 
 public:
 	//overrides

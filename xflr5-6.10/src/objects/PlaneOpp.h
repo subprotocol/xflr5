@@ -68,7 +68,7 @@ public:
 	void Allocate(int PanelArraySize);
 	void Release();
 
-	void GetPlaneOppProperties(QString &WingOppProperties);
+	void GetPlaneOppProperties(QString &PlaneOppProperties);
 
 	QString title();
 	double alpha() {return m_Alpha;}

@@ -65,11 +65,7 @@ public:
     static int forceUnitIndex()  {return s_ForceUnit;}
     static int momentUnitIndex() {return s_MomentUnit;}
 
-
-//    static void SetUnits(int LUnit, int AUnit, int SUnit, int WUnit, int FUnit, int MUnit,
-//				 double &mtoUnit, double &m2toUnit, double &mstoUnit,  double &kgtoUnit,
-//				 double &NtoUnit, double &NmtoUnit);
-    static void SetUnits();
+    static void SetUnitConversionFactors();
 
 private slots:
 	void OnSelChanged(const QString &);
