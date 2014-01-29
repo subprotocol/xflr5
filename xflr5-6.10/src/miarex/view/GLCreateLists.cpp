@@ -632,13 +632,13 @@ void GLCreateCpLegendClr(QRect cltRect)
 }
 
 
-void GLCreateDownwash(Wing *pWing, WingOpp *pWOpp, int List)
+void GLCreateDownwash(Wing *pWing, WPolar *pWPolar, WingOpp *pWOpp, int List)
 {
 	// pWing is either the Wing, the stab, or the fin
 	// pWOpp is related to the pWing
 
 
-	if(!pWing || !pWOpp) return;
+	if(!pWing || !pWPolar || !pWOpp) return;
 	
 	QColor color;
 	int style, width;
@@ -650,7 +650,7 @@ void GLCreateDownwash(Wing *pWing, WingOpp *pWOpp, int List)
 
 	double sina = -sin(pWOpp->m_Alpha*PI/180.0);
 	double cosa =  cos(pWOpp->m_Alpha*PI/180.0);
-    factor = QMiarex::s_VelocityScale/5.0;
+	factor = QMiarex::s_VelocityScale/5.0;
 
 	//DOWNWASH
 	glNewList(List,GL_COMPILE);
@@ -659,9 +659,9 @@ void GLCreateDownwash(Wing *pWing, WingOpp *pWOpp, int List)
 
 		glEnable (GL_LINE_STIPPLE);
 
-        color = W3dPrefsDlg::s_DownwashColor;
-        style = W3dPrefsDlg::s_DownwashStyle;
-        width = W3dPrefsDlg::s_DownwashWidth;
+		color = W3dPrefsDlg::s_DownwashColor;
+		style = W3dPrefsDlg::s_DownwashStyle;
+		width = W3dPrefsDlg::s_DownwashWidth;
 
 		glColor3d(color.redF(), color.greenF(), color.blueF());
 
@@ -676,7 +676,7 @@ void GLCreateDownwash(Wing *pWing, WingOpp *pWOpp, int List)
 
 		if(pWOpp)
 		{
-			if(pWOpp->m_AnalysisMethod==LLTMETHOD)
+			if(pWPolar->analysisMethod()==LLTMETHOD)
 			{
 				for (i=1; i<pWOpp->m_NStation; i++)
 				{
@@ -788,13 +788,13 @@ void GLCreateDrag(Wing *pWing, WPolar* pWPolar, WingOpp *pWOpp, int List)
 	cosb =  cos(pWPolar->sideSlip()*PI/180.0);
 	sinb =  sin(pWPolar->sideSlip()*PI/180.0);
 
-    Icolor = W3dPrefsDlg::s_IDragColor;
-    Istyle = W3dPrefsDlg::s_IDragStyle;
-    Iwidth = W3dPrefsDlg::s_IDragWidth;
+	Icolor = W3dPrefsDlg::s_IDragColor;
+	Istyle = W3dPrefsDlg::s_IDragStyle;
+	Iwidth = W3dPrefsDlg::s_IDragWidth;
 
-    Vcolor = W3dPrefsDlg::s_VDragColor;
-    Vstyle = W3dPrefsDlg::s_VDragStyle;
-    Vwidth = W3dPrefsDlg::s_VDragWidth;
+	Vcolor = W3dPrefsDlg::s_VDragColor;
+	Vstyle = W3dPrefsDlg::s_VDragStyle;
+	Vwidth = W3dPrefsDlg::s_VDragWidth;
 
 	if     (Istyle == 1) 	IDash = 0xCFCF;
 	else if(Istyle == 2) 	IDash = 0x6666;
@@ -819,7 +819,7 @@ void GLCreateDrag(Wing *pWing, WPolar* pWPolar, WingOpp *pWOpp, int List)
 	//DRAGLINE
 	glNewList(List,GL_COMPILE);
 	{
-        QMiarex::s_GLList++;
+		QMiarex::s_GLList++;
 		glEnable (GL_LINE_STIPPLE);
 		glLineStipple (1, IDash);// Solid
 		glLineWidth((GLfloat)(Iwidth));
@@ -829,7 +829,7 @@ void GLCreateDrag(Wing *pWing, WPolar* pWPolar, WingOpp *pWOpp, int List)
 
 		if(pWOpp)
 		{
-			if(pWOpp->m_AnalysisMethod==LLTMETHOD)
+			if(pWPolar->analysisMethod()==LLTMETHOD)
 			{
 				for (i=1; i<pWOpp->m_NStation; i++)
 				{
@@ -1293,7 +1293,7 @@ void GLCreateVortices(int nPanels, Panel *pPanel, CVector *pNode, WPolar *pWPola
 			B  += BD;
 			D  -= BD;
 
-			if(pWPolar && pWPolar->m_bVLM1)
+			if(pWPolar && pWPolar->bVLM1())
 			{
 				glLineStipple (1, 0xFFFF);
 				glBegin(GL_LINES);
@@ -1316,7 +1316,7 @@ void GLCreateVortices(int nPanels, Panel *pPanel, CVector *pNode, WPolar *pWPola
 				}
 				glEnd();
 			}
-			else if(!pWPolar || (pWPolar && !pWPolar->m_bVLM1))
+			else if(!pWPolar || (pWPolar && !pWPolar->bVLM1()))
 			{
 				glBegin(GL_LINE_STRIP);
 				{
@@ -1592,11 +1592,11 @@ void GLCreateLiftStrip(Wing *pWing, WPolar *pWPolar, WingOpp *pWOpp, int List)
 		style = W3dPrefsDlg::s_XCPStyle;
 		width = W3dPrefsDlg::s_XCPWidth;
 
-		if     (style == 1) 	glLineStipple (1, 0xCFCF);
-		else if(style == 2) 	glLineStipple (1, 0x6666);
-		else if(style == 3) 	glLineStipple (1, 0xFF18);
-		else if(style == 4) 	glLineStipple (1, 0x7E66);
-		else					glLineStipple (1, 0xFFFF);
+		if     (style == 1) glLineStipple (1, 0xCFCF);
+		else if(style == 2) glLineStipple (1, 0x6666);
+		else if(style == 3) glLineStipple (1, 0xFF18);
+		else if(style == 4) glLineStipple (1, 0x7E66);
+		else				glLineStipple (1, 0xFFFF);
 
 		glColor3d(color.redF(), color.greenF(), color.blueF());
 		glLineWidth((GLfloat)width);
@@ -1606,7 +1606,7 @@ void GLCreateLiftStrip(Wing *pWing, WPolar *pWPolar, WingOpp *pWOpp, int List)
 
 		if(pWOpp)
 		{
-			if(pWOpp->m_AnalysisMethod==LLTMETHOD)
+			if(pWPolar->analysisMethod()==LLTMETHOD)
 			{
 				for (i=1; i<pWOpp->m_NStation; i++)
 				{
@@ -1714,9 +1714,9 @@ void GLCreateLiftStrip(Wing *pWing, WPolar *pWPolar, WingOpp *pWOpp, int List)
 }
 
 
-void GLCreateTrans(Wing *pWing, WingOpp *pWOpp, int List)
+void GLCreateTrans(Wing *pWing, WPolar *pWPolar, WingOpp *pWOpp, int List)
 {
-    if(!pWing || !pWOpp) return;
+    if(!pWing || !pWPolar || !pWOpp) return;
     int i,j,k,m, style;
     double yrel, xt, yt, zt, yob ;
     CVector Pt;
@@ -1742,7 +1742,7 @@ void GLCreateTrans(Wing *pWing, WingOpp *pWOpp, int List)
         glLineWidth((GLfloat)W3dPrefsDlg::s_TopWidth);
         if(pWOpp)
         {
-            if(pWOpp->m_AnalysisMethod==LLTMETHOD)
+		  if(pWPolar->analysisMethod()==LLTMETHOD)
             {
                 glBegin(GL_LINE_STRIP);
                 {
@@ -1821,7 +1821,7 @@ void GLCreateTrans(Wing *pWing, WingOpp *pWOpp, int List)
         glLineWidth((GLfloat)W3dPrefsDlg::s_BotWidth);
         if(pWOpp)
         {
-            if(pWOpp->m_AnalysisMethod==LLTMETHOD)
+		  if(pWPolar->analysisMethod()==LLTMETHOD)
             {
                 glBegin(GL_LINE_STRIP);
                 {

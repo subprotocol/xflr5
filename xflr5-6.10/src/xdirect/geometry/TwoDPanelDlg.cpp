@@ -46,7 +46,7 @@ TwoDPanelDlg::TwoDPanelDlg(QWidget *pParent) : QDialog(pParent)
 void TwoDPanelDlg::SetupLayout()
 {
 	setWindowTitle(tr("Global Panel Refinement"));
-	QGridLayout *InputDataLayout = new QGridLayout;
+	QGridLayout *pInputDataLayout = new QGridLayout;
 	{
 		QLabel *l1 = new QLabel(tr("Number of Panels"));
 		QLabel *l2 = new QLabel(tr("Panel Bunching Parameter"));
@@ -55,12 +55,12 @@ void TwoDPanelDlg::SetupLayout()
 		QLabel *l5 = new QLabel(tr("Top Side Refined Area x/c limits"));
 		QLabel *l6 = new QLabel(tr("Bottom Side Refined Area x/c limits"));
 
-		InputDataLayout->addWidget(l1,1,1);
-		InputDataLayout->addWidget(l2,2,1);
-		InputDataLayout->addWidget(l3,3,1);
-		InputDataLayout->addWidget(l4,4,1);
-		InputDataLayout->addWidget(l5,5,1);
-		InputDataLayout->addWidget(l6,6,1);
+		pInputDataLayout->addWidget(l1,1,1);
+		pInputDataLayout->addWidget(l2,2,1);
+		pInputDataLayout->addWidget(l3,3,1);
+		pInputDataLayout->addWidget(l4,4,1);
+		pInputDataLayout->addWidget(l5,5,1);
+		pInputDataLayout->addWidget(l6,6,1);
 
 
 		m_pctrlNPanels = new IntEdit(100, this);
@@ -74,14 +74,14 @@ void TwoDPanelDlg::SetupLayout()
 		m_pctrlXpRef1 = new DoubleEdit;
 		m_pctrlXpRef2 = new DoubleEdit;
 
-		InputDataLayout->addWidget(m_pctrlNPanels, 1, 2);
-		InputDataLayout->addWidget(m_pctrlCVpar,   2, 2);
-		InputDataLayout->addWidget(m_pctrlCTErat,  3, 2);
-		InputDataLayout->addWidget(m_pctrlCTRrat,  4, 2);
-		InputDataLayout->addWidget(m_pctrlXsRef1,  5, 2);
-		InputDataLayout->addWidget(m_pctrlXsRef2,  5, 3);
-		InputDataLayout->addWidget(m_pctrlXpRef1,  6, 2);
-		InputDataLayout->addWidget(m_pctrlXpRef2,  6, 3);
+		pInputDataLayout->addWidget(m_pctrlNPanels, 1, 2);
+		pInputDataLayout->addWidget(m_pctrlCVpar,   2, 2);
+		pInputDataLayout->addWidget(m_pctrlCTErat,  3, 2);
+		pInputDataLayout->addWidget(m_pctrlCTRrat,  4, 2);
+		pInputDataLayout->addWidget(m_pctrlXsRef1,  5, 2);
+		pInputDataLayout->addWidget(m_pctrlXsRef2,  5, 3);
+		pInputDataLayout->addWidget(m_pctrlXpRef1,  6, 2);
+		pInputDataLayout->addWidget(m_pctrlXpRef2,  6, 3);
 
 		connect(m_pctrlNPanels, SIGNAL(editingFinished()), this, SLOT(OnChanged()));
 		connect(m_pctrlCVpar,   SIGNAL(editingFinished()), this, SLOT(OnChanged()));
@@ -93,28 +93,28 @@ void TwoDPanelDlg::SetupLayout()
 		connect(m_pctrlXpRef2,  SIGNAL(editingFinished()), this, SLOT(OnChanged()));
 	}
 
-	QHBoxLayout *CommandButtonsLayout = new QHBoxLayout;
+	QHBoxLayout *pCommandButtonsLayout = new QHBoxLayout;
 	{
 		OKButton      = new QPushButton(tr("OK"));
 		CancelButton  = new QPushButton(tr("Cancel"));
 		ApplyButton   = new QPushButton(tr("Apply"));
-		CommandButtonsLayout->addStretch(1);
-		CommandButtonsLayout->addWidget(ApplyButton);
-		CommandButtonsLayout->addStretch(1);
-		CommandButtonsLayout->addWidget(OKButton);
-		CommandButtonsLayout->addStretch(1);
-		CommandButtonsLayout->addWidget(CancelButton);
-		CommandButtonsLayout->addStretch(1);
+		pCommandButtonsLayout->addStretch(1);
+		pCommandButtonsLayout->addWidget(ApplyButton);
+		pCommandButtonsLayout->addStretch(1);
+		pCommandButtonsLayout->addWidget(OKButton);
+		pCommandButtonsLayout->addStretch(1);
+		pCommandButtonsLayout->addWidget(CancelButton);
+		pCommandButtonsLayout->addStretch(1);
 	}
 
-	QVBoxLayout *mainLayout = new QVBoxLayout;
+	QVBoxLayout *pmainLayout = new QVBoxLayout;
 	{
-		mainLayout->addStretch(1);
-		mainLayout->addLayout(InputDataLayout);
-		mainLayout->addStretch(1);
-		mainLayout->addLayout(CommandButtonsLayout);
-		mainLayout->addStretch(1);
-		setLayout(mainLayout);
+		pmainLayout->addStretch(1);
+		pmainLayout->addLayout(pInputDataLayout);
+		pmainLayout->addStretch(1);
+		pmainLayout->addLayout(pCommandButtonsLayout);
+		pmainLayout->addStretch(1);
+		setLayout(pmainLayout);
 	}
 
 	connect(ApplyButton, SIGNAL(clicked()),this, SLOT(OnApply()));

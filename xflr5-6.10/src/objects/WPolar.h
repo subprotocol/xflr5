@@ -120,9 +120,10 @@ public: //access methods
 	bool bGround() {return m_bGround;}
 	bool bIgnoreBodyPanels() {return m_bIgnoreBodyPanels;}
 	bool bViscous() {return m_bViscous;}
+	bool bVLM1() {return m_bVLM1;}
 
 private:
-
+	bool     m_bVLM1;              /**< true if the analysis is performed with horseshoe vortices, flase if quad rings */
 	bool     m_bAutoInertia;       /**< true if the inertia to be taken into account is the one of the parent plane */
 	bool     m_bDirichlet;         /**< true if Dirichlet boundary conditions should be applied, false if Neumann */
 	bool     m_bGround;            /**< true if ground effect should be taken into account in the analysis */
@@ -207,7 +208,6 @@ private:
 public:
 	enumAnalysisMethod m_AnalysisMethod;  /**< The method used for the analysis. May be one of the following types : LLTMETHOD, VLMMETHOD, PANELMETHOD */
 	enumPolarType      m_WPolarType;      /**< The type of analysis. May be one of the following types :FIXEDSPEEDPOLAR, FIXEDLIFTPOLAR, FIXEDAOAPOLAR, STABILITYPOLAR */
-	bool          m_bVLM1;                /**< true if the analysis is performed with horseshoe vortices, flase if quad rings */
 	CVector       m_CoG;                  /**< the position of the CoG */
 	double        m_Density;              /**< The fluid's density */
 	double        m_Mass;                 /**< The mass for type 2 and type 7 polars */

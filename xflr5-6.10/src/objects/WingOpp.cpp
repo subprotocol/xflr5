@@ -33,6 +33,8 @@
  */
 WingOpp::WingOpp(int PanelArraySize)
 {
+	m_AnalysisMethod = LLTMETHOD;
+
 	m_NVLMPanels   = PanelArraySize;
 	m_dCp = m_dG = m_dSigma = NULL;
 
@@ -49,7 +51,6 @@ WingOpp::WingOpp(int PanelArraySize)
 	m_NStation     = 0;
 	m_nFlaps       = 0;
 	m_nControls    = 0;
-	m_AnalysisMethod = LLTMETHOD;
 
 	m_Alpha               = 0.0;
 	m_QInf                = 0.0;
@@ -238,12 +239,12 @@ bool WingOpp::SerializeWingOppWPA(QDataStream &ar, bool bIsStoring)
 		ReadCOLORREF(ar,clr);
 
 		ar >>k;
-		if(k==1)      m_WPolarType = FIXEDSPEEDPOLAR;
+/*		if(k==1)      m_WPolarType = FIXEDSPEEDPOLAR;
 		else if(k==2) m_WPolarType = FIXEDLIFTPOLAR;
 		else if(k==4) m_WPolarType = FIXEDAOAPOLAR;
 		else if(k==6) m_WPolarType = STABILITYPOLAR; //former control polars
 		else if(k==7) m_WPolarType = STABILITYPOLAR;
-		else return false;
+		else return false;*/
 
 		ar >> m_NStation;
 		ar >> f; m_Alpha =f;
@@ -642,13 +643,14 @@ void WingOpp::createWOpp(void *pWingPtr, void *pWPolarPtr)
 	Wing *pWing = (Wing*)pWingPtr;
 	WPolar *pWPolar = (WPolar*)pWPolarPtr;
 
+
 	m_WingName            = pWing->m_WingName;
+	m_NVLMPanels          = pWing->m_MatSize;
 	m_NStation            = pWing->m_NStation;
 	m_nFlaps              = pWing->m_nFlaps;
 
 	m_PlrName             = pWPolar->polarName();
-	m_WPolarType          = pWPolar->m_WPolarType;
-	m_AnalysisMethod      = pWPolar->m_AnalysisMethod;
+	m_AnalysisMethod      = pWPolar->analysisMethod();
 	m_Beta                = pWPolar->m_BetaSpec;
 	m_Phi                 = pWPolar->m_BankAngle;
 	m_Weight              = pWPolar->m_Mass;

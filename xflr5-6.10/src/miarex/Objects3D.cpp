@@ -2081,7 +2081,7 @@ Plane * Objects3D::setModPlane(Plane *pModPlane)
 			{
 				// we have a valid name
 				// rename the plane
-				pModPlane->RenamePlane(renDlg.newName());
+				pModPlane->setPlaneName(renDlg.newName());
 
 				bool bInserted = false;
 				for (l=0; l<s_oaPlane.size();l++)
@@ -2120,7 +2120,7 @@ Plane * Objects3D::setModPlane(Plane *pModPlane)
 			pPlane = getPlane(renDlg.newName());
 			deletePlane(pPlane);
 
-			pModPlane->RenamePlane(renDlg.newName());
+			pModPlane->setPlaneName(renDlg.newName());
 
 			//place the Plane in alphabetical order in the array
 			//remove the current Plane from the array

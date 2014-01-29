@@ -78,6 +78,9 @@ Settings::Settings(QWidget *pParent) : QDialog(pParent)
 	connect(m_pctrlTextFont, SIGNAL(clicked()),this, SLOT(OnTextFont()));
 	connect(m_pctrlTableFont, SIGNAL(clicked()),this, SLOT(OnTableFont()));
 
+	connect(m_pctrlReverseZoom, SIGNAL(clicked()), this, SLOT(OnReverseZoom()));
+	connect(m_pctrlAlphaChannel, SIGNAL(clicked()), this, SLOT(OnAlphaChannel()));
+
 	connect(OKButton, SIGNAL(clicked()),this, SLOT(accept()));
 }
 
@@ -464,3 +467,13 @@ void Settings::LoadSettings(QSettings *pSettings)
 
 
 
+void Settings::OnReverseZoom()
+{
+	s_bReverseZoom = m_pctrlReverseZoom->isChecked();
+}
+
+
+void Settings::OnAlphaChannel()
+{
+	s_bAlphaChannel = m_pctrlAlphaChannel->isChecked();
+}

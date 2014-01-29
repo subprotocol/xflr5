@@ -1358,7 +1358,7 @@ void GL3dBodyDlg::GLDraw3D()
 	}
 	if(m_bResetglBody )
 	{
-		m_ArcBall.GetMatrix();
+//		m_ArcBall.GetMatrix();
 		CVector eye(0.0,0.0,1.0);
 		CVector up(0.0,1.0,0.0);
 		m_ArcBall.SetZoom(0.3,eye,up);
@@ -2070,7 +2070,7 @@ void GL3dBodyDlg::mouseMoveEvent(QMouseEvent *event)
 
 void GL3dBodyDlg::mousePressEvent(QMouseEvent *event)
 {
-	int iF;
+	int iFrame;
 	QPoint point(event->pos().x(), event->pos().y());
 
 	CVector Real;
@@ -2128,16 +2128,17 @@ void GL3dBodyDlg::mousePressEvent(QMouseEvent *event)
 			Real.x =  (Real.x - m_BodyScaledOffset.x)/m_BodyScale;
 			Real.y =  (Real.y - m_BodyScaledOffset.y)/m_BodyScale;
 			Real.z = 0.0;
-			iF = m_pBody->IsFramePos(Real, m_BodyScale/m_BodyRefScale);
-			if(iF >=0)
+			iFrame = m_pBody->IsFramePos(Real, m_BodyScale/m_BodyRefScale);
+			if(iFrame >=0)
 			{
-				m_pBody->m_iActiveFrame = iF;
+				m_pBody->m_iActiveFrame = iFrame;
 				m_pFrame = m_pBody->activeFrame();
 
 				SetFrame(m_pBody->m_iActiveFrame);
-				m_pctrlFrameTable->selectRow(iF);
+				if(iFrame>=0 && iFrame<m_pFrameModel->rowCount()) m_pctrlFrameTable->selectRow(iFrame);
 
-				if(m_pFrame && m_pFrame->m_iSelect>=0) m_pctrlPointTable->selectRow(m_pFrame->m_iSelect);
+				if(m_pFrame && m_pFrame->m_iSelect>=0 && m_pFrame->m_iSelect<m_pPointModel->rowCount())
+					m_pctrlPointTable->selectRow(m_pFrame->m_iSelect);
 
 				m_bTrans = false;
 				m_bDragPoint  = true;
@@ -2157,8 +2158,7 @@ void GL3dBodyDlg::mousePressEvent(QMouseEvent *event)
 				m_bTrans = false;
 				m_bDragPoint  = true;
 
-				/** @todo do something*/
-//				m_pctrlPointTable->selectRow(m_pFrame->m_iSelect);
+				if(m_pFrame->m_iSelect<m_pPointModel->rowCount()) m_pctrlPointTable->selectRow(m_pFrame->m_iSelect);
 			}
 		}
 		if(m_bTrans && !bCtrl)	m_3dWidget.setCursor(Qt::ClosedHandCursor);
@@ -2474,7 +2474,6 @@ void GL3dBodyDlg::OnImportBodyDef()
 
 	double mtoUnit = 1.0;
 
-	/** @todo create a specific dialog for units */
 	LengthUnitDlg luDlg(this);
 
 	luDlg.m_Question = QObject::tr("Choose the length unit to read this file :");
@@ -3312,7 +3311,7 @@ void GL3dBodyDlg::SetBodyScale()
   
 	m_glScaled = (GLfloat)(3./4.* (m_VerticalSplit+1.0) / m_pBody->Length());
 
-	m_ArcBall.GetMatrix();
+//	m_ArcBall.GetMatrix();
 	CVector eye(0.0,0.0,1.0);
 	CVector up(0.0,1.0,0.0);
 	m_ArcBall.SetZoom(0.3,eye,up);

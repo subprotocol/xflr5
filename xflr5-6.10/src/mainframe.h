@@ -221,7 +221,7 @@ private:
 	void *m_pXDirect;   /**< A void pointer to the instance of the QXDirect application. The pointer will be cast to the QXDirect type at runtime. This is necessary to prevent loop includes of header files. */
 	void *m_pStabView;  /** < A void pointer to the instance of the StabViewDlg window. */
 	
-	static QPointer<MainFrame> _self;  /**< @todo need to discuss this one with Francesco */
+	static QPointer<MainFrame> _self; /**< necessary for MacOS >*/
 
 	QStackedWidget *m_pctrlCentralWidget;  /** The stacked widget which is loaded at the center of the display area. The stack holds one TwoDWidget and one ThreeDWidget and sxwitches between the two depending on the user's request. */
 	TwoDWidget *m_p2DWidget;        /** A pointer to the instance of the TwoDWidget which is used to perform 2d drawings */

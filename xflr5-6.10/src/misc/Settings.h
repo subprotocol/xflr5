@@ -53,6 +53,8 @@ private slots:
 	void OnTextColor();
 	void OnTextFont();
 	void OnTableFont();
+	void OnReverseZoom();
+	void OnAlphaChannel();
 
 private:
 	void reject();

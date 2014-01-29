@@ -356,11 +356,11 @@ void BatchDlg::AlphaLoop()
 		str = QString("Alpha = %1\n").arg(alphadeg,0,'f',2);
 		OutputMsg(str);
 
-		m_pCurPolar = CreatePolar(alphadeg, m_Mach, m_ACrit);// Do something
-		if(!m_pCurPolar) return;
+		Polar *pCurPolar = CreatePolar(m_pFoil, alphadeg, m_Mach, m_ACrit);// Do something
+		if(!pCurPolar) return;
 
 		m_pXFoilTask->setReRange(m_ReMin, m_ReMax, m_ReInc);
-		m_pXFoilTask->InitializeTask(m_pFoil, m_pCurPolar, QXDirect::s_bViscous, m_bInitBL, m_bFromZero);
+		m_pXFoilTask->InitializeTask(m_pFoil, pCurPolar, QXDirect::s_bViscous, m_bInitBL, m_bFromZero);
 
 		m_pXFoilTask->run();
 
@@ -384,7 +384,6 @@ void BatchDlg::AlphaLoop()
 /**
  * Overrides the base class reject() method, to prevent window closure when an analysis is running.
  * If the analysis is running, cancels it and returns. 
- * @todo should add some kind of loop to wait for the end of the analysis and then close the window.
  * If not, closes the window.
  */
 void BatchDlg::reject()
@@ -422,18 +421,17 @@ void BatchDlg::CleanUp()
  * Creates the Polar object from the specified data.
  * If a former Polar  with an identical name exists for this Foil, cancels the creation and sets the former Polar as active.
  * Otherwise, adds the new Polar to the array of objects.
- * @todo pass the pointer to the Foil as a paramter to avoir errors.
  * @param Spec the value of the Reynolds number in the case of Type 1, 2 or 3 Polars, or the value of the aoa in the case of a Type 4 Polar
  * @param Mach the Mach number
  * @param NCrit the transition parameter
  * @return a pointer to the created Polar object
  */
-Polar *BatchDlg::CreatePolar(double Spec, double Mach, double NCrit)
+Polar *BatchDlg::CreatePolar(Foil *pFoil, double Spec, double Mach, double NCrit)
 {
-	if(!m_pFoil) return NULL;
+	if(!pFoil) return NULL;
 
 	Polar *pPolar = new Polar;
-	pPolar->m_FoilName   = m_pFoil->m_FoilName;
+	pPolar->m_FoilName   = pFoil->m_FoilName;
 	pPolar->m_bIsVisible = true;
 
 	pPolar->m_PolarType = m_PolarType;
@@ -793,13 +791,16 @@ void BatchDlg::OnAnalyze()
 
 /**
  * The user has requested to quit the analysis.
-  * @todo check the exit sequence if the analysis is still running.
  */
 void BatchDlg::OnClose()
 {
-	m_bCancel = true;
-	XFoil::s_bCancel= true;
-	XFoilTask::s_bCancel = true;
+	if(m_bIsRunning)
+	{
+		m_bCancel = true;
+		XFoil::s_bCancel= true;
+		XFoilTask::s_bCancel = true;
+		return;
+	}
 
 	ReadParams();
 
@@ -975,7 +976,7 @@ void BatchDlg::ReadParams()
 /**
  * For Type 1, 2 and 3 Polar objects
  * Loops through all the specified Relist, and for each element of the list:
- *	- creates a Polar object
+ *- creates a Polar object
  *  - initializes the XFoilTask object
  *  - launches the XFoilTask whcih will loop over the specified aoa or Cl range
  */
@@ -1007,10 +1008,10 @@ void BatchDlg::ReLoop()
 		str = QString("Re=%1   Ma=%2   Nc=%3\n").arg(Reynolds,8,'f',0).arg(Mach,5,'f',3).arg(NCrit,5,'f',2);
 		OutputMsg(str);
 
-		m_pCurPolar = CreatePolar(Reynolds, Mach, NCrit);
-		if(!m_pCurPolar) return;
+		Polar *pCurPolar = CreatePolar(m_pFoil, Reynolds, Mach, NCrit);
+		if(!pCurPolar) return;
 
-		m_pXFoilTask->InitializeTask(m_pFoil, m_pCurPolar, QXDirect::s_bViscous, m_bInitBL, m_bFromZero);
+		m_pXFoilTask->InitializeTask(m_pFoil, pCurPolar, QXDirect::s_bViscous, m_bInitBL, m_bFromZero);
 		m_pXFoilTask->run();
 
 		m_bErrors = m_bErrors || m_pXFoilTask->m_bErrors;
@@ -1096,7 +1097,7 @@ void BatchDlg::SetPlrName(Polar *pPolar)
 /**
  * Performs the analysis.
  * Creates and launches a QTimer to update the output at ergular intervals.
- * Lanuches the ReLoop() or the AlphaLoop() depending on the Polar type.
+ * Launches the ReLoop() or the AlphaLoop() depending on the Polar type.
  * At the end of the analysis, performs a CleanUp() sequence.
  */
 void BatchDlg::Analyze()

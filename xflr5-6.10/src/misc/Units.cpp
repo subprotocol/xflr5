@@ -503,8 +503,6 @@ void Units::getWeightUnitLabel(QString &str)
 /**
 * Initializes the conversion factors for all user-defined units
 */
-//void UnitsDlg::SetUnits(int s_LengthUnit, int s_AreaUnit, int s_SpeedUnit, int s_WeightUnit, int s_ForceUnit, int s_MomentMUnit,
-//			         double &s_mtoUnit, double &s_m2toUnit, double &s_mstoUnit,  double &s_kgtoUnit, double &s_NtoUnit, double &s_NmtoUnit)
 void Units::SetUnitConversionFactors()
 {
 	switch(s_LengthUnit)

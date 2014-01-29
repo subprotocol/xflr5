@@ -60,7 +60,6 @@ public:
 	bool SerializePlaneXFL(QDataStream &ar, bool bIsStoring);
 	void ComputePlane(void);
 	void CreateSurfaces();
-	void RenamePlane(QString PlaneName);
 	void RenameWings();
 
 	void ClearPointMasses();
@@ -131,6 +130,7 @@ public:
 	CVector CoG()  {return m_CoG;}
 
 	double mac()           {return m_Wing[0].m_MAChord;}
+	double span()          {return m_Wing[0].m_PlanformSpan;}
 	double rootChord()     {return m_Wing[0].m_Chord[0];}
 	double tipChord()      {return m_Wing[0].TipChord();}
 

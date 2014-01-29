@@ -20,6 +20,8 @@
 *****************************************************************************/
 
 #include "PlaneOpp.h"
+#include "Plane.h"
+#include "WPolar.h"
 #include "../globals.h"
 #include "../misc/Units.h"
 
@@ -29,10 +31,12 @@ bool PlaneOpp::s_bKeepOutOpps=false;
 /**
 *The public constructor
 */
-PlaneOpp::PlaneOpp(int PanelArraySize)
+PlaneOpp::PlaneOpp(void *pPlanePtr, void *pWPolarPtr, int PanelArraySize)
 {
 	m_PlaneName   = "";
 	m_PlrName     = "";
+
+
 	m_NStation    = 0;
 	m_NPanels     = 0;
 	m_Style       = 0;
@@ -88,6 +92,28 @@ PlaneOpp::PlaneOpp(int PanelArraySize)
 
 	m_dCp = m_dG = m_dSigma = NULL;
 	Allocate(PanelArraySize);
+
+
+	if(pPlanePtr)
+	{
+		Plane * pPlane = (Plane*)pPlanePtr;
+		m_PlaneName = pPlane->planeName();
+		m_MAChord   = pPlane->mac();
+		m_Span      = pPlane->span();
+		m_NStation  = pPlane->m_Wing[0].m_NStation;
+	}
+
+	if(pWPolarPtr)
+	{
+		WPolar *pWPolar = (WPolar*)pWPolarPtr;
+		m_PlrName         = pWPolar->polarName();
+		m_bVLM1           = pWPolar->bVLM1();
+		m_PlrName         = pWPolar->polarName();
+		m_bThinSurface    = pWPolar->bThinSurfaces();
+		m_bTiltedGeom     = pWPolar->bTilted();
+		m_WPolarType      = pWPolar->polarType();
+		m_AnalysisMethod  = pWPolar->analysisMethod();
+	}	
 }
 
 

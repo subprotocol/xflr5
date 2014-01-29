@@ -3780,9 +3780,6 @@ void MainFrame::OnUnits()
 
 	if(uDlg.exec()==QDialog::Accepted)
 	{
-		/** @todo restore */
-//		UnitsDlg::SetUnits();
-
 		SetSaveState(false);
 
 		if(m_iApp==MIAREX)

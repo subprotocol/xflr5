@@ -835,7 +835,7 @@ PlaneOpp* LLTAnalysis::createPlaneOpp(double QInf, double Alpha, bool bWingOut)
 {
 	int l;
 
-	PlaneOpp *pNewPOpp = new PlaneOpp(0);
+	PlaneOpp *pNewPOpp = new PlaneOpp(m_pPlane, m_pWPolar, 0);
 
 	if(pNewPOpp == NULL)
 	{
@@ -844,11 +844,6 @@ PlaneOpp* LLTAnalysis::createPlaneOpp(double QInf, double Alpha, bool bWingOut)
 	}
 	else
 	{
-		pNewPOpp->m_PlaneName           = m_pPlane->planeName();
-		pNewPOpp->m_PlrName             = m_pWPolar->polarName();
-		pNewPOpp->m_AnalysisMethod      = m_pWPolar->analysisMethod();
-		pNewPOpp->m_WPolarType          = m_pWPolar->polarType();
-
 		pNewPOpp->m_Alpha               = Alpha;
 		pNewPOpp->m_QInf                = QInf;
 		pNewPOpp->m_NPanels             = m_pWing->m_MatSize;
@@ -873,66 +868,53 @@ PlaneOpp* LLTAnalysis::createPlaneOpp(double QInf, double Alpha, bool bWingOut)
 		pNewPOpp->m_pPlaneWOpp[0]->createWOpp(m_pWing, m_pWPolar);
 
 		WingOpp *pNewPoint = pNewPOpp->m_pPlaneWOpp[0];
-
-		pNewPoint->m_WingName  = m_pWing->WingName();
-		pNewPoint->m_Alpha               = Alpha;
-		pNewPoint->m_QInf                = QInf;
-
-		pNewPoint->m_Span                = m_pWPolar->m_WSpan;
-		pNewPoint->m_MAChord             = m_pWing->m_MAChord;
-		pNewPoint->m_NStation            = m_pWing->m_NStation;
-
-		pNewPoint->m_PlrName             = m_pWPolar->m_WPlrName;
-		pNewPoint->m_AnalysisMethod      = m_pWPolar->m_AnalysisMethod;
-
-		pNewPoint->m_WPolarType          = m_pWPolar->m_WPolarType;
-		pNewPoint->m_Weight              = m_pWPolar->m_Mass;
-
-		double Cb =0.0;
-
-
-		pNewPoint->m_NVLMPanels          = m_pWing->m_MatSize;
-		pNewPoint->m_bOut                = m_bWingOut;
-		pNewPoint->m_CL                  = m_CL;
-		pNewPoint->m_ICD                 = m_CDi;
-
-		pNewPoint->m_GCm                 = m_GCm;
-		pNewPoint->m_VCm                 = m_VCm;
-		pNewPoint->m_ICm                 = m_ICm;
-		pNewPoint->m_GRm                 = m_GRm;
-		pNewPoint->m_GYm                 = m_GYm;
-		pNewPoint->m_VYm                 = m_VYm;
-		pNewPoint->m_IYm                 = m_IYm;
-
-		pNewPoint->m_CP                  = m_CP;
-		pNewPoint->m_VCD                 = m_CDv;
-
-		int nStation = LLTAnalysis::s_NLLTStations;
-		pNewPoint->m_NStation = nStation;
-
-		for (l=1; l<nStation; l++)
 		{
-			pNewPoint->m_SpanPos[l]       = -m_SpanPos[l];
-			pNewPoint->m_StripArea[l]     =  m_StripArea[l];
-			pNewPoint->m_Ai[l]            =  m_Ai[nStation-l];
-			pNewPoint->m_Cl[l]            =  m_Cl[nStation-l];
-			pNewPoint->m_PCd[l]           =  m_PCd[nStation-l];
-			pNewPoint->m_ICd[l]           =  m_ICd[nStation-l];
-			pNewPoint->m_Cm[l]            =  m_Cm[nStation-l];
-			pNewPoint->m_CmAirf[l]        =  m_CmAirf[nStation-l];
-			pNewPoint->m_XCPSpanRel[l]    =  m_XCPSpanRel[nStation-l];
-			pNewPoint->m_XCPSpanAbs[l]    =  m_XCPSpanAbs[nStation-l];
-			pNewPoint->m_Re[l]            =  m_Re[nStation-l];
-			pNewPoint->m_Chord[l]         =  m_Chord[nStation-l];
-			pNewPoint->m_Twist[l]         =  m_Twist[nStation-l];
-			pNewPoint->m_XTrTop[l]        =  m_XTrTop[nStation-l];
-			pNewPoint->m_XTrBot[l]        =  m_XTrBot[nStation-l];
-			pNewPoint->m_BendingMoment[l] =  m_BendingMoment[nStation-l];
-			if(qAbs(m_BendingMoment[l])>qAbs(Cb))	Cb = m_BendingMoment[l];
+			pNewPoint->m_Alpha          = Alpha;
+			pNewPoint->m_QInf           = QInf;
+
+			pNewPoint->m_bOut           = m_bWingOut;
+			pNewPoint->m_CL             = m_CL;
+			pNewPoint->m_ICD            = m_CDi;
+
+			pNewPoint->m_GCm            = m_GCm;
+			pNewPoint->m_VCm            = m_VCm;
+			pNewPoint->m_ICm            = m_ICm;
+			pNewPoint->m_GRm            = m_GRm;
+			pNewPoint->m_GYm            = m_GYm;
+			pNewPoint->m_VYm            = m_VYm;
+			pNewPoint->m_IYm            = m_IYm;
+
+			pNewPoint->m_CP             = m_CP;
+			pNewPoint->m_VCD            = m_CDv;
+
+			int nStation = LLTAnalysis::s_NLLTStations;
+			pNewPoint->m_NStation = nStation;
+
+			double Cb =0.0;
+			for (l=1; l<nStation; l++)
+			{
+				pNewPoint->m_SpanPos[l]       = -m_SpanPos[l];
+				pNewPoint->m_StripArea[l]     =  m_StripArea[l];
+				pNewPoint->m_Ai[l]            =  m_Ai[nStation-l];
+				pNewPoint->m_Cl[l]            =  m_Cl[nStation-l];
+				pNewPoint->m_PCd[l]           =  m_PCd[nStation-l];
+				pNewPoint->m_ICd[l]           =  m_ICd[nStation-l];
+				pNewPoint->m_Cm[l]            =  m_Cm[nStation-l];
+				pNewPoint->m_CmAirf[l]        =  m_CmAirf[nStation-l];
+				pNewPoint->m_XCPSpanRel[l]    =  m_XCPSpanRel[nStation-l];
+				pNewPoint->m_XCPSpanAbs[l]    =  m_XCPSpanAbs[nStation-l];
+				pNewPoint->m_Re[l]            =  m_Re[nStation-l];
+				pNewPoint->m_Chord[l]         =  m_Chord[nStation-l];
+				pNewPoint->m_Twist[l]         =  m_Twist[nStation-l];
+				pNewPoint->m_XTrTop[l]        =  m_XTrTop[nStation-l];
+				pNewPoint->m_XTrBot[l]        =  m_XTrBot[nStation-l];
+				pNewPoint->m_BendingMoment[l] =  m_BendingMoment[nStation-l];
+				if(qAbs(m_BendingMoment[l])>qAbs(Cb))	Cb = m_BendingMoment[l];
+			}
+
+
+			pNewPoint->m_MaxBending = (float)Cb;
 		}
-
-
-		pNewPoint->m_MaxBending = (float)Cb;
 	}
 
 	//add the data to the polar object

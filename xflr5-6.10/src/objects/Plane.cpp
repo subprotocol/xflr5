@@ -732,19 +732,9 @@ void Plane::ClearPointMasses()
 	}
 }
 
-/**
- * Rename the plane and its wings
- * @param PlaneName the new plane's name
- */
-void Plane::RenamePlane(QString PlaneName)
-{
-	m_PlaneName = PlaneName;
-	RenameWings();
-}
 
 /**
 * Renames each of the Plane's Wing objects with an automatic name.
-* @todo replace by a renameplane(planename)?
 */
 void Plane::RenameWings()
 {
@@ -753,6 +743,7 @@ void Plane::RenameWings()
 	m_Wing[2].m_WingName = m_PlaneName+"_Elev";
 	m_Wing[3].m_WingName = m_PlaneName+"_Fin";
 }
+
 
 /**
  *Renames the plane and sets the automatic default name for its wings .

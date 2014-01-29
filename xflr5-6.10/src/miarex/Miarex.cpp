@@ -1847,10 +1847,11 @@ void QMiarex::FillComboBoxes(bool bEnable)
 */
 void QMiarex::FillWOppCurve(WingOpp *pWOpp, Graph *pGraph, Curve *pCurve)
 {
-	if(!pCurve) return;
+	if(!pWOpp || !pGraph || !pCurve || !m_pCurWPolar) return;
 	int Var = pGraph->GetYVariable();
 	int nStart, i;
-	if(pWOpp->m_AnalysisMethod==LLTMETHOD) nStart = 1;
+
+	if(m_pCurWPolar->analysisMethod()==LLTMETHOD) nStart = 1;
 	else nStart = 0;
 
 	switch(Var)
@@ -2471,7 +2472,7 @@ void QMiarex::GLDraw3D()
 				if(m_pWingList[iw])
 				{
 					GLCreateLiftStrip(m_pWingList[iw], m_pCurWPolar, m_pWOpp[iw], VLMWINGLIFT+iw);
-					GLCreateTrans(m_pWingList[iw], m_pWOpp[iw], VLMWINGTOPTRANS+iw);
+					GLCreateTrans(m_pWingList[iw], m_pCurWPolar, m_pWOpp[iw], VLMWINGTOPTRANS+iw);
 				}
 			}
 
@@ -2519,7 +2520,7 @@ void QMiarex::GLDraw3D()
 		{
 			if(m_pWingList[iw] && m_pWOpp[iw])
 			{
-				GLCreateDownwash(m_pWingList[iw],m_pWOpp[iw], VLMWINGWASH+iw);
+				GLCreateDownwash(m_pWingList[iw], m_pCurWPolar,m_pWOpp[iw], VLMWINGWASH+iw);
 			}
 		}
 
@@ -10263,10 +10264,6 @@ void QMiarex::UpdateView()
  */
 void QMiarex::zoomEvent(QPoint pt, double zoomFactor)
 {
-	//The mouse button has been wheeled
-	//Process the message
-
-
 	if(m_iView==W3DVIEW)
 	{
 		if(m_pCurPlane)

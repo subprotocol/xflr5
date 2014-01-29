@@ -137,9 +137,9 @@ public:
 	Quaternion Quat;
 	double angle, cosa2, sina2, cosa;
 
-	double ab_glp[16];
-	double ab_glm[16];
-	int ab_glv[4];
+//	double ab_glp[16];
+//	double ab_glm[16];
+//	int ab_glv[4];
 
 	//	object offset
 	double *m_pOffx, *m_pOffy;

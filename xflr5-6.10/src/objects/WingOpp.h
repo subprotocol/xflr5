@@ -108,7 +108,6 @@ public:
 	int m_NStation;		/**< the number of stations along the span */
 	int m_nFlaps;		/**< the number of trailing edge flaps */
 
-	enumPolarType m_WPolarType;		       /**< defines the type of the parent WPolar */
 	enumAnalysisMethod m_AnalysisMethod;   /**< defines by which type of method (LLT, VLM, PANEL), this WingOpp was calculated */
 
 	double *m_dCp;                           /**< a pointer to the array of lift coefficient for each panel */

@@ -4166,7 +4166,7 @@ PlaneOpp* PanelAnalysis::createPlaneOpp(double *Cp, double *Gamma, double *Sigma
 	int i,l;
 	double Cb = 0.0;
 
-	pPOpp = new PlaneOpp(m_MatSize);
+	pPOpp = new PlaneOpp(m_pPlane, m_pWPolar, m_MatSize);
 	if(!pPOpp) return NULL;
 
 //		pPOpp->m_Color = MainFrame::GetColor(6);
@@ -4187,23 +4187,12 @@ PlaneOpp* PanelAnalysis::createPlaneOpp(double *Cp, double *Gamma, double *Sigma
 
 	pWOpp = pPOpp->m_pPlaneWOpp[0];
 
-	pPOpp->m_PlaneName = m_pPlane->planeName();
-
-	pPOpp->m_bVLM1               = m_pWPolar->m_bVLM1;
-	pPOpp->m_PlrName             = m_pWPolar->m_WPlrName;
-	pPOpp->m_bThinSurface        = m_pWPolar->m_bThinSurfaces;
-	pPOpp->m_bTiltedGeom         = m_pWPolar->m_bTiltedGeom;
-
-	pWOpp->m_WPolarType          = m_pWPolar->m_WPolarType;     /** @todo leave it for now until LLT is cleared */
-	pPOpp->m_WPolarType          = m_pWPolar->m_WPolarType;     /** @todo remove, redundant with WPolar*/
-	pPOpp->m_AnalysisMethod      = m_pWPolar->m_AnalysisMethod; /** @todo remove, redundant with WPolar*/
-
-	pPOpp->m_NStation            = m_pPlane->m_Wing[0].m_NStation;
 
 	for (l=0; l<m_pPlane->m_Wing[0].m_NStation; l++)
 	{
 		if(qAbs(m_pPlane->m_Wing[0].m_BendingMoment[l])>qAbs(Cb))	Cb = m_pPlane->m_Wing[0].m_BendingMoment[l];
 	}
+
 
 	pWOpp->m_MaxBending = (float)Cb;
 
@@ -4370,7 +4359,10 @@ PlaneOpp* PanelAnalysis::createPlaneOpp(double *Cp, double *Gamma, double *Sigma
 
 
 
-/** Sends the analysis messages to the specified text output stream */
+/**
+ * Adds the input message to the ouput message. The message is read and cleared from the calling dialog class.
+ * @param str the message to output
+*/
 void PanelAnalysis::traceLog(QString str)
 {
 	m_OutMessage += str;

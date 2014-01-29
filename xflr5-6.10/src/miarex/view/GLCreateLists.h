@@ -34,7 +34,7 @@
 void GLCreateGeom(Wing *pWing, int List, Body *pBody=NULL);
 void GLCreateCp(int nPanels, int nNodes, CVector *pNode, Panel *pPanel, PlaneOpp *pPOpp);
 void GLCreateCpLegendClr(QRect cltRect);
-void GLCreateDownwash(Wing *pWing, WingOpp *pWOpp, int List);
+void GLCreateDownwash(Wing *pWing, WPolar *pWPolar, WingOpp *pWOpp, int List);
 void GLCreateDrag(Wing *pWing, WPolar* pWPolar, WingOpp *pWOpp, int List);
 void GLCreateMesh(int iList, int size, Panel *pPanel, CVector *pNode, QColor PanelColor, QColor BackColor, bool bBack=true);
 void GLCreateCtrlPts(int size, Panel *pPanel);
@@ -44,7 +44,7 @@ void GLCreateLiftForce(WPolar *pWPolar, PlaneOpp *pPOpp);
 bool GLCreateStreamLines(Wing *PlaneWing[MAXWINGS], CVector *pNode, WPolar *pWPolar, PlaneOpp *pPOpp);
 bool GLCreateSurfSpeeds(Panel *pPanel, WPolar *pWPolar, PlaneOpp *pPOpp);
 void GLCreateVortices(int size, Panel *pPanel, CVector *pNode, WPolar *pWPolar);
-void GLCreateTrans(Wing *pWing, WingOpp *pWOpp, int List);
+void GLCreateTrans(Wing *pWing, WPolar *pWPolar, WingOpp *pWOpp, int List);
 void GLCreatePanelForce(int size, Panel *pPanel, WPolar *pWPolar, PlaneOpp *pPOpp);
 
 #endif // GLCREATELISTS_H

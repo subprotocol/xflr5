@@ -361,7 +361,7 @@ void ThreeDWidget::resizeGL(int width, int height)
 	if(m_iView == GLMIAREXVIEW)
 	{
 		QMiarex* pMiarex = (QMiarex*)s_pMiarex;
-		pMiarex->m_ArcBall.GetMatrix();
+//		pMiarex->m_ArcBall.GetMatrix();
 		pMiarex->m_bIs3DScaleSet = false;
 		pMiarex->Set3DScale();
 	}
@@ -435,7 +435,7 @@ void ThreeDWidget::CreateArcballList(ArcBall &ArcBall, double GLScale)
 {
 	int row, col, NumAngles, NumCircles;
 	double R, lat_incr, lon_incr, phi, theta;
-	ArcBall.GetMatrix();
+//	ArcBall.GetMatrix();
 	CVector eye(0.0,0.0,1.0);
 	CVector up(0.0,1.0,0.0);
 	ArcBall.SetZoom(0.45,eye,up);

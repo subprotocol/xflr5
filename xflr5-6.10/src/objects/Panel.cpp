@@ -105,7 +105,7 @@ void Panel::SetPanelFrame(CVector const &LA, CVector const &LB, CVector const &T
 	static CVector smp, smq;
 
 	if(qAbs(LA.y)<1.e-5 && qAbs(TA.y)<1.e-5 && qAbs(LB.y)<1.e-5 && qAbs(TB.y)<1.e-5)
-		m_bIsInSymPlane = true; /** @todo check if any use anymore */
+		m_bIsInSymPlane = true;
 	else m_bIsInSymPlane = false;
 
 	LATB.x = TB.x - LA.x;

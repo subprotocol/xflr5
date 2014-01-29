@@ -83,7 +83,7 @@ ArcBall::ArcBall(void)
 	ab_up.Set(0.0,1.0,0.0);
 	ab_out.Set(1.0,0.0,0.0);
 
-	ab_glp[0]  = 1.0; ab_glp[1]  = 0.0; ab_glp[2]  = 0.0; ab_glp[3]  = 0.0; 
+/*	ab_glp[0]  = 1.0; ab_glp[1]  = 0.0; ab_glp[2]  = 0.0; ab_glp[3]  = 0.0;
 	ab_glp[4]  = 0.0; ab_glp[5]  = 1.0; ab_glp[6]  = 0.0; ab_glp[7]  = 0.0; 
 	ab_glp[8]  = 0.0; ab_glp[9]  = 0.0; ab_glp[10] = 1.0; ab_glp[11] = 0.0; 
 	ab_glp[12] = 0.0; ab_glp[13] = 0.0; ab_glp[14] = 0.0; ab_glp[15] = 1.0; 
@@ -94,19 +94,19 @@ ArcBall::ArcBall(void)
 	ab_glv[1] = 0;
 	ab_glv[2] = 640;
 	ab_glv[3] = 480;
-
+*/
 	sc.Set(0.0,0.0,1.0);
 	ec.Set(0.0,0.0,1.0);
 
 	memset(ab_crosspoint, 0, 16*sizeof(float));
 }
 
-/** @todo check utility */
+
+
 void ArcBall::GetMatrix()
 {
-
-	glGetDoublev(GL_PROJECTION_MATRIX,ab_glp);
-	glGetIntegerv(GL_VIEWPORT,ab_glv);
+//	glGetDoublev(GL_PROJECTION_MATRIX,ab_glp);
+//	glGetIntegerv(GL_VIEWPORT,ab_glv);
 }
 
 
@@ -327,8 +327,6 @@ void ArcBall::SetZoom(double radius, CVector eye, CVector up)
 
 void ArcBall::PlanarCoords(int const &mx, int const &my, CVector &V)
 {
-//	gluUnProject(mx,my,0,ab_glm,ab_glp,ab_glv,&ax,&ay,&az);
-
 	ClientToGL(mx, my, ax, ay);
 
 	m.Set(ax- ab_eye.x, ay- ab_eye.y, az- ab_eye.z);
@@ -343,7 +341,6 @@ void ArcBall::PlanarCoords(int const &mx, int const &my, CVector &V)
 void ArcBall::SphereCoords(int const &mx, int const &my, CVector &V)
 {
 	// find the intersection with the sphere
-//	gluUnProject(mx, my, 0.0, ab_glm, ab_glp, ab_glv, &ax,&ay);
 
 	ClientToGL(mx, my, ax, ay);
 

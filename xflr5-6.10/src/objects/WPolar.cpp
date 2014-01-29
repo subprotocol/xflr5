@@ -355,6 +355,8 @@ void WPolar::CalculatePoint(int i)
 //	double tcd = m_TCd[i];
 //	double Qinf =  m_QInfinite[i];
 
+	if(i>=m_CL.count()) return;
+
 	m_ClCd[i]   =  m_CL[i]/m_TCd[i];
 
 	if(m_CL[i]>0.0) {
@@ -366,7 +368,7 @@ void WPolar::CalculatePoint(int i)
 		m_Cl32Cd[i] =  -(double)pow(-m_CL[i],1.5)/m_TCd[i];
 	}
 
-    if(qAbs(m_CL[i])>0.) m_Gamma[i]  =  atan(m_TCd[i]/m_CL[i]) * 180.0/PI;
+	if(qAbs(m_CL[i])>0.) m_Gamma[i]  =  atan(m_TCd[i]/m_CL[i]) * 180.0/PI;
 	else m_Gamma[i] = 90.0;
 	m_Vz[i] = (double)sqrt(2*m_Mass*9.81/m_Density/m_WArea)/m_Cl32Cd[i];
 	m_Vx[i] = m_QInfinite[i] * (double)cos(m_Gamma[i]*PI/180.0);
@@ -399,7 +401,7 @@ void WPolar::CalculatePoint(int i)
 	c = m_EigenValue[2][i];
 	sum  = c.real() * 2.0;                          // is a real number
 	prod = c.real()*c.real() + c.imag()*c.imag();  // is a positive real number
-    OmegaN = qAbs(c.imag());
+	OmegaN = qAbs(c.imag());
 	if(OmegaN>PRECISION) Omega1 = sqrt(prod);
 	else                 Omega1 = 0.0;
 	Sigma1 = sum /2.0;
@@ -1893,7 +1895,10 @@ bool WPolar::SerializeWPlrXFL(QDataStream &ar, bool bIsStoring)
 		// assumes the arrays have been cleared previously
 		double d[20];
 		ClearData();
+
 		ar >> n;
+		if(qAbs(n)>10000) return false;
+
 		for (i=0; i<n; i++)
 		{
 

@@ -580,6 +580,7 @@ void BatchThreadDlg::OnAnalyze()
 		XFoil::s_bCancel = true;
 		return;
 	}
+
 	m_bCancel    = false;
 	m_bIsRunning = true;
 
@@ -601,10 +602,11 @@ void BatchThreadDlg::OnAnalyze()
 
 /**
  * The user has requested to quit the dialog box
- * @todo check exit sequence if threads are not terminated yet.
  */
 void BatchThreadDlg::OnClose()
 {
+	if(m_bIsRunning) return;
+
 	s_bUpdatePolarView = m_pctrlUpdatePolarView->isChecked();
 	m_bCancel = true;
 	XFoilTask::s_bCancel = true;
@@ -998,7 +1000,7 @@ void BatchThreadDlg::StartThread()
 				UpdateOutput(strong);
 				QThreadPool::globalInstance()->start(m_pXFoilTask+it);
 
-				//remove it from the todo array
+				//remove it from the array of pairs to analyze
 				pAnalysis = m_AnalysisPair.last();
 				m_AnalysisPair.removeLast();
 				delete pAnalysis;

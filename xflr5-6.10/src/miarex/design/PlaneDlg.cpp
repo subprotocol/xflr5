@@ -519,8 +519,7 @@ void PlaneDlg::OnInertia()
 
 void PlaneDlg::OnPlaneName() 
 {
-	m_pPlane->m_PlaneName = m_pctrlPlaneName->text();
-	m_pPlane->RenameWings();
+	m_pPlane->setPlaneName(m_pctrlPlaneName->text());
 }
 
 

@@ -63,7 +63,7 @@ private:
 
 	void AlphaLoop();
 	void CleanUp();
-	Polar* CreatePolar(double Spec, double Mach, double NCrit);
+	Polar* CreatePolar(Foil *pFoil, double Spec, double Mach, double NCrit);
 	void SetupLayout();
 	void InitDialog();
 	void ReadParams();
@@ -136,7 +136,6 @@ private:
 	QFile *m_pXFile;               /**< a pointer to the log file>*/
 
 	Foil *m_pFoil;                 /**< a pointer to the Foil for which the analysis will be run>*/
-	Polar *m_pCurPolar;            /**< a pointer to the active Polar @todo replace with a local variable>*/
 
 	QStringList m_FoilList;        /**< the list of Foil objects to analyze>*/
 

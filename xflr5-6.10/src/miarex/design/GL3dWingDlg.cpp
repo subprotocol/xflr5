@@ -801,7 +801,7 @@ void GL3dWingDlg::GLDraw3D()
 
 	if(m_bResetglWing)
 	{
-		m_ArcBall.GetMatrix();
+//		m_ArcBall.GetMatrix();
 		CVector eye(0.0,0.0,1.0);
 		CVector up(0.0,1.0,0.0);
 		m_ArcBall.SetZoom(0.3,eye,up);
@@ -2111,7 +2111,7 @@ void GL3dWingDlg::SetWingScale()
 	m_UFOOffset.x = 0.0;
 	m_UFOOffset.y = 0.0;
 
-	m_ArcBall.GetMatrix();
+//	m_ArcBall.GetMatrix();
 	CVector eye(0.0,0.0,1.0);
 	CVector up(0.0,1.0,0.0);
 	m_ArcBall.SetZoom(0.3,eye,up);

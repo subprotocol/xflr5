@@ -57,7 +57,7 @@ class PlaneOpp
 	friend class LLTAnalysis;
 
 public:
-	PlaneOpp(int PanelArraySize=0);
+	PlaneOpp(void *pPlanePtr=NULL, void *pWPolarPtr=NULL, int PanelArraySize=0);
 	~PlaneOpp();
 
 	bool SerializePOppWPA(QDataStream &ar, bool bIsStoring);
