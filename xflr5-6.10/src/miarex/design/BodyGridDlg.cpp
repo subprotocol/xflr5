@@ -43,21 +43,21 @@ QColor BodyGridDlg::s_Color = QColor(150,150,150);
 double BodyGridDlg::s_Unit = 0.2;
 
 bool BodyGridDlg::s_bMinGrid = false;
-int BodyGridDlg::s_MinStyle=2;
-int BodyGridDlg::s_MinWidth =1;
+int BodyGridDlg::s_MinStyle = 2;
+int BodyGridDlg::s_MinWidth = 1;
 QColor BodyGridDlg::s_MinColor=QColor(75,75,75);
 double BodyGridDlg::s_MinorUnit=0.05;
 
 
 bool BodyGridDlg::s_bGrid2 = false;
 int BodyGridDlg::s_Style2 = 1;
-int BodyGridDlg::s_Width2 =1;
+int BodyGridDlg::s_Width2 = 1;
 QColor BodyGridDlg::s_Color2 = QColor(150,150,150);
 double BodyGridDlg::s_Unit2 = 0.01;
 
 bool BodyGridDlg::s_bMinGrid2 = false;
-int BodyGridDlg::s_MinStyle2=2;
-int BodyGridDlg::s_MinWidth2 =1;
+int BodyGridDlg::s_MinStyle2 = 2;
+int BodyGridDlg::s_MinWidth2 = 1;
 QColor BodyGridDlg::s_MinColor2=QColor(75,75,75);
 double BodyGridDlg::s_MinorUnit2=0.002;
 
@@ -89,8 +89,8 @@ void BodyGridDlg::InitDialog()
 	m_pctrlMinLine->SetStyle(s_MinStyle);
 	m_pctrlMinLine->SetWidth(s_MinWidth);
 	m_pctrlMinLine->SetColor(s_MinColor);
-	m_pctrlUnit->SetValue(s_Unit);
-	m_pctrlMinUnit->SetValue(s_MinorUnit);
+	m_pctrlUnit->SetValue(s_Unit*Units::mtoUnit());
+	m_pctrlMinUnit->SetValue(s_MinorUnit*Units::mtoUnit());
 
 	m_pctrlGrid2->setChecked(s_bGrid2);
 	m_pctrlLine2->SetStyle(s_Style2);
@@ -100,8 +100,8 @@ void BodyGridDlg::InitDialog()
 	m_pctrlMinLine2->SetStyle(s_MinStyle2);
 	m_pctrlMinLine2->SetWidth(s_MinWidth2);
 	m_pctrlMinLine2->SetColor(s_MinColor2);
-	m_pctrlUnit2->SetValue(s_Unit2);
-	m_pctrlMinUnit2->SetValue(s_MinorUnit2);
+	m_pctrlUnit2->SetValue(s_Unit2*Units::mtoUnit());
+	m_pctrlMinUnit2->SetValue(s_MinorUnit2*Units::mtoUnit());
 
 	EnableControls();
 }
@@ -111,7 +111,6 @@ void BodyGridDlg::InitDialog()
 void BodyGridDlg::SetupLayout()
 {
 	setWindowTitle(tr("Grid Parameters"));
-
 
 	m_pctrlScales   = new QCheckBox(tr("Show Scales"));
 	m_pctrlGrid     = new QCheckBox(tr("Main Grid"));
@@ -124,10 +123,10 @@ void BodyGridDlg::SetupLayout()
 	m_pctrlMinLine  = new LineBtn(this);
 	m_pctrlMinLine2 = new LineBtn(this);
 
-    m_pctrlUnit  = new DoubleEdit(100.00);
-    m_pctrlUnit2 = new DoubleEdit(101.00);
-    m_pctrlMinUnit  = new DoubleEdit(102.00);
-    m_pctrlMinUnit2 = new DoubleEdit(103.00);
+	m_pctrlUnit  = new DoubleEdit(100.00);
+	m_pctrlUnit2 = new DoubleEdit(101.00);
+	m_pctrlMinUnit  = new DoubleEdit(102.00);
+	m_pctrlMinUnit2 = new DoubleEdit(103.00);
 	m_pctrlUnit->SetPrecision(3);
 	m_pctrlUnit2->SetPrecision(3);
 	m_pctrlMinUnit->SetPrecision(3);
@@ -138,65 +137,65 @@ void BodyGridDlg::SetupLayout()
 	m_pctrlLength3 = new QLabel("mm");
 	m_pctrlLength4 = new QLabel("mm");
 
-	QGroupBox *BodyBox = new QGroupBox(tr("Body Grid"));
+	QGroupBox *pBodyBox = new QGroupBox(tr("Body Grid"));
 	{
-		QGridLayout *BodyLayout = new QGridLayout;
+		QGridLayout *pBodyLayout = new QGridLayout;
 		{
-			BodyLayout->addWidget(m_pctrlGrid,1,1);
-			BodyLayout->addWidget(m_pctrlLine,1,2);
-			BodyLayout->addWidget(m_pctrlUnit,1,3);
-			BodyLayout->addWidget(m_pctrlLength1, 1,4);
-			BodyLayout->addWidget(m_pctrlMinGrid,2,1);
-			BodyLayout->addWidget(m_pctrlMinLine,2,2);
-			BodyLayout->addWidget(m_pctrlMinUnit,2,3);
-			BodyLayout->addWidget(m_pctrlLength2, 2,4);
+			pBodyLayout->addWidget(m_pctrlGrid,1,1);
+			pBodyLayout->addWidget(m_pctrlLine,1,2);
+			pBodyLayout->addWidget(m_pctrlUnit,1,3);
+			pBodyLayout->addWidget(m_pctrlLength1, 1,4);
+			pBodyLayout->addWidget(m_pctrlMinGrid,2,1);
+			pBodyLayout->addWidget(m_pctrlMinLine,2,2);
+			pBodyLayout->addWidget(m_pctrlMinUnit,2,3);
+			pBodyLayout->addWidget(m_pctrlLength2, 2,4);
 		}
-		BodyBox->setLayout(BodyLayout);
+		pBodyBox->setLayout(pBodyLayout);
 	}
 
 
-	QGroupBox *FrameBox = new QGroupBox(tr("Frame Grid"));
+	QGroupBox *pFrameBox = new QGroupBox(tr("Frame Grid"));
 	{
-		QGridLayout *FrameLayout = new QGridLayout;
+		QGridLayout *pFrameLayout = new QGridLayout;
 		{
-			FrameLayout->addWidget(m_pctrlGrid2,1,1);
-			FrameLayout->addWidget(m_pctrlLine2,1,2);
-			FrameLayout->addWidget(m_pctrlUnit2,1,3);
-			FrameLayout->addWidget(m_pctrlLength3, 1,4);
-			FrameLayout->addWidget(m_pctrlMinGrid2,2,1);
-			FrameLayout->addWidget(m_pctrlMinLine2,2,2);
-			FrameLayout->addWidget(m_pctrlMinUnit2,2,3);
-			FrameLayout->addWidget(m_pctrlLength4, 2,4);
+			pFrameLayout->addWidget(m_pctrlGrid2,1,1);
+			pFrameLayout->addWidget(m_pctrlLine2,1,2);
+			pFrameLayout->addWidget(m_pctrlUnit2,1,3);
+			pFrameLayout->addWidget(m_pctrlLength3, 1,4);
+			pFrameLayout->addWidget(m_pctrlMinGrid2,2,1);
+			pFrameLayout->addWidget(m_pctrlMinLine2,2,2);
+			pFrameLayout->addWidget(m_pctrlMinUnit2,2,3);
+			pFrameLayout->addWidget(m_pctrlLength4, 2,4);
 		}
-		FrameBox->setLayout(FrameLayout);
+		pFrameBox->setLayout(pFrameLayout);
 	}
 
-	QHBoxLayout *CommandButtons = new QHBoxLayout;
+	QHBoxLayout *pCommandButtons = new QHBoxLayout;
 	{
 		QPushButton *OKButton = new QPushButton(tr("OK"));
 		QPushButton *Cancel = new QPushButton(tr("Cancel"));
-		CommandButtons->addStretch(1);
-		CommandButtons->addWidget(OKButton);
-		CommandButtons->addStretch(1);
-		CommandButtons->addWidget(Cancel);
-		CommandButtons->addStretch(1);
+		pCommandButtons->addStretch(1);
+		pCommandButtons->addWidget(OKButton);
+		pCommandButtons->addStretch(1);
+		pCommandButtons->addWidget(Cancel);
+		pCommandButtons->addStretch(1);
 		connect(OKButton, SIGNAL(clicked()),this, SLOT(OnOK()));
 		connect(Cancel, SIGNAL(clicked()), this, SLOT(reject()));
 	}
 
-	QVBoxLayout *MainLayout = new QVBoxLayout;
+	QVBoxLayout *pMainLayout = new QVBoxLayout;
 	{
-		MainLayout->addWidget(m_pctrlScales);
-		MainLayout->addStretch(1);
-		MainLayout->addWidget(BodyBox);
-		MainLayout->addStretch(1);
-		MainLayout->addWidget(FrameBox);
-		MainLayout->addStretch(1);
-		MainLayout->addLayout(CommandButtons);
-		MainLayout->addStretch(1);
+		pMainLayout->addWidget(m_pctrlScales);
+		pMainLayout->addStretch(1);
+		pMainLayout->addWidget(pBodyBox);
+		pMainLayout->addStretch(1);
+		pMainLayout->addWidget(pFrameBox);
+		pMainLayout->addStretch(1);
+		pMainLayout->addLayout(pCommandButtons);
+		pMainLayout->addStretch(1);
 	}
 
-	setLayout(MainLayout);
+	setLayout(pMainLayout);
 
 
 	connect(m_pctrlGrid, SIGNAL(clicked()), this, SLOT(OnGrid()));
@@ -204,10 +203,10 @@ void BodyGridDlg::SetupLayout()
 	connect(m_pctrlGrid2, SIGNAL(clicked()), this, SLOT(OnGrid2()));
 	connect(m_pctrlMinGrid2, SIGNAL(clicked()), this, SLOT(OnMinGrid2()));
 
-    connect(m_pctrlLine, SIGNAL(clickedLB()), this, SLOT(OnLineStyle()));
-    connect(m_pctrlLine2, SIGNAL(clickedLB()), this, SLOT(OnLine2Style()));
-    connect(m_pctrlMinLine, SIGNAL(clickedLB()), this, SLOT(OnMinLineStyle()));
-    connect(m_pctrlMinLine2, SIGNAL(clickedLB()), this, SLOT(OnMinLine2Style()));
+	connect(m_pctrlLine, SIGNAL(clickedLB()), this, SLOT(OnLineStyle()));
+	connect(m_pctrlLine2, SIGNAL(clickedLB()), this, SLOT(OnLine2Style()));
+	connect(m_pctrlMinLine, SIGNAL(clickedLB()), this, SLOT(OnMinLineStyle()));
+	connect(m_pctrlMinLine2, SIGNAL(clickedLB()), this, SLOT(OnMinLine2Style()));
 }
 
 
@@ -263,7 +262,7 @@ void BodyGridDlg::OnMinGrid2()
 
 void BodyGridDlg::OnLineStyle()
 {
-    LinePickerDlg dlg(this);
+	LinePickerDlg dlg(this);
 	dlg.InitDialog(s_Style, s_Width, s_Color);
 
 	if(QDialog::Accepted==dlg.exec())
@@ -280,7 +279,7 @@ void BodyGridDlg::OnLineStyle()
 
 void BodyGridDlg::OnLine2Style()
 {
-    LinePickerDlg dlg(this);
+	LinePickerDlg dlg(this);
 	dlg.InitDialog(s_Style2, s_Width2, s_Color2);
 
 	if(QDialog::Accepted==dlg.exec())
@@ -297,7 +296,7 @@ void BodyGridDlg::OnLine2Style()
 
 void BodyGridDlg::OnMinLineStyle()
 {
-    LinePickerDlg dlg(this);
+	LinePickerDlg dlg(this);
 	dlg.InitDialog(s_MinStyle, s_MinWidth, s_MinColor);
 
 	if(QDialog::Accepted==dlg.exec())
@@ -314,7 +313,7 @@ void BodyGridDlg::OnMinLineStyle()
 
 void BodyGridDlg::OnMinLine2Style()
 {
-    LinePickerDlg dlg(this);
+	LinePickerDlg dlg(this);
 	dlg.InitDialog(s_MinStyle2, s_MinWidth2, s_MinColor2);
 
 	if(QDialog::Accepted==dlg.exec())

@@ -41,7 +41,7 @@ class BodyGridDlg : public QDialog
 	friend class MainFrame;
 
 public:
-    BodyGridDlg(QWidget *pParent);
+	BodyGridDlg(QWidget *pParent);
 	static void LoadSettings (QSettings *pSettings);
 	static void SaveSettings (QSettings *pSettings);
 
@@ -66,7 +66,7 @@ private:
 
 	QCheckBox *m_pctrlGrid, *m_pctrlMinGrid, *m_pctrlGrid2, *m_pctrlMinGrid2;
 	LineBtn *m_pctrlLine, *m_pctrlMinLine, *m_pctrlLine2, *m_pctrlMinLine2;
-    DoubleEdit *m_pctrlUnit, *m_pctrlMinUnit, *m_pctrlUnit2, *m_pctrlMinUnit2;
+	DoubleEdit *m_pctrlUnit, *m_pctrlMinUnit, *m_pctrlUnit2, *m_pctrlMinUnit2;
 	QLabel *m_pctrlLength1, *m_pctrlLength2, *m_pctrlLength3, *m_pctrlLength4;
 
 	static bool s_bScale;

@@ -240,7 +240,7 @@ private:
 	Frame *m_pFrame;
 	Body *m_pBody;
 
-    BodyGridDlg *m_BodyGridDlg;
+	BodyGridDlg *m_pBodyGridDlg;
 
 
 	ArcBall m_ArcBall;

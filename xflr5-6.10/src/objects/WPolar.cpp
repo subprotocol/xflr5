@@ -1845,7 +1845,6 @@ bool WPolar::SerializeWPlrXFL(QDataStream &ar, bool bIsStoring)
 		ar >> m_Color;
 		ar >> m_bIsVisible >> m_bShowPoints;
 
-
 		ar >> n;
 		if(n==1)      m_AnalysisMethod=LLTMETHOD;
 		else if(n==2) m_AnalysisMethod=VLMMETHOD;

@@ -554,20 +554,8 @@ bool Body::ImportDefinition(QTextStream &inStream, double mtoUnit)
 	return true;
 }
 
-/**
- * Inserts a new side line on the body definition. Sidelines are defined by their index, starting from the Body's
- * lower point to the top.  For NURBS Body the hoop direction is also defined from bottom to top.
- * @param SideLine the index of the sideline
- */
-void Body::InsertSideLine(int SideLine)
-{
-	if(SideLine==0) SideLine++;
-	for (int i=0; i<FrameSize(); i++)
-	{
-		m_SplineSurface.m_pFrame[i]->InsertPoint(SideLine);
-	}
-	SetKnots();
-}
+
+
 
 /**
  * Inserts a control point in the selected Frame.
@@ -577,26 +565,32 @@ void Body::InsertSideLine(int SideLine)
 int Body::InsertPoint(CVector Real)
 {
 	//Real is to be inserted in the current frame
-	if(m_iActiveFrame<0)
+	if(!activeFrame())
 	{
-        QMessageBox msgBox;
-        msgBox.setStandardButtons(QMessageBox::Ok);
+		QMessageBox msgBox;
+		msgBox.setStandardButtons(QMessageBox::Ok);
 		msgBox.setWindowTitle(QObject::tr("Warning"));
 		msgBox.setText(QObject::tr("Please select a Frame before inserting a point"));
-        msgBox.exec();
+		msgBox.exec();
 
 		return -1;
 	}
 
 	int i, n;
-	n = (m_SplineSurface.m_pFrame[m_iActiveFrame])->InsertPoint(Real, 3);
+
+
+	n = activeFrame()->InsertPoint(Real, 3);
 	for (i=0; i<FrameSize(); i++)
 	{
-		if(i!=m_iActiveFrame)
+		Frame *pFrame = m_SplineSurface.m_pFrame[i];
+		if(pFrame != activeFrame())
 		{
-			m_SplineSurface.m_pFrame[i]->InsertPoint(n);
+			pFrame->InsertPoint(n);
 		}
 	}
+
+	m_hPanels.insert(n, 1);
+
 	SetKnots();
 	return n;
 }
@@ -665,6 +659,9 @@ int Body::InsertFrame(CVector Real)
 	if(n>=FrameSize())	m_iActiveFrame = FrameSize();
 	if(n<=0)			m_iActiveFrame = 0;
 	m_iHighlight = -1;
+
+	m_xPanels.insert(n, 1);
+
 	SetKnots();
 
 	return n+1;

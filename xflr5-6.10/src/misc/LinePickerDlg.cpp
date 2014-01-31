@@ -45,7 +45,7 @@ LinePickerDlg::LinePickerDlg(QWidget *pParent): QDialog(pParent)
 	m_pctrlStyle->setItemDelegate(m_pStyleDelegate);
 	m_pctrlWidth->setItemDelegate(m_pWidthDelegate);
 
-    connect(m_pctrlColor, SIGNAL(clickedLB()), this, SLOT(OnColor()));
+	connect(m_pctrlColor, SIGNAL(clickedLB()), this, SLOT(OnColor()));
 	connect(m_pctrlStyle, SIGNAL(activated(int)), this, SLOT(OnStyle(int)));
 	connect(m_pctrlWidth, SIGNAL(activated(int)), this, SLOT(OnWidth(int)));
 

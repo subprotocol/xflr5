@@ -2510,6 +2510,13 @@ void MainFrame::keyPressEvent(QKeyEvent *event)
 	{
 		switch (event->key())
 		{
+			case Qt::Key_F2:
+			{
+				Body thisBody;
+				GL3dBodyDlg dlg;
+				dlg.InitDialog(&thisBody);
+				dlg.exec();
+			}
 			case Qt::Key_F1:
 			{
 				//secret key for fast debugging

@@ -208,7 +208,7 @@ void GLCreateGeom(Wing *pWing, int List, Body *pBody)
 	//OUTLINE
 	glNewList(List+MAXWINGS,GL_COMPILE);
 	{
-        QMiarex::s_GLList++;
+		QMiarex::s_GLList++;
 
 		glEnable(GL_DEPTH_TEST);
 		glEnable (GL_LINE_STIPPLE);
@@ -220,10 +220,10 @@ void GLCreateGeom(Wing *pWing, int List, Body *pBody)
 		else                                      glLineStipple (1, 0xFFFF);
 
 
-        glColor3d(W3dPrefsDlg::s_OutlineColor.redF(),W3dPrefsDlg::s_OutlineColor.greenF(),W3dPrefsDlg::s_OutlineColor.blueF());
-        glLineWidth((GLfloat)W3dPrefsDlg::s_OutlineWidth);
+		glColor3d(W3dPrefsDlg::s_OutlineColor.redF(),W3dPrefsDlg::s_OutlineColor.greenF(),W3dPrefsDlg::s_OutlineColor.blueF());
+		glLineWidth((GLfloat)W3dPrefsDlg::s_OutlineWidth);
 
-        //TOP outline
+		//TOP outline
 		for (j=0; j<pWing->m_Surface.size(); j++)
 		{
 			glBegin(GL_LINE_STRIP);

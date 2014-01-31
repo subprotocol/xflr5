@@ -185,7 +185,7 @@ int Frame::InsertPoint(const CVector &Real, int iAxis)
 	}
 	else if(iAxis==3)
 	{
-		if(Real.z>m_CtrlPoint.last().z)
+/*		if(Real.z>m_CtrlPoint.last().z)
 		{
 			for(k=0; k<m_CtrlPoint.size()-1; k++)
 			{
@@ -195,7 +195,16 @@ int Frame::InsertPoint(const CVector &Real, int iAxis)
 				}
 			}
 		}
-		else k=-1;
+		else k=-1;*/
+
+		double areal = atan2(Real.y, Real.z) *180/PI;
+
+		for(k=0; k<m_CtrlPoint.count(); k++)
+		{
+			double actrlPt = atan2(m_CtrlPoint.at(k).y, m_CtrlPoint.at(k).z) *180/PI;
+			if(areal<=actrlPt) break;
+		}
+		k--;
 	}
 
 	m_CtrlPoint.insert(k+1, Real);

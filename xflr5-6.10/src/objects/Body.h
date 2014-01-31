@@ -75,12 +75,11 @@ public:
 	CVector LeadingPoint();
 
 	void ClearPointMasses();
-    void ComputeAero(double *Cp, double &XCP, double &YCP, double &ZCP,
-					 double &GCm, double &GRm, double &GYm, double &Alpha, CVector &CoG);
+	void ComputeAero(double *Cp, double &XCP, double &YCP, double &ZCP,
+				  double &GCm, double &GRm, double &GYm, double &Alpha, CVector &CoG);
 	void Duplicate(Body *pBody);
 	void ExportGeometry(QTextStream &outStream, int type, double mtoUnit, int nx, int nh);
 	void GetPoint(double u, double v, bool bRight, CVector &Pt);
-	void InsertSideLine(int SideLine);
 	void RemoveActiveFrame();
 	void RemoveSideLine(int SideLine);
 	void Scale(double XFactor, double YFactor, double ZFactor, bool bFrameOnly=false, int FrameID=0);
@@ -118,8 +117,8 @@ public:
 	int m_iHighlight;                         /**< the currently selected point to highlight */
 	int m_iRes;                               /**< the number of output points in one direction of the NURBS surface */
 	int m_NElements;                          /**< the number of mesh elements for this Body object = m_nxPanels * m_nhPanels *2 */
-	int m_nxPanels;                           /**< the number of mesh elements in the direction of the x-axis */
-	int m_nhPanels;                           /**< the number of mesh elements in the hoop direction */
+	int m_nxPanels;                           /**< For a NURBS body, the number of mesh elements in the direction of the x-axis */
+	int m_nhPanels;                           /**< For a NURBS body, the number of mesh elements in the hoop direction */
 
 	int m_BodyStyle;                          /**< the index of the spline's style */
 	int m_BodyWidth;                          /**< the width of the spline */
