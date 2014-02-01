@@ -60,13 +60,13 @@ void GLCreateGeom(Wing *pWing, int List, Body *pBody)
 
 		if(Settings::s_bAlphaChannel)
 		{
-			glColor4d(pWing->m_WingColor.redF(),pWing->m_WingColor.greenF(),pWing->m_WingColor.blueF(), pWing->m_WingColor.alphaF());
+			glColor4d(pWing->wingColor().redF(),pWing->wingColor().greenF(),pWing->wingColor().blueF(), pWing->wingColor().alphaF());
 			glEnable (GL_BLEND);
 			glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		}
 		else
 		{
-			glColor3d(pWing->m_WingColor.redF(),pWing->m_WingColor.greenF(),pWing->m_WingColor.blueF());
+			glColor3d(pWing->wingColor().redF(),pWing->wingColor().greenF(),pWing->wingColor().blueF());
 			glDisable (GL_BLEND);
 		}
 		glEnable(GL_DEPTH_TEST);

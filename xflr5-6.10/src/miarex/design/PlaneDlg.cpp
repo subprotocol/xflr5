@@ -454,7 +454,7 @@ void PlaneDlg::OnImportWing()
 		if(pWing)
 		{
 			m_pPlane->wing()->Duplicate(pWing);
-			m_pPlane->wing()->m_WingColor = pWing->m_WingColor;
+			m_pPlane->wing()->setWingColor(pWing->wingColor());
 		}
 	}
 }
@@ -473,7 +473,7 @@ void PlaneDlg::OnImportWing2()
 		if(pWing)
 		{
 			m_pPlane->wing2()->Duplicate(pWing);
-			m_pPlane->wing2()->m_WingColor = pWing->m_WingColor;
+			m_pPlane->wing2()->setWingColor(pWing->wingColor());
 		}
 	}
 }

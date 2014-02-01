@@ -294,7 +294,7 @@ private:
 	//Miarex Actions
 	QAction *WPolarAct, *WOppAct, *W3DAct, *CpViewAct, *StabTimeAct, *RootLocusAct;
 	QAction *W3DPrefsAct, *W3DLightAct, *W3DScalesAct;
-	QAction *definePlaneAct, *editPlaneAct, *SavePlaneAsProject;
+	QAction *definePlaneAct, *editPlaneAct, *editWingAct, *editBodyAct, *savePlaneAsProjectAct;
 	QAction *renameCurPlaneAct, *deleteCurPlane, *duplicateCurPlane;
 	QAction *renameCurWPolar, *editWPolar, *editWPolarPts, *exportCurWPolar, *resetCurWPolar;
 	QAction *ShowPolarProps, *ShowWOppProps;
@@ -314,7 +314,6 @@ private:
 	QAction *exportCurWOpp, *showCurWOppOnly, *hideAllWOpps, *showAllWOpps, *deleteAllWOpps;
 	QAction *showAllWPlrOpps, *hideAllWPlrOpps, * deleteAllWPlrOpps;
 	QAction *defineWPolar, *defineStabPolar, *advancedSettings;
-	QAction *editCurBodyAct;
 	QAction *halfWingAct;
 	QAction *showEllipticCurve, *showXCmRefLocation, *showStabCurve, *showFinCurve, *showWing2Curve;
 	QAction *exporttoAVL, *resetWingScale, *scaleWingAct;

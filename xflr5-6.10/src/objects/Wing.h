@@ -182,9 +182,14 @@ public:
 	QString &LeftFoil(const int &iSection);
 	QString& rWingDescription() {return m_WingDescription;}
 
+	QColor const wingColor() {return m_WingColor;}
+	void setWingColor(QColor colour){m_WingColor= colour;}
 
 //__________________________Variables_______________________
 private:
+	QString m_WingName;	                       /**< the Wing's name; this name is used to identify the wing and as a reference for child Polar and WingOpp objects. */
+	QString m_WingDescription;                 /**< a text field for the description of the Wing */
+	QColor m_WingColor;                        /**< the Wing's display color */
 
 //	static bool s_bVLMSymetric;	     /**< true if the vlm calculation is symmetric */
 	static double s_MinPanelSize;      /**< wing minimum panel size ; panels of less length are ignored */
@@ -251,10 +256,7 @@ private:
 	CVector m_F[MAXSPANSTATIONS];              /**< the lift vector at span stations */
 
 public:	
-	QString m_WingName;	                       /**< the wing's name; this name is used to identify the wing and as a reference for child Polar and WingOpp objects. */
-	QString m_WingDescription;                 /**< a text field for the description of the wing */
 
-	QColor m_WingColor;                        /**< the Wing's display color */
 
 	QList<WingSection*> m_WingSection;         /**< the array of wing sections. A WingSection extends between a foil and the next. */
 	QList<PointMass*> m_PointMass;             /**< the array of PointMass objects associated to this Wing object*/

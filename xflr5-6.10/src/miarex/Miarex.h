@@ -157,6 +157,7 @@ private slots:
 	void OnDuplicateCurPlane();
 	void OnEditCurWPolar();
 	void OnEditCurWPolarPts();
+	void OnEditCurWing();
 	void OnEditCurBody();
 	void OnEditCurPlane();
 	void OnExporttoAVL();

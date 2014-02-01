@@ -1893,25 +1893,38 @@ void Objects3D::deletePlaneResults(Plane *pPlane)
 		}
 	}
 
-	//next remove all PPolars associated to the plane
+	//next reset all WPolars associated to the plane
 	for (i=s_oaWPolar.size()-1; i>=0; i--)
 	{
 		pWPolar = (WPolar*)s_oaWPolar.at(i);
 		if (pWPolar->m_PlaneName == pPlane->planeName())
 		{
-			pWPolar->ClearData();
-			//results only... means that the areas and spans have been edited... update polar
-			if( pWPolar->m_RefAreaType==PLANFORMAREA)
+			if(pWPolar->isStabilityPolar())
 			{
-				pWPolar->m_WArea = pPlane->m_Wing[0].m_PlanformArea;
-				pWPolar->m_WSpan = pPlane->m_Wing[0].m_PlanformSpan;
+				// just delete the WPolar, since the number of controls or their order may have been modified
+				// too complex to re-map the gains for the control surfaces
+				s_oaWPolar.removeAt(i);
+				delete pWPolar;
+				pWPolar = NULL;
 			}
-			else
+
+			if(pWPolar)
 			{
-				pWPolar->m_WArea = pPlane->m_Wing[0].m_ProjectedArea;
-				pWPolar->m_WSpan = pPlane->m_Wing[0].m_ProjectedSpan;
+				pWPolar->ClearData();
+
+				//results only... means that the areas and spans have been edited... update polar
+				if( pWPolar->m_RefAreaType==PLANFORMAREA)
+				{
+					pWPolar->m_WArea = pPlane->m_Wing[0].m_PlanformArea;
+					pWPolar->m_WSpan = pPlane->m_Wing[0].m_PlanformSpan;
+				}
+				else
+				{
+					pWPolar->m_WArea = pPlane->m_Wing[0].m_ProjectedArea;
+					pWPolar->m_WSpan = pPlane->m_Wing[0].m_ProjectedSpan;
+				}
+				pWPolar->m_WMAChord  = pPlane->m_Wing[0].m_MAChord;
 			}
-			pWPolar->m_WMAChord  = pPlane->m_Wing[0].m_MAChord;
 		}
 	}
 }

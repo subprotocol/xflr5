@@ -1004,18 +1004,22 @@ void MainFrame::CreateMiarexActions()
 	connect(definePlaneAct, SIGNAL(triggered()), pMiarex, SLOT(OnNewPlane()));
 
 	editPlaneAct = new QAction(tr("Edit...")+"\tShift+F3", this);
-	editPlaneAct->setStatusTip(tr("Shows a dialogbox to edit the currently selected wing or plane"));
+	editPlaneAct->setStatusTip(tr("Shows a form to edit the currently selected plane"));
 	connect(editPlaneAct, SIGNAL(triggered()), pMiarex, SLOT(OnEditCurPlane()));
+
+	editWingAct = new QAction(tr("Edit wing..."), this);
+	editWingAct->setStatusTip(tr("Shows a form to edit the wing of the currently selected plane"));
+	editWingAct->setShortcut(QKeySequence(Qt::Key_F10));
+	connect(editWingAct, SIGNAL(triggered()), pMiarex, SLOT(OnEditCurWing()));
+
+	editBodyAct = new QAction(tr("Edit body..."), this);
+	editBodyAct->setStatusTip(tr("Shows a form to edit the body of the currently selected plane"));
+	editBodyAct->setShortcut(QKeySequence(Qt::Key_F11));
+	connect(editBodyAct, SIGNAL(triggered()), pMiarex, SLOT(OnEditCurBody()));
 
 	renameCurPlaneAct = new QAction(tr("Rename...")+"\tF2", this);
 	renameCurPlaneAct->setStatusTip(tr("Rename the currently selected object"));
 	connect(renameCurPlaneAct, SIGNAL(triggered()), pMiarex, SLOT(OnRenameCurPlane()));
-
-
-	editCurBodyAct = new QAction(tr("Edit Body..."), this);
-	editCurBodyAct->setStatusTip(tr("Edit the body of the currently selected plane"));
-	editCurBodyAct->setShortcut(QKeySequence(Qt::SHIFT+Qt::Key_F10));
-	connect(editCurBodyAct, SIGNAL(triggered()), pMiarex, SLOT(OnEditCurBody()));
 
 	exporttoAVL = new QAction(tr("Export to AVL..."), this);
 	exporttoAVL->setStatusTip(tr("Export the current plane or wing to a text file in the format required by AVL"));
@@ -1229,9 +1233,9 @@ void MainFrame::CreateMiarexActions()
 	duplicateCurPlane->setStatusTip(tr("Duplicate the currently selected wing or plane"));
 	connect(duplicateCurPlane, SIGNAL(triggered()), pMiarex, SLOT(OnDuplicateCurPlane()));
 
-	SavePlaneAsProject = new QAction(tr("Save as Project..."), this);
-	SavePlaneAsProject->setStatusTip(tr("Save the currently selected wing or plane as a new separate project"));
-	connect(SavePlaneAsProject, SIGNAL(triggered()), this, SLOT(OnSavePlaneAsProject()));
+	savePlaneAsProjectAct = new QAction(tr("Save as Project..."), this);
+	savePlaneAsProjectAct->setStatusTip(tr("Save the currently selected wing or plane as a new separate project"));
+	connect(savePlaneAsProjectAct, SIGNAL(triggered()), this, SLOT(OnSavePlaneAsProject()));
 
 	renameCurWPolar = new QAction(tr("Rename..."), this);
 	renameCurWPolar->setStatusTip(tr("Rename the currently selected polar"));
@@ -1296,12 +1300,13 @@ void MainFrame::CreateMiarexMenus()
 		currentPlaneMenu = PlaneMenu->addMenu(tr("Current Plane"));
 		{
 			currentPlaneMenu->addAction(editPlaneAct);
+			currentPlaneMenu->addAction(editWingAct);
+			currentPlaneMenu->addAction(editBodyAct);
+			currentPlaneMenu->addSeparator();
 			currentPlaneMenu->addAction(renameCurPlaneAct);
 			currentPlaneMenu->addAction(duplicateCurPlane);
 			currentPlaneMenu->addAction(deleteCurPlane);
-			currentPlaneMenu->addAction(SavePlaneAsProject);
-			currentPlaneMenu->addSeparator();
-			currentPlaneMenu->addAction(editCurBodyAct);
+			currentPlaneMenu->addAction(savePlaneAsProjectAct);
 			currentPlaneMenu->addSeparator();
 			currentPlaneMenu->addAction(scaleWingAct);
 			currentPlaneMenu->addSeparator();
@@ -2510,23 +2515,6 @@ void MainFrame::keyPressEvent(QKeyEvent *event)
 	{
 		switch (event->key())
 		{
-			case Qt::Key_F2:
-			{
-				Body thisBody;
-				GL3dBodyDlg dlg;
-				dlg.InitDialog(&thisBody);
-				dlg.exec();
-			}
-			case Qt::Key_F1:
-			{
-				//secret key for fast debugging
-				OnMiarex();
-				break;
-			}
-			case Qt::Key_F4:
-			{
-				break;
-			}
 			case Qt::Key_L:
 			{
 				OnLogFile();

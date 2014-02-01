@@ -1568,7 +1568,7 @@ void WPolar::GetPolarProperties(QString &PolarProperties, bool bData)
 			{
 				if(pWing->m_Surface.at(j)->m_bTEFlap)
 				{
-                    if(qAbs(m_ControlGain[iCtrl])>PRECISION)
+					if(qAbs(m_ControlGain[iCtrl])>PRECISION)
 					{
 						strong = QString(QString::fromUtf8("Wing Flap %1: g=%2°/unit\n"))
 										.arg(nFlap+1)
@@ -1589,7 +1589,7 @@ void WPolar::GetPolarProperties(QString &PolarProperties, bool bData)
 			{
 				if(pStab->m_Surface.at(j)->m_bTEFlap)
 				{
-                    if(qAbs(m_ControlGain[iCtrl])>PRECISION)
+					if(qAbs(m_ControlGain[iCtrl])>PRECISION)
 					{
 						strong = QString(QString::fromUtf8("Elev. Flap %1: gain=%2°/unit\n"))
 										.arg(nFlap+1)
@@ -1609,7 +1609,7 @@ void WPolar::GetPolarProperties(QString &PolarProperties, bool bData)
 			{
 				if(pFin->m_Surface.at(j)->m_bTEFlap)
 				{
-                    if(qAbs(m_ControlGain[iCtrl])>PRECISION)
+					if(qAbs(m_ControlGain[iCtrl])>PRECISION)
 					{
 						strong = QString(QString::fromUtf8("Fin Flap %1: gain=%2°/unit\n"))
 										.arg(nFlap+1)

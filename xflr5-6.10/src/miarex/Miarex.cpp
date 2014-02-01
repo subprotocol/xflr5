@@ -694,7 +694,8 @@ void QMiarex::SetControls()
 	pMainFrame->curWOppMenu->setEnabled(m_pCurPOpp);
 
 	//	pMainFrame->CurBodyMenu->setVisible(m_pCurPlane!=NULL);
-	pMainFrame->editCurBodyAct->setEnabled(m_pCurPlane && m_pCurPlane->body());
+	pMainFrame->editWingAct->setEnabled(m_pCurPlane);
+	pMainFrame->editBodyAct->setEnabled(m_pCurPlane && m_pCurPlane->body());
 
 	StabViewDlg *pStabView = (StabViewDlg*)pMainFrame->m_pStabView;
 	pStabView->SetControls();
@@ -5549,7 +5550,7 @@ void QMiarex::OnEditCurPlane()
 
 	int i;
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
-	if(!m_pCurPlane) return;
+
 	WPolar *pWPolar;
 	PlaneOpp* pPOpp;
 	bool bHasResults = false;
@@ -5640,8 +5641,114 @@ void QMiarex::OnEditCurPlane()
 
 	delete pModPlane; // clean up
 
-	return;
 }
+
+
+
+/**
+ * The user has requested an edition of the current Plane
+ * Launches the dialog box, and maps the data depending on whether the user wants to overwrite, create a new object, or has cancelled the request.
+ */
+void QMiarex::OnEditCurWing()
+{
+	if(!m_pCurPlane)	return;
+
+	int i;
+	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
+
+	WPolar *pWPolar;
+	PlaneOpp* pPOpp;
+	bool bHasResults = false;
+	for (i=0; i< m_poaWPolar->size(); i++)
+	{
+		pWPolar = (WPolar*)m_poaWPolar->at(i);
+		if(pWPolar->m_Alpha.size() && pWPolar->planeName() == m_pCurPlane->planeName())
+		{
+			bHasResults = true;
+			break;
+		}
+	}
+
+	for (i=0; i<m_poaPOpp->size(); i++)
+	{
+		pPOpp = (PlaneOpp*)m_poaPOpp->at(i);
+		if(pPOpp->planeName() == m_pCurPlane->planeName())
+		{
+			bHasResults = true;
+			break;
+		}
+	}
+
+	Plane* pModPlane= new Plane;
+
+	pModPlane->Duplicate(m_pCurPlane);
+
+	GL3dWingDlg plDlg(pMainFrame);
+	plDlg.m_bAcceptName = false;
+	plDlg.InitDialog(pModPlane->wing());
+
+	ModDlg mdDlg(pMainFrame);
+
+	if(QDialog::Accepted == plDlg.exec())
+	{
+		if(plDlg.m_bDescriptionChanged)
+		{
+			emit projectModified();
+			m_pCurPlane->wing()->setWingColor(pModPlane->wing()->wingColor());
+			m_pCurPlane->wing()->m_WingDescription = pModPlane->wing()->WingDescription();
+		}
+
+		if(plDlg.m_bChanged)
+		{
+			if(bHasResults)
+			{
+				mdDlg.m_Question = tr("The modification will erase all results associated to this Plane.\nContinue ?");
+				mdDlg.InitDialog();
+				int Ans = mdDlg.exec();
+
+				if (Ans == QDialog::Rejected)
+				{
+					//restore geometry
+					delete pModPlane; // clean up
+					return;
+				}
+				else if(Ans==20)
+				{
+					//save mods to a new plane object
+					m_pCurPlane = Objects3D::setModPlane(pModPlane);
+
+					SetPlane();
+					pMainFrame->UpdatePlaneListBox();
+					UpdateView();
+					return;
+				}
+			}
+
+			//then modifications are automatically recorded
+			m_pCurPlane->Duplicate(pModPlane);
+
+			Objects3D::deletePlaneResults(m_pCurPlane);// will also set new surface and Aerochord in WPolars
+			m_bResetglGeom = true;
+			m_bResetglMesh = true;
+//			m_bResetglOpp  = true;
+			s_bResetCurves = true;
+		}
+
+		SetPlane();
+		pMainFrame->UpdatePlaneListBox();
+		m_bIs2DScaleSet = false;
+		SetScale();
+		OnAdjustToWing();
+		SetControls();
+
+		UpdateView();
+	}
+
+	delete pModPlane; // clean up
+
+}
+
+
 
 
 
