@@ -9,11 +9,28 @@
                 <dict>
                         <key>CFBundleTypeExtensions</key>
                         <array>
+                                <string>xfl</string>
+                                <string>XFL</string>
+                        </array>
+                        <key>CFBundleTypeName</key>
+                        <string>XFLR5 Project</string>
+                        <key>CFBundleTypeRole</key>
+                        <string>Editor</string>
+                        <key>LSItemContentTypes</key>
+                        <array>
+                            <string>xfl.xflr5.sourceforge.net</string>
+                        </array>
+                        <key>LSIsAppleDefaultForType</key>
+                        <true/>
+                </dict>
+                <dict>
+                            <key>CFBundleTypeExtensions</key>
+                        <array>
                                 <string>wpa</string>
                                 <string>WPA</string>
                         </array>
                         <key>CFBundleTypeName</key>
-                        <string>XFLR5 Project</string>
+                        <string>XFLR5 Old-Style Project</string>
                         <key>CFBundleTypeRole</key>
                         <string>Editor</string>
                         <key>LSItemContentTypes</key>
@@ -46,9 +63,27 @@
         <array>
             <dict>
                 <key>UTTypeIdentifier</key>
-                <string>wpa.xflr5.sourceforge.net</string>
+                <string>xfl.xflr5.sourceforge.net</string>
                 <key>UTTypeDescription</key>
                 <string>XFLR5 Project</string>
+                <key>UTTypeConformsTo</key>
+                <array>
+                    <string>public.data</string>
+                </array>
+                <key>UTTypeTagSpecification</key>
+                <dict>
+                    <key>public.filename-extension</key>
+                    <array>
+                        <string>xfl</string>
+                        <string>XFL</string>
+                    </array>
+                </dict>
+            </dict>
+            <dict>
+                <key>UTTypeIdentifier</key>
+                <string>wpa.xflr5.sourceforge.net</string>
+                <key>UTTypeDescription</key>
+                <string>XFLR5 Old-Style Project</string>
                 <key>UTTypeConformsTo</key>
                 <array>
                     <string>public.data</string>
@@ -91,12 +126,12 @@
         <key>CFBundlePackageType</key>
         <string>APPL</string>
         <key>CFBundleShortVersionString</key>
-        <string>6.09</string>
+        <string>6.10</string>
         <key>CFBundleSignature</key>
         <string>XFLR</string>
         <key>CFBundleInfoDictionaryVersion</key>
         <string>6.0</string>
         <key>CFBundleVersion</key>
-        <string>574</string>
+        <string>663</string>
 </dict>
 </plist>
