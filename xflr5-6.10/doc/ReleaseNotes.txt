@@ -15,12 +15,12 @@
 *******************************************************************************
 
 
-xflr5 v6.10 2014
-	- Introducing type 5 polars for the analysis of variable sideslip
-	- Disabled the horseshoe vortex method for Stability, for beta-polars, and whenever sidelip is defined.
-	- Aligned  theviscous drag vector with freestream velocity rather than with x-axis - slight impact on viscous results
+xflr5 v6.10 2014, February 1st, 2014
 	- Created a new binary .xfl projet file format. Replaces once and for all the awful .wpa format
 	- Removed the option for independent wing analysis
+	- Introducing type 5 polars for the analysis of variable sideslip
+	- Disabled the horseshoe vortex method for stability polars, for beta-polars, and whenever sidelip is defined.
+	- Aligned  theviscous drag vector with freestream velocity rather than with x-axis - slight impact on viscous results
 	- Enabled LLT analysis for all Plane objects
 	- Removed the option for symmetry in 3d analysis
 	- Corrected the bug in type 4 plane analysis- elevator and fin coefficients were incorrectly calculated

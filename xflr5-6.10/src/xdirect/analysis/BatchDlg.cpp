@@ -931,8 +931,8 @@ void BatchDlg::ReadParams()
 			m_AlphaInc = m_pctrlSpecDelta->Value();
 			m_AlphaMax = m_pctrlSpecMax->Value();
 			m_AlphaMin = m_pctrlSpecMin->Value();
-			if(m_AlphaMin< m_AlphaMax) m_AlphaInc =  qAbs(m_SpInc);
-			else                       m_AlphaInc = -qAbs(m_SpInc);
+			if(m_AlphaMin< m_AlphaMax) m_AlphaInc =  qAbs(m_AlphaInc);
+			else                       m_AlphaInc = -qAbs(m_AlphaInc);
 		}
 		else
 		{
