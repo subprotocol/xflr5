@@ -1737,14 +1737,14 @@ void QXInverse::OnStoreFoil()
 	if(!m_bLoaded) return;
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 
-	Foil* pFoil = new Foil();
-	pFoil->CopyFoil(m_pModFoil);
-	pFoil->m_FoilStyle = 0;
-	pFoil->m_FoilWidth = 1;
-	memcpy(pFoil->xb, m_pModFoil->x, sizeof(m_pModFoil->x));
-	memcpy(pFoil->yb, m_pModFoil->y, sizeof(m_pModFoil->y));
-	pFoil->nb = m_pModFoil->n;
-	pFoil->m_FoilName = m_pRefFoil->m_FoilName;
+	Foil* pNewFoil = new Foil();
+	pNewFoil->CopyFoil(m_pModFoil);
+	pNewFoil->m_FoilStyle = 0;
+	pNewFoil->m_FoilWidth = 1;
+	memcpy(pNewFoil->xb, m_pModFoil->x, sizeof(m_pModFoil->x));
+	memcpy(pNewFoil->yb, m_pModFoil->y, sizeof(m_pModFoil->y));
+	pNewFoil->nb = m_pModFoil->n;
+	pNewFoil->m_FoilName = m_pRefFoil->m_FoilName;
 
 	QStringList NameList;
 	for(int k=0; k<Foil::s_oaFoil.size(); k++)
@@ -1755,10 +1755,14 @@ void QXInverse::OnStoreFoil()
 
 	RenameDlg renDlg(pMainFrame);
 	renDlg.InitDialog(&NameList, Foil::curFoil()->foilName(), tr("Enter the foil's new name"));
-
 	if(renDlg.exec() !=QDialog::Rejected)
 	{
-		Foil::curFoil()->insertThisFoil();
+		pNewFoil->setFoilName(renDlg.newName());
+		pNewFoil->insertThisFoil();
+	}
+	else
+	{
+		delete pNewFoil;
 	}
 }
 
