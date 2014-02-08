@@ -15,7 +15,14 @@
 *******************************************************************************
 
 
-xflr5 v6.10 2014, February 1st, 2014
+xflr5 v6.10.02 February xxx, 2014
+	- Fixed the issue with the storage of modified foils in inverse design
+	- Fixed the issue of ineffective a.o.a. increment in Batch Foil Analysis
+	- Fixed the bug which caused the flap moment not to be reset at each plane calculation
+
+
+
+xflr5 v6.10.01 February 1st, 2014
 	- Created a new binary .xfl projet file format. Replaces once and for all the awful .wpa format
 	- Removed the option for independent wing analysis
 	- Introducing type 5 polars for the analysis of variable sideslip

@@ -2367,6 +2367,7 @@ void Wing::PanelComputeOnBody(double QInf, double Alpha, double *Cp, double *Gam
 	for (m=0; m< m_NStation; m++) m_Re[m] = m_Chord[m] * QInf /pWPolar->m_Viscosity;
 
 	m = p = nFlap = 0;
+	m_FlapMoment.clear();
 
 	// For each of the wing's surfaces, calculate the coefficients on each strip
 	// and sum them up to get the wing's overall coefficients
