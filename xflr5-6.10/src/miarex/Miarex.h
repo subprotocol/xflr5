@@ -264,6 +264,7 @@ public:
 	void DrawOppGraphLegend(QPainter &painter, QPoint place, int bottom);
 	void DrawWPolarLegend(QPainter &painter, QPoint place, int bottom);
 	void DrawStabTimeLegend(QPainter &painter, QPoint place, int bottom);
+	void DrawTextLegend();
 	void DuplicatePlane();
 	void FillComboBoxes(bool bEnable = true);
 	void FillWPlrCurve(Curve *pCurve, WPolar *pWPolar, int XVar, int YVar);
@@ -561,6 +562,8 @@ public:
 	QGraph* m_pCurRLStabGraph;              /**< a pointer to the currently active Root Locus Graph */
 	QGraph* m_pCurTimeGraph;                /**< a pointer to the currently active time graph */
 
+	bool m_bResetTextLegend;
+	QPixmap m_PixText;
 
 public:
 	static void *s_pMainFrame;          /**< a pointer to the frame class */

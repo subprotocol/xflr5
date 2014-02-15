@@ -88,7 +88,7 @@ private:
 	QLabel *m_pctrlSurf1;
 	QLabel *m_pctrlSurf2;
 	QLabel *m_pctrlSurf3;
-	QLabel *m_pctrlVolume;
+//	QLabel *m_pctrlVolume;
 	QLabel *m_pctrlLen1;
 	QLabel *m_pctrlLen2;
 	QLabel *m_pctrlLen3;

@@ -317,10 +317,21 @@ void ThreeDWidget::paintEvent(QPaintEvent *event)
 	if(m_iView==GLMIAREXVIEW)
 	{
 		QMiarex* pMiarex = (QMiarex*)s_pMiarex;
-		pMiarex->PaintPlaneLegend(painter, rect());
+/*		pMiarex->PaintPlaneLegend(painter, rect());
 		pMiarex->PaintPlaneOppLegend(painter, rect());
 		pMiarex->PaintCpLegendText(painter);
-		pMiarex->PaintPanelForceLegendText(painter);
+		pMiarex->PaintPanelForceLegendText(painter);*/
+
+		if(pMiarex->m_bResetTextLegend)
+		{
+			pMiarex->DrawTextLegend();
+			pMiarex->m_bResetTextLegend = false;
+		}
+
+		painter.setBackgroundMode(Qt::TransparentMode);
+		painter.setOpacity(1);
+		painter.drawPixmap(0,0, pMiarex->m_PixText);
+
 	}
 	else if(m_iView == GLBODYVIEW)
 	{

@@ -3764,6 +3764,7 @@ void MainFrame::OnStyleSettings()
 
 	pXDirect->m_CpGraph.SetInverted(true);
 	pMiarex->m_CpGraph.SetInverted(true);
+	pMiarex->m_bResetTextLegend = true;
 	UpdateView();
 }
 

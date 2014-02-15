@@ -154,8 +154,10 @@ QMiarex::QMiarex(QWidget *parent)
 	m_pLLTDlg = new LLTAnalysisDlg(pMainFrame, m_pLLT);
 	m_pPanelAnalysisDlg = new PanelAnalysisDlg(pMainFrame, Objects3D::s_pPanelAnalysis);
 
-
 	m_pglLightDlg = new GLLightDlg(pMainFrame);
+
+	m_PixText = QPixmap(":/images/xflr5_64.png");
+	m_PixText.fill(Qt::transparent);
 
 	m_pXFile      = NULL;
 	m_pCurPlane   = NULL;
@@ -210,8 +212,7 @@ QMiarex::QMiarex(QWidget *parent)
 	m_bShowCpScale       = true;
 	m_bIs2DScaleSet      = false;
 	m_bIs3DScaleSet      = false;
-//	m_bForcedResponse    = true;
-
+	m_bResetTextLegend   = true;
 
 
 	m_LLTMaxIterations      = 100;
@@ -3997,6 +3998,9 @@ void QMiarex::On3DView()
 
 	m_bArcball = false;
 
+	m_bResetTextLegend = true;
+
+
 	if(m_iView==W3DVIEW)
 	{
 		SetControls();
@@ -4028,7 +4032,7 @@ void QMiarex::On3DView()
 void QMiarex::On3DCp()
 {
 	m_b3DCp = m_pctrlCp->isChecked();
-
+	m_bResetTextLegend = true;
 	if(m_b3DCp)
 	{
 		s_bSurfaces = false;
@@ -7329,6 +7333,7 @@ void QMiarex::OnShowXCmRef()
 void QMiarex::OnPanelForce()
 {
 	m_bPanelForce	 = m_pctrlPanelForce->isChecked();
+	m_bResetTextLegend = true;
 	if(m_bPanelForce)
 	{
 		m_b3DCp =false;
@@ -7582,6 +7587,9 @@ void QMiarex::OnTimeView()
 	StabViewDlg *pStabView =(StabViewDlg*)pMainFrame->m_pStabView;
 	StopAnimate();
 	m_iView =  STABTIMEVIEW;
+
+	m_bResetTextLegend = true;
+
 	pStabView->SetControls();
 	SetWingLegendPos();
 	
@@ -7600,6 +7608,9 @@ void QMiarex::OnRootLocusView()
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	StopAnimate();
 	m_iView = STABPOLARVIEW;
+
+	m_bResetTextLegend = true;
+
 	SetWPlrLegendPos();
 
 	pMainFrame->SetCentralWidget();
@@ -7618,6 +7629,8 @@ void QMiarex::OnModalView()
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 
 	m_iView = W3DVIEW;
+
+	m_bResetTextLegend = true;
 
 	pMainFrame->SetCentralWidget();
 	SetCurveParams();
@@ -7923,6 +7936,8 @@ void QMiarex::OnWOppView()
 {
 	MainFrame* pMainFrame = (MainFrame*)s_pMainFrame;
 
+	m_bResetTextLegend = true;
+
 	if(m_iView==WOPPVIEW)
 	{
 		SetControls();
@@ -7954,6 +7969,8 @@ void QMiarex::OnWPolarView()
 {
 	MainFrame* pMainFrame = (MainFrame*)s_pMainFrame;
 	if (m_bAnimateWOpp) StopAnimate();
+
+	m_bResetTextLegend = true;
 
 	if(m_iView==WPOLARVIEW)
 	{
@@ -7989,6 +8006,7 @@ void QMiarex::PaintView(QPainter &painter)
 	QPen TextPen;
 	QString GraphName;
 	painter.save();
+
 	w   = m_r2DCltRect.width();
 	w2  = (int)(w/2);
 	w3  = (int)(0.35*w);
@@ -8000,6 +8018,12 @@ void QMiarex::PaintView(QPainter &painter)
 	h38 = (int)(3*h/8);
 	//Refresh the active view
 	painter.fillRect(m_r2DCltRect, Settings::s_BackgroundColor);
+
+	if(m_bResetTextLegend)
+	{
+		DrawTextLegend();
+		m_bResetTextLegend = false;
+	}
 
 	if(m_r2DCltRect.width()<200 || m_r2DCltRect.height()<200)
 	{
@@ -8088,8 +8112,10 @@ void QMiarex::PaintView(QPainter &painter)
 					if (m_bXCP)    PaintXCP(painter, m_ptOffset, m_WingScale);
 					if (m_bXCmRef) PaintXCmRef(painter, m_ptOffset, m_WingScale);
 				}
-				PaintPlaneLegend(painter, m_r2DCltRect);
-				if(m_pCurPOpp) PaintPlaneOppLegend(painter, m_r2DCltRect);
+
+				painter.setBackgroundMode(Qt::TransparentMode);
+				painter.setOpacity(1);
+				painter.drawPixmap(0,0, m_PixText);
 			}
 		}
 		else if (m_iWingView == TWOGRAPHS && m_pCurPlane)
@@ -8222,9 +8248,9 @@ void QMiarex::PaintWing(QPainter &painter, QPoint ORef, double scale)
 	Wing *pWing = m_pCurPlane->m_Wing;
 
 	painter.save();
-    QPen WingPen(W3dPrefsDlg::s_OutlineColor);
+	QPen WingPen(W3dPrefsDlg::s_OutlineColor);
 	WingPen.setStyle(getStyle(W3dPrefsDlg::s_OutlineStyle));
-    WingPen.setWidth(W3dPrefsDlg::s_OutlineWidth);
+	WingPen.setWidth(W3dPrefsDlg::s_OutlineWidth);
 
 	painter.setPen(WingPen);
 
@@ -9459,6 +9485,7 @@ void QMiarex::SetScale()
 void QMiarex::SetPlane(QString PlaneName)
 {
 	QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+	m_bResetTextLegend = true;
 
 	//set the plane and initialize the pointers
 	m_pCurPlane = Objects3D::setPlaneObject(PlaneName, m_pCurPlane);
@@ -9905,6 +9932,8 @@ void QMiarex::SetWPolar(bool bCurrent, QString WPlrName)
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	WPolar *pWPolar = NULL;
 	QString PlaneName;
+
+	m_bResetTextLegend = true;
 
 	if(m_pCurPlane)     PlaneName = m_pCurPlane->planeName();
 	else return;
@@ -10633,6 +10662,8 @@ bool QMiarex::SetPlaneOpp(bool bCurrent, double x)
 
 	MainFrame* pMainFrame = (MainFrame*)s_pMainFrame;
 
+	m_bResetTextLegend = true;
+
 	m_pCurPOpp = Objects3D::setPlaneOppObject(m_pCurPlane, m_pCurWPolar, m_pCurPOpp, bCurrent, x);
 
 	SetCurveParams();
@@ -10687,7 +10718,29 @@ bool QMiarex::SetPlaneOpp(bool bCurrent, double x)
 }
 
 
-
+void QMiarex::DrawTextLegend()
+{
+	m_PixText = m_PixText.scaled(m_r2DCltRect.size());
+	m_PixText.fill(Qt::transparent);
+	QPainter paint(&m_PixText);
+/*	paint.save();
+	QPen textPen(Settings::s_TextColor);
+	paint.setPen(textPen);
+	paint.drawText(0, 0, "Hello");
+	paint.drawText(300, 300, "Hello1");
+	paint.drawText(300, 600, "Hello3");
+	paint.restore();*/
+	PaintPlaneLegend(paint, m_r2DCltRect);
+	if(m_pCurPOpp)
+	{
+		PaintPlaneOppLegend(paint, m_r2DCltRect);
+		if(m_iView==W3DVIEW)
+		{
+			PaintCpLegendText(paint);
+			PaintPanelForceLegendText(paint);
+		}
+	}
+}
 
 
 

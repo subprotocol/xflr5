@@ -16,6 +16,7 @@
 
 
 xflr5 v6.10.02 February xxx, 2014
+	- Fixed the display issue of text in 3D view for win32 systems
 	- Fixed the issue with the storage of modified foils in inverse design
 	- Fixed the issue of ineffective a.o.a. increment in Batch Foil Analysis
 	- Fixed the bug which caused the flap moment not to be reset at each plane calculation
