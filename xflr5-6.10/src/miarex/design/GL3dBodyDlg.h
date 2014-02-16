@@ -34,6 +34,7 @@
 #include <QPushButton>
 #include <QToolButton>
 #include <QSettings>
+#include <QPixmap>
 
 #include "BodyGridDlg.h"
 #include "BodyTableDelegate.h"
@@ -175,6 +176,7 @@ private:
 	void Insert(CVector Pt);
 	void Remove(CVector Pt);
 
+	QPixmap m_pixTextLegend;
 
 private:
 	ThreeDWidget m_3dWidget;

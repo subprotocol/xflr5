@@ -325,7 +325,6 @@ void ThreeDWidget::paintEvent(QPaintEvent *event)
 		if(pMiarex->m_bResetTextLegend)
 		{
 			pMiarex->DrawTextLegend();
-			pMiarex->m_bResetTextLegend = false;
 		}
 
 		painter.setBackgroundMode(Qt::TransparentMode);
@@ -374,6 +373,7 @@ void ThreeDWidget::resizeGL(int width, int height)
 		QMiarex* pMiarex = (QMiarex*)s_pMiarex;
 //		pMiarex->m_ArcBall.GetMatrix();
 		pMiarex->m_bIs3DScaleSet = false;
+        pMiarex->m_bResetTextLegend = true;
 		pMiarex->Set3DScale();
 	}
 	else if(m_iView == GLWINGVIEW)

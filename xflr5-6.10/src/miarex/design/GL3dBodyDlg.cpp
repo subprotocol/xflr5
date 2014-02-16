@@ -85,10 +85,24 @@ GL3dBodyDlg::GL3dBodyDlg(QWidget *pParent): QDialog(pParent)
 	setWindowTitle(tr("Body Edition"));
 	setWindowFlags(Qt::Window);
 
+	m_MousePos.setX(-1);
+	m_MousePos.setY(-1);
+
+
 	m_pBodyGridDlg = new BodyGridDlg(this);
 	m_pBody = NULL;
 	m_pPointPrecision = NULL;
 	m_pFramePrecision = NULL;
+
+	//create a default pix from a random image - couldn't find a better way to do this
+	m_pixTextLegend = QPixmap(":/images/xflr5_64.png");
+	m_pixTextLegend.fill(Qt::transparent);
+
+	QFontMetrics fm(Settings::s_TextFont);
+	int w = fm.averageCharWidth()*19;
+	int h = fm.height()*5;
+	QRect rect(0,0,w,h);
+	m_pixTextLegend = m_pixTextLegend.scaled(rect.size());
 
 	m_BodyOffset.Set( 0.20, -0.12, 0.0);
 	m_FrameOffset.Set(0.80, -0.50, 0.0);
@@ -1455,7 +1469,7 @@ void GL3dBodyDlg::GLDrawBodyLegend()
 		strong = QString(tr("Frame %1")).arg(m_pBody->m_iActiveFrame+1,2);
 		m_3dWidget.renderText(m_FrameRect.left() +dD ,dD,strong, Settings::s_TextFont);
 
-        strong = QString(tr("Scale = %1")).arg(m_FrameScale/m_BodyRefScale,4,'f',2);
+		strong = QString(tr("Scale = %1")).arg(m_FrameScale/m_BodyRefScale,4,'f',2);
 		m_3dWidget.renderText(m_FrameRect.left() +dD ,2*dD,strong, Settings::s_TextFont);
 
 		strong = QString(tr("Scale = %1")).arg(m_BodyScale/m_BodyRefScale,4,'f',2);
@@ -1496,68 +1510,6 @@ void GL3dBodyDlg::GLDrawBodyLegend()
 }
 
 
-void GL3dBodyDlg::PaintBodyLegend(QPainter &painter)
-{
-	if(!m_pBody) return;
-
-	QString strong, strLengthUnit;
-
-	QColor color;
-
-	Units::getLengthUnitLabel(strLengthUnit);
-
-	color = Settings::s_TextColor;
-
-	painter.save();
-	painter.setFont(Settings::s_TextFont);
-	painter.setRenderHint(QPainter::Antialiasing);
-
-	// Draw the labels
-	CVector real;
-	m_3dWidget.ClientToGL(m_MousePos, real);
-	QFontMetrics fm(Settings::s_TextFont);
-	int dD = fm.height();
-
-	strong = QString(tr("Frame %1")).arg(m_pBody->m_iActiveFrame+1,2);
-	painter.drawText(m_FrameRect.left() +dD ,dD,strong);
-
-	strong = QString(tr("Scale = %1")).arg(m_FrameScale/m_BodyRefScale,4,'f',2);
-	painter.drawText(m_FrameRect.left() +dD ,2*dD,strong);
-
-	strong = QString(tr("Scale = %1")).arg(m_BodyScale/m_BodyRefScale,4,'f',2);
-	painter.drawText(m_BodyLineRect.left() +dD ,dD,strong);
-
-	if(m_FrameRect.contains(m_MousePos))
-	{
-		real.x =  (real.x - m_FrameScaledOffset.x)/m_FrameScale;
-		real.y =  (real.y - m_FrameScaledOffset.y)/m_FrameScale;
-		real.z = 0.0;
-
-		strong = QString("y = %1 ").arg(real.x * Units::mtoUnit(),9,'f',3);
-		strong += strLengthUnit;
-		painter.drawText(m_FrameRect.left() +dD ,3*dD,strong);
-
-		strong = QString("z = %1 ").arg(real.y * Units::mtoUnit(),9,'f',3);
-		strong += strLengthUnit;
-		painter.drawText(m_FrameRect.left() +dD ,4*dD,strong);
-	}
-	else if(m_BodyLineRect.contains(m_MousePos))
-	{
-		real.x =  (real.x - m_BodyScaledOffset.x)/m_BodyScale;
-		real.y =  (real.y - m_BodyScaledOffset.y)/m_BodyScale;
-		real.z = 0.0;
-
-		strong = QString("x = %1 ").arg(real.x * Units::mtoUnit(),9,'f',3);
-		strong += strLengthUnit;
-		painter.drawText(m_BodyLineRect.left() +dD ,2*dD,strong);
-
-		strong = QString("z = %1 ").arg(real.y * Units::mtoUnit(),9,'f',3);
-		strong += strLengthUnit;
-		painter.drawText(m_BodyLineRect.left() +dD ,3*dD,strong);
-	}
-	painter.restore();
-}
-
 
 void GL3dBodyDlg::GLInverseMatrix()
 {
@@ -1577,6 +1529,7 @@ void GL3dBodyDlg::GLInverseMatrix()
 void GL3dBodyDlg::GLRenderBody()
 {
 //	int width;
+    m_3dWidget.makeCurrent();
 
 	GLdouble pts[4];
 
@@ -3932,3 +3885,68 @@ void GL3dBodyDlg::blockSignalling(bool bBlock)
 
 
 
+void GL3dBodyDlg::PaintBodyLegend(QPainter &painter)
+{
+	if(!m_pBody) return;
+
+	QString strong, strLengthUnit;
+	Units::getLengthUnitLabel(strLengthUnit);
+
+	m_pixTextLegend.fill(Qt::transparent);
+	QPainter pixPainter(&m_pixTextLegend);
+
+	pixPainter.save();
+	pixPainter.setFont(Settings::s_TextFont);
+	pixPainter.setRenderHint(QPainter::Antialiasing);
+	QPen textPen(Settings::s_TextColor);
+	pixPainter.setPen(textPen);
+
+	// Draw the labels
+	CVector real;
+	m_3dWidget.ClientToGL(m_MousePos, real);
+	QFontMetrics fm(Settings::s_TextFont);
+	int dD = fm.height();
+
+
+	if(m_FrameRect.contains(m_MousePos))
+	{
+		strong = QString(tr("Frame %1")).arg(m_pBody->m_iActiveFrame+1,2);
+		pixPainter.drawText(m_FrameRect.left() +dD ,dD,strong);
+		strong = QString(tr("Scale = %1")).arg(m_FrameScale/m_BodyRefScale,4,'f',2);
+		painter.drawText(m_FrameRect.left() +dD ,2*dD,strong);
+
+		real.x =  (real.x - m_FrameScaledOffset.x)/m_FrameScale;
+		real.y =  (real.y - m_FrameScaledOffset.y)/m_FrameScale;
+		real.z = 0.0;
+
+		strong = QString("y = %1 ").arg(real.x * Units::mtoUnit(),9,'f',3);
+		strong += strLengthUnit;
+		pixPainter.drawText(dD ,3*dD,strong);
+
+		strong = QString("z = %1 ").arg(real.y * Units::mtoUnit(),9,'f',3);
+		strong += strLengthUnit;
+		pixPainter.drawText(dD ,4*dD,strong);
+
+		painter.drawPixmap(m_FrameRect.left(),m_FrameRect.top(), m_pixTextLegend);
+	}
+	else if(m_BodyLineRect.contains(m_MousePos))
+	{
+		strong = QString(tr("Scale = %1")).arg(m_BodyScale/m_BodyRefScale,4,'f',2);
+		pixPainter.drawText(m_BodyLineRect.left() +dD ,dD,strong);
+
+		real.x =  (real.x - m_BodyScaledOffset.x)/m_BodyScale;
+		real.y =  (real.y - m_BodyScaledOffset.y)/m_BodyScale;
+		real.z = 0.0;
+
+		strong = QString("x = %1 ").arg(real.x * Units::mtoUnit(),9,'f',3);
+		strong += strLengthUnit;
+		pixPainter.drawText(dD ,2*dD,strong);
+
+		strong = QString("z = %1 ").arg(real.y * Units::mtoUnit(),9,'f',3);
+		strong += strLengthUnit;
+		pixPainter.drawText(dD ,3*dD,strong);
+
+		painter.drawPixmap(m_BodyLineRect.left(),m_BodyLineRect.top(), m_pixTextLegend);
+	}
+	pixPainter.restore();
+}

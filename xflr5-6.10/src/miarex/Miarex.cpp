@@ -156,7 +156,8 @@ QMiarex::QMiarex(QWidget *parent)
 
 	m_pglLightDlg = new GLLightDlg(pMainFrame);
 
-	m_PixText = QPixmap(":/images/xflr5_64.png");
+    //create a default pix from a random image - couldn't find a better way to do this
+    m_PixText = QPixmap(":/images/xflr5_64.png");
 	m_PixText.fill(Qt::transparent);
 
 	m_pXFile      = NULL;
@@ -3302,6 +3303,32 @@ void QMiarex::keyPressEvent(QKeyEvent *event)
 			UpdateView();
 			break;
 		}
+
+/*        case Qt::Key_F1:
+        {
+            QSize sz(m_PixText.size());
+            QImage img(sz, QImage::Format_RGB32);
+            QPainter painter(&img);
+            QString FileName, Filter;
+
+            Filter = "Portable Network Graphics (*.png)";
+            FileName = QFileDialog::getSaveFileName(this, tr("Save Image"),
+                                                    pMainFrame->m_ImageDirName,
+                                                    "Portable Network Graphics (*.png);;JPEG (*.jpg);;Windows Bitmap (*.bmp)",
+                                                    &Filter);
+
+            if(!FileName.length()) return;
+
+            int pos = FileName.lastIndexOf("/");
+            if(pos>0) pMainFrame->m_ImageDirName = FileName.left(pos);
+
+            pMainFrame->m_ImageFormat = PNG;
+
+            painter.drawPixmap(0,0,m_PixText);
+
+            img.save(FileName);
+            break;
+        }*/
 
 		default:
 			//			QWidget::keyPressEvent(event);
@@ -8022,7 +8049,6 @@ void QMiarex::PaintView(QPainter &painter)
 	if(m_bResetTextLegend)
 	{
 		DrawTextLegend();
-		m_bResetTextLegend = false;
 	}
 
 	if(m_r2DCltRect.width()<200 || m_r2DCltRect.height()<200)
@@ -8454,98 +8480,97 @@ void QMiarex::PaintPlaneOppLegend(QPainter &painter, QRect drawRect)
 	if(m_pCurPOpp && m_pCurPOpp->m_bOut)                       ZPos -= dheight;
 	if(m_pCurPOpp)                                             ZPos -= dheight*m_pCurPOpp->m_pPlaneWOpp[0]->m_nFlaps;
 
-	if(m_pCurPOpp && m_pCurPOpp->m_bIsVisible)
-	{
-		if(m_pCurPOpp->m_bOut)
-		{
-			Result = tr("Point is out of the flight envelope");
-			painter.drawText(RightPos, ZPos+D, dwidth, dheight, Qt::AlignRight | Qt::AlignTop, Result);
-			D+=dheight;
-		}
 
-		Units::getSpeedUnitLabel(str);
-		int l = str.length();
-		if(l==2)      Result = QString("V = %1 ").arg(m_pCurPOpp->m_QInf*Units::mstoUnit(),8,'f',3);
-		else if(l==3) Result = QString("V = %1 ").arg(m_pCurPOpp->m_QInf*Units::mstoUnit(),7,'f',2);
-		else if(l==4) Result = QString("V = %1 ").arg(m_pCurPOpp->m_QInf*Units::mstoUnit(),6,'f',1);
-		else          Result = "No unit defined for speed...";
+    if(m_pCurPOpp->m_bOut)
+    {
+        Result = tr("Point is out of the flight envelope");
+        painter.drawText(RightPos, ZPos+D, dwidth, dheight, Qt::AlignRight | Qt::AlignTop, Result);
+        D+=dheight;
+    }
 
-		Result += str;
-		painter.drawText(RightPos, ZPos+D, dwidth, dheight, Qt::AlignRight | Qt::AlignTop, Result);
+    Units::getSpeedUnitLabel(str);
+    int l = str.length();
+    if(l==2)      Result = QString("V = %1 ").arg(m_pCurPOpp->m_QInf*Units::mstoUnit(),8,'f',3);
+    else if(l==3) Result = QString("V = %1 ").arg(m_pCurPOpp->m_QInf*Units::mstoUnit(),7,'f',2);
+    else if(l==4) Result = QString("V = %1 ").arg(m_pCurPOpp->m_QInf*Units::mstoUnit(),6,'f',1);
+    else          Result = "No unit defined for speed...";
 
-		int e = 8, f=3;
+    Result += str;
+    painter.drawText(RightPos, ZPos+D, dwidth, dheight, Qt::AlignRight | Qt::AlignTop, Result);
 
-
-		Result = QString("Alpha = %1").arg(m_pCurPOpp->m_Alpha, e,'f',f) + QString::fromUtf8("°  ");
-		D+=dheight;
-		painter.drawText(RightPos, ZPos+D, dwidth, dheight, Qt::AlignRight | Qt::AlignTop, Result);
-
-		Result = QString("Beta = %1").arg(m_pCurPOpp->m_Beta, e,'f',f) + QString::fromUtf8("°  ");
-		D+=dheight;
-		painter.drawText(RightPos, ZPos+D, dwidth, dheight, Qt::AlignRight | Qt::AlignTop, Result);
-
-		Result = QString("CL = %1   ").arg(m_pCurPOpp->m_CL, e,'f',f);
-		D+=dheight;
-		painter.drawText(RightPos, ZPos+D, dwidth, dheight, Qt::AlignRight | Qt::AlignTop, Result);
-
-		Result = QString("CD = %1   " ).arg(m_pCurPOpp->m_VCD+m_pCurPOpp->m_ICD, e,'f',f);
-		D+=dheight;
-		painter.drawText(RightPos, ZPos+D, dwidth, dheight, Qt::AlignRight | Qt::AlignTop, Result);
-
-		/*		oswald=CZ^2/CXi/PI/allongement;*/
-		double cxielli=m_pCurPOpp->m_CL*m_pCurPOpp->m_CL/PI/m_pCurPlane->m_Wing[0].m_AR;
-		Result = QString("Efficiency = %1   ").arg(cxielli/m_pCurPOpp->m_ICD, e,'f',f);
-		D+=dheight;
-		painter.drawText(RightPos, ZPos+D, dwidth, dheight, Qt::AlignRight | Qt::AlignTop, Result);
-
-		Result = QString("CL/CD = %1   ").arg(m_pCurPOpp->m_CL/(m_pCurPOpp->m_ICD+m_pCurPOpp->m_VCD), e,'f',f);
-		D+=dheight;
-		painter.drawText(RightPos, ZPos+D, dwidth, dheight, Qt::AlignRight | Qt::AlignTop, Result);
-
-		Result = QString("Cm = %1   ").arg(m_pCurPOpp->m_GCm, e,'f',f);
-		D+=dheight;
-		painter.drawText(RightPos, ZPos+D, dwidth, dheight, Qt::AlignRight | Qt::AlignTop, Result);
-
-		Result = QString("Cl = %1   ").arg(m_pCurPOpp->m_GRm, e,'f',f);
-		D+=dheight;
-		painter.drawText(RightPos, ZPos+D, dwidth, dheight, Qt::AlignRight | Qt::AlignTop, Result);
-
-		Result = QString("Cn = %1   ").arg(m_pCurPOpp->m_GYm, e,'f',f);
-		D+=dheight;
-		painter.drawText(RightPos, ZPos+D, dwidth, dheight, Qt::AlignRight | Qt::AlignTop, Result);
+    int e = 8, f=3;
 
 
-		Units::getLengthUnitLabel(str);
-		l = str.length();
-		int c=8, d=3;
-		if(l==1)  str+=" ";
-		if(m_pCurPOpp->m_WPolarType==STABILITYPOLAR)
-		{
-			Result = QString("X_NP = %1 ").arg(m_pCurPOpp->m_XNP*Units::mtoUnit(), c,'f',d);
-			Result += str;
-			D+=dheight;
-			painter.drawText(RightPos, ZPos+D, dwidth, dheight, Qt::AlignRight | Qt::AlignTop, Result);
-		}
+    Result = QString("Alpha = %1").arg(m_pCurPOpp->m_Alpha, e,'f',f) + QString::fromUtf8("°  ");
+    D+=dheight;
+    painter.drawText(RightPos, ZPos+D, dwidth, dheight, Qt::AlignRight | Qt::AlignTop, Result);
 
-		Result = QString("X_CP = %1 ").arg(m_pCurPOpp->m_CP.x*Units::mtoUnit(), c, 'f', d);
-		Result += str;
-		D+=dheight;
-		painter.drawText(RightPos, ZPos+D, dwidth, dheight, Qt::AlignRight | Qt::AlignTop, Result);
+    Result = QString("Beta = %1").arg(m_pCurPOpp->m_Beta, e,'f',f) + QString::fromUtf8("°  ");
+    D+=dheight;
+    painter.drawText(RightPos, ZPos+D, dwidth, dheight, Qt::AlignRight | Qt::AlignTop, Result);
 
-		Result = QString("X_CG = %1 ").arg(m_pCurWPolar->m_CoG.x*Units::mtoUnit(), c, 'f', d);
-		Result += str;
-		D+=dheight;
-		painter.drawText(RightPos, ZPos+D, dwidth, dheight, Qt::AlignRight | Qt::AlignTop, Result);
+    Result = QString("CL = %1   ").arg(m_pCurPOpp->m_CL, e,'f',f);
+    D+=dheight;
+    painter.drawText(RightPos, ZPos+D, dwidth, dheight, Qt::AlignRight | Qt::AlignTop, Result);
 
-		for(i=0; i<m_pCurPOpp->m_pPlaneWOpp[0]->m_nFlaps; i++)
-		{
-			Result = QString("Flap %1 Moment =%2 ").arg(i+1).arg(m_pCurPOpp->m_pPlaneWOpp[0]->m_FlapMoment[i]*Units::NmtoUnit(),8,'f',4);
-			Units::getMomentUnitLabel(str);
-			Result += str;
-			D+=dheight;
-			painter.drawText(RightPos, ZPos+D, dwidth, dheight, Qt::AlignRight | Qt::AlignTop, Result);
-		}
-	}
+    Result = QString("CD = %1   " ).arg(m_pCurPOpp->m_VCD+m_pCurPOpp->m_ICD, e,'f',f);
+    D+=dheight;
+    painter.drawText(RightPos, ZPos+D, dwidth, dheight, Qt::AlignRight | Qt::AlignTop, Result);
+
+    /*		oswald=CZ^2/CXi/PI/allongement;*/
+    double cxielli=m_pCurPOpp->m_CL*m_pCurPOpp->m_CL/PI/m_pCurPlane->m_Wing[0].m_AR;
+    Result = QString("Efficiency = %1   ").arg(cxielli/m_pCurPOpp->m_ICD, e,'f',f);
+    D+=dheight;
+    painter.drawText(RightPos, ZPos+D, dwidth, dheight, Qt::AlignRight | Qt::AlignTop, Result);
+
+    Result = QString("CL/CD = %1   ").arg(m_pCurPOpp->m_CL/(m_pCurPOpp->m_ICD+m_pCurPOpp->m_VCD), e,'f',f);
+    D+=dheight;
+    painter.drawText(RightPos, ZPos+D, dwidth, dheight, Qt::AlignRight | Qt::AlignTop, Result);
+
+    Result = QString("Cm = %1   ").arg(m_pCurPOpp->m_GCm, e,'f',f);
+    D+=dheight;
+    painter.drawText(RightPos, ZPos+D, dwidth, dheight, Qt::AlignRight | Qt::AlignTop, Result);
+
+    Result = QString("Cl = %1   ").arg(m_pCurPOpp->m_GRm, e,'f',f);
+    D+=dheight;
+    painter.drawText(RightPos, ZPos+D, dwidth, dheight, Qt::AlignRight | Qt::AlignTop, Result);
+
+    Result = QString("Cn = %1   ").arg(m_pCurPOpp->m_GYm, e,'f',f);
+    D+=dheight;
+    painter.drawText(RightPos, ZPos+D, dwidth, dheight, Qt::AlignRight | Qt::AlignTop, Result);
+
+
+    Units::getLengthUnitLabel(str);
+    l = str.length();
+    int c=8, d=3;
+    if(l==1)  str+=" ";
+    if(m_pCurPOpp->m_WPolarType==STABILITYPOLAR)
+    {
+        Result = QString("X_NP = %1 ").arg(m_pCurPOpp->m_XNP*Units::mtoUnit(), c,'f',d);
+        Result += str;
+        D+=dheight;
+        painter.drawText(RightPos, ZPos+D, dwidth, dheight, Qt::AlignRight | Qt::AlignTop, Result);
+    }
+
+    Result = QString("X_CP = %1 ").arg(m_pCurPOpp->m_CP.x*Units::mtoUnit(), c, 'f', d);
+    Result += str;
+    D+=dheight;
+    painter.drawText(RightPos, ZPos+D, dwidth, dheight, Qt::AlignRight | Qt::AlignTop, Result);
+
+    Result = QString("X_CG = %1 ").arg(m_pCurWPolar->m_CoG.x*Units::mtoUnit(), c, 'f', d);
+    Result += str;
+    D+=dheight;
+    painter.drawText(RightPos, ZPos+D, dwidth, dheight, Qt::AlignRight | Qt::AlignTop, Result);
+
+    for(i=0; i<m_pCurPOpp->m_pPlaneWOpp[0]->m_nFlaps; i++)
+    {
+        Result = QString("Flap %1 Moment =%2 ").arg(i+1).arg(m_pCurPOpp->m_pPlaneWOpp[0]->m_FlapMoment[i]*Units::NmtoUnit(),8,'f',4);
+        Units::getMomentUnitLabel(str);
+        Result += str;
+        D+=dheight;
+        painter.drawText(RightPos, ZPos+D, dwidth, dheight, Qt::AlignRight | Qt::AlignTop, Result);
+    }
+
 	painter.restore();
 }
 
@@ -10371,6 +10396,7 @@ void QMiarex::UpdateUnits()
 	}
 	SetCurveParams();
 	s_bResetCurves = true;
+	m_bResetTextLegend = true;
 	UpdateView();
 }
 
@@ -10718,28 +10744,30 @@ bool QMiarex::SetPlaneOpp(bool bCurrent, double x)
 }
 
 
+
+/**
+ * Creates the offscreen pixmap with the text legend which will be overlayed on the 3D or 2D view
+ */
 void QMiarex::DrawTextLegend()
 {
-	m_PixText = m_PixText.scaled(m_r2DCltRect.size());
+    QRect rect;
+	if(m_iView==W3DVIEW) rect = m_r3DCltRect;
+	else                 rect = m_r2DCltRect;
+	m_PixText = m_PixText.scaled(rect.size());
 	m_PixText.fill(Qt::transparent);
 	QPainter paint(&m_PixText);
-/*	paint.save();
-	QPen textPen(Settings::s_TextColor);
-	paint.setPen(textPen);
-	paint.drawText(0, 0, "Hello");
-	paint.drawText(300, 300, "Hello1");
-	paint.drawText(300, 600, "Hello3");
-	paint.restore();*/
-	PaintPlaneLegend(paint, m_r2DCltRect);
+
+	PaintPlaneLegend(paint, rect);
 	if(m_pCurPOpp)
 	{
-		PaintPlaneOppLegend(paint, m_r2DCltRect);
+		PaintPlaneOppLegend(paint, rect);
 		if(m_iView==W3DVIEW)
 		{
 			PaintCpLegendText(paint);
 			PaintPanelForceLegendText(paint);
 		}
 	}
+	m_bResetTextLegend = false;
 }
 
 

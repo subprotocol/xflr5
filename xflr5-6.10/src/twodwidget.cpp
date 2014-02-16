@@ -252,7 +252,8 @@ void TwoDWidget::resizeEvent(QResizeEvent *event)
 	}
 	if(m_pMiarex)
 	{
-		pMiarex->m_bIs2DScaleSet = false;
+        pMiarex->m_bResetTextLegend = true;
+        pMiarex->m_bIs2DScaleSet = false;
 		pMiarex->Set2DScale();
 		if(pMiarex->m_iView==WOPPVIEW)   pMiarex->SetWingLegendPos();
 		if(pMiarex->m_iView==WPOLARVIEW) pMiarex->SetWPlrLegendPos();
