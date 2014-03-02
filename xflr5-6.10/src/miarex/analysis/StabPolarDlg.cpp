@@ -227,6 +227,8 @@ void StabPolarDlg::FillControlList()
 		}
 		s_StabPolar.m_nControls += m_pWingList[3]->m_nFlaps;
 	}
+
+    m_pctrlControlTable->resizeColumnsToContents();
 }
 
 
@@ -1130,30 +1132,6 @@ void StabPolarDlg::OnMethod()
 	SetWPolarName();
 }
 
-
-
-void StabPolarDlg::showEvent(QShowEvent *event)
-{
-	int w, w2, w3, w6;
-	w = m_pctrlControlTable->width();
-	w2 = (int)((double)w/2.0);
-	w3 = (int)((double)w/3.0);
-	w6 = (int)((double)w/6.0);
-
-	if(!s_StabPolar.m_bThinSurfaces)
-	{
-		m_pctrlControlTable->setColumnWidth(0,w3);
-		m_pctrlControlTable->setColumnWidth(1,w6);
-		m_pctrlControlTable->setColumnWidth(2,w6);
-		m_pctrlControlTable->setColumnWidth(3,w6);
-	}
-	else
-	{
-		m_pctrlControlTable->setColumnWidth(0,w2);
-		m_pctrlControlTable->setColumnWidth(1,2*w6);
-	}
-	event->accept();
-}
 
 
 void StabPolarDlg::OnAutoInertia()

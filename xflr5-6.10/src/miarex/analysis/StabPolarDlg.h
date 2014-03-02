@@ -86,7 +86,6 @@ private slots:
 
 private:
 	void keyPressEvent(QKeyEvent *event);
-	void showEvent(QShowEvent *event);
 	void EnableControls();
 	void FillControlList();
 	void FillUFOInertia();

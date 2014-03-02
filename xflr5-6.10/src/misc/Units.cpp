@@ -49,7 +49,7 @@ Units::Units(QWidget *parent): QDialog(parent)
 
 void Units::SetupLayout()
 {
-	QFont fixedWidthFont("Monospace");
+	QFont fixedWidthFont("Courier");
 
 	QGridLayout *pUnitsLayout = new QGridLayout;
 	{

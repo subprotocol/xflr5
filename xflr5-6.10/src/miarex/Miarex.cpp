@@ -8370,7 +8370,7 @@ void QMiarex::PaintPlaneLegend(QPainter &painter, QRect drawRect)
 	D+=dheight;
 
 	Units::getAreaUnitLabel(strong);
-	Result = QString(tr("Wing Load      =")+"%1 ").arg(Mass*Units::kgtoUnit()/m_pCurPlane->planformArea()/Units::m2toUnit(),10,'f',3);
+	Result = QString(tr("Wing Load      =")+"%1 ").arg(Mass*Units::kgtoUnit()/m_pCurPlane->projectedArea()/Units::m2toUnit(),10,'f',3);
 	Result += str + "/" + strong;
 	painter.drawText(LeftPos, ZPos+D, Result);
 	D+=dheight;
