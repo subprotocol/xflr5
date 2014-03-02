@@ -22,8 +22,6 @@
 #define PRECISION  0.00000000001  /**< Values are assumed 0 if less than this value. This is to avoid comparing the equality of two floating point numbers */
 
 
-#define PLANFORMAREA        1     /** The reference area and span for aero coefficients is the planform area. @todo replace by an enumeration */
-#define PROJECTEDAREA       2     /** The reference area and span for aero coefficients is the area projected on the xy plane. */
 
 
 //3D analysis parameters
@@ -113,6 +111,8 @@ typedef enum {TXT, CSV}	enumTextFileType;
 /** @enum The different number of graphs in the polar view */
 typedef enum {ONEGRAPH, TWOGRAPHS, ALLGRAPHS} enumGraphView;
 
+/** @enum The different type of reference areaand length */
+typedef enum {PLANFORMREFDIM, PROJECTEDREFDIM, MANUALREFDIM} enumRefDimension;
 
 #define QUESTION (BB || !BB) /**< Shakespeare */
 

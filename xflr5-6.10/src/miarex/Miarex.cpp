@@ -4928,7 +4928,7 @@ void QMiarex::OnDefineStabPolar()
 
 	StabPolarDlg::s_StabPolar.m_Viscosity     = WPolarDlg::s_WPolar.m_Viscosity;
 	StabPolarDlg::s_StabPolar.m_Density       = WPolarDlg::s_WPolar.m_Density;
-	StabPolarDlg::s_StabPolar.m_RefAreaType   = WPolarDlg::s_WPolar.m_RefAreaType;
+	StabPolarDlg::s_StabPolar.m_ReferenceDim  = WPolarDlg::s_WPolar.m_ReferenceDim;
 	StabPolarDlg::s_StabPolar.m_bThinSurfaces = WPolarDlg::s_WPolar.m_bThinSurfaces;
 
 
@@ -4947,7 +4947,7 @@ void QMiarex::OnDefineStabPolar()
 		pNewStabPolar->m_bShowPoints = true;
 		pNewStabPolar->m_bIsVisible  = true;
 
-		pNewStabPolar->m_WMAChord  = m_pCurPlane->mac();
+		pNewStabPolar->m_referenceChordLength  = m_pCurPlane->mac();
 
 		pNewStabPolar->DuplicateSpec(&StabPolarDlg::s_StabPolar);
 
@@ -4957,18 +4957,6 @@ void QMiarex::OnDefineStabPolar()
 			pNewStabPolar->polarName() = pNewStabPolar->polarName().left(60)+"..."+QString("(%1)").arg(m_poaWPolar->size());
 		}
 
-		if(pNewStabPolar->m_RefAreaType==PLANFORMAREA)
-		{
-			pNewStabPolar->m_WArea        = m_pCurPlane->planformArea();
-			if(m_pCurPlane && m_pCurPlane->BiPlane()) pNewStabPolar->m_WArea += m_pCurPlane->wing2()->m_PlanformArea;
-			pNewStabPolar->m_WSpan        = m_pCurPlane->planformSpan();
-		}
-		else
-		{
-			pNewStabPolar->m_WArea        = m_pCurPlane->projectedArea();
-			if(m_pCurPlane && m_pCurPlane->BiPlane()) pNewStabPolar->m_WArea += m_pCurPlane->wing2()->m_ProjectedArea;
-			pNewStabPolar->m_WSpan        = m_pCurPlane->projectedSpan();
-		}
 		pNewStabPolar->m_bVLM1           = false;
 		pNewStabPolar->m_bDirichlet      = m_bDirichlet;
 		pNewStabPolar->m_bTiltedGeom     = false;
@@ -5022,19 +5010,17 @@ void QMiarex::OnDefineWPolar()
 		pNewWPolar->setPlaneName(m_pCurPlane->planeName());
 		pNewWPolar->setPolarName(wpDlg.s_WPolar.polarName());
 
-		pNewWPolar->m_WMAChord = m_pCurPlane->mac();
-
-		if(pNewWPolar->m_RefAreaType==PLANFORMAREA)
+		if(pNewWPolar->m_ReferenceDim==PLANFORMREFDIM)
 		{
-			pNewWPolar->m_WSpan = m_pCurPlane->planformSpan();
-			pNewWPolar->m_WArea = m_pCurPlane->planformArea();
-			if(m_pCurPlane && m_pCurPlane->BiPlane()) pNewWPolar->m_WArea += m_pCurPlane->wing2()->m_PlanformArea;
+			pNewWPolar->m_referenceSpanLength = m_pCurPlane->planformSpan();
+			pNewWPolar->m_referenceArea = m_pCurPlane->planformArea();
+			if(m_pCurPlane && m_pCurPlane->BiPlane()) pNewWPolar->m_referenceArea += m_pCurPlane->wing2()->m_PlanformArea;
 		}
-		else
+		else if(pNewWPolar->m_ReferenceDim==PROJECTEDREFDIM)
 		{
-			pNewWPolar->m_WSpan = m_pCurPlane->projectedSpan();
-			pNewWPolar->m_WArea = m_pCurPlane->projectedArea();
-			if(m_pCurPlane && m_pCurPlane->BiPlane()) pNewWPolar->m_WArea += m_pCurPlane->wing2()->m_ProjectedArea;
+			pNewWPolar->m_referenceSpanLength = m_pCurPlane->projectedSpan();
+			pNewWPolar->m_referenceArea = m_pCurPlane->projectedArea();
+			if(m_pCurPlane && m_pCurPlane->BiPlane()) pNewWPolar->m_referenceArea += m_pCurPlane->wing2()->m_ProjectedArea;
 		}
 
 		pNewWPolar->m_bDirichlet      = m_bDirichlet;
@@ -5104,21 +5090,7 @@ void QMiarex::OnEditCurWPolar()
 		pNewWPolar->planeName() = m_pCurPlane->planeName();
 		pNewWPolar->polarName() = WPolarName;
 
-		if(pNewWPolar->m_RefAreaType==PLANFORMAREA)
-		{
-			pNewWPolar->m_WSpan = m_pCurPlane->planformSpan();
-			pNewWPolar->m_WArea = m_pCurPlane->planformArea();
-			if(m_pCurPlane && m_pCurPlane->BiPlane()) pNewWPolar->m_WArea += m_pCurPlane->wing2()->m_PlanformArea;
-		}
-		else
-		{
-			pNewWPolar->m_WSpan = m_pCurPlane->projectedSpan();
-			pNewWPolar->m_WArea = m_pCurPlane->projectedArea();
-			if(m_pCurPlane && m_pCurPlane->BiPlane()) pNewWPolar->m_WArea += m_pCurPlane->wing2()->m_ProjectedArea;
-		}
-
 		pNewWPolar->m_bDirichlet      = m_bDirichlet;
-//		pNewWPolar->m_bAVLControls    = false;
 
 		pNewWPolar->m_Color = MainFrame::GetColor(4);
 		pNewWPolar->m_bIsVisible = true;
@@ -5898,8 +5870,8 @@ void QMiarex::OnExportCurWOpp()
 		{
 //			complex<double> c, angle;
 			double u0 = m_pCurPOpp->m_pPlaneWOpp[0]->m_QInf;
-			double mac = m_pCurWPolar->m_WArea;
-			double b = m_pCurWPolar->m_WSpan;
+			double mac = m_pCurWPolar->m_referenceArea;
+			double b = m_pCurWPolar->m_referenceSpanLength;
 			
 			strong = "\n\n   ___Longitudinal modes____\n\n";
 			out << strong;
@@ -9701,6 +9673,8 @@ void QMiarex::SetupLayout()
 	QGroupBox *pPolarPropsBox = new QGroupBox(tr("Polar properties"));
 	{
 		m_pctrlPolarProps = new MinTextEdit(this);
+		m_pctrlPolarProps->setFontFamily("Courier");
+
 		QHBoxLayout *pPolarPropsLayout = new QHBoxLayout;
 		{
 			pPolarPropsLayout->addWidget(m_pctrlPolarProps);
@@ -9975,7 +9949,7 @@ void QMiarex::SetWPolar(bool bCurrent, QString WPlrName)
 	int i,j,k,m, NStation;
 	double SpanPos;
 
-	if(m_pCurWPolar->m_AnalysisMethod>LLTMETHOD)
+	if(m_pCurWPolar->m_AnalysisMeth>LLTMETHOD)
 	{
 		for(int iw=0; iw<MAXWINGS; iw++)
 		{

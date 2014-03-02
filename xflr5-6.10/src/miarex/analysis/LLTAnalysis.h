@@ -60,7 +60,7 @@ private:
 	double AlphaInduced(int k);
 	double Beta(int m, int k);
 	double Eta(int m);
-	void computeWing(double QInf, double Alpha, QString &ErrorMessage);
+	void ComputeWing(double QInf, double Alpha, QString &ErrorMessage);
 	void setVelocity(double &QInf);
 	void initializeGeom();
 	int iterate(double &QInf, double const Alpha);

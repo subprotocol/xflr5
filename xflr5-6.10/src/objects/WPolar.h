@@ -122,6 +122,11 @@ public: //access methods
 	bool bViscous() {return m_bViscous;}
 	bool bVLM1() {return m_bVLM1;}
 
+	double referenceArea()  {return m_referenceArea;}
+	double referenceSpanLength()  {return m_referenceSpanLength;}
+	double referenceChordLength() {return m_referenceChordLength;}
+
+
 private:
 	bool     m_bVLM1;              /**< true if the analysis is performed with horseshoe vortices, flase if quad rings */
 	bool     m_bAutoInertia;       /**< true if the inertia to be taken into account is the one of the parent plane */
@@ -141,7 +146,7 @@ private:
 	double   m_CoGIzz;             /**< The Izz component of the inertia tensor, w.r.t. the CoG origin */
 	QString  m_WPlrName;            /**< the polar's name */
 	int      m_PolarFormat;        /**< the identification number which references the format used to serialize the data */
-	int      m_RefAreaType;        /**< Describes the origin of the refernce area : 1 if planform area, else projected area */
+	enumRefDimension  m_ReferenceDim;        /**< Describes the origin of the refernce area : 1 if planform area, else projected area */
 	int      m_Style;              /**< the index of the curve's style for the graphs */
 	double   m_TotalWakeLength;    /**< the wake's length */
 	QString  m_PlaneName;          /**< the name of the parent wing or plane */
@@ -203,6 +208,9 @@ private:
 	QList <double>  m_Ym;         /**< the total yawing moment */
 	QList <double>  m_ZCP;        /**< the centre of pressure Z-position relative to the wing's root LE */
 
+	double m_referenceArea;          /**< The reference area for the calculation of aero coefficients */
+	double m_referenceChordLength;   /**< The reference length = the mean aero chord, for the calculation of aero coefficients */
+	double m_referenceSpanLength;    /**< The reference span for the calculation of aero coefficients */
 
 
 public:
@@ -211,9 +219,6 @@ public:
 	CVector       m_CoG;                  /**< the position of the CoG */
 	double        m_Density;              /**< The fluid's density */
 	double        m_Mass;                 /**< The mass for type 2 and type 7 polars */
-	double        m_WArea;                /**< The reference area for the calculation of aero coefficients */
-	double        m_WMAChord;             /**< The reference length = the mean aero chord, for the calculation of aero coefficients */
-	double        m_WSpan;                /**< The reference span for the calculation of aero coefficients */
 
 	int      m_nControls;          /**< the number of control surfaces for this wing or plane */
 	int      m_NXWakePanels;       /**< the number of wake panels */

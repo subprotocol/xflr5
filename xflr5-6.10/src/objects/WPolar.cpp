@@ -52,7 +52,7 @@ WPolar::WPolar()
 
 	m_AnalysisMethod = LLTMETHOD;
 	m_WPolarType     = FIXEDSPEEDPOLAR;
-	m_RefAreaType = 1;
+	m_ReferenceDim = PLANFORMREFDIM;
 	m_Style  = 0;
 	m_Width  = 1;
 	m_Color = randomColor();
@@ -62,9 +62,9 @@ WPolar::WPolar()
 	m_BetaSpec  = 0.0;
 	m_QInfSpec  = 10.0;
 	m_Mass      = 1.0;
-	m_WArea     = 0.0;
-	m_WMAChord  = 0.0;
-	m_WSpan     = 0.0;
+	m_referenceArea     = 0.0;
+	m_referenceChordLength  = 0.0;
+	m_referenceSpanLength     = 0.0;
 	m_Height    = 0.0;
 	m_Density   = 1.225;
 	m_Viscosity = 1.5e-5;//m2/s
@@ -370,29 +370,29 @@ void WPolar::CalculatePoint(int i)
 
 	if(qAbs(m_CL[i])>0.) m_Gamma[i]  =  atan(m_TCd[i]/m_CL[i]) * 180.0/PI;
 	else m_Gamma[i] = 90.0;
-	m_Vz[i] = (double)sqrt(2*m_Mass*9.81/m_Density/m_WArea)/m_Cl32Cd[i];
+	m_Vz[i] = (double)sqrt(2*m_Mass*9.81/m_Density/m_referenceArea)/m_Cl32Cd[i];
 	m_Vx[i] = m_QInfinite[i] * (double)cos(m_Gamma[i]*PI/180.0);
 
 	//dynamic pressure
 	double q =  0.5 * m_Density * m_QInfinite[i]*m_QInfinite[i];
 
-	m_FZ[i]  = q * m_CL[i]*m_WArea;
-	m_FY[i]  = q * m_CY[i]*m_WArea;
-	m_FX[i]  = q * m_TCd[i]*m_WArea;
+	m_FZ[i]  = q * m_CL[i]*m_referenceArea;
+	m_FY[i]  = q * m_CY[i]*m_referenceArea;
+	m_FX[i]  = q * m_TCd[i]*m_referenceArea;
 
-	m_Rm[i] = q * m_WArea * m_GRm[i] * m_WSpan;// in N.m
-	m_Ym[i] = q * m_WArea * m_GYm[i] * m_WSpan;// in N.m
-	m_Pm[i] = q * m_WArea * m_GCm[i] * m_WMAChord;// in N.m
+	m_Rm[i] = q * m_referenceArea * m_GRm[i] * m_referenceSpanLength;// in N.m
+	m_Ym[i] = q * m_referenceArea * m_GYm[i] * m_referenceSpanLength;// in N.m
+	m_Pm[i] = q * m_referenceArea * m_GCm[i] * m_referenceChordLength;// in N.m
 
 	//power for horizontal flight
 	m_VertPower[i] = m_Mass * 9.81 * m_Vz[i];
 
-	double AR      = m_WSpan*m_WSpan/m_WArea;
+	double AR      = m_referenceSpanLength*m_referenceSpanLength/m_referenceArea;
 
 	if(m_ICd[i]==0.0)	m_Oswald[i] = 0.0;
 	else				m_Oswald[i] = m_CL[i]*m_CL[i]/PI/m_ICd[i]/AR;
 
-	m_SM[i]        = (m_XCP[i]-m_CoG.x)/m_WMAChord *100.00;
+	m_SM[i]        = (m_XCP[i]-m_CoG.x)/m_referenceChordLength *100.00;
 
 	complex<double> c;
 	double OmegaN, Omega1, Dsi, Sigma1;
@@ -493,10 +493,10 @@ void WPolar::DuplicateSpec(WPolar *pWPolar)
 	for(int icg=0; icg<pWPolar->m_ControlGain.size(); icg++)
 		m_ControlGain.append(pWPolar->m_ControlGain.at(icg));
 
-	m_RefAreaType = pWPolar->m_RefAreaType;
-	m_WArea       = pWPolar->m_WArea;//for lift and drag calculations
-	m_WMAChord    = pWPolar->m_WMAChord;// for moment calculations
-	m_WSpan       = pWPolar->m_WSpan;//for moment calculations
+	m_ReferenceDim = pWPolar->m_ReferenceDim;
+	m_referenceArea        = pWPolar->m_referenceArea;//for lift and drag calculations
+	m_referenceChordLength = pWPolar->m_referenceChordLength;// for moment calculations
+	m_referenceSpanLength  = pWPolar->m_referenceSpanLength;//for moment calculations
 
 	//Inertia properties
 	m_Mass = pWPolar->m_Mass;
@@ -1138,16 +1138,16 @@ bool WPolar::SerializeWPlrWPA(QDataStream &ar, bool bIsStoring)
 		ReadCString(ar, m_WPlrName);
 
 		ar>> f;
-		m_WArea = f;
-		if (m_WArea<0) return false;
+		m_referenceArea = f;
+		if (m_referenceArea<0) return false;
 
 		ar>> f;
-		m_WMAChord = f;
-		if (m_WMAChord<0) return false;
+		m_referenceChordLength = f;
+		if (m_referenceChordLength<0) return false;
 
 		ar>> f;
-		m_WSpan = f;
-		if (m_WSpan<0) return false;
+		m_referenceSpanLength = f;
+		if (m_referenceSpanLength<0) return false;
 
 		ar >> m_Style  >> m_Width;
 		if (m_Style<0 || m_Style> 10) return false;
@@ -1268,23 +1268,27 @@ bool WPolar::SerializeWPlrWPA(QDataStream &ar, bool bIsStoring)
 		ar >> f;	m_Density=f;
 		ar >> f;	m_Viscosity=f;
 
-		if(m_PolarFormat>=1016) ar >> m_RefAreaType;
-		else                    m_RefAreaType = 1;
+		k=0;
+		if(m_PolarFormat>=1016) ar >> k;
+		if(k==1)      m_ReferenceDim = PLANFORMREFDIM;
+		else if(k==2) m_ReferenceDim = PROJECTEDREFDIM;
+		else if(k==3) m_ReferenceDim = MANUALREFDIM;
+		else          m_ReferenceDim = PLANFORMREFDIM;
 
 		ar >> n;
 		if (n<0 || n> 100000) return false;
 
 		if(m_PolarFormat<1010)
 		{
-			m_WArea    /=100.0;
-			m_WMAChord /=1000.0;
-			m_WSpan    /=1000.0;
+			m_referenceArea    /=100.0;
+			m_referenceChordLength /=1000.0;
+			m_referenceSpanLength    /=1000.0;
 			m_CoG.x   /=1000.0;
 		}
 		float Alpha, Cl, CY, ICd, PCd, GCm, GRm, GYm, VCm, ICm, VYm, IYm, QInfinite, XCP, YCP, ZCP, Ctrl, Cb, XNP;
 		f = Alpha =  Cl = CY = ICd = PCd = GCm = GRm = GYm = VCm = ICm = VYm = IYm = QInfinite = XCP = YCP = ZCP = Ctrl = Cb =0.0;
 //		bool bExists;
-		for (i=0; i< n; i++)
+		for (i=0; i<n; i++)
 		{
 			ar >> Alpha >> Cl;
 			if(m_PolarFormat>=1015) ar>>CY;
@@ -1472,8 +1476,9 @@ bool WPolar::SerializeWPlrWPA(QDataStream &ar, bool bIsStoring)
  */
 void WPolar::GetPolarProperties(QString &PolarProperties, bool bData)
 {
-	QString strong, lenunit, massunit, speedunit;
+	QString strong, lenunit, massunit, speedunit, areaunit;
 	Units::getLengthUnitLabel(lenunit);
+	Units::getAreaUnitLabel(areaunit);
 	Units::getWeightUnitLabel(massunit);
 	Units::getSpeedUnitLabel(speedunit);
 
@@ -1669,9 +1674,13 @@ void WPolar::GetPolarProperties(QString &PolarProperties, bool bData)
 		PolarProperties += "\n";
 	}
 
-	PolarProperties += QObject::tr("Ref. Area = ");
-	if(m_RefAreaType==1) PolarProperties += QObject::tr("Planform area")+"\n";
-	else                 PolarProperties += QObject::tr("Projected area")+"\n";
+	if(m_ReferenceDim==PLANFORMREFDIM)       PolarProperties += QObject::tr("Ref. dimensions = ")+QObject::tr("Planform")+"\n";
+	else if(m_ReferenceDim==PROJECTEDREFDIM) PolarProperties += QObject::tr("Ref. dimensions = ")+QObject::tr("Projected")+"\n";
+
+	PolarProperties += QObject::tr("Ref. area  = ") + QString("%1 ").arg(m_referenceArea*Units::m2toUnit(),9,'f',3) + areaunit +"\n";
+	PolarProperties += QObject::tr("Ref. span  = ") + QString("%1 ").arg(m_referenceSpanLength*Units::mtoUnit(),9,'f',3) +lenunit +"\n";
+	PolarProperties += QObject::tr("Ref. chord = ") + QString("%1 ").arg(m_referenceChordLength*Units::mtoUnit(),9,'f',3) + lenunit +"\n";
+
 
 	if(m_bTiltedGeom) PolarProperties += QObject::tr("Tilted geometry")+"\n";
 
@@ -1691,7 +1700,7 @@ void WPolar::GetPolarProperties(QString &PolarProperties, bool bData)
 	strong = QString(QObject::tr("Data points") +" = %1\n").arg(m_Alpha.size());
 	PolarProperties += "\n"+strong;
 
-	if(!bData) return;
+	if(!bData || m_Alpha.size()==0) return;
 	QTextStream out;
 	strong.clear();
 	out.setString(&strong);
@@ -1759,7 +1768,7 @@ bool WPolar::SerializeWPlrXFL(QDataStream &ar, bool bIsStoring)
 		ar << m_PlaneName;
 		ar << m_WPlrName;
 
-		ar << m_WArea << m_WMAChord << m_WSpan ;
+		ar << m_referenceArea << m_referenceChordLength << m_referenceSpanLength ;
 		ar << m_Style << m_Width;
 		ar << m_Color;
 		ar << m_bIsVisible << m_bShowPoints;
@@ -1788,7 +1797,9 @@ bool WPolar::SerializeWPlrXFL(QDataStream &ar, bool bIsStoring)
 
 		ar << m_Density << m_Viscosity;
 
-		ar << m_RefAreaType;
+		if(m_ReferenceDim == PLANFORMREFDIM)       ar << 1;
+		else if(m_ReferenceDim == PROJECTEDREFDIM) ar << 2;
+		else if(m_ReferenceDim == MANUALREFDIM)    ar << 3;
 
 		ar << m_bAutoInertia;
 		ar << m_Mass;
@@ -1840,7 +1851,7 @@ bool WPolar::SerializeWPlrXFL(QDataStream &ar, bool bIsStoring)
 		ar >> m_PlaneName;
 		ar >> m_WPlrName;
 
-		ar >> m_WArea >> m_WMAChord >> m_WSpan ;
+		ar >> m_referenceArea >> m_referenceChordLength >> m_referenceSpanLength;
 		ar >> m_Style >> m_Width;
 		ar >> m_Color;
 		ar >> m_bIsVisible >> m_bShowPoints;
@@ -1869,7 +1880,30 @@ bool WPolar::SerializeWPlrXFL(QDataStream &ar, bool bIsStoring)
 
 		ar >> m_Density >> m_Viscosity;
 
-		ar >> m_RefAreaType;
+		ar >> k;
+		if(k==1)      m_ReferenceDim = PLANFORMREFDIM;
+		else if(k==2) m_ReferenceDim = PROJECTEDREFDIM;
+		else if(k==3) m_ReferenceDim = MANUALREFDIM;
+		else          m_ReferenceDim = PLANFORMREFDIM;
+
+		Plane *pPlane = Objects3D::getPlane(m_PlaneName);
+		if(pPlane)
+		{
+			if(m_ReferenceDim==PLANFORMREFDIM)
+			{
+				m_referenceArea       = pPlane->planformArea();
+				m_referenceSpanLength = pPlane->planformSpan();
+				if(pPlane->BiPlane()) m_referenceArea += pPlane->wing2()->m_PlanformArea;
+				m_referenceChordLength = pPlane->mac();
+			}
+			else if(m_ReferenceDim==PROJECTEDREFDIM)
+			{
+				m_referenceArea       = pPlane->projectedArea();
+				m_referenceSpanLength = pPlane->projectedSpan();
+				if(pPlane->BiPlane()) m_referenceArea += pPlane->wing2()->m_ProjectedArea;
+				m_referenceChordLength = pPlane->mac();
+			}
+		}
 
 		ar >> m_bAutoInertia;
 		ar >> m_Mass;
@@ -1933,6 +1967,7 @@ bool WPolar::SerializeWPlrXFL(QDataStream &ar, bool bIsStoring)
 
 	return true;
 }
+
 
 void WPolar::Copy(WPolar *pWPolar)
 {

@@ -87,9 +87,10 @@ private slots:
 private:
 	void keyPressEvent(QKeyEvent *event);
 	void showEvent(QShowEvent *event);
-	void ReadCtrlData();
+	void EnableControls();
 	void FillControlList();
 	void FillUFOInertia();
+	void ReadCtrlData();
 	void ReadParams();
 	void SetDensity();
 	void SetWPolarName();
@@ -111,8 +112,9 @@ private:
 	QCheckBox *m_pctrlIgnoreBodyPanels;
 
 	QRadioButton *m_pctrlUnit1, *m_pctrlUnit2;
-	QRadioButton *m_pctrlArea1, *m_pctrlArea2;
+	QRadioButton *m_pctrlArea1, *m_pctrlArea2, *m_pctrlArea3;
 
+	DoubleEdit *m_pctrlRefChord, *m_pctrlRefArea, *m_pctrlRefSpan;
 
 	QStackedWidget *m_pctrlAnalysisControls;
 	QRadioButton *m_pctrlWingMethod2, *m_pctrlWingMethod3;
@@ -122,7 +124,6 @@ private:
 
 	QLabel *m_pctrlRho, *m_pctrlNu;
 	QLabel *m_pctrlDensityUnit, *m_pctrlViscosityUnit;
-	QLabel *m_pctrlLab299,*m_pctrlLab300,*m_pctrlLab301,*m_pctrlLab302,*m_pctrlLab303,*m_pctrlLab304,*m_pctrlLab305;
 
 	DoubleEdit *m_pctrlMass, *m_pctrlCoGx,*m_pctrlCoGz, *m_pctrlIxx, *m_pctrlIyy, *m_pctrlIzz, *m_pctrlIxz;
 

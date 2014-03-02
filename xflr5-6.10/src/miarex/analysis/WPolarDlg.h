@@ -90,7 +90,6 @@ private:
 	int m_UnitType;//1= International, 2= English
 	double m_WingLoad;
 
-
 	DoubleEdit *m_pctrlXCmRef, *m_pctrlZCmRef;
 	DoubleEdit *m_pctrlDensity;
 	DoubleEdit *m_pctrlViscosity;
@@ -111,7 +110,9 @@ private:
 	QRadioButton *m_pctrlType1,*m_pctrlType2,*m_pctrlType4,*m_pctrlType5;
 	QRadioButton *m_pctrlLLTMethod, *m_pctrlVLM1Method, *m_pctrlVLM2Method, *m_pctrlPanelMethod;
 	QRadioButton *m_pctrlUnit1, *m_pctrlUnit2;
-	QRadioButton *m_pctrlArea1, *m_pctrlArea2;
+	QRadioButton *m_pctrlArea1, *m_pctrlArea2, *m_pctrlArea3;
+
+	DoubleEdit *m_pctrlRefChord, *m_pctrlRefArea, *m_pctrlRefSpan;
 
 	QLabel *m_pctrlSRe;
 	QLabel *m_pctrlRRe;
@@ -124,7 +125,8 @@ private:
 	QLabel *m_pctrlRho, *m_pctrlNu;
 	QLabel *m_pctrlDensityUnit, *m_pctrlViscosityUnit;
 
-	QLabel *m_pctrlLengthUnit1, *m_pctrlLengthUnit2, *m_pctrlLengthUnit3;
+	QLabel *m_pctrlLengthUnit1, *m_pctrlLengthUnit2, *m_pctrlLengthUnit3, *m_pctrlLengthUnit4, *m_pctrlLengthUnit5;
+	QLabel *m_pctrlAreaUnit;
 
 	QPushButton	*OKButton, *CancelButton;
 };

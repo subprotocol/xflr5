@@ -245,7 +245,7 @@ void PanelAnalysisDlg::Analyze()
 		outstream << "\n";
 		QDateTime dt = QDateTime::currentDateTime();
 		QString str = dt.toString("dd.MM.yyyy  hh:mm:ss");
-		outstream << str<<"\n";
+		outstream << str<<"\n\n";
 
 		outstream << m_pctrlTextOutput->toPlainText();
 		outstream.flush();

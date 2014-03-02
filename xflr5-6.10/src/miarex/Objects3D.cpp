@@ -1913,17 +1913,19 @@ void Objects3D::deletePlaneResults(Plane *pPlane)
 				pWPolar->ClearData();
 
 				//results only... means that the areas and spans have been edited... update polar
-				if( pWPolar->m_RefAreaType==PLANFORMAREA)
+				if(pWPolar->m_ReferenceDim==PLANFORMREFDIM)
 				{
-					pWPolar->m_WArea = pPlane->m_Wing[0].m_PlanformArea;
-					pWPolar->m_WSpan = pPlane->m_Wing[0].m_PlanformSpan;
+					pWPolar->m_referenceArea = pPlane->planformArea();
+					pWPolar->m_referenceSpanLength = pPlane->planformSpan();
+					if(pPlane && pPlane->BiPlane()) pWPolar->m_referenceArea += pPlane->wing2()->m_PlanformArea;
 				}
-				else
+				else if(pWPolar->m_ReferenceDim==PROJECTEDREFDIM)
 				{
-					pWPolar->m_WArea = pPlane->m_Wing[0].m_ProjectedArea;
-					pWPolar->m_WSpan = pPlane->m_Wing[0].m_ProjectedSpan;
+					pWPolar->m_referenceArea = pPlane->projectedArea();
+					pWPolar->m_referenceSpanLength = pPlane->projectedSpan();
+					if(pPlane && pPlane->BiPlane()) pWPolar->m_referenceArea += pPlane->wing2()->m_ProjectedArea;
 				}
-				pWPolar->m_WMAChord  = pPlane->m_Wing[0].m_MAChord;
+				pWPolar->m_referenceChordLength  = pPlane->m_Wing[0].m_MAChord;
 			}
 		}
 	}

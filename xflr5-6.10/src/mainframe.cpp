@@ -4843,7 +4843,16 @@ bool MainFrame::SerializeProjectXFL(QDataStream &ar, bool bIsStoring)
 		for(i=0; i<n; i++)
 		{
 			pWPolar = new WPolar();
-			if(pWPolar->SerializeWPlrXFL(ar, bIsStoring)) Objects3D::s_oaWPolar.append(pWPolar);
+			if(pWPolar->SerializeWPlrXFL(ar, bIsStoring))
+			{
+				// clean up : the project may be carrying useless WPolars due to past programming errors
+				pPlane = Objects3D::getPlane(pWPolar->planeName());
+				if(pPlane) Objects3D::s_oaWPolar.append(pWPolar);
+				else
+				{
+qDebug()<< "WPolar"<< pWPolar->planeName()<<pWPolar->polarName()<<" has no parent";
+				}
+			}
 			else
 			{
 				QMessageBox::warning(this,tr("Warning"), tr("Error reading the file")+"\n"+tr("Saved the valid part"));
@@ -4859,7 +4868,15 @@ bool MainFrame::SerializeProjectXFL(QDataStream &ar, bool bIsStoring)
 			if(pPOpp->SerializePOppXFL(ar, bIsStoring))
 			{
 				//just append, since POpps have been sorted when first inserted
-				Objects3D::s_oaPOpp.append(pPOpp);
+				pPlane = Objects3D::getPlane(pPOpp->planeName());
+				pWPolar = Objects3D::getWPolar(pPlane, pPOpp->polarName());
+
+				// clean up : the project may be carrying useless PlaneOpps due to past programming errors
+				if(pPlane && pWPolar) Objects3D::s_oaPOpp.append(pPOpp);
+				else
+				{
+qDebug()<< "PlaneOpp"<<pPOpp->planeName()<<pPOpp->polarName()<<" has no parent";
+				}
 			}
 			else
 			{

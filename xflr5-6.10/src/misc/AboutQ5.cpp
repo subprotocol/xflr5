@@ -35,28 +35,28 @@ AboutQ5::AboutQ5(QWidget *parent) : QDialog(parent)
 void AboutQ5::SetupLayout()
 {
 	QGridLayout *LogoLayout = new QGridLayout;
-    {
-        QLabel *LabIconQ5 = new QLabel;
-        LabIconQ5->setObjectName("iconXFLR5");
-        LabIconQ5->setPixmap(QPixmap(QString::fromUtf8(":/images/xflr5_64.png")));
-	   QLabel *lab1  = new QLabel(VERSIONNAME);
-        lab1->setAlignment(Qt::AlignVCenter| Qt::AlignLeft);
-        QLabel *XFLR5Link = new QLabel;
-        XFLR5Link->setText("<a href=http://www.xflr5.com>http://www.xflr5.com</a>");
-        XFLR5Link->setOpenExternalLinks(true);
-        XFLR5Link->setTextInteractionFlags(Qt::LinksAccessibleByKeyboard|Qt::LinksAccessibleByMouse);
-        XFLR5Link->setAlignment(Qt::AlignVCenter| Qt::AlignLeft);
+	{
+		QLabel *LabIconQ5 = new QLabel;
+		LabIconQ5->setObjectName("iconXFLR5");
+		LabIconQ5->setPixmap(QPixmap(QString::fromUtf8(":/images/xflr5_64.png")));
+		QLabel *lab1  = new QLabel(VERSIONNAME);
+		lab1->setAlignment(Qt::AlignVCenter| Qt::AlignLeft);
+		QLabel *XFLR5Link = new QLabel;
+		XFLR5Link->setText("<a href=http://www.xflr5.com>http://www.xflr5.com</a>");
+		XFLR5Link->setOpenExternalLinks(true);
+		XFLR5Link->setTextInteractionFlags(Qt::LinksAccessibleByKeyboard|Qt::LinksAccessibleByMouse);
+		XFLR5Link->setAlignment(Qt::AlignVCenter| Qt::AlignLeft);
 
-        LogoLayout->setColumnStretch(1,1);
-        LogoLayout->setColumnStretch(2,2);
-        LogoLayout->addWidget(LabIconQ5,1,1,2,1);
-        LogoLayout->addWidget(lab1,1,2);
-        LogoLayout->addWidget(XFLR5Link,2,2);
-    }
+		LogoLayout->setColumnStretch(1,1);
+		LogoLayout->setColumnStretch(2,2);
+		LogoLayout->addWidget(LabIconQ5,1,1,2,1);
+		LogoLayout->addWidget(lab1,1,2);
+		LogoLayout->addWidget(XFLR5Link,2,2);
+	}
 
 	QLabel *lab2  = new QLabel(tr("Copyright (C) M. Drela and H. Youngren 2000 - XFoil v6.94"));
 	QLabel *lab3  = new QLabel(tr("Copyright (C) Matthieu Scherrer 2004 - Miarex v1.00"));
-	QLabel *lab4  = new QLabel(tr("Copyright (C) Andre Deperrois 2003-2013"));
+	QLabel *lab4  = new QLabel(tr("Copyright (C) Andre Deperrois 2003-2014"));
 	QLabel *lab5  = new QLabel(tr("This program is distributed in the hope that it will be useful,"));
 	QLabel *lab6  = new QLabel(tr("but WITHOUT ANY WARRANTY; without even the implied warranty of"));
 	QLabel *lab7  = new QLabel(tr("MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE."));
@@ -71,14 +71,14 @@ void AboutQ5::SetupLayout()
 	QPushButton *OKButton = new QPushButton(tr("OK"));
 	connect(OKButton, SIGNAL(clicked()),this, SLOT(accept()));
 	QHBoxLayout *OKLayout = new QHBoxLayout;
-    {
+	{
         OKLayout->addStretch(1);
         OKLayout->addWidget(OKButton);
         OKLayout->addStretch(1);
-    }
+	}
 
 	QVBoxLayout *MainLayout = new QVBoxLayout;
-    {
+	{
         MainLayout->addLayout(LogoLayout);
         MainLayout->addStretch(1);
         MainLayout->addWidget(lab2);
@@ -101,7 +101,7 @@ void AboutQ5::SetupLayout()
         MainLayout->addWidget(lab10);
         MainLayout->addStretch(1);
         MainLayout->addLayout(OKLayout);
-    }
+	}
 	setLayout(MainLayout);
 	setMinimumHeight(400);
 }

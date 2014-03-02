@@ -148,7 +148,7 @@ void Settings::SetupLayout()
 			pMainFontLayout->addWidget(m_pctrlTextFont,1,2);
 			pMainFontLayout->addWidget(m_pctrlTextClr,1,3);
 
-			QLabel *labTable = new QLabel(tr("Table display font"));
+			QLabel *labTable = new QLabel(tr("Table font"));
 			m_pctrlTableFont = new QPushButton;
 
 			pMainFontLayout->addWidget(labTable,2,1);

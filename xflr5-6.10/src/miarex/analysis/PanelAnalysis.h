@@ -63,7 +63,7 @@ private:
 
 	void ComputeAeroCoefs(double V0, double VDelta, int nrhs);
 	void ComputeOnBodyCp(double V0, double VDelta, int nval);
-	void computePlane(double Alpha, double QInf, double Beta, int qrhs);
+	void ComputePlane(double Alpha, double QInf, int qrhs);
 	void ComputeFarField(double QInf, double Alpha0, double AlphaDelta, int nval);
 	void ComputeBalanceSpeeds(double Alpha, int q);
 	void CreateDoubletStrength(double Alpha0, double AlphaDelta, int nval);

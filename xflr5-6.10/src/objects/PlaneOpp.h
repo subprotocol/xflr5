@@ -89,8 +89,8 @@ private:
 	double m_Bank;             /**< the bank angle */
 	double m_Ctrl;             /**< the value of the control variable */
 	
-	double m_Span;                         /**< the parent's Wing span */
-	double m_MAChord;                      /**< the parent's Wing mean aerodynamic chord*/
+	double m_Span;             /**< the parent's Wing span */
+	double m_MAChord;          /**< the parent's Wing mean aerodynamic chord*/
 	int m_NStation;            /**< unused */
 
 

@@ -957,7 +957,7 @@ void Polar::GetPolarProperties(QString &PolarProperties, bool bData)
 	strong = QString(QObject::tr("NCrit") + " = %L1\n").arg(m_ACrit,6,'f',2);
 	PolarProperties += strong;
 
-	strong = QString(QObject::tr("Forced top trans.") + " = %L1\n").arg(m_XTop,6,'f',2);
+	strong = QString(QObject::tr("Forced top trans.   ") + " = %L1\n").arg(m_XTop,6,'f',2);
 	PolarProperties += strong;
 
 	strong = QString(QObject::tr("Forced bottom trans.") + " = %L1\n").arg(m_XBot,6,'f',2);

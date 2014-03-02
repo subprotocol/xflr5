@@ -23,8 +23,10 @@
 #include <math.h>
 #include "LLTAnalysis.h"
 #include "LLTAnalysisDlg.h"
+#include "../../misc/Units.h"
 #include <QString>
-#include <QtDebug>
+
+
 
 QList<void *> *LLTAnalysis::s_poaPolar = NULL;
 int LLTAnalysis::s_IterLim = 20;
@@ -177,7 +179,7 @@ double LLTAnalysis::Beta(int m, int k)
  * @param Alpha the angle of attack, in degrees
  * @param ErrorMessage a reference to the output string which is filled with the error messages
  */
-void LLTAnalysis::computeWing(double QInf, double Alpha, QString &ErrorMessage)
+void LLTAnalysis::ComputeWing(double QInf, double Alpha, QString &ErrorMessage)
 {
 	Foil* pFoil0 = NULL;
 	Foil* pFoil1 = NULL;
@@ -215,29 +217,29 @@ void LLTAnalysis::computeWing(double QInf, double Alpha, QString &ErrorMessage)
 		yob   = cos((double)m*PI/(double)s_NLLTStations);
 		m_pWing->GetFoils(&pFoil0, &pFoil1, yob*m_pWing->m_PlanformSpan/2.0, tau);
 
-        m_Cl[m]     = GetCl(pFoil0, pFoil1, m_Re[m], Alpha+m_Ai[m]+m_Twist[m], tau, bOutRe, bError);
+		m_Cl[m]     = GetCl(pFoil0, pFoil1, m_Re[m], Alpha+m_Ai[m]+m_Twist[m], tau, bOutRe, bError);
 		if(bOutRe) bPointOutRe = true;
 		if(bError) bPointOutAlpha = true;
 
-        m_PCd[m]    = GetCd(pFoil0, pFoil1, m_Re[m], Alpha+m_Ai[m]+m_Twist[m], tau, m_pWing->m_AR, bOutRe, bError);
+		m_PCd[m]    = GetCd(pFoil0, pFoil1, m_Re[m], Alpha+m_Ai[m]+m_Twist[m], tau, m_pWing->m_AR, bOutRe, bError);
 		if(bOutRe) bPointOutRe = true;
 		if(bError) bPointOutAlpha = true;
 
 		m_ICd[m]    = -m_Cl[m] * (m_Ai[m]* PI/180.0);
 
-        m_XTrTop[m] = GetXTr(pFoil0, pFoil1, m_Re[m], Alpha+m_Ai[m] + m_Twist[m], tau, true, bOutRe, bError);
+		m_XTrTop[m] = GetXTr(pFoil0, pFoil1, m_Re[m], Alpha+m_Ai[m] + m_Twist[m], tau, true, bOutRe, bError);
 		if(bOutRe) bPointOutRe = true;
 		if(bError) bPointOutAlpha = true;
 
-        m_XTrBot[m] = GetXTr(pFoil0, pFoil1, m_Re[m], Alpha+m_Ai[m]+m_Twist[m], tau, false, bOutRe, bError);
+		m_XTrBot[m] = GetXTr(pFoil0, pFoil1, m_Re[m], Alpha+m_Ai[m]+m_Twist[m], tau, false, bOutRe, bError);
 		if(bOutRe) bPointOutRe = true;
 		if(bError) bPointOutAlpha = true;
 
-        m_CmAirf[m] = GetCm(pFoil0, pFoil1, m_Re[m], Alpha+m_Ai[m]+m_Twist[m], tau, bOutRe, bError);
+		m_CmAirf[m] = GetCm(pFoil0, pFoil1, m_Re[m], Alpha+m_Ai[m]+m_Twist[m], tau, bOutRe, bError);
 		if(bOutRe) bPointOutRe = true;
 		if(bError) bPointOutAlpha = true;
 
-        m_XCPSpanRel[m] = GetXCp(pFoil0, pFoil1, m_Re[m], Alpha+m_Ai[m]+m_Twist[m], tau, bOutRe, bError);
+		m_XCPSpanRel[m] = GetXCp(pFoil0, pFoil1, m_Re[m], Alpha+m_Ai[m]+m_Twist[m], tau, bOutRe, bError);
 
 		if(qAbs(m_XCPSpanRel[m])<0.000001)
 		{
@@ -659,7 +661,7 @@ bool LLTAnalysis::alphaLoop()
 			//converged,
 			str= QString("    ...converged after %1 iterations\n").arg(iter);
 			traceLog(str);
-			computeWing(m_pWPolar->m_QInfSpec, Alpha, str);// generates wing results,
+			ComputeWing(m_pWPolar->m_QInfSpec, Alpha, str);// generates wing results,
 			traceLog(str);
 			if (m_bWingOut) m_bWarning = true;
 			PlaneOpp *pPOpp = createPlaneOpp(m_pWPolar->m_QInfSpec, Alpha, m_bWingOut);// Adds WOpp point and adds result to polar
@@ -749,7 +751,7 @@ bool LLTAnalysis::QInfLoop()
 			//converged,
 			str = QString("    ...converged after %1 iterations\n").arg(iter);
 			traceLog(str);
-			computeWing(QInf, m_pWPolar->m_AlphaSpec,str);// generates wing results,
+			ComputeWing(QInf, m_pWPolar->m_AlphaSpec,str);// generates wing results,
 			traceLog(str);
 			if (m_bWingOut) m_bWarning = true;
 			PlaneOpp *pPOpp = createPlaneOpp(QInf, m_pWPolar->m_AlphaSpec, m_bWingOut);// Adds WOpp point and adds result to polar
@@ -808,6 +810,17 @@ void LLTAnalysis::initializeAnalysis()
 	m_bWarning = m_bError = false;
 	m_PlaneOppList.clear();
 	initializeGeom();
+
+	QString strUnitLabel, strange;
+	Units::getAreaUnitLabel(strUnitLabel);
+	strange =QString("Ref. area  = %1 ").arg(m_pWPolar->referenceArea()*Units::m2toUnit(),9,'f',3)+strUnitLabel;
+	traceLog(strange+"\n");
+	Units::getLengthUnitLabel(strUnitLabel);
+	strange =QString("Ref. span  = %1 ").arg(m_pWPolar->referenceSpanLength()*Units::mtoUnit(),9,'f',3)+strUnitLabel;
+	traceLog(strange+"\n");
+	Units::getLengthUnitLabel(strUnitLabel);
+	strange =QString("Ref. chord = %1 ").arg(m_pWPolar->referenceChordLength()*Units::mtoUnit(),9,'f',3)+strUnitLabel;
+	traceLog(strange+"\n"+"\n");
 }
 
 

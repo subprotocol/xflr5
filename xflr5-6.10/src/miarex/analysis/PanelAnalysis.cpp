@@ -24,6 +24,7 @@
 #include <QApplication>
 #include "../../globals.h"
 #include "../Objects3D.h"
+#include "../../misc/Units.h"
 #include "PanelAnalysis.h"
 
 
@@ -487,7 +488,7 @@ bool PanelAnalysis::initializeAnalysis()
 
 	QString strange;
 
-	strange = "Launching 3D Panel Analysis....\n";
+	strange = "Launching the 3D Panel Analysis....\n";
 	traceLog(strange);
 
 	traceLog(m_pPlane->planeName()+"\n");
@@ -498,6 +499,17 @@ bool PanelAnalysis::initializeAnalysis()
 	else if(m_pWPolar->polarType()==FIXEDAOAPOLAR)  strange = "Type 5 - Sideslip variation polar";
 	else if(m_pWPolar->polarType()==STABILITYPOLAR) strange = "Type 7 - Stability polar";
 	traceLog(strange+"\n");
+
+	QString strUnitLabel;
+	Units::getAreaUnitLabel(strUnitLabel);
+	strange =QString("Ref. area  = %1 ").arg(m_pWPolar->referenceArea()*Units::m2toUnit(),9,'f',3)+strUnitLabel;
+	traceLog(strange+"\n");
+	Units::getLengthUnitLabel(strUnitLabel);
+	strange =QString("Ref. span  = %1 ").arg(m_pWPolar->referenceSpanLength()*Units::mtoUnit(),9,'f',3)+strUnitLabel;
+	traceLog(strange+"\n");
+	Units::getLengthUnitLabel(strUnitLabel);
+	strange =QString("Ref. chord = %1 ").arg(m_pWPolar->referenceChordLength()*Units::mtoUnit(),9,'f',3)+strUnitLabel;
+	traceLog(strange+"\n"+"\n");
 
 	m_NSpanStations = 0;
 	for(int iw=0; iw<MAXWINGS; iw++)
@@ -1220,7 +1232,7 @@ void PanelAnalysis::ComputeBalanceSpeeds(double Alpha, int q)
 	else if(m_pWPolar->polarType()==FIXEDLIFTPOLAR)
 	{
 		Lift =  Force.dot(WindNormal) ;      //N/q, for 1/ms
-		TempCl = Lift/m_pWPolar->m_WArea;
+		TempCl = Lift/m_pWPolar->m_referenceArea;
 		if(Lift<=0.0)
 		{
 			strong = "           "+QString("Found a negative lift for Alpha=%1.... skipping the angle...\n").arg(Alpha, 5,'f',2);
@@ -1231,7 +1243,7 @@ void PanelAnalysis::ComputeBalanceSpeeds(double Alpha, int q)
 		}
 		else
 		{
-			m_3DQInf[q] =  sqrt(2.0* 9.81 * m_pWPolar->m_Mass/m_pWPolar->m_Density/TempCl/m_pWPolar->m_WArea);
+			m_3DQInf[q] =  sqrt(2.0* 9.81 * m_pWPolar->m_Mass/m_pWPolar->m_Density/TempCl/m_pWPolar->m_referenceArea);
 			strong = QString("           Alpha=%1   QInf=%2m/s").arg(Alpha, 5,'f',2).arg(m_3DQInf[q],5,'f',2);
 			strong+="\n";
 			traceLog(strong);
@@ -1345,7 +1357,7 @@ void PanelAnalysis::ComputeAeroCoefs(double V0, double VDelta, int nrhs)
 			if(s_bCancel) return;
 			str = QString("      Computing Plane for QInf=%1m/s").arg((V0+q*VDelta),7,'f',2);
 			traceLog(str);
-			computePlane(m_Alpha, V0+q*VDelta, m_OpBeta, q);
+			ComputePlane(m_Alpha, V0+q*VDelta, q);
 			s_Progress += 5.0*(double)nrhs /(double)nrhs;
 			qApp->processEvents();
 		}
@@ -1358,7 +1370,7 @@ void PanelAnalysis::ComputeAeroCoefs(double V0, double VDelta, int nrhs)
 			str = QString("      Computing Plane for beta=%1").arg((m_OpBeta),0,'f',1);
 			str += QString::fromUtf8("°\n");
 			traceLog(str);
-			computePlane(m_Alpha, m_3DQInf[q], V0+q*VDelta, q);
+			ComputePlane(m_Alpha, m_3DQInf[q], q);
 			s_Progress += 5.0*(double)nrhs /(double)nrhs;
 			qApp->processEvents();
 		}
@@ -1374,7 +1386,7 @@ void PanelAnalysis::ComputeAeroCoefs(double V0, double VDelta, int nrhs)
 				else                          str = QString("      Computing Plane for alpha=%1").arg(m_OpAlpha,7,'f',2);
 				str += QString::fromUtf8("°\n");
 				traceLog(str);
-				computePlane(V0+q*VDelta, m_3DQInf[q], m_OpBeta, q);
+				ComputePlane(V0+q*VDelta, m_3DQInf[q], q);
 			}
 			s_Progress += 5.0*(double)nrhs/(double)nrhs;
 			qApp->processEvents();
@@ -1392,7 +1404,7 @@ void PanelAnalysis::ComputeAeroCoefs(double V0, double VDelta, int nrhs)
  * @param QInf the freesteam velocity of this calculation
  * @param qrhs the index of the current right hand side calculation
 */
-void PanelAnalysis::computePlane(double Alpha, double QInf, double Beta, int qrhs)
+void PanelAnalysis::ComputePlane(double Alpha, double QInf, int qrhs)
 {
 	int pos;
 	double *Mu, *Sigma;
@@ -1491,12 +1503,12 @@ void PanelAnalysis::computePlane(double Alpha, double QInf, double Beta, int qrh
 
 		if(!s_bTrefftz) SumPanelForces(m_Cp+qrhs*m_MatSize, Alpha, Lift, IDrag);
 
-		m_CL          =       Force.dot(WindNormal)    /m_pWPolar->m_WArea;
-		m_CX          =       Force.dot(WindDirection) /m_pWPolar->m_WArea;
-		m_CY          =       Force.dot(WindSide)      /m_pWPolar->m_WArea;
+		m_CL          =       Force.dot(WindNormal)    /m_pWPolar->referenceArea();
+		m_CX          =       Force.dot(WindDirection) /m_pWPolar->referenceArea();
+		m_CY          =       Force.dot(WindSide)      /m_pWPolar->referenceArea();
 
-		m_InducedDrag =  1.0*IDrag/m_pWPolar->m_WArea;
-		m_ViscousDrag =  1.0*VDrag/m_pWPolar->m_WArea;
+		m_InducedDrag =  1.0*IDrag/m_pWPolar->referenceArea();
+		m_ViscousDrag =  1.0*VDrag/m_pWPolar->referenceArea();
 
 		if(qAbs(Force.dot(WindNormal))>0.0)
 		{
@@ -1509,15 +1521,15 @@ void PanelAnalysis::computePlane(double Alpha, double QInf, double Beta, int qrh
 			m_CP.Set(0.0,0.0,0.0);
 		}
 
-		m_GCm *= 1.0 / m_pWPolar->m_WArea /m_pPlane->mac();
-		m_VCm *= 1.0 / m_pWPolar->m_WArea /m_pPlane->mac();
-		m_ICm *= 1.0 / m_pWPolar->m_WArea /m_pPlane->mac();
+		m_GCm *= 1.0 / m_pWPolar->referenceArea() /m_pWPolar->referenceChordLength();
+		m_VCm *= 1.0 / m_pWPolar->referenceArea() /m_pWPolar->referenceChordLength();
+		m_ICm *= 1.0 / m_pWPolar->referenceArea() /m_pWPolar->referenceChordLength();
 
-		m_GRm *= 1.0 / m_pWPolar->m_WArea /m_pWPolar->m_WSpan;
+		m_GRm *= 1.0 / m_pWPolar->m_referenceArea /m_pWPolar->referenceSpanLength();
 
-		m_GYm *= 1.0 / m_pWPolar->m_WArea /m_pWPolar->m_WSpan;
-		m_VYm *= 1.0 / m_pWPolar->m_WArea /m_pWPolar->m_WSpan;
-		m_IYm *= 1.0 / m_pWPolar->m_WArea /m_pWPolar->m_WSpan;
+		m_GYm *= 1.0 / m_pWPolar->referenceArea() /m_pWPolar->referenceSpanLength();
+		m_VYm *= 1.0 / m_pWPolar->referenceArea() /m_pWPolar->referenceSpanLength();
+		m_IYm *= 1.0 / m_pWPolar->referenceArea() /m_pWPolar->referenceSpanLength();
 
 		if(m_bPointOut) s_bWarning = true;
 
@@ -1557,6 +1569,7 @@ void PanelAnalysis::GetVortexCp(const int &p, double *Gamma, double *Cp, CVector
 
 	Cp[p]  = -2.0 * PanelForce.dot(m_pPanel[p].Normal) /m_pPanel[p].Area/m_pWPolar->m_Density;
 }
+
 
 /**
 * This method calculates the Cp coefficient on a panel based on the distribution of doublet strengths.
@@ -1599,7 +1612,8 @@ void PanelAnalysis::GetDoubletDerivative(const int &p, double *Mu, double &Cp, C
 	{
 		// no right neighbour
 		// do we have two left neighbours ?
-		if(m_pPanel[PL].m_iPL>=0){
+		if(m_pPanel[PL].m_iPL>=0)
+		{
 			x2  = 0.0;
 			x1  = x2 - m_pPanel[p].SMQ  - m_pPanel[PL].SMQ;
 			x0  = x1 - m_pPanel[PL].SMQ - m_pPanel[m_pPanel[PL].m_iPL].SMQ;
@@ -2539,7 +2553,7 @@ bool PanelAnalysis::controlLoop()
 				str = QString("      Computing Plane for alpha=%1").arg(m_AlphaEq,7,'f',2);
 				str += QString::fromUtf8("°\n");
 				traceLog(str);
-				computePlane(m_AlphaEq, u0, m_OpBeta, 0);
+				ComputePlane(m_AlphaEq, u0, 0);
 
 				if (s_bCancel) return true;
 			}
@@ -2683,8 +2697,8 @@ void PanelAnalysis::ComputeNDStabDerivatives()
 	double rho = m_pWPolar->m_Density;
 
 	q = 1./2. * m_pWPolar->m_Density * u0 * u0;
-	b   = m_pWPolar->m_WSpan;
-	S   = m_pWPolar->m_WArea;
+	b   = m_pWPolar->m_referenceSpanLength;
+	S   = m_pWPolar->m_referenceArea;
 	mac = m_pPlane->mac();
 	theta0 = 0.0;//steady level flight only ?
 
@@ -3310,7 +3324,7 @@ bool PanelAnalysis::ComputeTrimmedConditions()
 
 	phi = m_pWPolar->m_BankAngle *PI/180.0;
 	Lift   = Force.dot(WindNormal);		//N/rho ; bank effect not included
-	VerticalCl = Lift*2.0/m_pWPolar->m_WArea * cos(phi)/m_pWPolar->m_Density;
+	VerticalCl = Lift*2.0/m_pWPolar->m_referenceArea * cos(phi)/m_pWPolar->m_Density;
 	if(Lift<=0.0)
 	{
 		u0 = -100.0;
@@ -3324,7 +3338,7 @@ bool PanelAnalysis::ComputeTrimmedConditions()
 	{
 		double radius, W, p, q, r; //trimmed flight data
 
-		u0 =  sqrt( 2.0* 9.81 * m_pWPolar->m_Mass /m_pWPolar->m_Density/m_pWPolar->m_WArea / VerticalCl );
+		u0 =  sqrt( 2.0* 9.81 * m_pWPolar->m_Mass /m_pWPolar->m_Density/m_pWPolar->m_referenceArea / VerticalCl );
 		strong = QString("VInf = %1 m/s").arg(u0,0,'f',5);
 		strong+= strange + "\n";
 		if(m_bTrace) traceLog(strong);

@@ -6330,6 +6330,9 @@ void QXDirect::SetupLayout()
 	{
 		m_pctrlPolarProps = new QLabel;
 		m_pctrlPolarProps->setSizePolicy(szPolicyExpanding);
+		QFont fnt("Courier");
+		m_pctrlPolarProps->setFont(fnt);
+
 
 	//	m_pctrlPolarProps->setReadOnly(true);
 	//	m_pctrlPolarProps->setWordWrapMode(QTextOption::NoWrap);

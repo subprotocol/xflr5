@@ -825,7 +825,7 @@ void GLCreateDrag(Wing *pWing, WPolar* pWPolar, WingOpp *pWOpp, int List)
 		glLineWidth((GLfloat)(Iwidth));
 //		glPolygonMode(GL_FRONT,GL_LINE);
 
-		double q0 = 0.5 * pWPolar->m_Density * pWPolar->m_WArea * pWOpp->m_QInf * pWOpp->m_QInf;
+		double q0 = 0.5 * pWPolar->m_Density * pWPolar->referenceArea() * pWOpp->m_QInf * pWOpp->m_QInf;
 
 		if(pWOpp)
 		{
@@ -1360,7 +1360,7 @@ void GLCreateLiftForce(WPolar *pWPolar, PlaneOpp *pPOpp)
 		//Resulting force vector
 		glLineWidth((GLfloat)(W3dPrefsDlg::s_XCPWidth * 2.0));
 
-		double force = 0.5*pWPolar->m_Density * pWPolar->m_WArea
+		double force = 0.5*pWPolar->m_Density * pWPolar->referenceArea()
 		*pPOpp->m_QInf*pPOpp->m_QInf
 		*pPOpp->m_CL;
 
@@ -1438,7 +1438,7 @@ void GLCreateMoments(Wing *pWing, WPolar *pWPolar, PlaneOpp *pPOpp)
 
 		glLineWidth((GLfloat)(width*2.0));
 
-		amp = 0.5*pWPolar->m_Density * pWPolar->m_WArea * pWPolar->m_WSpan
+		amp = 0.5*pWPolar->m_Density * pWPolar->referenceArea() * pWPolar->referenceSpanLength()
 				 *pPOpp->m_QInf*pPOpp->m_QInf * pPOpp->m_GCm/3.0;
 
 		amp *= QMiarex::s_LiftScale*factor;
@@ -1483,7 +1483,7 @@ void GLCreateMoments(Wing *pWing, WPolar *pWPolar, PlaneOpp *pPOpp)
 
 		//Resulting Rolling Moment Arc vector
 
-		amp = 0.5*pWPolar->m_Density * pWPolar->m_WArea * pWPolar->m_WMAChord
+		amp = 0.5*pWPolar->m_Density * pWPolar->referenceArea() * pWPolar->referenceChordLength()
 						*pPOpp->m_QInf*pPOpp->m_QInf
 						*pPOpp->m_GRm/3.0;
 
@@ -1521,7 +1521,7 @@ void GLCreateMoments(Wing *pWing, WPolar *pWPolar, PlaneOpp *pPOpp)
 
 		//Resulting Yawing Moment Arc vector
 
-		amp = 0.5*pWPolar->m_Density * pWPolar->m_WArea * pWPolar->m_WSpan
+		amp = 0.5*pWPolar->m_Density * pWPolar->referenceArea() * pWPolar->referenceSpanLength()
 						*pPOpp->m_QInf*pPOpp->m_QInf
 						*(pPOpp->m_GYm)/3.0;
 
