@@ -87,8 +87,8 @@ private:
 	QWidget *m_pParent;
 
 	QTabWidget *m_pTabWidget;
-	QWidget *ScalePage, *FontPage, *GridPage;
-	QWidget *VariablePage;
+	QWidget *m_pScalePage, *m_pFontPage, *m_pGridPage;
+	QWidget *m_pVariablePage;
 
 	QListWidget *m_pctrlXSel, *m_pctrlYSel;
 

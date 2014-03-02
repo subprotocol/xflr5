@@ -26,6 +26,7 @@
 #define WPOLARDLG_H
 
 #include <QDialog>
+#include <QTabWidget>
 #include <QCheckBox>
 #include <QPushButton>
 #include <QLabel>
@@ -117,18 +118,15 @@ private:
 	QLabel *m_pctrlSRe;
 	QLabel *m_pctrlRRe;
 	QLabel *m_pctrlQInfCl;
-	QLabel *m_pctrlUFOName;
 	QLabel *m_pctrlWingLoad;
-	QLabel *m_pctrlSpeedUnit;
-	QLabel *m_pctrlWeightUnit;
 
 	QLabel *m_pctrlRho, *m_pctrlNu;
 	QLabel *m_pctrlDensityUnit, *m_pctrlViscosityUnit;
 
-	QLabel *m_pctrlLengthUnit1, *m_pctrlLengthUnit2, *m_pctrlLengthUnit3, *m_pctrlLengthUnit4, *m_pctrlLengthUnit5;
-	QLabel *m_pctrlAreaUnit;
-
 	QPushButton	*OKButton, *CancelButton;
+
+	QTabWidget *m_pTabWidget;
+	QWidget *m_pPolarTypePage, *m_pMethodPage, *m_pOptionPage, *m_pPlaneDataPage;
 };
 
 #endif // WPOLARDLG_H

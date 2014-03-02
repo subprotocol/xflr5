@@ -1492,6 +1492,7 @@ void WPolar::GetPolarProperties(QString &PolarProperties, bool bData)
 	else if(m_WPolarType==FIXEDLIFTPOLAR) strong = "Type 2: "+QObject::tr("Fixed lift") +"\n";
 	else if(m_WPolarType==FIXEDAOAPOLAR)  strong = "Type 4: "+QObject::tr("Fixed angle of attack") +"\n";
 	else if(m_WPolarType==STABILITYPOLAR) strong = "Type 7: "+QObject::tr("Stability analysis") +"\n";
+	else if(m_WPolarType==BETAPOLAR)      strong = "Type 5: "+QObject::tr("Sideslip analysis") +"\n";
 	PolarProperties += strong;
 
 	if(m_WPolarType==FIXEDSPEEDPOLAR)
@@ -1527,7 +1528,7 @@ void WPolar::GetPolarProperties(QString &PolarProperties, bool bData)
 
 
 	//Control data
-	if(m_WPolarType==STABILITYPOLAR)
+	if(m_WPolarType==STABILITYPOLAR && pPlane)
 	{
 		int j;
 		int iCtrl = 0;

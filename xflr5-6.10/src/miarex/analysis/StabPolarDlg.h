@@ -119,12 +119,13 @@ private:
 	QRadioButton *m_pctrlWingMethod2, *m_pctrlWingMethod3;
 	QRadioButton *m_pctrlPanelMethod;
 
-	QLabel *m_pctrlUFOName;
-
 	QLabel *m_pctrlRho, *m_pctrlNu;
 	QLabel *m_pctrlDensityUnit, *m_pctrlViscosityUnit;
 
 	DoubleEdit *m_pctrlMass, *m_pctrlCoGx,*m_pctrlCoGz, *m_pctrlIxx, *m_pctrlIyy, *m_pctrlIzz, *m_pctrlIxz;
+
+	QTabWidget *m_pTabWidget;
+	QWidget  *m_pMethodPage, *m_pOptionPage, *m_pPlaneDataPage, *m_pControlPage;
 
 	int  *m_precision;
 

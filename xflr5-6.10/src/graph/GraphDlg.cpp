@@ -727,46 +727,45 @@ void GraphDlg::SetupLayout()
 	}
 
 	m_pTabWidget = new QTabWidget(this);
-	ScalePage    = new QWidget(this);
-	GridPage     = new QWidget(this);
-	FontPage     = new QWidget(this);
-	VariablePage = new QWidget(this);
+	m_pScalePage    = new QWidget(this);
+	m_pGridPage     = new QWidget(this);
+	m_pFontPage     = new QWidget(this);
+	m_pVariablePage = new QWidget(this);
 
 	//________Variable Page______________________
-	QVBoxLayout *VariablePageLayout = new QVBoxLayout(this);
+	QVBoxLayout *pVariablePageLayout = new QVBoxLayout(this);
 	{
-		QHBoxLayout *AxisNamesLayout = new QHBoxLayout;
+		QHBoxLayout *pAxisNamesLayout = new QHBoxLayout;
 		{
 			QLabel *YAxis = new QLabel(tr("YAxis"));
 			QLabel *vs = new QLabel(tr("vs."));
 			QLabel *XAxis = new QLabel(tr("XAxis"));
-			AxisNamesLayout->addStretch(1);
-			AxisNamesLayout->addWidget(YAxis);
-			AxisNamesLayout->addStretch(1);
-			AxisNamesLayout->addWidget(vs);
-			AxisNamesLayout->addStretch(1);
-			AxisNamesLayout->addWidget(XAxis);
-			AxisNamesLayout->addStretch(1);
+			pAxisNamesLayout->addStretch(1);
+			pAxisNamesLayout->addWidget(YAxis);
+			pAxisNamesLayout->addStretch(1);
+			pAxisNamesLayout->addWidget(vs);
+			pAxisNamesLayout->addStretch(1);
+			pAxisNamesLayout->addWidget(XAxis);
+			pAxisNamesLayout->addStretch(1);
 		}
 
-		QHBoxLayout *VariableBoxLayout = new QHBoxLayout;
+		QHBoxLayout *pVariableBoxLayout = new QHBoxLayout;
 		{
 			m_pctrlXSel = new QListWidget;
 			m_pctrlYSel = new QListWidget;
-			VariableBoxLayout->addWidget(m_pctrlYSel);
-			VariableBoxLayout->addWidget(m_pctrlXSel);
+			pVariableBoxLayout->addWidget(m_pctrlYSel);
+			pVariableBoxLayout->addWidget(m_pctrlXSel);
 		}
 
-		VariablePageLayout->addLayout(AxisNamesLayout);
-		VariablePageLayout->addLayout(VariableBoxLayout);
+		pVariablePageLayout->addLayout(pAxisNamesLayout);
+		pVariablePageLayout->addLayout(pVariableBoxLayout);
 	}
-	VariablePage->setLayout(VariablePageLayout);
+	m_pVariablePage->setLayout(pVariablePageLayout);
 
 	//________Font Page______________________
 
-	QVBoxLayout *FontPageLayout = new QVBoxLayout;
+	QVBoxLayout *pFontPageLayout = new QVBoxLayout;
 	{
-
 		QGroupBox *pFontBox = new QGroupBox(tr("Fonts"));
 		{
 			QGridLayout *pFontButtonsLayout = new QGridLayout;
@@ -803,7 +802,7 @@ void GraphDlg::SetupLayout()
 
 		QGroupBox *pBackBox = new QGroupBox(tr("BackGround"));
 		{
-			QGridLayout *BackDataLayout = new QGridLayout;
+			QGridLayout *pBackDataLayout = new QGridLayout;
 			{
 				QLabel *GraphBackLabel = new QLabel(tr("Graph Background"));
 				GraphBackLabel->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
@@ -814,15 +813,15 @@ void GraphDlg::SetupLayout()
 				m_pctrlBorderStyle = new LineBtn(this);
 				m_pctrlBorderStyle->setMinimumWidth(100);
 
-				BackDataLayout->addWidget(GraphBackLabel,1,1);
-				BackDataLayout->addWidget(m_pctrlGraphBorder,2,1,1,1,Qt::AlignRight | Qt::AlignVCenter);
+				pBackDataLayout->addWidget(GraphBackLabel,1,1);
+				pBackDataLayout->addWidget(m_pctrlGraphBorder,2,1,1,1,Qt::AlignRight | Qt::AlignVCenter);
 
-				BackDataLayout->addWidget(m_pctrlGraphBack,1,2);
-				BackDataLayout->addWidget(m_pctrlBorderStyle,2,2);
+				pBackDataLayout->addWidget(m_pctrlGraphBack,1,2);
+				pBackDataLayout->addWidget(m_pctrlBorderStyle,2,2);
 
-				BackDataLayout->setColumnStretch(0,1);
+				pBackDataLayout->setColumnStretch(0,1);
 			}
-			pBackBox->setLayout(BackDataLayout);
+			pBackBox->setLayout(pBackDataLayout);
 		}
 		QGroupBox *pPaddingBox = new QGroupBox(tr("Padding"));
 		{
@@ -839,19 +838,19 @@ void GraphDlg::SetupLayout()
 			pPaddingBox->setLayout(pPaddingLayout);
 		}
 
-		FontPageLayout->addWidget(pFontBox);
-		FontPageLayout->addStretch(1);
-		FontPageLayout->addWidget(pBackBox);
-		FontPageLayout->addStretch(1);
-		FontPageLayout->addWidget(pPaddingBox);
-		FontPageLayout->addStretch(1);
+		pFontPageLayout->addWidget(pFontBox);
+		pFontPageLayout->addStretch(1);
+		pFontPageLayout->addWidget(pBackBox);
+		pFontPageLayout->addStretch(1);
+		pFontPageLayout->addWidget(pPaddingBox);
+		pFontPageLayout->addStretch(1);
 	}
-	FontPage->setLayout(FontPageLayout);
+	m_pFontPage->setLayout(pFontPageLayout);
 	//________End Font Page______________________
 
 	//________Scale Page______________________
 
-	QGridLayout *ScalePageLayout = new QGridLayout;
+	QGridLayout *pScalePageLayout = new QGridLayout;
 	{
 		QLabel *XAxis2 = new QLabel(tr("X Axis"));
 		QLabel *YAxis2 = new QLabel(tr("Y Axis"));
@@ -867,10 +866,10 @@ void GraphDlg::SetupLayout()
 		OriginLabel->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
 		UnitLabel->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
 	//	ScaleData->addStretch(1);
-		ScalePageLayout->addWidget(MinLabel,5,1);
-		ScalePageLayout->addWidget(MaxLabel,6,1);
-		ScalePageLayout->addWidget(OriginLabel,7,1);
-		ScalePageLayout->addWidget(UnitLabel,8,1);
+		pScalePageLayout->addWidget(MinLabel,5,1);
+		pScalePageLayout->addWidget(MaxLabel,6,1);
+		pScalePageLayout->addWidget(OriginLabel,7,1);
+		pScalePageLayout->addWidget(UnitLabel,8,1);
 
 		m_pctrlXAuto    = new QCheckBox(tr("Auto Scale"));
 		m_pctrlXMin     = new DoubleEdit;
@@ -878,12 +877,12 @@ void GraphDlg::SetupLayout()
 		m_pctrlXOrigin  = new DoubleEdit;
 		m_pctrlXUnit    = new DoubleEdit;
 
-		ScalePageLayout->addWidget(XAxis2,2,2);
-		ScalePageLayout->addWidget(m_pctrlXAuto,4,2);
-		ScalePageLayout->addWidget(m_pctrlXMin,5,2);
-		ScalePageLayout->addWidget(m_pctrlXMax,6,2);
-		ScalePageLayout->addWidget(m_pctrlXOrigin,7,2);
-		ScalePageLayout->addWidget(m_pctrlXUnit,8,2);
+		pScalePageLayout->addWidget(XAxis2,2,2);
+		pScalePageLayout->addWidget(m_pctrlXAuto,4,2);
+		pScalePageLayout->addWidget(m_pctrlXMin,5,2);
+		pScalePageLayout->addWidget(m_pctrlXMax,6,2);
+		pScalePageLayout->addWidget(m_pctrlXOrigin,7,2);
+		pScalePageLayout->addWidget(m_pctrlXUnit,8,2);
 
 		m_pctrlYInverted = new QCheckBox(tr("Inverted Axis"));
 		m_pctrlYAuto     = new QCheckBox(tr("Auto Scale"));
@@ -892,22 +891,22 @@ void GraphDlg::SetupLayout()
 		m_pctrlYOrigin   = new DoubleEdit;
 		m_pctrlYUnit     = new DoubleEdit;
 
-		ScalePageLayout->addWidget(YAxis2,2,3);
-		ScalePageLayout->addWidget(m_pctrlYInverted,3,3);
-		ScalePageLayout->addWidget(m_pctrlYAuto,4,3);
-		ScalePageLayout->addWidget(m_pctrlYMin,5,3);
-		ScalePageLayout->addWidget(m_pctrlYMax,6,3);
-		ScalePageLayout->addWidget(m_pctrlYOrigin,7,3);
-		ScalePageLayout->addWidget(m_pctrlYUnit,8,3);
-		ScalePageLayout->setRowStretch(9,1);
+		pScalePageLayout->addWidget(YAxis2,2,3);
+		pScalePageLayout->addWidget(m_pctrlYInverted,3,3);
+		pScalePageLayout->addWidget(m_pctrlYAuto,4,3);
+		pScalePageLayout->addWidget(m_pctrlYMin,5,3);
+		pScalePageLayout->addWidget(m_pctrlYMax,6,3);
+		pScalePageLayout->addWidget(m_pctrlYOrigin,7,3);
+		pScalePageLayout->addWidget(m_pctrlYUnit,8,3);
+		pScalePageLayout->setRowStretch(9,1);
 	}
-	ScalePage->setLayout(ScalePageLayout);
+	m_pScalePage->setLayout(pScalePageLayout);
 	//________End Scale Page______________________
 
 	//________Axis Page______________________
-	QGridLayout *AxisDataLayout = new QGridLayout;
+	QGridLayout *pAxisDataLayout = new QGridLayout;
 	{
-		AxisDataLayout->setRowStretch(0,1);
+		pAxisDataLayout->setRowStretch(0,1);
 		QLabel *AxisStyleLabel = new QLabel(tr("Axis Style"));
 
 		m_pctrlXMajGridShow = new QCheckBox(tr("X Major Grid"));
@@ -927,31 +926,31 @@ void GraphDlg::SetupLayout()
 		m_pctrlXMinorUnit = new DoubleEdit;
 		m_pctrlYMinorUnit = new DoubleEdit;
 
-		AxisDataLayout->addWidget(AxisStyleLabel,1,1);
-		AxisDataLayout->addWidget(m_pctrlXMajGridShow,2,1);
-		AxisDataLayout->addWidget(m_pctrlYMajGridShow,3,1);
-		AxisDataLayout->addWidget(m_pctrlXMinGridShow,4,1);
-		AxisDataLayout->addWidget(m_pctrlYMinGridShow,5,1);
+		pAxisDataLayout->addWidget(AxisStyleLabel,1,1);
+		pAxisDataLayout->addWidget(m_pctrlXMajGridShow,2,1);
+		pAxisDataLayout->addWidget(m_pctrlYMajGridShow,3,1);
+		pAxisDataLayout->addWidget(m_pctrlXMinGridShow,4,1);
+		pAxisDataLayout->addWidget(m_pctrlYMinGridShow,5,1);
 
-		AxisDataLayout->addWidget(m_pctrlAxisStyle,1,2);
-		AxisDataLayout->addWidget(m_pctrlXMajGridStyle,2,2);
-		AxisDataLayout->addWidget(m_pctrlYMajGridStyle,3,2);
-		AxisDataLayout->addWidget(m_pctrlXMinGridStyle,4,2);
-		AxisDataLayout->addWidget(m_pctrlYMinGridStyle,5,2);
+		pAxisDataLayout->addWidget(m_pctrlAxisStyle,1,2);
+		pAxisDataLayout->addWidget(m_pctrlXMajGridStyle,2,2);
+		pAxisDataLayout->addWidget(m_pctrlYMajGridStyle,3,2);
+		pAxisDataLayout->addWidget(m_pctrlXMinGridStyle,4,2);
+		pAxisDataLayout->addWidget(m_pctrlYMinGridStyle,5,2);
 
-		AxisDataLayout->addWidget(m_pctrlAutoXMinUnit,4,3);
-		AxisDataLayout->addWidget(m_pctrlAutoYMinUnit,5,3);
-		AxisDataLayout->addWidget(m_pctrlXMinorUnit,4,4);
-		AxisDataLayout->addWidget(m_pctrlYMinorUnit,5,4);
+		pAxisDataLayout->addWidget(m_pctrlAutoXMinUnit,4,3);
+		pAxisDataLayout->addWidget(m_pctrlAutoYMinUnit,5,3);
+		pAxisDataLayout->addWidget(m_pctrlXMinorUnit,4,4);
+		pAxisDataLayout->addWidget(m_pctrlYMinorUnit,5,4);
 	}
-	GridPage->setLayout(AxisDataLayout);
+	m_pGridPage->setLayout(pAxisDataLayout);
 	//________End Axis Page______________________
 
 
-	m_pTabWidget->addTab(VariablePage, tr("Variables"));
-	m_pTabWidget->addTab(ScalePage, tr("Scales"));
-	m_pTabWidget->addTab(GridPage, tr("Axis and Grids"));
-	m_pTabWidget->addTab(FontPage, tr("Fonts and BackGround"));
+	m_pTabWidget->addTab(m_pVariablePage, tr("Variables"));
+	m_pTabWidget->addTab(m_pScalePage, tr("Scales"));
+	m_pTabWidget->addTab(m_pGridPage, tr("Axis and Grids"));
+	m_pTabWidget->addTab(m_pFontPage, tr("Fonts and BackGround"));
 
 	m_pTabWidget->setCurrentIndex(s_ActivePage);
 	connect(m_pTabWidget, SIGNAL(currentChanged (int)), this, SLOT(OnActivePage(int)));
