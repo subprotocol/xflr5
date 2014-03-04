@@ -645,95 +645,108 @@ void StabPolarDlg::SetupLayout()
 
 	QFontMetrics fm(italicFnt);
 
-	m_pTabWidget = new QTabWidget(this);
-	m_pTabWidget->setMinimumWidth(fm.averageCharWidth() * 103);
-	m_pMethodPage = new QWidget(this);
-	m_pPlaneDataPage = new QWidget(this);
-	m_pOptionPage = new QWidget(this);
-	m_pControlPage = new QWidget(this);
+
+	QTabWidget *pTabWidget = new QTabWidget(this);
+	pTabWidget->setMinimumWidth(fm.averageCharWidth() * 103);
+
+	QWidget  *pMethodPage = new QWidget(this);
+	QWidget  *pInertiaPage = new QWidget(this);
+	QWidget  *pCoefficientPage = new QWidget(this);
+	QWidget  *pOptionPage = new QWidget(this);
+	QWidget  *pControlPage = new QWidget(this);
 
 
 
 	QVBoxLayout *pMethodPageLayout = new QVBoxLayout;
 	{
-		m_pctrlAnalysisControls = new QStackedWidget;
+		QHBoxLayout *pMethodLayout = new QHBoxLayout;
 		{
-			QGroupBox *pWingMethodBox = new QGroupBox(tr("Analysis methods"));
+			m_pctrlAnalysisControls = new QStackedWidget;
 			{
-				QVBoxLayout *pWingMethodLayout = new QVBoxLayout;
+				QGroupBox *pWingMethodBox = new QGroupBox(tr("Analysis methods"));
 				{
-					m_pctrlWingMethod2 = new QRadioButton(tr("Ring vortex")+" (VLM2)");
-					m_pctrlWingMethod3 = new QRadioButton(tr("3D Panels"));
-					pWingMethodLayout->addWidget(m_pctrlWingMethod2);
-					pWingMethodLayout->addWidget(m_pctrlWingMethod3);
-					pWingMethodLayout->addStretch();
+					QVBoxLayout *pWingMethodLayout = new QVBoxLayout;
+					{
+						m_pctrlWingMethod2 = new QRadioButton(tr("Ring vortex")+" (VLM2)");
+						m_pctrlWingMethod3 = new QRadioButton(tr("3D Panels"));
+						pWingMethodLayout->addWidget(m_pctrlWingMethod2);
+						pWingMethodLayout->addWidget(m_pctrlWingMethod3);
+						pWingMethodLayout->addStretch();
+					}
+					pWingMethodBox->setLayout(pWingMethodLayout);
 				}
-				pWingMethodBox->setLayout(pWingMethodLayout);
+
+				QGroupBox *pPlaneMethodBox = new QGroupBox(tr("Plane analysis methods"));
+				{
+					QVBoxLayout *pPlaneMethodLayout = new QVBoxLayout;
+					{
+						m_pctrlPanelMethod = new QRadioButton(tr("Mix 3D Panels/VLM2"));
+						m_pctrlIgnoreBodyPanels = new QCheckBox(tr("Ignore Body Panels"));
+						pPlaneMethodLayout->addStretch();
+						pPlaneMethodLayout->addWidget(m_pctrlPanelMethod);
+						pPlaneMethodLayout->addWidget(m_pctrlIgnoreBodyPanels);
+						pPlaneMethodLayout->addStretch();
+
+					}
+					pPlaneMethodBox->setLayout(pPlaneMethodLayout);
+				}
+
+				m_pctrlAnalysisControls->addWidget(pWingMethodBox);
+
+				m_pctrlAnalysisControls->addWidget(pPlaneMethodBox);
+
 			}
 
-			QGroupBox *pPlaneMethodBox = new QGroupBox(tr("Plane analysis methods"));
+			QGroupBox* pViscousBox = new QGroupBox("Viscous properties");
 			{
-				QVBoxLayout *pPlaneMethodLayout = new QVBoxLayout;
+				QVBoxLayout *pViscousLayout = new QVBoxLayout;
 				{
-					m_pctrlPanelMethod = new QRadioButton(tr("Mix 3D Panels/VLM2"));
-					m_pctrlIgnoreBodyPanels = new QCheckBox(tr("Ignore Body Panels"));
-					pPlaneMethodLayout->addStretch();
-					pPlaneMethodLayout->addWidget(m_pctrlPanelMethod);
-					pPlaneMethodLayout->addWidget(m_pctrlIgnoreBodyPanels);
-                    pPlaneMethodLayout->addStretch();
-
+					m_pctrlViscous = new QCheckBox(tr("Viscous Analysis"));
+					pViscousLayout->addWidget(m_pctrlViscous);
+					QLabel *lab11 = new QLabel(tr("Note : the analysis may be of the viscous type\nonly if all the flap controls are inactive"));
+					pViscousLayout->addWidget(lab11);
+					pViscousLayout->addStretch(1);
 				}
-				pPlaneMethodBox->setLayout(pPlaneMethodLayout);
+				pViscousBox->setLayout(pViscousLayout);
 			}
-			m_pctrlAnalysisControls->addWidget(pWingMethodBox);
-			m_pctrlAnalysisControls->addWidget(pPlaneMethodBox);
+			pMethodLayout->addWidget(m_pctrlAnalysisControls);
+			pMethodLayout->addWidget(pViscousBox);
 		}
 
 		QGroupBox *pPlaneGroupBox = new QGroupBox(tr("Plane and Flight Data"));
 		{
-			QVBoxLayout *pPlaneFlightLayout = new QVBoxLayout;
+			QGridLayout *pPlaneFlightLayout = new QGridLayout;
 			{
-				QGridLayout *pPlaneLayout = new QGridLayout;
-				{
-					QLabel *lab2 = new QLabel(tr("b ="));
-					QLabel *lab3 = new QLabel(tr("f ="));
-					lab2->setFont(QFont("Symbol"));
-					lab3->setFont(QFont("Symbol"));
-					lab2->setAlignment(Qt::AlignVCenter|Qt::AlignRight);
-					lab3->setAlignment(Qt::AlignVCenter|Qt::AlignRight);
-					QLabel *lab4 = new QLabel(QString::fromUtf8("°"));
-					QLabel *lab5 = new QLabel(QString::fromUtf8("°"));
-					m_pctrlBeta  = new DoubleEdit(0.818,2);
-					m_pctrlPhi   = new DoubleEdit(0.414,2);
+				QLabel *lab2 = new QLabel(tr("b ="));
+				QLabel *lab3 = new QLabel(tr("f ="));
+				lab2->setFont(QFont("Symbol"));
+				lab3->setFont(QFont("Symbol"));
+				lab2->setAlignment(Qt::AlignVCenter|Qt::AlignRight);
+				lab3->setAlignment(Qt::AlignVCenter|Qt::AlignRight);
+				QLabel *lab4 = new QLabel(QString::fromUtf8("°"));
+				QLabel *lab5 = new QLabel(QString::fromUtf8("°"));
+				m_pctrlBeta  = new DoubleEdit(0.818,2);
+				m_pctrlPhi   = new DoubleEdit(0.414,2);
 
-					pPlaneLayout->addWidget(lab2,1,1);
-					pPlaneLayout->addWidget(m_pctrlBeta,1,2);
-					pPlaneLayout->addWidget(lab4 ,1,3);
-					pPlaneLayout->addWidget(lab3,2,1);
-					pPlaneLayout->addWidget(m_pctrlPhi,2,2);
-					pPlaneLayout->addWidget(lab5,2,3);
-
-					pPlaneLayout->setColumnStretch(1,1);
-				}
-
-				m_pctrlViscous = new QCheckBox(tr("Viscous Analysis"));
-				//	PlaneLayout->addWidget(m_pctrlViscous,5,1,1,3);
-				pPlaneFlightLayout->addLayout(pPlaneLayout);
-				pPlaneFlightLayout->addWidget(m_pctrlViscous);
-				QLabel *lab11 = new QLabel(tr("Note : the analysis may be of the viscous type\nonly if all the flap controls are inactive"));
-				pPlaneFlightLayout->addWidget(lab11);
-				pPlaneFlightLayout->addStretch(1);
-
-				pPlaneGroupBox->setLayout(pPlaneFlightLayout);
+				pPlaneFlightLayout->addWidget(lab2,1,1);
+				pPlaneFlightLayout->addWidget(m_pctrlBeta,1,2);
+				pPlaneFlightLayout->addWidget(lab4 ,1,3);
+				pPlaneFlightLayout->addWidget(lab3,2,1);
+				pPlaneFlightLayout->addWidget(m_pctrlPhi,2,2);
+				pPlaneFlightLayout->addWidget(lab5,2,3);
+				pPlaneFlightLayout->setRowStretch(3,1);
+				pPlaneFlightLayout->setColumnStretch(3,1);
 			}
+
+			pPlaneGroupBox->setLayout(pPlaneFlightLayout);
 		}
 
-		pMethodPageLayout->addWidget(m_pctrlAnalysisControls);
+		pMethodPageLayout->addLayout(pMethodLayout);
 		pMethodPageLayout->addWidget(pPlaneGroupBox);
-		m_pMethodPage->setLayout(pMethodPageLayout);
+		pMethodPage->setLayout(pMethodPageLayout);
 	}
 
-	QVBoxLayout *pPlaneDataPageLayout = new QVBoxLayout;
+	QVBoxLayout *pInertiaPageLayout = new QVBoxLayout;
 	{
 		QGroupBox *pInertiaBox = new QGroupBox("Inertia");
 		{
@@ -794,17 +807,28 @@ void StabPolarDlg::SetupLayout()
 					pInertiaDataLayout->addWidget(m_pctrlLab303,2,6);
 					pInertiaDataLayout->addWidget(m_pctrlLab304,3,6);
 					pInertiaDataLayout->addWidget(m_pctrlLab305,4,6);
+					pInertiaDataLayout->setColumnStretch(1,1);
 					pInertiaDataLayout->setColumnStretch(4,1);
+					pInertiaDataLayout->setColumnStretch(6,1);
 				}
 
+				pInertiaLayout->addStretch(1);
 				pInertiaLayout->addWidget(m_pctrlPlaneInertia);
-			//	InertiaLayout->addWidget(m_pctrlEstimation);
+				pInertiaLayout->addStretch(1);
 				pInertiaLayout->addLayout(pInertiaDataLayout);
 				pInertiaLayout->addStretch(1);
 			}
 			pInertiaBox->setLayout(pInertiaLayout);
 		}
 
+		pInertiaPageLayout->addWidget(pInertiaBox);
+
+		pInertiaPage->setLayout(pInertiaPageLayout);
+	}
+
+
+	QVBoxLayout *pCoeffcientPageLayout = new QVBoxLayout;
+	{
 		QGroupBox *pAreaBox = new QGroupBox(tr("Ref. dimensions for aero coefficients"));
 		{
 			QVBoxLayout *pAreaOptions = new QVBoxLayout;
@@ -855,10 +879,9 @@ void StabPolarDlg::SetupLayout()
 			pAreaBox->setLayout(pAreaOptions);
 		}
 
-		pPlaneDataPageLayout->addWidget(pInertiaBox);
-		pPlaneDataPageLayout->addWidget(pAreaBox);
+		pCoeffcientPageLayout->addWidget(pAreaBox);
 
-		m_pPlaneDataPage->setLayout(pPlaneDataPageLayout);
+		pCoefficientPage->setLayout(pCoeffcientPageLayout);
 	}
 
 	QVBoxLayout *pControlPageLayout  = new QVBoxLayout;
@@ -898,7 +921,7 @@ void StabPolarDlg::SetupLayout()
 
 		pControlPageLayout->addWidget(m_pctrlControlTable);
 		pControlPageLayout->addWidget(SignLabel);
-		m_pControlPage->setLayout(pControlPageLayout);
+		pControlPage->setLayout(pControlPageLayout);
 	}
 
 	QVBoxLayout *pOptionPageLayout = new QVBoxLayout;
@@ -938,15 +961,16 @@ void StabPolarDlg::SetupLayout()
 		}
 		pOptionPageLayout->addWidget(pAeroDataGroupBox);
 		pOptionPageLayout->addStretch();
-		m_pOptionPage->setLayout(pOptionPageLayout);
+		pOptionPage->setLayout(pOptionPageLayout);
 	}
 
-	m_pTabWidget->addTab(m_pMethodPage, tr("Method"));
-	m_pTabWidget->addTab(m_pPlaneDataPage, tr("Plane properties"));
-	m_pTabWidget->addTab(m_pControlPage, tr("Control parameters"));
-	m_pTabWidget->addTab(m_pOptionPage, tr("Other options"));
+	pTabWidget->addTab(pMethodPage, tr("Analysis"));
+	pTabWidget->addTab(pInertiaPage, tr("Inertia"));
+	pTabWidget->addTab(pCoefficientPage, tr("Ref. dimensions"));
+	pTabWidget->addTab(pControlPage, tr("Control parameters"));
+	pTabWidget->addTab(pOptionPage, tr("Aero data"));
 
-	m_pTabWidget->setCurrentIndex(0);
+	pTabWidget->setCurrentIndex(0);
 
 	QHBoxLayout *pCommandButtons = new QHBoxLayout;
 	{
@@ -962,17 +986,17 @@ void StabPolarDlg::SetupLayout()
 
 	QVBoxLayout * pMainLayout = new QVBoxLayout(this);
 	{
-        QHBoxLayout *pPolarNameLayout = new QHBoxLayout;
-        {
-            m_pctrlAutoName = new QCheckBox(tr("Auto Analysis Name"));
-            m_pctrlWPolarName = new QLineEdit(tr("Polar Name"));
-            pPolarNameLayout->addWidget(m_pctrlAutoName);
-            pPolarNameLayout->addWidget(m_pctrlWPolarName);
-        }
+		QHBoxLayout *pPolarNameLayout = new QHBoxLayout;
+		{
+			m_pctrlAutoName = new QCheckBox(tr("Auto Analysis Name"));
+			m_pctrlWPolarName = new QLineEdit(tr("Polar Name"));
+			pPolarNameLayout->addWidget(m_pctrlAutoName);
+			pPolarNameLayout->addWidget(m_pctrlWPolarName);
+		}
 
-        pMainLayout->addLayout(pPolarNameLayout);
-        pMainLayout->addSpacing(13);
-        pMainLayout->addWidget(m_pTabWidget);
+		pMainLayout->addLayout(pPolarNameLayout);
+		pMainLayout->addSpacing(13);
+		pMainLayout->addWidget(pTabWidget);
 		pMainLayout->addStretch(1);
 		pMainLayout->addSpacing(23);
 		pMainLayout->addLayout(pCommandButtons);

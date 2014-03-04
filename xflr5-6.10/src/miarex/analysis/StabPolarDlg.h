@@ -124,8 +124,6 @@ private:
 
 	DoubleEdit *m_pctrlMass, *m_pctrlCoGx,*m_pctrlCoGz, *m_pctrlIxx, *m_pctrlIyy, *m_pctrlIzz, *m_pctrlIxz;
 
-	QTabWidget *m_pTabWidget;
-	QWidget  *m_pMethodPage, *m_pOptionPage, *m_pPlaneDataPage, *m_pControlPage;
 
 	int  *m_precision;
 

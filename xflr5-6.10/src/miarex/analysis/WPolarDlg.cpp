@@ -28,6 +28,7 @@
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QGridLayout>
+#include <QTabWidget>
 #include <QGroupBox>
 #include <QMessageBox>
 #include <math.h>
@@ -662,17 +663,20 @@ void WPolarDlg::SetupLayout()
 	italicFnt.setItalic(true);
 
 	QFontMetrics fm(italicFnt);
-	m_pTabWidget = new QTabWidget(this);
-	m_pTabWidget->setMinimumWidth(fm.averageCharWidth() * 91);
-	m_pPolarTypePage = new QWidget(this);
-	m_pMethodPage = new QWidget(this);
-	m_pPlaneDataPage = new QWidget(this);
-	m_pOptionPage = new QWidget(this);
+
+
+	QTabWidget *pTabWidget = new QTabWidget(this);
+	pTabWidget->setMinimumWidth(fm.averageCharWidth() * 91);
+	QWidget *pPolarTypePage = new QWidget(this);
+	QWidget *pMethodPage = new QWidget(this);
+	QWidget *pInertiaPage = new QWidget(this);
+	QWidget *pCoefficientPage = new QWidget(this);
+	QWidget *pOptionPage = new QWidget(this);
 
 
 	QVBoxLayout *pPolarTypePageLayout = new QVBoxLayout;
 	{
-		QVBoxLayout *pAnalysisSettingsLayout = new QVBoxLayout;
+		QHBoxLayout *pAnalysisSettingsLayout = new QHBoxLayout;
 		{
 			QVBoxLayout *pTypeLayout = new QVBoxLayout;
 			{
@@ -718,38 +722,38 @@ void WPolarDlg::SetupLayout()
 				pTypeDataLayout->setColumnStretch(3,1);
 			}
 
-			QVBoxLayout *pFlightLayout = new QVBoxLayout;
-			{
-				m_pctrlWingLoad  = new QLabel(tr("Wing Loading = 0.033 kg/dm2"));
-				m_pctrlSRe       = new QLabel(tr("SRe"));
-				m_pctrlRRe       = new QLabel(tr("RRe"));
-				m_pctrlQInfCl    = new QLabel(tr("QInfCl"));
-
-				m_pctrlWingLoad->setFont(italicFnt);
-				m_pctrlRRe->setFont(italicFnt);
-				m_pctrlSRe->setFont(italicFnt);
-				m_pctrlQInfCl->setFont(italicFnt);
-
-				m_pctrlWingLoad->setAlignment(Qt::AlignRight | Qt::AlignCenter);
-				m_pctrlSRe->setAlignment(Qt::AlignRight | Qt::AlignCenter);
-				m_pctrlRRe->setAlignment(Qt::AlignRight | Qt::AlignCenter);
-				m_pctrlQInfCl->setAlignment(Qt::AlignRight | Qt::AlignCenter);
-				pFlightLayout->addWidget(m_pctrlWingLoad);
-				pFlightLayout->addWidget(m_pctrlSRe);
-				pFlightLayout->addWidget(m_pctrlRRe);
-				pFlightLayout->addWidget(m_pctrlQInfCl);
-				pFlightLayout->addStretch();
-			}
-
 			pAnalysisSettingsLayout->addLayout(pTypeLayout);
 			pAnalysisSettingsLayout->addStretch();
 			pAnalysisSettingsLayout->addLayout(pTypeDataLayout);
-			pAnalysisSettingsLayout->addStretch();
-			pAnalysisSettingsLayout->addLayout(pFlightLayout);
+		}
+
+		QVBoxLayout *pFlightLayout = new QVBoxLayout;
+		{
+			m_pctrlWingLoad  = new QLabel(tr("Wing Loading = 0.033 kg/dm2"));
+			m_pctrlSRe       = new QLabel(tr("SRe"));
+			m_pctrlRRe       = new QLabel(tr("RRe"));
+			m_pctrlQInfCl    = new QLabel(tr("QInfCl"));
+
+			m_pctrlWingLoad->setFont(italicFnt);
+			m_pctrlRRe->setFont(italicFnt);
+			m_pctrlSRe->setFont(italicFnt);
+			m_pctrlQInfCl->setFont(italicFnt);
+
+			m_pctrlWingLoad->setAlignment(Qt::AlignRight | Qt::AlignCenter);
+			m_pctrlSRe->setAlignment(Qt::AlignRight | Qt::AlignCenter);
+			m_pctrlRRe->setAlignment(Qt::AlignRight | Qt::AlignCenter);
+			m_pctrlQInfCl->setAlignment(Qt::AlignRight | Qt::AlignCenter);
+			pFlightLayout->addWidget(m_pctrlWingLoad);
+			pFlightLayout->addWidget(m_pctrlSRe);
+			pFlightLayout->addWidget(m_pctrlRRe);
+			pFlightLayout->addWidget(m_pctrlQInfCl);
+			pFlightLayout->addStretch();
 		}
 
 		pPolarTypePageLayout->addLayout(pAnalysisSettingsLayout);
-		m_pPolarTypePage->setLayout(pPolarTypePageLayout);
+		pPolarTypePageLayout->addStretch();
+		pPolarTypePageLayout->addLayout(pFlightLayout);
+		pPolarTypePage->setLayout(pPolarTypePageLayout);
 	}
 
 	QVBoxLayout *pMethodPageLayout = new QVBoxLayout;
@@ -791,10 +795,10 @@ void WPolarDlg::SetupLayout()
 
 		pMethodPageLayout->addWidget(pAnalysisMethods);
 		pMethodPageLayout->addWidget(pOptionsGroupBox);
-		m_pMethodPage->setLayout(pMethodPageLayout);
+		pMethodPage->setLayout(pMethodPageLayout);
 	}
 
-	QVBoxLayout *pPlaneDataPageLayout = new QVBoxLayout;
+	QVBoxLayout *pInertiaPageLayout = new QVBoxLayout;
 	{
 		QGroupBox *pInertiaBox = new QGroupBox(tr("Inertia properties"));
 		{
@@ -843,6 +847,12 @@ void WPolarDlg::SetupLayout()
 			pInertiaBox->setLayout(pInertiaLayout);
 		}
 
+		pInertiaPageLayout->addWidget(pInertiaBox);
+		pInertiaPage->setLayout(pInertiaPageLayout);
+	}
+
+	QVBoxLayout *pCoefficientPageLayout = new QVBoxLayout;
+	{
 		QGroupBox *pAreaBox = new QGroupBox(tr("Ref. dimensions for aero coefficients"));
 		{
 			QVBoxLayout *pAreaOptions = new QVBoxLayout;
@@ -899,12 +909,11 @@ void WPolarDlg::SetupLayout()
 			pAreaBox->setLayout(pAreaOptions);
 		}
 
-		pPlaneDataPageLayout->addWidget(pInertiaBox);
-		pPlaneDataPageLayout->addWidget(pAreaBox);
-		m_pPlaneDataPage->setLayout(pPlaneDataPageLayout);
+		pCoefficientPageLayout->addWidget(pAreaBox);
+		pCoefficientPage->setLayout(pCoefficientPageLayout);
 	}
 
-	QVBoxLayout *pOptionPageLayout =new QVBoxLayout;
+	QHBoxLayout *pOptionPageLayout =new QHBoxLayout;
 	{
 		QGroupBox *pAeroDataGroupBox = new QGroupBox(tr("Aerodynamic Data"));
 		{
@@ -971,16 +980,17 @@ void WPolarDlg::SetupLayout()
 		pOptionPageLayout->addWidget(pAeroDataGroupBox);
 
 		pOptionPageLayout->addWidget(pGroundGroupBox);
-		m_pOptionPage->setLayout(pOptionPageLayout);
+		pOptionPage->setLayout(pOptionPageLayout);
 	}
 
 
-	m_pTabWidget->addTab(m_pPolarTypePage, tr("Polar Type"));
-	m_pTabWidget->addTab(m_pMethodPage, tr("Methods"));
-	m_pTabWidget->addTab(m_pPlaneDataPage, tr("Plane properties"));
-	m_pTabWidget->addTab(m_pOptionPage, tr("Other options"));
+	pTabWidget->addTab(pPolarTypePage, tr("Polar Type"));
+	pTabWidget->addTab(pMethodPage, tr("Analysis"));
+	pTabWidget->addTab(pInertiaPage, tr("Inertia"));
+	pTabWidget->addTab(pCoefficientPage, tr("Ref. dimensions"));
+	pTabWidget->addTab(pOptionPage, tr("Aero data"));
 
-	m_pTabWidget->setCurrentIndex(0);
+	pTabWidget->setCurrentIndex(0);
 //	connect(m_pTabWidget, SIGNAL(currentChanged (int)), this, SLOT(OnActivePage(int)));
 
 	QHBoxLayout *pCommandButtons = new QHBoxLayout;
@@ -997,17 +1007,17 @@ void WPolarDlg::SetupLayout()
 
 	QVBoxLayout *pMainLayout = new QVBoxLayout(this);
 	{
-        QHBoxLayout *pPolarNameLayout = new QHBoxLayout;
-        {
-            m_pctrlAutoName = new QCheckBox(tr("Auto Analysis Name"));
-            m_pctrlWPolarName = new QLineEdit(tr("Polar Name"));
-            pPolarNameLayout->addWidget(m_pctrlAutoName);
-            pPolarNameLayout->addWidget(m_pctrlWPolarName);
-        }
+		QHBoxLayout *pPolarNameLayout = new QHBoxLayout;
+		{
+			m_pctrlAutoName = new QCheckBox(tr("Auto Analysis Name"));
+			m_pctrlWPolarName = new QLineEdit(tr("Polar Name"));
+			pPolarNameLayout->addWidget(m_pctrlAutoName);
+			pPolarNameLayout->addWidget(m_pctrlWPolarName);
+		}
 
-        pMainLayout->addLayout(pPolarNameLayout);
-        pMainLayout->addSpacing(13);
-		pMainLayout->addWidget(m_pTabWidget);
+		pMainLayout->addLayout(pPolarNameLayout);
+		pMainLayout->addSpacing(13);
+		pMainLayout->addWidget(pTabWidget);
 		pMainLayout->addStretch(1);
 		pMainLayout->addLayout(pCommandButtons);
 		pMainLayout->addStretch(1);

@@ -26,7 +26,6 @@
 #define WPOLARDLG_H
 
 #include <QDialog>
-#include <QTabWidget>
 #include <QCheckBox>
 #include <QPushButton>
 #include <QLabel>
@@ -125,8 +124,6 @@ private:
 
 	QPushButton	*OKButton, *CancelButton;
 
-	QTabWidget *m_pTabWidget;
-	QWidget *m_pPolarTypePage, *m_pMethodPage, *m_pOptionPage, *m_pPlaneDataPage;
 };
 
 #endif // WPOLARDLG_H
