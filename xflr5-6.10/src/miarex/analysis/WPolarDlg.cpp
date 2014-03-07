@@ -657,16 +657,14 @@ void WPolarDlg::SetupLayout()
 	Units::getWeightUnitLabel(strWeightUnit);
 
 
-	QFont typewriterFont("Courier");
+	QFont fnt;
 	QFont symbolFont("Symbol");
-	QFont italicFnt;
-	italicFnt.setItalic(true);
 
-	QFontMetrics fm(italicFnt);
+	QFontMetrics fm(fnt);
 
 
 	QTabWidget *pTabWidget = new QTabWidget(this);
-	pTabWidget->setMinimumWidth(fm.averageCharWidth() * 91);
+	pTabWidget->setMinimumWidth(fm.averageCharWidth() * 83);
 	QWidget *pPolarTypePage = new QWidget(this);
 	QWidget *pMethodPage = new QWidget(this);
 	QWidget *pInertiaPage = new QWidget(this);
@@ -733,11 +731,6 @@ void WPolarDlg::SetupLayout()
 			m_pctrlSRe       = new QLabel(tr("SRe"));
 			m_pctrlRRe       = new QLabel(tr("RRe"));
 			m_pctrlQInfCl    = new QLabel(tr("QInfCl"));
-
-			m_pctrlWingLoad->setFont(italicFnt);
-			m_pctrlRRe->setFont(italicFnt);
-			m_pctrlSRe->setFont(italicFnt);
-			m_pctrlQInfCl->setFont(italicFnt);
 
 			m_pctrlWingLoad->setAlignment(Qt::AlignRight | Qt::AlignCenter);
 			m_pctrlSRe->setAlignment(Qt::AlignRight | Qt::AlignCenter);
@@ -812,9 +805,6 @@ void WPolarDlg::SetupLayout()
 					QLabel *lab2 = new QLabel(tr("Plane Mass ="));
 					QLabel *lab3 = new QLabel(tr("X_CoG ="));
 					QLabel *lab4 = new QLabel(tr("Z_CoG ="));
-					lab2->setFont(italicFnt);
-					lab3->setFont(italicFnt);
-					lab4->setFont(italicFnt);
 					lab2->setAlignment(Qt::AlignRight | Qt::AlignCenter);
 					lab3->setAlignment(Qt::AlignRight | Qt::AlignCenter);
 					lab4->setAlignment(Qt::AlignRight | Qt::AlignCenter);
@@ -831,9 +821,6 @@ void WPolarDlg::SetupLayout()
 					QLabel *labWeightUnit  = new QLabel(strWeightUnit);
 					QLabel *labLengthUnit1 = new QLabel(strLengthUnit);
 					QLabel *labLengthUnit3 = new QLabel(strLengthUnit);
-					labWeightUnit->setFont(italicFnt);
-					labLengthUnit1->setFont(italicFnt);
-					labLengthUnit3->setFont(italicFnt);
 
 					pInertiaDataLayout->addWidget(labWeightUnit ,1,3);
 					pInertiaDataLayout->addWidget(labLengthUnit1 ,2,3);
@@ -876,13 +863,6 @@ void WPolarDlg::SetupLayout()
 					labRefArea->setAlignment(Qt::AlignRight | Qt::AlignCenter);
 					labRefSpan->setAlignment(Qt::AlignRight | Qt::AlignCenter);
 					labRefChord->setAlignment(Qt::AlignRight | Qt::AlignCenter);
-
-					labRefArea->setFont(italicFnt);
-					labRefSpan->setFont(italicFnt);
-					labRefChord->setFont(italicFnt);
-					labAreaUnit->setFont(italicFnt);
-					labLengthUnit4->setFont(italicFnt);
-					labLengthUnit5->setFont(italicFnt);
 
 					labAreaUnit->setAlignment(Qt::AlignLeft | Qt::AlignCenter);
 					labLengthUnit4->setAlignment(Qt::AlignLeft | Qt::AlignCenter);
@@ -960,11 +940,9 @@ void WPolarDlg::SetupLayout()
 				QHBoxLayout *pGroundHeightLayout = new QHBoxLayout;
 				{
 					QLabel *lab10 = new QLabel(tr("Height ="));
-					lab10->setFont(italicFnt);
 					m_pctrlHeight = new DoubleEdit(0.00,2);
 					m_pctrlHeight->setAlignment(Qt::AlignRight | Qt::AlignCenter);
 					QLabel *labLengthUnit2 = new QLabel(strLengthUnit);
-					labLengthUnit2->setFont(italicFnt);
 					pGroundHeightLayout->addStretch();
 					pGroundHeightLayout->addWidget(lab10);
 					pGroundHeightLayout->addWidget(m_pctrlHeight);
