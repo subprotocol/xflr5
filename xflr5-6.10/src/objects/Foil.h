@@ -39,7 +39,6 @@
 #include "CRectangle.h"
 #include <QTextStream>
 
-#define MIDPOINTCOUNT 500
 
 
 /**
@@ -175,14 +174,14 @@ private:
 	double m_fXThickness;                /**< the x-position of the Foil's max thickness point */
 
 	double m_Gap;			             /**< the trailing edge gap */
-	CVector m_TE;                        /**< the trailing edge point */
-	CVector m_LE;                        /**< the leading edge point */
+	CVector m_TE;                         /**< the trailing edge point */
+	CVector m_LE;                         /**< the leading edge point */
 
-	CVector m_rpBaseMid[MIDPOINTCOUNT];  /**< the mid camber line points of the base geometry */
-	CVector m_BaseExtrados[IQX];	     /**< the upper surface points of the base geometry */
-	CVector m_BaseIntrados[IQX];    	 /**< the lower surface points of the base geometry */
+	CVector m_rpBaseMid[MIDPOINTCOUNT+1];  /**< the mid camber line points of the base geometry */
+	CVector m_BaseExtrados[IQX];	         /**< the upper surface points of the base geometry */
+	CVector m_BaseIntrados[IQX];    	    /**< the lower surface points of the base geometry */
 
-	CVector m_rpMid[MIDPOINTCOUNT];      /**< the mid camber line points */
+	CVector m_rpMid[MIDPOINTCOUNT+1];      /**< the mid camber line points */
 	CVector m_rpExtrados[IQX];	         /**< the upper surface points */
 	CVector m_rpIntrados[IQX];	         /**< the lower surface points */
 
@@ -193,12 +192,12 @@ private:
 public:
 
 	bool m_bTEFlap;          /**< true if the foil has a trailing edge flap */
-	double m_TEFlapAngle;    /**< the trailing edge flap angle */
+	double m_TEFlapAngle;    /**< the trailing edge flap angle, in degrees*/
 	double m_TEXHinge;       /**< the x-position of the trailing edge flap, in chord % */
 	double m_TEYHinge;       /**< the y-position of the trailng edge flap, in chord %*/
 
 	bool m_bLEFlap;          /**< true if the foil has a leading edge flap */
-	double m_LEFlapAngle;    /**< the leading edge flap angle */
+	double m_LEFlapAngle;    /**< the leading edge flap angle, in degrees */
 	double m_LEXHinge;       /**< the x-position of the leading edge flap, in chord % */
 	double m_LEYHinge;       /**< the y-position of the leading edge flap, in chord %*/
 

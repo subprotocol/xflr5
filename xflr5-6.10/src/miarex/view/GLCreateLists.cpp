@@ -1207,6 +1207,7 @@ void GLCreateCtrlPts(int nPanels, Panel *pPanel)
 	glNewList(VLMCTRLPTS,GL_COMPILE);
 	{
 		QMiarex::s_GLList++;
+		glEnable(GL_DEPTH_TEST);
 		glLineWidth(1.0);
 		glColor3d(0.0,1.0,0.0);
 		for (int p=0; p<nPanels; p++)
@@ -1222,6 +1223,7 @@ void GLCreateCtrlPts(int nPanels, Panel *pPanel)
 			}
 			glEnd();
 		}
+		glDisable(GL_DEPTH_TEST);
 	}
 	glEndList();
 }
@@ -1243,7 +1245,8 @@ void GLCreateVortices(int nPanels, Panel *pPanel, CVector *pNode, WPolar *pWPola
 	{
 		QMiarex::s_GLList++;
 
-		glEnable (GL_LINE_STIPPLE);
+		glEnable(GL_DEPTH_TEST);
+		glEnable(GL_LINE_STIPPLE);
 		glLineStipple (1, 0xFFFF);
 
 		glLineWidth(1.0);
@@ -1316,7 +1319,7 @@ void GLCreateVortices(int nPanels, Panel *pPanel, CVector *pNode, WPolar *pWPola
 				}
 				glEnd();
 			}
-			else if(!pWPolar || (pWPolar && !pWPolar->bVLM1()))
+			else if(pWPolar && !pWPolar->bVLM1() && pWPolar->bThinSurfaces())
 			{
 				glBegin(GL_LINE_STRIP);
 				{
@@ -1330,6 +1333,7 @@ void GLCreateVortices(int nPanels, Panel *pPanel, CVector *pNode, WPolar *pWPola
 			}
 		}
 		glDisable (GL_LINE_STIPPLE);
+		glDisable(GL_DEPTH_TEST);
 	}
 	glEndList();
 }
@@ -1723,163 +1727,163 @@ void GLCreateTrans(Wing *pWing, WPolar *pWPolar, WingOpp *pWOpp, int List)
 
 
     //TOP TRANSITION
-    glNewList(List,GL_COMPILE);
-    {
+	glNewList(List,GL_COMPILE);
+	{
 		QMiarex::s_GLList++;
 
 		glEnable(GL_DEPTH_TEST);
-        glEnable (GL_LINE_STIPPLE);
+		glEnable (GL_LINE_STIPPLE);
 
-        style = W3dPrefsDlg::s_TopStyle;
-        if     (style == 1) 	glLineStipple (1, 0xCFCF);
-        else if(style == 2) 	glLineStipple (1, 0x6666);
-        else if(style == 3) 	glLineStipple (1, 0xFF18);
-        else if(style == 4) 	glLineStipple (1, 0x7E66);
-        else					glLineStipple (1, 0xFFFF);
+		style = W3dPrefsDlg::s_TopStyle;
+		if     (style == 1) 	glLineStipple (1, 0xCFCF);
+		else if(style == 2) 	glLineStipple (1, 0x6666);
+		else if(style == 3) 	glLineStipple (1, 0xFF18);
+		else if(style == 4) 	glLineStipple (1, 0x7E66);
+		else					glLineStipple (1, 0xFFFF);
 
-        glColor3d(W3dPrefsDlg::s_TopColor.redF(),W3dPrefsDlg::s_TopColor.greenF(),W3dPrefsDlg::s_TopColor.blueF());
+		glColor3d(W3dPrefsDlg::s_TopColor.redF(),W3dPrefsDlg::s_TopColor.greenF(),W3dPrefsDlg::s_TopColor.blueF());
 
-        glLineWidth((GLfloat)W3dPrefsDlg::s_TopWidth);
-        if(pWOpp)
-        {
-		  if(pWPolar->analysisMethod()==LLTMETHOD)
-            {
-                glBegin(GL_LINE_STRIP);
-                {
-                    for (i=1; i<pWOpp->m_NStation; i++)
-                    {
-                        yob = 2.0*pWOpp->m_SpanPos[i]/pWOpp->m_Span;
+		glLineWidth((GLfloat)W3dPrefsDlg::s_TopWidth);
+		if(pWOpp)
+		{
+			if(pWPolar->analysisMethod()==LLTMETHOD)
+			{
+				glBegin(GL_LINE_STRIP);
+				{
+					for (i=1; i<pWOpp->m_NStation; i++)
+					{
+						yob = 2.0*pWOpp->m_SpanPos[i]/pWOpp->m_Span;
 						xt = pWing->getOffset(yob) + pWOpp->m_XTrTop[i]*pWing->getChord(yob);
-                        pWing->GetViewYZPos(pWOpp->m_XTrTop[i], pWOpp->m_SpanPos[i],yt,zt,0);
+						pWing->GetViewYZPos(pWOpp->m_XTrTop[i], pWOpp->m_SpanPos[i],yt,zt,0);
 
-                        glVertex3d(xt,yt,zt);
-                    }
-                }
-                glEnd();
-            }
-            else
-            {
-                if(!pWing->IsFin())
-                {
-                    glBegin(GL_LINE_STRIP);
-                    {
-                        m = 0;
+						glVertex3d(xt,yt,zt);
+					}
+				}
+				glEnd();
+			}
+			else
+			{
+				if(!pWing->IsFin())
+				{
+					glBegin(GL_LINE_STRIP);
+					{
+						m = 0;
 						for(j=0; j<pWing->m_Surface.size(); j++)
-                        {
+						{
 							for(k=0; k<pWing->m_Surface[j]->m_NYPanels; k++)
-                            {
-                                yrel = pWing->yrel(pWOpp->m_SpanPos[m]);
+							{
+								yrel = pWing->yrel(pWOpp->m_SpanPos[m]);
 								pWing->m_Surface[j]->GetSurfacePoint(pWOpp->m_XTrTop[m],pWOpp->m_XTrTop[m],yrel,Pt,1);
-                                glVertex3d(Pt.x, Pt.y, Pt.z);
-                                m++;
-                            }
-                        }
-                    }
-                    glEnd();
-                }
-                else
-                {
-                    m = 0;
+								glVertex3d(Pt.x, Pt.y, Pt.z);
+								m++;
+							}
+						}
+					}
+					glEnd();
+				}
+				else
+				{
+					m = 0;
 					for(j=0; j<pWing->m_Surface.size(); j++)
-                    {
-                        glBegin(GL_LINE_STRIP);
-                        {
+					{
+						glBegin(GL_LINE_STRIP);
+						{
 							for(k=0; k<pWing->m_Surface[j]->m_NYPanels; k++)
-                            {
-                                yrel = pWing->yrel(pWOpp->m_SpanPos[m]);
+							{
+								yrel = pWing->yrel(pWOpp->m_SpanPos[m]);
 								pWing->m_Surface[j]->GetSurfacePoint(pWOpp->m_XTrTop[m],pWOpp->m_XTrTop[m],yrel,Pt,1);
-                                glVertex3d(Pt.x, Pt.y, Pt.z);
+								glVertex3d(Pt.x, Pt.y, Pt.z);
 
-                                m++;
-                            }
-                        }
-                        glEnd();
-                    }
-                }
-            }
-        }
+								m++;
+							}
+						}
+						glEnd();
+					}
+				}
+			}
+		}
 		glDisable(GL_DEPTH_TEST);
 		glDisable (GL_LINE_STIPPLE);
-    }
-    glEndList();
+	}
+	glEndList();
 
-    //BOTTOM TRANSITION
-    glNewList(List+MAXWINGS,GL_COMPILE);
-    {
+	//BOTTOM TRANSITION
+	glNewList(List+MAXWINGS,GL_COMPILE);
+	{
 		QMiarex::s_GLList++;
-        glEnable (GL_LINE_STIPPLE);
+		glEnable (GL_LINE_STIPPLE);
 		glEnable(GL_DEPTH_TEST);
-        style = W3dPrefsDlg::s_BotStyle;
-        if     (style == 1) 	glLineStipple (1, 0xCFCF);
-        else if(style == 2) 	glLineStipple (1, 0x6666);
-        else if(style == 3) 	glLineStipple (1, 0xFF18);
-        else if(style == 4) 	glLineStipple (1, 0x7E66);
-        else					glLineStipple (1, 0xFFFF);
+		style = W3dPrefsDlg::s_BotStyle;
+		if     (style == 1) 	glLineStipple (1, 0xCFCF);
+		else if(style == 2) 	glLineStipple (1, 0x6666);
+		else if(style == 3) 	glLineStipple (1, 0xFF18);
+		else if(style == 4) 	glLineStipple (1, 0x7E66);
+		else					glLineStipple (1, 0xFFFF);
 
-        glColor3d(W3dPrefsDlg::s_BotColor.redF(),W3dPrefsDlg::s_BotColor.greenF(),W3dPrefsDlg::s_BotColor.blueF());
+		glColor3d(W3dPrefsDlg::s_BotColor.redF(),W3dPrefsDlg::s_BotColor.greenF(),W3dPrefsDlg::s_BotColor.blueF());
 
-        glLineWidth((GLfloat)W3dPrefsDlg::s_BotWidth);
-        if(pWOpp)
-        {
-		  if(pWPolar->analysisMethod()==LLTMETHOD)
-            {
-                glBegin(GL_LINE_STRIP);
-                {
-                    for (i=1; i<pWOpp->m_NStation; i++)
-                    {
-                        yob = 2.0*pWOpp->m_SpanPos[i]/pWOpp->m_Span;
+		glLineWidth((GLfloat)W3dPrefsDlg::s_BotWidth);
+		if(pWOpp)
+		{
+			if(pWPolar->analysisMethod()==LLTMETHOD)
+			{
+				glBegin(GL_LINE_STRIP);
+				{
+					for (i=1; i<pWOpp->m_NStation; i++)
+					{
+						yob = 2.0*pWOpp->m_SpanPos[i]/pWOpp->m_Span;
 						xt = pWing->getOffset(yob) + pWOpp->m_XTrBot[i]*pWing->getChord(yob);
-                        pWing->GetViewYZPos(pWOpp->m_XTrBot[i], pWOpp->m_SpanPos[i],yt,zt,0);
+						pWing->GetViewYZPos(pWOpp->m_XTrBot[i], pWOpp->m_SpanPos[i],yt,zt,0);
 
-                        glVertex3d(xt,yt, zt);
-                    }
-                }
-                glEnd();
-            }
-            else
-            {
-                if(!pWing->IsFin())
-                {
-                    glBegin(GL_LINE_STRIP);
-                    {
-                        int m = 0;
+						glVertex3d(xt,yt, zt);
+					}
+				}
+				glEnd();
+			}
+			else
+			{
+				if(!pWing->IsFin())
+				{
+					glBegin(GL_LINE_STRIP);
+					{
+						int m = 0;
 						for(j=0; j<pWing->m_Surface.size(); j++)
-                        {
+						{
 							for(k=0; k<pWing->m_Surface[j]->m_NYPanels; k++)
-                            {
-                                yrel = pWing->yrel(pWOpp->m_SpanPos[m]);
+							{
+								yrel = pWing->yrel(pWOpp->m_SpanPos[m]);
 								pWing->m_Surface[j]->GetSurfacePoint(pWOpp->m_XTrBot[m],pWOpp->m_XTrBot[m],yrel,Pt,-1);
-                                glVertex3d(Pt.x, Pt.y, Pt.z);
-                                m++;
-                            }
-                        }
-                    }
-                    glEnd();
-                }
-                else
-                {
-                    int m = 0;
+								glVertex3d(Pt.x, Pt.y, Pt.z);
+								m++;
+							}
+						}
+					}
+					glEnd();
+				}
+				else
+				{
+					int m = 0;
 					for(j=0; j<pWing->m_Surface.size(); j++)
-                    {
-                        glBegin(GL_LINE_STRIP);
-                        {
+					{
+						glBegin(GL_LINE_STRIP);
+						{
 							for(k=0; k<pWing->m_Surface[j]->m_NYPanels; k++)
-                            {
-                                yrel = pWing->yrel(pWOpp->m_SpanPos[m]);
+							{
+								yrel = pWing->yrel(pWOpp->m_SpanPos[m]);
 								pWing->m_Surface[j]->GetSurfacePoint(pWOpp->m_XTrBot[m],pWOpp->m_XTrBot[m],yrel,Pt,-1);
-                                glVertex3d(Pt.x, Pt.y, Pt.z);
-                                m++;
-                            }
-                        }
-                        glEnd();
-                    }
-                }
-            }
-        }
+								glVertex3d(Pt.x, Pt.y, Pt.z);
+								m++;
+							}
+						}
+						glEnd();
+					}
+				}
+			}
+		}
 		glDisable(GL_DEPTH_TEST);
 		glDisable (GL_LINE_STIPPLE);
-    }
-    glEndList();
+	}
+	glEndList();
 }
 
 

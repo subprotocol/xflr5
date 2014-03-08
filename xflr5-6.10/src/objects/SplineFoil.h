@@ -32,9 +32,6 @@
 #define SPLINEFOIL_H
 
 
-#define MIDPOINTCOUNT 500    /** @todo put in the PARAMS and delete same entry in Foil.h */
-
-
 #include "Spline.h"
 
 

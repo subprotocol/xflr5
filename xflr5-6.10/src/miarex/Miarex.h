@@ -228,6 +228,7 @@ private slots:
 	void OnTwoGraphs();
 	void OnPlaneInertia();
 	void OnVortices();
+	void OnNormals();
 	void OnWing2Curve();
 	void OnPlaneOppProperties();
 	void OnWOppView();
@@ -349,7 +350,7 @@ public:
 	LineDelegate *m_pStyleDelegate, *m_pWidthDelegate;
 
 	QCheckBox *m_pctrlAxes, *m_pctrlLight, *m_pctrlSurfaces, *m_pctrlOutline, *m_pctrlPanels;
-	QCheckBox *m_pctrlFoilNames, *m_pctrlVortices, *m_pctrlMasses;
+	QCheckBox *m_pctrlFoilNames, *m_pctrlVortices, *m_pctrlPanelNormals, *m_pctrlMasses;
 
 	QAction *m_pXView, *m_pYView, *m_pZView, *m_pIsoView;
 	QToolButton *m_pctrlX, *m_pctrlY, *m_pctrlZ, *m_pctrlIso;
@@ -417,6 +418,7 @@ public:
 	bool m_bType4;                     /**< true if polars of type 4 are to be displayed */
 	bool m_bType7;                     /**< true if polars of type 71 are to be displayed */
 	bool m_bVortices;                  /**< true if the panel vortices should be displayed */
+	bool m_bPanelNormals;                   /**< true if the panel normals should be displayed */
 	bool m_bXBot;                      /**< true if the transition on the bottom surface should be displayed in the operating point or in 3D view*/
 	bool m_bXCmRef; 	               /**< true if the position of the reference point for the moments should be displayed in the operating point view*/
 	bool m_bXCP;                       /**< true if the lift curve should be displayed in the operating point or in the 3D view*/

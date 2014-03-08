@@ -15,12 +15,15 @@
 *******************************************************************************
 
 
-xflr5 v6.10.02 March 8th, 2014
+xflr5 v6.10.02 March xxxth, 2014
+	- Modified the calculation of the foil mid line and wing mid surface - reduces issues with foils with coarse panelling at leading edge
+	- Added and option to display panel normals and vortices - meant to help check if foil panelling is fine enough
 	- Added an option to set manually the reference dimensions for the calculation of aerodynamic coefficients of planes
 	- Fixed the display issue of text in 3D view for win32 systems
 	- Fixed the issue with the storage of modified foils in inverse design
 	- Fixed the issue of ineffective a.o.a. increment in Batch Foil Analysis
 	- Fixed the bug which caused the flap moment not to be reset at each plane calculation
+	- Mothe minor cosmetic changes
 
 
 

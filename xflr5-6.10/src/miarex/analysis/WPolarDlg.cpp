@@ -895,39 +895,49 @@ void WPolarDlg::SetupLayout()
 
 	QHBoxLayout *pOptionPageLayout =new QHBoxLayout;
 	{
-		QGroupBox *pAeroDataGroupBox = new QGroupBox(tr("Aerodynamic Data"));
+		QGroupBox *pAeroDataGroupBox = new QGroupBox(tr("Air Data"));
 		{
-			QGridLayout *pAeroDataLayout = new QGridLayout;
+			QVBoxLayout *pAeroDataLayout = new QVBoxLayout;
 			{
-				QLabel *lab9 = new QLabel(tr("Unit"));
-				lab9->setAlignment(Qt::AlignRight | Qt::AlignCenter);
-				m_pctrlUnit1 = new QRadioButton(tr("International"));
-				m_pctrlUnit2 = new QRadioButton(tr("Imperial"));
-				m_pctrlRho = new QLabel("r =");
-				m_pctrlDensity = new DoubleEdit(1.225,3);
-				m_pctrlDensityUnit = new QLabel("kg/m3");
-				m_pctrlNu = new QLabel("n =");
-				m_pctrlRho->setAlignment(Qt::AlignRight | Qt::AlignCenter);
-				m_pctrlNu->setAlignment(Qt::AlignRight | Qt::AlignCenter);
-				m_pctrlViscosity = new DoubleEdit(1.500e-5,3);
-				m_pctrlViscosityUnit = new QLabel("m2/s");
-				m_pctrlRho->setFont(symbolFont);
-				m_pctrlNu->setFont(symbolFont);
-				m_pctrlDensity->SetPrecision(5);
-				m_pctrlViscosity->SetPrecision(3);
-				m_pctrlDensity->SetMin(0.0);
-				m_pctrlViscosity->SetMin(0.0);
-				pAeroDataLayout->addWidget(lab9,1,1);
-				pAeroDataLayout->addWidget(m_pctrlUnit1,1,2);
-				pAeroDataLayout->addWidget(m_pctrlUnit2,1,3);
-				pAeroDataLayout->addWidget(m_pctrlRho,2,1);
-				pAeroDataLayout->addWidget(m_pctrlDensity,2,2);
-				pAeroDataLayout->addWidget(m_pctrlDensityUnit,2,3);
-				pAeroDataLayout->addWidget(m_pctrlNu,3,1);
-				pAeroDataLayout->addWidget(m_pctrlViscosity,3,2);
-				pAeroDataLayout->addWidget(m_pctrlViscosityUnit,3,3);
-				pAeroDataLayout->setRowStretch(4,1);
-				pAeroDataLayout->setColumnStretch(1,1);
+				QHBoxLayout *pAeroUnitLayout = new QHBoxLayout;
+				{
+					QLabel *lab9 = new QLabel(tr("Unit"));
+					lab9->setAlignment(Qt::AlignRight | Qt::AlignCenter);
+					m_pctrlUnit1 = new QRadioButton(tr("International"));
+					m_pctrlUnit2 = new QRadioButton(tr("Imperial"));
+					pAeroUnitLayout->addWidget(lab9);
+					pAeroUnitLayout->addWidget(m_pctrlUnit1);
+					pAeroUnitLayout->addWidget(m_pctrlUnit2);
+					pAeroUnitLayout->addStretch();
+				}
+				QGridLayout *pAeroDataValuesLayout = new QGridLayout;
+				{
+					m_pctrlRho = new QLabel("r =");
+					m_pctrlDensity = new DoubleEdit(1.225,3);
+					m_pctrlDensityUnit = new QLabel("kg/m3");
+					m_pctrlNu = new QLabel("n =");
+					m_pctrlRho->setAlignment(Qt::AlignRight | Qt::AlignCenter);
+					m_pctrlNu->setAlignment(Qt::AlignRight | Qt::AlignCenter);
+					m_pctrlViscosity = new DoubleEdit(1.500e-5,3);
+					m_pctrlViscosityUnit = new QLabel("m2/s");
+					m_pctrlRho->setFont(symbolFont);
+					m_pctrlNu->setFont(symbolFont);
+					m_pctrlDensity->SetPrecision(5);
+					m_pctrlViscosity->SetPrecision(3);
+					m_pctrlDensity->SetMin(0.0);
+					m_pctrlViscosity->SetMin(0.0);
+					pAeroDataValuesLayout->addWidget(m_pctrlRho,1,1);
+					pAeroDataValuesLayout->addWidget(m_pctrlDensity,1,2);
+					pAeroDataValuesLayout->addWidget(m_pctrlDensityUnit,1,3);
+					pAeroDataValuesLayout->addWidget(m_pctrlNu,2,1);
+					pAeroDataValuesLayout->addWidget(m_pctrlViscosity,2,2);
+					pAeroDataValuesLayout->addWidget(m_pctrlViscosityUnit,2,3);
+					pAeroDataValuesLayout->setRowStretch(3,1);
+					pAeroDataValuesLayout->setColumnStretch(1,3);
+					pAeroDataValuesLayout->setColumnStretch(4,3);
+				}
+				pAeroDataLayout->addLayout(pAeroUnitLayout);
+				pAeroDataLayout->addLayout(pAeroDataValuesLayout);
 			}
 			pAeroDataGroupBox->setLayout(pAeroDataLayout);
 		}

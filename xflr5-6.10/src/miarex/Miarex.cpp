@@ -156,8 +156,8 @@ QMiarex::QMiarex(QWidget *parent)
 
 	m_pglLightDlg = new GLLightDlg(pMainFrame);
 
-    //create a default pix from a random image - couldn't find a better way to do this
-    m_PixText = QPixmap(":/images/xflr5_64.png");
+	//create a default pix from a random image - couldn't find a better way to do this
+	m_PixText = QPixmap(":/images/xflr5_64.png");
 	m_PixText.fill(Qt::transparent);
 
 	m_pXFile      = NULL;
@@ -206,8 +206,9 @@ QMiarex::QMiarex(QWidget *parent)
 
 	m_bArcball           = false;
 	m_bStream            = false;
+	m_bPanelNormals      = false;
 	m_bVortices          = false;
-	m_bSurfVelocities            = false;
+	m_bSurfVelocities    = false;
 	m_bCrossPoint        = false;
 	m_bPickCenter        = false;
 	m_bShowCpScale       = true;
@@ -524,7 +525,8 @@ void QMiarex::Connect()
 	connect(m_pctrlSurfaces,  SIGNAL(clicked()), SLOT(OnSurfaces()));
 	connect(m_pctrlOutline,   SIGNAL(clicked()), SLOT(OnOutline()));
 	connect(m_pctrlPanels,    SIGNAL(clicked()), SLOT(OnPanels()));
-//	connect(m_pctrlVortices,  SIGNAL(clicked()), SLOT(OnVortices()));
+	connect(m_pctrlVortices,  SIGNAL(clicked()), SLOT(OnVortices()));
+	connect(m_pctrlPanelNormals,  SIGNAL(clicked()), SLOT(OnNormals()));
 	connect(m_pctrlFoilNames, SIGNAL(clicked()), SLOT(OnFoilNames()));
 	connect(m_pctrlMasses,    SIGNAL(clicked()), SLOT(OnMasses()));
 //	connect(m_pctrlLight,     SIGNAL(clicked()), SLOT(OnLight()));
@@ -676,7 +678,6 @@ void QMiarex::SetControls()
 	m_pctrlIDrag->setEnabled(     m_iView==W3DVIEW && m_pCurPOpp);
 	m_pctrlVDrag->setEnabled(     m_iView==W3DVIEW && m_pCurPOpp);
 	m_pctrlDownwash->setEnabled(  m_iView==W3DVIEW && m_pCurPOpp);
-//	m_pctrlVortices->setEnabled(  m_iView==W3DVIEW && m_pCurPOpp);
 	m_pctrlMoment->setEnabled(    m_iView==W3DVIEW && m_pCurPOpp);
 	m_pctrlPanelForce->setEnabled(m_iView==W3DVIEW && m_pCurPOpp && m_pCurWPolar && m_pCurWPolar->analysisMethod()!=LLTMETHOD);
 	m_pctrlCp->setEnabled(        m_iView==W3DVIEW && m_pCurPOpp && m_pCurWPolar && m_pCurWPolar->analysisMethod()!=LLTMETHOD);
@@ -709,6 +710,8 @@ void QMiarex::SetControls()
 
 	m_pctrlOutline->setChecked(s_bOutline);
 	m_pctrlPanels->setChecked(s_bVLMPanels);
+	m_pctrlVortices->setChecked(m_bVortices);
+	m_pctrlPanelNormals->setChecked(m_bPanelNormals);
 	m_pctrlAxes->setChecked(s_bAxes);
 	m_pctrlCp->setChecked(m_b3DCp);
 	m_pctrlPanelForce->setChecked(m_bPanelForce);
@@ -724,6 +727,14 @@ void QMiarex::SetControls()
 	m_pctrlOutline->setChecked(s_bOutline);
 	m_pctrlStream->setChecked(m_bStream);
 	m_pctrlClipPlanePos->setValue((int)(m_ClipPlanePos*100.0));
+
+	m_pctrlOutline->setEnabled(m_pCurPlane);
+	m_pctrlSurfaces->setEnabled(m_pCurPlane);
+	m_pctrlMasses->setEnabled(m_pCurPlane);
+	m_pctrlFoilNames->setEnabled(m_pCurPlane);
+	m_pctrlPanels->setEnabled(m_pCurPlane);
+	m_pctrlPanelNormals->setEnabled(m_pCurWPolar);
+	m_pctrlVortices->setEnabled(m_pCurWPolar && m_pCurWPolar->analysisMethod()!=LLTMETHOD && m_pCurWPolar->bThinSurfaces());
 
 	SetCurveParams();
 
@@ -2125,8 +2136,8 @@ void QMiarex::FillWPlrCurve(Curve *pCurve, WPolar *pWPolar, int XVar, int YVar)
 
 /**
 * Returns a pointer to the graph in which the point pt lies
-*@param a reference to the QPoint object which holds the mouse input in client coordinates
-*@param a pointer to the instance of the QGraph which contains the client point
+* @param pt a reference to the QPoint object which holds the mouse input in client coordinates
+* @return a pointer to the instance of the QGraph which contains the client point
 */
 QGraph* QMiarex::GetGraph(QPoint &pt)
 {
@@ -2231,8 +2242,12 @@ void QMiarex::GLCallViewLists()
 
 	if(m_bVortices && m_pCurPlane)
 	{
-		glCallList(VLMCTRLPTS);
 		glCallList(VLMVORTICES);
+	}
+
+	if(m_bPanelNormals && m_pCurPlane)
+	{
+		glCallList(VLMCTRLPTS);
 	}
 
 	if(m_b3DCp && m_pCurPOpp && m_pCurPOpp->m_AnalysisMethod>=VLMMETHOD)
@@ -3202,14 +3217,7 @@ void QMiarex::keyPressEvent(QKeyEvent *event)
 		}
 		case Qt::Key_V:
 		{
-			if (event->modifiers().testFlag(Qt::ControlModifier) & event->modifiers().testFlag(Qt::ShiftModifier))
-			{
-				m_bVortices = !m_bVortices;
-				if(m_bVortices) m_bResetglMesh = true;
-				UpdateView();
-				break;
-			}
-			else if(m_pCurGraph)
+			if(m_pCurGraph)
 			{
 				GraphDlg::s_ActivePage=0;
 				OnGraphSettings();
@@ -3364,13 +3372,11 @@ void QMiarex::keyReleaseEvent(QKeyEvent *event)
 
 /**
  * Launches the LLT analysis and updates the display after the analysis
- *@param V0 : the start angle
- *@param VMax : the maximal angle
- *@param VDelta : the increment angle
- *@param bSequence : if true, the analysis will be run for the whole range between V0 and VMax;
- * if not, the analysis will be run for V0 only
- *@param bInitCalc : if true, the starting point for convergence iterations will be reset to the default
- * if not, the iterations will start at the last calculated point
+ * @param V0 : the start angle
+ * @param VMax : the maximal angle
+ * @param VDelta : the increment angle
+ * @param bSequence : if true, the analysis will be run for the whole range between V0 and VMax; if not, the analysis will be run for V0 only
+ * @param bInitCalc : if true, the starting point for convergence iterations will be reset to the default; if not, the iterations will start at the last calculated point
  *
 */
 void QMiarex::LLTAnalyze(double V0, double VMax, double VDelta, bool bSequence, bool bInitCalc)
@@ -7784,12 +7790,23 @@ void QMiarex::OnFourGraphs()
 
 
 /**
- * The user has toggled the display of the vortices in 3D view
+ * The user has toggled the display of the vortices in 3D viewm_pctrlVortices
  *@deprecated Option disabled, only used for development
  */
 void QMiarex::OnVortices()
 {
-//	m_bVortices = m_pctrlVortices->isChecked();
+	m_bVortices = m_pctrlVortices->isChecked();
+	UpdateView();
+}
+
+
+/**
+ * The user has toggled the display of the vortices in 3D view
+ *@deprecated Option disabled, only used for development
+ */
+void QMiarex::OnNormals()
+{
+	m_bPanelNormals = m_pctrlPanelNormals->isChecked();
 	UpdateView();
 }
 
@@ -9775,21 +9792,24 @@ void QMiarex::SetupLayout()
 		{
 			QGridLayout *pThreeDParamsLayout = new QGridLayout;
 			{
-				m_pctrlAxes       = new QCheckBox(tr("Axes"), this);
+				m_pctrlAxes         = new QCheckBox(tr("Axes"), this);
 //				m_pctrlLight      = new QCheckBox(tr("Light"), this);
-				m_pctrlSurfaces   = new QCheckBox(tr("Surfaces"), this);
-				m_pctrlOutline    = new QCheckBox(tr("Outline"), this);
-				m_pctrlPanels     = new QCheckBox(tr("Panels"), this);
-				m_pctrlFoilNames  = new QCheckBox(tr("Foil Names"), this);
-//				m_pctrlVortices   = new QCheckBox(tr("Vortices"), this);
-				m_pctrlMasses     = new QCheckBox(tr("Masses"), this);
+				m_pctrlSurfaces     = new QCheckBox(tr("Surfaces"), this);
+				m_pctrlOutline      = new QCheckBox(tr("Outline"), this);
+				m_pctrlPanels       = new QCheckBox(tr("Panels"), this);
+				m_pctrlFoilNames    = new QCheckBox(tr("Foil Names"), this);
+				m_pctrlVortices     = new QCheckBox(tr("Vortices"), this);
+				m_pctrlPanelNormals = new QCheckBox(tr("Normals"), this);
+				m_pctrlMasses       = new QCheckBox(tr("Masses"), this);
 
 				pThreeDParamsLayout->addWidget(m_pctrlAxes, 1,1);
 				pThreeDParamsLayout->addWidget(m_pctrlPanels, 1,2);
-				pThreeDParamsLayout->addWidget(m_pctrlSurfaces, 2,1);
-				pThreeDParamsLayout->addWidget(m_pctrlOutline, 2,2);
-				pThreeDParamsLayout->addWidget(m_pctrlFoilNames, 3,1);
-				pThreeDParamsLayout->addWidget(m_pctrlMasses, 3,2);
+				pThreeDParamsLayout->addWidget(m_pctrlPanelNormals, 2,1);
+				pThreeDParamsLayout->addWidget(m_pctrlVortices, 2,2);
+				pThreeDParamsLayout->addWidget(m_pctrlSurfaces, 3,1);
+				pThreeDParamsLayout->addWidget(m_pctrlOutline, 3,2);
+				pThreeDParamsLayout->addWidget(m_pctrlFoilNames, 4,1);
+				pThreeDParamsLayout->addWidget(m_pctrlMasses, 4,2);
 			}
 
 			QVBoxLayout *ThreeDView = new QVBoxLayout;
@@ -9802,10 +9822,10 @@ void QMiarex::SetupLayout()
 					m_pctrlIso        = new QToolButton;
 					if(m_pctrlX->iconSize().height()<=48)
 					{
-                        m_pctrlX->setIconSize(QSize(24,24));
-                        m_pctrlY->setIconSize(QSize(24,24));
-                        m_pctrlZ->setIconSize(QSize(24,24));
-                        m_pctrlIso->setIconSize(QSize(24,24));
+						m_pctrlX->setIconSize(QSize(24,24));
+						m_pctrlY->setIconSize(QSize(24,24));
+						m_pctrlZ->setIconSize(QSize(24,24));
+						m_pctrlIso->setIconSize(QSize(24,24));
 					}
 					m_pXView   = new QAction(QIcon(":/images/OnXView.png"), tr("X View"), this);
 					m_pYView   = new QAction(QIcon(":/images/OnYView.png"), tr("Y View"), this);
@@ -10018,6 +10038,7 @@ void QMiarex::SetWPolar(bool bCurrent, QString WPlrName)
 
 	SetAnalysisParams();
 	SetCurveParams();
+
 	m_bResetglLegend = true;
 	s_bResetCurves = true;
 
@@ -10029,6 +10050,12 @@ void QMiarex::SetWPolar(bool bCurrent, QString WPlrName)
 		pStabView->SetMode();
 		pMainFrame->m_pctrlStabViewWidget->show();
 		pStabView->show();
+	}
+
+	if(m_pCurWPolar->analysisMethod()==LLTMETHOD || !m_pCurWPolar->bThinSurfaces())
+	{
+		m_pctrlVortices->setChecked(false);
+		m_bVortices =  false;
 	}
 
 	QApplication::restoreOverrideCursor();
