@@ -37,7 +37,7 @@ void GLCreateCpLegendClr(QRect cltRect);
 void GLCreateDownwash(Wing *pWing, WPolar *pWPolar, WingOpp *pWOpp, int List);
 void GLCreateDrag(Wing *pWing, WPolar* pWPolar, WingOpp *pWOpp, int List);
 void GLCreateMesh(int iList, int size, Panel *pPanel, CVector *pNode, QColor PanelColor, QColor BackColor, bool bBack=true);
-void GLCreateCtrlPts(int size, Panel *pPanel);
+void GLCreateCtrlPts(int size, Panel *pPanel, double normalLength);
 void GLCreateLiftStrip(Wing *pWing, WPolar *pWPolar, WingOpp *pWOpp, int List);
 void GLCreateMoments(Wing *pWing, WPolar *pWPolar, PlaneOpp *pPOpp);
 void GLCreateLiftForce(WPolar *pWPolar, PlaneOpp *pPOpp);

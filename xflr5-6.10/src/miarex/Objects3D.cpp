@@ -1199,7 +1199,7 @@ int Objects3D::createBodyElements(Plane *pCurPlane)
 
 	//right side next
 	i = s_MatSize;
-	//right side next
+
 	for (k=nx-1; k>=0; k--)
 	{
 		for (l=nh-1; l>=0; l--)
@@ -2445,6 +2445,7 @@ WPolar* Objects3D::setWPolarObject(Plane *pCurPlane, WPolar *pCurWPolar, bool bC
 		}
 
 	}
+
 	return pWPolar;
 }
 

@@ -1195,38 +1195,8 @@ void GLCreateMesh(int iList, int nPanels, Panel *pPanel, CVector *pNode, QColor 
 }
 
 
-void GLCreateCtrlPts(int nPanels, Panel *pPanel)
-{
-	if(!pPanel || !nPanels)
-	{
-		glNewList(VLMCTRLPTS, GL_COMPILE);
-		glEndList();
-		return;
-	}
 
-	glNewList(VLMCTRLPTS,GL_COMPILE);
-	{
-		QMiarex::s_GLList++;
-		glEnable(GL_DEPTH_TEST);
-		glLineWidth(1.0);
-		glColor3d(0.0,1.0,0.0);
-		for (int p=0; p<nPanels; p++)
-		{
-			//All panels
-			glBegin(GL_LINES);
-			{
-				glVertex3d(pPanel[p].CtrlPt.x, pPanel[p].CtrlPt.y, pPanel[p].CtrlPt.z);
-				glVertex3d((pPanel[p].CtrlPt.x + pPanel[p].Normal.x * 0.04),
-				(pPanel[p].CtrlPt.y + pPanel[p].Normal.y * 0.04),
-				(pPanel[p].CtrlPt.z + pPanel[p].Normal.z * 0.04));
 
-			}
-			glEnd();
-		}
-		glDisable(GL_DEPTH_TEST);
-	}
-	glEndList();
-}
 
 
 void GLCreateVortices(int nPanels, Panel *pPanel, CVector *pNode, WPolar *pWPolar)
@@ -1319,7 +1289,7 @@ void GLCreateVortices(int nPanels, Panel *pPanel, CVector *pNode, WPolar *pWPola
 				}
 				glEnd();
 			}
-			else if(pWPolar && !pWPolar->bVLM1() && pWPolar->bThinSurfaces())
+			else if(pWPolar && !pWPolar->bVLM1() && pPanel[p].m_Pos==MIDSURFACE)
 			{
 				glBegin(GL_LINE_STRIP);
 				{
@@ -2260,7 +2230,7 @@ void GLCreatePanelForce(int nPanels, Panel *pPanel, WPolar *pWPolar, PlaneOpp *p
 
 	glNewList(PANELFORCEARROWS, GL_COMPILE);
 	{
-        QMiarex::s_GLList++;
+		QMiarex::s_GLList++;
 		glLineWidth(1.0);
 
 		for (p=0; p<nPanels; p++)
@@ -2271,8 +2241,8 @@ void GLCreatePanelForce(int nPanels, Panel *pPanel, WPolar *pWPolar, PlaneOpp *p
 			color = (force-rmin)/range;
 			glColor3d(GLGetRed(color),GLGetGreen(color),GLGetBlue(color));
 
-			if(pWPolar->m_AnalysisMethod==VLMMETHOD) O = pPanel[p].CtrlPt;
-			else                                     O = pPanel[p].CollPt;
+			if(pPanel->m_Pos==MIDSURFACE) O = pPanel[p].CtrlPt;
+			else                          O = pPanel[p].CollPt;
 
 			// Rotate the reference arrow to align it with the panel normal
 
@@ -2397,3 +2367,91 @@ void GLCreatePanelForce(int nPanels, Panel *pPanel, WPolar *pWPolar, PlaneOpp *p
 }
 
 
+
+void GLCreateCtrlPts(int nPanels, Panel *pPanel, double normalLength)
+{
+	if(!pPanel || !nPanels)
+	{
+		glNewList(VLMCTRLPTS, GL_COMPILE);
+		glEndList();
+		return;
+	}
+
+	double cosa, cosa2, sina2;
+	Quaternion Qt;
+	CVector Omega, P, P1, P2, O;
+	CVector R(0.0,0.0,1.0);
+	CVector R1( 0.05, 0.0, -0.1);
+	CVector R2(-0.05, 0.0, -0.1);
+
+
+	glNewList(VLMCTRLPTS,GL_COMPILE);
+	{
+		QMiarex::s_GLList++;
+		glEnable(GL_DEPTH_TEST);
+		glLineWidth(1.0);
+		glColor3d(0.0, 0.5, 0.5);
+		for (int p=0; p<nPanels; p++)
+		{
+
+
+			// Rotate the reference arrow to align it with the panel normal
+			if(R==P)
+			{
+				Qt.Set(0.0, 0.0,0.0,1.0); //Null quaternion
+			}
+			else
+			{
+				cosa   = R.dot(pPanel[p].Normal);
+				sina2  = sqrt((1.0 - cosa)*0.5);
+				cosa2  = sqrt((1.0 + cosa)*0.5);
+
+				Omega = R * pPanel[p].Normal;//crossproduct
+				Omega.Normalize();
+				Omega *=sina2;
+				Qt.Set(cosa2, Omega.x, Omega.y, Omega.z);
+			}
+
+			Qt.Conjugate(R,  P);
+			Qt.Conjugate(R1, P1);
+			Qt.Conjugate(R2, P2);
+
+			P  *= normalLength;
+			P1 *= normalLength;
+			P2 *= normalLength;
+
+			if(pPanel[p].m_Pos==MIDSURFACE) O = pPanel[p].CtrlPt;
+			else                            O = pPanel[p].CollPt;
+
+			glBegin(GL_LINES);
+			{
+/*				glVertex3d(pPanel[p].CtrlPt.x, pPanel[p].CtrlPt.y, pPanel[p].CtrlPt.z);
+				glVertex3d((pPanel[p].CtrlPt.x + pPanel[p].Normal.x * 0.04),
+						 (pPanel[p].CtrlPt.y + pPanel[p].Normal.y * 0.04),
+						 (pPanel[p].CtrlPt.z + pPanel[p].Normal.z * 0.04))*/;
+				glBegin(GL_LINES);
+				{
+					glVertex3d(O.x, O.y, O.z);
+					glVertex3d(O.x+P.x, O.y+P.y, O.z+P.z);
+				}
+				glEnd();
+
+				glBegin(GL_LINES);
+				{
+					glVertex3d(O.x+P.x, O.y+P.y, O.z+P.z);
+					glVertex3d(O.x+P.x+P1.x, O.y+P.y+P1.y, O.z+P.z+P1.z);
+				}
+				glEnd();
+				glBegin(GL_LINES);
+				{
+					glVertex3d(O.x+P.x, O.y+P.y, O.z+P.z);
+					glVertex3d(O.x+P.x+P2.x, O.y+P.y+P2.y, O.z+P.z+P2.z);
+				}
+				glEnd();
+			}
+			glEnd();
+		}
+		glDisable(GL_DEPTH_TEST);
+	}
+	glEndList();
+}

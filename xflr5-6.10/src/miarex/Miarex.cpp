@@ -2351,6 +2351,7 @@ void QMiarex::GLDraw3D()
 {
 	QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
 
+
 	if (!m_pCurPlane)
 	{
 		m_bResetglGeom = true;
@@ -2449,7 +2450,11 @@ void QMiarex::GLDraw3D()
 			glDeleteLists(VLMCTRLPTS,2);
 			s_GLList-=2;
 		}
-		GLCreateCtrlPts(Objects3D::s_MatSize, s_pPanel);
+		double length = .01;
+		if(m_pCurPlane) length = m_pCurPlane->mac()/5.0;
+
+
+		GLCreateCtrlPts(Objects3D::s_MatSize, s_pPanel, length);
 		GLCreateVortices(Objects3D::s_MatSize, s_pPanel, s_pNode, m_pCurWPolar);
 		m_bResetglMesh = false;
 	}
@@ -9560,7 +9565,7 @@ void QMiarex::SetPlane(QString PlaneName)
 
 	SetScale();
 	SetWGraphScale();
-	
+
 	QApplication::restoreOverrideCursor();
 }
 
@@ -10052,7 +10057,7 @@ void QMiarex::SetWPolar(bool bCurrent, QString WPlrName)
 		pStabView->show();
 	}
 
-	if(m_pCurWPolar->analysisMethod()==LLTMETHOD || !m_pCurWPolar->bThinSurfaces())
+	if(m_pCurWPolar && (m_pCurWPolar->analysisMethod()==LLTMETHOD || !m_pCurWPolar->bThinSurfaces()))
 	{
 		m_pctrlVortices->setChecked(false);
 		m_bVortices =  false;
@@ -10060,7 +10065,6 @@ void QMiarex::SetWPolar(bool bCurrent, QString WPlrName)
 
 	QApplication::restoreOverrideCursor();
 }
-
 
 
 /**
