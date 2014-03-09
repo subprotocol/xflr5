@@ -40,6 +40,7 @@ IntEdit::IntEdit(int val, QWidget *pParent)
 	m_pDV = new QIntValidator(this);
 	setValidator(m_pDV);
 	setAlignment(Qt::AlignRight);
+	FormatValue();
 }
 
 

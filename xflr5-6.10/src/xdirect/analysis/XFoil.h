@@ -39,7 +39,6 @@ See http://raphael.mit.edu/xfoil for more information.
 */
 
 
-#include <QString>
 #include <QTextStream>
 #include <math.h>
 #include <complex>
@@ -116,7 +115,6 @@ public:
 	void mapgen(int n, double x[],double y[]);
 	complex<double> conjg(complex<double> cplx);
 
-	QString m_FoilName;
 	bool m_bTrace;
 
 	bool lqspec, lsym,leiw,lqslop,lscini, lrecalc, lcnpl;
@@ -140,9 +138,16 @@ public:
 	complex<double> zc[ICX+1], zc_cn[ICX+1][IMX4+1];
 	complex<double> piq[ICX+1], cn[IMX+1], eiw[ICX+1][IMX+1];
 	complex<double> cnsav[IMX+1];
-	double dnTrace[100];//... added arcds
-	double dgTrace[100];//... added arcds
+	double dnTrace[100];//... added techwinder
+	double dgTrace[100];//... added techwinder
 	int QMax;
+
+	// camber and thickness properties declared as member variables to access them from the Foil class
+	double xcam[IQX], ycam[IQX], xthk[IQX], ythk[IQX], ycamp[IQX], ythkp[IQX];
+	double  thick, xthick, cambr, xcambr;
+	int ncam, nthk;
+
+	QString m_FoilName;
 
 //	complex<double> zcoldw, dzte, chordz, zleold, zc, zc_cn, piq, cn, eiw;
 
@@ -258,11 +263,13 @@ public:
 	double angtol;
 	QTextStream m_OutStream;
 
-protected:
-	double DeRotate();
 
 //____________FUNCTION & METHODS___________________________________________________
-	bool aecalc(int n, double x[], double y[], double t[], int itype, double &area, 
+public:
+	double DeRotate();
+
+protected:
+	bool aecalc(int n, double x[], double y[], double t[], int itype, double &area,
 				double &xcen, double &ycen, double &ei11, double &ei22, double &apx1, double &apx2);
 	bool apcalc();
 	bool axset( double hk1, double t1, double rt1, double a1,
@@ -448,7 +455,7 @@ private:
 	double hopi,qopi,dtor;
 
    
-    double vs1[5][6],vs2[5][6],vsrez[5],vsr[5],vsm[5],vsx[5];
+	double vs1[5][6],vs2[5][6],vsrez[5],vsr[5],vsm[5],vsx[5];
 	bool tforce[ISX];
 
 	bool trforc, simi,tran,turb,wake, trfree;

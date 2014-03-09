@@ -30,7 +30,7 @@
 #include <QtDebug>
 
 int XFoilTask::s_IterLim=100;
-bool XFoilTask::s_bAutoInitBL = false;
+bool XFoilTask::s_bAutoInitBL = true;
 bool XFoilTask::s_bCancel = false;
 bool XFoilTask::s_bSkipOpp = false;
 bool XFoilTask::s_bSkipPolar = false;
@@ -210,7 +210,6 @@ bool XFoilTask::AlphaSequence()
 	{
 		if(s_bCancel) break;
 
-
 		qApp->processEvents();
 
 		total = (int)qAbs((SpMax*1.0001-SpMin)/SpInc);//*1.0001 to make sure upper limit is included
@@ -238,6 +237,7 @@ bool XFoilTask::AlphaSequence()
 			if(m_bAlpha)
 			{
 				alphadeg = SpMin+ia*SpInc;
+
 				XFoilInstance.alfa = alphadeg * PI/180.0;
 				XFoilInstance.lalfa = true;
 				XFoilInstance.qinf = 1.0;
@@ -409,7 +409,6 @@ bool XFoilTask::Iterate()
 //		QString str =QObject::tr("CpCalc: local speed too large\n Compressibility corrections invalid");
 		return false;
 	}
-
 
 	while(m_Iterations<s_IterLim && !XFoilInstance.lvconv && !s_bCancel)
 	{

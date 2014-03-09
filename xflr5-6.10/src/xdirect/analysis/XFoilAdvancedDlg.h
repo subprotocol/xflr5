@@ -39,6 +39,8 @@ class XFoilAdvancedDlg : public QDialog
 	Q_OBJECT
 
 	friend class QXDirect;
+	friend class BatchThreadDlg;
+	friend class BatchDlg;
 
 public:
 	XFoilAdvancedDlg(QWidget *pParent=NULL);
@@ -61,7 +63,7 @@ private:
 
 	int m_IterLimit; /** @todo replace with a static variable in XFoilTask */
 	double m_VAccel;
-	bool m_bInitBL;
+	bool m_bAutoInitBL;
 	bool m_bFullReport;
 
 };

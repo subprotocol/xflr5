@@ -3026,7 +3026,7 @@ void MainFrame::OnCurFoilStyle()
 {
 	if(!Foil::curFoil()) return;
 
-    LinePickerDlg dlg(this);
+	LinePickerDlg dlg(this);
 	dlg.InitDialog(Foil::curFoil()->m_FoilStyle, Foil::curFoil()->m_FoilWidth, Foil::curFoil()->m_FoilColor);
 
 	if(QDialog::Accepted==dlg.exec())
@@ -3904,7 +3904,6 @@ void MainFrame::openRecentFile()
 		OnXDirect();
 		UpdateFoilListBox();
 		UpdateView();
-
 	}
 	else if(m_iApp==MIAREX)
 	{
@@ -4441,14 +4440,21 @@ void MainFrame::SetCentralWidget()
 	if(m_iApp!=MIAREX)
 	{
 		m_pctrlCentralWidget->setCurrentIndex(0);
+		m_p2DWidget->setFocus();
 	}
 	else if(m_iApp==MIAREX)
 	{
 		if(pMiarex->m_iView==WOPPVIEW || pMiarex->m_iView==WPOLARVIEW || pMiarex->m_iView==WCPVIEW ||
 		   pMiarex->m_iView==STABPOLARVIEW || pMiarex->m_iView==STABTIMEVIEW)
+		{
 			m_pctrlCentralWidget->setCurrentIndex(0);
+			m_p2DWidget->setFocus();
+		}
 		else if(pMiarex->m_iView==W3DVIEW)
+		{
 			m_pctrlCentralWidget->setCurrentIndex(1);
+			m_pGLWidget->setFocus();
+		}
 	}
 }
 

@@ -20,6 +20,7 @@
 *****************************************************************************/
 
 #include "BatchThreadDlg.h"
+#include "XFoilAdvancedDlg.h"
 #include "ReListDlg.h"
 #include "../XDirect.h"
 #include "../../misc/Settings.h"
@@ -96,6 +97,8 @@ BatchThreadDlg::BatchThreadDlg(QWidget *pParent) : QDialog(pParent)
 	connect(m_pctrlSpecMax, SIGNAL(editingFinished()), this, SLOT(OnSpecChanged()));
 	connect(m_pctrlSpecDelta, SIGNAL(editingFinished()), this, SLOT(OnSpecChanged()));
 }
+
+
 
 /**
  * This course of action will lead us to destruction.
@@ -282,10 +285,15 @@ void BatchThreadDlg::SetupLayout()
 
 	QHBoxLayout *CommandButtons = new QHBoxLayout;
 	{
+		QPushButton *pAdvancedSettings =  new QPushButton(tr("Advanced Settings"));
+		connect(pAdvancedSettings, SIGNAL(clicked()), this, SLOT(OnAdvancedSettings()));
+
 		m_pctrlClose     = new QPushButton(tr("Close"));
 		m_pctrlAnalyze   = new QPushButton(tr("Analyze"))	;
 		m_pctrlAnalyze->setAutoDefault(true);
 
+		CommandButtons->addStretch(1);
+		CommandButtons->addWidget(pAdvancedSettings);
 		CommandButtons->addStretch(1);
 		CommandButtons->addWidget(m_pctrlAnalyze);
 		CommandButtons->addStretch(1);
@@ -853,8 +861,8 @@ void BatchThreadDlg::StartAnalysis()
 	strong ="Launching multi-threaded batch analysis\n\n";
 	UpdateOutput(strong);
 
-	if(!m_bFromList) nRe = (int)qAbs((m_ReMax-m_ReMin)/m_ReInc);
-	else             nRe = QXDirect::s_ReList.count()-1;
+	if(!m_bFromList) nRe = (int)qAbs((m_ReMax-m_ReMin)/m_ReInc)+1;
+	else             nRe = QXDirect::s_ReList.count();
 
 //	QThreadPool::globalInstance()->setExpiryTimeout(60000);//ms
 
@@ -866,7 +874,7 @@ void BatchThreadDlg::StartAnalysis()
 		pFoil = Foil::foil(m_FoilList.at(i));
 		if(pFoil)
 		{
-			for (iRe=0; iRe<=nRe; iRe++)
+			for (iRe=0; iRe<nRe; iRe++)
 			{
 				pAnalysis = new Analysis;
 				m_AnalysisPair.append(pAnalysis);
@@ -993,7 +1001,7 @@ void BatchThreadDlg::StartThread()
 				else         m_pXFoilTask[it].setSequence(false, m_ClMin, m_ClMax, m_ClInc);
 
 
-				m_pXFoilTask[it].InitializeTask(pAnalysis->pFoil, pAnalysis->pPolar);
+				m_pXFoilTask[it].InitializeTask(pAnalysis->pFoil, pAnalysis->pPolar, true, m_bInitBL, m_bFromZero);
 
 				//launch it
 				strong = "Starting "+pAnalysis->pFoil->m_FoilName+" / "+pAnalysis->pPolar->m_PlrName+"\n";
@@ -1076,7 +1084,23 @@ void BatchThreadDlg::hideEvent(QHideEvent *event)
 }
 
 
+void BatchThreadDlg::OnAdvancedSettings()
+{
+	XFoilAdvancedDlg xfaDlg(this);
+	xfaDlg.m_IterLimit   = XFoilTask::s_IterLim;
+	xfaDlg.m_bAutoInitBL     = XFoilTask::s_bAutoInitBL;
+	xfaDlg.m_VAccel      = XFoil::vaccel;
+	xfaDlg.m_bFullReport = XFoil::s_bFullReport;
+	xfaDlg.InitDialog();
 
+	if (QDialog::Accepted == xfaDlg.exec())
+	{
+		XFoil::vaccel             = xfaDlg.m_VAccel;
+		XFoil::s_bFullReport      = xfaDlg.m_bFullReport;
+		XFoilTask::s_bAutoInitBL  = xfaDlg.m_bAutoInitBL;
+		XFoilTask::s_IterLim      = xfaDlg.m_IterLimit;
+	}
+}
 
 
 

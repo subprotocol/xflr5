@@ -97,6 +97,8 @@ private slots:
 	void OnInitBL(int);
 	void OnFoilList();
 	void OnFoilSelectionType();
+	void OnAdvancedSettings();
+
 
 private:
 	QRadioButton * m_pctrlFoil1, * m_pctrlFoil2;

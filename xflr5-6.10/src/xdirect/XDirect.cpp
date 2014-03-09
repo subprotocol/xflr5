@@ -2751,7 +2751,7 @@ void QXDirect::OnExportCurXFoilResults()
 
 	out << VERSIONNAME;
 	out << ("\n");
-	strong = m_pXFoil->m_FoilName+ "\n";
+	strong = Foil::curFoil()->m_FoilName+ "\n";
 	out << (strong);
 
 	if(type==1)
@@ -4895,8 +4895,8 @@ void QXDirect::OnXDirectStyle()
 void QXDirect::OnXFoilAdvanced()
 {
 	XFoilAdvancedDlg xfaDlg((MainFrame*)s_pMainFrame);
-	xfaDlg.m_IterLimit = XFoilTask::s_IterLim;
-	xfaDlg.m_bInitBL   = XFoilTask::s_bAutoInitBL;
+	xfaDlg.m_IterLimit   = XFoilTask::s_IterLim;
+	xfaDlg.m_bAutoInitBL     = XFoilTask::s_bAutoInitBL;
 	xfaDlg.m_VAccel      = XFoil::vaccel;
 	xfaDlg.m_bFullReport = XFoil::s_bFullReport;
 	xfaDlg.InitDialog();
@@ -4904,11 +4904,13 @@ void QXDirect::OnXFoilAdvanced()
 	if (QDialog::Accepted == xfaDlg.exec())
 	{
 		XFoil::vaccel             = xfaDlg.m_VAccel;
-		XFoil::s_bFullReport   = xfaDlg.m_bFullReport;
-		XFoilTask::s_bAutoInitBL  = xfaDlg.m_bInitBL;
+		XFoil::s_bFullReport      = xfaDlg.m_bFullReport;
+		XFoilTask::s_bAutoInitBL  = xfaDlg.m_bAutoInitBL;
 		XFoilTask::s_IterLim      = xfaDlg.m_IterLimit;
 	}
 }
+
+
 
 /**
  * The method which draws the boundary layer in the OpPoint view.

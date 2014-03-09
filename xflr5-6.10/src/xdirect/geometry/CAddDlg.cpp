@@ -156,7 +156,7 @@ void CAddDlg::OnApply()
 	strong = QString(tr("(added %1 points to original foil)")).arg(added);
 	m_pctrlAdded->setText(strong);
 
-	for (i=0; i< pXFoil->n; i++)
+	for (i=0; i<pXFoil->n; i++)
 	{
 		m_pBufferFoil->xb[i] = pXFoil->x[i+1];
 		m_pBufferFoil->yb[i] = pXFoil->y[i+1];

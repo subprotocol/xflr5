@@ -26,7 +26,6 @@
 #define BATCHDLG_H
 
 #include <QDialog>
-#include <QDialog>
 #include <QCheckBox>
 #include <QPushButton>
 #include <QLabel>
@@ -36,6 +35,7 @@
 #include "../../graph/GraphWidget.h"
 #include "../../objects/Foil.h"
 #include "../../objects/Polar.h"
+#include "../../misc/IntEdit.h"
 #include "../../misc/DoubleEdit.h"
 #include "XFoilTask.h"
 
@@ -72,7 +72,6 @@ private:
 	void SetFileHeader();
 	void SetPlrName(Polar *pPolar);
 	void Analyze();
-	void UpdateGraph();
 	void OutputMsg(QString &msg);
 
 
@@ -88,6 +87,7 @@ private slots:
 	void OnFoilList();
 	void OnFoilSelectionType();
 	void OnProgress();
+	void OnAnalysisSettings();
 
 private:
     static QPoint s_Position;   /**< the position on the client area of the dialog's topleft corner */
@@ -98,12 +98,14 @@ private:
 	QRadioButton *m_rbRange1, *m_rbRange2;
 	QRadioButton *m_rbspec1, *m_rbspec2;
 	QPushButton *m_pctrlEditList;
+	IntEdit *m_pctrlMaxIter;
 	DoubleEdit *m_pctrlReMin, *m_pctrlReMax, *m_pctrlReDelta, *m_pctrlMach;
 	DoubleEdit *m_pctrlSpecMin, *m_pctrlSpecMax, *m_pctrlSpecDelta;
 	DoubleEdit *m_pctrlNCrit, *m_pctrlXTopTr, *m_pctrlXBotTr;
 	QLabel *m_pctrlSpecVar;
 	QLabel *m_pctrlMaType, *m_pctrlReType;
-	QCheckBox *m_pctrlInitBL, *m_pctrlFromZero, *m_pctrlStoreOpp;
+	QCheckBox *m_pctrlInitBLOpp, *m_pctrlInitBLPolar;
+	QCheckBox *m_pctrlFromZero, *m_pctrlStoreOpp;
 	QPushButton *m_pctrlSkipOpp, *m_pctrlSkipPolar;
 	QPushButton *m_pctrlClose, *m_pctrlAnalyze;
 	QTextEdit *m_pctrlTextOutput;

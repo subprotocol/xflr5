@@ -31,7 +31,7 @@ XFoilAdvancedDlg::XFoilAdvancedDlg(QWidget *pParent) : QDialog(pParent)
 
 	m_IterLimit = 100;
 	m_VAccel = 0.001;
-	m_bInitBL = true;
+	m_bAutoInitBL = true;
 	m_bFullReport = false;
 
 	connect(m_pctrlDefaults, SIGNAL(clicked()), SLOT(OnDefaults()));
@@ -117,7 +117,7 @@ void XFoilAdvancedDlg::OnDefaults()
 {
 	m_IterLimit = 100;
 	m_VAccel = 0.001;
-	m_bInitBL = true;
+	m_bAutoInitBL = true;
 	m_bFullReport = false;
 	QXDirect::s_bKeepOpenErrors = true;
 	QXDirect::s_TimeUpdateInterval = 100;
@@ -128,7 +128,7 @@ void XFoilAdvancedDlg::OnDefaults()
 void XFoilAdvancedDlg::InitDialog()
 {
 	m_pctrlVAccel->SetValue(m_VAccel);
-	m_pctrlInitBL->setChecked(m_bInitBL);
+	m_pctrlInitBL->setChecked(m_bAutoInitBL);
 	m_pctrlIterLimit->SetValue(m_IterLimit);
 	m_pctrlFullReport->setChecked(m_bFullReport);
 	m_pctrlKeepErrorsOpen->setChecked(QXDirect::s_bKeepOpenErrors);
@@ -171,7 +171,7 @@ void XFoilAdvancedDlg::OnOK()
 {
 	m_IterLimit = m_pctrlIterLimit->Value();
 	m_VAccel = m_pctrlVAccel->Value();
-	m_bInitBL = m_pctrlInitBL->isChecked();
+	m_bAutoInitBL = m_pctrlInitBL->isChecked();
 	m_bFullReport = m_pctrlFullReport->isChecked();
 	QXDirect::s_TimeUpdateInterval = m_pctrlTimerInterval->Value();
 	QXDirect::s_bKeepOpenErrors = m_pctrlKeepErrorsOpen->isChecked();

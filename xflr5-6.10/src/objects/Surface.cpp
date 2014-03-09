@@ -491,7 +491,7 @@ void Surface::GetSurfacePoint(double const &xArel, double const &xBrel, double c
  * @param pos defines on which surface (BOTSURFACE, TOPSURFACE, MIDSURFACE) the point is calculated
  */
 void Surface::GetSurfacePointNormal(double const &xArel, double const &xBrel, double const &yrel,
-									CVector &Point, CVector &PtNormal, int const &pos)
+							 CVector &Point, CVector &PtNormal, int const &pos)
 {
 	static CVector APt, BPt, Nc, u;
 	static double TopA, TopB, BotA, BotB, nxA, nxB, nyA, nyB, theta;

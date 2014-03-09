@@ -104,7 +104,7 @@ public:
 	double DeRotate();
 	double GetBaseUpperY(double const &x);
 	double GetBaseLowerY(double const &x);
-	double GetMidY(double const &x);
+	double GetMidY(double const &xl);
 	double GetLowerY(double x);
 	double GetUpperY(double x);
 	double GetCamber(double const &x);
@@ -150,8 +150,8 @@ private:
 	int m_iInt;                          /**< the number of points on the lower surface of the current foil */
 	int m_iExt;                          /**< the number of points on the upper surface of the current foil */
 
-	int m_FoilStyle;                    /**< the index of the style with which to draw the Foil */
-	int m_FoilWidth;                    /**< the width with which to draw the Foil */
+	int m_FoilStyle;                     /**< the index of the style with which to draw the Foil */
+	int m_FoilWidth;                     /**< the width with which to draw the Foil */
 	QColor m_FoilColor;                  /**< the color with which to draw the Foil */
 
 	int m_iHighLight;                    /**< the index of the point to highlight in the display */
@@ -173,21 +173,21 @@ private:
 	double m_fXCamber;                   /**< the x-position of the Foil's max camber point */
 	double m_fXThickness;                /**< the x-position of the Foil's max thickness point */
 
-	double m_Gap;			             /**< the trailing edge gap */
-	CVector m_TE;                         /**< the trailing edge point */
-	CVector m_LE;                         /**< the leading edge point */
+	double m_Gap;			            /**< the trailing edge gap */
+	CVector m_TE;                        /**< the trailing edge point */
+	CVector m_LE;                        /**< the leading edge point */
 
-	CVector m_rpBaseMid[MIDPOINTCOUNT+1];  /**< the mid camber line points of the base geometry */
-	CVector m_BaseExtrados[IQX];	         /**< the upper surface points of the base geometry */
-	CVector m_BaseIntrados[IQX];    	    /**< the lower surface points of the base geometry */
+	CVector m_rpBaseMid[IQX+1];          /**< the mid camber line points of the base geometry */
+	CVector m_BaseExtrados[IQX];	       /**< the upper surface points of the base geometry */
+	CVector m_BaseIntrados[IQX];    	  /**< the lower surface points of the base geometry */
 
-	CVector m_rpMid[MIDPOINTCOUNT+1];      /**< the mid camber line points */
-	CVector m_rpExtrados[IQX];	         /**< the upper surface points */
-	CVector m_rpIntrados[IQX];	         /**< the lower surface points */
+	CVector m_rpMid[IQX+1];              /**< the mid camber line points */
+	CVector m_rpExtrados[IQX];	       /**< the upper surface points */
+	CVector m_rpIntrados[IQX];	       /**< the lower surface points */
 
-	QString m_FoilName;		 /**<  the foil's name... */
+	QString m_FoilName;		            /**<  the foil's name... */
 
-	static QList <void *> s_oaFoil;    /**< The array of void pointers to the Foil objects. */
+	static QList <void *> s_oaFoil;      /**< The array of void pointers to the Foil objects. */
 
 public:
 

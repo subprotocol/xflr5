@@ -2475,9 +2475,6 @@ bool XFoil::geopar(double x[], double xp[], double y[], double yp[], double s[],
 {
 	int i;
 	double chsq, curvle, ang1, ang2, xcena, ycena, slen, xcent, ycent;
-	double  thick, xthick, cambr, xcambr;
-	double xcam[IQX], ycam[IQX], xthk[IQX], ythk[IQX], ycamp[IQX], ythkp[IQX];
-	int ncam, nthk;
 
 	//------------------------------------------------------
 	//     sets geometric parameters for airfoil shape
@@ -3556,6 +3553,16 @@ bool XFoil::Initialize()
 	memset(alqsp, 0, sizeof(alqsp));
 	memset(clqsp, 0, sizeof(clqsp));
 	memset(cmqsp, 0, sizeof(cmqsp));
+
+
+	memset(xcam, 0, IQX*sizeof(double));
+	memset(ycam, 0, IQX*sizeof(double));
+	memset(xthk, 0, IQX*sizeof(double));
+	memset(ythk, 0, IQX*sizeof(double));
+	memset(ycamp, 0, IQX*sizeof(double));
+	memset(ythkp, 0, IQX*sizeof(double));
+	ncam = nthk = 0;
+
 	agte = 0.0;
 	ag0 = 0.0;
 	qim0 = 0.0;
@@ -4004,7 +4011,6 @@ bool XFoil::InitXFoilGeometry(void *pFoilPtr)
 
 	int i, k;
 
-	m_FoilName = pFoil->m_FoilName;
 	for (i =0; i<pFoil->n; i++)
 	{
 		xb[i+1] = pFoil->x[i];
@@ -5774,7 +5780,7 @@ bool XFoil::Preprocess()
 	segspl(xb,xbp,sb,nb);
 //	segspl(yb,ybp,sb,nb);
 	geopar(xb,xbp,yb,ybp,sb,nb, w1,sble,chordb,areab,radble,angbte,
-		ei11ba,ei22ba,apx1ba,apx2ba,ei11bt,ei22bt,apx1bt,apx2bt);
+		  ei11ba,ei22ba,apx1ba,apx2ba,ei11bt,ei22bt,apx1bt,apx2bt);
 
 	xble = seval(sble,xb,xbp,sb,nb);
 	yble = seval(sble,yb,ybp,sb,nb);
@@ -12964,7 +12970,8 @@ double XFoil::DeRotate()
 	double xoff = 0.0;
 	double yoff = 0.0;
 	double xt, yt;
-	for (int i=1; i<=n; i++){
+	for (int i=1; i<=n; i++)
+	{
 		xt = xb[i];
 		yt = yb[i];
 		xb[i] = ca*xt + sa*yt + xoff;
