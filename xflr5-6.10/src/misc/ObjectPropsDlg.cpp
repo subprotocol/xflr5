@@ -31,13 +31,6 @@
 
 ObjectPropsDlg::ObjectPropsDlg(QWidget *pParent) : QDialog(pParent)
 {
-	m_pMiarex     = NULL;
-	m_pXDirect    = NULL;
-	m_pPolar      = NULL;
-	m_pWPolar     = NULL;
-	m_pPOpp       = NULL;
-	m_pOpp        = NULL;
-
 	SetupLayout();
 }
 
@@ -73,11 +66,11 @@ void ObjectPropsDlg::SetupLayout()
 }
 
 
-void ObjectPropsDlg::InitDialog()
+void ObjectPropsDlg::InitDialog(QString title, QString props)
 {
 	QString strange;
 
-	if(m_pXDirect)
+/*	if(m_pXDirect)
 	{
 		if(m_pPolar)
 		{
@@ -103,9 +96,11 @@ void ObjectPropsDlg::InitDialog()
 			m_pPOpp->GetPlaneOppProperties(strange);
 			setWindowTitle(tr("Operating Point Properties"));
 		}
-	}
+	}*/
 
-	m_pctrlDescription->setText(strange);
+
+	setWindowTitle(title);
+	m_pctrlDescription->setText(props);
 }
 
 

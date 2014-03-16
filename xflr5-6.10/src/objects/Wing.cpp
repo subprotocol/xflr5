@@ -1898,6 +1898,51 @@ void Wing::ScaleTwist(double NewTwist)
 }
 
 
+/**
+* Scales the wing's area.
+* All dimensions scaled proportionally sqrt(2).
+* Useful e.g. when the weight is changed or when playing with Cl.
+* @param newArea the new value of the wing's area.
+*/
+void Wing::ScaleArea(double newArea)
+{
+	if(fabs(m_PlanformArea)<PRECISION) return;
+	if(newArea<PRECISION) return;
+
+	double ratio = sqrt(newArea/m_PlanformArea);
+
+	for (int is=0; is<m_WingSection.size(); is++)
+	{
+		YPosition(is) *= ratio;
+		Chord(is)     *= ratio;
+	}
+	ComputeGeometry();
+}
+
+
+/**
+* Scales the wing's Aspect Ratio.
+* Defined chords and the span scaled accordingly but the wing area remains unchanged.
+* Good for general optimisation.
+* @param newAR the new value of the aspect ratio.
+*/
+void Wing::ScaleAR(double newAR)
+{
+	if(m_AR<PRECISION)  return;
+	if(newAR<PRECISION) return;
+
+	double ratio = sqrt(newAR/m_AR);
+
+	for (int is=0; is<m_WingSection.size(); is++)
+	{
+		YPosition(is) *= ratio;
+		Chord(is)     /= ratio;
+	}
+	ComputeGeometry();
+}
+
+
+
 
 /**
  * Loads or Saves the data of this Wing to a binary file.

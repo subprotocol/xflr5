@@ -7123,11 +7123,16 @@ void QMiarex::OnScaleWing()
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 
 	WingScaleDlg wsDlg(pMainFrame);
-	wsDlg.InitDialog(m_pCurPlane->planformSpan(), m_pCurPlane->m_Wing[0].Chord(0), m_pCurPlane->m_Wing[0].AverageSweep(), m_pCurPlane->m_Wing[0].TipTwist());
+	wsDlg.InitDialog(m_pCurPlane->planformSpan(),
+				  m_pCurPlane->rootChord(),
+				  m_pCurPlane->wing()->AverageSweep(),
+				  m_pCurPlane->wing()->TipTwist(),
+				  m_pCurPlane->planformArea(),
+				  m_pCurPlane->aspectRatio());
 
 	if(QDialog::Accepted == wsDlg.exec())
 	{
-		if (wsDlg.m_bSpan || wsDlg.m_bChord || wsDlg.m_bSweep || wsDlg.m_bTwist)
+		if (wsDlg.m_bSpan || wsDlg.m_bChord || wsDlg.m_bSweep || wsDlg.m_bTwist || wsDlg.m_bArea || wsDlg.m_bAR)
 		{
 			Plane *pNewPlane = new Plane;
 			pNewPlane->Duplicate(m_pCurPlane);
@@ -7135,11 +7140,15 @@ void QMiarex::OnScaleWing()
 			if(wsDlg.m_bChord) pNewPlane->wing()->ScaleChord(wsDlg.m_NewChord);
 			if(wsDlg.m_bSweep) pNewPlane->wing()->ScaleSweep(wsDlg.m_NewSweep);
 			if(wsDlg.m_bTwist) pNewPlane->wing()->ScaleTwist(wsDlg.m_NewTwist);
+			if(wsDlg.m_bArea) pNewPlane->wing()->ScaleArea(wsDlg.m_NewArea);
+			if(wsDlg.m_bAR) pNewPlane->wing()->ScaleAR(wsDlg.m_NewAR);
 			pNewPlane->ComputePlane();
 
 			m_pCurPlane = Objects3D::setModPlane(pNewPlane);
 			SetPlane();
 			pMainFrame->UpdatePlaneListBox();
+
+			emit projectModified();
 		}
 
 		s_bResetCurves = true;
@@ -8418,11 +8427,11 @@ void QMiarex::PaintPlaneLegend(QPainter &painter, QRect drawRect)
 	painter.drawText(LeftPos, ZPos+D, str1);
 	D+=dheight;
 
-	str1 = QString(tr("Aspect Ratio   =")+"%1").arg(m_pCurPlane->m_Wing[0].m_AR,10,'f',3);
+	str1 = QString(tr("Aspect Ratio   =")+"%1").arg(m_pCurPlane->aspectRatio(),10,'f',3);
 	painter.drawText(LeftPos, ZPos+D, str1);
 	D+=dheight;
 
-	str1 = QString(tr("Taper Ratio    =")+"%1").arg(m_pCurPlane->m_Wing[0].m_TR,10,'f',3);
+	str1 = QString(tr("Taper Ratio    =")+"%1").arg(m_pCurPlane->taperRatio(),10,'f',3);
 	painter.drawText(LeftPos, ZPos+D, str1);
 	D+=dheight;
 
@@ -10485,13 +10494,9 @@ void QMiarex::OnWPolarProperties()
 {
 	if(!m_pCurWPolar) return;
 	ObjectPropsDlg opDlg((MainFrame*)s_pMainFrame);
-	opDlg.m_pXDirect = NULL;
-	opDlg.m_pOpp = NULL;
-	opDlg.m_pPolar = NULL;
-	opDlg.m_pMiarex = this;
-	opDlg.m_pPOpp = NULL;
-	opDlg.m_pWPolar = m_pCurWPolar;
-	opDlg.InitDialog();
+	QString strangeProps;
+	m_pCurWPolar->GetPolarProperties(strangeProps);
+	opDlg.InitDialog(tr("Polar properties"), strangeProps);
 	opDlg.exec();
 }
 
@@ -10503,13 +10508,9 @@ void QMiarex::OnPlaneOppProperties()
 {
 	if(!m_pCurPOpp) return;
 	ObjectPropsDlg opDlg((MainFrame*)s_pMainFrame);
-	opDlg.m_pXDirect = NULL;
-	opDlg.m_pOpp = NULL;
-	opDlg.m_pPolar = NULL;
-	opDlg.m_pMiarex = this;
-	opDlg.m_pPOpp = m_pCurPOpp;
-	opDlg.m_pWPolar = NULL;
-	opDlg.InitDialog();
+	QString strangeProps;
+	m_pCurPOpp->GetPlaneOppProperties(strangeProps);
+	opDlg.InitDialog(tr("Operating point Properties"), strangeProps);
 	opDlg.exec();
 }
 

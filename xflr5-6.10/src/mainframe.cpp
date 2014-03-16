@@ -104,7 +104,7 @@ MainFrame::MainFrame(QWidget *parent, Qt::WindowFlags flags) : QMainWindow(paren
 
 	if(s_bTrace)
 	{
-        QString FileName = QDir::homePath() + "/Trace.log";
+		QString FileName = QDir::homePath() + "/Trace.log";
 		s_pTraceFile = new QFile(FileName);
 		if (!s_pTraceFile->open(QIODevice::ReadWrite | QIODevice::Text)) s_bTrace = false;
 	}
@@ -441,14 +441,15 @@ void MainFrame::CreateActions()
 	exitAct->setStatusTip(tr("Exit the application"));
 	connect(exitAct, SIGNAL(triggered()), this, SLOT(close()));
 
+	openGLAct = new QAction(tr("OpenGL info"), this);
+	connect(openGLAct, SIGNAL(triggered()), this, SLOT(OnOpenGLInfo()));
+
 	aboutAct = new QAction(tr("&About"), this);
 	aboutAct->setStatusTip(tr("More information about XFLR5"));
 	connect(aboutAct, SIGNAL(triggered()), this, SLOT(aboutXFLR5()));
 
 	aboutQtAct = new QAction(tr("About Qt"), this);
 	connect(aboutQtAct, SIGNAL(triggered()), this, SLOT(AboutQt()));
-
-
 
 	CreateAFoilActions();
 	CreateXDirectActions();
@@ -927,6 +928,7 @@ void MainFrame::CreateMenus()
 
 	helpMenu = menuBar()->addMenu(tr("&?"));
 	{
+		helpMenu->addAction(openGLAct);
 		helpMenu->addAction(aboutQtAct);
 		helpMenu->addAction(aboutAct);
 	}
@@ -3326,6 +3328,67 @@ void MainFrame::OnNewProject()
 	}
 
 	UpdateView();
+}
+
+
+void MainFrame::OnOpenGLInfo()
+{
+	QGLFormat fmt = m_pGLWidget->format();
+	QString strongProps;
+
+
+	if(fmt.hasOpenGL())         strongProps += QString("OpenGl::OpenGL            = supported\n");
+	else                        strongProps += QString("OpenGl::OpenGL            = not supported\n");
+
+	strongProps += QString("OpenGl::majorVersion      = %1\n").arg(fmt.majorVersion());
+	strongProps += QString("OpenGl::minorVersion      = %1\n").arg(fmt.minorVersion());
+
+	if(fmt.hasOpenGLOverlays()) strongProps += QString("OpenGl::hasOpenGLOverlays = supported\n");
+	else                        strongProps += QString("OpenGl::hasOpenGLOverlays = not supported\n");
+
+	if(fmt.hasOverlay())        strongProps += QString("OpenGl::hasOverlay        = enabled\n");
+	else                        strongProps += QString("OpenGl::hasOverlay        = disabled\n");
+
+	if(fmt.doubleBuffer())      strongProps += QString("OpenGl::doubleBuffer      = enabled\n");
+	else                        strongProps += QString("OpenGl::doubleBuffer      = disabled\n");
+
+	if(fmt.accum())             strongProps += QString("OpenGl::accum             = enabled\n");
+	else                        strongProps += QString("OpenGl::accum             = disabled\n");
+
+	if(fmt.depth())             strongProps += QString("OpenGl::depthBuffer       = enabled\n");
+	else                        strongProps += QString("OpenGl::depthBuffer       = disabled\n");
+
+	if(fmt.alpha())             strongProps += QString("OpenGl::alpha             = enabled\n");
+	else                        strongProps += QString("OpenGl::alpha             = disabled\n");
+
+	if(fmt.directRendering())   strongProps += QString("OpenGl::directRendering   = enabled\n");
+	else                        strongProps += QString("OpenGl::directRendering   = disabled\n");
+
+	if(fmt.stereo())            strongProps += QString("OpenGl::stereo            = enabled\n");
+	else                        strongProps += QString("OpenGl::stereo            = disabled\n");
+
+	if(fmt.rgba())              strongProps += QString("OpenGl::rgba              = color mode\n");
+	else                        strongProps += QString("OpenGl::rgba              = index mode\n");
+
+	if(fmt.sampleBuffers())     strongProps += QString("OpenGl::multiSampleBuffer = enabled\n");
+	else                        strongProps += QString("OpenGl::multiSampleBuffer = disabled\n");
+
+	if(fmt.swapInterval()==-1)  strongProps += QString("OpenGl::swapInterval      = supported\n");
+	else                        strongProps += QString("OpenGl::swapInterval      = not supported\n");
+
+	strongProps += QString("OpenGl::accumBufferSize   = %1\n").arg(fmt.accumBufferSize());
+	strongProps += QString("OpenGl::depthBufferSize   = %1\n").arg(fmt.depthBufferSize());
+	strongProps += QString("OpenGl::plane             = %1\n").arg(fmt.plane());
+	strongProps += QString("OpenGl::samplesPerPixel   = %1\n").arg(fmt.samples());
+
+
+	if(fmt.profile() == QGLFormat::NoProfile)                strongProps += QString("Opengl::CompatibilityProfile::NoProfile");
+	else if(fmt.profile() == QGLFormat::CoreProfile)         strongProps += QString("Opengl::CompatibilityProfile::CoreProfile");
+	else if(fmt.profile()== QGLFormat::CompatibilityProfile) strongProps += QString("Opengl::CompatibilityProfile::CompatibilityProfile");
+
+	ObjectPropsDlg dlg(this);
+	dlg.InitDialog(tr("Support for OpenGL provided by your system:"), strongProps);
+	dlg.exec();
 }
 
 

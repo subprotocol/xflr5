@@ -408,6 +408,23 @@ void Trace(int n)
 }
 
 
+void Trace(QString msg, bool b)
+{
+	if(!MainFrame::s_bTrace) return;
+
+	QDateTime dt = QDateTime::currentDateTime();
+	QString str = dt.toString("hh:mm:ss  ");
+	if(b) str += msg + "=true";
+	else  str += msg + "=false";
+
+	if(MainFrame::s_pTraceFile && MainFrame::s_pTraceFile->isOpen())
+	{
+		QTextStream ts(MainFrame::s_pTraceFile);
+		ts << str << "\n";
+	}
+	qDebug()<<str;
+}
+
 /**
 * Outputs in a debug file the current time and a string message passed as an input parameter.
 * The file is in the user's default temporary directory with the name Trace.log. 

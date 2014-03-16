@@ -118,6 +118,9 @@ public:
 	void ScaleTwist(double NewTwist);
 	void ScaleSpan(double NewSpan);
 	void ScaleChord(double NewChord);
+	void ScaleArea(double newArea);
+	void ScaleAR(double newAR);
+
 	bool SerializeWingWPA(QDataStream &ar, bool bIsStoring);
 	bool SerializeWingXFL(QDataStream &ar, bool bIsStoring);
 	bool ExportAVLWing(QTextStream &out, int index, double y, double Thetay);

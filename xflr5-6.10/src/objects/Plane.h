@@ -142,6 +142,9 @@ public:
 
 	bool isWing() {return !m_bBiplane&& !m_bStab && !m_bFin && !m_bBody;}
 
+	double aspectRatio()  {return m_Wing[0].m_AR;}
+	double taperRatio()   {return m_Wing[0].m_TR;}
+
 	Wing *getWing(int iw);
 
 public:

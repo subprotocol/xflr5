@@ -75,6 +75,7 @@ void WriteCOLORREF(QDataStream &ar, QColor const &color);
 
 void Trace(int n);
 void Trace(QString msg);
+void Trace(QString msg, bool b);
 void Trace(QString msg, int n);
 void Trace(QString msg, double f);
 

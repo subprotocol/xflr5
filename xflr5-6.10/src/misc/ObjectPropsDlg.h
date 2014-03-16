@@ -23,33 +23,19 @@
 #define ObjectPropsDlg_H
 #include <QTextEdit>
 #include <QDialog>
-#include "../objects/Polar.h"
-#include "../objects/WPolar.h"
 
 class ObjectPropsDlg : public QDialog
 {
 	Q_OBJECT
 
-	friend class MainFrame;
-	friend class QXDirect;
-	friend class QMiarex;
-
-
 public:
     ObjectPropsDlg(QWidget *pParent);
-	void InitDialog();
+	void InitDialog(QString title, QString props);
 
 private:
 	void SetupLayout();
 
 	QTextEdit *m_pctrlDescription;
-	Polar *m_pPolar;
-	WPolar *m_pWPolar;
-	PlaneOpp *m_pPOpp;
-	OpPoint *m_pOpp;
-
-	void *m_pXDirect;
-	void *m_pMiarex;
 
 };
 

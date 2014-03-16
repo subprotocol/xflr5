@@ -4234,15 +4234,11 @@ void QXDirect::OnRenamePolar()
  */
 void QXDirect::OnOpPointProps()
 {
-	if(!Polar::curPolar()) return;
+	if(!OpPoint::curOpp()) return;
 	ObjectPropsDlg opDlg((MainFrame*)s_pMainFrame);
-	opDlg.m_pXDirect = this;
-	opDlg.m_pOpp = OpPoint::curOpp();
-	opDlg.m_pPolar = NULL;
-	opDlg.m_pMiarex = NULL;
-	opDlg.m_pPOpp = NULL;
-	opDlg.m_pWPolar = NULL;
-	opDlg.InitDialog();
+	QString strangeProps;
+	OpPoint::curOpp()->GetOppProperties(strangeProps);
+	opDlg.InitDialog(tr("Operating point properties"), strangeProps);
 	opDlg.exec();
 }
 
@@ -4256,13 +4252,9 @@ void QXDirect::OnPolarProps()
 {
 	if(!Polar::curPolar()) return;
 	ObjectPropsDlg opDlg((MainFrame*)s_pMainFrame);
-	opDlg.m_pXDirect = this;
-	opDlg.m_pOpp = NULL;
-	opDlg.m_pPolar = Polar::curPolar();
-	opDlg.m_pMiarex = NULL;
-	opDlg.m_pPOpp = NULL;
-	opDlg.m_pWPolar = NULL;
-	opDlg.InitDialog();
+	QString strangeProps;
+	Polar::curPolar()->GetPolarProperties(strangeProps);
+	opDlg.InitDialog(tr("Polar properties"), strangeProps);
 	opDlg.exec();
 }
 

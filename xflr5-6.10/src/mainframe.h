@@ -127,6 +127,7 @@ private slots:
 	void OnLanguage();
 	void OnLoadFile();
 	void OnLogFile();
+	void OnOpenGLInfo();
 	void OnProjectModified();
 	void OnResetCurGraphScales();
 	void OnResetSettings();
@@ -271,7 +272,7 @@ private:
 	QAction *unitsAct;
 	QAction *languageAct;
 	QAction *exitAct;
-	QAction *aboutAct, *aboutQtAct;
+	QAction *aboutAct, *aboutQtAct, *openGLAct;
 	QAction *recentFileActs[MAXRECENTFILES];
 	QAction *separatorAct;
 	QAction *saveViewToImageFileAct, *resetSettingsAct;

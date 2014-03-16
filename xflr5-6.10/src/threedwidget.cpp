@@ -41,6 +41,36 @@ void *ThreeDWidget::s_pMainFrame;
 ThreeDWidget::ThreeDWidget(QWidget *parent)
 	: QGLWidget(parent)
 {
+	if(MainFrame::s_bTrace)
+	{
+		Trace(".........OpenGL::Resulting_Format");
+
+		Trace("OpenGl::majorversion", format().majorVersion());
+		Trace("OpenGl::minorversion", format().minorVersion());
+		Trace("OpenGl::accum", format().accum());
+		Trace("OpenGl::accumbuffersize", format().accumBufferSize());
+		Trace("OpenGl::alpha", format().alpha());
+		Trace("OpenGl::depth", format().depth());
+		Trace("OpenGl::double bufffer",format().doubleBuffer());
+		Trace("OpenGl::depth buffer size", format().depthBufferSize());
+		Trace("OpenGl::directRendering", format().directRendering());
+		Trace("OpenGl::plane", format().plane());
+		Trace("OpenGl::rgba", format().rgba());
+		Trace("OpenGl::sampleBuffers", format().sampleBuffers());
+		Trace("OpenGl::stereo", format().stereo());
+		Trace("OpenGl::swapInterval", format().swapInterval());
+		Trace("OpenGl::hasOverlay", format().hasOverlay());
+		Trace("OpenGl::hasOpenGLOverlays", format().hasOpenGLOverlays());
+
+		if(format().profile() == QGLFormat::NoProfile)                 Trace("Opengl::CompatibilityProfile::NoProfile");
+		else if(format().profile() == QGLFormat::CoreProfile)          Trace("Opengl::CompatibilityProfile::CoreProfile");
+		else if(format().profile()== QGLFormat::CompatibilityProfile) Trace("Opengl::CompatibilityProfile::CompatibilityProfile");
+
+		Trace("\n\n");
+
+		qDebug() << "Current OpenGL context format:" << format();
+	}
+
 	m_pParent = parent;
 	m_iView = GLMIAREXVIEW;
 
@@ -317,10 +347,10 @@ void ThreeDWidget::paintEvent(QPaintEvent *event)
 	if(m_iView==GLMIAREXVIEW)
 	{
 		QMiarex* pMiarex = (QMiarex*)s_pMiarex;
-/*		pMiarex->PaintPlaneLegend(painter, rect());
+		pMiarex->PaintPlaneLegend(painter, rect());
 		pMiarex->PaintPlaneOppLegend(painter, rect());
 		pMiarex->PaintCpLegendText(painter);
-		pMiarex->PaintPanelForceLegendText(painter);*/
+		pMiarex->PaintPanelForceLegendText(painter);
 
 		if(pMiarex->m_bResetTextLegend)
 		{
@@ -388,28 +418,6 @@ void ThreeDWidget::resizeGL(int width, int height)
 		pDlg->SetBodyLineScale();
 		pDlg->SetFrameScale();
 	}
-
-
-/*	QGLFormat fmt = format();
-	qDebug()<<"accum"<<fmt.accum();
-	qDebug()<<"accumbuffersize"<<fmt.accumBufferSize();
-	qDebug()<<"alpha"<<fmt.alpha();
-	qDebug()<<"depth"<<fmt.depth();
-	qDebug()<<"double bufffer"<<fmt.doubleBuffer();
-	qDebug()<<"depth buffer size"<<fmt.depthBufferSize();
-	qDebug()<<"directRendering"<<fmt.directRendering();
-	qDebug()<<"has overlay"<<fmt.hasOverlay();
-	qDebug()<<"majorversion"<<fmt.majorVersion();
-	qDebug()<<"minorversion"<<fmt.minorVersion();
-	qDebug()<<"hasOpenGLOverlays"<<fmt.hasOpenGLOverlays();
-	qDebug()<<"overlay"<<fmt.hasOverlay();
-	qDebug()<<"plane"<<fmt.plane();
-	qDebug()<<"rgba"<<fmt.rgba();
-	qDebug()<<"sampleBuffers"<<fmt.sampleBuffers();
-	qDebug()<<"stereo"<<fmt.stereo();
-	qDebug()<<"swapInterval"<<fmt.swapInterval();
-	qDebug()<<"______________________";*/
-
 }
 
 

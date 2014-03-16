@@ -1744,17 +1744,24 @@ void GL3dWingDlg::OnResetMesh()
 
 void GL3dWingDlg::OnScaleWing()
 {
-    WingScaleDlg dlg(this);
-	dlg.InitDialog(m_pWing->m_PlanformSpan, m_pWing->Chord(0), m_pWing->AverageSweep(), m_pWing->Twist(m_pWing->NWingSection()-1));
+	WingScaleDlg dlg(this);
+	dlg.InitDialog(m_pWing->m_PlanformSpan,
+				m_pWing->Chord(0),
+				m_pWing->AverageSweep(),
+				m_pWing->Twist(m_pWing->NWingSection()-1),
+				m_pWing->m_PlanformArea,
+				m_pWing->m_AR);
 
 	if(QDialog::Accepted == dlg.exec())
 	{
-		if (dlg.m_bSpan || dlg.m_bChord || dlg.m_bSweep || dlg.m_bTwist)
+		if (dlg.m_bSpan || dlg.m_bChord || dlg.m_bSweep || dlg.m_bTwist || dlg.m_bArea || dlg.m_bAR)
 		{
 			if(dlg.m_bSpan)  m_pWing->ScaleSpan(dlg.m_NewSpan);
 			if(dlg.m_bChord) m_pWing->ScaleChord(dlg.m_NewChord);
 			if(dlg.m_bSweep) m_pWing->ScaleSweep(dlg.m_NewSweep);
 			if(dlg.m_bTwist) m_pWing->ScaleTwist(dlg.m_NewTwist);
+			if(dlg.m_bArea) m_pWing->ScaleArea(dlg.m_NewArea);
+			if(dlg.m_bAR) m_pWing->ScaleAR(dlg.m_NewAR);
 		}
 
 		FillDataTable();

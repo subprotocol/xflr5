@@ -131,7 +131,7 @@ void QGraph::DrawCurve(int nIndex, QPainter &painter)
 				To.setX(int(pCurve->x[i]/m_scalex+m_ptoffset.x()));
 				To.setY(int(pCurve->y[i]/scaley  +m_ptoffset.y()));
 				painter.drawLine(From, To);
-	
+
 				From = To;
 			}
 		}
@@ -168,7 +168,7 @@ void QGraph::DrawCurve(int nIndex, QPainter &painter)
 
 
 void QGraph::DrawAxes(QPainter &painter)
-{	
+{
 	static double xp, yp, scaley;
 	static QPen AxesPen;
 	scaley = m_scaley;
@@ -269,19 +269,20 @@ void QGraph::DrawXTicks(QPainter &painter)
 	nx = (int)((xo-xmin)/xunit);
 	xt = xo - nx*xunit;
 
-
 	if(yo>=ymin && yo<=ymax) yp = yo;
 	else if(yo>ymax)         yp = ymax;
 	else                     yp = ymin;
 
-	while(xt<=xmax*1.0001)
+	int iTick = 0;
+
+	while(fabs(xunit)>0.0 && xt<=xmax*1.0001 && iTick<100)
 	{
 		//Draw ticks
 		if(xt>=xmin)
 		{
 			painter.setPen(LabelPen);
 			painter.drawLine(int(xt/m_scalex) + m_ptoffset.x(),int(yp/scaley) +TickSize + m_ptoffset.y(),
-							 int(xt/m_scalex) + m_ptoffset.x(),int(yp/scaley)           + m_ptoffset.y());
+						  int(xt/m_scalex) + m_ptoffset.x(),int(yp/scaley)           + m_ptoffset.y());
 			painter.setPen(m_LabelColor);
 
 			if(fabs(xt)<PRECISION)
@@ -289,8 +290,8 @@ void QGraph::DrawXTicks(QPainter &painter)
 
 				strLabel = "0";
 				painter.drawText((int)(xt/m_scalex) - fm.width(strLabel)/2 + m_ptoffset.x(),
-								 (int)(yp/scaley)   + TickSize*2 +height   + m_ptoffset.y(),
-								 strLabel);
+							  (int)(yp/scaley)   + TickSize*2 +height   + m_ptoffset.y(),
+							  strLabel);
 			}
 			else if(exp_x>=4 || exp_x<=-4)
 			{
@@ -319,6 +320,7 @@ void QGraph::DrawXTicks(QPainter &painter)
 			}
 		}
 		xt += xunit ;
+		iTick++;
 	}
 	painter.restore();
 }
@@ -340,7 +342,7 @@ void QGraph::DrawYTicks(QPainter &painter)
 	painter.setFont(m_LabelFont);
 
 	fmheight  = fm.height();
-	fmheight4 = (int)(fmheight/4);
+	fmheight4 = (int)((double)fmheight/4.0);
 
 	TickSize = 5;
 
@@ -355,14 +357,16 @@ void QGraph::DrawYTicks(QPainter &painter)
 
 	yt = yo-int((yo-ymin)*1.0001/yunit)*yunit;//one tick at the origin
 
-	while(yt<=ymax*1.0001)
+	int iTick=0;
+
+	while(fabs(yunit)>PRECISION && yt<=ymax*1.0001 && iTick<100)
 	{
 		//Draw ticks
 		if(yt>=ymin)
 		{
 			painter.setPen(LabelPen);
-			painter.drawLine((int)(xp/m_scalex)              + m_ptoffset.x(), (int)(yt/scaley) + m_ptoffset.y(),
-							 (int)(xp/m_scalex)-TickSize + m_ptoffset.x(), (int)(yt/scaley) + m_ptoffset.y());
+			painter.drawLine((int)(xp/m_scalex)          + m_ptoffset.x(), (int)(yt/scaley) + m_ptoffset.y(),
+					    (int)(xp/m_scalex)-TickSize + m_ptoffset.x(), (int)(yt/scaley) + m_ptoffset.y());
 
 			painter.setPen(m_LabelColor);
 
@@ -370,9 +374,9 @@ void QGraph::DrawYTicks(QPainter &painter)
 			if(fabs(yt)<PRECISION)
 			{
 				strLabel = "0";
-				painter.drawText((int)(xp/m_scalex)   - fm.width(strLabel)-TickSize*2 +m_ptoffset.x(),
-								 (int)(yt/scaley) + fmheight4 +m_ptoffset.y(),
-								 strLabel);
+				painter.drawText((int)(xp/m_scalex) - fm.width(strLabel)-TickSize*2 +m_ptoffset.x(),
+							  (int)(yt/scaley)   + fmheight4 +m_ptoffset.y(),
+							  strLabel);
 			}
 			else if(abs(exp_y)>=4)
 			{
@@ -405,14 +409,14 @@ void QGraph::DrawYTicks(QPainter &painter)
 				else if (exp_y>=-1) strLabel = QString("%1").arg(yt,6,'f',1);
 				else if (exp_y>=-2) strLabel = QString("%1").arg(yt,6,'f',2);
 				else if (exp_y>=-3) strLabel = QString("%1").arg(yt,6,'f',3);
-				
+
 				painter.drawText((int)(xp/m_scalex)   - fm.width(strLabel)-TickSize*2 +m_ptoffset.x(),
 								 (int)(yt/scaley) + fmheight4 +m_ptoffset.y(),
 								 strLabel);
 			}
 		}
 		yt += yunit ;
-
+		iTick++;
 	}
 	painter.restore();
 }
@@ -626,7 +630,7 @@ void QGraph::ExportToFile(QFile &XFile, enumTextFileType FileType)
 	for(i=0; i<m_oaCurves.size(); i++)
 	{
 		pCurve = GetCurve(i);
-		if(pCurve) 
+		if(pCurve)
 		{
 			maxpoints = qMax(maxpoints,pCurve->size());
 
