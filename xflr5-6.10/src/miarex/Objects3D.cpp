@@ -2609,7 +2609,7 @@ void Objects3D::setControlPositions(Plane *pPlane, WPolar *pWPolar, Panel *pPane
 	if(!pPlane->isWing())
 	{
 		//wing incidence
-		if(qAbs(pWPolar->m_ControlGain[0])>0.0)
+		if(qAbs(pWPolar->m_ControlGain[0])>PRECISION)
 		{
 			//wing tilt
 			angle = pWPolar->m_ControlGain[0] * t; //maxcontrol is the gain
@@ -2652,7 +2652,7 @@ void Objects3D::setControlPositions(Plane *pPlane, WPolar *pWPolar, Panel *pPane
 		if(pPlane->stab())
 		{
 			//elevator incidence
-			if(qAbs(pWPolar->m_ControlGain[1])>0.0)
+			if(qAbs(pWPolar->m_ControlGain[1])>PRECISION)
 			{
 				//Elevator tilt
 				angle = pWPolar->m_ControlGain[1] * t; //maxcontrol is the gain

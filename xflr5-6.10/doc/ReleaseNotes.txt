@@ -19,6 +19,7 @@ xflr5 v6.10.02 March xxxth, 2014
 	- Added an option to scale the wing's area and aspect ratio
 	- Fixed a potential crash bug in Graph scales drawing when no project is loaded
 	- Improved the support for OpenGL on Windows platforms
+	- Changed the calculation of satbility derivatives to be always invsicid - no noticeable impact on results
 	- Modified the calculation of the foil mid line and wing mid surface - reduces issues with foils with coarse panelling at leading edge
 	- Added and option to display panel normals and vortices - meant to help check if foil panelling is fine enough
 	- Added an option to set manually the reference dimensions for the calculation of aerodynamic coefficients of planes

@@ -33,7 +33,7 @@
 #include <QHeaderView>
 #include <QMessageBox>
 #include <math.h>
-
+#include <QtDebug>
 
 
 WPolar StabPolarDlg::s_StabPolar;
@@ -209,7 +209,7 @@ void StabPolarDlg::FillControlList()
 			strong = QString(tr("Elevator Flap %1 ")+QString::fromUtf8("(°)")).arg(i+1);
 			m_pControlModel->setData(ind, strong);
 
-			ind = m_pControlModel->index(s_StabPolar.m_nControls, 1, QModelIndex());
+			ind = m_pControlModel->index(i+s_StabPolar.m_nControls, 1, QModelIndex());
 			m_pControlModel->setData(ind, s_StabPolar.m_ControlGain[i+s_StabPolar.m_nControls]);
 		}
 		s_StabPolar.m_nControls += m_pWingList[2]->m_nFlaps;
@@ -222,7 +222,7 @@ void StabPolarDlg::FillControlList()
 			strong = QString(tr("Fin Flap %1 ")+QString::fromUtf8("(°)")).arg(i+1);
 			m_pControlModel->setData(ind, strong);
 
-			ind = m_pControlModel->index(s_StabPolar.m_nControls, 1, QModelIndex());
+			ind = m_pControlModel->index(i+s_StabPolar.m_nControls, 1, QModelIndex());
 			m_pControlModel->setData(ind, s_StabPolar.m_ControlGain[i+s_StabPolar.m_nControls]);
 		}
 		s_StabPolar.m_nControls += m_pWingList[3]->m_nFlaps;
@@ -585,14 +585,14 @@ void StabPolarDlg::ReadParams()
 	if(m_pctrlArea1->isChecked())
 	{
 		s_StabPolar.m_ReferenceDim = PLANFORMREFDIM;
-		s_StabPolar.m_referenceArea       = m_pPlane->planformArea() /Units::m2toUnit();
-		s_StabPolar.m_referenceSpanLength = m_pPlane->planformSpan() /Units::mtoUnit();
+		s_StabPolar.m_referenceArea       = m_pPlane->planformArea();
+		s_StabPolar.m_referenceSpanLength = m_pPlane->planformSpan() ;
 	}
 	else if(m_pctrlArea2->isChecked())
 	{
 		s_StabPolar.m_ReferenceDim = PROJECTEDREFDIM;
-		s_StabPolar.m_referenceArea       = m_pPlane->projectedArea() /Units::m2toUnit();
-		s_StabPolar.m_referenceSpanLength = m_pPlane->projectedSpan() /Units::mtoUnit();
+		s_StabPolar.m_referenceArea       = m_pPlane->projectedArea();
+		s_StabPolar.m_referenceSpanLength = m_pPlane->projectedSpan();
 	}
 	else if(m_pctrlArea3->isChecked())
 	{

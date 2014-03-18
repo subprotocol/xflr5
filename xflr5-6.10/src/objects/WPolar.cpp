@@ -27,6 +27,8 @@
 #include "../misc/Units.h"
 #include <math.h>
 #include <QMessageBox>
+#include <QtDebug>
+
 
 
 /**
@@ -72,6 +74,7 @@ WPolar::WPolar()
 	m_nControls = 0;
 	m_ControlGain.clear();
 	m_ControlGain.resize(100);
+
 	memset(m_EigenValue, 0, 2*8*MAXPOLARPOINTS*sizeof(double));
 	
 	m_bAutoInertia = true;
@@ -1528,7 +1531,7 @@ void WPolar::GetPolarProperties(QString &PolarProperties, bool bData)
 
 
 	//Control data
-	if(m_WPolarType==STABILITYPOLAR && pPlane)
+	if(m_ControlGain.size()<m_nControls && m_WPolarType==STABILITYPOLAR && pPlane)
 	{
 		int j;
 		int iCtrl = 0;

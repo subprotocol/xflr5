@@ -19,7 +19,6 @@
 
 *****************************************************************************/
 
-
 #include <QtDebug>
 #include <QApplication>
 #include "../../globals.h"
@@ -1521,6 +1520,8 @@ void PanelAnalysis::ComputePlane(double Alpha, double QInf, int qrhs)
 			m_CP.Set(0.0,0.0,0.0);
 		}
 
+
+
 		m_GCm *= 1.0 / m_pWPolar->referenceArea() /m_pWPolar->referenceChordLength();
 		m_VCm *= 1.0 / m_pWPolar->referenceArea() /m_pWPolar->referenceChordLength();
 		m_ICm *= 1.0 / m_pWPolar->referenceArea() /m_pWPolar->referenceChordLength();
@@ -2822,7 +2823,7 @@ void PanelAnalysis::ComputeNDStabDerivatives()
 * @param Moment the resulting moment vector
 * @param bTilted  true if the calculation is performed on a tilted geometry
 */
-void PanelAnalysis::Forces(double *Mu, double *Sigma, double alpha, double *VInf, CVector &Force, CVector &Moment)
+void PanelAnalysis::Forces(double *Mu, double *Sigma, double alpha, double *VInf, CVector &Force, CVector &Moment, bool bViscous)
 {
 	if(!m_pPanel || !m_pWPolar) return;
 
@@ -2939,7 +2940,7 @@ void PanelAnalysis::Forces(double *Mu, double *Sigma, double alpha, double *VInf
 				}
 
 			}
-			if(m_pWPolar->bViscous())
+			if(bViscous)
 			{
 				//add the viscous drag component to force and moment
 				qdyn = 0.5 * m_pWPolar->m_Density * QInfStrip * QInfStrip;
@@ -2983,7 +2984,8 @@ void PanelAnalysis::Forces(double *Mu, double *Sigma, double alpha, double *VInf
 	}
 
 	if(m_pWPolar->bThinSurfaces()) Force -= WindDirection*Force.dot(WindDirection)/2.0;
-	if(m_pWPolar->bViscous())
+
+	if(bViscous)
 	{
 		Force += WindDirection * ViscousDrag;
 		Moment += ViscousMoment;
@@ -3320,7 +3322,8 @@ bool PanelAnalysis::ComputeTrimmedConditions()
 
 	u0 = 1.0;
 
-	Forces(m_Mu, m_Sigma, m_AlphaEq, m_RHS+50*m_MatSize, Force, Moment);
+
+	Forces(m_Mu, m_Sigma, m_AlphaEq, m_RHS+50*m_MatSize, Force, Moment, m_pWPolar->bViscous());
 
 	phi = m_pWPolar->m_BankAngle *PI/180.0;
 	Lift   = Force.dot(WindNormal);		//N/rho ; bank effect not included
@@ -3383,7 +3386,7 @@ bool PanelAnalysis::ComputeTrimmedConditions()
 	VInf *= u0;
 
 	// Store the force and moment acting on the surfaces
-	// Will be of use later for stability control derivatives
+	// Will be of use later for stability and control derivatives
 	// need to re-calculate because of viscous drag which is not linear
 
 	for(p=0; p<m_MatSize; p++)
@@ -3393,8 +3396,9 @@ bool PanelAnalysis::ComputeTrimmedConditions()
 		m_RHS[52*m_MatSize+p] = VInf.z;
 	}
 
-	Forces(m_Mu, m_Sigma, m_AlphaEq, m_RHS+50*m_MatSize, Force0, Moment0);
-
+	// Force0 and Moment0 are the reference values for forward differentiation
+	// Stability derivatives are inviscid
+	Forces(m_Mu, m_Sigma, m_AlphaEq, m_RHS+50*m_MatSize, Force0, Moment0, false);
 	return true;
 }
 
@@ -3418,7 +3422,7 @@ void PanelAnalysis::ComputeStabilityDerivatives()
 	traceLog(strong);
 
 	deltaspeed    = 0.01;         //  m/s   for forward difference estimation
-	deltarotation = 0.001;       //  rad/s for forward difference estimation
+	deltarotation = 0.001;        //  rad/s for forward difference estimation
 
 	// Define the stability axes
 	cosa = cos(m_AlphaEq*PI/180);
@@ -3468,7 +3472,7 @@ void PanelAnalysis::ComputeStabilityDerivatives()
 	{
 		//re-use existing memory to define the velocity field
 		if(m_pPanel[p].m_Pos==MIDSURFACE) CGM = m_pPanel[p].VortexPos - m_pWPolar->m_CoG;
-		else                      CGM = m_pPanel[p].CollPt    - m_pWPolar->m_CoG;
+		else                              CGM = m_pPanel[p].CollPt    - m_pWPolar->m_CoG;
 
 		// a rotation of the plane about a vector is the opposite of a rotation of the freestream about this vector
 		Ris = is*CGM * (-deltarotation) + V0;
@@ -3512,7 +3516,6 @@ void PanelAnalysis::ComputeStabilityDerivatives()
 		}
 	}
 
-
 	// The LU matrix is unchanged, so back-substitute for unit vortex circulations
 	Crout_LU_with_Pivoting_Solve(m_aij, m_uRHS, m_Index, m_RHS,             Size, &s_bCancel);
 	Crout_LU_with_Pivoting_Solve(m_aij, m_vRHS, m_Index, m_RHS+  m_MatSize, Size, &s_bCancel);
@@ -3529,7 +3532,7 @@ void PanelAnalysis::ComputeStabilityDerivatives()
 	memcpy(m_rRHS, m_RHS+5*m_MatSize, m_MatSize*sizeof(double));
 
 
-	// Compute stabiliy and control derivatives
+	// Compute stability and control derivatives
 	Xu = Xw = Zu = Zw = Mu = Mw = Mq = Zwp = Mwp = 0.0;
 	Yv = Yp = Yr = Lv = Lp = Lr = Nv = Np  = Nr  = 0.0;
 
@@ -3537,14 +3540,15 @@ void PanelAnalysis::ComputeStabilityDerivatives()
 	// 1st ORDER STABILITY DERIVATIVES
 	// x-derivatives________________________
 	alpha = atan2(Vi.z, Vi.x) * 180.0/PI;// =m_AlphaEq....
-	Forces(m_uRHS, m_Sigma, alpha, m_RHS+50*m_MatSize, Force, Moment);
+	Forces(m_uRHS, m_Sigma, alpha, m_RHS+50*m_MatSize, Force, Moment, false);
+
 	Xu = (Force - Force0).dot(is)   /deltaspeed;
 	Zu = (Force - Force0).dot(ks)   /deltaspeed;
 	Mu = (Moment- Moment0).dot(js)  /deltaspeed;
 
 	// y-derivatives________________________
 	alpha = atan2(Vj.z, Vj.x)*180.0/PI;// =m_AlphaEq....
-	Forces(m_vRHS, m_Sigma+m_MatSize, alpha, m_RHS+53*m_MatSize, Force, Moment);
+	Forces(m_vRHS, m_Sigma+m_MatSize, alpha, m_RHS+53*m_MatSize, Force, Moment, false);
 	Yv = (Force - Force0).dot(js)   /deltaspeed;
 //	Lv = (Moment.dot(WindDirection) - Moment0.dot(is)) /deltaspeed;
 	Nv = (Moment.dot(WindNormal)    - Moment0.dot(ks)) /deltaspeed;
@@ -3553,7 +3557,7 @@ void PanelAnalysis::ComputeStabilityDerivatives()
 
 	// z-derivatives________________________
 	alpha = atan2(Vk.z, Vk.x)* 180.0/PI;
-	Forces(m_wRHS, m_Sigma+2*m_MatSize, alpha, m_RHS+56*m_MatSize, Force, Moment);
+	Forces(m_wRHS, m_Sigma+2*m_MatSize, alpha, m_RHS+56*m_MatSize, Force, Moment, false);
 	Xw = (Force - Force0).dot(is)   /deltaspeed;
 	Zw = (Force - Force0).dot(ks)   /deltaspeed;
 	Mw = (Moment - Moment0).dot(js) /deltaspeed;
@@ -3562,19 +3566,19 @@ void PanelAnalysis::ComputeStabilityDerivatives()
 	qApp->processEvents();
 
 	// p-derivatives
-	Forces(m_pRHS, m_Sigma+3*m_MatSize, m_AlphaEq, m_RHS+59*m_MatSize, Force, Moment);
+	Forces(m_pRHS, m_Sigma+3*m_MatSize, m_AlphaEq, m_RHS+59*m_MatSize, Force, Moment, false);
 	Yp = (Force-Force0).dot(js)   /deltarotation;
 	Lp = (Moment-Moment0).dot(is) /deltarotation;
 	Np = (Moment-Moment0).dot(ks) /deltarotation;
 
 	// q-derivatives
-	Forces(m_qRHS, m_Sigma+4*m_MatSize, m_AlphaEq, m_RHS+62*m_MatSize, Force, Moment);
+	Forces(m_qRHS, m_Sigma+4*m_MatSize, m_AlphaEq, m_RHS+62*m_MatSize, Force, Moment, false);
 	Xq = (Force-Force0).dot(is)   /deltarotation;
 	Zq = (Force-Force0).dot(ks)   /deltarotation;
 	Mq = (Moment-Moment0).dot(js) /deltarotation;
 
 	// r-derivatives
-	Forces(m_rRHS, m_Sigma+5*m_MatSize, m_AlphaEq, m_RHS+65*m_MatSize, Force, Moment);
+	Forces(m_rRHS, m_Sigma+5*m_MatSize, m_AlphaEq, m_RHS+65*m_MatSize, Force, Moment, false);
 	Yr = (Force-Force0).dot(js)   /deltarotation;
 	Lr = (Moment-Moment0).dot(is) /deltarotation;
 	Nr = (Moment-Moment0).dot(ks) /deltarotation;
@@ -3812,7 +3816,7 @@ void PanelAnalysis::ComputeControlDerivatives()
 	Crout_LU_with_Pivoting_Solve(m_aij, m_cRHS, m_Index, m_RHS, m_MatSize, &s_bCancel);
 	memcpy(m_cRHS, m_RHS, m_MatSize*sizeof(double));
 
-	Forces(m_cRHS, m_Sigma, m_AlphaEq, m_RHS+50*m_MatSize, Force, Moment);
+	Forces(m_cRHS, m_Sigma, m_AlphaEq, m_RHS+50*m_MatSize, Force, Moment, false);
 
 	// make the forward difference with nominal results
 	// which gives the stability derivative for a rotation of control ic
@@ -3836,6 +3840,7 @@ double PanelAnalysis::ComputeCm(double Alpha)
 	static double Cm, cosa, sina, Gamma, Gammap1;
 	static CVector VInf, Force, PanelLeverArm, ForcePt, PanelForce, WindDirection, VLocal;
 	double Speed2, Cp;
+
 	// Define the wind axis
 	cosa = cos(Alpha*PI/180.0);
 	sina = sin(Alpha*PI/180.0);

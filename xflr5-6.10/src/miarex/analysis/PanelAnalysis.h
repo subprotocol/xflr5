@@ -93,7 +93,7 @@ private:
 	void ComputeControlDerivatives();
 	void ComputeResults();
 	void ComputeNDStabDerivatives();
-	void Forces(double *Mu, double *Sigma, double alpha, double *VInf, CVector &Force, CVector &Moment);
+	void Forces(double *Mu, double *Sigma, double alpha, double *VInf, CVector &Force, CVector &Moment, bool bViscous);
 	double ComputeCm(double Alpha);
 
 	bool AllocateMatrix(int matSize, int &memsize);

@@ -599,14 +599,14 @@ void WPolarDlg::ReadValues()
 	if(m_pctrlArea1->isChecked())
 	{
 		s_WPolar.m_ReferenceDim = PLANFORMREFDIM;
-		s_WPolar.m_referenceArea       = m_pPlane->planformArea() /Units::m2toUnit();
-		s_WPolar.m_referenceSpanLength = m_pPlane->planformSpan() /Units::mtoUnit();
+		s_WPolar.m_referenceArea       = m_pPlane->planformArea();
+		s_WPolar.m_referenceSpanLength = m_pPlane->planformSpan();
 	}
 	else if(m_pctrlArea2->isChecked())
 	{
 		s_WPolar.m_ReferenceDim = PROJECTEDREFDIM;
-		s_WPolar.m_referenceArea       = m_pPlane->projectedArea() /Units::m2toUnit();
-		s_WPolar.m_referenceSpanLength = m_pPlane->projectedSpan() /Units::mtoUnit();
+		s_WPolar.m_referenceArea       = m_pPlane->projectedArea();
+		s_WPolar.m_referenceSpanLength = m_pPlane->projectedSpan();
 	}
 	else if(m_pctrlArea3->isChecked())
 	{
