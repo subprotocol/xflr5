@@ -71,7 +71,6 @@ private slots:
 
 //	void OnSetupLight();
 	void OnClipPlane(int pos);
-	void OnLight();
 	void OnSurfaces();
 	void OnOutline();
 	void OnPanels();
@@ -160,18 +159,18 @@ private:
 	QPushButton *m_pctrlResetMesh;
 	QPushButton *m_pctrlInsertBefore, *m_pctrlInsertAfter, *m_pctrlDeleteSection;
 	QLabel *m_pctrlWingSpan, *m_pctrlWingArea, *m_pctrlMAC, *m_pctrlGeomChord;
-	QLabel *m_pctrlMACSpanPos, *m_pctrlAspectRatio, *m_pctrlTaperRatio, *m_pctrlSweep, *m_pctrlNFlaps;
+    QLabel *m_pctrlAspectRatio, *m_pctrlTaperRatio, *m_pctrlSweep, *m_pctrlNFlaps;
 	QLabel *m_pctrlVLMPanels, *m_pctrl3DPanels;
 	QLabel *m_pctrlProjectedArea, *m_pctrlProjectedSpan;
 
-	QLabel *m_pctrlLength1, *m_pctrlLength2, *m_pctrlLength3, *m_pctrlLength4, *m_pctrlLength5;
+    QLabel *m_pctrlLength1, *m_pctrlLength2, *m_pctrlLength3, *m_pctrlLength4;
 	QLabel *m_pctrlAreaUnit1, *m_pctrlAreaUnit2, * m_pctrlVolumeUnit;
 	QTableView *m_pctrlWingTable;
 	QStandardItemModel *m_pWingModel;
 	WingDelegate *m_pWingDelegate;
 
 	QPushButton *OKButton, *CancelButton;
-	QCheckBox *m_pctrlAxes, *m_pctrlLight, *m_pctrlSurfaces, *m_pctrlOutline, *m_pctrlPanels, *m_pctrlFoilNames;
+    QCheckBox *m_pctrlAxes, *m_pctrlSurfaces, *m_pctrlOutline, *m_pctrlPanels, *m_pctrlFoilNames;
 	QCheckBox *m_pctrlShowMasses;
 	QPushButton *m_pctrlReset, *m_pctrlPickCenter;
 

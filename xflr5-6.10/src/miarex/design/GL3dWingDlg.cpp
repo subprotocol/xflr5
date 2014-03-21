@@ -231,7 +231,6 @@ void GL3dWingDlg::Connect()
 
 	connect(m_pctrlAxes,       SIGNAL(clicked()), this, SLOT(OnAxes()));
 	connect(m_pctrlPanels,     SIGNAL(clicked()), this, SLOT(OnPanels()));
-	connect(m_pctrlLight,      SIGNAL(clicked()), this, SLOT(OnLight()));
 	connect(m_pctrlSurfaces,   SIGNAL(clicked()), this, SLOT(OnSurfaces()));
 	connect(m_pctrlOutline,    SIGNAL(clicked()), this, SLOT(OnOutline()));
 
@@ -1040,7 +1039,6 @@ bool GL3dWingDlg::InitDialog(Wing *pWing)
 	m_pctrlLength2->setText(str);
 	m_pctrlLength3->setText(str);
 	m_pctrlLength4->setText(str);
-	m_pctrlLength5->setText(str);
 	m_pWing = pWing;
 	if(!m_pWing) return false;
 	ComputeGeometry();
@@ -1067,7 +1065,6 @@ bool GL3dWingDlg::InitDialog(Wing *pWing)
 	m_pctrlOutline->setChecked(s_bOutline);
 	m_pctrlAxes->setChecked(s_bAxes);
 	m_pctrlPanels->setChecked(s_bVLMPanels);
-	m_pctrlLight->setChecked(GLLightDlg::IsLightOn());
 	m_pctrlFoilNames->setChecked(s_bFoilNames);
 	m_pctrlShowMasses->setChecked(s_bShowMasses);
 
@@ -1538,15 +1535,6 @@ void GL3dWingDlg::OnInertia()
 }
 
 
-
-void GL3dWingDlg::OnLight()
-{
-	GLLightDlg::SetLightOn(m_pctrlLight->isChecked());
-	UpdateView();
-}
-
-
-
 void GL3dWingDlg::OnInsertBefore()
 {
 	if(m_iSection <0 || m_iSection>m_pWing->NWingSection()) return;
@@ -1561,11 +1549,11 @@ void GL3dWingDlg::OnInsertBefore()
 
 	m_pWing->InsertSection(m_iSection);
 
-	m_pWing->YPosition(n)       = (m_pWing->YPosition(n+1)      + m_pWing->YPosition(n-1))     /2.0;
-	m_pWing->Chord(n)     = (m_pWing->Chord(n+1)    + m_pWing->Chord(n-1))   /2.0;
-	m_pWing->Offset(n)    = (m_pWing->Offset(n+1)   + m_pWing->Offset(n-1))  /2.0;
-	m_pWing->Twist(n)     = (m_pWing->Twist(n+1)    + m_pWing->Twist(n-1))   /2.0;
-	m_pWing->Dihedral(n)  = (m_pWing->Dihedral(n+1) + m_pWing->Dihedral(n-1))/2.0;
+    m_pWing->YPosition(n) = (m_pWing->YPosition(n+1) + m_pWing->YPosition(n-1)) /2.0;
+    m_pWing->Chord(n)     = (m_pWing->Chord(n+1)     + m_pWing->Chord(n-1))     /2.0;
+    m_pWing->Offset(n)    = (m_pWing->Offset(n+1)    + m_pWing->Offset(n-1))    /2.0;
+    m_pWing->Twist(n)     = (m_pWing->Twist(n+1)     + m_pWing->Twist(n-1))     /2.0;
+    m_pWing->Dihedral(n)  = (m_pWing->Dihedral(n+1)  + m_pWing->Dihedral(n-1))  /2.0;
 
 	m_pWing->XPanelDist(n) = m_pWing->XPanelDist(n-1);
 	m_pWing->YPanelDist(n) = m_pWing->YPanelDist(n-1);
@@ -2156,9 +2144,6 @@ void GL3dWingDlg::SetWingData()
 	str = QString("%1").arg(m_pWing->m_MAChord*Units::mtoUnit(),5,'f',2);
 	m_pctrlMAC->setText(str);
 
-	str = QString("%1").arg(m_pWing->m_yMac*Units::mtoUnit(),5,'f',2);
-	m_pctrlMACSpanPos->setText(str);
-
 	str = QString("%1").arg(m_pWing->m_AR,5,'f',2);
 	m_pctrlAspectRatio->setText(str);
 
@@ -2264,14 +2249,12 @@ void GL3dWingDlg::SetupLayout()
 		m_pctrlLength2    = new QLabel("mm", this);
 		m_pctrlLength3    = new QLabel("mm", this);
 		m_pctrlLength4    = new QLabel("mm", this);
-		m_pctrlLength5    = new QLabel("mm", this);
 		m_pctrlAreaUnit1  = new QLabel("mm2", this);
 		m_pctrlAreaUnit2  = new QLabel("mm2", this);
 		m_pctrlLength1->setAlignment(Qt::AlignLeft);
 		m_pctrlLength2->setAlignment(Qt::AlignLeft);
 		m_pctrlLength3->setAlignment(Qt::AlignLeft);
 		m_pctrlLength4->setAlignment(Qt::AlignLeft);
-		m_pctrlLength5->setAlignment(Qt::AlignLeft);
 		m_pctrlAreaUnit1->setAlignment(Qt::AlignLeft);
 		m_pctrlAreaUnit2->setAlignment(Qt::AlignLeft);
 
@@ -2319,21 +2302,18 @@ void GL3dWingDlg::SetupLayout()
 
 		QLabel *lab20 = new QLabel(tr("Mean Geom. Chord"), this);
 		QLabel *lab21 = new QLabel(tr("Mean Aero Chord"), this);
-		QLabel *lab22 = new QLabel(tr("MAC Span Pos"), this);
 		QLabel *lab23 = new QLabel(tr("Aspect ratio"), this);
 		QLabel *lab24 = new QLabel(tr("Taper Ratio"), this);
 		QLabel *lab25 = new QLabel(tr("Root to Tip Sweep"), this);
 		QLabel *lab26 = new QLabel(tr("Number of Flaps"), this);
 		lab20->setAlignment(Qt::AlignRight);
 		lab21->setAlignment(Qt::AlignRight);
-		lab22->setAlignment(Qt::AlignRight);
-		lab23->setAlignment(Qt::AlignRight);
+        lab23->setAlignment(Qt::AlignRight);
 		lab24->setAlignment(Qt::AlignRight);
 		lab25->setAlignment(Qt::AlignRight);
 		lab26->setAlignment(Qt::AlignRight);
 		pDataLayout->addWidget(lab20,6,1);
 		pDataLayout->addWidget(lab21,7,1);
-	//	DataLayout->addWidget(lab22,8,1);
 		pDataLayout->addWidget(lab23,9,1);
 		pDataLayout->addWidget(lab24,10,1);
 		pDataLayout->addWidget(lab25,11,1);
@@ -2341,28 +2321,24 @@ void GL3dWingDlg::SetupLayout()
 
 		m_pctrlGeomChord    = new QLabel("170.0", this);
 		m_pctrlMAC          = new QLabel("150.0", this);
-		m_pctrlMACSpanPos   = new QLabel("466.00", this);
 		m_pctrlAspectRatio  = new QLabel("13.33", this);
 		m_pctrlTaperRatio   = new QLabel("1.50", this);
 		m_pctrlSweep        = new QLabel("2.58", this);
 		m_pctrlNFlaps       = new QLabel("0", this);
 		m_pctrlMAC->setAlignment(Qt::AlignRight);
 		m_pctrlGeomChord->setAlignment(Qt::AlignRight);
-		m_pctrlMACSpanPos->setAlignment(Qt::AlignRight);
 		m_pctrlAspectRatio->setAlignment(Qt::AlignRight);
 		m_pctrlTaperRatio->setAlignment(Qt::AlignRight);
 		m_pctrlSweep->setAlignment(Qt::AlignRight);
 		m_pctrlNFlaps->setAlignment(Qt::AlignRight);
 		pDataLayout->addWidget(m_pctrlGeomChord,    6,2);
 		pDataLayout->addWidget(m_pctrlMAC,          7,2);
-	//	DataLayout->addWidget(m_pctrlMACSpanPos,   8,2);
 		pDataLayout->addWidget(m_pctrlAspectRatio,  9,2);
 		pDataLayout->addWidget(m_pctrlTaperRatio,  10,2);
 		pDataLayout->addWidget(m_pctrlSweep,       11,2);
 		pDataLayout->addWidget(m_pctrlNFlaps,      12,2);
 		pDataLayout->addWidget(m_pctrlLength3, 6, 3);
 		pDataLayout->addWidget(m_pctrlLength4, 7, 3);
-	//	DataLayout->addWidget(m_pctrlLength5, 8, 3);
 		QLabel *lab30 = new QLabel(QString::fromUtf8("°"));
 		lab30->setAlignment(Qt::AlignLeft);
 		pDataLayout->addWidget(lab30, 11, 3);
@@ -2384,14 +2360,12 @@ void GL3dWingDlg::SetupLayout()
 		QGridLayout *ThreeDParams = new QGridLayout;
 		{
 			m_pctrlAxes       = new QCheckBox(tr("Axes"), this);
-			m_pctrlLight      = new QCheckBox(tr("Light"), this);
 			m_pctrlSurfaces   = new QCheckBox(tr("Surfaces"), this);
 			m_pctrlOutline    = new QCheckBox(tr("Outline"), this);
 			m_pctrlPanels     = new QCheckBox(tr("Panels"), this);
 			m_pctrlFoilNames  = new QCheckBox(tr("Foil Names"), this);
 			m_pctrlShowMasses = new QCheckBox(tr("Masses"), this);
 			m_pctrlAxes->setSizePolicy(szPolicyMinimum);
-			m_pctrlLight->setSizePolicy(szPolicyMinimum);
 			m_pctrlSurfaces->setSizePolicy(szPolicyMinimum);
 			m_pctrlOutline->setSizePolicy(szPolicyMinimum);
 			m_pctrlPanels->setSizePolicy(szPolicyMinimum);
@@ -2399,7 +2373,6 @@ void GL3dWingDlg::SetupLayout()
 			ThreeDParams->addWidget(m_pctrlPanels, 1,2);
 			ThreeDParams->addWidget(m_pctrlSurfaces, 2,1);
 			ThreeDParams->addWidget(m_pctrlOutline, 2,2);
-		//	ThreeDParams->addWidget(m_pctrlLight, 3,1);
 			ThreeDParams->addWidget(m_pctrlFoilNames, 3,1);
 			ThreeDParams->addWidget(m_pctrlShowMasses, 3,2);
 		}

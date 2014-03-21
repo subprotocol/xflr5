@@ -2605,7 +2605,7 @@ bool PanelAnalysis::SolveEigenvalues()
 
 	str = QString("      Eigenvalue:  %1+%2i   |   %3+%4i   |   %5+%6i   |   %7+%8i\n")
 		  .arg(m_rLong[0].real(),9, 'g', 4).arg(m_rLong[0].imag(),9, 'g', 4)
-		  .arg(m_rLong[1].real(),9, 'g', 4).arg(m_rLong[1].imag(),9, 'g', 4)
+          .arg(m_rLong[1].real(),9, 'g', 4).arg(m_rLong[1].imag(),9, 'g', 4)
 		  .arg(m_rLong[2].real(),9, 'g', 4).arg(m_rLong[2].imag(),9, 'g', 4)
 		  .arg(m_rLong[3].real(),9, 'g', 4).arg(m_rLong[3].imag(),9, 'g', 4);
 	traceLog(str);
@@ -3443,6 +3443,10 @@ void PanelAnalysis::ComputeStabilityDerivatives()
 	Vj = V0 - js * deltaspeed; //a plane movement to the right is a wind flow to the left, i.e. negative y
 	Vk = V0 - ks * deltaspeed; //a plane movement downwards (Z_stability>0) is a positive increase of V in geometry axes
 
+
+    strong = "         Creating the RHS translation vectors\n";
+    traceLog(strong);
+
 	for (p=0; p<m_MatSize; p++)
 	{
 		//re-use existing memory to define the velocity field
@@ -3467,6 +3471,9 @@ void PanelAnalysis::ComputeStabilityDerivatives()
 	//______________________________________________________________________________
 	// RHS for unit rotation vectors around Stability axis
 	// stability axis origin is CoG
+
+    strong = "         Creating the RHS rotation vectors\n";
+    traceLog(strong);
 
 	for (p=0; p<m_MatSize; p++)
 	{
@@ -3517,6 +3524,10 @@ void PanelAnalysis::ComputeStabilityDerivatives()
 	}
 
 	// The LU matrix is unchanged, so back-substitute for unit vortex circulations
+
+    strong = "         LU solving for RHS\n";
+    traceLog(strong);
+
 	Crout_LU_with_Pivoting_Solve(m_aij, m_uRHS, m_Index, m_RHS,             Size, &s_bCancel);
 	Crout_LU_with_Pivoting_Solve(m_aij, m_vRHS, m_Index, m_RHS+  m_MatSize, Size, &s_bCancel);
 	Crout_LU_with_Pivoting_Solve(m_aij, m_wRHS, m_Index, m_RHS+2*m_MatSize, Size, &s_bCancel);
@@ -3531,6 +3542,9 @@ void PanelAnalysis::ComputeStabilityDerivatives()
 	memcpy(m_qRHS, m_RHS+4*m_MatSize, m_MatSize*sizeof(double));
 	memcpy(m_rRHS, m_RHS+5*m_MatSize, m_MatSize*sizeof(double));
 
+
+    strong = "         Calculating forces and derivatives\n";
+    traceLog(strong);
 
 	// Compute stability and control derivatives
 	Xu = Xw = Zu = Zw = Mu = Mw = Mq = Zwp = Mwp = 0.0;
