@@ -15,7 +15,7 @@
 *******************************************************************************
 
 
-xflr5 v6.10.02 March xxxth, 2014
+xflr5 v6.10.02 March 21st, 2014
 	- Added an option to scale the wing's area and aspect ratio
 	- Fixed a potential crash bug in Graph scales drawing when no project is loaded
 	- Improved the support for OpenGL on Windows platforms
