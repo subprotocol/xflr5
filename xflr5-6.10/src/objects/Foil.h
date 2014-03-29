@@ -102,9 +102,9 @@ public:
 	void GetUpperY(double x, double &y, double &normx, double &normy);
 
 	double DeRotate();
-	double GetBaseUpperY(double const &x);
-	double GetBaseLowerY(double const &x);
-	double GetMidY(double const &xl);
+	double GetBaseUpperY(double x);
+	double GetBaseLowerY(double x);
+	double GetMidY(double xl);
 	double GetLowerY(double x);
 	double GetUpperY(double x);
 	double GetCamber(double const &x);
@@ -177,11 +177,11 @@ private:
 	CVector m_TE;                        /**< the trailing edge point */
 	CVector m_LE;                        /**< the leading edge point */
 
-	CVector m_rpBaseMid[IQX+1];          /**< the mid camber line points of the base geometry */
+	CVector m_rpBaseMid[MIDPOINTCOUNT+1];          /**< the mid camber line points of the base geometry */
 	CVector m_BaseExtrados[IQX];	       /**< the upper surface points of the base geometry */
 	CVector m_BaseIntrados[IQX];    	  /**< the lower surface points of the base geometry */
 
-	CVector m_rpMid[IQX+1];              /**< the mid camber line points */
+	CVector m_rpMid[MIDPOINTCOUNT+1];              /**< the mid camber line points */
 	CVector m_rpExtrados[IQX];	       /**< the upper surface points */
 	CVector m_rpIntrados[IQX];	       /**< the lower surface points */
 

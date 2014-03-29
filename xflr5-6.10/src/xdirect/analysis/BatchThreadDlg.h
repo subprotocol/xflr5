@@ -69,9 +69,9 @@ private:
 	void CleanUp();
 	Polar * CreatePolar(Foil *pFoil, double Re, double Mach, double NCrit);
 
-    void keyPressEvent(QKeyEvent *event);
-    void showEvent(QShowEvent *event);
-    void hideEvent(QHideEvent *event);
+	void keyPressEvent(QKeyEvent *event);
+	void showEvent(QShowEvent *event);
+	void hideEvent(QHideEvent *event);
 
 
 	void outputFoilList();

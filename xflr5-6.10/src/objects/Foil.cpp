@@ -390,7 +390,7 @@ void Foil::DrawMidLine(QPainter &painter, double const &scalex, double const &sc
 	From.ry() = (int)(-m_rpMid[0].y*scaley)  +Offset.y();
 
 
-	for (k=0; k<MIDPOINTCOUNT+1; k++)
+	for (k=0; k<=MIDPOINTCOUNT+1; k++)
 	{
 		To.rx() = (int)( m_rpMid[k].x*scalex)+Offset.x();
 		To.ry() = (int)(-m_rpMid[k].y*scaley)+Offset.y();
@@ -487,40 +487,46 @@ double Foil::GetArea()
 }
 
 
+
 /**
  * Returns the y-position on the lower surface, at a specified chord position.
  * @param &x the chordwise position
  * @return the y-position
  */
-double Foil::GetBaseLowerY(double const &x)
+double Foil::GetBaseLowerY(double x)
 {
 	static int i;
 	static double y;
 
-//	x = x*(m_BaseIntrados[m_iInt].x-m_BaseIntrados[0].x);//in case there is a flap which reduces the length
+	x = m_BaseIntrados[0].x + x*(m_BaseIntrados[m_iInt].x-m_BaseIntrados[0].x);//in case there is a flap which reduces the length
+
 	for (i=0; i<m_iBaseInt; i++)
 	{
 		if (m_BaseIntrados[i].x <m_BaseIntrados[i+1].x  &&  m_BaseIntrados[i].x <= x && x<=m_BaseIntrados[i+1].x )
 		{
-			y = (m_BaseIntrados[i].y 	+ (m_BaseIntrados[i+1].y-m_BaseIntrados[i].y)
-							 /(m_BaseIntrados[i+1].x-m_BaseIntrados[i].x)*(x-m_BaseIntrados[i].x));
+			y = (m_BaseIntrados[i].y   + (m_BaseIntrados[i+1].y-m_BaseIntrados[i].y)
+								   /(m_BaseIntrados[i+1].x-m_BaseIntrados[i].x)*(x-m_BaseIntrados[i].x));
 			return y;
 		}
 	}
 	return 0.0;
 }
 
+
+
+
 /**
  * Returns the y-position on the upper surface, at a specified chord position
  * @param &x the chordwise position
  * @return the y-position
  */
-double Foil::GetBaseUpperY(double const &x)
+double Foil::GetBaseUpperY(double x)
 {
 	static double y;
 	static int i;
 
-//	x = x*(m_BaseExtrados[m_iExt].x-m_BaseExtrados[0].x);//in case there is a flap which reduces the length
+	x = m_BaseExtrados[0].x + x*(m_BaseExtrados[m_iExt].x-m_BaseExtrados[0].x);//in case there is a flap which reduces the length
+
 	for (i=0; i<m_iBaseExt; i++)
 	{
 		if (m_BaseExtrados[i].x <m_BaseExtrados[i+1].x  &&  m_BaseExtrados[i].x <= x && x<=m_BaseExtrados[i+1].x )
@@ -610,7 +616,8 @@ double Foil::GetCamberSlope(double const &x)
 	static int i;
 	for (i=0; i<MIDPOINTCOUNT-1; i++)
 	{
-		if ((m_rpMid[i].x <= x) && (x < m_rpMid[i+1].x)){
+		if ((m_rpMid[i].x <= x) && (x < m_rpMid[i+1].x))
+		{
 			double dx = m_rpMid[i+1].x-m_rpMid[i].x;
 			double dy = m_rpMid[i+1].y-m_rpMid[i].y;
 			return atan2(dy,dx);
@@ -643,7 +650,7 @@ double Foil::length()
 */
 double Foil::GetLowerY(double x)
 {
-//	x = m_rpIntrados[0].x + x*(m_rpIntrados[m_iInt].x-m_rpIntrados[0].x)*.999999999;//in case there is a flap which reduces the length
+	x = m_rpIntrados[0].x + x*(m_rpIntrados[m_iInt].x-m_rpIntrados[0].x)*.999999999;//in case there is a flap which reduces the length
 	static double y;
 	for (int i=0; i<m_iInt; i++)
 	{
@@ -672,8 +679,8 @@ void Foil::GetLowerY(double x, double &y, double &normx, double &normy)
 	static double nabs;
 	static int i;
 
-//	x = m_rpIntrados[0].x + x*(m_rpIntrados[m_iInt].x-m_rpIntrados[0].x)*.999999999;//in case there is a flap which reduces the length
-	x = m_rpExtrados[0].x + x*.99999999;
+	x = m_rpIntrados[0].x + x*(m_rpIntrados[m_iInt].x-m_rpIntrados[0].x)*.999999999;//in case there is a flap which reduces the length
+//	x = m_rpExtrados[0].x + x*.99999999;
 	for (i=0; i<m_iInt; i++)
 	{
 		if (m_rpIntrados[i].x <m_rpIntrados[i+1].x  &&  m_rpIntrados[i].x <= x && x<=m_rpIntrados[i+1].x )
@@ -694,20 +701,18 @@ void Foil::GetLowerY(double x, double &y, double &normx, double &normy)
 * @param x the chordwise position
 * @return the position on the mid line
 */
-double Foil::GetMidY(double const &x)
+double Foil::GetMidY(double xl)
 {
-//	return (GetUpperY(x)+GetLowerY(x))/2.0;
+	xl = m_rpMid[0].x + xl*(m_rpMid[MIDPOINTCOUNT].x-m_rpMid[0].x)*.999999999;//in case there is a flap which reduces the length
 
-//	double xl = m_rpMid[0].x + x*(m_rpMid[MIDPOINTCOUNT].x-m_rpMid[0].x)*.999999999;//in case there is a flap which reduces the length
-
-	if(x<m_rpMid[0].x || x>m_rpMid[MIDPOINTCOUNT].x) return 0.0;
+	if(xl<m_rpMid[0].x || xl>m_rpMid[MIDPOINTCOUNT].x) return 0.0;
 
 	for(int im=0; im<MIDPOINTCOUNT; im++)
 	{
-		if(m_rpMid[im].x<=x && x<=m_rpMid[im+1].x)
+		if(m_rpMid[im].x<=xl && xl<=m_rpMid[im+1].x)
 		{
-			return  m_rpMid[im].y + (x-m_rpMid[im].x) *   (m_rpMid[im+1].y - m_rpMid[im].y)
-											    / (m_rpMid[im+1].x - m_rpMid[im].x);
+			return  m_rpMid[im].y + (xl-m_rpMid[im].x) *   (m_rpMid[im+1].y - m_rpMid[im].y)
+												/ (m_rpMid[im+1].x - m_rpMid[im].x);
 		}
 	}
 	return 0.0;
@@ -724,8 +729,7 @@ double Foil::GetMidY(double const &x)
 double Foil::GetUpperY(double x)
 {
 	// Returns the y-coordinate on the current foil's upper surface at the x position
-//	x = m_rpExtrados[0].x + x*(m_rpExtrados[m_iExt].x-m_rpExtrados[0].x)*.999999999;//in case there is a flap which reduces the length
-	x = m_rpExtrados[0].x + x*.99999999;
+	x = m_rpExtrados[0].x + x*(m_rpExtrados[m_iExt].x-m_rpExtrados[0].x)*.999999999;//in case there is a flap which reduces the length
 
 	for (int i=0; i<m_iExt; i++)
 	{
@@ -754,7 +758,7 @@ void Foil::GetUpperY(double x, double &y, double &normx, double &normy)
 	static int i;
 
 	// Returns the y-coordinate on the current foil's upper surface at the x position
-//	x = m_rpExtrados[0].x + x*(m_rpExtrados[m_iExt].x-m_rpExtrados[0].x)*.999999999;//in case there is a flap which reduces the length
+	x = m_rpExtrados[0].x + x*(m_rpExtrados[m_iExt].x-m_rpExtrados[0].x)*.999999999;//in case there is a flap which reduces the length
 
 	for (i=0; i<m_iExt; i++)
 	{
