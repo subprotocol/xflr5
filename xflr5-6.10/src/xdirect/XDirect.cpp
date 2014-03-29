@@ -61,7 +61,6 @@
 #include "geometry/CAddDlg.h"
 
 #include "XDirectStyleDlg.h"
-#include "ManageFoilsDlg.h"
 
 Polar QXDirect::s_refPolar;
 
@@ -3819,31 +3818,6 @@ void QXDirect::OnInterpolateFoils()
 	UpdateView();
 }
 
-
-/**
- * The user has requested the launch of the interface to manage Foil objects.
- */
-void QXDirect::OnManageFoils()
-{
-	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
-
-	ManageFoilsDlg mfDlg(pMainFrame);
-
-	QString FoilName = "";
-	if(Foil::curFoil()) FoilName = Foil::curFoil()->foilName();
-	mfDlg.InitDialog(FoilName);
-	mfDlg.exec();
-
-	if(mfDlg.m_bChanged) emit projectModified();
-
-	if(mfDlg.m_pFoil) SetFoil(mfDlg.m_pFoil);
-	else                           SetFoil();
-
-	pMainFrame->UpdateFoilListBox();
-	emit projectModified();
-	SetControls();
-	UpdateView();
-}
 
 
 /**

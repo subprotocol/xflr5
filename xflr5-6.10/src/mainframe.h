@@ -144,6 +144,7 @@ private slots:
 	void OnSaveProject();
 	void OnStyleSettings();
 	void OnUnits();
+	void OnManageFoils();
 	void OnSavePlaneAsProject();
 	void openRecentFile();
 

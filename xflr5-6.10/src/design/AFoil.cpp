@@ -1809,17 +1809,20 @@ void QAFoil::OnFoilClicked(const QModelIndex& index)
 		Foil *pFoil= Foil::foil(pItem->text());
 		Foil::setCurFoil(pFoil);
 
-		if(index.column()==12)
+		if(pFoil)
 		{
-			pFoil->m_bVisible = !pFoil->m_bVisible;
-		}
-		else if(index.column()==13)
-		{
-			pFoil->m_bPoints = !pFoil->m_bPoints;
-		}
-		else if(index.column()==14)
-		{
-			pFoil->m_bCenterLine = !pFoil->m_bCenterLine;
+			if(index.column()==12)
+			{
+				pFoil->m_bVisible = !pFoil->m_bVisible;
+			}
+			else if(index.column()==13)
+			{
+				pFoil->m_bPoints = !pFoil->m_bPoints;
+			}
+			else if(index.column()==14)
+			{
+				pFoil->m_bCenterLine = !pFoil->m_bCenterLine;
+			}
 		}
 		emit projectModified();
 		UpdateView();
@@ -3117,3 +3120,7 @@ Foil* QAFoil::AddNewFoil(Foil *pFoil)
 	}
 	return NULL;
 }
+
+
+
+

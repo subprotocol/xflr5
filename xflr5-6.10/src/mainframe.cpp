@@ -57,6 +57,7 @@
 #include "xdirect/geometry/FoilGeomDlg.h"
 #include "xdirect/geometry/TEGapDlg.h"
 #include "xdirect/geometry/LEDlg.h"
+#include "xdirect/ManageFoilsDlg.h"
 #include "xdirect/analysis/XFoilAnalysisDlg.h"
 #include "xdirect/analysis/FoilPolarDlg.h"
 #include "xinverse/XInverse.h"
@@ -1814,7 +1815,7 @@ void MainFrame::CreateXDirectActions()
 
 	ManageFoilsAct = new QAction(tr("Manage Foils"), this);
 	ManageFoilsAct->setShortcut(Qt::Key_F7);
-	connect(ManageFoilsAct, SIGNAL(triggered()), pXDirect, SLOT(OnManageFoils()));
+	connect(ManageFoilsAct, SIGNAL(triggered()), this, SLOT(OnManageFoils()));
 
 	RenamePolarAct = new QAction(tr("Rename"), this);
 	connect(RenamePolarAct, SIGNAL(triggered()), pXDirect, SLOT(OnRenamePolar()));
@@ -5897,3 +5898,34 @@ void MainFrame::OnProjectModified()
 }
 
 
+
+/**
+ * The user has requested the launch of the interface to manage Foil objects.
+ */
+void MainFrame::OnManageFoils()
+{
+	ManageFoilsDlg mfDlg(this);
+
+	QString FoilName = "";
+	if(Foil::curFoil()) FoilName = Foil::curFoil()->foilName();
+	mfDlg.InitDialog(FoilName);
+	mfDlg.exec();
+
+	if(mfDlg.m_bChanged) SetSaveState(false);;
+
+	if(m_iApp==XFOILANALYSIS)
+	{
+		QXDirect *pXDirect = (QXDirect*)m_pXDirect;
+		pXDirect->SetFoil(mfDlg.m_pFoil);
+		UpdateFoilListBox();
+		pXDirect->SetControls();
+	}
+	else if(m_iApp==DIRECTDESIGN)
+	{
+		QAFoil *pAFoil = (QAFoil*)m_pAFoil;
+		pAFoil->FillFoilTable();
+		pAFoil->SelectFoil();
+	}
+
+	UpdateView();
+}

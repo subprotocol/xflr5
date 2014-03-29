@@ -162,7 +162,6 @@ private slots:
 	void OnSetFlap();
 	void OnInterpolateFoils();
 	void OnNacaFoils();
-	void OnManageFoils();
 	void OnRenamePolar();
 	void OnAnimateSingle();
 	void OnHighlightOpp();
