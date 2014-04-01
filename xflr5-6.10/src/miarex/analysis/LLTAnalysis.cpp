@@ -877,6 +877,7 @@ PlaneOpp* LLTAnalysis::createPlaneOpp(double QInf, double Alpha, bool bWingOut)
 
 		pNewPOpp->m_bOut                = bWingOut;
 
+
 		pNewPOpp->AddWingOpp(0, 0);
 		pNewPOpp->m_pPlaneWOpp[0]->createWOpp(m_pWing, m_pWPolar);
 
@@ -924,7 +925,6 @@ PlaneOpp* LLTAnalysis::createPlaneOpp(double QInf, double Alpha, bool bWingOut)
 				pNewPoint->m_BendingMoment[l] =  m_BendingMoment[nStation-l];
 				if(qAbs(m_BendingMoment[l])>qAbs(Cb))	Cb = m_BendingMoment[l];
 			}
-
 
 			pNewPoint->m_MaxBending = (float)Cb;
 		}

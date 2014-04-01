@@ -5911,7 +5911,7 @@ void MainFrame::OnManageFoils()
 	mfDlg.InitDialog(FoilName);
 	mfDlg.exec();
 
-	if(mfDlg.m_bChanged) SetSaveState(false);;
+	if(mfDlg.m_bChanged) SetSaveState(false);
 
 	if(m_iApp==XFOILANALYSIS)
 	{

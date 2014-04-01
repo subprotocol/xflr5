@@ -560,10 +560,17 @@ bool WingOpp::SerializeWingOppXFL(QDataStream &ar, bool bIsStoring)
 			ar << m_SpanPos[k] << m_StripArea[k];
 		}
 
-		ar << m_nFlaps;
-		for(k=0; k<m_nFlaps; k++)
+		if(m_AnalysisMethod!=LLTMETHOD)
 		{
-			ar << m_FlapMoment[k];
+			ar << m_nFlaps;
+			for(k=0; k<m_nFlaps; k++)
+			{
+				ar << m_FlapMoment[k];
+			}
+		}
+		else
+		{
+			ar <<0;
 		}
 
 

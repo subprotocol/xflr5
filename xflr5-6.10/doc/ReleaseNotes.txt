@@ -15,6 +15,11 @@
 *******************************************************************************
 
 
+xflr5 v6.10.03 April 8th, 2014
+	- Corrected the incorrect calculation of the mid camber line of foil with flaps
+	- Corrected the crash bug when calculating a wing with flaps using the LLT method
+	- Corrected the crash bug when deleting foils from the manage dialog box
+
 xflr5 v6.10.02 March 21st, 2014
 	- Added an option to scale the wing's area and aspect ratio
 	- Fixed a potential crash bug in Graph scales drawing when no project is loaded

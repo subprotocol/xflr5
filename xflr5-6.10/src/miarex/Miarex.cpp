@@ -8481,7 +8481,7 @@ void QMiarex::PaintPlaneOppLegend(QPainter &painter, QRect drawRect)
 
 	if(m_pCurPOpp && m_pCurPOpp->m_WPolarType==STABILITYPOLAR) ZPos -= dheight;
 	if(m_pCurPOpp && m_pCurPOpp->m_bOut)                       ZPos -= dheight;
-	if(m_pCurPOpp)                                             ZPos -= dheight*m_pCurPOpp->m_pPlaneWOpp[0]->m_nFlaps;
+	if(m_pCurPOpp && m_pCurPOpp->analysisMethod()!=LLTMETHOD)  ZPos -= dheight*m_pCurPOpp->m_pPlaneWOpp[0]->m_nFlaps;
 
 
     if(m_pCurPOpp->m_bOut)
@@ -8542,7 +8542,6 @@ void QMiarex::PaintPlaneOppLegend(QPainter &painter, QRect drawRect)
     D+=dheight;
     painter.drawText(RightPos, ZPos+D, dwidth, dheight, Qt::AlignRight | Qt::AlignTop, Result);
 
-
     Units::getLengthUnitLabel(str);
     l = str.length();
     int c=8, d=3;
@@ -8565,13 +8564,16 @@ void QMiarex::PaintPlaneOppLegend(QPainter &painter, QRect drawRect)
     D+=dheight;
     painter.drawText(RightPos, ZPos+D, dwidth, dheight, Qt::AlignRight | Qt::AlignTop, Result);
 
-    for(i=0; i<m_pCurPOpp->m_pPlaneWOpp[0]->m_nFlaps; i++)
+    if(m_pCurPOpp->analysisMethod()!=LLTMETHOD)
     {
-        Result = QString("Flap %1 Moment =%2 ").arg(i+1).arg(m_pCurPOpp->m_pPlaneWOpp[0]->m_FlapMoment[i]*Units::NmtoUnit(),8,'f',4);
-        Units::getMomentUnitLabel(str);
-        Result += str;
-        D+=dheight;
-        painter.drawText(RightPos, ZPos+D, dwidth, dheight, Qt::AlignRight | Qt::AlignTop, Result);
+	    for(i=0; i<m_pCurPOpp->m_pPlaneWOpp[0]->m_nFlaps; i++)
+	    {
+		   Result = QString("Flap %1 Moment =%2 ").arg(i+1).arg(m_pCurPOpp->m_pPlaneWOpp[0]->m_FlapMoment[i]*Units::NmtoUnit(),8,'f',4);
+		   Units::getMomentUnitLabel(str);
+		   Result += str;
+		   D+=dheight;
+		   painter.drawText(RightPos, ZPos+D, dwidth, dheight, Qt::AlignRight | Qt::AlignTop, Result);
+	    }
     }
 
 	painter.restore();
