@@ -2769,7 +2769,7 @@ void QMiarex::GLDrawMasses()
 			}
 		}
 		glPopMatrix();
-        glColor3d(W3dPrefsDlg::s_MassColor.redF(), W3dPrefsDlg::s_MassColor.greenF(), W3dPrefsDlg::s_MassColor.blueF());
+		glColor3d(W3dPrefsDlg::s_MassColor.redF(), W3dPrefsDlg::s_MassColor.greenF(), W3dPrefsDlg::s_MassColor.blueF());
 		for(int im=0; im<pCurBody->m_PointMass.size(); im++)
 		{
 			glPushMatrix();

@@ -1141,6 +1141,7 @@ void BatchDlg::Analyze()
 			else                           AlphaLoop();
 			strong = "\n\n";
 			OutputMsg(strong);
+			if(m_bCancel) break;
 		}
 	}
 
