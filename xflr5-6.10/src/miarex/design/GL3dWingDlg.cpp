@@ -2527,7 +2527,12 @@ void GL3dWingDlg::showEvent(QShowEvent *event)
 void GL3dWingDlg::resizeEvent(QResizeEvent *event)
 {
 	SetWingScale();
+	UpdateView();
+	event->accept();
+}
 
+void GL3dWingDlg::UpdateView()
+{
 	double w = (double)m_pctrlWingTable->width()*.97;
 	int wFoil  = (int)(w/5.);
 	int wCols  = (int)(w/11);
@@ -2542,16 +2547,7 @@ void GL3dWingDlg::resizeEvent(QResizeEvent *event)
 	m_pctrlWingTable->setColumnWidth(7, wCols);
 	m_pctrlWingTable->setColumnWidth(8, wCols);
 	m_pctrlWingTable->setColumnWidth(9, wCols);
-
-	UpdateView();
-	event->accept();
-}
-
-
-
-
-void GL3dWingDlg::UpdateView()
-{
+	
 	if(isVisible()) m_pGLWidget->updateGL();
 }
 
